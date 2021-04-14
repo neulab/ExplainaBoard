@@ -6,4 +6,4 @@
 
 
 
-### Code and Data Will be Released in One Week!
+### Code and data will be released in one week!
