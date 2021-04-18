@@ -8,14 +8,14 @@ For each task, we give an example file to show how output files should be organi
 
 9 tasks and its sample name.
 
-| Task             				  | Sample           | 
-|---------------------------------|------------------|
-| Named Entity Recognition   	  | sample-ner.tsv   | 
-| Part-of-Speech Tagging          | sample-pos.tsv   | 
-| Chinese Word Segmentation 	  | sample-cws.tsv   | 
-| Text Chunking 				  | sample-chunk.tsv | 
-| Text Classification       	  | sample-tc.tsv    | 
-| Aspect Sentiment Classification | sample-absa.tsv  | 
-| Natural Language Inference      | sample-nli.tsv   | 
+| Task             				  | Sample           | Description
+|---------------------------------|------------------|------------------------------|  
+| Named Entity Recognition   	  | sample-ner.tsv   | token, true tag, predict tag |
+| Part-of-Speech Tagging          | sample-pos.tsv   | token, true tag, predict tag |
+| Chinese Word Segmentation 	  | sample-cws.tsv   | token, true tag, predict tag |
+| Text Chunking 				  | sample-chunk.tsv | token, true tag, predict tag |
+| Text Classification       	  | sample-tc.tsv    | sentence, true tag, predict tag, prediction probability 
+| Aspect Sentiment Classification | sample-absa.tsv  | sentence 1, sentence 2, true tag, predict tag 
+| Natural Language Inference      | sample-nli.tsv   | sentence 1, sentence 2, true tag, predict tag, prediction probability | 
 | Semantic Parsing                | sample-semp.csv  | 
 | Text Summarization              | sample-summ.tsv  | 
