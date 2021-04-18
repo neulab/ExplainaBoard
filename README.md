@@ -10,7 +10,7 @@
 
 ## Task 
 
-| Task             		   |	              | Dataset | Model | Attribute | 
+|              		   Task 	              | Dataset | Model | Attribute | 
 |---------------------------------------------|---------|-------|-----------|  
 |				           | Sentiment		  | 8       | 40    | 2         |
 | Text Classification      | Topics           | 4       | 18    | 2         |
