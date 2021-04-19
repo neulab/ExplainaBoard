@@ -3,7 +3,7 @@
 The system's output for the named entity recognition task includes three columns separated by a tab.
 
 - `First column`: token;
-- `Second column`: the true tag for a token;
-- `Third column`: the predicted tag for a token;
+- `Second column`: the true tag for the given token;
+- `Third column`: the predicted tag for the given token;
 
 `Note`: The system's output file should have the sentence boundary like the original testing set.
