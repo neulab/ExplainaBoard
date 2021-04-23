@@ -1,0 +1,17 @@
+# Sentence Length
+notation:	sLen
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Entity Length
+notation:	eLen
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[1,2]
+is_preComputed:	No
+
+# Tag
+notation:	tag
+type:	bucketAttribute_DiscreteValue
+setting:	4	1
+is_preComputed:	No

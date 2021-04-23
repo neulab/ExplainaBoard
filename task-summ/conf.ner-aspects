@@ -1,0 +1,47 @@
+# Length of source document
+
+notation:	compress_r1
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+notation:	docLen_r1
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Length of generated summaries
+notation:	hypLen_r1
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Length of Gold References
+notation:	refLen_r1
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Length of source document
+notation:	docLen_r2
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Length of generated summaries
+notation:	hypLen_r2
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Length of Gold References
+notation:	refLen_r2
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Length of Gold References
+notation:	compress_r1
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
