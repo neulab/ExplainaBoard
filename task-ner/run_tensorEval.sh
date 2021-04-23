@@ -1,10 +1,10 @@
-# /usr2/home/pliu3/data/InterpretEval/task-panx/genPreComputed
+
 
 function tensorEval(){
 
   # Task forms
   task_type="ner"
-  # Model Name or team's name, e.g., nyu
+
   model_name=$1
 
 
