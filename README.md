@@ -84,3 +84,8 @@ tasks, and analyze output json files.
     ```
 
 * `src` stores some auxiliary codes.
+
+## Submit Your Results
+You can submit your system's output by this [form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
+
+
