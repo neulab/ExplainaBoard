@@ -9,7 +9,7 @@
 [**Bib**](http://explainaboard.nlpedia.ai/explainaboard.bib)
 
 
-<img src="./fig/logo-full-v2.png" width="800" class="center">
+<img src="./fig/logo-full-v2.png" width="400" class="center">
 
 
 ExplainaBoard is an interpretable, interactive and reliable leaderboard with seven (so far) new features compared with generic leaderboard.
