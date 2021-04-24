@@ -14,11 +14,11 @@
 
 ### ExplainaBoard is an interpretable, interactive and reliable leaderboard with seven (so far) new features (F) compared with generic leaderboard.
 * F1: *Single-system Analysis*: What is a system good or bad at?
-* F2: Pairwise Analysis: Where is one system better (worse) than another?
-* F3: Data Bias Analysis: What are the characteristics of different evaluated datasets?
-* F5: Common errors: What are common mistakes that top-5 systems made?
-* F6: Fine-grained errors: where will errors occur?
-* F7: System Combination: Is there potential complementarity between different systems?
+* F2: *Pairwise Analysis*: Where is one system better (worse) than another?
+* F3: *Data Bias Analysis*: What are the characteristics of different evaluated datasets?
+* F5: *Common errors*: What are common mistakes that top-5 systems made?
+* F6: *Fine-grained errors*: where will errors occur?
+* F7: *System Combination*: Is there potential complementarity between different systems?
 
 
 <img src="./fig/intro.png" width="400" class="center">
