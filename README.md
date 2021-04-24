@@ -82,7 +82,7 @@ tasks, and analyze output json files.
   
     ```js
         cd ./meta-eval/genCSV/json2csv.py
-        python json2csv.py > xtreme.csv
+        python json2csv.py > explainabord.csv
     ```
 
 * `src` stores some auxiliary codes.
