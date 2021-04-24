@@ -1,6 +1,14 @@
+<img src="./fig/logo-full-v2.png" width="800" class="center">
 # ExplainaBoard: An Explainable Leaderboard for NLP
 
-<img src="./fig/logo-full-v2.png" width="800" class="center">
+
+
+[**Introduction**](#introduction) | 
+[**Website**](#website) |
+[**Download**](#download-system-output) |
+[**Backend**](#test-your-results) |
+[**Paper**](https://arxiv.org/pdf/2104.06387.pdf) |
+[**Bib**](http://explainaboard.nlpedia.ai/explainaboard.bib)
 
 
 
