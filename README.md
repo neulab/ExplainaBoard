@@ -16,7 +16,7 @@
 
 
 
-<img src="./fig/logo-full-v2.png" width="800" class="center">
+<img src="./fig/demo.gif" width="800" class="center">
 
 
 
