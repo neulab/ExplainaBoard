@@ -55,7 +55,7 @@ If these system outputs are useful for you, you can [cite our work](http://expla
 
 
 
-## Test Uour Results
+## Test Your Results
 ```
 pip install -r requirements.txt
 ```
