@@ -1,6 +1,6 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
 
-[**Introduction**](#introduction) | 
+[**Introduction**](##introduction) | 
 [**Website**](#website) |
 [**Download**](#download-system-output) |
 [**Backend**](#test-your-results) |
@@ -11,7 +11,7 @@
 
 <img src="./fig/logo-full-v2.png" width="800" class="center">
 
-
+## Introduction
 ### ExplainaBoard is an interpretable, interactive and reliable leaderboard with seven (so far) new features (F) compared with generic leaderboard.
 * F1: *Single-system Analysis*: What is a system good or bad at?
 * F2: *Pairwise Analysis*: Where is one system better (worse) than another?
