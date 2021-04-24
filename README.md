@@ -91,3 +91,9 @@ tasks, and analyze output json files.
 You can submit your system's output by this [form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
 
 
+
+## Acknowledgement
+We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
+Colin Raffel, Yang Liu, Li Dong. We also thank
+Vijay Viswanathan, Yiran Chen, Hiroaki Hayashi for useful discussion and feedback about ExplainaBoard.
+
