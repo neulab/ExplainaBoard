@@ -25,3 +25,32 @@
 | Text Generation          | Summarization    | 2       | 36    | 7         | 
 
 
+ ## Install Dependency Libararies （python 3.X）
+```
+pip install -r requirements.txt
+```
+
+## Description of Each Directory
+* `task-[task_name]`: fine-grained analysis for each task, 
+  aiming to generating fine-grained analysis results with the json format.
+  For example, task-mlqa can calculate the fine-graied F1 scores for different systems,
+  and output corresponding json files in task-mlqa/output/ .
+  
+* `meta-eval` is a sort of controller, which can be used to start the fine-graind anlsysis of all
+tasks, and analyze output json files.
+
+    - calculate fine-grained results for all tasks: ./meta-eval/run-allTasks.sh
+    ```js
+        cd ./meta-eval/
+        ./run-allTasks.sh
+     ```
+  
+    - merge json files of all tasks into a csv file, which would be useful for further SQL import:
+    ./meta-eval/genCSV/json2csv.py
+  
+    ```js
+        cd ./meta-eval/genCSV/json2csv.py
+        python json2csv.py > xtreme.csv
+    ```
+
+* `src` stores some auxiliary codes.
