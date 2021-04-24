@@ -5,6 +5,7 @@
 [**Download**](#download-system-output) |
 [**Backend**](#test-your-results) |
 [**Paper**](https://arxiv.org/pdf/2104.06387.pdf) |
+[**Video**](https://www.youtube.com/watch?v=3X6NgpbN_GU) |
 [**Bib**](http://explainaboard.nlpedia.ai/explainaboard.bib)
 
 
@@ -15,6 +16,7 @@
 
 
 
+<img src="./fig/logo-full-v2.png" width="800" class="center">
 
 
 
