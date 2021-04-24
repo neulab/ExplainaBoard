@@ -2,7 +2,7 @@
 
 [**Introduction**](##introduction) | 
 [**Website**](#website) |
-[**Download**](#download-system-output) |
+[**Download**](#download-system-outputs) |
 [**Backend**](#test-your-results) |
 [**Paper**](https://arxiv.org/pdf/2104.06387.pdf) |
 [**Video**](https://www.youtube.com/watch?v=3X6NgpbN_GU) |
@@ -49,7 +49,13 @@ We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), wh
 | Text Generation          | Summarization    | 2       | 36    | 7         | 
 
 
- ## Install Dependency Libararies （python 3.X）
+## Download System Outputs
+We haven't released datasets or corresponding system outputs that require licenses. But If you have licenses please fill in this [form](https://docs.google.com/forms/d/1rl7dgOTroT4hazUsd8CaSbGPKFbo2HNOO5pFBsM8IY0/edit) and we will send them to you privately. (Description of output's format can refer [here](https://github.com/neulab/ExplainaBoard/tree/main/output_format)
+If these system outputs are useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
+
+
+
+## Test Uour Results
 ```
 pip install -r requirements.txt
 ```
