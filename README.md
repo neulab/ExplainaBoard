@@ -23,7 +23,7 @@
 
 <img src="./fig/intro.png" width="400" class="center">
 
-<img src="./fig/demo.gif" width="800" class="center">
+
 
 
 
@@ -47,6 +47,8 @@ We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), wh
 | 					       | CWS              | 7       | 64    | 7         |
 | Structure Prediction     | Semantic Parsing | 4       | 12    | 4         | 
 | Text Generation          | Summarization    | 2       | 36    | 7         | 
+
+<img src="./fig/demo.gif" width="800" class="center">
 
 
 ## Download System Outputs
