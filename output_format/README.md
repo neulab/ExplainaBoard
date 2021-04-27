@@ -24,5 +24,5 @@ For example, The system's output file of the NER task should contain three colum
 | Text Classification       	  | sample-tc.tsv    | sentence, true tag, predict tag, prediction probability | 
 | Aspect Sentiment Classification | sample-absa.tsv  | sentence 1, sentence 2, true tag, predict tag |
 | Natural Language Inference      | sample-nli.tsv   | sentence 1, sentence 2, true tag, predict tag, prediction probability | 
-| Semantic Parsing                | sample-semp.csv  | 
+| Semantic Parsing                | sample-semp.csv  | database/table id, question, true query, predict query |
 | Text Summarization              | sample-summ.tsv  | 
