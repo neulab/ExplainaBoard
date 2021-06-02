@@ -4,7 +4,7 @@
   <br />
   <br />
   <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
-  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Unbabel/COMET" /></a>
+  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
   <a href=""><img alt="PyPI" src="https://img.shields.io/pypi/v/interpret-eval" /></a>
   <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
 </p>
@@ -21,7 +21,7 @@
 [**Bib**](http://explainaboard.nlpedia.ai/explainaboard.bib)
 
 
-<img src="./fig/logo-full-v2.png" width="800" class="center">
+
 
 
 
