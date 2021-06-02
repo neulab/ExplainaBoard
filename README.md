@@ -60,6 +60,7 @@ If these system outputs are useful for you, you can [cite our work](http://expla
 ## Test Your Results
 ```
 pip install -r requirements.txt
+python setup.py install
 ```
 
 ### Description of Each Directory
