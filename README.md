@@ -50,7 +50,7 @@ means, you can play with ExplainaBoard at following levels:
 
 
 
-## Quick Installation
+## API-based Toolkit: Quick Installation
 
 #### Method 1: Simple installation from PyPI (Python 3 only)
 ```
@@ -72,31 +72,13 @@ python setup.py install
   interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
 ```
 
-
-
-
-
-
-
-
-## Submit Your Results
-You can submit your system's output by this 
-[form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) 
-following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
-
-
-
-
-
-
-
-
-
-## Website
+## Web-based Toolkit
 We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks, 
 40 datasets and 300 systems. Detailed information is as follows.
+<img src="./fig/demo.gif" width="800" class="center">
 
-### Task 
+
+#### So far, ExplainaBoard covers following  tasks 
 
 | Task                     | Sub-task         | Dataset | Model | Attribute | 
 |--------------------------|------------------|---------|-------|-----------|  
@@ -112,12 +94,15 @@ We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), wh
 | Structure Prediction     | Semantic Parsing | 4       | 12    | 4         | 
 | Text Generation          | Summarization    | 2       | 36    | 7         | 
 
-<img src="./fig/demo.gif" width="800" class="center">
 
 
 
 
 
+## Submit Your Results
+You can submit your system's output by this 
+[form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) 
+following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
 
 
 
