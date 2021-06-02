@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="7b1f464d-9744-4be4-a1a0-5f614a53a234" name="lor">
+        <fileTransfer accessType="SFTP" host="lor.lti.cs.cmu.edu" port="22" sshConfigId="1fb050de-aecd-4721-9c4c-a48ef441b1db" sshConfig="pliu3@lor.lti.cs.cmu.edu:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

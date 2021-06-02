@@ -1,0 +1,893 @@
+i would like to find a flight from charlotte to las vegas that makes a stop in st. louis	flight	flight	0.9993268502197581	1
+on april first i need a ticket from tacoma to san jose departing before 7 am	airfare	airfare	0.9913625130881499	1
+on april first i need a flight going from phoenix to san diego	flight	flight	0.999302708014708	1
+i would like a flight traveling one way from phoenix to san diego on april first	flight	flight	0.9993206379258667	1
+i would like a flight from orlando to salt lake city for april first on delta airlines	flight	flight	0.9993303337759457	1
+i need a flight from toronto to newark one way leaving wednesday evening or thursday morning	flight	flight	0.9993283866534035	1
+monday morning i would like to fly from columbus to indianapolis	flight	flight	0.9992455953088996	1
+on wednesday april sixth i would like to fly from long beach to columbus after 3 pm	flight	flight	0.999255955987586	1
+after 12 pm on wednesday april sixth i would like to fly from long beach to columbus	flight	flight	0.9992694679817675	1
+are there any flights from long beach to columbus on wednesday april sixth	flight	flight	0.9993128931061308	1
+find a flight from memphis to tacoma dinner	flight	flight	0.999321253047695	1
+on next wednesday flight from kansas city to chicago should arrive in chicago around 7 pm return flight on thursday	flight	flight	0.9993144288962632	1
+show flight and prices kansas city to chicago on next wednesday arriving in chicago by 7 pm	flight+airfare	flight	0.9867088087807507	0
+flight on american from miami to chicago arrive in chicago about 5 pm	flight	flight	0.9993207163323727	1
+find flights arriving new york city next saturday	flight	flight	0.9992991070932596	1
+find nonstop flights from salt lake city to new york on saturday april ninth	flight	flight	0.9993256370072322	1
+show flights from burbank to milwaukee for today	flight	flight	0.9993294690038882	1
+show flights tomorrow evening from milwaukee to st. louis	flight	flight	0.9993193489869983	1
+show flights saturday evening from st. louis to burbank	flight	flight	0.9993157231675254	1
+show flights from burbank to st. louis on monday	flight	flight	0.9993291758778519	1
+show flights from burbank to milwaukee on monday	flight	flight	0.9993315191187634	1
+show flights tuesday evening from milwaukee to st. louis	flight	flight	0.9993223072976721	1
+show flights wednesday evening from st. louis to burbank	flight	flight	0.9993210413148298	1
+which flights travel from kansas city to los angeles	flight	flight	0.9993218862545324	1
+what flights travel from las vegas to los angeles	flight	flight	0.9993223956722517	1
+which flights travel from kansas city to los angeles on april ninth	flight	flight	0.9993252649032872	1
+which flights travel from las vegas to los angeles california and arrive on april ninth between 4 and 5 pm	flight	flight	0.9993153798080877	1
+which flights on us air go from orlando to cleveland	flight	flight	0.9993287051183825	1
+which flights travel from cleveland to indianapolis on april fifth	flight	flight	0.9993236581200351	1
+which flights travel from indianapolis to san diego on april fifth	flight	flight	0.9993262345541988	1
+which flights go from cleveland to indianapolis on april fifth	flight	flight	0.9993253213733614	1
+which flights travel from nashville to tacoma	flight	flight	0.9993187104975926	1
+does tacoma airport offer transportation from the airport to the downtown area	ground_service	ground_service	0.9926417370632507	1
+which flights travel from tacoma to san jose	flight	flight	0.9993227444594877	1
+what day of the week do flights from nashville to tacoma fly on	day_name	flight_time	0.8805332883731608	0
+what are the flights from tacoma to san jose	flight	flight	0.9993082792690241	1
+what days of the week do flights from san jose to nashville fly on	day_name	flight_time	0.8863555712121631	0
+what are the flights from tacoma to san jose	flight	flight	0.9993082792690241	1
+i need a flight that goes from boston to orlando	flight	flight	0.999309086407804	1
+are there any flights from boston to orlando connecting in new york	flight	flight	0.9993094845201604	1
+are there any flights from boston to orlando connecting in columbus	flight	flight	0.99930791206114	1
+does this flight serve dinner	flight	flight	0.9992844035198489	1
+i need a flight from charlotte to miami	flight	flight	0.9993258017506937	1
+i need a nonstop flight from miami to toronto	flight	flight	0.9993183234406979	1
+i need a nonstop flight from toronto to st. louis	flight	flight	0.9993266335487292	1
+i need a flight from toronto to st. louis	flight	flight	0.9993256969183358	1
+i need a flight from st. louis to charlotte	flight	flight	0.999326833397433	1
+i need a flight on united airlines from la guardia to san jose	flight	flight	0.9993171898651331	1
+i need a flight from tampa to milwaukee	flight	flight	0.9993257003775025	1
+i need a flight from milwaukee to seattle	flight	flight	0.9993265288541097	1
+what meals are served on american flight 811 from tampa to milwaukee	meal	meal	0.4351638199331554	1
+what meals are served on american flight 665 673 from milwaukee to seattle	meal	meal	0.433726368669988	1
+i need a flight from memphis to las vegas	flight	flight	0.999323255697065	1
+i need a flight from las vegas to ontario	flight	flight	0.9993182572528765	1
+i need a flight from ontario to memphis	flight	flight	0.9993232000331587	1
+which flights go from milwaukee to tampa and stop in nashville	flight	flight	0.9993124985718683	1
+which flights leave newark after noon next saturday and arrive in los angeles	flight	flight	0.9993125373684721	1
+which flights leave detroit and arrive at st. petersburg around 9 am	flight	flight	0.9993130810813621	1
+which flights on northwest airline leave detroit and arrive at st. petersburg	flight	flight	0.9993184008504572	1
+which flights leave chicago next tuesday and arrive in detroit around 6 pm	flight	flight	0.9993127984306641	1
+show me round trip flights from chicago to detroit leaving next tuesday and returning the day after	flight	flight	0.9993386602900987	1
+which round trip flights leave chicago next tuesday around 6 pm and arrive in detroit	flight	flight	0.9993218562561523	1
+which round trip flights leave chicago next tuesday and arrive in detroit around 6 pm	flight	flight	0.999318555144279	1
+which flights leave on monday from montreal and arrive in chicago in the morning	flight	flight	0.9993133929895334	1
+which flights leave chicago on april twelfth and arrive in indianapolis in the morning	flight	flight	0.9993159664175042	1
+which flights leave on wednesday april thirteenth from indianapolis and arrive in montreal in the morning	flight	flight	0.9993121965848556	1
+which flights leave april twelfth from indianapolis and arrive in montreal around 10 pm	flight	flight	0.9993056005594122	1
+i 'd like to go from long beach to st. louis and i 'd like to stop in dallas i 'd also like to have lunch during my flight	flight	flight	0.9991836119238505	1
+next wednesday i would like to leave kansas city on a trip to chicago which arrives in chicago around 7 pm	flight	flight	0.9992485371631449	1
+i would like to return from chicago around 7 pm to kansas city	flight	flight	0.999285855489502	1
+i would like to leave this afternoon on an american flight from cincinnati to burbank	flight	flight	0.9992876516995434	1
+on sunday evening i would like to leave montreal quebec on a flight to san diego california	flight	flight	0.9992921632213182	1
+what are the flights on sunday from montreal quebec to san diego california	flight	flight	0.9993093447835515	1
+on tuesday are the flights from san diego california to indianapolis indiana i would like the flight to be in the afternoon	flight	flight	0.9992756420192886	1
+on thursday morning i would like a nonstop flight from indianapolis to toronto	flight	flight	0.9993062131376855	1
+on friday morning i would like to fly from toronto to montreal	flight	flight	0.999279827736046	1
+i would like an early morning flight today from los angeles to charlotte	flight	flight	0.9993145264622117	1
+on wednesday night i would like a flight from charlotte to newark	flight	flight	0.9993176356640423	1
+on friday night i would like a flight from newark to los angeles	flight	flight	0.9993253689010533	1
+find a flight from tampa to montreal by way of new york	flight	flight	0.999326115439908	1
+please find a flight from miami florida to las vegas nevada arriving before 4 o'clock pm	flight	flight	0.9993106223713899	1
+please find a flight from las vegas to michigan	flight	flight	0.9993150857196048	1
+please find a flight from detroit michigan to st. petersburg arriving before 10 pm	flight	flight	0.9993303918587297	1
+please find a flight from st. petersburg to miami on thursday	flight	flight	0.999329888910128	1
+please find a flight from san diego to toronto on alaska airlines	flight	flight	0.999325840408579	1
+please find the flights from columbus to houston with a layover in nashville tomorrow	flight	flight	0.9993237514552606	1
+please give me the flights from nashville to houston nonstop with dinner served	flight	flight	0.999323908788521	1
+please find flights available from kansas city to newark	flight	flight	0.9993299065437498	1
+please find a flight that goes from kansas city to newark to orlando back to kansas city	flight	flight	0.999290511920043	1
+please find a flight from kansas city to newark	flight	flight	0.9993208850915815	1
+please find a flight from newark to orlando	flight	flight	0.9993167741040974	1
+please find a flight from orlando to kansas city	flight	flight	0.9993135438110272	1
+i would like to fly from columbus to phoenix through cincinnati in the afternoon	flight	flight	0.9993038925419631	1
+i would like to know what airports are in los angeles	airport	airport	0.7430656794860897	1
+does the airport at burbank have a flight that comes in from kansas city	flight	airport	0.6697951252799366	0
+which flights arrive in burbank from kansas city on saturdays in the afternoon	flight	flight	0.9993202982172442	1
+which flights arrive in burbank from las vegas on saturday april twenty third in the afternoon	flight	flight	0.9993137975590561	1
+which flights are available from orlando to cleveland that arrive around 10 pm	flight	flight	0.9993164910940404	1
+what flights are available from indianapolis to san diego on april twenty first in the late afternoon	flight	flight	0.999335254525289	1
+what flights leave cleveland going to indianapolis on april twenty first in the morning	flight	flight	0.9993327742181747	1
+which flights are available on april twenty first in the morning from nashville to tacoma	flight	flight	0.9993218941022832	1
+which flights are available from tacoma to san jose in the morning on april twenty second	flight	flight	0.9993300442378718	1
+which flights are available from san jose to nashville leaving in the morning on april twenty three	flight	flight	0.9993223922103883	1
+what is the most expensive one way fare between detroit and westchester county	airfare	airfare	0.9922416020219261	1
+what airlines fly between detroit and westchester county	airline	airline	0.9835192750625469	1
+what are the departure times from detroit to westchester county	flight_time	flight_time	0.9557159080387804	1
+what is the latest flight from baltimore to oakland that serves dinner	flight	flight	0.9993198571276372	1
+what is the earliest flight between baltimore and oakland that serves breakfast	flight	flight	0.9993099638297074	1
+to what cities from boston does america west fly first class	city	city	0.7815629438715681	1
+what airline flies from boston to san diego	airline	airline	0.983219113185969	1
+what is the latest breakfast flight from dallas to tampa	flight	flight	0.9991039428437326	1
+show me all lufthansa flights from seattle to boston with stopovers in minneapolis	flight	flight	0.999262688030935	1
+show me all flights from seattle to boston with stopovers in minneapolis	flight	flight	0.9993271255420795	1
+list philadelphia to san francisco flights with stopovers in dallas	flight	flight	0.999317978185162	1
+show me the connecting flights between boston and denver and the types of aircraft used	flight	flight	0.9757754665341238	1
+show me all the morning flights from philadelphia to fort worth	flight	flight	0.9993143842066483	1
+show me all the flights from kansas city to st. paul	flight	flight	0.9993274437733143	1
+show me northwest flight 608 from kansas city to st. paul	flight	flight	0.9992493575057189	1
+show me all the flights from indianapolis to charlotte on monday	flight	flight	0.9993240070461105	1
+what is the ground transportation between the charlotte airport charlotte airport and downtown charlotte	ground_service	ground_service	0.9927873424000907	1
+show me all the flights from charlotte to minneapolis that leave at 2 pm or later on monday	flight	flight	0.9993139078566464	1
+show me all the flights from charlotte to minneapolis on tuesday morning	flight	flight	0.9993124957675734	1
+show me the direct flights from charlotte to minneapolis on tuesday morning	flight	flight	0.999337134663423	1
+show me flight us 1500 on monday from charlotte to minneapolis please	flight	flight	0.9993134571939732	1
+show me all the flights from minneapolis to indianapolis on tuesday that leave after 2 pm	flight	flight	0.9993275136378955	1
+show me the flights from minneapolis to indiana	flight	flight	0.999336441424341	1
+show me the flights in from minneapolis to indianapolis on tuesday afternoon	flight	flight	0.9993370293474813	1
+show me flight us 1207 from indianapolis to charlotte on monday and flight us 1500 from charlotte to minneapolis on monday and flight twa 639 from minneapolis to indianapolis	flight	flight	0.9991913409485329	1
+show me all the flights from las vegas to new york city	flight	flight	0.9993169910439221	1
+which different airlines go from las vegas to new york city	airline	airline	0.983465564433431	1
+show me all the flights on america west and twa from las vegas to jfk on a friday	flight	flight	0.9993091201048467	1
+what are the flights from tacoma to miami that leave after 6 pm tomorrow	flight	flight	0.999306423689872	1
+i 'd like to fly from san diego to houston on june tenth	flight	flight	0.9993041811737203	1
+is there an american airlines flight from houston to newark on june tenth after 6 pm	flight	flight	0.9993122065634235	1
+is there an american airlines flight from houston to newark on june tenth after 3 pm	flight	flight	0.9993090188108643	1
+i need to get from cincinnati to denver on june sixth by 6 pm	flight	flight	0.9992597595974129	1
+what 's the ground transportation in denver	ground_service	ground_service	0.9926491156369898	1
+what 's the fare for a taxi to denver	ground_fare	airfare	0.9119791670042463	0
+what are the fares for ground transportation in denver	ground_fare	ground_fare	0.5407826834832086	1
+i need to fly from denver to westchester county on june seventh after 3 pm	flight	flight	0.9992912558532061	1
+what 's the ground transportation in westchester county	ground_service	ground_service	0.9923925755081031	1
+i need to take a united airlines flight on june eighth from westchester county to cincinnati after 3 pm	flight	flight	0.9992773800213265	1
+what united airlines flights on june eighth go from westchester county to cincinnati	flight	flight	0.9993015697151497	1
+on june eighth what flights go from westchester county to cincinnati	flight	flight	0.9992944845642563	1
+does us air fly from cincinnati to denver on june sixth	flight	flight	0.9992279490654634	1
+list the flights from cincinnati to denver on june sixth	flight	flight	0.9993319630576187	1
+list the flights from denver to westchester county on june seventh	flight	flight	0.9993347716511841	1
+list the flights from westchester county to cincinnati on june eighth	flight	flight	0.9993356783222982	1
+list the flights from cincinnati to westchester county on june sixth	flight	flight	0.9993327049913306	1
+list the flights from westchester county to denver on june seventh	flight	flight	0.9993366547672634	1
+list the flights from denver to cincinnati on june eighth	flight	flight	0.9993321692212673	1
+list the flights from denver to cincinnati on june sixth after 4 pm	flight	flight	0.9993296363237845	1
+list the flights from cincinnati to westchester county on june seventh	flight	flight	0.9993328719017179	1
+list the flights from westchester county to cincinnati on june seventh leaving after 5 pm	flight	flight	0.9993324753728481	1
+what airlines off from love field between 6 and 10 am on june sixth	airline	airline	0.9834313945948319	1
+what flights arrive at love field on june sixth	flight	flight	0.9993107658080835	1
+list the flights from montreal to philly before 9 am	flight	flight	0.9993236948547847	1
+list the flights from cleveland to memphis	flight	flight	0.9993195492334376	1
+list the flights from memphis to cleveland	flight	flight	0.999323533111405	1
+list the flights from denver to baltimore arriving on july first	flight	flight	0.9993362605732979	1
+list the flights from dallas to baltimore arriving july first	flight	flight	0.9993348603247307	1
+list the flights from pittsburgh to baltimore arriving on july first	flight	flight	0.9993358759597452	1
+list the flights on canadian airlines international	flight	flight	0.999292766612832	1
+how many canadian airlines international flights use j31	quantity	quantity	0.9567337000909255	1
+how many canadian airlines international flights use aircraft 320	quantity	quantity	0.9561093431294492	1
+how many canadian airlines flights use aircraft dh8	quantity	quantity	0.954663970888995	1
+show me the flights on american airlines which fly from st. petersburg to ontario canada with a stopover in st. louis	flight	flight	0.999301882179566	1
+show me the flights on american airlines which go from st. petersburg to ontario california by way of st. louis	flight	flight	0.9993096544944314	1
+which airport is closest to ontario california	airport	airport	0.7069980542826563	1
+show me the flights from houston to orlando	flight	flight	0.9993352202969158	1
+show me the flights from orlando to houston	flight	flight	0.9993335876096312	1
+show me the flights from detroit to las vegas	flight	flight	0.9993353925190902	1
+show me the cheapest round trip coach fare from las vegas to detroit	airfare	airfare	0.9917194238085778	1
+show me the cheapest round trip coach fare on twa from las vegas to detroit	airfare	airfare	0.9912655792845732	1
+show me the delta flights which serve a snack to coach passengers	flight	flight	0.9992654600967036	1
+what is meal code sb	abbreviation	abbreviation	0.9717439963506701	1
+what meals are available on dl 468 which al arrives in san francisco at 950 am	meal	meal	0.4348279161430986	1
+show me the delta flights from tampa to san francisco	flight	flight	0.9993168650195694	1
+show me delta flight 486	flight	flight	0.9992399499263446	1
+list the tower air flights on mondays	flight	flight	0.9992984384192655	1
+list all tower air flights with meals	flight	flight	0.9992328287338724	1
+what flights depart from baltimore	flight	flight	0.9993229797629124	1
+what flights depart from baltimore and arrive at san francisco on a friday	flight	flight	0.9993305612954201	1
+what flights leave from cincinnati in the morning and arrive in tampa	flight	flight	0.9993184334638845	1
+which flights depart from tampa and arrive in cincinnati in the evening	flight	flight	0.9993164187515314	1
+which flights depart from tampa in the early evening and arrive in cincinnati	flight	flight	0.9993153321173411	1
+which flights depart from philadelphia and arrive in atlanta	flight	flight	0.9993131954930102	1
+which flights depart from a atlanta and arrive in toronto	flight	flight	0.9993198757180184	1
+which flights depart from toronto and arrive in washington dc	flight	flight	0.9993092350087205	1
+which flights depart from new york and arrive in los angeles after 10 am	flight	flight	0.999314383264221	1
+how far is new york 's la guardia from downtown	distance	distance	0.8942603684402121	1
+how far is toronto international from downtown	distance	distance	0.8901700658370981	1
+how far is los angeles international from downtown	distance	distance	0.8921084163648602	1
+how far is san francisco international from downtown	distance	distance	0.8907422881630789	1
+how much is the limousine service in boston	ground_fare	ground_fare	0.7939619020178128	1
+how much is a limousine service in la guardia	ground_fare	ground_fare	0.7970651005393415	1
+how much is a limousine service in toronto international	ground_fare	ground_fare	0.80410295777265	1
+how much is limousine service in los angeles	ground_fare	ground_fare	0.7997095566188273	1
+what airlines fly between washington dc and columbus ohio	airline	airline	0.9835347499487551	1
+what flights are there between washington dc and columbus ohio	flight	flight	0.9993075010144795	1
+what are the flights between washington dc and columbus ohio	flight	flight	0.9992896944102079	1
+what are the fares for all flights between washington and columbus	airfare	airfare	0.9914173845255	1
+at the charlotte airport how many different types of aircraft are there for us air	aircraft	aircraft	0.8344352874468643	1
+list all us air flights arriving in charlotte on saturday at 1 pm	flight	flight	0.9993165306284436	1
+what is the first class round trip airfare from india indianapolis to memphis	airfare	airfare	0.9917429144937141	1
+list all flights from memphis to miami	flight	flight	0.9992981718319189	1
+list all flights and their fares from indianapolis to memphis on a monday morning	flight+airfare	flight+airfare	0.7392936176618127	1
+list all flights and their fares from memphis to miami on a wednesday evening	flight+airfare	flight+airfare	0.737306315364575	1
+list all flights and their fares for all flights between miami and indianapolis	flight+airfare	flight+airfare	0.7036905707552547	1
+list all flights from cleveland to kansas city on monday	flight	flight	0.999325339593871	1
+list all flights from kansas city to cleveland	flight	flight	0.9993186180617321	1
+list all flights from cleveland to nashville	flight	flight	0.9992995554621993	1
+list all flights from nashville to cleveland on sunday	flight	flight	0.9993111152404445	1
+list all sunday flights from cleveland to nashville and their fares	flight+airfare	flight	0.4885992458710834	0
+what airlines are departing from baltimore	airline	airline	0.9834634335208707	1
+which airlines fly from baltimore to san francisco	airline	airline	0.9835810496040227	1
+how long does a flight from baltimore to san francisco take	distance	distance	0.8861866867617386	1
+which flights are leaving from kansas city to atlanta early monday morning	flight	flight	0.9993188077678784	1
+which flights are leaving atlanta and arriving in st. louis close to 230 pm on tuesday	flight	flight	0.9993202795621599	1
+please list flights from st. louis to st. paul which depart after 10 am thursday morning	flight	flight	0.9993322511084507	1
+list flights from st. paul to kansas city friday in the evening with a meal included	flight	flight	0.9993192669493292	1
+list early morning flights from cincinnati to tampa	flight	flight	0.9993118163430559	1
+list early evening flights from tampa to cincinnati	flight	flight	0.9993100211372655	1
+list evening flights from tampa to cincinnati	flight	flight	0.9993221348772627	1
+list flights from philadelphia to atlanta friday am	flight	flight	0.9993352880130176	1
+list flights from atlanta to toronto friday afternoon	flight	flight	0.9993371466362635	1
+list flights from toronto to washington dc saturday am	flight	flight	0.9993338425038383	1
+list flights from washington dc to philadelphia saturday pm	flight	flight	0.9993313978936873	1
+list direct flights from new york city to los angeles after 10 am	flight	flight	0.9993319331952034	1
+list the airfare for american airlines flight 19 from jfk to lax	airfare+flight	airfare	0.9909599570430794	0
+what is fare code m	abbreviation	abbreviation	0.9773625626884235	1
+list the distance in miles from boston airport to downtown boston	distance	distance	0.8903695191924177	1
+list the distance in miles from new york 's la guardia airport to downtown new york city	distance	distance	0.8825863435513027	1
+list the distance in miles from toronto international airport to downtown toronto	distance	distance	0.8896428554874798	1
+list the distance in miles from san francisco international airport to san francisco downtown	distance	distance	0.8882410725161187	1
+list limousine rates for the city of boston	ground_fare	ground_fare	0.7885622024464403	1
+list american airlines flights from houston to milwaukee departing friday pm	flight	flight	0.9993156494617647	1
+list flights from houston to milwaukee friday pm	flight	flight	0.9993325208539167	1
+list american airlines flights from milwaukee to san jose wednesday	flight	flight	0.9993116027286417	1
+list american airlines flights from san jose to dallas friday afternoon	flight	flight	0.9993167388905734	1
+list flights from dallas to houston arriving sunday afternoon	flight	flight	0.9993391651805823	1
+list airlines flying from seattle to salt lake city	airline	airline	0.9834597477575898	1
+what is the seating capacity for aircraft l10	capacity	capacity	0.7798809690491378	1
+what is the seating capacity for delta be1	capacity	capacity	0.7818045617999868	1
+list flights from seattle to salt lake city on delta l10	flight	flight	0.9993391619044735	1
+list flights from seattle to salt lake city on delta be1	flight	flight	0.9993361058239465	1
+list flights from boston to pittsburgh daily	flight	flight	0.9993384652287861	1
+list flights from pittsburgh to newark daily	flight	flight	0.9993386958552084	1
+list flights from newark to boston daily	flight	flight	0.9993399225005939	1
+list us air flights leaving saturday from charlotte airport at 1 pm	flight	flight	0.9993129410514708	1
+list us air flights leaving saturday from charlotte airport around 1 pm	flight	flight	0.9993099106525895	1
+list first class airfare round trip from indianapolis to memphis	airfare	airfare	0.9917673016904934	1
+what is fare code f	abbreviation	abbreviation	0.9773796360421824	1
+list flights from memphis to miami wednesday evening	flight	flight	0.9993324418231522	1
+list flights from miami to indianapolis sunday	flight	flight	0.9993327741673664	1
+list flights from ontario california to orlando florida	flight	flight	0.9993333725204389	1
+list flights from ontario california to salt lake city utah	flight	flight	0.9993340916979231	1
+list flights from ontario california to salt lake city utah monday	flight	flight	0.9993338697358425	1
+list flights from salt lake city utah to phoenix arizona monday	flight	flight	0.9993296084735477	1
+list flights from salt lake city to phoenix arizona tuesday	flight	flight	0.9993369200536486	1
+list flights from phoenix arizona to ontario california wednesday	flight	flight	0.999335852542339	1
+what airlines fly from baltimore to san francisco	airline	airline	0.9835304664549251	1
+what is the fare for a first class round trip ticket from detroit to st. petersburg	airfare	airfare	0.9918956405596211	1
+what is the airfare for a round trip first class ticket from detroit to st. petersburg	airfare	airfare	0.9918617586791826	1
+kansas city to atlanta monday morning flights	flight	flight	0.99931189329292	1
+monday morning flights from atlanta to kansas city	flight	flight	0.9993307942908972	1
+kansas city to atlanta monday morning flights	flight	flight	0.99931189329292	1
+atlanta to st. louis tuesday before 230 pm flights	flight	flight	0.9992891191304396	1
+st. louis to st. paul thursday after 10 am	flight	flight	0.9991413575820058	1
+st. paul to kansas city friday night	flight	flight	0.9990785132336135	1
+cleveland to kansas city arrive monday before 3 pm	flight	flight	0.9992386683755334	1
+kansas city to cleveland flight arrive wednesday before 5 pm	flight	flight	0.9993133924310414	1
+cleveland to nashville flight friday morning	flight	flight	0.9993089768845387	1
+nashville to cleveland sunday before 9	flight	flight	0.9992121525279084	1
+first class flights pittsburgh to newark monday morning	flight	flight	0.9993268071865722	1
+flights newark to los angeles wednesday morning	flight	flight	0.9993234297735227	1
+los angeles to minneapolis thursday afternoon	flight	flight	0.9992509354930246	1
+minneapolis to pittsburgh flight	flight	flight	0.9992881205295882	1
+minneapolis to pittsburgh first class flight	flight	flight	0.9993054094860561	1
+i would like flights leaving from milwaukee to orlando	flight	flight	0.9993296791028227	1
+what does hp stand for	abbreviation	abbreviation	0.9777496519825474	1
+i would like flights from ontario to tacoma	flight	flight	0.9993262842920643	1
+i would like flights from minneapolis to san diego	flight	flight	0.9993250658455047	1
+i would like flights from salt lake city to cincinnati	flight	flight	0.9993275280231888	1
+i would like to see flights from cincinnati to salt lake city	flight	flight	0.9993246228774795	1
+i 'd like flights from new york to miami	flight	flight	0.9993226905360911	1
+i would like flights from miami to new york	flight	flight	0.999320613856395	1
+i would like a flight leaving san francisco for san diego	flight	flight	0.9993113159225866	1
+i would like flights from san diego to las vegas	flight	flight	0.9993225602645647	1
+i would like a flight from san diego to las vegas	flight	flight	0.9993205077438987	1
+i would like flights from las vegas to san francisco	flight	flight	0.9993250163080619	1
+what does fare code bn mean	abbreviation	abbreviation	0.9787045773602021	1
+i would like to have the airline that flies toronto detroit and st. louis	airline	airline	0.9828111141852628	1
+i would like a flight from toronto to detroit	flight	flight	0.9993205728339962	1
+i would like a flight from detroit to st. louis	flight	flight	0.9993252323429141	1
+i would like a flight from toronto to st. louis	flight	flight	0.9993229942255832	1
+i would like flights from san francisco to long beach	flight	flight	0.9993265755592412	1
+i would like flights leaving san francisco to san diego	flight	flight	0.99932369072145	1
+i would like a flight from san francisco to st. petersburg	flight	flight	0.9993246481623529	1
+show me a one way flight from milwaukee to orlando leaving wednesday afternoon after 6 pm	flight	flight	0.9993145814270653	1
+show me one way flights from milwaukee to orlando on wednesday	flight	flight	0.9993344519738312	1
+show me flights from columbus to chicago first class that leave before 10 am	flight	flight	0.9993359634329287	1
+show me the cheapest round trip between st. petersburg and detroit that arrives before 7 pm	flight	flight	0.9991915766187976	1
+show me nonstop flights from kansas city to phoenix	flight	flight	0.9993240939906275	1
+what is airline wn	airline	airline	0.9824673061441715	1
+show me the cheapest first class round trip from new york to miami	flight	flight	0.999187589943694	1
+now show me all the round trips from new york to miami	flight	flight	0.9992428325850562	1
+show me the cheapest one way flight from san francisco to houston	flight	flight	0.9993144718407447	1
+now show me the cheapest one way flight from houston to boston	flight	flight	0.9993052846788448	1
+show me the cheapest round trip fares from houston to boston	airfare	airfare	0.992068571968703	1
+show me the cheapest round trip fares from san francisco to houston	airfare	airfare	0.9920671921877311	1
+show me the cheapest round trip fare from san francisco to houston on february twenty eighth 1994	airfare	airfare	0.9921128898977638	1
+show me the cheapest one way fare from san francisco to houston on february twenty eighth 1994	airfare	airfare	0.9922245364918334	1
+now show me ground transportation in houston on monday afternoon	ground_service	ground_service	0.9926958506285556	1
+now show me one way flights from houston to boston	flight	flight	0.9993283938792111	1
+and now show me ground transportation that i could get in boston late night	ground_service	ground_service	0.992627944345686	1
+show me airlines that have flights between toronto and detroit between detroit and st. louis and between st. louis and toronto	airline	airline	0.9834255948904725	1
+show me round trip fares from toronto to detroit on delta northwest us air and united airlines	airfare	airfare	0.9919260694010664	1
+show me flights between detroit and st. louis on delta northwest us air and united airlines	flight	flight	0.9993316570034826	1
+show me flights from montreal to orlando and long beach	flight	flight	0.9993325729255861	1
+show me flights from montreal to orlando	flight	flight	0.9993382004309409	1
+i need a flight on friday afternoon in june from new york to cleveland	flight	flight	0.9993201719186756	1
+i need a flight from new york to los angeles on saturday evening on us air	flight	flight	0.9993239500496921	1
+i 'd like a red eye flight from new york to los angeles on saturday evening on us air	flight	flight	0.9993271394183875	1
+i 'd like a flight from new york to los angeles on saturday morning on us air	flight	flight	0.9993299470186394	1
+i need a flight from san francisco to milwaukee on monday morning	flight	flight	0.9993312132934403	1
+what does ua mean	abbreviation	abbreviation	0.978885183492666	1
+i need a flight from milwaukee to washington dc on monday night	flight	flight	0.9993332760453283	1
+how about flights from milwaukee to washington dc on tuesday mornings	flight	flight	0.9992967274465625	1
+what meals are there on flight 382 from milwaukee to washington dc on tuesday morning	meal	meal	0.4368758488237033	1
+i 'll need to rent a car in washington dc	ground_service	ground_service	0.9921994862868976	1
+can i get a flight on tuesday night from washington dc to oakland	flight	flight	0.9993166957136925	1
+how about from dc to oakland on wednesday morning	flight	flight	0.9992152719657459	1
+how much does it cost to fly on twa from columbus to milwaukee	airfare	airfare	0.9915126044721744	1
+what does q mean	abbreviation	abbreviation	0.9787510463962885	1
+how much does it cost to fly from columbus to st. louis round trip on twa	airfare	airfare	0.9913794891071985	1
+what 's the cheapest flight from columbus to st. louis round trip on twa	flight	flight	0.999325712529592	1
+what 's the cheapest round trip flight on twa from columbus to st. paul	flight	flight	0.9993203076718062	1
+i want to fly from milwaukee to los angeles	flight	flight	0.9992966331679738	1
+can i get the shortest flight from milwaukee to orlando	flight	flight	0.9992964907076695	1
+what is the shortest flight from milwaukee to long beach	flight	flight	0.9993096951373974	1
+what does m mean	abbreviation	abbreviation	0.9786036262257701	1
+what does ap 57 mean	abbreviation	abbreviation	0.9782103267674918	1
+what is the shortest flight from milwaukee to st. petersburg	flight	flight	0.9993125317194412	1
+what is the shortest flight from milwaukee to long beach	flight	flight	0.9993096951373974	1
+what is the shortest flight from milwaukee to san diego	flight	flight	0.9993087622696267	1
+what does ap 20 mean	abbreviation	abbreviation	0.9780833511926257	1
+can i get a flight today from san francisco to detroit michigan	flight	flight	0.9993188466547049	1
+what 's the cheapest flight from san francisco to detroit today	flight	flight	0.9993228717551956	1
+i want to fly from san francisco to milwaukee and from milwaukee to denver	flight	flight	0.9992952965734265	1
+what 's the cheapest flight from san francisco to milwaukee	flight	flight	0.9993241752359836	1
+i need to rent a car in milwaukee	ground_service	ground_service	0.99236202512444	1
+what 's the cheapest flight tomorrow from milwaukee to denver	flight	flight	0.9993254994638389	1
+what ground transportation is available at denver	ground_service	ground_service	0.9926999364218824	1
+what 's the cheapest flight from san francisco to denver	flight	flight	0.9993252341147791	1
+what flights leave from cleveland and go to dallas	flight	flight	0.9993193793591366	1
+show me all nonstop flights from st. petersburg to charlotte	flight	flight	0.9993320886618471	1
+what airline is us	airline	airline	0.982783271695957	1
+show me flights between toronto and san diego	flight	flight	0.9993357645615154	1
+what is phl	abbreviation	abbreviation	0.9759787136703914	1
+what is mci	abbreviation	abbreviation	0.9756312036466769	1
+show me the flights between oakland and salt lake city	flight	flight	0.9993375108226126	1
+what does not sa mean	abbreviation	abbreviation	0.9779767109580569	1
+what is the earliest daily flight between oakland and salt lake city	flight	flight	0.9992961567596799	1
+what airline is dl	airline	airline	0.982797521088675	1
+what is the latest daily flight between oakland and salt lake city	flight	flight	0.999308656951871	1
+show me the flights between los angeles and dallas	flight	flight	0.9993372659917815	1
+what ground transportation is available from dallas fort worth airport to downtown dallas	ground_service	ground_service	0.9926759015799607	1
+how many passengers can an l1011 aircraft hold	capacity	capacity	0.7820601032104031	1
+what is the seating capacity of a dc9	capacity	capacity	0.7838659212356377	1
+what are the flights between dallas and phoenix	flight	flight	0.9993099262589661	1
+what ground transportation is available between phoenix airport and downtown phoenix	ground_service	ground_service	0.9927881192628698	1
+what is the seating capacity for the aircraft m80	capacity	capacity	0.7811720009880972	1
+are there any flights between dallas and phoenix using a dc10 aircraft	flight	flight	0.9992855577951987	1
+what airline is aa	airline	airline	0.9826996162078608	1
+show me the flights between milwaukee and indiana	flight	flight	0.9993334403649503	1
+what are the flights between milwaukee and pittsburgh	flight	flight	0.9993082939193497	1
+what ground transportation is available between pittsburgh airport and downtown pittsburgh	ground_service	ground_service	0.9926839494112468	1
+show me the flights between pittsburgh and washington dc	flight	flight	0.9993332373227969	1
+what ground transportation is available between dca and downtown washington	ground_service	ground_service	0.9925967241877176	1
+what are the flights between dca and milwaukee	flight	flight	0.9993017679041019	1
+what ground transportation is available between milwaukee airport and downtown milwaukee	ground_service	ground_service	0.9926855696154547	1
+determine the type of aircraft used on a flight from cleveland to dallas that leaves before noon	aircraft	aircraft	0.9739696857041431	1
+find a flight between st. petersburg and charlotte the flight should leave in the afternoon and arrive as soon after 5 pm as possible it should be a nonstop flight	flight	flight	0.9993173196799154	1
+list a flight on delta airlines from toronto to san diego	flight	flight	0.999293943133188	1
+list a flight on american airlines from toronto to san diego	flight	flight	0.999301267297967	1
+list a flight from toronto to san diego	flight	flight	0.9993256173126291	1
+list flights from oakland to salt lake city leaving after 1700 wednesday	flight	flight	0.9993355645671893	1
+list flights from oakland to salt lake city leaving after midnight thursday	flight	flight	0.9993405833721473	1
+list flights between phoenix and las vegas	flight	flight	0.9993349735450413	1
+list flights from las vegas to denver	flight	flight	0.999333388750222	1
+list flights from milwaukee to washington dc before 1200	flight	flight	0.9993311757451694	1
+list flights from washington dc to pittsburgh leaving after 1800	flight	flight	0.9993361001262305	1
+list flights from washington dc to pittsburgh	flight	flight	0.9993364227443535	1
+list flights between pittsburgh and milwaukee	flight	flight	0.9993375063990313	1
+i 'd like a flight to san diego from washington dc	flight	flight	0.9993054542589883	1
+i 'd like to fly from cleveland to dallas	flight	flight	0.9992998485421053	1
+i want to fly from washington dc to phoenix arizona	flight	flight	0.9992943083013178	1
+i need a flight from phoenix to atlanta	flight	flight	0.9993209986407886	1
+i would like to fly from atlanta to san diego	flight	flight	0.9993051833085549	1
+i would like to fly from san diego to seattle	flight	flight	0.9993021293347291	1
+i would like to fly from orlando to kansas city	flight	flight	0.9993062947324545	1
+i need a flight from kansas city to minneapolis	flight	flight	0.9993231213491675	1
+i need a flight from san diego to washington dc	flight	flight	0.9993193090791905	1
+i need a flight from washington dc to san diego	flight	flight	0.9993181479679709	1
+i need a round trip flight from san diego to washington dc and the fares	flight+airfare	flight	0.9525922488828403	0
+i need a round trip from atlanta to washington dc and the fares leaving in the morning	flight+airfare	flight	0.996314059866869	0
+i need a round trip from phoenix to washington dc and the fare leaving in the morning	flight+airfare	flight	0.9918507205913277	0
+what is the lowest fare for a flight from washington dc to boston	airfare	airfare	0.9919587744597073	1
+what is the lowest fare from washington dc to montreal	airfare	airfare	0.9923468963872873	1
+what is the lowest fare from toronto to washington dc	airfare	airfare	0.992330010821126	1
+i want a flight from montreal to washington dc	flight	flight	0.9993234264995864	1
+i want a flight from nashville to seattle that arrives no later than 3 pm	flight	flight	0.9993199078113891	1
+i want a flight from memphis to seattle that arrives no later than 3 pm	flight	flight	0.999321122035671	1
+i need a flight from indianapolis to seattle arriving in seattle at 1205 pm	flight	flight	0.9993218947309286	1
+i want a flight round trip from memphis to seattle	flight	flight	0.999331766629031	1
+i want to fly from nashville to seattle and i want the cheapest fare round trip	flight	flight	0.9992271517270991	1
+i want to fly from memphis to seattle round trip with the cheapest fare	flight	flight	0.9992666642310901	1
+i want to fly from indianapolis to seattle round trip with the cheapest fare	flight	flight	0.9992632820218915	1
+please list flights from orlando to philadelphia	flight	flight	0.9993065007657791	1
+please list flights from san francisco to charlotte	flight	flight	0.9993217109693956	1
+please list flights from milwaukee to philadelphia	flight	flight	0.9993022362316505	1
+please list flights from philadelphia to san francisco	flight	flight	0.999322474884514	1
+please show ground transportation to milwaukee	ground_service	ground_service	0.9926985353550694	1
+please list flights from san francisco to milwaukee	flight	flight	0.9993159088508309	1
+list flights from houston to denver	flight	flight	0.9993351907975099	1
+list flights from houston to phoenix	flight	flight	0.999335272930715	1
+list flights from phoenix to houston	flight	flight	0.9993359343119689	1
+list flights from newark to houston	flight	flight	0.9993376978256302	1
+show flights from denver to houston	flight	flight	0.9993233863447669	1
+show flights from st. petersburg to charlotte	flight	flight	0.9993293561755002	1
+show flights from orlando to kansas city	flight	flight	0.999322990463474	1
+show flights from kansas city to minneapolis	flight	flight	0.9993189055385454	1
+show flights from kansas city to orlando	flight	flight	0.9993185276253401	1
+show flights from minneapolis to kansas city	flight	flight	0.9993254050600943	1
+show flights from kansas city to orlando	flight	flight	0.9993185276253401	1
+list flights from washington dc to boston	flight	flight	0.9993334096094371	1
+list fares from washington dc to montreal	airfare	airfare	0.9919216657763011	1
+list flights from washington dc to montreal	flight	flight	0.999331126307954	1
+list fares from washington dc to toronto that should be good	airfare	airfare	0.9920484106276234	1
+list fares from washington dc to boston	airfare	airfare	0.9919462663522284	1
+list flights from washington dc to montreal	flight	flight	0.999331126307954	1
+list flights from washington dc to toronto	flight	flight	0.9993320495935438	1
+list flights from toronto to washington dc	flight	flight	0.9993307343866241	1
+list flights from oakland to salt lake city	flight	flight	0.9993376532655636	1
+what flights go from dallas to phoenix	flight	flight	0.9993345605765587	1
+what flights go from phoenix to salt lake city	flight	flight	0.9993292766426151	1
+i need an early flight from milwaukee to denver	flight	flight	0.9993025546319896	1
+what types of ground transportation are available in denver	ground_service	ground_service	0.9927537804875665	1
+what flights go from denver to st. louis on tuesday morning	flight	flight	0.9993361522441029	1
+is ground transportation available in st. louis	ground_service	ground_service	0.9925395100019077	1
+i need to fly from st. louis to milwaukee on wednesday afternoon	flight	flight	0.9992924718144334	1
+flights from washington to seattle	flight	flight	0.999332981562202	1
+flights from atlanta to seattle	flight	flight	0.9993317176734606	1
+flights from san diego to seattle	flight	flight	0.9993340347722043	1
+i would like flight information from phoenix to denver	flight	flight	0.9993281655860492	1
+could i have flight information on flights from salt lake city to phoenix please	flight	flight	0.9993307862140896	1
+could i have flight information on flights from pittsburgh to phoenix please	flight	flight	0.9993284464654555	1
+i would like information on flights leaving from washington dc to denver	flight	flight	0.9993030868328382	1
+i need information on flights from washington to boston that leave on a saturday	flight	flight	0.9993121637746802	1
+i need the flights from washington to montreal on a saturday	flight	flight	0.9993185651027312	1
+i need the fares on flights from washington to toronto on a saturday	airfare	airfare	0.9913020865671275	1
+i want to go from boston to washington on a saturday	flight	flight	0.9992949207338111	1
+i need a flight from cleveland to dallas that leaves before noon see if too much information	flight	flight	0.9993268412485354	1
+get fares from washington to boston	airfare	airfare	0.9917919260655472	1
+get saturday fares from washington to boston	airfare	airfare	0.9917429788070923	1
+get fares from washington to montreal	airfare	airfare	0.9917041715733398	1
+get saturday fares from washington to montreal	airfare	airfare	0.991677276486176	1
+get saturday fares from washington to toronto	airfare	airfare	0.9917964720815062	1
+get the saturday fare from washington to toronto	airfare	airfare	0.9921331826678905	1
+list saturday flights from washington to boston	flight	flight	0.9993108337828969	1
+list saturday flights from boston to washington	flight	flight	0.9993205219113058	1
+get flights from milwaukee to dtw	flight	flight	0.9993153061212884	1
+list flights from milwaukee to detroit	flight	flight	0.9993361586220211	1
+get flights from detroit to toronto	flight	flight	0.9993113320883984	1
+get flights from toronto to milwaukee	flight	flight	0.9993099026261303	1
+get last flight from oakland to salt lake city on wednesday or first flight from oakland to salt lake city on thursday	flight	flight	0.9992880163814271	1
+get first flight from oakland to salt lake city on thursday	flight	flight	0.9993274938975902	1
+get last flight from oakland to salt lake city on wednesday	flight	flight	0.9993241125820819	1
+list last wednesday flight from oakland to salt lake city	flight	flight	0.9993122771020564	1
+get flight from toronto to san diego stopping at dtw	flight	flight	0.9993065118465289	1
+get flights between st. petersburg and charlotte	flight	flight	0.9993231120881704	1
+i need a flight from milwaukee to indianapolis leaving monday before 9 am	flight	flight	0.9993326317961473	1
+i need a flight departing from milwaukee to indianapolis leaving monday before 8 am	flight	flight	0.9993209219925911	1
+is there ground transportation available at the indianapolis airport	ground_service	ground_service	0.992652184069741	1
+i need flight information for a flight departing from indianapolis to cleveland departing tuesday at noon	flight	flight	0.9993032885570678	1
+i need flight information for a flight departing from cleveland to milwaukee wednesday after 6 pm	flight	flight	0.9993052736326531	1
+i need flight information for flights departing from cleveland going back to milwaukee wednesday after 5 pm	flight	flight	0.9992890875641104	1
+i need flight information for flights departing from cleveland to milwaukee on wednesday after 5 pm	flight	flight	0.9992929962851981	1
+i need flight information for flights departing from cleveland to milwaukee on wednesday after 5 pm	flight	flight	0.9992929962851981	1
+i need a flight from denver to salt lake city on monday	flight	flight	0.9993271887425794	1
+is there ground transportation available at the denver airport	ground_service	ground_service	0.9926496190254835	1
+i need flight and airline information for a flight from denver to salt lake city on monday departing after 5 pm	flight+airline	flight	0.9933833179228752	0
+is there ground transportation available at the salt lake city airport	ground_service	ground_service	0.9926667948971859	1
+i need a flight from salt lake city to phoenix departing wednesday after 5 pm	flight	flight	0.9993224554735226	1
+is there ground transportation available at the phoenix airport	ground_service	ground_service	0.992641593190589	1
+i need a flight from oakland to salt lake city on wednesday departing after 6 pm	flight	flight	0.9993269099356306	1
+i need flight and fare information for thursday departing prior to 9 am from oakland going to salt lake city	flight+airfare	flight	0.976161980314285	0
+i need flight and fare information departing from oakland to salt lake city on thursday before 8 am	flight+airfare	flight	0.9980674988925848	0
+i need flight numbers and airlines for flights departing from oakland to salt lake city on thursday departing before 8 am	flight_no+airline	flight_no	0.28409208940090586	0
+i need flight numbers for those flights departing on thursday before 8 am from oakland going to salt lake city	flight_no	flight_no	0.4692217875969541	1
+list airports in arizona nevada and california please	airport	airport	0.7562443207523443	1
+list california nevada arizona airports	airport	airport	0.7351985352845564	1
+list the arizona airport	airport	airport	0.7463428983796367	1
+list california airports	airport	airport	0.7529345066448079	1
+list flights from las vegas to phoenix	flight	flight	0.9993331448750147	1
+list california airports	airport	airport	0.7529345066448079	1
+list airports	airport	airport	0.7397340162113423	1
+list wednesday night flights from oakland to salt lake city	flight	flight	0.9993212863774406	1
+list flights from oakland to salt lake city before 6 am thursday morning	flight	flight	0.9993388235252573	1
+which airlines fly between toronto and san diego	airline	airline	0.9835478681894236	1
+please list afternoon flights between st. petersburg and charlotte	flight	flight	0.9993035162673101	1
+what is tpa	abbreviation	abbreviation	0.9753828371466602	1
+what are the flights from cleveland to dallas	flight	flight	0.9993110667181943	1
+please list only the flights from cleveland to dallas that leave before noon	flight	flight	0.9992468234519237	1
+what type of aircraft are flying from cleveland to dallas before noon	aircraft	aircraft	0.9764389899516919	1
+i need information on flights from indianapolis to seattle	flight	flight	0.9992667463521404	1
+i need a flight from memphis to seattle	flight	flight	0.9993249443604609	1
+i need a ticket from nashville to seattle	airfare	airfare	0.9918106069471975	1
+i need a ticket from nashville tennessee to seattle	airfare	airfare	0.9918923964339561	1
+i need flight information from milwaukee to tampa	flight	flight	0.9993307982153115	1
+i need to rent a car at tampa	ground_service	ground_service	0.9923126433313305	1
+i need a daily flight from st. louis to milwaukee	flight	flight	0.9993202247686751	1
+i need flights departing from oakland and arriving salt lake city	flight	flight	0.999328991091303	1
+i need information on flights from toronto to san diego	flight	flight	0.9992797039352004	1
+i need information on flights from toronto to san diego	flight	flight	0.9992797039352004	1
+i want a flight from toronto to san diego	flight	flight	0.9993226585525979	1
+i need information on flights between st. petersburg and charlotte	flight	flight	0.9993014552899501	1
+i need the flight numbers of flights leaving from cleveland and arriving at dallas	flight_no	flight_no	0.4674336449752347	1
+which flights go from new york to miami and back	flight	flight	0.9993171775018507	1
+what does fare code qo mean	abbreviation	abbreviation	0.9789320084908817	1
+show me flights from milwaukee to orlando one way	flight	flight	0.9993358565774949	1
+what the abbreviation us stand for	abbreviation	abbreviation	0.9747491498796529	1
+i 'd like a one way ticket from milwaukee to orlando either wednesday evening or thursday morning	airfare	airfare	0.9919396609556977	1
+show me flights from milwaukee to orlando	flight	flight	0.999340055356659	1
+what does fare code f mean	abbreviation	abbreviation	0.9789140275750289	1
+what does fare code h mean	abbreviation	abbreviation	0.9789384236405291	1
+what does fare code y mean	abbreviation	abbreviation	0.9788754301190141	1
+what are restrictions ap 57	abbreviation	abbreviation	0.9527501023866881	1
+please show me first class flights from indianapolis to memphis one way leaving before 10 am	flight	flight	0.9993327288468855	1
+now show me all round trip flights from burbank to seattle that arrive before 7 pm in seattle	flight	flight	0.9993148291271433	1
+round trip flights from orlando to montreal please	flight	flight	0.9993264080710254	1
+what airline is dl	airline	airline	0.982797521088675	1
+show me all delta airlines flights from montreal to orlando	flight	flight	0.9992556748889376	1
+show me all flights from orlando to montreal please	flight	flight	0.9993226610853725	1
+which airline is kw	airline	airline	0.9827831379758041	1
+please list all flights from new york to miami any any type of class	flight	flight	0.9992683556681329	1
+what does fare code bh mean	abbreviation	abbreviation	0.9785898219263893	1
+show me a return flight from miami to jfk please	flight	flight	0.9993351283385518	1
+what does fare code bh mean	abbreviation	abbreviation	0.9785898219263893	1
+what does fare code bh mean	abbreviation	abbreviation	0.9785898219263893	1
+what does fare code bh mean	abbreviation	abbreviation	0.9785898219263893	1
+what does fare code bh mean	abbreviation	abbreviation	0.9785898219263893	1
+show me one way flights from milwaukee to orlando after 6 pm on wednesday	flight	flight	0.9993295701194702	1
+show me the flights from indianapolis to memphis	flight	flight	0.9993360256555474	1
+show me round trip flights from burbank to seattle	flight	flight	0.9993394725533776	1
+show me round trip flights from orlando to montreal	flight	flight	0.99933736603065	1
+show me nonstop flights from montreal to orlando	flight	flight	0.9993323919947843	1
+show me round trips between montreal and orlando	flight	flight	0.9992211826845385	1
+show me round trip flights from montreal to orlando	flight	flight	0.9993366797631524	1
+show me the cheapest one way flights from montreal to orlando	flight	flight	0.9993222629865435	1
+show me the cheapest one way flights from orlando to montreal	flight	flight	0.9993203141858459	1
+show me the cheapest economy flights from miami to new york	flight	flight	0.9993338176858731	1
+kansas city to las vegas economy	flight	flight	0.9988477631823562	1
+kansas city to las vegas economy	flight	flight	0.9988477631823562	1
+what airline is hp	airline	airline	0.9827968684133692	1
+ground transportation in las vegas	ground_service	ground_service	0.9925897090466366	1
+ground transportation for las vegas	ground_service	ground_service	0.9926209750525282	1
+las vegas to baltimore economy	flight	flight	0.9990743630429458	1
+las vegas to baltimore economy	flight	flight	0.9990743630429458	1
+baltimore to kansas city economy	flight	flight	0.9974974957833483	1
+what airline is us	airline	airline	0.982783271695957	1
+which airline is us	airline	airline	0.9829081985958067	1
+which airline is us	airline	airline	0.9829081985958067	1
+which airline is us	airline	airline	0.9829081985958067	1
+which airline is us	airline	airline	0.9829081985958067	1
+columbus to chicago one way before 10 am	flight	flight	0.9991494674341477	1
+what airline is hp	airline	airline	0.9827968684133692	1
+st. petersburg to detroit	flight	flight	0.999096146550279	1
+from milwaukee to orlando one way after 5 pm wednesday	flight	flight	0.9992466535846728	1
+and from milwaukee to atlanta before 10 am daily	flight	flight	0.9992430994291102	1
+what airline is yx	airline	airline	0.9828696030002632	1
+show me all flights from san jose to phoenix	flight	flight	0.9993310006548421	1
+show me all flights from san jose to phoenix	flight	flight	0.9993310006548421	1
+what airline is hp	airline	airline	0.9827968684133692	1
+show me ground transportation in phoenix	ground_service	ground_service	0.9926290600936521	1
+show me flights from phoenix to fort worth	flight	flight	0.9993336037441494	1
+show me ground transportation in fort worth	ground_service	ground_service	0.9926824324936243	1
+show me flights from fort worth to san jose	flight	flight	0.999336848643698	1
+show me first class flights from new york to miami round trip	flight	flight	0.9993346818240889	1
+show me first class flights from new york to miami round trip	flight	flight	0.9993346818240889	1
+show me all round trip flights from new york to miami nonstop	flight	flight	0.9993292314190719	1
+show me all round trip flights from miami to new york nonstop	flight	flight	0.9993297628634206	1
+show me one way flights from indianapolis to memphis before 10 am on any day	flight	flight	0.9993246630476071	1
+what does fare code f mean	abbreviation	abbreviation	0.9789140275750289	1
+show me round trip flights from burbank to tacoma	flight	flight	0.9993404873040941	1
+what does the restriction ap58 mean	abbreviation	abbreviation	0.9665411420362006	1
+what does fare code h mean	abbreviation	abbreviation	0.9789384236405291	1
+what airline is as	airline	airline	0.9826325643732435	1
+what airline is as	airline	airline	0.9826325643732435	1
+what airline is as	airline	airline	0.9826325643732435	1
+what airline is as as in sam	airline	airline	0.9827698932606607	1
+show me nonstop flights from st. petersburg to toronto	flight	flight	0.9993280742055088	1
+show me nonstop flights from toronto to st. petersburg	flight	flight	0.9993297002929471	1
+show me the nonstop flights and fares from toronto to st. petersburg	flight+airfare	flight+airfare	0.7280516979337194	1
+show me the nonstop flights from toronto to st. petersburg	flight	flight	0.9993319155594129	1
+show me weekday flights from milwaukee to orlando one way	flight	flight	0.9993272375675307	1
+show me weekday flights from milwaukee to orlando one way	flight	flight	0.9993272375675307	1
+what airline is hp	airline	airline	0.9827968684133692	1
+list flights from chicago to san diego	flight	flight	0.9993364938417794	1
+list flights from chicago to san diego	flight	flight	0.9993364938417794	1
+list flights from kansas city to denver	flight	flight	0.9993379989066142	1
+list flights from denver to phoenix	flight	flight	0.9993372874135912	1
+list flights from phoenix to las vegas	flight	flight	0.9993349560965454	1
+list flights from las vegas to san diego	flight	flight	0.9993315932826634	1
+list flights from chicago to kansas city in the morning	flight	flight	0.9993418035399031	1
+list flights from houston to san jose	flight	flight	0.9993339662943425	1
+list flights from houston to milwaukee	flight	flight	0.9993348534266685	1
+list flights from milwaukee to san jose on wednesday	flight	flight	0.9993438757014568	1
+list flights from san jose to dallas on friday	flight	flight	0.9993430084981086	1
+list flights from dallas to houston	flight	flight	0.9993340325129655	1
+list distance from airports to downtown in new york	distance	distance	0.8863536070704695	1
+list airports in new york	airport	airport	0.7567874344573801	1
+list airports in new york	airport	airport	0.7567874344573801	1
+list airports in la	airport	airport	0.7526775094435395	1
+list airports	airport	airport	0.7397340162113423	1
+list airports in la	airport	airport	0.7526775094435395	1
+list airports in la	airport	airport	0.7526775094435395	1
+list the airports in la	airport	airport	0.7514326347354041	1
+list la	city	abbreviation	0.9207833452864523	0
+list la	city	abbreviation	0.9207833452864523	0
+list flights from new york to la	flight	flight	0.9993327071601721	1
+list flights from la guardia to burbank	flight	flight	0.9993283507127613	1
+list flights from la to orlando	flight	flight	0.9993298423356259	1
+list flights from ontario california to orlando	flight	flight	0.9993328393723756	1
+list flights from ontario california to orlando	flight	flight	0.9993328393723756	1
+list flights from indianapolis to memphis with fares on monday	flight	flight	0.9992458886696809	1
+list flights from indianapolis to memphis on monday	flight	flight	0.9993393103175797	1
+list flights from memphis to miami on wednesday	flight	flight	0.9993372412396301	1
+list flights from miami to indianapolis on sunday	flight	flight	0.9993388789390805	1
+list flights from charlotte on saturday afternoon	flight	flight	0.9993299455608354	1
+list type of aircraft for all flights from charlotte	aircraft	aircraft	0.9759067703670589	1
+list flights and fares from tacoma to orlando round trip leaving saturday returning next saturday	flight+airfare	flight+airfare	0.7422670560598201	1
+what class is fare code q	abbreviation	abbreviation	0.9695115278300938	1
+list flights from orlando to tacoma on saturday of fare basis code of q	flight	flight	0.9992709068492069	1
+list airfares for first class round trip from detroit to st. petersburg	airfare	airfare	0.9915154208116072	1
+list coach round trip airfare from detroit to st. petersburg	airfare	airfare	0.9903835160900175	1
+list flights from pittsburgh to newark on monday morning	flight	flight	0.9993429775600889	1
+list flights from minneapolis to pittsburgh on friday	flight	flight	0.9993418682160996	1
+list flights before 9 am from cincinnati to tampa	flight	flight	0.9993255721026125	1
+list flights from cincinnati to tampa before noon	flight	flight	0.9993352151692333	1
+list flights from tampa to cincinnati after 3 pm	flight	flight	0.9993347231331381	1
+list airlines that fly from seattle to salt lake city	airline	airline	0.9835302833371253	1
+list delta flights from seattle to salt lake city	flight	flight	0.9993059300182998	1
+list seating capacities of delta flights from seattle to salt lake city	capacity	capacity	0.7168877609422204	1
+list delta flights from seattle to salt lake city with aircraft type	flight	flight	0.9992721907738746	1
+what ground transportation is there in baltimore	ground_service	ground_service	0.9926383649728808	1
+list ground transportation in baltimore	ground_service	ground_service	0.9926251817244287	1
+list flights from baltimore to san francisco on friday	flight	flight	0.9993439799303931	1
+give me the flights from los angeles to pittsburgh on tuesday	flight	flight	0.9993360148924142	1
+give me the flights from pittsburgh to los angeles thursday evening	flight	flight	0.9993353654407271	1
+give me the round trip flights from cleveland to miami next wednesday	flight	flight	0.9993310715746421	1
+give me the fares for round trip flights from cleveland to miami next wednesday	airfare	airfare	0.9913479323126785	1
+give me the flights and fares for a trip to cleveland from miami on wednesday	flight	flight+airfare	0.7451309408135968	0
+give me the fares from miami to cleveland next sunday	airfare	airfare	0.9918130713538033	1
+give me the flights from milwaukee to phoenix on saturday or sunday on american airlines	flight	flight	0.999334716898023	1
+give me the flights from phoenix to milwaukee on wednesday evening	flight	flight	0.9993366090798815	1
+give me the flights from phoenix to milwaukee on wednesday on american airlines	flight	flight	0.9993369178196567	1
+give me the flights from phoenix to milwaukee on american airlines	flight	flight	0.9993387984617147	1
+give me the flights from phoenix to milwaukee	flight	flight	0.9993337354918356	1
+give me the meal flights departing early saturday morning from chicago to seattle nonstop	flight	flight	0.9989882336625371	1
+give me the flights from chicago to seattle saturday morning that have meals	flight	flight	0.9993329214828782	1
+give me flights from seattle to chicago that have meals on continental	flight	flight	0.9992898821317399	1
+give me the flights from seattle to chicago that have meals on continental saturday morning	flight	flight	0.9992984524154156	1
+give me the flights from chicago to seattle on continental that have meals early saturday morning	flight	flight	0.9993223458642347	1
+give me a combination of continental flights from chicago to seattle that have meals early saturday morning	flight	flight	0.9990236709018263	1
+give me the saturday morning flights with meals from chicago to minneapolis	flight	flight	0.9992810884611367	1
+give me the saturday morning flights on continental that have meals from chicago to minneapolis	flight	flight	0.9992931829851198	1
+give me the saturday morning flights from chicago to st. paul on continental that have meals	flight	flight	0.9993157254360225	1
+give me the flights from new york to las vegas nonstop	flight	flight	0.9993334982638393	1
+give me the flights from memphis to las vegas nonstop	flight	flight	0.999332429840588	1
+give me the cheapest round trip flights from indianapolis to orlando around december twenty fifth	flight	flight	0.9993198924954367	1
+i need a friday flight from newark to tampa	flight	flight	0.9993252655637757	1
+i need a sunday flight from tampa to charlotte	flight	flight	0.9993215663586549	1
+give me a flight from charlotte to baltimore on tuesday morning	flight	flight	0.999327841670705	1
+can i have a morning flight from baltimore to newark please	flight	flight	0.9993164094708309	1
+cheapest round trip fare from or indianapolis to orlando on december twenty fifth	airfare	airfare	0.9921887736800423	1
+cheapest one way fare from indianapolis to orlando on december twenty seventh	airfare	airfare	0.9921395366897946	1
+flight number from dallas to houston	flight_no	flight_no	0.4695560062768845	1
+flight number from houston to dallas	flight_no	flight_no	0.46862684494497964	1
+saturday flight on american airlines from milwaukee to phoenix	flight	flight	0.9993027782537021	1
+flight numbers on american airlines from phoenix to milwaukee	flight_no	flight_no	0.4748247010958492	1
+flight numbers from chicago to seattle	flight_no	flight_no	0.47133575573940806	1
+flight numbers from chicago to seattle on continental	flight_no	flight_no	0.48251856159991263	1
+flight numbers from seattle to chicago on continental	flight_no	flight_no	0.4824582090757191	1
+is there a fare from pittsburgh to cleveland under 200 dollars	airfare	airfare	0.992198866910812	1
+how much is coach flight from pittsburgh to atlanta	airfare	airfare	0.9905103785519382	1
+newark to tampa on friday	flight	flight	0.9992375285358504	1
+tampa to charlotte sunday morning	flight	flight	0.9992065068815681	1
+charlotte to baltimore on tuesday	flight	flight	0.9992616061769994	1
+baltimore to newark wednesday morning	flight	flight	0.9991943342007936	1
+dallas to houston after 1201 am	flight	flight	0.9992269120800287	1
+houston to dallas before midnight	flight	flight	0.9992344899455813	1
+indianapolis to orlando december twenty seventh	flight	flight	0.9992073281248751	1
+cheapest fare from indianapolis to orlando on the twenty seventh of december	airfare	airfare	0.9923207878878008	1
+cheapest fare round trip from indianapolis to orlando on december twenty seventh	airfare	airfare	0.9921729301282635	1
+cleveland to miami on wednesday arriving before 4 pm	flight	flight	0.9992707550272004	1
+miami to cleveland sunday afternoon	flight	flight	0.9992430670933445	1
+new york city to las vegas and memphis to las vegas on sunday	flight	flight	0.9991309418783069	1
+new york city to las vegas and memphis to las vegas on sunday	flight	flight	0.9991309418783069	1
+new york to las vegas sunday afternoon	flight	flight	0.9992390134600203	1
+memphis to las vegas sunday afternoon	flight	flight	0.999223057157698	1
+new york to las vegas on sunday afternoon	flight	flight	0.9992485106973897	1
+chicago to seattle saturday morning	flight	flight	0.9992189656746305	1
+chicago to las vegas saturday morning	flight	flight	0.9992118825653117	1
+los angeles to pittsburgh afternoon tuesday	flight	flight	0.9992498333406159	1
+los angeles to pittsburgh afternoon on monday	flight	flight	0.9992553926522857	1
+pittsburgh to los angeles thursday evening	flight	flight	0.999254615761658	1
+milwaukee to phoenix on saturday	flight	flight	0.9992547681515405	1
+phoenix to milwaukee on sunday	flight	flight	0.9992361546175644	1
+phoenix to milwaukee on wednesday	flight	flight	0.9992471430350909	1
+a flight from baltimore to san francisco arriving between 5 and 8 pm	flight	flight	0.9993230238451628	1
+how many northwest flights leave st. paul	flight	quantity	0.9585726363371606	0
+how many northwest flights leave washington dc	flight	quantity	0.9582410626680823	0
+how many flights does northwest have leaving dulles	flight	quantity	0.9585403544203572	0
+what cities does northwest fly out of	city	city	0.8316575371839424	1
+list the cities from which northwest flies	city	city	0.825184269791852	1
+what cities does northwest fly to	city	city	0.8318108741559982	1
+i would like a connecting flight from dallas to san francisco leaving after 4 o'clock	flight	flight	0.9993238701702795	1
+please list all the flights from dallas to san francisco	flight	flight	0.9992318460452605	1
+tell me again the morning flights on american airlines from philadelphia to dallas	flight	flight	0.999312403934692	1
+tell me the flights that leave philadelphia and go to dallas	flight	flight	0.99930945798656	1
+what is a d9s	abbreviation	abbreviation	0.5656236867546452	1
+what type of plane is a d9s	aircraft	aircraft	0.9755039076083863	1
+what is a d9s	abbreviation	abbreviation	0.5656236867546452	1
+show me the airports serviced by tower air	airport	airport	0.6964765813012294	1
+show me the first class and coach flights between jfk and orlando	flight	flight	0.9992530634975924	1
+show me the first class and coach flights from kennedy airport to miami	flight	flight	0.9992219770636535	1
+show me the first class and coach flights from jfk to miami	flight	flight	0.9992582510034191	1
+are meals ever served on tower air	meal	meal	0.4211161803551686	1
+are snacks served on tower air	meal	meal	0.3672102086401247	1
+show delta airlines flights from jfk to miami	flight	flight	0.9992754458357395	1
+show delta airlines from boston to salt lake	flight	flight	0.9991450202167552	1
+show delta airlines flights from boston to salt lake	flight	flight	0.9992953290421279	1
+show delta airlines flights from boston to salt lake city	flight	flight	0.9992996112509532	1
+what are the fares for flights between boston and washington dc	airfare	airfare	0.991724715830511	1
+what is the least expensive fare from boston to salt lake city	airfare	airfare	0.9923280913621647	1
+what are the lowest fares from washington dc to salt lake city	airfare	airfare	0.991684904652454	1
+what is the lowest fare from bwi to salt lake city	airfare	airfare	0.9923479040894747	1
+show me the cost of a first class ticket from detroit to las vegas and back	airfare	airfare	0.9921427891977076	1
+what is the earliest arriving flight from boston to washington dc	flight	flight	0.9993016409107028	1
+what is the earliest arriving flight between boston and washington dc	flight	flight	0.9993041036382184	1
+what 's the earliest arriving flight between boston and washington dc	flight	flight	0.9993130752819271	1
+what is the earliest arriving flight from houston to orlando	flight	flight	0.9993087817409476	1
+what is the earliest arriving flight from houston to orlando	flight	flight	0.9993087817409476	1
+show me the flights between houston and orlando	flight	flight	0.999335915288599	1
+show me the flights between houston and orlando	flight	flight	0.999335915288599	1
+show me the flights from houston to orlando	flight	flight	0.9993352202969158	1
+list all flights leaving denver between 8 pm and 9 pm	flight	flight	0.9992894382801841	1
+what is the seating capacity on the aircraft 733	capacity	capacity	0.7803106032357519	1
+what is the seating capacity of a 72s	capacity	capacity	0.7831724545483372	1
+what is the seating capacity of the aircraft 72s	capacity	capacity	0.7747073896131067	1
+what is the seating capacity of the aircraft m80	capacity	capacity	0.7797050455399286	1
+what is the seating capacity of the type of aircraft m80	capacity	capacity	0.7564630278958039	1
+what is the seating capacity of an m80	capacity	capacity	0.7878588531878212	1
+what airlines serve denver	airline	airline	0.9832808904257498	1
+list the airlines with flights to or from denver	airline	airline	0.9833374365120666	1
+what airlines fly into denver	airline	airline	0.9834794783480914	1
+list all flights arriving in denver between 8 and 9 pm	flight	flight	0.999300965839218	1
+what is the capacity of the 73s	capacity	capacity	0.7742627338549359	1
+what is 73s	abbreviation	abbreviation	0.94348773929554	1
+what is seating capacity on the aircraft 73s	capacity	capacity	0.776493265709235	1
+what is the seating capacity of a 757	capacity	capacity	0.7866722262436048	1
+how many people will a 757 hold	capacity	capacity	0.7591905493173271	1
+how many passengers can fly on a 757	capacity	capacity	0.7750538671494839	1
+list all of the daily flights arriving in denver between 8 and 9 pm	flight	flight	0.9992844302632884	1
+list all of the daily flights arriving in denver from 8 to 9 pm	flight	flight	0.9992851817456102	1
+show me all of the daily flights arriving in denver between 8 pm and 9 pm	flight	flight	0.9993047632376297	1
+what is the seating capacity of the 757	capacity	capacity	0.784673430327471	1
+tell me about the m80 aircraft	aircraft	aircraft	0.9720071492376863	1
+tell me about the m80 aircraft	aircraft	aircraft	0.9720071492376863	1
+tell me about the type of aircraft called an m80	aircraft	aircraft	0.9752200584389479	1
+what is the seating capacity of the 733	capacity	capacity	0.7845181287301011	1
+what is the seating capacity of the m80	capacity	capacity	0.7863683270669692	1
+what is the seating capacity on the aircraft m80	capacity	capacity	0.7815835442598152	1
+list all flights arriving or leaving denver between 8 and 9 pm	flight	flight	0.9992786471099782	1
+list all flights arriving in denver between 8 and 9 pm	flight	flight	0.999300965839218	1
+list all flights on all types of aircraft arriving in denver between 8 and 9 pm	flight	flight	0.9988270921734084	1
+please list all flights from nashville to memphis on monday morning	flight	flight	0.9992901138617098	1
+please list the flights from nashville to memphis on monday morning	flight	flight	0.9993236670777537	1
+is there ground transportation from the memphis airport into town when if i arrive at 842 in the morning	ground_service	ground_service	0.9925164353493009	1
+please list the flights from memphis to new york city on a monday night	flight	flight	0.9993337878029387	1
+what is cvg	abbreviation	abbreviation	0.9753312072996796	1
+what ground transportation is available from la guardia airport into new york city	ground_service	ground_service	0.9925548224741855	1
+is there ground transportation from lga into new york city	ground_service	ground_service	0.9922909923200409	1
+please list the ground transportation from lga into new york city	ground_service	ground_service	0.9924878560047785	1
+please list ground transportation from ewr into new york city	ground_service	ground_service	0.9923808440745009	1
+show me the morning flights from memphis to new york city	flight	flight	0.9993304404212066	1
+give me the flights from new york city to nashville leaving after 5 pm on wednesday	flight	flight	0.9993329173934398	1
+tell me about the ground transportation from nashville airport	ground_service	ground_service	0.9926500038311598	1
+what are the nonstop flights from cincinnati to charlotte leaving after noon and arriving before 7 pm	flight	flight	0.9993060971272111	1
+how many flights does alaska airlines have to burbank	flight	quantity	0.9585335484268028	0
+list the alaska airline flights from burbank to anywhere	flight	flight	0.999270954145236	1
+list the alaska airline flights from burbank	flight	flight	0.999269750235405	1
+which airline is as	airline	airline	0.9827076333747643	1
+list the alaska airlines flights arriving in burbank	flight	flight	0.9993105106596609	1
+list the alaska airlines flights a departing from burbank	flight	flight	0.9993229426440705	1
+list all alaska airlines flights	flight	flight	0.9992377477949426	1
+list all flights departing from seattle	flight	flight	0.9993088002778435	1
+list the flights from indianapolis to memphis that leave before noon	flight	flight	0.9993306628634088	1
+list the cheapest fare from charlotte to las vegas	airfare	airfare	0.992350459782938	1
+i want a flight from los angeles to charlotte early in the morning	flight	flight	0.9993246997583183	1
+i would like a morning flight from charlotte to newark	flight	flight	0.9993216351310789	1
+i 'd like a morning flight from newark to los angeles	flight	flight	0.9993191923657441	1
+i 'd like an evening flight from newark to los angeles	flight	flight	0.9993202106912283	1
+i would like a flight that leaves on sunday from montreal quebec to san diego california	flight	flight	0.9993101121106407	1
+i would like a flight on tuesday which leaves from san diego to indianapolis indiana and that leaves in the afternoon	flight	flight	0.9993172761459266	1
+i would like to leave thursday morning from indianapolis to toronto	flight	flight	0.9992805525455004	1
+i would like a flight on friday morning from toronto to montreal	flight	flight	0.9993189059814263	1
+i would like a flight from cincinnati to burbank on american	flight	flight	0.999328997344694	1
+what type of aircraft is used for the american flight leaving at 419 pm	aircraft	aircraft	0.9759132310634566	1
+i need a flight leaving kansas city to chicago leaving next wednesday and returning the following day	flight	flight	0.9993235001271825	1
+what flights go from long beach to st. louis	flight	flight	0.9993263393874335	1
+what are the flights from memphis to las vegas	flight	flight	0.9993114792262642	1
+what are the flights from las vegas to ontario	flight	flight	0.9993145617135051	1
+what are the flights from ontario to memphis	flight	flight	0.9993066565316973	1
+what type of ground transportation is there at the las vegas airport	ground_service	ground_service	0.992760646093814	1
+is there taxi service at the ontario airport	ground_service	ground_service	0.9916463701844846	1
+what are the flights from tampa to milwaukee	flight	flight	0.9993038378584475	1
+what are the flights from milwaukee to seattle	flight	flight	0.9993016118483352	1
+what are the flights from la guardia to san jose on united	flight	flight	0.9993238639071155	1
+what are the flights on mondays that travel from charlotte north carolina to phoenix arizona	flight	flight	0.9992931766475773	1
+what are the flights from phoenix arizona to st. paul minnesota on tuesday	flight	flight	0.9993292811897047	1
+what are the flights on thursday leaving from st. paul minnesota to st. louis	flight	flight	0.9993245040734963	1
+what are the flights from st. louis to charlotte north carolina leaving on friday	flight	flight	0.9993229491428931	1
+what are the flights from boston to orlando that stop in new york	flight	flight	0.9993023225623447	1
+i need a morning flight from burbank to milwaukee on next monday	flight	flight	0.9993262885075707	1
+how about a flight from milwaukee to st. louis that leaves monday night	flight	flight	0.9993008956340608	1
+and a flight from st. louis to burbank that leaves tuesday afternoon	flight	flight	0.9993060052848882	1
+how about a flight leaving tuesday night from st. louis to burbank	flight	flight	0.9992985729994025	1
+i need a flight from salt lake to newark airport that arrives on saturday before 6 pm	flight	flight	0.9993190941206763	1
+i 'd like a flight from cincinnati to newark airport that arrives on saturday before 6 pm	flight	flight	0.9993211841222432	1
+i need a flight on american airlines from miami to chicago that arrives around 5 pm	flight	flight	0.9993151197274951	1
+i need a flight from memphis to tacoma that goes through los angeles	flight	flight	0.999325565064106	1
+what are the flights between cincinnati and san jose california which leave after 6 pm	flight	flight	0.9993055824657434	1
+what are the nonstop flights between san jose and houston texas	flight	flight	0.9993064295589292	1
+what are the nonstop flights between houston and memphis	flight	flight	0.9992922543749231	1
+what are the flights between memphis and cincinnati on wednesday	flight	flight	0.9993159934939999	1
+what are the american flights from newark to nashville	flight	flight	0.9992926865841479	1
+the flights from ontario to westchester that stop in chicago	flight	flight	0.9993195111362309	1
+please list the flights from los angeles to charlotte	flight	flight	0.9993159690065662	1
+please list the flights from charlotte to newark	flight	flight	0.9993090074732829	1
+please list the flights from newark to los angeles	flight	flight	0.9993119169995873	1
+please list the flights from cincinnati to burbank on american airlines	flight	flight	0.9993274065235032	1
+please give me the flights from kansas city to chicago on june sixteenth	flight	flight	0.9993299302351244	1
+please give me the flights from chicago to kansas city on june seventeenth	flight	flight	0.9993249563327156	1
+please list all the flights from kansas city to chicago on june sixteenth	flight	flight	0.9992697017501299	1
+please list all the flights from chicago to kansas city on june seventeenth	flight	flight	0.9992606572571382	1
+i 'd like to travel from burbank to milwaukee	flight	flight	0.9992908075678382	1
+can you find me a flight from salt lake city to new york city next saturday before arriving before 6 pm	flight	flight	0.9993199863277756	1
+can you find me another flight from cincinnati to new york on saturday before 6 pm	flight	flight	0.9993310473591817	1
+can you list all of the delta flights from salt lake city to new york next saturday arriving before 6 pm	flight	flight	0.9992811774428807	1
+i 'd like to fly from miami to chicago on on american airlines arriving around 5 pm	flight	flight	0.9993035863948687	1
+i 'd like to travel from kansas city to chicago next wednesday	flight	flight	0.9993008185437232	1
+i 'd like a round trip flight from kansas city to chicago on wednesday may twenty sixth arriving at 7 pm	flight	flight	0.9993175884077391	1
+yes i 'd like to find a flight from memphis to tacoma stopping in los angeles	flight	flight	0.9993121173787419	1
+find flight from san diego to phoenix on monday am	flight	flight	0.9993130437544988	1
+find flight from phoenix to detroit on monday	flight	flight	0.9993196604191373	1
+find flight from detroit to san diego on tuesday	flight	flight	0.9993241721164264	1
+find flight from cincinnati to san jose on monday	flight	flight	0.9993209557003859	1
+find flight from san jose to houston on wednesday	flight	flight	0.999321262702385	1
+find flight from houston to memphis on friday	flight	flight	0.9993267489024632	1
+find flight from memphis to cincinnati on sunday	flight	flight	0.9993247254611082	1
+find american flight from newark to nashville around 630 pm	flight	flight	0.9993048796684124	1
+please find a flight round trip from los angeles to tacoma washington with a stopover in san francisco not exceeding the price of 300 dollars for june tenth 1993	flight	flight	0.9992607429115782	1
+are there any flights on june tenth from burbank to tacoma	flight	flight	0.9993164850809972	1
+please find a flight from ontario to westchester that makes a stop in chicago on may seventeenth one way with dinner	flight	flight	0.9993270759315619	1
+like to book a flight from burbank to milwaukee	flight	flight	0.9993064928024842	1
+show me all the flights from burbank to milwaukee	flight	flight	0.9993201412447924	1
+find me all the flights from milwaukee to st. louis	flight	flight	0.9993090483888514	1
+now show me all the flights from st. louis to burbank	flight	flight	0.9993112513314613	1
+is there one airline that flies from burbank to milwaukee milwaukee to st. louis and from st. louis to burbank	airline	airline	0.9831286170193925	1
+find me all the round trip flights from burbank to milwaukee stopping in st. louis	flight	flight	0.9993226113856787	1
+i 'd like to book two flights to westchester county	flight	flight	0.9992922239465855	1
+i want to book a flight from salt lake city to westchester county	flight	flight	0.9993103642324789	1
+tell me all the airports near westchester county	airport	airport	0.7507951047207891	1
+i 'd like to book a flight from cincinnati to new york city on united airlines for next saturday	flight	flight	0.9993100494612533	1
+tell me all the airports in the new york city area	airport	airport	0.7536628882985202	1
+please find all the flights from cincinnati to any airport in the new york city area that arrive next saturday before 6 pm	flight	flight	0.9992904102839024	1
+find me a flight from cincinnati to any airport in the new york city area	flight	flight	0.9992983988106655	1
+i 'd like to fly from miami to chicago on american airlines	flight	flight	0.9993114581950912	1
+i would like to book a round trip flight from kansas city to chicago	flight	flight	0.9992962165744437	1
+find me a flight that flies from memphis to tacoma	flight	flight	0.9993141209386892	1

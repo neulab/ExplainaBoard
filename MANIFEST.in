@@ -1,0 +1,2 @@
+include *.txt
+recursive-include interpret_eval/tasks/* *.aspects *.json
