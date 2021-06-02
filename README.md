@@ -1,17 +1,4 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
-<p align="center">
-  <img src="./fig/logo-full-v2.png" width="800" class="center">
-  <br />
-  <br />
-  <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
-  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
-  <a href=""><img alt="PyPI" src="https://img.shields.io/pypi/v/interpret-eval" /></a>
-  <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-</p>
-
-
-
-
 [**Introduction**](##introduction) | 
 [**Website**](#website) |
 [**Download**](#download-system-outputs) |
@@ -19,6 +6,21 @@
 [**Paper**](https://arxiv.org/pdf/2104.06387.pdf) |
 [**Video**](https://www.youtube.com/watch?v=3X6NgpbN_GU) |
 [**Bib**](http://explainaboard.nlpedia.ai/explainaboard.bib)
+
+<p align="center">
+  <img src="./fig/logo-full-v2.png" width="800" class="center">
+  <br />
+  <br />
+  <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
+  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
+  <a href="https://pypi.org/project/interpret-eval/"><img alt="PyPI" src="https://img.shields.io/pypi/v/interpret-eval" /></a>
+  <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
+</p>
+
+
+
+
+
 
 
 
@@ -42,27 +44,38 @@
 We not only provide a Web-based Interactive Toolkit but also release an API that users can flexible evaluate their systems offline, which
 means, you can play with ExplainaBoard at following levels:
 
-* [Just playing with it]: You can walk around, track NLP progress, understand relative merits of different top-performing systems.
-* [We help you analyze your model]: You submit your model outputs and deploy them into online ExplainaBoard
-* [Do it by yourself]: You can process your model outputs by yourself using our API.
+* Just playing with it: You can walk around, track NLP progress, understand relative merits of different top-performing systems.
+* We help you analyze your model: You submit your model outputs and deploy them into online ExplainaBoard
+* Do it by yourself: You can process your model outputs by yourself using our API.
 
 
 
-## API
+## Quick Installation
 
-### Test Your Results
+#### Method 1: Simple installation from PyPI (Python 3 only)
 ```
+pip install interpret-eval
+```
+
+#### Method 2: Install from the source and develop locally (Python 3 only)
+```bash
+# Clone current repo
+git clone https://github.com/neulab/ExplainaBoard.git
+# Requirements
 pip install -r requirements.txt
+# Install the package
 python setup.py install
 ```
+#### Then, you can run following examples via bash
 
-
-### Example
-
+```bash
+  interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
 ```
-interpret-eval -h
-interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
-```
+
+
+
+
+
 
 
 
