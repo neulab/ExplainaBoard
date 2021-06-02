@@ -11,6 +11,23 @@
 
 <img src="./fig/logo-full-v2.png" width="800" class="center">
 
+
+
+## Test Your Results
+```
+pip install -r requirements.txt
+python setup.py install
+```
+
+### Example
+
+```
+interpret-eval -h
+interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
+```
+
+
+
 ## Introduction
 ### ExplainaBoard is an interpretable, interactive and reliable leaderboard with seven (so far) new features (F) compared with generic leaderboard.
 * F1: *Single-system Analysis*: What is a system good or bad at?
@@ -56,19 +73,6 @@ We haven't released datasets or corresponding system outputs that require licens
 If these system outputs are useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
 
 
-
-## Test Your Results
-```
-pip install -r requirements.txt
-python setup.py install
-```
-
-### Example
-
-```
-interpret-eval -h
-interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
-```
 
 
 ## Submit Your Results
