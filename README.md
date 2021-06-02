@@ -1,4 +1,16 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
+<p align="center">
+  <img src="./fig/logo-full-v2.png" width="800" class="center">
+  <br />
+  <br />
+  <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
+  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Unbabel/COMET" /></a>
+  <a href=""><img alt="PyPI" src="https://img.shields.io/pypi/v/interpret-eval" /></a>
+  <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
+</p>
+
+
+
 
 [**Introduction**](##introduction) | 
 [**Website**](#website) |
@@ -13,21 +25,6 @@
 
 
 
-## Test Your Results
-```
-pip install -r requirements.txt
-python setup.py install
-```
-
-### Example
-
-```
-interpret-eval -h
-interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
-```
-
-
-
 ## Introduction
 ### ExplainaBoard is an interpretable, interactive and reliable leaderboard with seven (so far) new features (F) compared with generic leaderboard.
 * F1: *Single-system Analysis*: What is a system good or bad at?
@@ -39,6 +36,43 @@ interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv 
 
 
 <img src="./fig/intro.png" width="400" class="center">
+
+
+### Usage
+We not only provide a Web-based Interactive Toolkit but also release an API that users can flexible evaluate their systems offline, which
+means, you can play with ExplainaBoard at following levels:
+
+* [Just playing with it]: You can walk around, track NLP progress, understand relative merits of different top-performing systems.
+* [We help you analyze your model]: You submit your model outputs and deploy them into online ExplainaBoard
+* [Do it by yourself]: You can process your model outputs by yourself using our API.
+
+
+
+## API
+
+### Test Your Results
+```
+pip install -r requirements.txt
+python setup.py install
+```
+
+
+### Example
+
+```
+interpret-eval -h
+interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
+```
+
+
+
+## Submit Your Results
+You can submit your system's output by this 
+[form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) 
+following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
+
+
+
 
 
 
@@ -68,6 +102,12 @@ We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), wh
 <img src="./fig/demo.gif" width="800" class="center">
 
 
+
+
+
+
+
+
 ## Download System Outputs
 We haven't released datasets or corresponding system outputs that require licenses. But If you have licenses please fill in this [form](https://docs.google.com/forms/d/1rl7dgOTroT4hazUsd8CaSbGPKFbo2HNOO5pFBsM8IY0/edit) and we will send them to you privately. (Description of output's format can refer [here](https://github.com/neulab/ExplainaBoard/tree/main/output_format)
 If these system outputs are useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
@@ -75,8 +115,6 @@ If these system outputs are useful for you, you can [cite our work](http://expla
 
 
 
-## Submit Your Results
-You can submit your system's output by this [form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
 
 
 
