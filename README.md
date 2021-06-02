@@ -44,9 +44,9 @@
 We not only provide a Web-based Interactive Toolkit but also release an API that users can flexible evaluate their systems offline, which
 means, you can play with ExplainaBoard at following levels:
 
-* Just playing with it: You can walk around, track NLP progress, understand relative merits of different top-performing systems.
-* We help you analyze your model: You submit your model outputs and deploy them into online ExplainaBoard
-* Do it by yourself: You can process your model outputs by yourself using our API.
+* U1: *Just playing with it*: You can walk around, track NLP progress, understand relative merits of different top-performing systems.
+* U2: *We help you analyze your model*: You submit your model outputs and deploy them into online ExplainaBoard
+* U3: *Do it by yourself*: You can process your model outputs by yourself using our API.
 
 
 
