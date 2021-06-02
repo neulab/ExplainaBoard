@@ -63,30 +63,13 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
-### Description of Each Directory
-* `task-[task_name]`: fine-grained analysis for each task, 
-  aiming to generating fine-grained analysis results with the json format.
-  For example, task-mlqa can calculate the fine-graied F1 scores for different systems,
-  and output corresponding json files in task-mlqa/output/ .
-  
-* `meta-eval` is a sort of controller, which can be used to start the fine-graind anlsysis of all
-tasks, and analyze output json files.
+### Example
 
-    - calculate fine-grained results for all tasks: ./meta-eval/run-allTasks.sh
-    ```js
-        cd ./meta-eval/
-        ./run-allTasks.sh
-     ```
-  
-    - merge json files of all tasks into a csv file, which would be useful for further SQL import:
-    ./meta-eval/genCSV/json2csv.py
-  
-    ```js
-        cd ./meta-eval/genCSV/json2csv.py
-        python json2csv.py > explainabord.csv
-    ```
+```
+interpret-eval -h
+interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
+```
 
-* `src` stores some auxiliary codes.
 
 ## Submit Your Results
 You can submit your system's output by this [form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
