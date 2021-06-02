@@ -38,12 +38,12 @@ setup(
     ],
   },
   install_requires=[
-      "nltk >= 3.2",
+      "nltk>=3.2",
       "numpy",
       "scipy",
       "matplotlib",
       "scikit-learn",
-      "seqeval==0.0.12",
+      "seqeval",
   ],
   include_package_data=True,
 )
