@@ -62,8 +62,10 @@ pip install interpret-eval
 # Clone current repo
 git clone https://github.com/neulab/ExplainaBoard.git
 cd ExplainaBoard
+
 # Requirements
 pip install -r requirements.txt
+
 # Install the package
 python setup.py install
 ```
