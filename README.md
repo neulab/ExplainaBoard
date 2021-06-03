@@ -1,5 +1,5 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
-[**Introduction**](##introduction) | 
+[**Introduction**](#introduction) | 
 [**Web Tool**](https://github.com/neulab/ExplainaBoard#web-based-toolkit-quick-learning) |
 [**API Tool**](#api-based-toolkit-quick-installation) |
 [**Download**](#download-system-outputs) |
