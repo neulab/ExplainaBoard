@@ -1,7 +1,7 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
 [**Introduction**](##introduction) | 
-[**Web Tool**](http://explainaboard.nlpedia.ai/) |
-[**API Tool**](#test-your-results) |
+[**Web Tool**](https://github.com/neulab/ExplainaBoard#web-based-toolkit-quick-learning) |
+[**API Tool**](#api-based-toolkit-quick-installation) |
 [**Download**](#download-system-outputs) |
 [**Paper**](https://arxiv.org/pdf/2104.06387.pdf) |
 [**Video**](https://www.youtube.com/watch?v=3X6NgpbN_GU) |
