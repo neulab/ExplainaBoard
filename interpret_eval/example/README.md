@@ -4,7 +4,7 @@
 ```bash
 sentence \t true_label \t predicted_label
 ```
-Although the above example file of text classification show multiple columns, but if not aiming to print the ``calibration`` feature, the above three columns are sufficient.
+Although the above example file of text classification shows multiple columns, but if not aiming to print the ``calibration`` feature, the above three columns are sufficient.
 
 
 ### Tagging
@@ -19,3 +19,4 @@ Specific tasks including Named Entity Recognition (NER), Chinese Word Segmentati
 ```bash
 sentence1 \t sentence2 \t true_label \t predicted_label
 ```
+Although the above example file of text classification shows multiple columns, but if not aiming to print the ``calibration`` feature, the above three columns are sufficient.
