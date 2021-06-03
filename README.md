@@ -61,6 +61,7 @@ pip install interpret-eval
 ```bash
 # Clone current repo
 git clone https://github.com/neulab/ExplainaBoard.git
+cd ExplainaBoard
 # Requirements
 pip install -r requirements.txt
 # Install the package
@@ -71,8 +72,11 @@ python setup.py install
 ```bash
   interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
 ```
+This will generate a detailed report (saved in ``out.json`) for your input system (``test-conll00.tsv``).
 
-## Web-based Toolkit
+
+
+## Web-based Toolkit: Quick Learning
 We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks, 
 40 datasets and 300 systems. Detailed information is as follows.
 <img src="./fig/demo.gif" width="800" class="center">
