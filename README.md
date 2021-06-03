@@ -73,6 +73,7 @@ python setup.py install
   interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
 ```
 where ``test-conll00.tsv`` denotes your system output file whose format depends on different tasks.
+For each task we have provided one [example output file](https://github.com/neulab/ExplainaBoard/blob/main/interpret_eval/example/) to show how they are formated.
 The above command will generate a detailed report (saved in ``out.json``) for your input system (``test-conll00.tsv``).
 Specifically, following statistics are included:
 
