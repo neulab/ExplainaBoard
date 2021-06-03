@@ -4,7 +4,7 @@
 ```bash
 sentence \t true_label \t predicted_label
 ```
-If not printing the ``calibration`` feature, the above three columns are sufficient.
+Although the above example file of text classification show multiple columns, but if not aiming to print the ``calibration`` feature, the above three columns are sufficient.
 
 
 ### Tagging
