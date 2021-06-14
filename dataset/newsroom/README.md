@@ -17,7 +17,7 @@ with Diverse Extractive Strategies](https://www.aclweb.org/anthology/N18-1065.pd
 
 
 ## Data Structure
-
+A data sample is shown in the following json format.
 ### Example
 ```json
 {
