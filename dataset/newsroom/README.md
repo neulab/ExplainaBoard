@@ -45,7 +45,7 @@ Each data sample contains the following fields:
 * text: Article text.
 * summary: Summary written by newsroom editors and journalists.
 * compression: How succinct a summary is. Compression(A, S) is defined as the word ratio between the article and summary:
-![\Large Compression(A, S) = \frac{|A|}{|S|}](https://latex.codecogs.com/svg.latex?x%3D%5Cfrac%7B-b%5Cpm%5Csqrt%7Bb%5E2-4ac%7D%7D%7B2a%7D)
+![\Large Compression(A, S) = \frac{|A|}{|S|}](https://latex.codecogs.com/svg.image?Compression(A,%20S)%20=%20%5Cfrac%7B%7CA%7C%7D%7B%7CS%7C%7D)
 * coverage: The extent to which a summary is derivative of a text. Coverage(A, S) measures the percentage of words in the summary that are part of an extractive fragment with the article:
 $$Coverage(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|$$
 * density: How well the word sequence of a summary can be described as a series of extractions. Density(A, S) is defined as the average length of the extractive fragment to which each word in the summary belongs. 
