@@ -5,6 +5,7 @@
 PEGASUS uses pre-training objectives tailored for abstractive text summarization. Specifically, in PEGASUS, important sentences are removed/masked from an input document and are generated together as one output sequence from the remaining sentences, similar to an extractive summary. 
 
 ## Meta Data
+* Download Link of System Output: [Google drive](xxx)
 * Github Repo: [google-research/pegasus](https://github.com/google-research/pegasus)
 * Paper: [PEGASUS: Pre-training with Extracted Gap-sentences for Abstractive Summarization](http://proceedings.mlr.press/v119/zhang20ae/zhang20ae.pdf)
 * Corresponding Author: Peter J. Liu
