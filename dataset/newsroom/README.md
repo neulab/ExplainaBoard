@@ -21,18 +21,18 @@ with Diverse Extractive Strategies](https://www.aclweb.org/anthology/N18-1065.pd
 ### Example
 ```json
 {
-    "url":"http:\/\/www.nydailynews.com\/archives\/news\/1995\/10\/14\/1995-10-14_selena_s_last_cries___shot_s.html",
-    "archive":"http:\/\/web.archive.org\/web\/20090428161725id_\/http:\/\/www.nydailynews.com:80\/archives\/news\/1995\/10\/14\/1995-10-14_selena_s_last_cries___shot_s.html",
-    "title":"SELENA'S LAST CRIES SHOT SINGER BEGGED HELP, NAMED SUSPECT",
-    "date":"20090428161725",
-    "text":"By MATT SCHWARTZ in Houston and WENDELL JAMIESON in New York Daily News Writers\n\nSaturday, October 14th 1995, 4:22AM\n\nBleeding from a massive chest wound, Tejano star Selena cried, \"Help me! Help me! I've been shot!\" and then named her killer with her dying breath.\n\nShaken witnesses yesterday told a spellbound Houston courtroom how the blood-covered, mortally wounded 23-year-old Hispanic singing sensation burst into the lobby of the Corpus Christi Days Inn last March 31.\n\nGasping for breath, Selena told motel workers that Yolanda Saldivar the president of her fan club shot her once in the back. She begged, \"Close the door or she will shoot me again,\" the witnesses said.\n\nThe testimony came on the third day of Saldivar's trial on charges she murdered Selena with a shot from a .38-caliber revolver when the star tried to fire her for embezzling $30,000 from two boutiques she managed for the singer.\n\nAs a paramedic and motel workers recounted Selena's last desperate moments, her mother, father and brother sobbed quietly. Saldivar, as she has throughout the trial, stared blankly.\n\nRuben Deleon, the motel's sales director, said he knelt over the dying star and asked who shot her.\n\n\"She said 'Yolanda Saldivar in room 158,' \" Deleon said.\n\n\"She was yelling, 'Help me! Help me! I've been shot,' \" said Rosalinda Gonzalez, an assistant manager. \"I asked who shot her. She said the lady in room 158. She moaned. Her eyes rolled up.\"\n\nFront desk clerk Shawna Vela said she dialed 911 and took the phone with her as she kneeled over the fallen singer, asking her what happened.\n\n\"She said 'Yolanda,' she said 'In room 158,' \" Vela testified.\n\nThe first paramedic on the scene, Richard Fredrickson, testified that he arrived just two minutes after the call but it was already too late.\n\n\"The girl was covered with blood,\" he remembered. \"Blood was thick from her neck to her knees, all the way around both sides.\"\n\nFredrickson couldn't even see the mortal wound until he cut off Selena's sweatshirt. He felt for a pulse in her neck but could feel only twitching muscles, he said.\n\nMinutes later, as he rode in an ambulance with the now unconscious Selena, he unclenched the dying woman's fist and made an ironic discovery.\n\n\"When I opened it, a ring fell out,\" he said. \"It was covered with blood.\"\n\nThe 14-karat gold and diamond ring, topped with a white-gold egg, was a gift from the Grammy winner's boutique employes and Saldivar. Police have said Saldivar demanded the ring back. But before Selena could hand it over, she was shot.\n\nThe singer, whose full name was Selena Quintanilla Perez, was born around Easter and collected decorative eggs.\n\nThe defense claims Saldivar, 35, was hysterical and shot Selena by accident. Prosecutors say it was deliberate.",
-    "summary":"Bleeding from a massive chest wound, Tejano star Selena cried, \"Help me! Help me! I've been shot!\"and then named her killer with her dying breath. Shaken witnesses yesterday told a spellbound Houston courtroom how the blood-covered, mortally wounded 23-year-old Hispanic singing sensation burst into the lobby of the Corpus Christi Days Inn last March 31. Gasping for breath, Selena told motel workers that Yolanda Saldivar the president of her fan club shot",
-    "compression":6.9651162791,
-    "coverage":0.988372093,
-    "density":25.4069767442,
-    "compression_bin":"low",
-    "coverage_bin":"high",
-    "density_bin":"extractive"
+    "url": "http:\/\/www.nydailynews.com\/archives\/news\/1995\/10\/14\/1995-10-14_selena_s_last_cries___shot_s.html",
+    "archive": "http:\/\/web.archive.org\/web\/20090428161725id_\/http:\/\/www.nydailynews.com:80\/archives\/news\/1995\/10\/14\/1995-10-14_selena_s_last_cries___shot_s.html",
+    "title": "SELENA'S LAST CRIES SHOT SINGER BEGGED HELP, NAMED SUSPECT",
+    "date": "20090428161725",
+    "text": "By MATT SCHWARTZ in Houston and WENDELL JAMIESON in New York Daily News Writers\n\nSaturday, October 14th 1995, 4:22AM\n\nBleeding from a massive chest wound, Tejano star Selena cried, \"Help me! Help me! I've been shot!\" and then named her killer with her dying breath.\n\nShaken witnesses yesterday told a spellbound Houston courtroom how the blood-covered, mortally wounded 23-year-old Hispanic singing sensation burst into the lobby of the Corpus Christi Days Inn last March 31.\n\nGasping for breath, Selena told motel workers that Yolanda Saldivar the president of her fan club shot her once in the back. She begged, \"Close the door or she will shoot me again,\" the witnesses said.\n\nThe testimony came on the third day of Saldivar's trial on charges she murdered Selena with a shot from a .38-caliber revolver when the star tried to fire her for embezzling $30,000 from two boutiques she managed for the singer.\n\nAs a paramedic and motel workers recounted Selena's last desperate moments, her mother, father and brother sobbed quietly. Saldivar, as she has throughout the trial, stared blankly.\n\nRuben Deleon, the motel's sales director, said he knelt over the dying star and asked who shot her.\n\n\"She said 'Yolanda Saldivar in room 158,' \" Deleon said.\n\n\"She was yelling, 'Help me! Help me! I've been shot,' \" said Rosalinda Gonzalez, an assistant manager. \"I asked who shot her. She said the lady in room 158. She moaned. Her eyes rolled up.\"\n\nFront desk clerk Shawna Vela said she dialed 911 and took the phone with her as she kneeled over the fallen singer, asking her what happened.\n\n\"She said 'Yolanda,' she said 'In room 158,' \" Vela testified.\n\nThe first paramedic on the scene, Richard Fredrickson, testified that he arrived just two minutes after the call but it was already too late.\n\n\"The girl was covered with blood,\" he remembered. \"Blood was thick from her neck to her knees, all the way around both sides.\"\n\nFredrickson couldn't even see the mortal wound until he cut off Selena's sweatshirt. He felt for a pulse in her neck but could feel only twitching muscles, he said.\n\nMinutes later, as he rode in an ambulance with the now unconscious Selena, he unclenched the dying woman's fist and made an ironic discovery.\n\n\"When I opened it, a ring fell out,\" he said. \"It was covered with blood.\"\n\nThe 14-karat gold and diamond ring, topped with a white-gold egg, was a gift from the Grammy winner's boutique employes and Saldivar. Police have said Saldivar demanded the ring back. But before Selena could hand it over, she was shot.\n\nThe singer, whose full name was Selena Quintanilla Perez, was born around Easter and collected decorative eggs.\n\nThe defense claims Saldivar, 35, was hysterical and shot Selena by accident. Prosecutors say it was deliberate.",
+    "summary": "Bleeding from a massive chest wound, Tejano star Selena cried, \"Help me! Help me! I've been shot!\"and then named her killer with her dying breath. Shaken witnesses yesterday told a spellbound Houston courtroom how the blood-covered, mortally wounded 23-year-old Hispanic singing sensation burst into the lobby of the Corpus Christi Days Inn last March 31. Gasping for breath, Selena told motel workers that Yolanda Saldivar the president of her fan club shot",
+    "compression": 6.9651162791,
+    "coverage": 0.988372093,
+    "density": 25.4069767442,
+    "compression_bin": "low",
+    "coverage_bin": "high",
+    "density_bin": "extractive"
 }
 ```
 
@@ -45,14 +45,14 @@ Each data sample contains the following fields:
 * text: Article text.
 * summary: Summary written by newsroom editors and journalists.
 * compression: How succinct a summary is. Compression(A, S) is defined as the word ratio between the article and summary:
-$$Compression(A, S) = \frac{|A|}{|S|}$$
+![\Large Compression(A, S) = \frac{|A|}{|S|}](https://latex.codecogs.com/svg.latex?x%3D%5Cfrac%7B-b%5Cpm%5Csqrt%7Bb%5E2-4ac%7D%7D%7B2a%7D)
 * coverage: The extent to which a summary is derivative of a text. Coverage(A, S) measures the percentage of words in the summary that are part of an extractive fragment with the article:
 $$Coverage(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|$$
 * density: How well the word sequence of a summary can be described as a series of extractions. Density(A, S) is defined as the average length of the extractive fragment to which each word in the summary belongs. 
 $$Density(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|^2$$
 * compression_bin: The degree of compression.
-* coverage_bin: The degree of Coverage.
-* density_bin: The degree of Density.
+* coverage_bin: The degree of coverage.
+* density_bin: The degree of density.
 
 ### Split
 The data are divided into *training* (76%), *development* (8%), *test* (8%), and unreleased test (8%) datasets using a hash function of the article URL.
