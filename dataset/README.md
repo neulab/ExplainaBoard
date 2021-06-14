@@ -12,5 +12,13 @@ Copy the directory ``ExplainaBoard/dataset/example`` and rename it as your datas
 
 
 ### Step 3
-Fill in the ``README.md`` file under ``ExplainaBoard/dataset/XYZ/`` with the template
+Fill in the ``README.md`` file under ``ExplainaBoard/dataset/XYZ/``.
+
+
+### Step 4
+Set up a ``Pull request`` and we will deal with them.
+
+
+
+# How to add your system outputs?
 
