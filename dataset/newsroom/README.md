@@ -17,8 +17,8 @@ with Diverse Extractive Strategies](https://www.aclweb.org/anthology/N18-1065.pd
 
 
 ## Data Structure
-A data sample is shown in the following json format.
 ### Example
+A data sample is shown in the following json format.
 ```json
 {
     "url": "http:\/\/www.nydailynews.com\/archives\/news\/1995\/10\/14\/1995-10-14_selena_s_last_cries___shot_s.html",
