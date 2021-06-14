@@ -1,4 +1,4 @@
-# Dataset for XSum
+# Dataset for Newsroom
 
 
 ## Description
