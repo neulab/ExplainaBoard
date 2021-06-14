@@ -46,13 +46,13 @@ Each data sample contains the following fields:
 * summary: Summary written by newsroom editors and journalists.
 * compression: How succinct a summary is. Compression(A, S) is defined as the word ratio between the article and summary:
 
-![\Large Compression(A, S) = \frac{|A|}{|S|}](https://latex.codecogs.com/svg.image?Compression(A,%20S)%20=%20%5Cfrac%7B%7CA%7C%7D%7B%7CS%7C%7D)
+&nbsp;&nbsp;&nbsp;![\Large Compression(A, S) = \frac{|A|}{|S|}](https://latex.codecogs.com/svg.image?Compression(A,%20S)%20=%20%5Cfrac%7B%7CA%7C%7D%7B%7CS%7C%7D)
 * coverage: The extent to which a summary is derivative of a text. Coverage(A, S) measures the percentage of words in the summary that are part of an extractive fragment with the article:
 
-![\Large Coverage(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|](https://latex.codecogs.com/svg.image?Coverage(A,&space;S)&space;=&space;\frac{1}{|S|}\sum_{f&space;\in&space;\mathcal{F}(A,&space;S)}|f|)
+&nbsp;&nbsp;&nbsp;![\Large Coverage(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|](https://latex.codecogs.com/svg.image?Coverage(A,&space;S)&space;=&space;\frac{1}{|S|}\sum_{f&space;\in&space;\mathcal{F}(A,&space;S)}|f|)
 * density: How well the word sequence of a summary can be described as a series of extractions. Density(A, S) is defined as the average length of the extractive fragment to which each word in the summary belongs:
 
-![\Large Density(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|^2](https://latex.codecogs.com/svg.image?Density(A,%20S)%20=%20%5Cfrac%7B1%7D%7B%7CS%7C%7D%5Csum_%7Bf%20%5Cin%20%5Cmathcal%7BF%7D(A,%20S)%7D%7Cf%7C%5E2)
+&nbsp;&nbsp;&nbsp;![\Large Density(A, S) = \frac{1}{|S|}\sum_{f \in \mathcal{F}(A, S)}|f|^2](https://latex.codecogs.com/svg.image?Density(A,%20S)%20=%20%5Cfrac%7B1%7D%7B%7CS%7C%7D%5Csum_%7Bf%20%5Cin%20%5Cmathcal%7BF%7D(A,%20S)%7D%7Cf%7C%5E2)
 * compression_bin: The degree of compression.
 * coverage_bin: The degree of coverage.
 * density_bin: The degree of density.
