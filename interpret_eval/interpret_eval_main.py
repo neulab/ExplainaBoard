@@ -60,6 +60,8 @@ def main():
         interpret_eval.tasks.tc.tensoreval.evaluate(task_type=task, analysis_type=analysis_type, systems=systems, output=output, is_print_ci = is_print_ci, is_print_case = is_print_case, is_print_ece = is_print_ece)
     elif task == "nli":
         interpret_eval.tasks.nli.tensoreval.evaluate(task_type=task, analysis_type=analysis_type, systems=systems, output=output, is_print_ci = is_print_ci, is_print_case = is_print_case, is_print_ece = is_print_ece)
+    elif task == "re":
+        interpret_eval.tasks.re.tensoreval.evaluate(task_type=task, analysis_type=analysis_type, systems=systems, output=output, is_print_ci = is_print_ci, is_print_case = is_print_case, is_print_ece = is_print_ece)
 
 
 
@@ -68,3 +70,5 @@ if __name__ == '__main__':
     main()
     # python interpret_eval_main.py --task absa  --systems ./test-laptop.tsv --output ./output/a.json
     # python interpret_eval_main.py --task ner --systems ./test-conll03.tsv --output ./a.json
+    # python interpret_eval_main.py --task re --systems ./test_re.tsv --output ./a.json
+    # python tensoreval.py  --task re --case True --systems ./test_re.tsv --output a.json --ci True

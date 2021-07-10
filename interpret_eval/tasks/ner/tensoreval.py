@@ -321,6 +321,9 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	path_preComputed = ""
 	path_aspect_conf = "./interpret_eval/tasks/ner/conf.aspects"
 	path_json_input = "./interpret_eval/tasks/ner/template.json"
+
+	# path_aspect_conf = "./tasks/ner/conf.aspects"
+	# path_json_input = "./tasks/ner/template.json"
 	# path_aspect_conf = "/usr2/home/pliu3/data/neulab/interpret_eval/tasks/ner/conf.aspects"
 	# path_json_input = "/usr2/home/pliu3/data/neulab/interpret_eval/tasks/ner/template.json"
 	fn_write_json = output
