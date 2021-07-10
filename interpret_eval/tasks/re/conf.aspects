@@ -1,0 +1,35 @@
+# Sentence Length
+notation:	sLen
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+# Paragraph Length
+notation:	pLen
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+
+# Number of Entity
+notation:	nEnt
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+
+# Average Distance
+notation:	avgDist
+type:	bucketAttribute_SpecifiedBucketValue
+setting:	4	[]
+is_preComputed:	No
+
+
+
+# Tag
+notation:	tag
+type:	bucketAttribute_DiscreteValue
+setting:	2	1
+is_preComputed:	No
+
+
