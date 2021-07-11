@@ -5,3 +5,7 @@ interpret_eval/example/test_re.tsv
 interpret_eval/tasks/re/errorAnalysis.py
 interpret_eval/example/test-re.tsv
 interpret_eval/example/test-re.tsv
+interpret_eval/tasks/re/test_re.tsv
+interpret_eval/tasks/re/tensoreval-backup.py
+interpret_eval/tasks/re/a.json
+interpret_eval/tasks/re/instantiate.json
