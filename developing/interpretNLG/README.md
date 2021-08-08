@@ -30,5 +30,5 @@ Here is an [example]()
 ## Output: Analysis of system output
 
 #### Example
-Here is an [example]()
+Here is an [example](https://github.com/neulab/ExplainaBoard/blob/NLG/developing/interpretNLG/example/newstest2020.dong-nmt.768.en-zh.json)
 
