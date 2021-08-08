@@ -24,7 +24,8 @@ The specific format (jsonl) follows:
 ```
 
 #### Example
-Here is an [example]()
+Here is an [example](https://github.com/neulab/ExplainaBoard/blob/NLG/developing/interpretNLG/example/input.jsonl)
+
 
 
 ## Output: Analysis of system output
