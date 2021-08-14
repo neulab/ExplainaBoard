@@ -90,8 +90,8 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
     corpus_type = "dataset_name"
     model_name = "model_name"
     path_preComputed = ""
-    path_aspect_conf = "./interpret_eval/tasks/pos/conf.aspects"
-    path_json_input = "./interpret_eval/tasks/pos/template.json"
+    path_aspect_conf = "./explainaboard/tasks/pos/conf.aspects"
+    path_json_input = "./explainaboard/tasks/pos/template.json"
     fn_write_json = output
 
     # Initalization
