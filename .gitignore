@@ -9,3 +9,7 @@ interpret_eval/tasks/re/test_re.tsv
 interpret_eval/tasks/re/tensoreval-backup.py
 interpret_eval/tasks/re/a.json
 interpret_eval/tasks/re/instantiate.json
+instantiate.json
+out.json
+*.egg-info
+__pycache__
