@@ -72,7 +72,7 @@ python setup.py install
 #### Then, you can run following examples via bash
 
 ```bash
-   --task chunk --systems ./explainaboard/example/test-conll00.tsv --output out.json
+   explainaboard --task chunk --systems ./explainaboard/example/test-conll00.tsv --output out.json
 ```
 where ``test-conll00.tsv`` denotes your system output file whose format depends on different tasks.
 For each task we have provided one [example output file](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/example/) to show how they are formated.
