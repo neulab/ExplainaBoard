@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
-import argparse
-import numpy
-import sys
-from sklearn.metrics import f1_score
+from explainaboard.tasks.src.error_analysis import *
 
-# sys.path.append("./src")
-# from src.utils import *
-# from src.errorAnalysis import *
-from ..src.errorAnalysis import *
 
 #   getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent, dict_precomputed_path)
 

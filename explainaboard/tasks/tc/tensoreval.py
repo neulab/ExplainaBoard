@@ -1,25 +1,5 @@
 # -*- coding: utf-8 -*-
-import argparse
-import numpy
-import sys
-# sys.path.append("./src")
-# from src.utils import *
-# from src.errorAnalysis import *
-
-from ..src.errorAnalysis import *
-
-
-
-
-
-# def tuple2str(triplet):
-# 	res = ""
-# 	for v in triplet:
-# 		res += str(v) + "_"
-# 	return res.rstrip("_")
-
-
-
+from explainaboard.tasks.src.error_analysis import *
 
 def sent2list(sent):
 	if len(sent.split(" ")) == 1 and len(list(sent))>=5:
@@ -31,11 +11,6 @@ def sent2list(sent):
 
 
 def getAspectValue(sent_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
-
-
-
-
-
 	dict_span2aspectVal = {}
 	dict_span2aspectVal_pred = {}
 
