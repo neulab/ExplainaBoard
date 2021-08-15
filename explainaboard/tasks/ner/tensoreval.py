@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-import argparse
-import numpy
-import sys
+from explainaboard.tasks.src.error_analysis import *
 
-from ..src.errorAnalysis import *
 # from ..src.ner_overall_f1 import *
 # from src.utils import *
 # from src.errorAnalysis import *

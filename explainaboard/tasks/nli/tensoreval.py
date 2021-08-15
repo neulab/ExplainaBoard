@@ -1,14 +1,5 @@
 # -*- coding: utf-8 -*-
-import argparse
-import numpy
-import sys
-import csv
-
-# sys.path.append("./src")
-# from src.utils import *
-# from src.errorAnalysis import *
-from ..src.errorAnalysis import *
-
+from explainaboard.tasks.src.error_analysis import *
 
 
 

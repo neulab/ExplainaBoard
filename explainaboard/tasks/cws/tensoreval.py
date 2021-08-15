@@ -1,12 +1,4 @@
-import sys
-import argparse
-import numpy
-import sys
-# sys.path.append("./src")
-# from src.utils import *
-# from src.errorAnalysis import *
-from ..src.errorAnalysis import *
-
+from explainaboard.tasks.src.error_analysis import *
 
 def get_chunk_type(tok):
 	"""
