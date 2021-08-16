@@ -3,27 +3,6 @@ import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 
 
-def calculate_ece(result_list):
-    ece = 0
-    size = 0
-    tem_list = []
-    for value in result_list:
-        if value[2] == 0:
-            tem_list.append(0)
-            continue
-        size = size + value[2]
-        error = abs(float(value[0]) - float(value[1]))
-        tem_list.append(error)
-
-    if size == 0:
-        return -1
-
-    for i in range(len(result_list)):
-        ece = ece + ((result_list[i][2] / size) * tem_list[i])
-
-    return ece
-
-
 def divide_into_bin(size_of_bin, raw_list):
     bin_list = []
     basic_width = 1 / size_of_bin
@@ -90,7 +69,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
     bin_list = divide_into_bin(size_of_bin, raw_list)
 
-    ece = calculate_ece(bin_list)
+    ece = ea.calculate_ece(bin_list)
     dic = OrderedDict()
     dic['dataset-name'] = dataset
     dic['model-name'] = model

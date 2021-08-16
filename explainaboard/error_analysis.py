@@ -2212,3 +2212,23 @@ def getBucketAcc_with_errorCase_semp(dict_bucket2span, dict_bucket2span_pred, di
 
     return sortDict(dict_bucket2f1)
 
+
+def calculate_ece(result_list):
+    ece = 0
+    size = 0
+    tem_list = []
+    for value in result_list:
+        if value[2] == 0:
+            tem_list.append(0)
+            continue
+        size = size + value[2]
+        error = abs(float(value[0]) - float(value[1]))
+        tem_list.append(error)
+
+    if size == 0:
+        return -1
+
+    for i in range(len(result_list)):
+        ece = ece + ((result_list[i][2] / size) * tem_list[i])
+
+    return ece
