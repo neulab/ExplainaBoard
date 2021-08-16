@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
+import numpy
 
 
 def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
@@ -235,7 +236,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 		if type(list(aspect2Val.values())[0]) != type("string"):
 		# if isinstance(list(aspect2Val.values())[0], str):
-			dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
+			dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
 	print("------------------ Dataset Bias")
 	for k, v in dict_aspect2bias.items():
