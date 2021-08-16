@@ -2,11 +2,7 @@
 import explainaboard.error_analysis as ea
 
 
-def sent2list(sent):
-	if len(sent.split(" ")) == 1 and len(list(sent))>=5:
-		return list(sent)
-	else:
-		return sent.split(" ")
+
 
 
 

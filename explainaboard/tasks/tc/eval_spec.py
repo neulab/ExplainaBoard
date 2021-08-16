@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
-
-def sent2list(sent):
-	if len(sent.split(" ")) == 1 and len(list(sent))>=5:
-		return list(sent)
-	else:
-		return sent.split(" ")
-
-
+import explainaboard.data_utils as du
 
 
 def getAspectValue(sent_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
@@ -60,34 +53,6 @@ def getAspectValue(sent_list, sample_list_tag, sample_list_tag_pred, dict_aspect
 
 	# print(dict_span2aspectVal["bleu"])
 	return  dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sent
-
-
-def get_probability_right_or_not(file_path):
-    """
-
-    :param file_path: the file_path is the path to your file.
-
-    And the path must include file name.
-
-    the file name is in this format: test_dataset_model.tsv.
-
-    the file_path must in the format: /root/path/to/your/file/test_dataset.tsv
-
-    The file must in this format:
-    sentence\tground_truth\tpredict_label\tprobability\tright_or_not
-    if prediction is right, right_or_not is assigned to 1, otherwise 0.
-
-    """
-
-    import pandas as pd
-    import numpy as np
-
-    result = pd.read_csv(file_path, sep='\t', header=None)
-
-    probability_list = np.array(result[3]).tolist()
-    right_or_not_list = np.array(result[4]).tolist()
-
-    return probability_list, right_or_not_list
 
 
 def get_raw_list(probability_list, right_or_not_list):
@@ -180,7 +145,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
     # import json
 
-    probability_list, right_or_not_list = get_probability_right_or_not(file_path)
+    probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=3, right_or_not_col=4)
 
     raw_list = get_raw_list(probability_list, right_or_not_list)
 
