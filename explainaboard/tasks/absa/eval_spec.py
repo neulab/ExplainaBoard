@@ -3,9 +3,6 @@ import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 
 
-
-
-
 def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
     """
 
@@ -58,10 +55,6 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
 
 def getAspectValue(sent_list, aspect_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
-
-
-
-
 
 	dict_span2aspectVal = {}
 	dict_span2aspectVal_pred = {}

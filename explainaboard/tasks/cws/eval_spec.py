@@ -1,17 +1,5 @@
 import explainaboard.error_analysis as ea
 
-def get_chunk_type(tok):
-	"""
-	Args:
-		tok: id of token, ex 4
-		idx_to_tag: dictionary {4: "B-PER", ...}
-	Returns:
-		tuple: "B", "PER"
-	"""
-	# tag_name = idx_to_tag[tok]
-	tag_class = tok.split('-')[0]
-	tag_type = tok.split('-')[-1]
-	return tag_class, tag_type
 
 def get_chunks(seq):
 	"""
