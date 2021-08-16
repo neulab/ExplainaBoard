@@ -1,12 +1,6 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
 
-# from ..src.ner_overall_f1 import *
-# from src.utils import *
-# from src.errorAnalysis import *
-
-
-
 
 def get_chunk_type(tok):
 	"""

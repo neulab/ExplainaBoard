@@ -2,31 +2,6 @@
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 
-# def get_probability_right_or_not(file_path):
-# 	probability_list, right_or_not_list = [], []
-#
-# 	fin = open(file_path, "r")
-# 	for line in fin:
-# 		line = line.rstrip("\n")
-# 		if len(line.split("\t")) !=6:
-# 			continue
-#
-#
-# 		probability_list.append(float(line.split("\t")[4]))
-# 		right_or_not_list.append(float(line.split("\t")[5]))
-#
-#
-#
-# 	return probability_list, right_or_not_list
-
-
-def get_raw_list(probability_list, right_or_not_list):
-    total_raw_list = []
-
-    for index in range(len(right_or_not_list)):
-        total_raw_list.append([probability_list[index], right_or_not_list[index]])
-    return total_raw_list
-
 
 def calculate_ece(result_list):
     ece = 0
@@ -111,7 +86,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
     probability_list, right_or_not_list = du.get_probability_right_or_not(file_path)
 
-    raw_list = get_raw_list(probability_list, right_or_not_list)
+    raw_list = list(zip((probability_list, right_or_not_list)))
 
     bin_list = divide_into_bin(size_of_bin, raw_list)
 
