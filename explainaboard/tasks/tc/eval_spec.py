@@ -55,39 +55,6 @@ def getAspectValue(sent_list, sample_list_tag, sample_list_tag_pred, dict_aspect
 	return  dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sent
 
 
-def divide_into_bin(size_of_bin, raw_list):
-    bin_list = []
-    basic_width = 1 / size_of_bin
-
-    for i in range(0, size_of_bin):
-        bin_list.append([])
-
-    for value in raw_list:
-        probability = value[0]
-        isRight = value[1]
-        if probability == 1.0:
-            bin_list[size_of_bin - 1].append([probability, isRight])
-            continue
-        for i in range(0, size_of_bin):
-            if (probability >= i * basic_width) & (probability < (i + 1) * basic_width):
-                bin_list[i].append([probability, isRight])
-
-    result_list = []
-    for i in range(0, size_of_bin):
-        value = bin_list[i]
-        if len(value) == 0:
-            result_list.append([0, 0, 0])
-            continue
-        total_probability = 0
-        total_right = 0
-        for result in value:
-            total_probability = total_probability + result[0]
-            total_right = total_right + result[1]
-        result_list.append([total_probability / len(value), total_right / (len(value)), len(value)])
-
-    return result_list
-
-
 def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
     """
 
@@ -120,7 +87,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
     raw_list = list(zip(probability_list, right_or_not_list))
 
-    bin_list = divide_into_bin(size_of_bin, raw_list)
+    bin_list = ea.divide_into_bin(size_of_bin, raw_list)
 
     ece = ea.calculate_ece(bin_list)
     dic = ea.OrderedDict()
