@@ -22,10 +22,6 @@ import scipy.stats
 import csv
 
 
-
-
-
-
 def get_chunks(seq):
 	"""
 	tags:dic{'per':1,....}

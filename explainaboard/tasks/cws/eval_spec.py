@@ -40,15 +40,6 @@ def read_data(corpus_type, fn, column_no=-1, delimiter =' '):
 	return total_word_sequences, total_tag_sequences, word_sequences, tag_sequences
 
 
-
-
-
-
-
-
-
-#   getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent, dict_precomputed_path)
-
 def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent,
 				   test_trueTag_sequences_sent, dict_preComputed_path, dict_aspect_func):
 
@@ -176,19 +167,6 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 
 		#print(dict_span2aspectVal)
 	return  dict_span2aspectVal, dict_span2sid, dict_chunkid2span
-
-
-
-
-# def tuple2str(triplet):
-# 	res = ""
-# 	for v in triplet:
-# 		res += str(v) + "_"
-# 	return res.rstrip("_")
-
-
-
-
 
 
 def evaluate(task_type = "ner", analysis_type = "single", systems = [], output = "./output.json", is_print_ci = False, is_print_case = False, is_print_ece = False):
