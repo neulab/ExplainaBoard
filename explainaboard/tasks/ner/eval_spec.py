@@ -2,51 +2,6 @@
 import explainaboard.error_analysis as ea
 
 
-def get_chunks(seq):
-	"""
-	tags:dic{'per':1,....}
-	Args:
-		seq: [4, 4, 0, 0, ...] sequence of labels
-		tags: dict["O"] = 4
-	Returns:
-		list of (chunk_type, chunk_start, chunk_end)
-
-	Example:
-		seq = [4, 5, 0, 3]
-		tags = {"B-PER": 4, "I-PER": 5, "B-LOC": 3}
-		result = [("PER", 0, 2), ("LOC", 3, 4)]
-	"""
-	default = 'O'
-	# idx_to_tag = {idx: tag for tag, idx in tags.items()}
-	chunks = []
-	chunk_type, chunk_start = None, None
-	for i, tok in enumerate(seq):
-		#End of a chunk 1
-		if tok == default and chunk_type is not None:
-			# Add a chunk.
-			chunk = (chunk_type, chunk_start, i)
-			chunks.append(chunk)
-			chunk_type, chunk_start = None, None
-
-		# End of a chunk + start of a chunk!
-		elif tok != default:
-			tok_chunk_class, tok_chunk_type = ea.get_chunk_type(tok)
-			if chunk_type is None:
-				chunk_type, chunk_start = tok_chunk_type, i
-			elif tok_chunk_type != chunk_type or tok_chunk_class == "B":
-				chunk = (chunk_type, chunk_start, i)
-				chunks.append(chunk)
-				chunk_type, chunk_start = tok_chunk_type, i
-		else:
-			pass
-	# end condition
-	if chunk_type is not None:
-		chunk = (chunk_type, chunk_start, len(seq))
-		chunks.append(chunk)
-
-	return chunks
-
-
 def read_data(corpus_type, fn, column_no=-1, delimiter =' '):
 	print('corpus_type',corpus_type)
 	word_sequences = list()
