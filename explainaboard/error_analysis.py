@@ -78,10 +78,8 @@ def get_chunk_type(tok):
 	Returns:
 		tuple: "B", "PER"
 	"""
-	# tag_name = idx_to_tag[tok]
-	tag_class = tok.split('-')[0]
-	tag_type = tok.split('-')[-1]
-	return tag_class, tag_type
+	tok_split = tok.split('-')
+	return tok_split[0], tok_split[-1]
 
 # def run_evaluate(self, sess, test, tags):
 def evaluate(words,labels_pred, labels):
