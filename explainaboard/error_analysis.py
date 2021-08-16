@@ -1,25 +1,15 @@
 import numpy as np
-import pickle
-import codecs
 import os
-from collections import Counter
-import re
-import math
 import scipy.stats as statss
 import json
-import random
-import numpy
-import codecs
+
 
 from seqeval.metrics import precision_score, recall_score, f1_score
-#from sklearn.metrics import f1_score
 from nltk.tokenize import TweetTokenizer
-from collections import OrderedDict
 
 
 from random import choices
 import scipy.stats
-import csv
 
 
 def get_chunks(seq):
