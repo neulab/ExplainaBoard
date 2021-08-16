@@ -13,3 +13,5 @@ out.json
 instantiate.json
 __pycache__
 .idea
+*.egg-info
+*.swp
