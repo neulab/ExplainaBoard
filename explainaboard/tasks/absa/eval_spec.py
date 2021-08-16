@@ -1,31 +1,23 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
+import explainaboard.data_utils as du
 
-
-
-def sent2list(sent):
-	if len(sent.split(" ")) == 1 and len(list(sent))>=5:
-		return list(sent)
-	else:
-		return sent.split(" ")
-
-
-def get_probability_right_or_not(file_path):
-	probability_list, right_or_not_list = [], []
-
-	fin = open(file_path, "r")
-	for line in fin:
-		line = line.rstrip("\n")
-		if len(line.split("\t")) !=6:
-			continue
-
-
-		probability_list.append(float(line.split("\t")[4]))
-		right_or_not_list.append(float(line.split("\t")[5]))
-
-
-
-	return probability_list, right_or_not_list
+# def get_probability_right_or_not(file_path):
+# 	probability_list, right_or_not_list = [], []
+#
+# 	fin = open(file_path, "r")
+# 	for line in fin:
+# 		line = line.rstrip("\n")
+# 		if len(line.split("\t")) !=6:
+# 			continue
+#
+#
+# 		probability_list.append(float(line.split("\t")[4]))
+# 		right_or_not_list.append(float(line.split("\t")[5]))
+#
+#
+#
+# 	return probability_list, right_or_not_list
 
 
 def get_raw_list(probability_list, right_or_not_list):
@@ -117,7 +109,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
     """
     from collections import OrderedDict
 
-    probability_list, right_or_not_list = get_probability_right_or_not(file_path)
+    probability_list, right_or_not_list = du.get_probability_right_or_not(file_path)
 
     raw_list = get_raw_list(probability_list, right_or_not_list)
 
