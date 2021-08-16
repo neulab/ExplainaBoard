@@ -55,14 +55,6 @@ def getAspectValue(sent_list, sample_list_tag, sample_list_tag_pred, dict_aspect
 	return  dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sent
 
 
-def get_raw_list(probability_list, right_or_not_list):
-    total_raw_list = []
-
-    for index in range(len(right_or_not_list)):
-        total_raw_list.append([probability_list[index], right_or_not_list[index]])
-    return total_raw_list
-
-
 def calculate_ece(result_list):
     ece = 0
     size = 0
@@ -147,7 +139,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
     probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=3, right_or_not_col=4)
 
-    raw_list = get_raw_list(probability_list, right_or_not_list)
+    raw_list = list(zip(probability_list, right_or_not_list))
 
     bin_list = divide_into_bin(size_of_bin, raw_list)
 

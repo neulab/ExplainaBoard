@@ -3,41 +3,6 @@ import numpy
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 
-# def get_probability_right_or_not(file_path):
-#     """
-#
-#     :param file_path: the file_path is the path to your file.
-#
-#     And the path must include file name.
-#
-#     the file name is in this format: test_dataset_model.tsv.
-#
-#     the file_path must in the format: /root/path/to/your/file/test_dataset.tsv
-#
-#     The file must in this format:
-#     sentence1\tsentence2\tground_truth\tpredict_label\tprobability\tright_or_not
-#     if prediction is right, right_or_not is assigned to 1, otherwise 0.
-#
-#     """
-#
-#     import pandas as pd
-#     import numpy as np
-#
-#     result = pd.read_csv(file_path, sep='\t', header=None)
-#
-#     probability_list = np.array(result[4]).tolist()
-#     right_or_not_list = np.array(result[5]).tolist()
-#
-#     return probability_list, right_or_not_list
-
-
-def get_raw_list(probability_list, right_or_not_list):
-    total_raw_list = []
-
-    for index in range(len(right_or_not_list)):
-        total_raw_list.append([probability_list[index], right_or_not_list[index]])
-    return total_raw_list
-
 
 def calculate_ece(result_list):
     ece = 0
@@ -122,7 +87,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
 
     probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=4, right_or_not_col=5)
 
-    raw_list = get_raw_list(probability_list, right_or_not_list)
+    raw_list = list(zip(probability_list, right_or_not_list))
 
     bin_list = divide_into_bin(size_of_bin, raw_list)
 
