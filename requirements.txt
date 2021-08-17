@@ -3,4 +3,5 @@ numpy
 scipy
 matplotlib
 scikit-learn
-seqeval==0.0.12
+seqeval
+pandas

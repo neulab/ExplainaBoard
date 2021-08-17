@@ -9,3 +9,7 @@ explainaboard/tasks/re/test_re.tsv
 explainaboard/tasks/re/tensoreval-backup.py
 explainaboard/tasks/re/a.json
 explainaboard/tasks/re/instantiate.json
+out.json
+instantiate.json
+__pycache__
+.idea

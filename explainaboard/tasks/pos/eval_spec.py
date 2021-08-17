@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
-import argparse
-import numpy
-import sys
-from sklearn.metrics import f1_score
+import explainaboard.error_analysis as ea
 
-# sys.path.append("./src")
-# from src.utils import *
-# from src.errorAnalysis import *
-from ..src.errorAnalysis import *
 
 #   getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent, dict_precomputed_path)
 
@@ -16,10 +9,10 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
     dict_preComputed_model = {}
     for aspect, path in dict_preComputed_path.items():
         print("path:\t" + path)
-        if os.path.exists(path):
+        if ea.os.path.exists(path):
             print('load the hard dictionary of entity span in test set...')
             fread = open(path, 'rb')
-            dict_preComputed_model[aspect] = pickle.load(fread)
+            dict_preComputed_model[aspect] = ea.pickle.load(fread)
         else:
             raise ValueError("can not load hard dictionary" + aspect + "\t" + path)
 
@@ -27,8 +20,8 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
     for aspect, fun in dict_aspect_func.items():
         dict_span2aspectVal[aspect] = {}
 
-    dict_pos2sid = getPos2SentId(test_word_sequences_sent)
-    dict_ap2rp = getTokenPosition(test_word_sequences_sent)
+    dict_pos2sid = ea.getPos2SentId(test_word_sequences_sent)
+    dict_ap2rp = ea.getTokenPosition(test_word_sequences_sent)
 
 
     dict_span2sid = {}
@@ -44,7 +37,7 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 
 
         dict_span2sid[token_pos] = token_sentid
-        dict_chunkid2span[token_pos] = token + "|||" + format4json(' '.join(test_word_sequences_sent[token_sentid]))
+        dict_chunkid2span[token_pos] = token + "|||" + ea.format4json(' '.join(test_word_sequences_sent[token_sentid]))
 
         # Sentence Length: sentLen
         aspect = "sLen"
@@ -95,7 +88,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
     fn_write_json = output
 
     # Initalization
-    dict_aspect_func = loadConf(path_aspect_conf)
+    dict_aspect_func = ea.loadConf(path_aspect_conf)
     metric_names = list(dict_aspect_func.keys())
     print("dict_aspect_func: ", dict_aspect_func)
     print(dict_aspect_func)
@@ -112,9 +105,9 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 
 
-    list_text_sent, list_text_token = read_single_column(path_text, 0)
-    list_true_tags_sent, list_true_tags_token = read_single_column(path_text, 1)
-    list_pred_tags_sent, list_pred_tags_token = read_single_column(path_text, 2)
+    list_text_sent, list_text_token = ea.read_single_column(path_text, 0)
+    list_true_tags_sent, list_true_tags_token = ea.read_single_column(path_text, 1)
+    list_pred_tags_sent, list_pred_tags_token = ea.read_single_column(path_text, 2)
 
 
 
@@ -128,15 +121,15 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
     print(len(dict_chunkid2span), len(dict_chunkid2span_pred))
 
 
-    holistic_performance = accuracy(list_true_tags_token, list_pred_tags_token)
+    holistic_performance = ea.accuracy(list_true_tags_token, list_pred_tags_token)
 
 
     confidence_low_overall, confidence_up_overall = 0, 0
     if is_print_ci:
-        confidence_low_overall, confidence_up_overall = compute_confidence_interval_f1(dict_span2sid.keys(),
-                                                                                       dict_span2sid_pred.keys(),
-                                                                                       dict_span2sid, dict_span2sid_pred,
-                                                                                       n_times=1000)
+        confidence_low_overall, confidence_up_overall = ea.compute_confidence_interval_f1(dict_span2sid.keys(),
+                                                                                          dict_span2sid_pred.keys(),
+                                                                                          dict_span2sid, dict_span2sid_pred,
+                                                                                          n_times=1000)
 
     print("------------------ Holistic Result")
     print()
@@ -174,22 +167,22 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
         dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
-        dict_bucket2span_pred[aspect] = bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
-                                                                                dict_bucket2span[aspect].keys())
-        dict_bucket2f1[aspect], errorCase_list = getBucketF1_pos(dict_bucket2span[aspect], dict_bucket2span_pred[aspect], dict_span2sid, dict_span2sid_pred, dict_chunkid2span, dict_chunkid2span_pred, is_print_ci, is_print_case)
+        dict_bucket2span_pred[aspect] = ea.bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
+                                                                                   dict_bucket2span[aspect].keys())
+        dict_bucket2f1[aspect], errorCase_list = ea.getBucketF1_pos(dict_bucket2span[aspect], dict_bucket2span_pred[aspect], dict_span2sid, dict_span2sid_pred, dict_chunkid2span, dict_chunkid2span_pred, is_print_ci, is_print_case)
         aspect_names.append(aspect)
     print("aspect_names: ", aspect_names)
 
     print("------------------ Breakdown Performance")
     for aspect in dict_aspect_func.keys():
-        printDict(dict_bucket2f1[aspect], aspect)
+        ea.printDict(dict_bucket2f1[aspect], aspect)
     print("")
 
     # Calculate databias w.r.t numeric attributes
     dict_aspect2bias = {}
     for aspect, aspect2Val in dict_span2aspectVal.items():
         if type(list(aspect2Val.values())[0]) != type("string"):
-            dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
+            dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
 
     print("------------------ Dataset Bias")
     for k, v in dict_aspect2bias.items():
@@ -233,7 +226,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
             dict_fineGrained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
                                              "confidence_low": confidence_low, "confidence_up": confidence_up, "bucket_error_case":error_entity_list})
 
-    obj_json = load_json(path_json_input)
+    obj_json = ea.load_json(path_json_input)
 
     obj_json["task"] = task_type
     obj_json["data"]["name"] = corpus_type
@@ -248,6 +241,6 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
     obj_json["model"]["results"]["overall"]["error_case"] = errorCase_list
 
-    save_json(obj_json, fn_write_json)
+    ea.save_json(obj_json, fn_write_json)
 
 

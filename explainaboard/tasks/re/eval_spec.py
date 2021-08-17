@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
-import argparse
-import numpy
-import sys
-# sys.path.append("./src")
-# from src.utils import *
-#from errorAnalysis import *
-from ..src.errorAnalysis import *
-
+import explainaboard.error_analysis as ea
 
 
 def sent2list(sent):
@@ -49,10 +42,10 @@ def getAspectValue(sample_list, dict_aspect_func):
 
 		sent, entities, paragraph, true_label, pred_label, sent_length, para_length, n_entity, avg_distance = info_list
 
-		dict_sid2sent[str(sample_id)] = format4json_tc(entities + "|||" + sent)
+		dict_sid2sent[str(sample_id)] = ea.format4json_tc(entities + "|||" + sent)
 
-		sent_pos = tuple2str((sample_id, true_label))
-		sent_pos_pred = tuple2str((sample_id, pred_label))
+		sent_pos = ea.tuple2str((sample_id, true_label))
+		sent_pos_pred = ea.tuple2str((sample_id, pred_label))
 
 		# Sentence Length: sentALen
 		aspect = "sLen"
@@ -114,7 +107,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 
 	# Initalization
-	dict_aspect_func = loadConf(path_aspect_conf)
+	dict_aspect_func = ea.loadConf(path_aspect_conf)
 	metric_names = list(dict_aspect_func.keys())
 	print("dict_aspect_func: ", dict_aspect_func)
 	print(dict_aspect_func)
@@ -135,11 +128,11 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 			print("PreComputed directory:\t", dict_preComputed_path[aspect])
 
 
-	sample_list, sent_list, entity_list, true_list, pred_list = file_to_list_re(path_text)
+	sample_list, sent_list, entity_list, true_list, pred_list = ea.file_to_list_re(path_text)
 
 	errorCase_list = []
 	if is_print_case:
-		errorCase_list = getErrorCase_re(sent_list, entity_list, true_list, pred_list)
+		errorCase_list = ea.getErrorCase_re(sent_list, entity_list, true_list, pred_list)
 		print(" -*-*-*- the number of error casse:\t", len(errorCase_list))
 
 
@@ -148,14 +141,14 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	dict_span2aspectVal, dict_span2aspectVal_pred,  dict_sid2sent  = getAspectValue(sample_list, dict_aspect_func)
 
 
-	holistic_performance = accuracy(true_list, pred_list)
+	holistic_performance = ea.accuracy(true_list, pred_list)
 	holistic_performance = format(holistic_performance, '.3g')
 
 
 	# Confidence Interval of Holistic Performance
 	confidence_low, confidence_up = 0,0
 	if is_print_ci:
-		confidence_low, confidence_up = compute_confidence_interval_acc(true_list, pred_list, n_times=1000)
+		confidence_low, confidence_up = ea.compute_confidence_interval_acc(true_list, pred_list, n_times=1000)
 
 
 
@@ -197,10 +190,10 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 		dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal[aspect])
 		# print(aspect, dict_bucket2span[aspect])
 		# exit()
-		dict_bucket2span_pred[aspect] = bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
-																				dict_bucket2span[aspect].keys())
+		dict_bucket2span_pred[aspect] = ea.bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
+																																							 dict_bucket2span[aspect].keys())
 		# dict_bucket2span_pred[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal_pred[aspect])
-		dict_bucket2f1[aspect] = getBucketAcc_with_errorCase_re(dict_bucket2span[aspect], dict_bucket2span_pred[aspect], dict_sid2sent, is_print_ci, is_print_case)
+		dict_bucket2f1[aspect] = ea.getBucketAcc_with_errorCase_re(dict_bucket2span[aspect], dict_bucket2span_pred[aspect], dict_sid2sent, is_print_ci, is_print_case)
 		aspect_names.append(aspect)
 	print("aspect_names: ", aspect_names)
 
@@ -209,7 +202,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 	print("------------------ Breakdown Performance")
 	for aspect in dict_aspect_func.keys():
-		printDict(dict_bucket2f1[aspect], aspect)
+		ea.printDict(dict_bucket2f1[aspect], aspect)
 	print("")
 
 
@@ -217,7 +210,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	dict_aspect2bias={}
 	for aspect, aspect2Val in dict_span2aspectVal.items():
 		if type(list(aspect2Val.values())[0]) != type("string"):
-			dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
+			dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
 
 	print("------------------ Dataset Bias")
 	for k,v in dict_aspect2bias.items():
@@ -267,7 +260,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 
 
-	obj_json = load_json(path_json_input)
+	obj_json = ea.load_json(path_json_input)
 
 	obj_json["task"] = task_type
 	obj_json["data"]["name"] = corpus_type
@@ -294,7 +287,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 
 
-	save_json(obj_json, fn_write_json)
+	ea.save_json(obj_json, fn_write_json)
 
 
 
@@ -353,6 +346,6 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 # 	# print(sample_list[0])
 # 	evaluate(task_type=task, analysis_type=analysis_type, systems=systems, output=output, is_print_ci = is_print_ci, is_print_case = is_print_case, is_print_ece = is_print_ece)
 #
-# # python tensoreval.py  --task re --systems ./test_re.tsv --output ./a.json
+# # python eval_spec.py  --task re --systems ./test_re.tsv --output ./a.json
 # if __name__ == '__main__':
 # 	main()
