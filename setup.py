@@ -43,7 +43,8 @@ setup(
       "scipy",
       "matplotlib",
       "scikit-learn",
-      "seqeval==0.0.12",
+      "seqeval",
+      "pandas"
   ],
   include_package_data=True,
 )

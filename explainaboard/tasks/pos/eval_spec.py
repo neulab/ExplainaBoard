@@ -141,19 +141,21 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
     def __selectBucktingFunc(func_name, func_setting, dict_obj):
         if func_name == "bucketAttribute_SpecifiedBucketInterval":
-            return eval(func_name)(dict_obj, eval(func_setting))
+            return ea.bucketAttribute_SpecifiedBucketInterval(dict_obj, eval(func_setting))
         elif func_name == "bucketAttribute_SpecifiedBucketValue":
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             n_buckets, specified_bucket_value_list = int(func_setting.split("\t")[0]), eval(func_setting.split("\t")[1])
-            return eval(func_name)(dict_obj, n_buckets, specified_bucket_value_list)
+            return ea.bucketAttribute_SpecifiedBucketValue(dict_obj, n_buckets, specified_bucket_value_list)
         elif func_name == "bucketAttribute_DiscreteValue":  # now the discrete value is R-tag..
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             tags_list = list(set(dict_obj.values()))
             topK_buckets, min_buckets = int(func_setting.split("\t")[0]), int(func_setting.split("\t")[1])
             # return eval(func_name)(dict_obj, min_buckets, topK_buckets)
-            return eval(func_name)(dict_obj, topK_buckets, min_buckets)
+            return ea.bucketAttribute_DiscreteValue(dict_obj, topK_buckets, min_buckets)
+        else:
+            raise ValueError(f'Illegal function name {func_name}')
 
 
     dict_bucket2span = {}
