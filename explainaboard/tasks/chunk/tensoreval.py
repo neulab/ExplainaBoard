@@ -1,4 +1,4 @@
-import sys
+# -*- coding: utf-8 -*-
 import argparse
 import numpy
 import sys
@@ -6,7 +6,6 @@ import sys
 # from src.utils import *
 # from src.errorAnalysis import *
 from ..src.errorAnalysis import *
-
 
 def get_chunk_type(tok):
 	"""
@@ -38,99 +37,32 @@ def get_chunks(seq):
 	default = 'O'
 	# idx_to_tag = {idx: tag for tag, idx in tags.items()}
 	chunks = []
-	# chunk_type, chunk_start = None, None
-	chunk_current = 0
-	#print(seq)
-	# BMES -> BIEO
-	w_start = 0
-	chunk = None
-	tag = ""
+	chunk_type, chunk_start = None, None
 	for i, tok in enumerate(seq):
-		tag += tok
-		if tok == "S":
-			chunk = ("S",i, i+1)
+		#End of a chunk 1
+		if tok == default and chunk_type is not None:
+			# Add a chunk.
+			chunk = (chunk_type, chunk_start, i)
 			chunks.append(chunk)
-			tag = ""
-		if tok == "B":
-			w_start = i
-		if tok == "E":
-			chunk = (tag, w_start, i+1)
-			chunks.append(chunk)
-			tag=""
+			chunk_type, chunk_start = None, None
 
-
-
-
-	# for i, tok in enumerate(seq):
-	# 	if tok == "M":
-	# 		tok = "I"
-	# 	if tok == "S":
-	# 		tok = "B"
-	#
-	# 	#End of a chunk 1
-	# 	if tok == default and chunk_type is not None:
-	# 		# Add a chunk.
-	# 		chunk = (chunk_type, chunk_start, i)
-	# 		chunks.append(chunk)
-	# 		chunk_type, chunk_start = None, None
-	#
-	# 	# End of a chunk + start of a chunk!
-	# 	elif tok != default:
-	# 		tok_chunk_class, tok_chunk_type = get_chunk_type(tok)
-	# 		if chunk_type is None:
-	# 			chunk_type, chunk_start = tok_chunk_type, i
-	# 		elif tok_chunk_type != chunk_type or tok_chunk_class == "B":
-	# 			chunk = (chunk_type, chunk_start, i)
-	# 			chunks.append(chunk)
-	# 			chunk_type, chunk_start = tok_chunk_type, i
-	# 	else:
-	# 		pass
-	# # end condition
-	# if chunk_type is not None:
-	# 	chunk = (chunk_type, chunk_start, len(seq))
-	# 	chunks.append(chunk)
+		# End of a chunk + start of a chunk!
+		elif tok != default:
+			tok_chunk_class, tok_chunk_type = get_chunk_type(tok)
+			if chunk_type is None:
+				chunk_type, chunk_start = tok_chunk_type, i
+			elif tok_chunk_type != chunk_type or tok_chunk_class == "B":
+				chunk = (chunk_type, chunk_start, i)
+				chunks.append(chunk)
+				chunk_type, chunk_start = tok_chunk_type, i
+		else:
+			pass
+	# end condition
+	if chunk_type is not None:
+		chunk = (chunk_type, chunk_start, len(seq))
+		chunks.append(chunk)
 
 	return chunks
-
-
-def read_data(corpus_type, fn, column_no=-1, delimiter =' '):
-	print('corpus_type',corpus_type)
-	word_sequences = list()
-	tag_sequences = list()
-	total_word_sequences = list()
-	total_tag_sequences = list()
-	with codecs.open(fn, 'r', 'utf-8') as f:
-		lines = f.readlines()
-	curr_words = list()
-	curr_tags = list()
-	for k in range(len(lines)):
-		line = lines[k].strip()
-		if len(line) == 0 or line.startswith('-DOCSTART-'): # new sentence or new document
-			if len(curr_words) > 0:
-				word_sequences.append(curr_words)
-				tag_sequences.append(curr_tags)
-				curr_words = list()
-				curr_tags = list()
-			continue
-
-		strings = line.split(delimiter)
-		word = strings[0].strip()
-		tag = strings[column_no].strip()  # be default, we take the last tag
-
-		#tag='B-'+tag
-		tag = tag + "-W"
-		curr_words.append(word)
-		curr_tags.append(tag)
-		total_word_sequences.append(word)
-		total_tag_sequences.append(tag)
-		if k == len(lines) - 1:
-			word_sequences.append(curr_words)
-			tag_sequences.append(curr_tags)
-	# if verbose:
-	# 	print('Loading from %s: %d samples, %d words.' % (fn, len(word_sequences), get_words_num(word_sequences)))
-	# return word_sequences, tag_sequences
-	return total_word_sequences, total_tag_sequences, word_sequences, tag_sequences
-
 
 
 
@@ -184,6 +116,7 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 
 
 	dict_span2aspectVal = {}
+	dict_chunkid2span = {}
 	for aspect, fun in dict_aspect_func.items():
 		dict_span2aspectVal[aspect] = {}
 
@@ -195,57 +128,32 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 	dict_pos2sid = getPos2SentId(test_word_sequences_sent)
 	dict_ap2rp = getTokenPosition(test_word_sequences_sent)
 	all_chunks = get_chunks(test_trueTag_sequences)
-
 	dict_span2sid = {}
-	dict_chunkid2span = {}
 	for span_info in all_chunks:
 
-		#print(span_info)
-
-
-		#span_type = span_info[0].lower()
-
+		span_type = span_info[0].lower()
 		#print(span_type)
 		idx_start = span_info[1]
 		idx_end = span_info[2]
-		span_cnt = ''.join(test_word_sequences[idx_start:idx_end]).lower()
-		#print(span_cnt.encode("utf-8").decode("utf-8"))
-		span_cnt = span_cnt.encode("gbk","ignore").decode("gbk","ignore")
-		#print(sys.getdefaultencoding())
-		span_type = ''.join(test_trueTag_sequences[idx_start:idx_end])
-
-
-		span_pos = str(idx_start) + "|||" + str(idx_end) + "|||" + span_type
-
-		if len(span_type) !=(idx_end  - idx_start):
-			print(idx_start, idx_end)
-			print(span_info)
-			print(span_type + "\t" + span_cnt)
-			print("--------------")
-
-
-		#print(span_pos)
-		# print(span_info)
-		# print(span_cnt)
-
+		span_cnt = ' '.join(test_word_sequences[idx_start:idx_end]).lower()
+		span_pos = str(idx_start) + "_" + str(idx_end) + "_" + span_type
 
 		span_length = idx_end - idx_start
 
-		# span_token_list = test_word_sequences[idx_start:idx_end]
-		# span_token_pos_list = [str(pos) + "|||" + span_type for pos in range(idx_start, idx_end)]
-		#print(span_token_pos_list)
+		span_token_list = test_word_sequences[idx_start:idx_end]
+		span_token_pos_list = [ str(pos) + "_" + span_type for pos in range(idx_start, idx_end)]
 
 
 		span_sentid = dict_pos2sid[idx_start]
+
+
+
+
 		sLen = float(sentLen_list[span_sentid])
 
 		dict_span2sid[span_pos] = span_sentid
+		dict_chunkid2span[span_pos] = format4json(span_cnt) + "|||" + format4json(' '.join(test_word_sequences_sent[span_sentid]))
 
-
-		text_sample = "".join(test_word_sequences_sent[span_sentid])
-		text_sample = text_sample
-
-		dict_chunkid2span[span_pos] = span_cnt + "|||" + text_sample
 
 		# Sentence Length: sLen
 		aspect = "sLen"
@@ -253,12 +161,16 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 			dict_span2aspectVal[aspect][span_pos] = sLen
 
 
+		# Relative Position: relPos
+		aspect = "rPos"
+		if aspect in dict_aspect_func.keys():
+			dict_span2aspectVal[aspect][span_pos] = (dict_ap2rp[idx_start])*1.0/sLen
+
 
 		# Entity Length: eLen
 		aspect = "eLen"
 		if aspect in dict_aspect_func.keys():
 			dict_span2aspectVal[aspect][span_pos] = float(span_length)
-
 
 
 		# Tag: tag
@@ -271,13 +183,11 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 
 
 
-
-# def tuple2str(triplet):
-# 	res = ""
-# 	for v in triplet:
-# 		res += str(v) + "_"
-# 	return res.rstrip("_")
-
+def tuple2str(triplet):
+	res = ""
+	for v in triplet:
+		res += str(v) + "_"
+	return res.rstrip("_")
 
 
 
@@ -295,10 +205,9 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	corpus_type = "dataset_name"
 	model_name = "model_name"
 	path_preComputed = ""
-	path_aspect_conf = "./interpret_eval/tasks/cws/conf.aspects"
-	path_json_input = "./interpret_eval/tasks/cws/template.json"
+	path_aspect_conf = "./explainaboard/tasks/chunk/conf.aspects"
+	path_json_input = "./explainaboard/tasks/chunk/template.json"
 	fn_write_json = output
-
 
 
 
@@ -309,7 +218,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	print(dict_aspect_func)
 
 	fwrite_json = open(fn_write_json, 'w')
-
+	path_comb_output = model_name + "/" + path_text.split("/")[-1]
 
 
 
@@ -329,21 +238,22 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	list_pred_tags_sent, list_pred_tags_token = read_single_column(path_text, 2)
 
 
-	dict_span2aspectVal, dict_span2sid, dict_chunkid2span = getAspectValue(list_text_token, list_true_tags_token, list_text_sent, list_true_tags_sent, dict_preComputed_path, dict_aspect_func)
-	dict_span2aspectVal_pred, dict_span2sid_pred, dict_chunkid2span_pred  = getAspectValue(list_text_token, list_pred_tags_token, list_text_sent, list_pred_tags_sent, dict_preComputed_path, dict_aspect_func)
+
+	dict_span2aspectVal, dict_span2sid, dict_chunkid2span  = getAspectValue(list_text_token, list_true_tags_token, list_text_sent, list_true_tags_sent, dict_preComputed_path, dict_aspect_func)
+	dict_span2aspectVal_pred, dict_span2sid_pred, dict_chunkid2span_pred = getAspectValue(list_text_token, list_pred_tags_token, list_text_sent, list_pred_tags_sent, dict_preComputed_path, dict_aspect_func)
 
 
 	holistic_performance = f1(list_true_tags_sent, list_pred_tags_sent)["f1"]
-
-
 	confidence_low_overall, confidence_up_overall = 0,0
 	if is_print_ci:
-		confidence_low_overall, confidence_up_overall = compute_confidence_interval_f1_cws(dict_span2sid.keys(), dict_span2sid_pred.keys(), dict_span2sid, dict_span2sid_pred, n_times=10)
+		confidence_low_overall, confidence_up_overall = compute_confidence_interval_f1(dict_span2sid.keys(), dict_span2sid_pred.keys(), dict_span2sid, dict_span2sid_pred, n_times=1000)
 
-
+	# print(dict_span2aspectVal)
 
 	print("confidence_low_overall:\t", confidence_low_overall)
 	print("confidence_up_overall:\t", confidence_up_overall)
+	# holistic_performance = f1(list_true_tags_sent, list_pred_tags_sent)["f1"]
+	#print(f1(list_true_tags_sent, list_pred_tags_sent))
 
 
 
@@ -351,7 +261,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 	print("------------------ Holistic Result")
 	print(holistic_performance)
-	# print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
+
 
 
 	def __selectBucktingFunc(func_name, func_setting, dict_obj):
@@ -384,12 +294,10 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 		# exit()
 		dict_bucket2span_pred[aspect] = bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
 																				dict_bucket2span[aspect].keys())
-		dict_bucket2f1[aspect], errorCase_list = getBucketF1_cws(dict_bucket2span[aspect], dict_bucket2span_pred[aspect], dict_span2sid, dict_span2sid_pred, dict_chunkid2span, dict_chunkid2span_pred, list_true_tags_token, list_pred_tags_token, is_print_ci, is_print_case)
+		dict_bucket2f1[aspect], errorCase_list = getBucketF1_chunk(dict_bucket2span[aspect], dict_bucket2span_pred[aspect], dict_span2sid, dict_span2sid_pred, dict_chunkid2span, dict_chunkid2span_pred, is_print_ci, is_print_case)
 		aspect_names.append(aspect)
 	print("aspect_names: ", aspect_names)
 
-	# for v in errorCase_list:
-	# 	print(v)
 
 
 
@@ -431,8 +339,6 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 				return bk_name
 
 
-
-
 	dict_fineGrained = {}
 	for aspect, metadata in dict_bucket2f1.items():
 		dict_fineGrained[aspect] = []
@@ -448,11 +354,9 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 			n_sample = v[1]
 			confidence_low = format(float(v[2])*100, '.4g')
 			confidence_up  = format(float(v[3])*100, '.4g')
-
 			error_entity_list = v[4]
-
 			# instantiation
-			dict_fineGrained[aspect].append({"bucket_name":bucket_name, "bucket_value":bucket_value, "num":n_sample, "confidence_low":confidence_low, "confidence_up":confidence_up, "bucket_error_case":error_entity_list[0:int(len(error_entity_list)/10)]})
+			dict_fineGrained[aspect].append({"bucket_name":bucket_name, "bucket_value":bucket_value, "num":n_sample, "confidence_low":confidence_low, "confidence_up":confidence_up, "bucket_error_case":error_entity_list})
 
 
 
@@ -462,9 +366,9 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 
 	obj_json["task"] = task_type
 	obj_json["data"]["name"] = corpus_type
-	obj_json["data"]["language"] = "Chinese"
+	obj_json["data"]["language"] = "English"
 	obj_json["data"]["bias"] = dict_aspect2bias
-
+	obj_json["data"]["output"] = path_comb_output
 	obj_json["model"]["name"] = model_name
 	obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
 	obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low_overall
@@ -472,10 +376,9 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
 
 
-	# Save error cases: overall
-	obj_json["model"]["results"]["overall"]["error_case"] = errorCase_list[0:int(len(errorCase_list)/10)]
+	obj_json["model"]["results"]["overall"]["error_case"] = errorCase_list
 
 
-
+	save_json(obj_json, "./instantiate.json")
 	save_json(obj_json, fn_write_json)
 

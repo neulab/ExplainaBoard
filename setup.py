@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 import unittest
 import codecs
-import interpret_eval
-import interpret_eval.tasks
+import explainaboard
+import explainaboard.tasks
 # def test_suite():
 #   test_loader = unittest.TestLoader()
 #
@@ -11,9 +11,9 @@ import interpret_eval.tasks
 
 
 setup(
-  name="interpret_eval",
-  version=interpret_eval.__version__,
-  description="Interpretable Evaluation for Natural Language Processing",
+  name="explainaboard",
+  version=explainaboard.__version__,
+  description="Explainable Leaderboards for Natural Language Processing",
   long_description=codecs.open("README.md", encoding="utf-8").read(),
   long_description_content_type="text/markdown",
   url="https://github.com/neulab/ExplainaBoard",
@@ -27,14 +27,14 @@ setup(
   "Programming Language :: Python :: 3",
   ],
   packages=find_packages(),
-  # packages=find_packages("interpret_eval"),
+  # packages=find_packages("explainaboard"),
   # package_data={
   #     "":["*.txt"],
   #     "tasks":["ner/*.aspects","ner/*.json"],
   # },
   entry_points={
     "console_scripts": [
-      "interpret-eval=interpret_eval.interpret_eval_main:main",
+      "explainaboard=explainaboard.explainaboard_main:main",
     ],
   },
   install_requires=[
