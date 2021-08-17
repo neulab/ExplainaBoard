@@ -13,7 +13,7 @@
   <br />
   <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
   <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
-  <a href="https://pypi.org/project/interpret-eval/"><img alt="PyPI" src="https://img.shields.io/pypi/v/interpret-eval" /></a>
+  <a href="https://pypi.org/project//"><img alt="PyPI" src="https://img.shields.io/pypi/v/explainaboard" /></a>
   <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
 </p>
 
@@ -54,7 +54,7 @@ means, you can play with ExplainaBoard at following levels:
 
 #### Method 1: Simple installation from PyPI (Python 3 only)
 ```
-pip install interpret-eval
+pip install 
 ```
 
 #### Method 2: Install from the source and develop locally (Python 3 only)
@@ -72,10 +72,10 @@ python setup.py install
 #### Then, you can run following examples via bash
 
 ```bash
-  interpret-eval --task chunk --systems ./interpret_eval/example/test-conll00.tsv --output out.json
+   --task chunk --systems ./explainaboard/example/test-conll00.tsv --output out.json
 ```
 where ``test-conll00.tsv`` denotes your system output file whose format depends on different tasks.
-For each task we have provided one [example output file](https://github.com/neulab/ExplainaBoard/blob/main/interpret_eval/example/) to show how they are formated.
+For each task we have provided one [example output file](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/example/) to show how they are formated.
 The above command will generate a detailed report (saved in ``out.json``) for your input system (``test-conll00.tsv``).
 Specifically, following statistics are included:
 
