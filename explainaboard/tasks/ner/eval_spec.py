@@ -1,69 +1,7 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
-
-# from ..src.ner_overall_f1 import *
-# from src.utils import *
-# from src.errorAnalysis import *
-
-
-
-
-def get_chunk_type(tok):
-	"""
-	Args:
-		tok: id of token, ex 4
-		idx_to_tag: dictionary {4: "B-PER", ...}
-	Returns:
-		tuple: "B", "PER"
-	"""
-	# tag_name = idx_to_tag[tok]
-	tag_class = tok.split('-')[0]
-	tag_type = tok.split('-')[-1]
-	return tag_class, tag_type
-
-def get_chunks(seq):
-	"""
-	tags:dic{'per':1,....}
-	Args:
-		seq: [4, 4, 0, 0, ...] sequence of labels
-		tags: dict["O"] = 4
-	Returns:
-		list of (chunk_type, chunk_start, chunk_end)
-
-	Example:
-		seq = [4, 5, 0, 3]
-		tags = {"B-PER": 4, "I-PER": 5, "B-LOC": 3}
-		result = [("PER", 0, 2), ("LOC", 3, 4)]
-	"""
-	default = 'O'
-	# idx_to_tag = {idx: tag for tag, idx in tags.items()}
-	chunks = []
-	chunk_type, chunk_start = None, None
-	for i, tok in enumerate(seq):
-		#End of a chunk 1
-		if tok == default and chunk_type is not None:
-			# Add a chunk.
-			chunk = (chunk_type, chunk_start, i)
-			chunks.append(chunk)
-			chunk_type, chunk_start = None, None
-
-		# End of a chunk + start of a chunk!
-		elif tok != default:
-			tok_chunk_class, tok_chunk_type = ea.get_chunk_type(tok)
-			if chunk_type is None:
-				chunk_type, chunk_start = tok_chunk_type, i
-			elif tok_chunk_type != chunk_type or tok_chunk_class == "B":
-				chunk = (chunk_type, chunk_start, i)
-				chunks.append(chunk)
-				chunk_type, chunk_start = tok_chunk_type, i
-		else:
-			pass
-	# end condition
-	if chunk_type is not None:
-		chunk = (chunk_type, chunk_start, len(seq))
-		chunks.append(chunk)
-
-	return chunks
+import pickle
+import numpy
 
 
 def read_data(corpus_type, fn, column_no=-1, delimiter =' '):
@@ -158,7 +96,7 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 		if ea.os.path.exists(path):
 			print('load the hard dictionary of entity span in test set...')
 			fread = open(path, 'rb')
-			dict_preComputed_model[aspect] = ea.pickle.load(fread)
+			dict_preComputed_model[aspect] = pickle.load(fread)
 		else:
 			raise ValueError("can not load hard dictionary" + aspect + "\t" + path)
 
@@ -430,7 +368,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	dict_aspect2bias={}
 	for aspect, aspect2Val in dict_span2aspectVal.items():
 		if type(list(aspect2Val.values())[0]) != type("string"):
-			dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
+			dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
 	print("------------------ Dataset Bias")
 	for k,v in dict_aspect2bias.items():

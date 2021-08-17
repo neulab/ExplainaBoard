@@ -1,29 +1,15 @@
 import numpy as np
-import pickle
-import codecs
 import os
-from collections import Counter
-import re
-import math
 import scipy.stats as statss
 import json
-import random
-import numpy
-import codecs
+
 
 from seqeval.metrics import precision_score, recall_score, f1_score
-#from sklearn.metrics import f1_score
 from nltk.tokenize import TweetTokenizer
-from collections import OrderedDict
 
 
 from random import choices
 import scipy.stats
-import csv
-
-
-
-
 
 
 def get_chunks(seq):
@@ -78,10 +64,8 @@ def get_chunk_type(tok):
 	Returns:
 		tuple: "B", "PER"
 	"""
-	# tag_name = idx_to_tag[tok]
-	tag_class = tok.split('-')[0]
-	tag_type = tok.split('-')[-1]
-	return tag_class, tag_type
+	tok_split = tok.split('-')
+	return tok_split[0], tok_split[-1]
 
 # def run_evaluate(self, sess, test, tags):
 def evaluate(words,labels_pred, labels):
@@ -2212,3 +2196,56 @@ def getBucketAcc_with_errorCase_semp(dict_bucket2span, dict_bucket2span_pred, di
 
     return sortDict(dict_bucket2f1)
 
+
+def calculate_ece(result_list):
+    ece = 0
+    size = 0
+    tem_list = []
+    for value in result_list:
+        if value[2] == 0:
+            tem_list.append(0)
+            continue
+        size = size + value[2]
+        error = abs(float(value[0]) - float(value[1]))
+        tem_list.append(error)
+
+    if size == 0:
+        return -1
+
+    for i in range(len(result_list)):
+        ece = ece + ((result_list[i][2] / size) * tem_list[i])
+
+    return ece
+
+
+def divide_into_bin(size_of_bin, raw_list):
+    bin_list = []
+    basic_width = 1 / size_of_bin
+
+    for i in range(0, size_of_bin):
+        bin_list.append([])
+
+    for value in raw_list:
+        probability = value[0]
+        isRight = value[1]
+        if probability == 1.0:
+            bin_list[size_of_bin - 1].append([probability, isRight])
+            continue
+        for i in range(0, size_of_bin):
+            if (probability >= i * basic_width) & (probability < (i + 1) * basic_width):
+                bin_list[i].append([probability, isRight])
+
+    result_list = []
+    for i in range(0, size_of_bin):
+        value = bin_list[i]
+        if len(value) == 0:
+            result_list.append([None, None, 0])
+            continue
+        total_probability = 0
+        total_right = 0
+        for result in value:
+            total_probability = total_probability + result[0]
+            total_right = total_right + result[1]
+        result_list.append([total_probability / len(value), total_right / (len(value)), len(value)])
+
+    return result_list
