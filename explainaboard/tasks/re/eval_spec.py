@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
-
-
-def sent2list(sent):
-	if len(sent.split(" ")) == 1 and len(list(sent))>=5:
-		return list(sent)
-	else:
-		return sent.split(" ")
-
-
-
+import numpy
 
 def getAspectValue(sample_list, dict_aspect_func):
 
@@ -210,7 +201,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	dict_aspect2bias={}
 	for aspect, aspect2Val in dict_span2aspectVal.items():
 		if type(list(aspect2Val.values())[0]) != type("string"):
-			dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
+			dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
 	print("------------------ Dataset Bias")
 	for k,v in dict_aspect2bias.items():

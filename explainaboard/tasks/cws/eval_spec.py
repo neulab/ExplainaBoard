@@ -1,88 +1,5 @@
 import explainaboard.error_analysis as ea
-
-def get_chunk_type(tok):
-	"""
-	Args:
-		tok: id of token, ex 4
-		idx_to_tag: dictionary {4: "B-PER", ...}
-	Returns:
-		tuple: "B", "PER"
-	"""
-	# tag_name = idx_to_tag[tok]
-	tag_class = tok.split('-')[0]
-	tag_type = tok.split('-')[-1]
-	return tag_class, tag_type
-
-def get_chunks(seq):
-	"""
-	tags:dic{'per':1,....}
-	Args:
-		seq: [4, 4, 0, 0, ...] sequence of labels
-		tags: dict["O"] = 4
-	Returns:
-		list of (chunk_type, chunk_start, chunk_end)
-
-	Example:
-		seq = [4, 5, 0, 3]
-		tags = {"B-PER": 4, "I-PER": 5, "B-LOC": 3}
-		result = [("PER", 0, 2), ("LOC", 3, 4)]
-	"""
-	default = 'O'
-	# idx_to_tag = {idx: tag for tag, idx in tags.items()}
-	chunks = []
-	# chunk_type, chunk_start = None, None
-	chunk_current = 0
-	#print(seq)
-	# BMES -> BIEO
-	w_start = 0
-	chunk = None
-	tag = ""
-	for i, tok in enumerate(seq):
-		tag += tok
-		if tok == "S":
-			chunk = ("S",i, i+1)
-			chunks.append(chunk)
-			tag = ""
-		if tok == "B":
-			w_start = i
-		if tok == "E":
-			chunk = (tag, w_start, i+1)
-			chunks.append(chunk)
-			tag=""
-
-
-
-
-	# for i, tok in enumerate(seq):
-	# 	if tok == "M":
-	# 		tok = "I"
-	# 	if tok == "S":
-	# 		tok = "B"
-	#
-	# 	#End of a chunk 1
-	# 	if tok == default and chunk_type is not None:
-	# 		# Add a chunk.
-	# 		chunk = (chunk_type, chunk_start, i)
-	# 		chunks.append(chunk)
-	# 		chunk_type, chunk_start = None, None
-	#
-	# 	# End of a chunk + start of a chunk!
-	# 	elif tok != default:
-	# 		tok_chunk_class, tok_chunk_type = get_chunk_type(tok)
-	# 		if chunk_type is None:
-	# 			chunk_type, chunk_start = tok_chunk_type, i
-	# 		elif tok_chunk_type != chunk_type or tok_chunk_class == "B":
-	# 			chunk = (chunk_type, chunk_start, i)
-	# 			chunks.append(chunk)
-	# 			chunk_type, chunk_start = tok_chunk_type, i
-	# 	else:
-	# 		pass
-	# # end condition
-	# if chunk_type is not None:
-	# 	chunk = (chunk_type, chunk_start, len(seq))
-	# 	chunks.append(chunk)
-
-	return chunks
+import numpy
 
 
 def read_data(corpus_type, fn, column_no=-1, delimiter =' '):
@@ -124,15 +41,6 @@ def read_data(corpus_type, fn, column_no=-1, delimiter =' '):
 	return total_word_sequences, total_tag_sequences, word_sequences, tag_sequences
 
 
-
-
-
-
-
-
-
-#   getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent, dict_precomputed_path)
-
 def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent,
 				   test_trueTag_sequences_sent, dict_preComputed_path, dict_aspect_func):
 
@@ -168,7 +76,7 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 		if ea.os.path.exists(path):
 			print('load the hard dictionary of entity span in test set...')
 			fread = open(path, 'rb')
-			dict_preComputed_model[aspect] = ea.pickle.load(fread)
+			dict_preComputed_model[aspect] = pickle.load(fread)
 		else:
 			raise ValueError("can not load hard dictionary" + aspect + "\t" + path)
 
@@ -260,19 +168,6 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 
 		#print(dict_span2aspectVal)
 	return  dict_span2aspectVal, dict_span2sid, dict_chunkid2span
-
-
-
-
-# def tuple2str(triplet):
-# 	res = ""
-# 	for v in triplet:
-# 		res += str(v) + "_"
-# 	return res.rstrip("_")
-
-
-
-
 
 
 def evaluate(task_type = "ner", analysis_type = "single", systems = [], output = "./output.json", is_print_ci = False, is_print_case = False, is_print_ece = False):
@@ -398,7 +293,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
 	dict_aspect2bias={}
 	for aspect, aspect2Val in dict_span2aspectVal.items():
 		if type(list(aspect2Val.values())[0]) != type("string"):
-			dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
+			dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
 	print("------------------ Dataset Bias")
 	for k,v in dict_aspect2bias.items():

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import explainaboard.error_analysis as ea
+import pickle
+import numpy
 
-
-#   getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent, dict_precomputed_path)
 
 def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent,
                    test_trueTag_sequences_sent, dict_preComputed_path, dict_aspect_func):
@@ -12,7 +12,7 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
         if ea.os.path.exists(path):
             print('load the hard dictionary of entity span in test set...')
             fread = open(path, 'rb')
-            dict_preComputed_model[aspect] = ea.pickle.load(fread)
+            dict_preComputed_model[aspect] = pickle.load(fread)
         else:
             raise ValueError("can not load hard dictionary" + aspect + "\t" + path)
 
@@ -184,7 +184,7 @@ def evaluate(task_type = "ner", analysis_type = "single", systems = [], output =
     dict_aspect2bias = {}
     for aspect, aspect2Val in dict_span2aspectVal.items():
         if type(list(aspect2Val.values())[0]) != type("string"):
-            dict_aspect2bias[aspect] = ea.numpy.average(list(aspect2Val.values()))
+            dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
     print("------------------ Dataset Bias")
     for k, v in dict_aspect2bias.items():
