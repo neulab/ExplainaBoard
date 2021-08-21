@@ -3,7 +3,9 @@ import string
 import argparse
 import explainaboard.tasks
 
-def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci=False, is_print_case=False, is_print_ece=False):
+
+def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci=False, is_print_case=False,
+                      is_print_ece=False):
     '''
     Run ExplainaBoard analysis suite
 
@@ -32,8 +34,6 @@ def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci
               is_print_ece=is_print_ece)
 
 
-
-
 if __name__ == '__main__':
     # python explainaboard_main.py --task absa  --systems ./test-laptop.tsv --output ./output/a.json
     # python explainaboard_main.py --task ner --systems ./test-conll03.tsv --output ./a.json
@@ -41,19 +41,17 @@ if __name__ == '__main__':
     # python eval_spec.py  --task re --case True --systems ./test_re.tsv --output a.json --ci True
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
 
-
     parser.add_argument('--task', type=str, required=True,
                         help="absa")
 
-    parser.add_argument('--ci', type=str, required=False, default= False,
+    parser.add_argument('--ci', type=str, required=False, default=False,
                         help="True|False")
 
-    parser.add_argument('--case', type=str, required=False, default= False,
+    parser.add_argument('--case', type=str, required=False, default=False,
                         help="True|False")
 
-    parser.add_argument('--ece', type=str, required=False, default= False,
+    parser.add_argument('--ece', type=str, required=False, default=False,
                         help="True|False")
-
 
     parser.add_argument('--type', type=str, required=False, default="single",
                         help="analysis type: single|pair|combine")
@@ -64,7 +62,6 @@ if __name__ == '__main__':
                         help="analysis output file")
     args = parser.parse_args()
 
-
     is_print_ci = args.ci
     is_print_case = args.case
     is_print_ece = args.ece
@@ -73,7 +70,6 @@ if __name__ == '__main__':
     analysis_type = args.type
     systems = args.systems.split(",")
     output = args.output
-
 
     print("task", task)
     print("type", analysis_type)
