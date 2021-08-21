@@ -7,8 +7,7 @@
 ## Meta Data
 * Official Homepage: https://lil.nlp.cornell.edu/newsroom/index.html
 * Download link: https://lil.nlp.cornell.edu/newsroom/download/index.html
-* Paper: [NEWSROOM: A Dataset of 1.3 Million Summaries
-with Diverse Extractive Strategies](https://www.aclweb.org/anthology/N18-1065.pdf)
+* Paper: [NEWSROOM: A Dataset of 1.3 Million Summaries with Diverse Extractive Strategies](https://www.aclweb.org/anthology/N18-1065.pdf)
 * Github Repo: [lil-lab/newsroom](https://github.com/lil-lab/newsroom)
 * Corresponding Author: Yoav Artzi
 * Supported Task: Summarization
