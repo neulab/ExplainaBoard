@@ -1,0 +1,13 @@
+language: python
+python:
+  - 3.8
+before_install:
+  - python --version
+  - pip install -U pip
+  - pip install codecov
+install:
+  - pip install -r requirements.txt
+  - pip setup.py develop
+script: python -m unittest
+after_success:
+  - codecov # submit coverage
