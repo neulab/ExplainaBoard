@@ -229,6 +229,8 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up
     obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
 
+    raise NotImplementedError('RE is not fully implemented yet')
+
     ece = 0
     dic_calibration = None
     if is_print_ece:
