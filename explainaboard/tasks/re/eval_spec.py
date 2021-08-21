@@ -229,18 +229,18 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up
     obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
 
-    raise NotImplementedError('RE is not fully implemented yet')
+    raise NotImplementedError('RE is not fully implemented yet, see below')
 
-    ece = 0
-    dic_calibration = None
-    if is_print_ece:
-        ece, dic_calibration = process_all(path_text,
-                                           size_of_bin=10, dataset=corpus_type, model=model_name)
+    # ece = 0
+    # dic_calibration = None
+    # if is_print_ece:
+    #     ece, dic_calibration = process_all(path_text,
+    #                                        size_of_bin=10, dataset=corpus_type, model=model_name)
 
-    obj_json["model"]["results"]["calibration"] = dic_calibration
-    # print(dic_calibration)
+    # obj_json["model"]["results"]["calibration"] = dic_calibration
+    # # print(dic_calibration)
 
-    ea.save_json(obj_json, fn_write_json)
+    # ea.save_json(obj_json, fn_write_json)
 
 #
 # def main():
