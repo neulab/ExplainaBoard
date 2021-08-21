@@ -1,15 +1,8 @@
 import numpy as np
-import pickle
-import codecs
 import os
-from collections import Counter
-import re
-import math
 import scipy.stats as statss
 import json
-import random
-import numpy
-import codecs
+import explainaboard.error_analysis as ea
 
 from seqeval.metrics import precision_score, recall_score, f1_score
 # from sklearn.metrics import f1_score
@@ -49,7 +42,7 @@ def get_chunks(seq):
 
         # End of a chunk + start of a chunk!
         elif tok != default:
-            tok_chunk_class, tok_chunk_type = get_chunk_type(tok)
+            tok_chunk_class, tok_chunk_type = ea.get_chunk_type(tok)
             if chunk_type is None:
                 chunk_type, chunk_start = tok_chunk_type, i
             elif tok_chunk_type != chunk_type or tok_chunk_class == "B":
@@ -619,25 +612,25 @@ def get_ci_interval(confidence_val, confidence_delta):
     return info
 
 
-def distance(text_sents, summary_sents):
-    density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2 = 0, 0, 0, 0, 0, 0, 0, 0
-
-    fragment = Fragments("\n".join(summary_sents), " ".join(text_sents))
-    compression = len(text_sents.split(" ")) / len(summary_sents.split(" "))
-    density = fragment.density()
-    # coverage = fragment.coverage()
-    # compression = fragment.compression()
-    copy_len = 0 if len(fragment.copy_len()) == 0 else sum(fragment.copy_len()) / len(fragment.copy_len())
-
-    novelty_1 = novelty_oneSample(text_sents, summary_sents, 1)
-    novelty_2 = novelty_oneSample(text_sents, summary_sents, 2)
-
-    repetition_1 = repetition_oneSample(summary_sents, 1)
-    # repetition_2 = repetition_oneSample(summary_sents, 2)
-
-    print(density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2)
-
-    return density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2
+# def distance(text_sents, summary_sents):
+#     density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2 = 0, 0, 0, 0, 0, 0, 0, 0
+#
+#     fragment = Fragments("\n".join(summary_sents), " ".join(text_sents))
+#     compression = len(text_sents.split(" ")) / len(summary_sents.split(" "))
+#     density = fragment.density()
+#     # coverage = fragment.coverage()
+#     # compression = fragment.compression()
+#     copy_len = 0 if len(fragment.copy_len()) == 0 else sum(fragment.copy_len()) / len(fragment.copy_len())
+#
+#     novelty_1 = novelty_oneSample(text_sents, summary_sents, 1)
+#     novelty_2 = novelty_oneSample(text_sents, summary_sents, 2)
+#
+#     repetition_1 = repetition_oneSample(summary_sents, 1)
+#     # repetition_2 = repetition_oneSample(summary_sents, 2)
+#
+#     print(density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2)
+#
+#     return density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2
 
 
 def list_minus(a, b):
