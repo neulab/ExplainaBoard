@@ -620,25 +620,25 @@ def get_ci_interval(confidence_val, confidence_delta):
     return info
 
 
-def distance(text_sents, summary_sents):
-    density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2 = 0, 0, 0, 0, 0, 0, 0, 0
-
-    fragment = Fragments("\n".join(summary_sents), " ".join(text_sents))
-    compression = len(text_sents.split(" ")) / len(summary_sents.split(" "))
-    density = fragment.density()
-    # coverage = fragment.coverage()
-    # compression = fragment.compression()
-    copy_len = 0 if len(fragment.copy_len()) == 0 else sum(fragment.copy_len()) / len(fragment.copy_len())
-
-    novelty_1 = novelty_oneSample(text_sents, summary_sents, 1)
-    novelty_2 = novelty_oneSample(text_sents, summary_sents, 2)
-
-    repetition_1 = repetition_oneSample(summary_sents, 1)
-    # repetition_2 = repetition_oneSample(summary_sents, 2)
-
-    print(density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2)
-
-    return density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2
+# def distance(text_sents, summary_sents):
+#     density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2 = 0, 0, 0, 0, 0, 0, 0, 0
+#
+#     fragment = Fragments("\n".join(summary_sents), " ".join(text_sents))
+#     compression = len(text_sents.split(" ")) / len(summary_sents.split(" "))
+#     density = fragment.density()
+#     # coverage = fragment.coverage()
+#     # compression = fragment.compression()
+#     copy_len = 0 if len(fragment.copy_len()) == 0 else sum(fragment.copy_len()) / len(fragment.copy_len())
+#
+#     novelty_1 = novelty_oneSample(text_sents, summary_sents, 1)
+#     novelty_2 = novelty_oneSample(text_sents, summary_sents, 2)
+#
+#     repetition_1 = repetition_oneSample(summary_sents, 1)
+#     # repetition_2 = repetition_oneSample(summary_sents, 2)
+#
+#     print(density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2)
+#
+#     return density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2
 
 
 def list_minus(a, b):
