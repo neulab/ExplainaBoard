@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 def get_probability_right_or_not(file_path, prob_col, right_or_not_col):
     """
 
