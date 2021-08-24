@@ -3,13 +3,13 @@ import explainaboard.error_analysis as ea
 import numpy
 
 
-def getAspectValue(sample_list, dict_aspect_func):
-    dict_span2aspectVal = {}
-    dict_span2aspectVal_pred = {}
+def get_aspect_value(sample_list, dict_aspect_func):
+    dict_span2aspect_val = {}
+    dict_span2aspect_val_pred = {}
 
     for aspect, fun in dict_aspect_func.items():
-        dict_span2aspectVal[aspect] = {}
-        dict_span2aspectVal_pred[aspect] = {}
+        dict_span2aspect_val[aspect] = {}
+        dict_span2aspect_val_pred[aspect] = {}
 
     # maintain it for print error case
     dict_sid2sent = {}
@@ -20,14 +20,14 @@ def getAspectValue(sample_list, dict_aspect_func):
         #
         #
         #
-        # word_list = wordSegment(sent).split(" ")
+        # word_list = word_segment(sent).split(" ")
 
         # Sentence	Entities	Paragraph	True Relation Label	Predicted Relation Label
         # Sentence Length	Paragraph Length	Number of Entities in Ground Truth Relation	Average Distance of Entities
 
         sent, entities, paragraph, true_label, pred_label, sent_length, para_length, n_entity, avg_distance = info_list
 
-        dict_sid2sent[str(sample_id)] = ea.format4json_tc(entities + "|||" + sent)
+        dict_sid2sent[str(sample_id)] = ea.format4json2(entities + "|||" + sent)
 
         sent_pos = ea.tuple2str((sample_id, true_label))
         sent_pos_pred = ea.tuple2str((sample_id, pred_label))
@@ -35,37 +35,37 @@ def getAspectValue(sample_list, dict_aspect_func):
         # Sentence Length: sentALen
         aspect = "sLen"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = float(sent_length)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = float(sent_length)
+            dict_span2aspect_val[aspect][sent_pos] = float(sent_length)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = float(sent_length)
 
         # Paragraph Length: pLen
         aspect = "pLen"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = float(para_length)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = float(para_length)
+            dict_span2aspect_val[aspect][sent_pos] = float(para_length)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = float(para_length)
 
         # Number of Entity: nEnt
         aspect = "nEnt"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = float(n_entity)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = float(n_entity)
+            dict_span2aspect_val[aspect][sent_pos] = float(n_entity)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = float(n_entity)
 
         # Average Distance: avgDist
         aspect = "avgDist"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = float(avg_distance)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = float(avg_distance)
+            dict_span2aspect_val[aspect][sent_pos] = float(avg_distance)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = float(avg_distance)
 
         # Tag: tag
         aspect = "tag"  ############## MUST Be Gold Tag for text classification task
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = true_label
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = true_label
+            dict_span2aspect_val[aspect][sent_pos] = true_label
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = true_label
 
         sample_id += 1
 
-    # print(dict_span2aspectVal["bleu"])
-    return dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sent
+    # print(dict_span2aspect_val["bleu"])
+    return dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sent
 
 
 def evaluate(task_type="ner", analysis_type="single", systems=[], output="./output.json", is_print_ci=False,
@@ -77,7 +77,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     corpus_type = "dataset_name"
     model_name = "model_name"
-    path_preComputed = ""
+    path_precomputed = ""
     path_aspect_conf = "./explainaboard/tasks/re/conf.aspects"
     path_json_input = "./explainaboard/tasks/re/template.json"
     # path_aspect_conf = "./tasks/re/conf.aspects"
@@ -85,7 +85,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     fn_write_json = output
 
     # Initalization
-    dict_aspect_func = ea.loadConf(path_aspect_conf)
+    dict_aspect_func = ea.load_conf(path_aspect_conf)
     metric_names = list(dict_aspect_func.keys())
     print("dict_aspect_func: ", dict_aspect_func)
     print(dict_aspect_func)
@@ -94,22 +94,22 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     path_comb_output = model_name + "/" + path_text.split("/")[-1]
 
-    # get preComputed paths from conf file
-    dict_preComputed_path = {}
+    # get precomputed paths from conf file
+    dict_precomputed_path = {}
     for aspect, func in dict_aspect_func.items():
-        is_preComputed = func[2].lower()
-        if is_preComputed == "yes":
-            dict_preComputed_path[aspect] = path_preComputed + "_" + aspect + ".pkl"
-            print("PreComputed directory:\t", dict_preComputed_path[aspect])
+        is_precomputed = func[2].lower()
+        if is_precomputed == "yes":
+            dict_precomputed_path[aspect] = path_precomputed + "_" + aspect + ".pkl"
+            print("precomputed directory:\t", dict_precomputed_path[aspect])
 
     sample_list, sent_list, entity_list, true_list, pred_list = ea.file_to_list_re(path_text)
 
-    errorCase_list = []
+    error_case_list = []
     if is_print_case:
-        errorCase_list = ea.getErrorCase_re(sent_list, entity_list, true_list, pred_list)
-        print(" -*-*-*- the number of error casse:\t", len(errorCase_list))
+        error_case_list = ea.get_error_case_re(sent_list, entity_list, true_list, pred_list)
+        print(" -*-*-*- the number of error casse:\t", len(error_case_list))
 
-    dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sent = getAspectValue(sample_list, dict_aspect_func)
+    dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sent = get_aspect_value(sample_list, dict_aspect_func)
 
     holistic_performance = ea.accuracy(true_list, pred_list)
     holistic_performance = format(holistic_performance, '.3g')
@@ -119,7 +119,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     if is_print_ci:
         confidence_low, confidence_up = ea.compute_confidence_interval_acc(true_list, pred_list, n_times=1000)
 
-    dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sent = getAspectValue(sample_list, dict_aspect_func)
+    dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sent = get_aspect_value(sample_list, dict_aspect_func)
 
     print("------------------ Holistic Result----------------------")
     print(holistic_performance)
@@ -127,14 +127,14 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     # print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
 
     def __selectBucktingFunc(func_name, func_setting, dict_obj):
-        if func_name == "bucketAttribute_SpecifiedBucketInterval":
+        if func_name == "bucket_attribute_SpecifiedBucketInterval":
             return eval(func_name)(dict_obj, eval(func_setting))
-        elif func_name == "bucketAttribute_SpecifiedBucketValue":
+        elif func_name == "bucket_attribute_SpecifiedBucketValue":
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             n_buckets, specified_bucket_value_list = int(func_setting.split("\t")[0]), eval(func_setting.split("\t")[1])
             return eval(func_name)(dict_obj, n_buckets, specified_bucket_value_list)
-        elif func_name == "bucketAttribute_DiscreteValue":  # now the discrete value is R-tag..
+        elif func_name == "bucket_attribute_DiscreteValue":  # now the discrete value is R-tag..
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             tags_list = list(set(dict_obj.values()))
@@ -148,14 +148,14 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     aspect_names = []
 
     for aspect, func in dict_aspect_func.items():
-        # print(aspect, dict_span2aspectVal[aspect])
-        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal[aspect])
+        # print(aspect, dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
-        dict_bucket2span_pred[aspect] = ea.bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
-                                                                                   dict_bucket2span[aspect].keys())
-        # dict_bucket2span_pred[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal_pred[aspect])
-        dict_bucket2f1[aspect] = ea.getBucketAcc_with_errorCase_re(dict_bucket2span[aspect],
+        dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
+                                                                                      dict_bucket2span[aspect].keys())
+        # dict_bucket2span_pred[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val_pred[aspect])
+        dict_bucket2f1[aspect] = ea.get_bucket_acc_with_error_case_re(dict_bucket2span[aspect],
                                                                    dict_bucket2span_pred[aspect], dict_sid2sent,
                                                                    is_print_ci, is_print_case)
         aspect_names.append(aspect)
@@ -163,12 +163,12 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     print("------------------ Breakdown Performance")
     for aspect in dict_aspect_func.keys():
-        ea.printDict(dict_bucket2f1[aspect], aspect)
+        ea.print_dict(dict_bucket2f1[aspect], aspect)
     print("")
 
     # Calculate databias w.r.t numeric attributes
     dict_aspect2bias = {}
-    for aspect, aspect2Val in dict_span2aspectVal.items():
+    for aspect, aspect2Val in dict_span2aspect_val.items():
         if type(list(aspect2Val.values())[0]) != type("string"):
             dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
@@ -223,7 +223,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["data"]["output"] = path_comb_output
 
     obj_json["model"]["name"] = model_name
-    obj_json["model"]["results"]["overall"]["error_case"] = errorCase_list
+    obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up

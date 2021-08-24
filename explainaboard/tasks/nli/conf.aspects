@@ -1,41 +1,41 @@
 # Sentence A Length
 notation:	sentALen
-type:	bucketAttribute_SpecifiedBucketValue
+type:	bucket_attribute_SpecifiedBucketValue
 setting:	4	[]
-is_preComputed:	No
+is_precomputed:	No
 
 # Sentence B Length
 notation:	sentBLen
-type:	bucketAttribute_SpecifiedBucketValue
+type:	bucket_attribute_SpecifiedBucketValue
 setting:	4	[]
-is_preComputed:	No
+is_precomputed:	No
 
 # Length(A) - Length(B)
 notation:	A-B
-type:	bucketAttribute_SpecifiedBucketValue
+type:	bucket_attribute_SpecifiedBucketValue
 setting:	4	[]
-is_preComputed:	No
+is_precomputed:	No
 
 
 # Length(A) + Length(B)
 notation:	A+B
-type:	bucketAttribute_SpecifiedBucketValue
+type:	bucket_attribute_SpecifiedBucketValue
 setting:	4	[]
-is_preComputed:	No
+is_precomputed:	No
 
 
 # Length(A)/Length(B)
 notation:	A/B
-type:	bucketAttribute_SpecifiedBucketValue
+type:	bucket_attribute_SpecifiedBucketValue
 setting:	4	[]
-is_preComputed:	No
+is_precomputed:	No
 
 
 # Tag
 notation:	tag
-type:	bucketAttribute_DiscreteValue
+type:	bucket_attribute_DiscreteValue
 setting:	3	1
-is_preComputed:	No
+is_precomputed:	No
 
 
 
