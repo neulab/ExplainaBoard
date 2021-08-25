@@ -102,11 +102,11 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             dict_precomputed_path[aspect] = path_precomputed + "_" + aspect + ".pkl"
             print("precomputed directory:\t", dict_precomputed_path[aspect])
 
-    sample_list, sent_list, entity_list, true_list, pred_list = ea.file_to_list_re(path_text)
+    sample_list, sent_list, entity_list, true_list, pred_list = file_to_list(path_text)
 
     error_case_list = []
     if is_print_case:
-        error_case_list = ea.get_error_case_re(sent_list, entity_list, true_list, pred_list)
+        error_case_list = get_error_case(sent_list, entity_list, true_list, pred_list)
         print(" -*-*-*- the number of error casse:\t", len(error_case_list))
 
     dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sent = get_aspect_value(sample_list, dict_aspect_func)
@@ -126,7 +126,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     # print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
 
-    def __selectBucktingFunc(func_name, func_setting, dict_obj):
+    def __select_bucketing_func(func_name, func_setting, dict_obj):
         if func_name == "bucket_attribute_SpecifiedBucketInterval":
             return eval(func_name)(dict_obj, eval(func_setting))
         elif func_name == "bucket_attribute_SpecifiedBucketValue":
@@ -149,15 +149,15 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     for aspect, func in dict_aspect_func.items():
         # print(aspect, dict_span2aspect_val[aspect])
-        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
         dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
                                                                                       dict_bucket2span[aspect].keys())
-        # dict_bucket2span_pred[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val_pred[aspect])
-        dict_bucket2f1[aspect] = ea.get_bucket_acc_with_error_case_re(dict_bucket2span[aspect],
-                                                                   dict_bucket2span_pred[aspect], dict_sid2sent,
-                                                                   is_print_ci, is_print_case)
+        # dict_bucket2span_pred[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val_pred[aspect])
+        dict_bucket2f1[aspect] = get_bucket_acc_with_error_case(dict_bucket2span[aspect],
+                                                                dict_bucket2span_pred[aspect], dict_sid2sent,
+                                                                is_print_ci, is_print_case)
         aspect_names.append(aspect)
     print("aspect_names: ", aspect_names)
 
@@ -177,7 +177,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
         print(k + ":\t" + str(v))
     print("")
 
-    def beautifyInterval(interval):
+    def beautify_interval(interval):
 
         if type(interval[0]) == type("string"):  ### pay attention to it
             return interval[0]
@@ -191,13 +191,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                 bk_name = range1_r + range1_l
                 return bk_name
 
-    dict_fineGrained = {}
+    dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
-        dict_fineGrained[aspect] = []
+        dict_fine_grained[aspect] = []
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautifyInterval(bucket_name)
+            bucket_name = beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -209,7 +209,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             bucket_error_case = v[4]
 
             # instantiation
-            dict_fineGrained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
+            dict_fine_grained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
                                              "confidence_low": confidence_low_bucket,
                                              "confidence_up": confidence_up_bucket,
                                              "bucket_error_case": bucket_error_case})
@@ -227,7 +227,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up
-    obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
+    obj_json["model"]["results"]["fine_grained"] = dict_fine_grained
 
     raise NotImplementedError('RE is not fully implemented yet, see below')
 
@@ -291,3 +291,68 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 # # python eval_spec.py  --task re --systems ./test_re.tsv --output ./a.json
 # if __name__ == '__main__':
 # 	main()
+def get_bucket_acc_with_error_case(dict_bucket2span, dict_bucket2span_pred, dict_sid2sent, is_print_ci, is_print_case):
+    # The structure of span_true or span_pred
+    # 2345|||Positive
+    # 2345 represents sentence id
+    # Positive represents the "label" of this instance
+
+    dict_bucket2f1 = {}
+
+    for bucket_interval, spans_true in dict_bucket2span.items():
+        spans_pred = []
+        if bucket_interval not in dict_bucket2span_pred.keys():
+            raise ValueError("Predict Label Bucketing Errors")
+        else:
+            spans_pred = dict_bucket2span_pred[bucket_interval]
+
+        # loop over samples from a given bucket
+        error_case_bucket_list = []
+        if is_print_case:
+            for info_true, info_pred in zip(spans_true, spans_pred):
+                sid_true, label_true = info_true.split("|||")
+                sid_pred, label_pred = info_pred.split("|||")
+                if sid_true != sid_pred:
+                    continue
+
+                sent_entities = dict_sid2sent[sid_true]
+                if label_true != label_pred:
+                    error_case_info = label_true + "|||" + label_pred + "|||" + sent_entities
+                    error_case_bucket_list.append(error_case_info)
+
+        accuracy_each_bucket = ea.accuracy(spans_pred, spans_true)
+        confidence_low, confidence_up = 0, 0
+        if is_print_ci:
+            confidence_low, confidence_up = ea.compute_confidence_interval_acc(spans_pred, spans_true)
+        dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
+                                           error_case_bucket_list]
+
+    return ea.sort_dict(dict_bucket2f1)
+
+
+def get_error_case(sent_list, entity_list, true_label_list, pred_label_list):
+    error_case_list = []
+    for sent, entities, true_label, pred_label in zip(sent_list, entity_list, true_label_list, pred_label_list):
+        if true_label != pred_label:
+            error_case_list.append(true_label + "|||" + pred_label + "|||" + entities + "|||" + ea.format4json2(sent))
+    return error_case_list
+
+
+def file_to_list(file_path):
+    sample_list = []
+    fin = open(file_path, "r")
+    true_list = []
+    pred_list = []
+    sent_list = []
+    entity_list = []
+    for idx, line in enumerate(fin):
+        if idx == 0:
+            continue
+        info_list = line.rstrip("\n").split("\t")
+        sample_list.append([info for info in info_list])
+        true_list.append(info_list[3])
+        pred_list.append(info_list[4])
+        sent_list.append(info_list[0])
+        entity_list.append(info_list[1])
+
+    return sample_list, sent_list, entity_list, true_list, pred_list

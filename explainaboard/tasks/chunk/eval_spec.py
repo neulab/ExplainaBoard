@@ -4,14 +4,14 @@ import pickle
 import numpy
 
 
-def get_aspect_value(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent,
-                   test_trueTag_sequences_sent, dict_precomputed_path, dict_aspect_func):
-    def getSententialValue(test_trueTag_sequences_sent, test_word_sequences_sent):
+def get_aspect_value(test_word_sequences, test_true_tag_sequences, test_word_sequences_sent,
+                   test_true_tag_sequences_sent, dict_precomputed_path, dict_aspect_func):
+    def getSententialValue(test_true_tag_sequences_sent, test_word_sequences_sent):
 
         eDen = []
         sentLen = []
 
-        for i, test_sent in enumerate(test_trueTag_sequences_sent):
+        for i, test_sent in enumerate(test_true_tag_sequences_sent):
             pred_chunks = set(ea.get_chunks(test_sent))
 
             num_entityToken = 0
@@ -44,12 +44,12 @@ def get_aspect_value(test_word_sequences, test_trueTag_sequences, test_word_sequ
         dict_span2aspect_val[aspect] = {}
 
     eDen_list, sentLen_list = [], []
-    eDen_list, sentLen_list = getSententialValue(test_trueTag_sequences_sent,
+    eDen_list, sentLen_list = getSententialValue(test_true_tag_sequences_sent,
                                                  test_word_sequences_sent)
 
     dict_pos2sid = ea.get_pos2sentid(test_word_sequences_sent)
     dict_ap2rp = ea.get_token_position(test_word_sequences_sent)
-    all_chunks = ea.get_chunks(test_trueTag_sequences)
+    all_chunks = ea.get_chunks(test_true_tag_sequences)
     dict_span2sid = {}
     for span_info in all_chunks:
 
@@ -168,7 +168,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     print("------------------ Holistic Result")
     print(holistic_performance)
 
-    def __selectBucktingFunc(func_name, func_setting, dict_obj):
+    def __select_bucketing_func(func_name, func_setting, dict_obj):
         if func_name == "bucket_attribute_SpecifiedBucketInterval":
             return ea.bucket_attribute_specified_bucket_interval(dict_obj, eval(func_setting))
         elif func_name == "bucket_attribute_SpecifiedBucketValue":
@@ -194,12 +194,12 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     for aspect, func in dict_aspect_func.items():
         # print(aspect, dict_span2aspect_val[aspect])
-        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
         dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
                                                                                       dict_bucket2span[aspect].keys())
-        dict_bucket2f1[aspect], error_case_list = ea.getBucketF1_chunk(dict_bucket2span[aspect],
+        dict_bucket2f1[aspect], error_case_list = get_bucket_f1_chunk(dict_bucket2span[aspect],
                                                                       dict_bucket2span_pred[aspect], dict_span2sid,
                                                                       dict_span2sid_pred, dict_chunkid2span,
                                                                       dict_chunkid2span_pred, is_print_ci,
@@ -223,7 +223,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
         print(k + ":\t" + str(v))
     print("")
 
-    def beautifyInterval(interval):
+    def beautify_interval(interval):
 
         if type(interval[0]) == type("string"):  ### pay attention to it
             return interval[0]
@@ -237,13 +237,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                 bk_name = range1_r + range1_l
                 return bk_name
 
-    dict_fineGrained = {}
+    dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
-        dict_fineGrained[aspect] = []
+        dict_fine_grained[aspect] = []
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautifyInterval(bucket_name)
+            bucket_name = beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -254,7 +254,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             confidence_up = format(float(v[3]) * 100, '.4g')
             error_entity_list = v[4]
             # instantiation
-            dict_fineGrained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
+            dict_fine_grained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
                                              "confidence_low": confidence_low, "confidence_up": confidence_up,
                                              "bucket_error_case": error_entity_list})
 
@@ -269,9 +269,86 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low_overall
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up_overall
-    obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
+    obj_json["model"]["results"]["fine_grained"] = dict_fine_grained
 
     obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
 
     ea.save_json(obj_json, "./instantiate.json")
     ea.save_json(obj_json, fn_write_json)
+
+
+def get_bucket_f1_chunk(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred, dict_chunkid2span,
+                      dict_chunkid2span_pred, is_print_ci, is_print_case):
+    dict_bucket2f1 = {}
+
+    # predict:  2_3 -> NER
+    dict_pos2tag_pred = {}
+    if is_print_case:
+        for k_bucket_eval, spans_pred in dict_bucket2span_pred.items():
+            for span_pred in spans_pred:
+                pos_pred = "_".join(span_pred.split("_")[0:2])
+                tag_pred = span_pred.split("_")[-1]
+                dict_pos2tag_pred[pos_pred] = tag_pred
+
+    # true:  2_3 -> NER
+    dict_pos2tag = {}
+    if is_print_case:
+        for k_bucket_eval, spans in dict_bucket2span.items():
+            for span in spans:
+                pos = "_".join(span.split("_")[0:2])
+                tag = span.split("_")[-1]
+                dict_pos2tag[pos] = tag
+
+    error_case_list = []
+    if is_print_case:
+        error_case_list = ea.get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
+
+    for bucket_interval, spans_true in dict_bucket2span.items():
+        spans_pred = []
+
+        # print('bucket_interval: ',bucket_interval)
+        if bucket_interval not in dict_bucket2span_pred.keys():
+            # print(bucket_interval)
+            raise ValueError("Predict Label Bucketing Errors")
+        else:
+            spans_pred = dict_bucket2span_pred[bucket_interval]
+
+        confidence_low, confidence_up = 0, 0
+        if is_print_ci:
+            confidence_low, confidence_up = ea.compute_confidence_interval_f1(spans_true, spans_pred, dict_span2sid,
+                                                                           dict_span2sid_pred)
+
+        confidence_low = format(confidence_low, '.3g')
+        confidence_up = format(confidence_up, '.3g')
+
+        f1, p, r = ea.evaluate_chunk_level(spans_pred, spans_true)
+
+        error_entity_list = []
+        if is_print_case:
+            for span_true in spans_true:
+                if span_true not in spans_pred:
+                    # print(span_true)
+                    pos_true = "_".join(span_true.split("_")[0:2])
+                    tag_true = span_true.split("_")[-1]
+
+                    if pos_true in dict_pos2tag_pred.keys():
+                        tag_pred = dict_pos2tag_pred[pos_true]
+                        if tag_pred != tag_true:
+                            error_entity_list.append(
+                                dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + dict_pos2tag_pred[pos_true])
+                    else:
+                        error_entity_list.append(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + "O")
+
+        # print("confidence_low:\t", confidence_low)
+        # print("confidence_up:\t", confidence_up)
+        # print("F1:\t", f1)
+        # print(error_entity_list)
+
+        dict_bucket2f1[bucket_interval] = [f1, len(spans_true), confidence_low, confidence_up, error_entity_list]
+
+    # if bucket_interval[0] == 1.0:
+    # 	print("debug-f1:",f1)
+    # 	print(spans_pred[0:20])
+    # 	print(spans_true[0:20])
+    # print("dict_bucket2f1: ",dict_bucket2f1)
+    return ea.sort_dict(dict_bucket2f1), error_case_list
