@@ -4,20 +4,23 @@
 ## Model Description
 
 ## Meta Data
-* Download link for system output: [This link](https://drive.google.com/file/d/1K6DspM6vZEmHS44QF6ErVQl9UGHhRUN6/view?usp=sharing)
-* Github Repo: https://github.com/neulab/InterpretEval
-* Paper: [Interpretable Multi-dataset Evaluation for Named Entity Recognition](https://arxiv.org/abs/2011.06854)
-* Corresponding Author: [Pengfei Liu](http://pfliu.com/).
+* Download link for system output: [This link](https://drive.google.com/file/d/1LMARoaHEGt8D4fGPPjUJRwPNt_RHgEeT/view?usp=sharing)
+* Github Repo: None
+* Paper: [Semantics-aware BERT for Language Understanding](https://arxiv.org/pdf/1909.02209v3.pdf)
+* Corresponding Author: [Hai Zhao](https://bcmi.sjtu.edu.cn/~zhaohai).
 
 ## Results
-F1: 93.03%
+Accuracy: 90.07%
 
 ## Reference
 ```
-@article{fu2020interpretable,
-  title={Interpretable multi-dataset evaluation for named entity recognition},
-  author={Fu, Jinlan and Liu, Pengfei and Neubig, Graham},
-  journal={arXiv preprint arXiv:2011.06854},
+@inproceedings{zhang2020semantics,
+  title={Semantics-aware BERT for language understanding},
+  author={Zhang, Zhuosheng and Wu, Yuwei and Zhao, Hai and Li, Zuchao and Zhang, Shuailiang and Zhou, Xi and Zhou, Xiang},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={34},
+  number={05},
+  pages={9628--9635},
   year={2020}
 }
 ```
