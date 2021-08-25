@@ -41,11 +41,11 @@ CTB is a popular Chinese Word Segmentation (CWS) dataset.
 
 
 ### Format
-The ``.csv`` is the most common format for CWS datasets, which always keep the dataset in three columns: tokens, true-tags, and predicted-tags, separated by space.
+The ``.csv`` is the most common format for CWS datasets, which always keep the dataset in three columns: tokens, true-tags, and predicted-tags, separated by space. Different sentences are separated with a blank line.
 
 
 ### Split
-CTB offer the official training, dev, and testing set.
+CTB provides a split of training, development, and testing set.
 
 
 ## Reference
