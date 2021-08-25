@@ -2,7 +2,7 @@
 
 
 ## Description
-CoNLL-2003 is a popular NER dataset, which contains four named entity types: person, location, organization, and miscellaneous name.
+CoNLL-2003 is a popular NER dataset, which was taken from the Reuters Corpus. The dataset contains four categories of entity type: person, location, organization, and miscellaneous name.
 
 ## Meta Data
 * Official Homepage: https://www.clips.uantwerpen.be/conll2003/ner/ 
