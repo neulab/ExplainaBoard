@@ -45,7 +45,7 @@ The ``.csv`` is the most common format for CWS datasets, which always keep the d
 
 
 ### Split
-CTB provides a split of training, development, and testing set.
+CTB provides an official split of training, development, and testing set.
 
 
 ## Reference
