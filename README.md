@@ -125,7 +125,8 @@ If these system outputs are useful for you, you can [cite our work](http://expla
 
 
 ### Currently Covered Systems
-
+So far, ExplainaBoard support more than 10 NLP tasks, including sequence classification, labeling, extraction and generation.
+Click [here](http://explainaboard.nlpedia.ai/) to see more.
 
 
 
