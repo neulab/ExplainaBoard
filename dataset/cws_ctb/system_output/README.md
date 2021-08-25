@@ -4,22 +4,21 @@
 ## Model Description
 
 ## Meta Data
-* Download link for system output: [This link](https://drive.google.com/file/d/1K6DspM6vZEmHS44QF6ErVQl9UGHhRUN6/view?usp=sharing)
-* Github Repo: https://github.com/flairNLP/flair
-* Paper: [Contextual String Embeddings for Sequence Labeling](https://aclanthology.org/C18-1139.pdf)
-* Corresponding Author: Not clear.
+* Download link for system output: [This link](https://drive.google.com/file/d/1paT3qkGgIoHWSS0vl1CH58go7W5dfFfS/view?usp=sharing)
+* Github Repo: https://github.com/neulab/InterpretEval
+* Paper: [RethinkCWS: Is Chinese Word Segmentation a Solved Task?](https://arxiv.org/pdf/2011.06858.pdf)
+* Corresponding Author: [Pengfei Liu](http://pfliu.com/).
 
 ## Results
-F1: 93.03%
+F1: 97.65%
 
 ## Reference
 ```
-@inproceedings{akbik2018contextual,
-  title={Contextual string embeddings for sequence labeling},
-  author={Akbik, Alan and Blythe, Duncan and Vollgraf, Roland},
-  booktitle={Proceedings of the 27th international conference on computational linguistics},
-  pages={1638--1649},
-  year={2018}
+@article{fu2020rethinkcws,
+  title={RethinkCWS: Is Chinese Word Segmentation a Solved Task?},
+  author={Fu, Jinlan and Liu, Pengfei and Zhang, Qi and Huang, Xuanjing},
+  journal={arXiv preprint arXiv:2011.06858},
+  year={2020}
 }
 ```
 
