@@ -49,7 +49,7 @@ Inc	I-NP	I-NP
 
 
 ### Format
-The ``.csv`` is the most common format for Chunk datasets, which always keep the dataset in three columns: token, true-tag, and predicted-tag, separated by space.
+The ``.csv`` is the most common format for Chunk datasets, which always keeps the dataset in three columns: token, true-tag, and predicted-tag, separated by space. A spaceline is usually token to interval different sentences.
 
 
 ### Split

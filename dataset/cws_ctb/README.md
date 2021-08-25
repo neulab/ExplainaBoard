@@ -2,7 +2,7 @@
 
 
 ## Description
-CTB is a popular Chinese Word Segmentation (CWS) dataset. 
+CTB (Chinese Treebank dataset) is a popular Chinese Word Segmentation (CWS) dataset. 
 
 ## Meta Data
 * Official Homepage: https://www.aclweb.org/mirror/ijcnlp08/sighan6/callforpapers.htm
