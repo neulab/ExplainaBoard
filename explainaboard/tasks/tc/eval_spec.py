@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collections import OrderedDict
+
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 import numpy
@@ -80,7 +82,7 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
     bin_list = ea.divide_into_bin(size_of_bin, raw_list)
 
     ece = ea.calculate_ece(bin_list)
-    dic = ea.OrderedDict()
+    dic = OrderedDict()
     dic['dataset-name'] = dataset
     dic['model-name'] = model
     dic['ECE'] = ece
@@ -135,7 +137,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             dict_precomputed_path[aspect] = path_precomputed + "_" + aspect + ".pkl"
             print("precomputed directory:\t", dict_precomputed_path[aspect])
 
-    sent_list, true_label_list, pred_label_list = ea.file_to_list_tc(path_text)
+    sent_list, true_label_list, pred_label_list = file_to_list_tc(path_text)
 
     error_case_list = []
     if is_print_case:
@@ -159,7 +161,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     # print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
 
-    def __selectBucktingFunc(func_name, func_setting, dict_obj):
+    def __select_bucketing_func(func_name, func_setting, dict_obj):
         if func_name == "bucket_attribute_SpecifiedBucketInterval":
             return ea.bucket_attribute_specified_bucket_interval(dict_obj, eval(func_setting))
         elif func_name == "bucket_attribute_SpecifiedBucketValue":
@@ -184,12 +186,12 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     for aspect, func in dict_aspect_func.items():
         # print(aspect, dict_span2aspect_val[aspect])
-        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
         dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
                                                                                       dict_bucket2span[aspect].keys())
-        # dict_bucket2span_pred[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspect_val_pred[aspect])
+        # dict_bucket2span_pred[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val_pred[aspect])
         dict_bucket2f1[aspect] = ea.get_bucket_acc_with_error_case(dict_bucket2span[aspect], dict_bucket2span_pred[aspect],
                                                                 dict_sid2sent, is_print_ci, is_print_case)
         aspect_names.append(aspect)
@@ -211,7 +213,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
         print(k + ":\t" + str(v))
     print("")
 
-    def beautifyInterval(interval):
+    def beautify_interval(interval):
 
         if type(interval[0]) == type("string"):  ### pay attention to it
             return interval[0]
@@ -225,13 +227,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                 bk_name = range1_r + range1_l
                 return bk_name
 
-    dict_fineGrained = {}
+    dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
-        dict_fineGrained[aspect] = []
+        dict_fine_grained[aspect] = []
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautifyInterval(bucket_name)
+            bucket_name = beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -243,7 +245,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             bucket_error_case = v[4]
 
             # instantiation
-            dict_fineGrained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
+            dict_fine_grained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
                                              "confidence_low": confidence_low, "confidence_up": confidence_up,
                                              "bucket_error_case": bucket_error_case})
 
@@ -260,7 +262,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up
-    obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
+    obj_json["model"]["results"]["fine_grained"] = dict_fine_grained
 
     ece = 0
     dic_calibration = None
@@ -273,3 +275,21 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     ea.save_json(obj_json, "./instantiate.json")
     ea.save_json(obj_json, fn_write_json)
+
+
+def file_to_list_tc(path_file):
+    sent_list = []
+    true_label_list = []
+    pred_label_list = []
+    fin = open(path_file, "r")
+    for line in fin:
+        line = line.rstrip("\n")
+        if len(line.split("\t")) != 5:
+            continue
+        sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
+        sent_list.append(sent)
+        true_label_list.append(true_label)
+        pred_label_list.append(pred_label)
+
+    fin.close()
+    return sent_list, true_label_list, pred_label_list
