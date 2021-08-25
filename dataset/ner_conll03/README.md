@@ -19,7 +19,7 @@ Language-Independent Named Entity Recognition](https://aclanthology.org/W03-0419
 ## Data Structure
 ### Example
 
-``
+```
 "token"	"true-tag"	"prediction-tag"
 SOCCER	O	O
 -	O	O
@@ -43,7 +43,7 @@ United	B-LOC	B-LOC
 Arab	I-LOC	I-LOC
 Emirates	I-LOC	I-LOC
 1996-12-06	O	O
-``
+```
 
 
 ### Format
@@ -55,11 +55,11 @@ CoNLL-2003 offer the official training, dev, and testing set.
 
 
 ## Reference
- ``
+ ```
  @article{sang2003introduction,
   title={Introduction to the CoNLL-2003 shared task: Language-independent named entity recognition},
   author={Sang, Erik F and De Meulder, Fien},
   journal={arXiv preprint cs/0306050},
   year={2003}
 }
-``
+```
