@@ -8,9 +8,9 @@ CoNLL-2003 is a popular NER dataset, which contains four named entity types: per
 * Official Homepage: https://www.clips.uantwerpen.be/conll2003/ner/ 
 * Download link: https://www.clips.uantwerpen.be/conll2003/eng.raw.tar
 * Paper: [Introduction to the CoNLL-2003 Shared Task:
-Language-Independent Named Entity Recognition] (https://aclanthology.org/W03-0419.pdf)
+Language-Independent Named Entity Recognition](https://aclanthology.org/W03-0419.pdf)
 * Github Repo: None
-* Corresponding Author: [Erik Tjong Kim Sang] (https://ifarm.nl/erikt/)
+* Corresponding Author: [Erik Tjong Kim Sang](https://ifarm.nl/erikt/)
 * Supported Task: Named Entity Recognition 
 * Language: English 
 
