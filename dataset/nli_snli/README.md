@@ -1,4 +1,4 @@
-# Dataset for CoNLL-2003
+# Dataset for SNLI
 
 
 ## Description
@@ -20,16 +20,12 @@ The SNLI dataset (Stanford Natural Language Inference) aims to judge the relatio
 ### Example
 
 ```
-{
-sentence A: "This church choir sings to the masses as they sing joyous songs from the book at a church.",
-sentence B: "The church has cracks in the ceiling.",
-label: "neutral",
-}
+This church choir sings to the masses as they sing joyous songs from the book at a church.	The church has cracks in the ceiling.	neutral
 ```
 
 
 ### Format
-NOT CLEAR~~~~~
+Each line contains three elements separated by a "tab", which are sentence A, sentence B, and label. 
 
 
 ### Split
