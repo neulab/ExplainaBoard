@@ -4,14 +4,14 @@ import pickle
 import numpy
 
 
-def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequences_sent,
-                   test_trueTag_sequences_sent, dict_preComputed_path, dict_aspect_func):
-    def getSententialValue(test_trueTag_sequences_sent, test_word_sequences_sent):
+def get_aspect_value(test_word_sequences, test_true_tag_sequences, test_word_sequences_sent,
+                   test_true_tag_sequences_sent, dict_precomputed_path, dict_aspect_func):
+    def getSententialValue(test_true_tag_sequences_sent, test_word_sequences_sent):
 
         eDen = []
         sentLen = []
 
-        for i, test_sent in enumerate(test_trueTag_sequences_sent):
+        for i, test_sent in enumerate(test_true_tag_sequences_sent):
             pred_chunks = set(ea.get_chunks(test_sent))
 
             num_entityToken = 0
@@ -28,28 +28,28 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
 
         return eDen, sentLen
 
-    dict_preComputed_model = {}
-    for aspect, path in dict_preComputed_path.items():
+    dict_precomputed_model = {}
+    for aspect, path in dict_precomputed_path.items():
         print("path:\t" + path)
         if ea.os.path.exists(path):
             print('load the hard dictionary of entity span in test set...')
             fread = open(path, 'rb')
-            dict_preComputed_model[aspect] = pickle.load(fread)
+            dict_precomputed_model[aspect] = pickle.load(fread)
         else:
             raise ValueError("can not load hard dictionary" + aspect + "\t" + path)
 
-    dict_span2aspectVal = {}
+    dict_span2aspect_val = {}
     dict_chunkid2span = {}
     for aspect, fun in dict_aspect_func.items():
-        dict_span2aspectVal[aspect] = {}
+        dict_span2aspect_val[aspect] = {}
 
     eDen_list, sentLen_list = [], []
-    eDen_list, sentLen_list = getSententialValue(test_trueTag_sequences_sent,
+    eDen_list, sentLen_list = getSententialValue(test_true_tag_sequences_sent,
                                                  test_word_sequences_sent)
 
-    dict_pos2sid = ea.getPos2SentId(test_word_sequences_sent)
-    dict_ap2rp = ea.getTokenPosition(test_word_sequences_sent)
-    all_chunks = ea.get_chunks(test_trueTag_sequences)
+    dict_pos2sid = ea.get_pos2sentid(test_word_sequences_sent)
+    dict_ap2rp = ea.get_token_position(test_word_sequences_sent)
+    all_chunks = ea.get_chunks(test_true_tag_sequences)
     dict_span2sid = {}
     for span_info in all_chunks:
 
@@ -76,25 +76,25 @@ def getAspectValue(test_word_sequences, test_trueTag_sequences, test_word_sequen
         # Sentence Length: sLen
         aspect = "sLen"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][span_pos] = sLen
+            dict_span2aspect_val[aspect][span_pos] = sLen
 
         # Relative Position: relPos
         aspect = "rPos"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][span_pos] = (dict_ap2rp[idx_start]) * 1.0 / sLen
+            dict_span2aspect_val[aspect][span_pos] = (dict_ap2rp[idx_start]) * 1.0 / sLen
 
         # Entity Length: eLen
         aspect = "eLen"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][span_pos] = float(span_length)
+            dict_span2aspect_val[aspect][span_pos] = float(span_length)
 
         # Tag: tag
         aspect = "tag"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][span_pos] = span_type
+            dict_span2aspect_val[aspect][span_pos] = span_type
 
-    # print(dict_span2aspectVal)
-    return dict_span2aspectVal, dict_span2sid, dict_chunkid2span
+    # print(dict_span2aspect_val)
+    return dict_span2aspect_val, dict_span2sid, dict_chunkid2span
 
 
 def tuple2str(triplet):
@@ -113,13 +113,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     corpus_type = "dataset_name"
     model_name = "model_name"
-    path_preComputed = ""
+    path_precomputed = ""
     path_aspect_conf = "./explainaboard/tasks/chunk/conf.aspects"
     path_json_input = "./explainaboard/tasks/chunk/template.json"
     fn_write_json = output
 
     # Initalization
-    dict_aspect_func = ea.loadConf(path_aspect_conf)
+    dict_aspect_func = ea.load_conf(path_aspect_conf)
     metric_names = list(dict_aspect_func.keys())
     print("dict_aspect_func: ", dict_aspect_func)
     print(dict_aspect_func)
@@ -127,26 +127,26 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     fwrite_json = open(fn_write_json, 'w')
     path_comb_output = model_name + "/" + path_text.split("/")[-1]
 
-    # get preComputed paths from conf file
-    dict_preComputed_path = {}
+    # get precomputed paths from conf file
+    dict_precomputed_path = {}
     for aspect, func in dict_aspect_func.items():
-        is_preComputed = func[2].lower()
-        if is_preComputed == "yes":
-            dict_preComputed_path[aspect] = path_preComputed + "_" + aspect + ".pkl"
-            print("PreComputed directory:\t", dict_preComputed_path[aspect])
+        is_precomputed = func[2].lower()
+        if is_precomputed == "yes":
+            dict_precomputed_path[aspect] = path_precomputed + "_" + aspect + ".pkl"
+            print("precomputed directory:\t", dict_precomputed_path[aspect])
 
     list_text_sent, list_text_token = ea.read_single_column(path_text, 0)
     list_true_tags_sent, list_true_tags_token = ea.read_single_column(path_text, 1)
     list_pred_tags_sent, list_pred_tags_token = ea.read_single_column(path_text, 2)
 
-    dict_span2aspectVal, dict_span2sid, dict_chunkid2span = getAspectValue(list_text_token, list_true_tags_token,
+    dict_span2aspect_val, dict_span2sid, dict_chunkid2span = get_aspect_value(list_text_token, list_true_tags_token,
                                                                            list_text_sent, list_true_tags_sent,
-                                                                           dict_preComputed_path, dict_aspect_func)
-    dict_span2aspectVal_pred, dict_span2sid_pred, dict_chunkid2span_pred = getAspectValue(list_text_token,
+                                                                           dict_precomputed_path, dict_aspect_func)
+    dict_span2aspect_val_pred, dict_span2sid_pred, dict_chunkid2span_pred = get_aspect_value(list_text_token,
                                                                                           list_pred_tags_token,
                                                                                           list_text_sent,
                                                                                           list_pred_tags_sent,
-                                                                                          dict_preComputed_path,
+                                                                                          dict_precomputed_path,
                                                                                           dict_aspect_func)
 
     holistic_performance = ea.f1(list_true_tags_sent, list_pred_tags_sent)["f1"]
@@ -158,7 +158,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                                                                                           dict_span2sid_pred,
                                                                                           n_times=1000)
 
-    # print(dict_span2aspectVal)
+    # print(dict_span2aspect_val)
 
     print("confidence_low_overall:\t", confidence_low_overall)
     print("confidence_up_overall:\t", confidence_up_overall)
@@ -168,21 +168,21 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     print("------------------ Holistic Result")
     print(holistic_performance)
 
-    def __selectBucktingFunc(func_name, func_setting, dict_obj):
-        if func_name == "bucketAttribute_SpecifiedBucketInterval":
-            return ea.bucketAttribute_SpecifiedBucketInterval(dict_obj, eval(func_setting))
-        elif func_name == "bucketAttribute_SpecifiedBucketValue":
+    def __select_bucketing_func(func_name, func_setting, dict_obj):
+        if func_name == "bucket_attribute_SpecifiedBucketInterval":
+            return ea.bucket_attribute_specified_bucket_interval(dict_obj, eval(func_setting))
+        elif func_name == "bucket_attribute_SpecifiedBucketValue":
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             n_buckets, specified_bucket_value_list = int(func_setting.split("\t")[0]), eval(func_setting.split("\t")[1])
-            return ea.bucketAttribute_SpecifiedBucketValue(dict_obj, n_buckets, specified_bucket_value_list)
-        elif func_name == "bucketAttribute_DiscreteValue":  # now the discrete value is R-tag..
+            return ea.bucket_attribute_specified_bucket_value(dict_obj, n_buckets, specified_bucket_value_list)
+        elif func_name == "bucket_attribute_DiscreteValue":  # now the discrete value is R-tag..
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             tags_list = list(set(dict_obj.values()))
             topK_buckets, min_buckets = int(func_setting.split("\t")[0]), int(func_setting.split("\t")[1])
             # return eval(func_name)(dict_obj, min_buckets, topK_buckets)
-            return ea.bucketAttribute_DiscreteValue(dict_obj, topK_buckets, min_buckets)
+            return ea.bucket_attribute_discrete_value(dict_obj, topK_buckets, min_buckets)
         else:
             raise ValueError(f'Illegal bucketing function {func_name}')
 
@@ -190,16 +190,16 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     dict_bucket2span_pred = {}
     dict_bucket2f1 = {}
     aspect_names = []
-    errorCase_list = []
+    error_case_list = []
 
     for aspect, func in dict_aspect_func.items():
-        # print(aspect, dict_span2aspectVal[aspect])
-        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal[aspect])
+        # print(aspect, dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
-        dict_bucket2span_pred[aspect] = ea.bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
-                                                                                   dict_bucket2span[aspect].keys())
-        dict_bucket2f1[aspect], errorCase_list = ea.getBucketF1_chunk(dict_bucket2span[aspect],
+        dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
+                                                                                      dict_bucket2span[aspect].keys())
+        dict_bucket2f1[aspect], error_case_list = get_bucket_f1_chunk(dict_bucket2span[aspect],
                                                                       dict_bucket2span_pred[aspect], dict_span2sid,
                                                                       dict_span2sid_pred, dict_chunkid2span,
                                                                       dict_chunkid2span_pred, is_print_ci,
@@ -209,12 +209,12 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     print("------------------ Breakdown Performance")
     for aspect in dict_aspect_func.keys():
-        ea.printDict(dict_bucket2f1[aspect], aspect)
+        ea.print_dict(dict_bucket2f1[aspect], aspect)
     print("")
 
     # Calculate databias w.r.t numeric attributes
     dict_aspect2bias = {}
-    for aspect, aspect2Val in dict_span2aspectVal.items():
+    for aspect, aspect2Val in dict_span2aspect_val.items():
         if type(list(aspect2Val.values())[0]) != type("string"):
             dict_aspect2bias[aspect] = numpy.average(list(aspect2Val.values()))
 
@@ -223,7 +223,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
         print(k + ":\t" + str(v))
     print("")
 
-    def beautifyInterval(interval):
+    def beautify_interval(interval):
 
         if type(interval[0]) == type("string"):  ### pay attention to it
             return interval[0]
@@ -237,13 +237,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                 bk_name = range1_r + range1_l
                 return bk_name
 
-    dict_fineGrained = {}
+    dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
-        dict_fineGrained[aspect] = []
+        dict_fine_grained[aspect] = []
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautifyInterval(bucket_name)
+            bucket_name = beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -254,7 +254,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             confidence_up = format(float(v[3]) * 100, '.4g')
             error_entity_list = v[4]
             # instantiation
-            dict_fineGrained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
+            dict_fine_grained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
                                              "confidence_low": confidence_low, "confidence_up": confidence_up,
                                              "bucket_error_case": error_entity_list})
 
@@ -269,9 +269,86 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low_overall
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up_overall
-    obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
+    obj_json["model"]["results"]["fine_grained"] = dict_fine_grained
 
-    obj_json["model"]["results"]["overall"]["error_case"] = errorCase_list
+    obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
 
     ea.save_json(obj_json, "./instantiate.json")
     ea.save_json(obj_json, fn_write_json)
+
+
+def get_bucket_f1_chunk(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred, dict_chunkid2span,
+                      dict_chunkid2span_pred, is_print_ci, is_print_case):
+    dict_bucket2f1 = {}
+
+    # predict:  2_3 -> NER
+    dict_pos2tag_pred = {}
+    if is_print_case:
+        for k_bucket_eval, spans_pred in dict_bucket2span_pred.items():
+            for span_pred in spans_pred:
+                pos_pred = "_".join(span_pred.split("_")[0:2])
+                tag_pred = span_pred.split("_")[-1]
+                dict_pos2tag_pred[pos_pred] = tag_pred
+
+    # true:  2_3 -> NER
+    dict_pos2tag = {}
+    if is_print_case:
+        for k_bucket_eval, spans in dict_bucket2span.items():
+            for span in spans:
+                pos = "_".join(span.split("_")[0:2])
+                tag = span.split("_")[-1]
+                dict_pos2tag[pos] = tag
+
+    error_case_list = []
+    if is_print_case:
+        error_case_list = ea.get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
+
+    for bucket_interval, spans_true in dict_bucket2span.items():
+        spans_pred = []
+
+        # print('bucket_interval: ',bucket_interval)
+        if bucket_interval not in dict_bucket2span_pred.keys():
+            # print(bucket_interval)
+            raise ValueError("Predict Label Bucketing Errors")
+        else:
+            spans_pred = dict_bucket2span_pred[bucket_interval]
+
+        confidence_low, confidence_up = 0, 0
+        if is_print_ci:
+            confidence_low, confidence_up = ea.compute_confidence_interval_f1(spans_true, spans_pred, dict_span2sid,
+                                                                           dict_span2sid_pred)
+
+        confidence_low = format(confidence_low, '.3g')
+        confidence_up = format(confidence_up, '.3g')
+
+        f1, p, r = ea.evaluate_chunk_level(spans_pred, spans_true)
+
+        error_entity_list = []
+        if is_print_case:
+            for span_true in spans_true:
+                if span_true not in spans_pred:
+                    # print(span_true)
+                    pos_true = "_".join(span_true.split("_")[0:2])
+                    tag_true = span_true.split("_")[-1]
+
+                    if pos_true in dict_pos2tag_pred.keys():
+                        tag_pred = dict_pos2tag_pred[pos_true]
+                        if tag_pred != tag_true:
+                            error_entity_list.append(
+                                dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + dict_pos2tag_pred[pos_true])
+                    else:
+                        error_entity_list.append(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + "O")
+
+        # print("confidence_low:\t", confidence_low)
+        # print("confidence_up:\t", confidence_up)
+        # print("F1:\t", f1)
+        # print(error_entity_list)
+
+        dict_bucket2f1[bucket_interval] = [f1, len(spans_true), confidence_low, confidence_up, error_entity_list]
+
+    # if bucket_interval[0] == 1.0:
+    # 	print("debug-f1:",f1)
+    # 	print(spans_pred[0:20])
+    # 	print(spans_true[0:20])
+    # print("dict_bucket2f1: ",dict_bucket2f1)
+    return ea.sort_dict(dict_bucket2f1), error_case_list

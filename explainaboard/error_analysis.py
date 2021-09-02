@@ -225,6 +225,19 @@ def format4json(sent):
     sent = sent.replace("\"", "")
     return sent
 
+def format4json2(sent):
+    # TODO: It is not clear what the difference between these two is
+    sent = sent.replace(":", " ").replace("\"", "").replace("\'", "").replace("/", "").replace("\\", "").replace("{",
+                                                                                                                 "").replace(
+        "}", "")
+    sent = sent.replace("\"", "").replace("\\n", "").replace("\\n\\n", "").replace("\\\"\"\"", "")
+
+    if len(sent.split(" ")) > 521:
+        wordlist = sent.split(" ")[:520]
+        sent = " ".join(wordlist) + " ... "
+
+    return sent
+
 
 def cap_feature(s):
     """
@@ -369,7 +382,7 @@ def compute_confidence_interval_f1(spans_true, spans_pred, dict_span2sid, dict_s
 
 
 ################       Calculate Bucket-wise F1 Score:
-def getBucketF1(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred):
+def get_bucket_f1(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred):
     print('------------------ attribute')
     dict_bucket2f1 = {}
     for bucket_interval, spans_true in dict_bucket2span.items():
@@ -409,21 +422,21 @@ def getBucketF1(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_spa
     # 	print(spans_pred[0:20])
     # 	print(spans_true[0:20])
     # print("dict_bucket2f1: ",dict_bucket2f1)
-    return sortDict(dict_bucket2f1)
+    return sort_dict(dict_bucket2f1)
 
 
-# dict_chunkid2spanSent:  2_3 -> New York|||This is New York city
+# dict_chunkid2span_sent:  2_3 -> New York|||This is New York city
 # dict_pos2tag: 2_3 -> NER
-def get_errorCase(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2spanSent, dict_chunkid2spanSent_pred):
-    errorCase_list = []
+def get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred):
+    error_case_list = []
     for pos, tag in dict_pos2tag.items():
 
         true_label = tag
         pred_label = ""
-        # print(dict_chunkid2spanSent.keys())
-        if pos + "_" + tag not in dict_chunkid2spanSent.keys():
+        # print(dict_chunkid2span_sent.keys())
+        if pos + "_" + tag not in dict_chunkid2span_sent.keys():
             continue
-        span_sentence = dict_chunkid2spanSent[pos + "_" + tag]
+        span_sentence = dict_chunkid2span_sent[pos + "_" + tag]
 
         if pos in dict_pos2tag_pred.keys():
             pred_label = dict_pos2tag_pred[pos]
@@ -432,15 +445,15 @@ def get_errorCase(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2spanSent, dict_c
         else:
             pred_label = "O"
         error_case = span_sentence + "|||" + true_label + "|||" + pred_label
-        errorCase_list.append(error_case)
+        error_case_list.append(error_case)
 
     for pos, tag in dict_pos2tag_pred.items():
 
         true_label = ""
         pred_label = tag
-        if pos + "_" + tag not in dict_chunkid2spanSent_pred.keys():
+        if pos + "_" + tag not in dict_chunkid2span_sent_pred.keys():
             continue
-        span_sentence = dict_chunkid2spanSent_pred[pos + "_" + tag]
+        span_sentence = dict_chunkid2span_sent_pred[pos + "_" + tag]
 
         if pos in dict_pos2tag.keys():
             true_label = dict_pos2tag[pos]
@@ -449,94 +462,13 @@ def get_errorCase(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2spanSent, dict_c
         else:
             true_label = "O"
         error_case = span_sentence + "|||" + true_label + "|||" + pred_label
-        errorCase_list.append(error_case)
+        error_case_list.append(error_case)
 
-    # print(errorCase_list)
-    return errorCase_list
-
-
-################       Calculate Bucket-wise F1 Score:
-def getBucketF1_ner(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred, dict_chunkid2span,
-                    dict_chunkid2span_pred, is_print_ci, is_print_case):
-    # print('------------------ attribute')
-    dict_bucket2f1 = {}
-
-    # predict:  2_3 -> NER
-    dict_pos2tag_pred = {}
-    for k_bucket_eval, spans_pred in dict_bucket2span_pred.items():
-        for span_pred in spans_pred:
-            pos_pred = "_".join(span_pred.split("_")[0:2])
-            tag_pred = span_pred.split("_")[-1]
-            dict_pos2tag_pred[pos_pred] = tag_pred
-        # print(dict_pos2tag_pred)
-
-    # true:  2_3 -> NER
-    dict_pos2tag = {}
-    for k_bucket_eval, spans in dict_bucket2span.items():
-        for span in spans:
-            pos = "_".join(span.split("_")[0:2])
-            tag = span.split("_")[-1]
-            dict_pos2tag[pos] = tag
-    # print(dict_pos2tag_pred)
-
-    errorCase_list = get_errorCase(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-
-        # print('bucket_interval: ',bucket_interval)
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            # print(bucket_interval)
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        confidence_low, confidence_up = 0, 0
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_f1(spans_true, spans_pred, dict_span2sid,
-                                                                           dict_span2sid_pred)
-
-        confidence_low = format(confidence_low, '.3g')
-        confidence_up = format(confidence_up, '.3g')
-
-        f1, p, r = evaluate_chunk_level(spans_pred, spans_true)
-
-        # print("-----------print spans_pred -------------")
-
-        error_entity_list = []
-        if is_print_case:
-            for span_true in spans_true:
-                if span_true not in spans_pred:
-                    # print(span_true)
-                    pos_true = "_".join(span_true.split("_")[0:2])
-                    tag_true = span_true.split("_")[-1]
-
-                    if pos_true in dict_pos2tag_pred.keys():
-                        tag_pred = dict_pos2tag_pred[pos_true]
-                        if tag_pred != tag_true:
-                            error_entity_list.append(
-                                dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + dict_pos2tag_pred[pos_true])
-                    else:
-                        error_entity_list.append(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + "O")
-
-            # print("confidence_low:\t", confidence_low)
-            # print("confidence_up:\t", confidence_up)
-            # print("F1:\t", f1)
-            # print(error_entity_list)
-
-            # print("------------------------------------------")
-
-        dict_bucket2f1[bucket_interval] = [f1, len(spans_true), confidence_low, confidence_up, error_entity_list]
-
-        # if bucket_interval[0] == 1.0:
-        # 	print("debug-f1:",f1)
-        # 	print(spans_pred[0:20])
-        # 	print(spans_true[0:20])
-    # print("dict_bucket2f1: ",dict_bucket2f1)
-    return sortDict(dict_bucket2f1), errorCase_list
+    # print(error_case_list)
+    return error_case_list
 
 
-def getBucketAcc(dict_bucket2span, dict_bucket2span_pred):
+def get_bucket_acc(dict_bucket2span, dict_bucket2span_pred):
     print('------------------ attribute')
     dict_bucket2f1 = {}
     for bucket_interval, spans_true in dict_bucket2span.items():
@@ -555,12 +487,12 @@ def getBucketAcc(dict_bucket2span, dict_bucket2span_pred):
 
         print("accuracy_each_bucket:\t", accuracy_each_bucket)
 
-    return sortDict(dict_bucket2f1)
+    return sort_dict(dict_bucket2f1)
 
 
 ################       Calculate Bucket-wise F1 Score:
 
-def getBucketROUGE(dict_bucket2span):
+def get_bucket_rouge(dict_bucket2span):
     print('------------------ attribute')
     dict_bucket2f1 = {}
     for bucket_interval, spans_true in dict_bucket2span.items():
@@ -573,27 +505,28 @@ def getBucketROUGE(dict_bucket2span):
 
         dict_bucket2f1[bucket_interval] = [avg_rouge, len(spans_true)]
 
-    return sortDict(dict_bucket2f1)
+    return sort_dict(dict_bucket2f1)
 
 
-def compute_holistic_f1_re(path, delimiter="\t"):
-    fin = open(path, "r")
-    true_list = []
-    pred_list = []
-    for line in fin:
-        if len(line.split("\t")) != 3:
-            # print(line)
-            continue
-        line = line.rstrip()
-        true_list.append(line.split("\t")[-2])
-        pred_list.append(line.split("\t")[-1])
-    f1 = f1_score(true_list, pred_list, average='micro')
-    # print(true_list[0:10])
-    # print(pred_list[0:10])
-    # print("------f1-----------")
-    # print(f1)
-    # exit()
-    return f1
+# TODO: dead code?
+# def compute_holistic_f1_re(path, delimiter="\t"):
+#     fin = open(path, "r")
+#     true_list = []
+#     pred_list = []
+#     for line in fin:
+#         if len(line.split("\t")) != 3:
+#             # print(line)
+#             continue
+#         line = line.rstrip()
+#         true_list.append(line.split("\t")[-2])
+#         pred_list.append(line.split("\t")[-1])
+#     f1 = f1_score(true_list, pred_list, average='micro')
+#     # print(true_list[0:10])
+#     # print(pred_list[0:10])
+#     # print("------f1-----------")
+#     # print(f1)
+#     # exit()
+#     return f1
 
 
 def compute_holistic_f1(fn_result, delimiter=" "):
@@ -630,11 +563,11 @@ def get_ci_interval(confidence_val, confidence_delta):
 #     # compression = fragment.compression()
 #     copy_len = 0 if len(fragment.copy_len()) == 0 else sum(fragment.copy_len()) / len(fragment.copy_len())
 #
-#     novelty_1 = novelty_oneSample(text_sents, summary_sents, 1)
-#     novelty_2 = novelty_oneSample(text_sents, summary_sents, 2)
+#     novelty_1 = novelty_one_sample(text_sents, summary_sents, 1)
+#     novelty_2 = novelty_one_sample(text_sents, summary_sents, 2)
 #
-#     repetition_1 = repetition_oneSample(summary_sents, 1)
-#     # repetition_2 = repetition_oneSample(summary_sents, 2)
+#     repetition_1 = repetition_one_sample(summary_sents, 1)
+#     # repetition_2 = repetition_one_sample(summary_sents, 2)
 #
 #     print(density, coverage, compression, copy_len, novelty_1, novelty_2, repetition_1, repetition_2)
 #
@@ -655,20 +588,20 @@ def get_avg(res):
     return result
 
 
-def wordSegment2(sent):
+def word_segment2(sent):
     tknzr = TweetTokenizer()
     token_list = tknzr.tokenize(sent)
     return token_list
 
 
-def wordSegment(sent):
+def word_segment(sent):
     if len(sent.split(" ")) == 1 and len(list(sent)) >= 10:
         return " ".join(list(sent))
     else:
         return sent
 
 
-def intervalTransformer(inter_list):
+def interval_transformer(inter_list):
     dict_old2new = {}
     last = 0
     for ind, interval in enumerate(inter_list):
@@ -685,7 +618,7 @@ def intervalTransformer(inter_list):
     return dict_old2new
 
 
-def sortDict(dict_obj, flag="key"):
+def sort_dict(dict_obj, flag="key"):
     sorted_dict_obj = []
     if flag == "key":
         sorted_dict_obj = sorted(dict_obj.items(), key=lambda item: item[0])
@@ -695,7 +628,7 @@ def sortDict(dict_obj, flag="key"):
     return dict(sorted_dict_obj)
 
 
-def reverseDict(dict_a2b):
+def reverse_dict(dict_a2b):
     dict_b2a = {}
     for k, v in dict_a2b.items():
         v = float(v)
@@ -707,7 +640,7 @@ def reverseDict(dict_a2b):
     return dict_b2a
 
 
-def reverseDict_discrete(dict_a2b):
+def reverse_dict_discrete(dict_a2b):
     dict_b2a = {}
     for k, v in dict_a2b.items():
         if v not in dict_b2a.keys():
@@ -718,7 +651,7 @@ def reverseDict_discrete(dict_a2b):
     return dict_b2a
 
 
-def findKey(dict_obj, x):
+def find_key(dict_obj, x):
     for k, v in dict_obj.items():
         if len(k) == 1:
             if x == k[0]:
@@ -734,24 +667,24 @@ def tuple2str(triplet):
     return res.rstrip("|||")
 
 
-def bucketAttribute_SpecifiedBucketValue(dict_span2attVal, n_buckets, hardcoded_bucket_values):
+def bucket_attribute_specified_bucket_value(dict_span2att_val, n_buckets, hardcoded_bucket_values):
     ################       Bucketing different Attributes
 
     # hardcoded_bucket_values = [set([float(0), float(1)])]
     # print("!!!debug-7--")
     p_infinity = 1000000
     n_infinity = -1000000
-    n_spans = len(dict_span2attVal)
-    dict_attVal2span = reverseDict(dict_span2attVal)
-    dict_attVal2span = sortDict(dict_attVal2span)
+    n_spans = len(dict_span2att_val)
+    dict_att_val2span = reverse_dict(dict_span2att_val)
+    dict_att_val2span = sort_dict(dict_att_val2span)
     dict_bucket2span = {}
 
     for backet_value in hardcoded_bucket_values:
-        if backet_value in dict_attVal2span.keys():
+        if backet_value in dict_att_val2span.keys():
             # print("------------work!!!!---------")
             # print(backet_value)
-            dict_bucket2span[(backet_value,)] = dict_attVal2span[backet_value]
-            n_spans -= len(dict_attVal2span[backet_value])
+            dict_bucket2span[(backet_value,)] = dict_att_val2span[backet_value]
+            n_spans -= len(dict_att_val2span[backet_value])
             n_buckets -= 1
 
     avg_entity = n_spans * 1.0 / n_buckets
@@ -763,16 +696,16 @@ def bucketAttribute_SpecifiedBucketValue(dict_span2attVal, n_buckets, hardcoded_
     # print("-----avg_entity----------")
     # print(avg_entity)
 
-    for attval, entity in dict_attVal2span.items():
-        if attval in hardcoded_bucket_values:
+    for att_val, entity in dict_att_val2span.items():
+        if att_val in hardcoded_bucket_values:
             continue
 
-        # print("debug-attval:\t",attval)
-        val_list.append(attval)
+        # print("debug-att_val:\t",att_val)
+        val_list.append(att_val)
         entity_list += entity
         n_tmp += len(entity)
 
-        # print(attval)
+        # print(att_val)
         # print(n_tmp, avg_entity)
 
         if n_tmp > avg_entity:
@@ -802,7 +735,7 @@ def bucketAttribute_SpecifiedBucketValue(dict_span2attVal, n_buckets, hardcoded_
     #
     #
     # [(0,), (0.1, 0.2), (0.3,0.4), (0.5, 0.6)] --> [(0,), (0,0.2), (0.2, 0.4), (0.4, 0.6)]
-    # dict_old2new = intervalTransformer(dict_bucket2span.keys())
+    # dict_old2new = interval_transformer(dict_bucket2span.keys())
     # dict_bucket2span_new = {}
     # for inter_list, span_list in dict_bucket2span.items():
     # 	dict_bucket2span_new[dict_old2new[inter_list]] = span_list
@@ -810,16 +743,16 @@ def bucketAttribute_SpecifiedBucketValue(dict_span2attVal, n_buckets, hardcoded_
     return dict_bucket2span
 
 
-def bucketAttribute_DiscreteValue(dict_span2attVal=None, n_buckets=100000000, n_entities=1):
+def bucket_attribute_discrete_value(dict_span2att_val=None, n_buckets=100000000, n_entities=1):
     ################          Bucketing different Attributes
 
     # print("!!!!!debug---------")
     # 	hardcoded_bucket_values = [set([float(0), float(1)])]
-    n_spans = len(dict_span2attVal)
+    n_spans = len(dict_span2att_val)
     dict_bucket2span = {}
 
-    dict_attVal2span = reverseDict_discrete(dict_span2attVal)
-    dict_attVal2span = sortDict(dict_attVal2span, flag="value")
+    dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
+    dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
 
     # dict["q_id"] = 2
 
@@ -829,18 +762,18 @@ def bucketAttribute_DiscreteValue(dict_span2attVal=None, n_buckets=100000000, n_
     val_list = []
 
     n_total = 1
-    for attval, entity in dict_attVal2span.items():
+    for att_val, entity in dict_att_val2span.items():
 
         if len(entity) < n_entities or n_total > n_buckets:
             break
-        dict_bucket2span[(attval,)] = entity
+        dict_bucket2span[(att_val,)] = entity
 
         n_total += 1
 
     return dict_bucket2span
 
 
-def bucketAttribute_SpecifiedBucketInterval(dict_span2attVal, intervals):
+def bucket_attribute_specified_bucket_interval(dict_span2att_val, intervals):
     ################       Bucketing different Attributes
 
     # hardcoded_bucket_values = [set([float(0), float(1)])]
@@ -848,22 +781,22 @@ def bucketAttribute_SpecifiedBucketInterval(dict_span2attVal, intervals):
     # intervals = [0, (0,0.5], (0.5,0.9], (0.99,1]]
 
     dict_bucket2span = {}
-    n_spans = len(dict_span2attVal)
+    n_spans = len(dict_span2att_val)
 
-    # print("!!!!!!!enter into bucketAttribute_SpecifiedBucketInterval")
+    # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
 
     # print(intervals)
 
     if type(list(intervals)[0][0]) == type("string"):  # discrete value, such as entity tags
-        dict_attVal2span = reverseDict_discrete(dict_span2attVal)
-        dict_attVal2span = sortDict(dict_attVal2span, flag="value")
-        for attval, entity in dict_attVal2span.items():
-            attval_tuple = (attval,)
-            if attval_tuple in intervals:
-                if attval_tuple not in dict_bucket2span.keys():
-                    dict_bucket2span[attval_tuple] = entity
+        dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
+        dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
+        for att_val, entity in dict_att_val2span.items():
+            att_val_tuple = (att_val,)
+            if att_val_tuple in intervals:
+                if att_val_tuple not in dict_bucket2span.keys():
+                    dict_bucket2span[att_val_tuple] = entity
                 else:
-                    dict_bucket2span[attval_tuple] += entity
+                    dict_bucket2span[att_val_tuple] += entity
 
         for val in intervals:
             if val not in dict_bucket2span.keys():
@@ -872,8 +805,8 @@ def bucketAttribute_SpecifiedBucketInterval(dict_span2attVal, intervals):
     else:
         # print("---debug----5")
         # print(intervals)
-        dict_attVal2span = reverseDict(dict_span2attVal)
-        dict_attVal2span = sortDict(dict_attVal2span)
+        dict_att_val2span = reverse_dict(dict_span2att_val)
+        dict_att_val2span = sort_dict(dict_att_val2span)
         for v in intervals:
             if len(v) == 1:
                 dict_bucket2span[v] = []
@@ -882,8 +815,8 @@ def bucketAttribute_SpecifiedBucketInterval(dict_span2attVal, intervals):
 
         # print("debug-interval:\t", intervals)
 
-        for attval, entity in dict_attVal2span.items():
-            res_key = findKey(dict_bucket2span, attval)
+        for att_val, entity in dict_att_val2span.items():
+            res_key = find_key(dict_bucket2span, att_val)
             # print("res-key:\t"+ str(res_key))
             if res_key == None:
                 continue
@@ -892,7 +825,7 @@ def bucketAttribute_SpecifiedBucketInterval(dict_span2attVal, intervals):
     return dict_bucket2span
 
 
-def printDict(dict_obj, info="dict"):
+def print_dict(dict_obj, info="dict"):
     # print("-----------------------------------------------")
     print("the information of #" + info + "#")
     print("Bucket_interval\tF1\tEntity-Number")
@@ -905,31 +838,31 @@ def printDict(dict_obj, info="dict"):
     print("")
 
 
-def extValue(cont, fr, to):
+def ext_value(cont, fr, to):
     return cont.split(fr)[-1].split(to)[0]
 
 
-def loadConf(path_conf):
+def load_conf(path_conf):
     fin = open(path_conf, "r")
     all_cont = fin.read()
     dict_aspect_func = {}
     for block in all_cont.split("# "):
         # print("debug3-------")
         # print(block)
-        notation = extValue(block, "notation:\t", "\n").rstrip(" ")
+        notation = ext_value(block, "notation:\t", "\n").rstrip(" ")
         if notation == "":
             continue
         # print("debug4--notation-----")
         # print(notation)
-        func_type = extValue(block, "type:\t", "\n").rstrip(" ")
-        func_setting = extValue(block, "setting:\t", "\n").rstrip(" ")
-        is_preComputed = extValue(block, "is_preComputed:\t", "\n").rstrip(" ")
-        dict_aspect_func[notation] = (func_type, func_setting, is_preComputed)
+        func_type = ext_value(block, "type:\t", "\n").rstrip(" ")
+        func_setting = ext_value(block, "setting:\t", "\n").rstrip(" ")
+        is_precomputed = ext_value(block, "is_precomputed:\t", "\n").rstrip(" ")
+        dict_aspect_func[notation] = (func_type, func_setting, is_precomputed)
     # exit()
     return dict_aspect_func
 
 
-def ensureDir(f):
+def ensure_dir(f):
     if not os.path.exists(f):
         os.makedirs(f)
 
@@ -946,7 +879,7 @@ def save_json(obj_json, path):
         json.dump(obj_json, f, indent=4, ensure_ascii=False)
 
 
-def getPos2SentId(test_word_sequences_sent):
+def get_pos2sentid(test_word_sequences_sent):
     dict_pos2sid = {}
     pos = 0
     for sid, sent in enumerate(test_word_sequences_sent):
@@ -956,7 +889,7 @@ def getPos2SentId(test_word_sequences_sent):
     return dict_pos2sid
 
 
-def getTokenPosition(test_word_sequences_sent):
+def get_token_position(test_word_sequences_sent):
     dict_ap2rp = {}
     pos = 0
     for sid, sent in enumerate(test_word_sequences_sent):
@@ -994,117 +927,38 @@ def file_to_list_triple(path_file):
     return sent_list, true_label_list, pred_label_list
 
 
-def file_to_list_tc(path_file):
-    sent_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) != 5:
-            continue
-        sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
-        sent_list.append(sent)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent_list, true_label_list, pred_label_list
-
-
-def file_to_list_re(file_path):
-    sample_list = []
-    fin = open(file_path, "r")
-    true_list = []
-    pred_list = []
-    sent_list = []
-    entity_list = []
-    for idx, line in enumerate(fin):
-        if idx == 0:
-            continue
-        info_list = line.rstrip("\n").split("\t")
-        sample_list.append([info for info in info_list])
-        true_list.append(info_list[3])
-        pred_list.append(info_list[4])
-        sent_list.append(info_list[0])
-        entity_list.append(info_list[1])
-
-    return sample_list, sent_list, entity_list, true_list, pred_list
+# TODO: dead code?
+# def file_to_list_summ(path_file):
+#     doc_list = []
+#     hyp_list = []
+#     ref_list = []
+#     r1 = []
+#     r2 = []
+#     rl = []
+#     r1_overall = []
+#     r2_overall = []
+#     rl_overall = []
+#     fin = open(path_file, "r")
+#     for line in fin:
+#         line = line.rstrip("\n")
+#         if len(line.split("\t")) < 9:
+#             continue
+#         sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
+#         doc_list.append(line.split("\t")[0])
+#         hyp_list.append(line.split("\t")[1])
+#         ref_list.append(line.split("\t")[2])
+#         r1.append(line.split("\t")[3])
+#         r2.append(line.split("\t")[4])
+#         rl.append(line.split("\t")[5])
+#         r1_overall.append(line.split("\t")[6])
+#         r2_overall.append(line.split("\t")[7])
+#         rl_overall.append(line.split("\t")[8])
+#
+#     fin.close()
+#     return doc_list, hyp_list, ref_list, r1, r2, rl, r1_overall, r2_overall, rl_overall
 
 
-def file_to_list_nli(path_file):
-    sent1_list = []
-    sent2_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) < 4:
-            continue
-        sent1, sent2, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2], \
-                                               line.split("\t")[3]
-        sent1_list.append(sent1)
-        sent2_list.append(sent2)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent1_list, sent2_list, true_label_list, pred_label_list
-
-
-def file_to_list_absa(path_file):
-    sent1_list = []
-    sent2_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) < 4:
-            continue
-        sent1, sent2, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2], \
-                                               line.split("\t")[3]
-        sent1_list.append(sent1)
-        sent2_list.append(sent2)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent1_list, sent2_list, true_label_list, pred_label_list
-
-
-def file_to_list_summ(path_file):
-    doc_list = []
-    hyp_list = []
-    ref_list = []
-    r1 = []
-    r2 = []
-    rl = []
-    r1_overall = []
-    r2_overall = []
-    rl_overall = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) < 9:
-            continue
-        sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
-        doc_list.append(line.split("\t")[0])
-        hyp_list.append(line.split("\t")[1])
-        ref_list.append(line.split("\t")[2])
-        r1.append(line.split("\t")[3])
-        r2.append(line.split("\t")[4])
-        rl.append(line.split("\t")[5])
-        r1_overall.append(line.split("\t")[6])
-        r2_overall.append(line.split("\t")[7])
-        rl_overall.append(line.split("\t")[8])
-
-    fin.close()
-    return doc_list, hyp_list, ref_list, r1, r2, rl, r1_overall, r2_overall, rl_overall
-
-
-def file2listPair(path_file):
+def file2list_pair(path_file):
     sent1_list = []
     sent2_list = []
     fin = open(path_file, "r")
@@ -1118,7 +972,7 @@ def file2listPair(path_file):
     return sent1_list, sent2_list
 
 
-def file2list_firstColumn(path_file):
+def file2list_first_column(path_file):
     res_list = []
     fin = open(path_file, "r")
     for line in fin:
@@ -1139,26 +993,26 @@ def file2dict(path_file):
     fin.close()
     return res_dict
 
+# TODO: dead code?
+# def read_tag_pos(file):
+#     labels = []
+#     example = []
+#     labels_holistic = []
+#     with open(file, 'r') as f:
+#         for line in f:
+#             line = line.strip()
+#             if line:
+#                 example.append("B-" + line)
+#                 # print("B"+line)
+#                 labels_holistic.append("B-" + line)
+#             else:
+#                 labels.append(example)
+#                 example = []
+#     if example:
+#         labels.append(example)
+#     return labels, labels_holistic
 
-def read_tag_pos(file):
-    labels = []
-    example = []
-    labels_holistic = []
-    with open(file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                example.append("B-" + line)
-                # print("B"+line)
-                labels_holistic.append("B-" + line)
-            else:
-                labels.append(example)
-                example = []
-    if example:
-        labels.append(example)
-    return labels, labels_holistic
-
-
+# TODO: dead code?
 # def read_tag(file):
 #   labels = []
 #   example = []
@@ -1175,23 +1029,24 @@ def read_tag_pos(file):
 #   return labels
 
 
-def read_text_pos(file):
-    labels = []
-    example = []
-    labels_holistic = []
-    with open(file, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                line = line.split("\t")[0]
-                example.append(line)
-                labels_holistic.append(line)
-            else:
-                labels.append(example)
-                example = []
-    if example:
-        labels.append(example)
-    return labels, labels_holistic
+# TODO: dead code?
+# def read_text_pos(file):
+#     labels = []
+#     example = []
+#     labels_holistic = []
+#     with open(file, 'r') as f:
+#         for line in f:
+#             line = line.strip()
+#             if line:
+#                 line = line.split("\t")[0]
+#                 example.append(line)
+#                 labels_holistic.append(line)
+#             else:
+#                 labels.append(example)
+#                 example = []
+#     if example:
+#         labels.append(example)
+#     return labels, labels_holistic
 
 
 def read_tag(file):
@@ -1252,36 +1107,7 @@ def f1(labels, predictions, language=None):
     return {'f1': f1 * 100, 'precision': precision * 100, 'recall': recall * 100}
 
 
-def format4json_tc(sent):
-    sent = sent.replace(":", " ").replace("\"", "").replace("\'", "").replace("/", "").replace("\\", "").replace("{",
-                                                                                                                 "").replace(
-        "}", "")
-    sent = sent.replace("\"", "").replace("\\n", "").replace("\\n\\n", "").replace("\\\"\"\"", "")
-
-    if len(sent.split(" ")) > 521:
-        wordlist = sent.split(" ")[:520]
-        sent = " ".join(wordlist) + " ... "
-
-    return sent
-
-
-def getErrorCase_tc(sent_list, true_label_list, pred_label_list):
-    errorCase_list = []
-    for sent, true_label, pred_label in zip(sent_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            errorCase_list.append(true_label + "|||" + pred_label + "|||" + format4json_tc(sent))
-    return errorCase_list
-
-
-def getErrorCase_re(sent_list, entity_list, true_label_list, pred_label_list):
-    errorCase_list = []
-    for sent, entities, true_label, pred_label in zip(sent_list, entity_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            errorCase_list.append(true_label + "|||" + pred_label + "|||" + entities + "|||" + format4json_tc(sent))
-    return errorCase_list
-
-
-def getBucketAcc_with_errorCase(dict_bucket2span, dict_bucket2span_pred, dict_sid2sent, is_print_ci, is_print_case):
+def get_bucket_acc_with_error_case(dict_bucket2span, dict_bucket2span_pred, dict_sid2sent, is_print_ci, is_print_case):
     # The structure of span_true or span_pred
     # 2345|||Positive
     # 2345 represents sentence id
@@ -1317,664 +1143,62 @@ def getBucketAcc_with_errorCase(dict_bucket2span, dict_bucket2span_pred, dict_si
         dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
                                            error_case_bucket_list]
 
-    return sortDict(dict_bucket2f1)
-
-
-def getBucketAcc_with_errorCase_re(dict_bucket2span, dict_bucket2span_pred, dict_sid2sent, is_print_ci, is_print_case):
-    # The structure of span_true or span_pred
-    # 2345|||Positive
-    # 2345 represents sentence id
-    # Positive represents the "label" of this instance
-
-    dict_bucket2f1 = {}
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        # loop over samples from a given bucket
-        error_case_bucket_list = []
-        if is_print_case:
-            for info_true, info_pred in zip(spans_true, spans_pred):
-                sid_true, label_true = info_true.split("|||")
-                sid_pred, label_pred = info_pred.split("|||")
-                if sid_true != sid_pred:
-                    continue
-
-                sent_entities = dict_sid2sent[sid_true]
-                if label_true != label_pred:
-                    error_case_info = label_true + "|||" + label_pred + "|||" + sent_entities
-                    error_case_bucket_list.append(error_case_info)
-
-        accuracy_each_bucket = accuracy(spans_pred, spans_true)
-        confidence_low, confidence_up = 0, 0
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_acc(spans_pred, spans_true)
-        dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
-                                           error_case_bucket_list]
-
-    return sortDict(dict_bucket2f1)
-
-
-def getErrorCase_nli(sent1_list, sent2_list, true_label_list, pred_label_list):
-    errorCase_list = []
-    for sent1, sent2, true_label, pred_label in zip(sent1_list, sent2_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            errorCase_list.append(
-                true_label + "|||" + pred_label + "|||" + format4json_tc(sent1) + "|||" + format4json_tc(sent2))
-    return errorCase_list
-
-
-def getBucketAcc_with_errorCase_nli(dict_bucket2span, dict_bucket2span_pred, dict_sid2sentpair, is_print_ci,
-                                    is_print_case):
-    # The structure of span_true or span_pred
-    # 2345|||Positive
-    # 2345 represents sentence id
-    # Positive represents the "label" of this instance
-
-    dict_bucket2f1 = {}
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        # loop over samples from a given bucket
-        error_case_bucket_list = []
-        if is_print_case:
-            for info_true, info_pred in zip(spans_true, spans_pred):
-                sid_true, label_true = info_true.split("|||")
-                sid_pred, label_pred = info_pred.split("|||")
-                if sid_true != sid_pred:
-                    continue
-
-                sent = dict_sid2sentpair[sid_true]
-                if label_true != label_pred:
-                    error_case_info = label_true + "|||" + label_pred + "|||" + sent
-                    error_case_bucket_list.append(error_case_info)
-
-        accuracy_each_bucket = accuracy(spans_pred, spans_true)
-        confidence_low, confidence_up = 0, 0
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_acc(spans_pred, spans_true)
-        dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
-                                           error_case_bucket_list]
-
-    return sortDict(dict_bucket2f1)
-
-
-def getErrorCase_absa(aspect_list, sent_list, true_label_list, pred_label_list):
-    errorCase_list = []
-    for aspect, sent, true_label, pred_label in zip(aspect_list, sent_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            errorCase_list.append(
-                true_label + "|||" + pred_label + "|||" + format4json_tc(aspect) + "|||" + format4json_tc(sent))
-    return errorCase_list
-
-
-def getBucketAcc_with_errorCase_absa(dict_bucket2span, dict_bucket2span_pred, dict_sid2sentpair, is_print_ci,
-                                     is_print_case):
-    # The structure of span_true or span_pred
-    # 2345|||Positive
-    # 2345 represents sentence id
-    # Positive represents the "label" of this instance
-
-    dict_bucket2f1 = {}
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-
-        # print('bucket_interval: ',bucket_interval)
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            # print(bucket_interval)
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        # loop over samples from a given bucket
-        error_case_bucket_list = []
-
-        if is_print_case:
-            for info_true, info_pred in zip(spans_true, spans_pred):
-                sid_true, label_true = info_true.split("|||")
-                sid_pred, label_pred = info_pred.split("|||")
-                if sid_true != sid_pred:
-                    continue
-
-                sent = dict_sid2sentpair[sid_true]
-                if label_true != label_pred:
-                    error_case_info = label_true + "|||" + label_pred + "|||" + sent
-                    error_case_bucket_list.append(error_case_info)
-
-        accuracy_each_bucket = accuracy(spans_pred, spans_true)
-        confidence_low, confidence_up = 0, 0
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_acc(spans_pred, spans_true)
-
-        dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
-                                           error_case_bucket_list]
-
-        # print(error_case_bucket_list)
-
-        print("accuracy_each_bucket:\t", accuracy_each_bucket)
-
-    return sortDict(dict_bucket2f1)
-
-
-# 1000
-def compute_confidence_interval_f1_cws(spans_true, spans_pred, dict_span2sid, dict_span2sid_pred, n_times=1000):
-    n_data = len(dict_span2sid)
-    sample_rate = get_sample_rate(n_data)
-    n_sampling = int(n_data * sample_rate)
-    print("sample_rate:\t", sample_rate)
-    print("n_sampling:\t", n_sampling)
-
-    dict_sid2span_salient = {}
-    for span in spans_true:
-        # print(span)
-        if len(span.split("|||")) != 3:
-            break
-        sid = dict_span2sid[span]
-        if sid in dict_sid2span_salient.keys():
-            dict_sid2span_salient[sid].append(span)
-        else:
-            dict_sid2span_salient[sid] = [span]
-
-    dict_sid2span_salient_pred = {}
-    for span in spans_pred:
-        sid = dict_span2sid_pred[span]
-        if sid in dict_sid2span_salient_pred.keys():
-            dict_sid2span_salient_pred[sid].append(span)
-        else:
-            dict_sid2span_salient_pred[sid] = [span]
-
-    performance_list = []
-    confidence_low, confidence_up = 0, 0
-    for i in range(n_times):
-        sample_index_list = choices(range(n_data), k=n_sampling)
-
-        true_label_bootstrap_list = []
-        pred_label_bootstrap_list = []
-        for ind, sid in enumerate(sample_index_list):
-
-            if sid in dict_sid2span_salient.keys():
-                true_label_list = dict_sid2span_salient[sid]
-                true_label_list_revised = [true_label + "|||" + str(ind) for true_label in true_label_list]
-                true_label_bootstrap_list += true_label_list_revised
-
-            if sid in dict_sid2span_salient_pred.keys():
-                pred_label_list = dict_sid2span_salient_pred[sid]
-                pred_label_list_revised = [pred_label + "|||" + str(ind) for pred_label in pred_label_list]
-                pred_label_bootstrap_list += pred_label_list_revised
-
-        f1, p, r = evaluate_chunk_level(pred_label_bootstrap_list, true_label_bootstrap_list)
-        performance_list.append(f1)
-
-    if n_times != 1000:
-        confidence_low, confidence_up = mean_confidence_interval(performance_list)
-    else:
-        performance_list.sort()
-        confidence_low = performance_list[24]
-        confidence_up = performance_list[974]
-
-    # print("\n")
-    # print("confidence_low:\t", confidence_low)
-    # print("confidence_up:\t", confidence_up)
-
-    return confidence_low, confidence_up
-
-
-# dict_chunkid2spanSent:  2_3 -> New York|||This is New York city
-# dict_pos2tag: 2_3 -> NER
-def get_errorCase_cws(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2spanSent, dict_chunkid2spanSent_pred,
-                      list_true_tags_token, list_pred_tags_token):
-    errorCase_list = []
-    for pos, tag in dict_pos2tag.items():
-
-        true_label = tag
-        pred_label = ""
-        # print(dict_chunkid2spanSent.keys())
-        if pos + "|||" + tag not in dict_chunkid2spanSent.keys():
-            continue
-        span_sentence = dict_chunkid2spanSent[pos + "|||" + tag]
-
-        if pos in dict_pos2tag_pred.keys():
-            pred_label = dict_pos2tag_pred[pos]
-            if true_label == pred_label:
-                continue
-        # print(pos + "\t" + true_label + "\t" + pred_label)
-        else:
-            start = int(pos.split("|||")[0])
-            end = int(pos.split("|||")[1])
-            pred_label = "".join(list_pred_tags_token[start:end])
-        # print(pred_label)
-        error_case = span_sentence + "|||" + true_label + "|||" + pred_label
-        errorCase_list.append(error_case)
-
-    for pos, tag in dict_pos2tag_pred.items():
-
-        true_label = ""
-        pred_label = tag
-        if pos + "|||" + tag not in dict_chunkid2spanSent_pred.keys():
-            continue
-        span_sentence = dict_chunkid2spanSent_pred[pos + "|||" + tag]
-
-        if pos in dict_pos2tag.keys():
-            true_label = dict_pos2tag[pos]
-            if true_label == pred_label:
-                continue
-        else:
-            start = int(pos.split("|||")[0])
-            end = int(pos.split("|||")[1])
-            true_label = "".join(list_true_tags_token[start:end])
-        error_case = span_sentence + "|||" + true_label + "|||" + pred_label
-        errorCase_list.append(error_case)
-
-    # for v in errorCase_list:
-    # 	print(len(errorCase_list))
-    # 	print(v)
-    # print(errorCase_list)
-
-    return errorCase_list
-
-
-################       Calculate Bucket-wise F1 Score:
-def getBucketF1_cws(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred, dict_chunkid2span,
-                    dict_chunkid2span_pred, list_true_tags_token, list_pred_tags_token, is_print_ci, is_print_case):
-    dict_bucket2f1 = {}
-
-    # predict:  2_3 -> NER
-    dict_pos2tag_pred = {}
-    if is_print_case:
-        for k_bucket_eval, spans_pred in dict_bucket2span_pred.items():
-            for span_pred in spans_pred:
-                pos_pred = "|||".join(span_pred.split("|||")[0:2])
-                tag_pred = span_pred.split("|||")[-1]
-                dict_pos2tag_pred[pos_pred] = tag_pred
-
-    # true:  2_3 -> NER
-    dict_pos2tag = {}
-    if is_print_case:
-        for k_bucket_eval, spans in dict_bucket2span.items():
-            for span in spans:
-                pos = "|||".join(span.split("|||")[0:2])
-                tag = span.split("|||")[-1]
-                dict_pos2tag[pos] = tag
-
-    errorCase_list = []
-    if is_print_case:
-        errorCase_list = get_errorCase_cws(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred,
-                                           list_true_tags_token, list_pred_tags_token)
-
-    # print(len(errorCase_list))
-    # print(errorCase_list)
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        confidence_low, confidence_up = 0, 0
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_f1_cws(spans_true, spans_pred, dict_span2sid,
-                                                                               dict_span2sid_pred)
-
-        confidence_low = format(confidence_low, '.3g')
-        confidence_up = format(confidence_up, '.3g')
-
-        f1, p, r = evaluate_chunk_level(spans_pred, spans_true)
-
-        error_entity_list = []
-        if is_print_case:
-            for span_true in spans_true:
-                if span_true not in spans_pred:
-                    # print(span_true)
-                    pos_true = "|||".join(span_true.split("|||")[0:2])
-                    tag_true = span_true.split("|||")[-1]
-
-                    if pos_true in dict_pos2tag_pred.keys():
-                        tag_pred = dict_pos2tag_pred[pos_true]
-                        if tag_pred != tag_true:
-                            error_entity_list.append(
-                                dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + dict_pos2tag_pred[pos_true])
-                    # print(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + dict_pos2tag_pred[pos_true])
-                    else:
-                        start = int(pos_true.split("|||")[0])
-                        end = int(pos_true.split("|||")[1])
-                        pred_label = "".join(list_pred_tags_token[start:end])
-                        error_entity_list.append(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + pred_label)
-
-            # print(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + pred_label)
-
-        dict_bucket2f1[bucket_interval] = [f1, len(spans_true), confidence_low, confidence_up, error_entity_list]
-
-    # if bucket_interval[0] == 1.0:
-    # 	print("debug-f1:",f1)
-    # 	print(spans_pred[0:20])
-    # 	print(spans_true[0:20])
-    # print("dict_bucket2f1: ",dict_bucket2f1)
-    return sortDict(dict_bucket2f1), errorCase_list
-
-
-# dict_chunkid2spanSent:  2_3 -> New York|||This is New York city
-# dict_pos2tag: 2_3 -> NER
-def get_errorCase_pos(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2spanSent, dict_chunkid2spanSent_pred):
-    # print("debug-1:")
-    # print()
-
-    errorCase_list = []
-    for pos, tag in dict_pos2tag.items():
-
-        true_label = tag
-        pred_label = ""
-        # print(dict_chunkid2spanSent.keys())
-        if pos + "_" + tag not in dict_chunkid2spanSent.keys():
-            continue
-        span_sentence = dict_chunkid2spanSent[pos + "_" + tag]
-
-        if pos in dict_pos2tag_pred.keys():
-            pred_label = dict_pos2tag_pred[pos]
-            if true_label == pred_label:
-                continue
-        else:
-            # pred_label = "O"
-            continue
-
-        error_case = format4json_tc(span_sentence) + "|||" + true_label + "|||" + pred_label
-
-        # if pred_label == "O":
-        # 	print(error_case)
-        # 	print(len(dict_pos2tag), len(dict_pos2tag_pred))
-        # 	print(pos)
-
-        errorCase_list.append(error_case)
-
-    # print(errorCase_list)
-    return errorCase_list
-
-
-# 1000
-def compute_confidence_interval_f1_pos(spans_true, spans_pred, dict_span2sid, dict_span2sid_pred, n_times=100):
-    n_data = len(dict_span2sid)
-    sample_rate = get_sample_rate(n_data)
-    n_sampling = int(n_data * sample_rate)
-    print("sample_rate:\t", sample_rate)
-    print("n_sampling:\t", n_sampling)
-
-    dict_sid2span_salient = {}
-    for span in spans_true:
-        # print(span)
-        if len(span.split("_")) != 3:
-            break
-        sid = dict_span2sid[span]
-        if sid in dict_sid2span_salient.keys():
-            dict_sid2span_salient[sid].append(span)
-        else:
-            dict_sid2span_salient[sid] = [span]
-
-    dict_sid2span_salient_pred = {}
-    for span in spans_pred:
-        sid = dict_span2sid_pred[span]
-        if sid in dict_sid2span_salient_pred.keys():
-            dict_sid2span_salient_pred[sid].append(span)
-        else:
-            dict_sid2span_salient_pred[sid] = [span]
-
-    performance_list = []
-    confidence_low, confidence_up = 0, 0
-    for i in range(n_times):
-        sample_index_list = choices(range(n_data), k=n_sampling)
-
-        true_label_bootstrap_list = []
-        pred_label_bootstrap_list = []
-        for ind, sid in enumerate(sample_index_list):
-
-            if sid in dict_sid2span_salient.keys():
-                true_label_list = dict_sid2span_salient[sid]
-                true_label_list_revised = [true_label + "_" + str(ind) for true_label in true_label_list]
-                true_label_bootstrap_list += true_label_list_revised
-
-            if sid in dict_sid2span_salient_pred.keys():
-                pred_label_list = dict_sid2span_salient_pred[sid]
-                pred_label_list_revised = [pred_label + "_" + str(ind) for pred_label in pred_label_list]
-                pred_label_bootstrap_list += pred_label_list_revised
-
-        f1, p, r = evaluate_chunk_level(pred_label_bootstrap_list, true_label_bootstrap_list)
-        performance_list.append(f1)
-
-    if n_times != 1000:
-        confidence_low, confidence_up = mean_confidence_interval(performance_list)
-    else:
-        performance_list.sort()
-        confidence_low = performance_list[24]
-        confidence_up = performance_list[974]
-
-    # print("\n")
-    # print("confidence_low:\t", confidence_low)
-    # print("confidence_up:\t", confidence_up)
-
-    return confidence_low, confidence_up
-
-
-def getBucketF1_pos(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred, dict_chunkid2span,
-                    dict_chunkid2span_pred, is_print_ci, is_print_case):
-    errorCase_list = []
-
-    dict_bucket2f1 = {}
-
-    # predict:  2_3 -> NER
-    dict_pos2tag_pred = {}
-    if is_print_case:
-        for k_bucket_eval, spans_pred in dict_bucket2span_pred.items():
-            for span_pred in spans_pred:
-                pos_pred = "_".join(span_pred.split("_")[0:2])
-                tag_pred = span_pred.split("_")[-1]
-                dict_pos2tag_pred[pos_pred] = tag_pred
-    # print(dict_pos2tag_pred)
-
-    # true:  2_3 -> NER
-    dict_pos2tag = {}
-    if is_print_case:
-        for k_bucket_eval, spans in dict_bucket2span.items():
-            for span in spans:
-                pos = "_".join(span.split("_")[0:2])
-                tag = span.split("_")[-1]
-                dict_pos2tag[pos] = tag
-    # print(dict_pos2tag_pred)
-
-    if is_print_case:
-        errorCase_list = get_errorCase_pos(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-
-        # print('bucket_interval: ',bucket_interval)
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            # print(bucket_interval)
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        confidence_low, confidence_up = 0, 0
-
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_f1_pos(spans_true, spans_pred, dict_span2sid,
-                                                                               dict_span2sid_pred)
-
-        confidence_low = format(confidence_low, '.3g')
-        confidence_up = format(confidence_up, '.3g')
-
-        f1, p, r = evaluate_chunk_level(spans_pred, spans_true)
-
-        error_entity_list = []
-        if is_print_case:
-            for span_true in spans_true:
-                if span_true not in spans_pred:
-                    # print(span_true)
-                    pos_true = "_".join(span_true.split("_")[0:2])
-                    tag_true = span_true.split("_")[-1]
-
-                    if pos_true in dict_pos2tag_pred.keys():
-                        tag_pred = dict_pos2tag_pred[pos_true]
-                        if tag_pred != tag_true:
-                            error_entity_list.append(
-                                format4json_tc(dict_chunkid2span[span_true]) + "|||" + tag_true + "|||" +
-                                dict_pos2tag_pred[pos_true])
-                    else:
-                        # error_entity_list.append(format4json_tc(dict_chunkid2span[span_true]) + "|||" + tag_true + "|||" + "O")
-                        continue
-
-        # print("confidence_low:\t", confidence_low)
-        # print("confidence_up:\t", confidence_up)
-        # print("F1:\t", f1)
-        # print(error_entity_list)
-
-        dict_bucket2f1[bucket_interval] = [f1, len(spans_true), confidence_low, confidence_up, error_entity_list]
-
-    # if bucket_interval[0] == 1.0:
-    # 	print("debug-f1:",f1)
-    # 	print(spans_pred[0:20])
-    # 	print(spans_true[0:20])
-    # print("dict_bucket2f1: ",dict_bucket2f1)
-    return sortDict(dict_bucket2f1), errorCase_list
-
-
-def getBucketF1_chunk(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_span2sid_pred, dict_chunkid2span,
-                      dict_chunkid2span_pred, is_print_ci, is_print_case):
-    dict_bucket2f1 = {}
-
-    # predict:  2_3 -> NER
-    dict_pos2tag_pred = {}
-    if is_print_case:
-        for k_bucket_eval, spans_pred in dict_bucket2span_pred.items():
-            for span_pred in spans_pred:
-                pos_pred = "_".join(span_pred.split("_")[0:2])
-                tag_pred = span_pred.split("_")[-1]
-                dict_pos2tag_pred[pos_pred] = tag_pred
-
-    # true:  2_3 -> NER
-    dict_pos2tag = {}
-    if is_print_case:
-        for k_bucket_eval, spans in dict_bucket2span.items():
-            for span in spans:
-                pos = "_".join(span.split("_")[0:2])
-                tag = span.split("_")[-1]
-                dict_pos2tag[pos] = tag
-
-    errorCase_list = []
-    if is_print_case:
-        errorCase_list = get_errorCase(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-
-        # print('bucket_interval: ',bucket_interval)
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            # print(bucket_interval)
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        confidence_low, confidence_up = 0, 0
-        if is_print_ci:
-            confidence_low, confidence_up = compute_confidence_interval_f1(spans_true, spans_pred, dict_span2sid,
-                                                                           dict_span2sid_pred)
-
-        confidence_low = format(confidence_low, '.3g')
-        confidence_up = format(confidence_up, '.3g')
-
-        f1, p, r = evaluate_chunk_level(spans_pred, spans_true)
-
-        error_entity_list = []
-        if is_print_case:
-            for span_true in spans_true:
-                if span_true not in spans_pred:
-                    # print(span_true)
-                    pos_true = "_".join(span_true.split("_")[0:2])
-                    tag_true = span_true.split("_")[-1]
-
-                    if pos_true in dict_pos2tag_pred.keys():
-                        tag_pred = dict_pos2tag_pred[pos_true]
-                        if tag_pred != tag_true:
-                            error_entity_list.append(
-                                dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + dict_pos2tag_pred[pos_true])
-                    else:
-                        error_entity_list.append(dict_chunkid2span[span_true] + "|||" + tag_true + "|||" + "O")
-
-        # print("confidence_low:\t", confidence_low)
-        # print("confidence_up:\t", confidence_up)
-        # print("F1:\t", f1)
-        # print(error_entity_list)
-
-        dict_bucket2f1[bucket_interval] = [f1, len(spans_true), confidence_low, confidence_up, error_entity_list]
-
-    # if bucket_interval[0] == 1.0:
-    # 	print("debug-f1:",f1)
-    # 	print(spans_pred[0:20])
-    # 	print(spans_true[0:20])
-    # print("dict_bucket2f1: ",dict_bucket2f1)
-    return sortDict(dict_bucket2f1), errorCase_list
-
-
-def getErrorCase_semp(text_list, sql_true_list, sql_pred_list, is_match_list):
-    errorCase_list = []
-    for text, sql_true, sql_pred, is_match in zip(text_list, sql_true_list, sql_pred_list, is_match_list):
-        if is_match == "0":
-            errorCase_list.append(
-                format4json_tc(text) + "|||" + format4json_tc(sql_true) + "|||" + format4json_tc(sql_pred))
-    return errorCase_list
-
-
-def getBucketAcc_with_errorCase_semp(dict_bucket2span, dict_bucket2span_pred, dict_sid2sentpair):
-    # The structure of span_true or span_pred
-    # 2345|||Positive
-    # 2345 represents sentence id
-    # Positive represents the "label" of this instance
-
-    dict_bucket2f1 = {}
-
-    for bucket_interval, spans_true in dict_bucket2span.items():
-        spans_pred = []
-
-        # print('bucket_interval: ',bucket_interval)
-        if bucket_interval not in dict_bucket2span_pred.keys():
-            # print(bucket_interval)
-            raise ValueError("Predict Label Bucketing Errors")
-        else:
-            spans_pred = dict_bucket2span_pred[bucket_interval]
-
-        # loop over samples from a given bucket
-        error_case_bucket_list = []
-        for info_true, info_pred in zip(spans_true, spans_pred):
-            sid_true, label_true = info_true.split("|||")
-            sid_pred, label_pred = info_pred.split("|||")
-            if sid_true != sid_pred:
-                continue
-
-            sent = dict_sid2sentpair[sid_true]
-            if label_true != label_pred:
-                error_case_info = sent
-                error_case_bucket_list.append(error_case_info)
-
-        accuracy_each_bucket = accuracy(spans_pred, spans_true)
-        # print("debug: span_pred:\t")
-        # print(spans_pred)
-        confidence_low, confidence_up = compute_confidence_interval_acc(spans_pred, spans_true)
-        dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
-                                           error_case_bucket_list]
-
-        # print(error_case_bucket_list)
-
-        print("accuracy_each_bucket:\t", accuracy_each_bucket)
-
-    return sortDict(dict_bucket2f1)
+    return sort_dict(dict_bucket2f1)
+
+
+# TODO: This seems to not be used anywhere? Is it dead code?
+# def get_error_case_semp(text_list, sql_true_list, sql_pred_list, is_match_list):
+#     error_case_list = []
+#     for text, sql_true, sql_pred, is_match in zip(text_list, sql_true_list, sql_pred_list, is_match_list):
+#         if is_match == "0":
+#             error_case_list.append(
+#                 format4json2(text) + "|||" + format4json2(sql_true) + "|||" + format4json2(sql_pred))
+#     return error_case_list
+#
+#
+# def get_bucket_acc_with_error_case_semp(dict_bucket2span, dict_bucket2span_pred, dict_sid2sentpair):
+#     # The structure of span_true or span_pred
+#     # 2345|||Positive
+#     # 2345 represents sentence id
+#     # Positive represents the "label" of this instance
+#
+#     dict_bucket2f1 = {}
+#
+#     for bucket_interval, spans_true in dict_bucket2span.items():
+#         spans_pred = []
+#
+#         # print('bucket_interval: ',bucket_interval)
+#         if bucket_interval not in dict_bucket2span_pred.keys():
+#             # print(bucket_interval)
+#             raise ValueError("Predict Label Bucketing Errors")
+#         else:
+#             spans_pred = dict_bucket2span_pred[bucket_interval]
+#
+#         # loop over samples from a given bucket
+#         error_case_bucket_list = []
+#         for info_true, info_pred in zip(spans_true, spans_pred):
+#             sid_true, label_true = info_true.split("|||")
+#             sid_pred, label_pred = info_pred.split("|||")
+#             if sid_true != sid_pred:
+#                 continue
+#
+#             sent = dict_sid2sentpair[sid_true]
+#             if label_true != label_pred:
+#                 error_case_info = sent
+#                 error_case_bucket_list.append(error_case_info)
+#
+#         accuracy_each_bucket = accuracy(spans_pred, spans_true)
+#         # print("debug: span_pred:\t")
+#         # print(spans_pred)
+#         confidence_low, confidence_up = compute_confidence_interval_acc(spans_pred, spans_true)
+#         dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
+#                                            error_case_bucket_list]
+#
+#         # print(error_case_bucket_list)
+#
+#         print("accuracy_each_bucket:\t", accuracy_each_bucket)
+#
+#     return sort_dict(dict_bucket2f1)
 
 
 def calculate_ece(result_list):
@@ -2007,13 +1231,13 @@ def divide_into_bin(size_of_bin, raw_list):
 
     for value in raw_list:
         probability = value[0]
-        isRight = value[1]
+        is_right = value[1]
         if probability == 1.0:
-            bin_list[size_of_bin - 1].append([probability, isRight])
+            bin_list[size_of_bin - 1].append([probability, is_right])
             continue
         for i in range(0, size_of_bin):
             if (probability >= i * basic_width) & (probability < (i + 1) * basic_width):
-                bin_list[i].append([probability, isRight])
+                bin_list[i].append([probability, is_right])
 
     result_list = []
     for i in range(0, size_of_bin):
