@@ -2,7 +2,7 @@
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 import numpy
-
+from collections import OrderedDict
 
 def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
     """
@@ -29,7 +29,6 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
     ece :the ece of this file
     dic :the details of the ECE information in json format
     """
-    from collections import OrderedDict
 
     probability_list, right_or_not_list = du.get_probability_right_or_not(file_path)
 
@@ -54,13 +53,13 @@ def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-atte
     return ece, dic
 
 
-def getAspectValue(sent_list, aspect_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
-    dict_span2aspectVal = {}
-    dict_span2aspectVal_pred = {}
+def get_aspect_value(sent_list, aspect_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
+    dict_span2aspect_val = {}
+    dict_span2aspect_val_pred = {}
 
     for aspect, fun in dict_aspect_func.items():
-        dict_span2aspectVal[aspect] = {}
-        dict_span2aspectVal_pred[aspect] = {}
+        dict_span2aspect_val[aspect] = {}
+        dict_span2aspect_val_pred[aspect] = {}
 
     dict_sid2sample = {}
 
@@ -71,7 +70,7 @@ def getAspectValue(sent_list, aspect_list, sample_list_tag, sample_list_tag_pred
         aspect_list = asp.split(" ")
 
         # for saving errorlist -- fine-grained version
-        dict_sid2sample[str(sample_id)] = ea.format4json_tc(ea.format4json_tc(asp) + "|||" + ea.format4json_tc(sent))
+        dict_sid2sample[str(sample_id)] = ea.format4json2(ea.format4json2(asp) + "|||" + ea.format4json2(sent))
 
         sent_length = len(word_list)
         aspect_length = len(aspect_list)
@@ -87,31 +86,59 @@ def getAspectValue(sent_list, aspect_list, sample_list_tag, sample_list_tag_pred
         # Sentence Length: sentALen
         aspect = "aspPos"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = asp_pos * 1.0 / float(sent_length)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = asp_pos * 1.0 / float(sent_length)
+            dict_span2aspect_val[aspect][sent_pos] = asp_pos * 1.0 / float(sent_length)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = asp_pos * 1.0 / float(sent_length)
 
         # Sentence Length: sentALen
         aspect = "senLen"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = float(sent_length)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = float(sent_length)
+            dict_span2aspect_val[aspect][sent_pos] = float(sent_length)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = float(sent_length)
 
         # Sentence Length: sentBLen
         aspect = "aspLen"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal[aspect][sent_pos] = float(aspect_length)
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = float(aspect_length)
+            dict_span2aspect_val[aspect][sent_pos] = float(aspect_length)
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = float(aspect_length)
 
         # Tag: tag
         aspect = "tag"
         if aspect in dict_aspect_func.keys():
-            dict_span2aspectVal["tag"][sent_pos] = tag
-            dict_span2aspectVal_pred[aspect][sent_pos_pred] = tag
+            dict_span2aspect_val["tag"][sent_pos] = tag
+            dict_span2aspect_val_pred[aspect][sent_pos_pred] = tag
 
         sample_id += 1
-    # print(dict_span2aspectVal["bleu"])
-    return dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sample
+    # print(dict_span2aspect_val["bleu"])
+    return dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sample
 
+
+def file_to_list(path_file):
+    sent1_list = []
+    sent2_list = []
+    true_label_list = []
+    pred_label_list = []
+    fin = open(path_file, "r")
+    for line in fin:
+        line = line.rstrip("\n")
+        if len(line.split("\t")) < 4:
+            continue
+        sent1, sent2, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2], \
+                                               line.split("\t")[3]
+        sent1_list.append(sent1)
+        sent2_list.append(sent2)
+        true_label_list.append(true_label)
+        pred_label_list.append(pred_label)
+
+    fin.close()
+    return sent1_list, sent2_list, true_label_list, pred_label_list
+
+def get_error_case(aspect_list, sent_list, true_label_list, pred_label_list):
+    error_case_list = []
+    for aspect, sent, true_label, pred_label in zip(aspect_list, sent_list, true_label_list, pred_label_list):
+        if true_label != pred_label:
+            error_case_list.append(
+                true_label + "|||" + pred_label + "|||" + ea.format4json2(aspect) + "|||" + ea.format4json2(sent))
+    return error_case_list
 
 def evaluate(task_type="ner", analysis_type="single", systems=[], output="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
@@ -122,32 +149,32 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     corpus_type = "dataset_name"
     model_name = "model_name"
-    path_preComputed = ""
+    path_precomputed = ""
     path_aspect_conf = "./explainaboard/tasks/absa/conf.aspects"
     path_json_input = "./explainaboard/tasks/absa/template.json"
     fn_write_json = output
 
     # Initalization
-    dict_aspect_func = ea.loadConf(path_aspect_conf)
+    dict_aspect_func = ea.load_conf(path_aspect_conf)
     metric_names = list(dict_aspect_func.keys())
     fwrite_json = open(fn_write_json, 'w')
 
     path_comb_output = model_name + "/" + path_text.split("/")[-1]
 
-    # get preComputed paths from conf file
-    dict_preComputed_path = {}
+    # get precomputed paths from conf file
+    dict_precomputed_path = {}
     for aspect, func in dict_aspect_func.items():
-        is_preComputed = func[2].lower()
-        if is_preComputed == "yes":
-            dict_preComputed_path[aspect] = path_preComputed + "_" + aspect + ".pkl"
-            print("PreComputed directory:\t", dict_preComputed_path[aspect])
+        is_precomputed = func[2].lower()
+        if is_precomputed == "yes":
+            dict_precomputed_path[aspect] = path_precomputed + "_" + aspect + ".pkl"
+            print("precomputed directory:\t", dict_precomputed_path[aspect])
 
-    aspect_list, sent_list, true_label_list, pred_label_list = ea.file_to_list_absa(path_text)
+    aspect_list, sent_list, true_label_list, pred_label_list = file_to_list(path_text)
 
-    errorCase_list = []
+    error_case_list = []
     if is_print_case:
-        errorCase_list = ea.getErrorCase_absa(aspect_list, sent_list, true_label_list, pred_label_list)
-        print(" -*-*-*- the number of error casse:\t", len(errorCase_list))
+        error_case_list = get_error_case(aspect_list, sent_list, true_label_list, pred_label_list)
+        print(" -*-*-*- the number of error casse:\t", len(error_case_list))
 
     # Confidence Interval of Holistic Performance
     confidence_low, confidence_up = 0, 0
@@ -155,7 +182,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
         confidence_low, confidence_up = ea.compute_confidence_interval_acc(true_label_list, pred_label_list,
                                                                            n_times=100)
 
-    dict_span2aspectVal, dict_span2aspectVal_pred, dict_sid2sample = getAspectValue(sent_list, aspect_list,
+    dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sample = get_aspect_value(sent_list, aspect_list,
                                                                                     true_label_list, pred_label_list,
                                                                                     dict_aspect_func)
 
@@ -165,21 +192,21 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     print("------------------ Holistic Result----------------------")
     print(holistic_performance)
 
-    def __selectBucktingFunc(func_name, func_setting, dict_obj):
-        if func_name == "bucketAttribute_SpecifiedBucketInterval":
-            return ea.bucketAttribute_SpecifiedBucketInterval(dict_obj, eval(func_setting))
-        elif func_name == "bucketAttribute_SpecifiedBucketValue":
+    def __select_bucketing_func(func_name, func_setting, dict_obj):
+        if func_name == "bucket_attribute_SpecifiedBucketInterval":
+            return ea.bucket_attribute_specified_bucket_interval(dict_obj, eval(func_setting))
+        elif func_name == "bucket_attribute_SpecifiedBucketValue":
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             n_buckets, specified_bucket_value_list = int(func_setting.split("\t")[0]), eval(func_setting.split("\t")[1])
-            return ea.bucketAttribute_SpecifiedBucketValue(dict_obj, n_buckets, specified_bucket_value_list)
-        elif func_name == "bucketAttribute_DiscreteValue":  # now the discrete value is R-tag..
+            return ea.bucket_attribute_specified_bucket_value(dict_obj, n_buckets, specified_bucket_value_list)
+        elif func_name == "bucket_attribute_DiscreteValue":  # now the discrete value is R-tag..
             if len(func_setting.split("\t")) != 2:
                 raise ValueError("selectBucktingFunc Error!")
             tags_list = list(set(dict_obj.values()))
             topK_buckets, min_buckets = int(func_setting.split("\t")[0]), int(func_setting.split("\t")[1])
             # return eval(func_name)(dict_obj, min_buckets, topK_buckets)
-            return ea.bucketAttribute_DiscreteValue(dict_obj, topK_buckets, min_buckets)
+            return ea.bucket_attribute_discrete_value(dict_obj, topK_buckets, min_buckets)
 
     dict_bucket2span = {}
     dict_bucket2span_pred = {}
@@ -187,27 +214,27 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     aspect_names = []
 
     for aspect, func in dict_aspect_func.items():
-        # print(aspect, dict_span2aspectVal[aspect])
-        dict_bucket2span[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal[aspect])
+        # print(aspect, dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
-        dict_bucket2span_pred[aspect] = ea.bucketAttribute_SpecifiedBucketInterval(dict_span2aspectVal_pred[aspect],
-                                                                                   dict_bucket2span[aspect].keys())
-        # dict_bucket2span_pred[aspect] = __selectBucktingFunc(func[0], func[1], dict_span2aspectVal_pred[aspect])
-        dict_bucket2f1[aspect] = ea.getBucketAcc_with_errorCase_absa(dict_bucket2span[aspect],
-                                                                     dict_bucket2span_pred[aspect], dict_sid2sample,
-                                                                     is_print_ci, is_print_case)
+        dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
+                                                                                      dict_bucket2span[aspect].keys())
+        # dict_bucket2span_pred[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val_pred[aspect])
+        dict_bucket2f1[aspect] = get_bucket_acc_with_error_case(dict_bucket2span[aspect],
+                                                                dict_bucket2span_pred[aspect], dict_sid2sample,
+                                                                is_print_ci, is_print_case)
         aspect_names.append(aspect)
     print("aspect_names: ", aspect_names)
 
     print("------------------ Breakdown Performance")
     for aspect in dict_aspect_func.keys():
-        ea.printDict(dict_bucket2f1[aspect], aspect)
+        ea.print_dict(dict_bucket2f1[aspect], aspect)
     print("")
 
     # Calculate databias w.r.t numeric attributes
     dict_aspect2bias = {}
-    for aspect, aspect2Val in dict_span2aspectVal.items():
+    for aspect, aspect2Val in dict_span2aspect_val.items():
 
         if type(list(aspect2Val.values())[0]) != type("string"):
             # if isinstance(list(aspect2Val.values())[0], str):
@@ -218,7 +245,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
         print(k + ":\t" + str(v))
     print("")
 
-    def beautifyInterval(interval):
+    def beautify_interval(interval):
 
         if type(interval[0]) == type("string"):  ### pay attention to it
             return interval[0]
@@ -232,13 +259,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                 bk_name = range1_r + range1_l
                 return bk_name
 
-    dict_fineGrained = {}
+    dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
-        dict_fineGrained[aspect] = []
+        dict_fine_grained[aspect] = []
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautifyInterval(bucket_name)
+            bucket_name = beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -248,15 +275,15 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
             confidence_low = format(v[2], '.4g')
             confidence_up = format(v[3], '.4g')
 
-            # for saving errorlist -- finegrained version
+            # for saving errorlist -- fine_grained version
             bucket_error_case = v[4]
 
             # instantiation
-            dict_fineGrained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
+            dict_fine_grained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
                                              "confidence_low": confidence_low, "confidence_up": confidence_up,
                                              "bucket_error_case": bucket_error_case})
 
-    # dict_fineGrained[aspect].append({"bucket_name":bucket_name, "bucket_value":bucket_value, "num":n_sample, "confidence_low":confidence_low, "confidence_up":confidence_up, "bucket_error_case":[]})
+    # dict_fine_grained[aspect].append({"bucket_name":bucket_name, "bucket_value":bucket_value, "num":n_sample, "confidence_low":confidence_low, "confidence_up":confidence_up, "bucket_error_case":[]})
 
     obj_json = ea.load_json(path_json_input)
 
@@ -269,10 +296,10 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up
-    obj_json["model"]["results"]["fine_grained"] = dict_fineGrained
+    obj_json["model"]["results"]["fine_grained"] = dict_fine_grained
 
     # add errorAnalysis -- holistic
-    obj_json["model"]["results"]["overall"]["error_case"] = errorCase_list
+    obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
 
     # Calibration
     ece = 0
@@ -287,3 +314,52 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     obj_json["data"]["output"] = path_comb_output
 
     ea.save_json(obj_json, fn_write_json)
+
+
+def get_bucket_acc_with_error_case(dict_bucket2span, dict_bucket2span_pred, dict_sid2sentpair, is_print_ci,
+                                   is_print_case):
+    # The structure of span_true or span_pred
+    # 2345|||Positive
+    # 2345 represents sentence id
+    # Positive represents the "label" of this instance
+
+    dict_bucket2f1 = {}
+
+    for bucket_interval, spans_true in dict_bucket2span.items():
+        spans_pred = []
+
+        # print('bucket_interval: ',bucket_interval)
+        if bucket_interval not in dict_bucket2span_pred.keys():
+            # print(bucket_interval)
+            raise ValueError("Predict Label Bucketing Errors")
+        else:
+            spans_pred = dict_bucket2span_pred[bucket_interval]
+
+        # loop over samples from a given bucket
+        error_case_bucket_list = []
+
+        if is_print_case:
+            for info_true, info_pred in zip(spans_true, spans_pred):
+                sid_true, label_true = info_true.split("|||")
+                sid_pred, label_pred = info_pred.split("|||")
+                if sid_true != sid_pred:
+                    continue
+
+                sent = dict_sid2sentpair[sid_true]
+                if label_true != label_pred:
+                    error_case_info = label_true + "|||" + label_pred + "|||" + sent
+                    error_case_bucket_list.append(error_case_info)
+
+        accuracy_each_bucket = ea.accuracy(spans_pred, spans_true)
+        confidence_low, confidence_up = 0, 0
+        if is_print_ci:
+            confidence_low, confidence_up = ea.compute_confidence_interval_acc(spans_pred, spans_true)
+
+        dict_bucket2f1[bucket_interval] = [accuracy_each_bucket, len(spans_true), confidence_low, confidence_up,
+                                           error_case_bucket_list]
+
+        # print(error_case_bucket_list)
+
+        print("accuracy_each_bucket:\t", accuracy_each_bucket)
+
+    return ea.sort_dict(dict_bucket2f1)
