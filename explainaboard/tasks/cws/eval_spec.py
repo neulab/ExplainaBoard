@@ -4,6 +4,7 @@ import explainaboard.error_analysis as ea
 import numpy
 import pickle
 import codecs
+import os
 
 
 def read_data(corpus_type, fn, column_no=-1, delimiter=' '):
@@ -164,8 +165,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     corpus_type = "dataset_name"
     model_name = "model_name"
     path_precomputed = ""
-    path_aspect_conf = "./explainaboard/tasks/cws/conf.aspects"
-    path_json_input = "./explainaboard/tasks/cws/template.json"
+    path_file = os.path.dirname(__file__)
+    path_aspect_conf = os.path.join(path_file, "conf.aspects")
+    path_json_input = os.path.join(path_file, "template.json")
     fn_write_json = output
 
     # Initalization

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-import numpy
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
+import os
+import numpy
 
 
 def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
@@ -142,8 +143,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     corpus_type = "dataset_name"
     model_name = "model_name"
     path_precomputed = ""
-    path_aspect_conf = "./explainaboard/tasks/nli/conf.aspects"
-    path_json_input = "./explainaboard/tasks/nli/template.json"
+    path_file = os.path.dirname(__file__)
+    path_aspect_conf = os.path.join(path_file, "conf.aspects")
+    path_json_input = os.path.join(path_file, "template.json")
     fn_write_json = output
 
     # Initalization
