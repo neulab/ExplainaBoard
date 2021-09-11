@@ -843,22 +843,17 @@ def ext_value(cont, fr, to):
 
 
 def load_conf(path_conf):
-    fin = open(path_conf, "r")
-    all_cont = fin.read()
-    dict_aspect_func = {}
-    for block in all_cont.split("# "):
-        # print("debug3-------")
-        # print(block)
-        notation = ext_value(block, "notation:\t", "\n").rstrip(" ")
-        if notation == "":
-            continue
-        # print("debug4--notation-----")
-        # print(notation)
-        func_type = ext_value(block, "type:\t", "\n").rstrip(" ")
-        func_setting = ext_value(block, "setting:\t", "\n").rstrip(" ")
-        is_precomputed = ext_value(block, "is_precomputed:\t", "\n").rstrip(" ")
-        dict_aspect_func[notation] = (func_type, func_setting, is_precomputed)
-    # exit()
+    with open(path_conf, "r") as fin:
+        all_cont = fin.read()
+        dict_aspect_func = {}
+        for block in all_cont.split("# "):
+            notation = ext_value(block, "notation:\t", "\n").rstrip(" ")
+            if notation == "":
+                continue
+            func_type = ext_value(block, "type:\t", "\n").rstrip(" ")
+            func_setting = ext_value(block, "setting:\t", "\n").rstrip(" ")
+            is_precomputed = ext_value(block, "is_precomputed:\t", "\n").rstrip(" ")
+            dict_aspect_func[notation] = (func_type, func_setting, is_precomputed)
     return dict_aspect_func
 
 
@@ -877,6 +872,27 @@ def load_json(path):
 def save_json(obj_json, path):
     with open(path, "w") as f:
         json.dump(obj_json, f, indent=4, ensure_ascii=False)
+
+
+def load_task_conf(task_dir):
+    path_aspect_conf = os.path.join(task_dir, "conf.aspects")
+    path_json_input = os.path.join(task_dir, "template.json")
+    # config file
+    dict_aspect_func = load_conf(path_aspect_conf)
+    print("dict_aspect_func: ", dict_aspect_func)
+    print(dict_aspect_func)
+    # pretrained aspects
+    dict_precomputed_path = {}
+    for aspect, func in dict_aspect_func.items():
+        is_precomputed = func[2].lower()
+        if is_precomputed == "yes":
+            dict_precomputed_path[aspect] = "_" + aspect + ".pkl"
+            print("precomputed directory:\t", dict_precomputed_path[aspect])
+    # create object template
+    obj_json = load_json(path_json_input)
+    obj_json["data"]["name"] = "dataset_name"
+    obj_json["model"]["name"] = "model_name"
+    return dict_aspect_func, dict_precomputed_path, obj_json
 
 
 def get_pos2sentid(test_word_sequences_sent):
@@ -1253,3 +1269,18 @@ def divide_into_bin(size_of_bin, raw_list):
         result_list.append([total_probability / len(value), total_right / (len(value)), len(value)])
 
     return result_list
+
+
+def select_bucketing_func(func_name, func_setting, dict_obj):
+    if func_name == "bucket_attribute_SpecifiedBucketInterval":
+        return bucket_attribute_specified_bucket_interval(dict_obj, eval(func_setting))
+    else:
+        fs1, fs2 = func_setting.split("\t")
+        if func_name == "bucket_attribute_SpecifiedBucketValue":
+            n_buckets, specified_bucket_value_list = int(fs1), eval(fs2)
+            return bucket_attribute_specified_bucket_value(dict_obj, n_buckets, specified_bucket_value_list)
+        elif func_name == "bucket_attribute_DiscreteValue":  # now the discrete value is R-tag..
+            topK_buckets, min_buckets = int(fs1), int(fs2)
+            return bucket_attribute_discrete_value(dict_obj, topK_buckets, min_buckets)
+        else:
+            raise ValueError(f'Illegal bucketing function {func_name}')
