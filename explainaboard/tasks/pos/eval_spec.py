@@ -4,6 +4,7 @@ from random import choices
 import explainaboard.error_analysis as ea
 import pickle
 import numpy
+import os
 
 
 def get_aspect_value(test_word_sequences, test_true_tag_sequences, test_word_sequences_sent,
@@ -79,8 +80,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     corpus_type = "dataset_name"
     model_name = "model_name"
     path_precomputed = ""
-    path_aspect_conf = "./explainaboard/tasks/pos/conf.aspects"
-    path_json_input = "./explainaboard/tasks/pos/template.json"
+    path_file = os.path.dirname(__file__)
+    path_aspect_conf = os.path.join(path_file, "conf.aspects")
+    path_json_input = os.path.join(path_file, "template.json")
     fn_write_json = output
 
     # Initalization
