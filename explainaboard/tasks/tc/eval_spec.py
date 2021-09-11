@@ -4,6 +4,7 @@ from collections import OrderedDict
 import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 import numpy
+import os
 
 
 def get_aspect_value(sent_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
@@ -115,8 +116,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     corpus_type = "dataset_name"
     model_name = "model_name"
     path_precomputed = ""
-    path_aspect_conf = "./explainaboard/tasks/tc/conf.aspects"
-    path_json_input = "./explainaboard/tasks/tc/template.json"
+    path_file = os.path.dirname(__file__)
+    path_aspect_conf = os.path.join(path_file, "conf.aspects")
+    path_json_input = os.path.join(path_file, "template.json")
     fn_write_json = output
 
     # Initalization
