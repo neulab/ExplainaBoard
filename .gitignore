@@ -14,3 +14,8 @@ __pycache__
 .idea
 *.egg-info
 *.swp
+json2csv.py
+run_sql.sh
+task_ner.sql
+database/task_ner.sql
+database/task_ner_error.sql
