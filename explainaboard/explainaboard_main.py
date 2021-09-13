@@ -4,7 +4,7 @@ import argparse
 import explainaboard.tasks
 
 
-def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci=False, is_print_case=False,
+def run_explainaboard(task, systems, output, dataset_name = 'dataset_name', model_name = 'model_name', analysis_type='single', is_print_ci=False, is_print_case=False,
                       is_print_ece=False):
     '''
     Run ExplainaBoard analysis suite
@@ -14,6 +14,8 @@ def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci
       systems: A path to the system files
       output: The output path where the files should be written out
       analysis_type: analysis type: single|pair|combine
+      dataset_name (str): the name of dataset
+      model_name (str): the name of mdoel
       is_print_ci: TODO
       is_print_case: TODO
       is_print_ece: TODO
@@ -28,6 +30,8 @@ def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci
     eval_func(task_type=task,
               systems=systems,
               output_filename=output,
+              dataset_name= dataset_name,
+              model_name = model_name,
               analysis_type=analysis_type,
               is_print_ci=is_print_ci,
               is_print_case=is_print_case,
@@ -62,6 +66,13 @@ def main():
 
     parser.add_argument('--output', type=str, required=True,
                         help="analysis output file")
+
+    parser.add_argument('--dataset_name', type=str, required=False, default="dataset_name",
+                        help="the name of dataset")
+
+    parser.add_argument('--model_name', type=str, required=False, default="model_name",
+                        help="the name of model")
+
     args = parser.parse_args()
 
     is_print_ci = args.ci
@@ -72,12 +83,15 @@ def main():
     analysis_type = args.type
     systems = args.systems.split(",")
     output = args.output
+    dataset_name = args.dataset_name
+    model_name = args.model_name
+
 
     print("task", task)
     print("type", analysis_type)
     print("systems", systems)
 
-    run_explainaboard(task, systems, output, analysis_type, is_print_ci, is_print_case, is_print_ece)
+    run_explainaboard(task, systems, output, dataset_name, model_name, analysis_type, is_print_ci, is_print_case, is_print_ece)
     
     
 if __name__ == '__main__':

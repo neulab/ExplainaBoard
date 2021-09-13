@@ -5,7 +5,7 @@
       <paths name="lor">
         <serverdata>
           <mappings>
-            <mapping deploy="/usr2/home/pliu3/data/neulab" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/ubuntu/ExplainaBoard" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
