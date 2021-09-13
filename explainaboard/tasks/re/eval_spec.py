@@ -69,40 +69,12 @@ def get_aspect_value(sample_list, dict_aspect_func):
     return dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sent
 
 
-def evaluate(task_type="ner", analysis_type="single", systems=[], output="./output.json", is_print_ci=False,
+def evaluate(task_type="ner", analysis_type="single", systems=[], output_filename="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
-    path_text = ""
 
-    if analysis_type == "single":
-        path_text = systems[0]
-
-    corpus_type = "dataset_name"
-    model_name = "model_name"
-    path_precomputed = ""
-    path_file = os.path.dirname(__file__)
-    path_aspect_conf = os.path.join(path_file, "conf.aspects")
-    path_json_input = os.path.join(path_file, "template.json")
-    # path_aspect_conf = "./tasks/re/conf.aspects"
-    # path_json_input = "./tasks/re/template.json"
-    fn_write_json = output
-
-    # Initalization
-    dict_aspect_func = ea.load_conf(path_aspect_conf)
-    metric_names = list(dict_aspect_func.keys())
-    print("dict_aspect_func: ", dict_aspect_func)
-    print(dict_aspect_func)
-
-    fwrite_json = open(fn_write_json, 'w')
-
-    path_comb_output = model_name + "/" + path_text.split("/")[-1]
-
-    # get precomputed paths from conf file
-    dict_precomputed_path = {}
-    for aspect, func in dict_aspect_func.items():
-        is_precomputed = func[2].lower()
-        if is_precomputed == "yes":
-            dict_precomputed_path[aspect] = path_precomputed + "_" + aspect + ".pkl"
-            print("precomputed directory:\t", dict_precomputed_path[aspect])
+    path_text = systems[0] if analysis_type == "single" else ""
+    path_comb_output = "model_name" + "/" + path_text.split("/")[-1]
+    dict_aspect_func, dict_precomputed_path, obj_json = ea.load_task_conf(task_dir=os.path.dirname(__file__))
 
     sample_list, sent_list, entity_list, true_list, pred_list = file_to_list(path_text)
 
@@ -128,22 +100,6 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     # print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
 
-    def __select_bucketing_func(func_name, func_setting, dict_obj):
-        if func_name == "bucket_attribute_SpecifiedBucketInterval":
-            return eval(func_name)(dict_obj, eval(func_setting))
-        elif func_name == "bucket_attribute_SpecifiedBucketValue":
-            if len(func_setting.split("\t")) != 2:
-                raise ValueError("selectBucktingFunc Error!")
-            n_buckets, specified_bucket_value_list = int(func_setting.split("\t")[0]), eval(func_setting.split("\t")[1])
-            return eval(func_name)(dict_obj, n_buckets, specified_bucket_value_list)
-        elif func_name == "bucket_attribute_DiscreteValue":  # now the discrete value is R-tag..
-            if len(func_setting.split("\t")) != 2:
-                raise ValueError("selectBucktingFunc Error!")
-            tags_list = list(set(dict_obj.values()))
-            topK_buckets, min_buckets = int(func_setting.split("\t")[0]), int(func_setting.split("\t")[1])
-            # return eval(func_name)(dict_obj, min_buckets, topK_buckets)
-            return eval(func_name)(dict_obj, topK_buckets, min_buckets)
-
     dict_bucket2span = {}
     dict_bucket2span_pred = {}
     dict_bucket2f1 = {}
@@ -151,7 +107,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
 
     for aspect, func in dict_aspect_func.items():
         # print(aspect, dict_span2aspect_val[aspect])
-        dict_bucket2span[aspect] = __select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
+        dict_bucket2span[aspect] = ea.select_bucketing_func(func[0], func[1], dict_span2aspect_val[aspect])
         # print(aspect, dict_bucket2span[aspect])
         # exit()
         dict_bucket2span_pred[aspect] = ea.bucket_attribute_specified_bucket_interval(dict_span2aspect_val_pred[aspect],
@@ -216,15 +172,11 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
                                              "confidence_up": confidence_up_bucket,
                                              "bucket_error_case": bucket_error_case})
 
-    obj_json = ea.load_json(path_json_input)
-
     obj_json["task"] = task_type
-    obj_json["data"]["name"] = corpus_type
     obj_json["data"]["language"] = "English"
     obj_json["data"]["bias"] = dict_aspect2bias
     obj_json["data"]["output"] = path_comb_output
 
-    obj_json["model"]["name"] = model_name
     obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low
@@ -242,7 +194,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output="./outp
     # obj_json["model"]["results"]["calibration"] = dic_calibration
     # # print(dic_calibration)
 
-    # ea.save_json(obj_json, fn_write_json)
+    # ea.save_json(obj_json, output_filename)
 
 #
 # def main():
