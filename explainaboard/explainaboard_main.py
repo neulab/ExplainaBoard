@@ -34,7 +34,9 @@ def run_explainaboard(task, systems, output, analysis_type='single', is_print_ci
               is_print_ece=is_print_ece)
 
 
-if __name__ == '__main__':
+    
+#if __name__ == '__main__':
+def main():
     # python explainaboard_main.py --task absa  --systems ./test-laptop.tsv --output ./output/a.json
     # python explainaboard_main.py --task ner --systems ./test-conll03.tsv --output ./a.json
     # python explainaboard_main.py --task re --systems ./test_re.tsv --output ./a.json
@@ -76,3 +78,7 @@ if __name__ == '__main__':
     print("systems", systems)
 
     run_explainaboard(task, systems, output, analysis_type, is_print_ci, is_print_case, is_print_ece)
+    
+    
+if __name__ == '__main__':
+    main()
