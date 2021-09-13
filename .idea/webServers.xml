@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="7b1f464d-9744-4be4-a1a0-5f614a53a234" name="lor">
-        <fileTransfer accessType="SFTP" host="lor.lti.cs.cmu.edu" port="22" sshConfigId="1fb050de-aecd-4721-9c4c-a48ef441b1db" sshConfig="pliu3@lor.lti.cs.cmu.edu:22 password">
+        <fileTransfer accessType="SFTP" host="3.22.166.30" port="22" sshConfigId="e236b08c-948f-4fda-93b8-e40119ee82ab" sshConfig="ubuntu@3.22.166.30:22 key" keyPair="true">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
