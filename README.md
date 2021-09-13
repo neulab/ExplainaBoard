@@ -54,7 +54,7 @@ means, you can play with ExplainaBoard at following levels:
 
 #### Method 1: Simple installation from PyPI (Python 3 only)
 ```
-pip install 
+pip install explainaboard
 ```
 
 #### Method 2: Install from the source and develop locally (Python 3 only)
