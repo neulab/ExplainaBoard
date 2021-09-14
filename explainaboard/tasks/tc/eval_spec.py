@@ -106,7 +106,7 @@ def get_error_case(sent_list, true_label_list, pred_label_list):
             error_case_list.append(true_label + "|||" + pred_label + "|||" + ea.format4json2(sent))
     return error_case_list
 
-def evaluate(task_type="ner", analysis_type="single", systems=[], output_filename="./output.json", is_print_ci=False,
+def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name = 'dataset_name', model_name = 'model_name', output_filename="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
 
     path_text = systems[0] if analysis_type == "single" else ""
@@ -211,6 +211,8 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output_filenam
     obj_json["data"]["language"] = "English"
     obj_json["data"]["bias"] = dict_aspect2bias
     obj_json["data"]["output"] = path_comb_output
+    obj_json["data"]["name"] = dataset_name
+    obj_json["model"]["name"] = model_name
 
     obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
