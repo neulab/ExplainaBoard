@@ -230,7 +230,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
 
     obj_json["model"]["results"]["overall"]["error_case"] = error_case_list
 
-    ea.save_json(obj_json, "./instantiate.json")
+
     ea.save_json(obj_json, output_filename)
 
 
