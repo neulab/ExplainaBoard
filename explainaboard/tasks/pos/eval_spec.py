@@ -70,7 +70,7 @@ def get_aspect_value(test_word_sequences, test_true_tag_sequences, test_word_seq
 #     return res.rstrip("_")
 
 
-def evaluate(task_type="ner", analysis_type="single", systems=[], output_filename="./output.json", is_print_ci=False,
+def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name = 'dataset_name', model_name = 'model_name', output_filename="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
 
     path_text = systems[0] if analysis_type == "single" else ""
@@ -185,8 +185,10 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output_filenam
 
     obj_json["task"] = task_type
     obj_json["data"]["language"] = "English"
+    obj_json["data"]["name"] = dataset_name
     obj_json["data"]["bias"] = dict_aspect2bias
     obj_json["data"]["output"] = path_comb_output
+    obj_json["model"]["name"] = model_name
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low_overall
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up_overall
