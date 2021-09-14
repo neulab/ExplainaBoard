@@ -133,7 +133,7 @@ def get_aspect_value(sent1_list, sent2_list, sample_list_tag, sample_list_tag_pr
     return dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sentpair
 
 
-def evaluate(task_type="ner", analysis_type="single", systems=[], output_filename="./output.json", is_print_ci=False,
+def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name = 'dataset_name', model_name = 'model_name', output_filename="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
 
     path_text = systems[0] if analysis_type == "single" else ""
@@ -240,7 +240,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], output_filenam
     obj_json["task"] = task_type
     obj_json["data"]["language"] = "English"
     obj_json["data"]["bias"] = dict_aspect2bias
+    obj_json["data"]["name"] = dataset_name
 
+    obj_json["model"]["name"] = model_name
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
     obj_json["model"]["results"]["overall"]["confidence_low"] = confidence_low
     obj_json["model"]["results"]["overall"]["confidence_up"] = confidence_up
