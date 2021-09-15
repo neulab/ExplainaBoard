@@ -1,4 +1,4 @@
-# System Outputs on Meta-Eval-Newsroom
+# System Outputs on Meta-Eval-Summeval
 ## Model Discription
 CTC: A Unified Framework for Evaluating NLG
 ## Meta Data
