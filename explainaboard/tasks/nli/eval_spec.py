@@ -3,56 +3,7 @@ import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 import os
 import numpy
-
-
-def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
-    """
-
-    :param file_path: the file_path is the path to your file.
-
-    And the path must include file name.
-
-    the file name is in this format: test_dataset_model.tsv.
-
-    the file_path must in the format: /root/path/to/your/file/test_dataset.tsv
-
-    The file must in this format:
-    sentence1\tsentence2\tground_truth\tpredict_label\tprobability\tright_or_not
-    if prediction is right, right_or_not is assigned to 1, otherwise 0.
-
-    :param size_of_bin: the numbers of how many bins
-
-    :param dataset: the name of the dataset
-
-    :param model: the name of the model
-
-    :return:
-    ece :the ece of this file
-    dic :the details of the ECE information in json format
-    """
-    from collections import OrderedDict
-
-    probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=4, right_or_not_col=5)
-
-    raw_list = list(zip(probability_list, right_or_not_list))
-
-    bin_list = ea.divide_into_bin(size_of_bin, raw_list)
-
-    ece = ea.calculate_ece(bin_list)
-    dic = OrderedDict()
-    dic['dataset-name'] = dataset
-    dic['model-name'] = model
-    dic['ECE'] = ece
-    dic['details'] = []
-    basic_width = 1 / size_of_bin
-    for i in range(len(bin_list)):
-        tem_dic = {}
-        bin_name = format(i * basic_width, '.2g') + '-' + format((i + 1) * basic_width, '.2g')
-        tem_dic = {'interval': bin_name, 'average_accuracy': bin_list[i][1], 'average_confidence': bin_list[i][0],
-                   'samples_number_in_this_bin': bin_list[i][2]}
-        dic['details'].append(tem_dic)
-
-    return ece, dic
+from collections import OrderedDict
 
 
 def get_aspect_value(sent1_list, sent2_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
@@ -140,11 +91,11 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     path_comb_output = "model_name" + "/" + path_text.split("/")[-1]
     dict_aspect_func, dict_precomputed_path, obj_json = ea.load_task_conf(task_dir=os.path.dirname(__file__))
 
-    sent1_list, sent2_list, true_label_list, pred_label_list = file_to_list(path_text)
+    sent1_list, sent2_list, true_label_list, pred_label_list = du.tsv_to_lists(path_text, col_ids=(0,1,2,3))
 
     error_case_list = []
     if is_print_case:
-        error_case_list = get_error_case(sent1_list, sent2_list, true_label_list, pred_label_list)
+        error_case_list = ea.get_error_case_classification(true_label_list, pred_label_list, sent1_list, sent2_list)
         print(" -*-*-*- the number of error casse:\t", len(error_case_list))
 
     # Confidence Interval of Holistic Performance
@@ -162,8 +113,6 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
 
     print("------------------ Holistic Result----------------------")
     print(holistic_performance)
-
-    # print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
 
     dict_bucket2span = {}
     dict_bucket2span_pred = {}
@@ -199,19 +148,6 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         print(k + ":\t" + str(v))
     print("")
 
-    def beautify_interval(interval):
-
-        if type(interval[0]) == type("string"):  ### pay attention to it
-            return interval[0]
-        else:
-            if len(interval) == 1:
-                bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
-                return bk_name
-            else:
-                range1_r = '(' + format(float(interval[0]), '.3g') + ','
-                range1_l = format(float(interval[1]), '.3g') + ')'
-                bk_name = range1_r + range1_l
-                return bk_name
 
     dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
@@ -219,7 +155,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautify_interval(bucket_name)
+            bucket_name = ea.beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -238,9 +174,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
                                              "bucket_error_case": bucket_error_case})
 
     obj_json["task"] = task_type
+    obj_json["data"]["name"] = dataset_name
     obj_json["data"]["language"] = "English"
     obj_json["data"]["bias"] = dict_aspect2bias
-    obj_json["data"]["name"] = dataset_name
 
     obj_json["model"]["name"] = model_name
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
@@ -255,8 +191,8 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     ece = 0
     dic_calibration = None
     if is_print_ece:
-        ece, dic_calibration = process_all(path_text,
-                                           size_of_bin=10, dataset="dataset_name", model="model_name")
+        ece, dic_calibration = ea.calculate_ece_by_file(path_text, prob_col=4, answer_cols=(2,3),
+                                                        size_of_bin=10, dataset="dataset_name", model="model_name")
 
     obj_json["model"]["results"]["calibration"] = dic_calibration
 
@@ -303,31 +239,3 @@ def get_bucket_acc_with_error_case(dict_bucket2span, dict_bucket2span_pred, dict
     return ea.sort_dict(dict_bucket2f1)
 
 
-def get_error_case(sent1_list, sent2_list, true_label_list, pred_label_list):
-    error_case_list = []
-    for sent1, sent2, true_label, pred_label in zip(sent1_list, sent2_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            error_case_list.append(
-                true_label + "|||" + pred_label + "|||" + ea.format4json2(sent1) + "|||" + ea.format4json2(sent2))
-    return error_case_list
-
-
-def file_to_list(path_file):
-    sent1_list = []
-    sent2_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) < 4:
-            continue
-        sent1, sent2, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2], \
-                                               line.split("\t")[3]
-        sent1_list.append(sent1)
-        sent2_list.append(sent2)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent1_list, sent2_list, true_label_list, pred_label_list

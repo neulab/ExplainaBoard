@@ -234,27 +234,13 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         print(k + ":\t" + str(v))
     print("")
 
-    def beautify_interval(interval):
-
-        if type(interval[0]) == type("string"):  ### pay attention to it
-            return interval[0]
-        else:
-            if len(interval) == 1:
-                bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
-                return bk_name
-            else:
-                range1_r = '(' + format(float(interval[0]), '.3g') + ','
-                range1_l = format(float(interval[1]), '.3g') + ')'
-                bk_name = range1_r + range1_l
-                return bk_name
-
     dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
         dict_fine_grained[aspect] = []
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautify_interval(bucket_name)
+            bucket_name = ea.beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -352,8 +338,8 @@ def compute_confidence_interval_f1(spans_true, spans_pred, dict_span2sid, dict_s
     return confidence_low, confidence_up
 
 
-def get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred,
-                   list_true_tags_token, list_pred_tags_token):
+def get_error_case_segmentation(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred,
+                                list_true_tags_token, list_pred_tags_token):
     error_case_list = []
     for pos, tag in dict_pos2tag.items():
 
@@ -428,8 +414,9 @@ def get_bucket_f1(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_s
 
     error_case_list = []
     if is_print_case:
-        error_case_list = get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred,
-                                         list_true_tags_token, list_pred_tags_token)
+        error_case_list = get_error_case_segmentation(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span,
+                                                      dict_chunkid2span_pred, list_true_tags_token,
+                                                      list_pred_tags_token)
 
     # print(len(error_case_list))
     # print(error_case_list)
