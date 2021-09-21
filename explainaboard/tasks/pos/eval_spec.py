@@ -187,7 +187,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='
     ea.save_json(obj_json, output_filename)
 
 
-def get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred):
+def get_error_case_pos(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred):
     # print("debug-1:")
     # print()
 
@@ -311,7 +311,7 @@ def get_bucket_f1(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_s
     # print(dict_pos2tag_pred)
 
     if is_print_case:
-        error_case_list = get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
+        error_case_list = get_error_case_pos(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
 
     for bucket_interval, spans_true in dict_bucket2span.items():
         spans_pred = []

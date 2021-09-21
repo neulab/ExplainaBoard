@@ -471,6 +471,19 @@ def get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict
     return error_case_list
 
 
+def get_error_case_classification(true_label_list, pred_label_list, out1_list, out2_list=None):
+    error_case_list = []
+    if out2_list:
+        for true_label, pred_label, out1, out2 in zip(true_label_list, pred_label_list, out1_list, out2_list):
+            if true_label != pred_label:
+                error_case_list.append('|||'.join([true_label, pred_label, format4json2(out1), format4json2(out2)]))
+    else:
+        for true_label, pred_label, out1 in zip(true_label_list, pred_label_list, out1_list):
+            if true_label != pred_label:
+                error_case_list.append('|||'.join([true_label, pred_label, format4json2(out1)]))
+    return error_case_list
+
+
 def get_bucket_acc(dict_bucket2span, dict_bucket2span_pred):
     print('------------------ attribute')
     dict_bucket2f1 = {}
