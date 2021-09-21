@@ -8,7 +8,7 @@ import os
 
 
 def get_aspect_value(test_word_sequences, test_true_tag_sequences, test_word_sequences_sent,
-                   test_true_tag_sequences_sent, dict_precomputed_path, dict_aspect_func):
+                     test_true_tag_sequences_sent, dict_precomputed_path, dict_aspect_func):
     dict_precomputed_model = {}
     for aspect, path in dict_precomputed_path.items():
         print("path:\t" + path)
@@ -70,9 +70,9 @@ def get_aspect_value(test_word_sequences, test_true_tag_sequences, test_word_seq
 #     return res.rstrip("_")
 
 
-def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name = 'dataset_name', model_name = 'model_name', output_filename="./output.json", is_print_ci=False,
+def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='dataset_name', model_name='model_name',
+             output_filename="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
-
     path_text = systems[0] if analysis_type == "single" else ""
     path_comb_output = "model_name" + "/" + path_text.split("/")[-1]
     dict_aspect_func, dict_precomputed_path, obj_json = ea.load_task_conf(task_dir=os.path.dirname(__file__))
@@ -82,15 +82,16 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     list_pred_tags_sent, list_pred_tags_token = ea.read_single_column(path_text, 2)
 
     dict_span2aspect_val, dict_span2sid, dict_chunkid2span = get_aspect_value(list_text_token, list_true_tags_token,
-                                                                           list_text_sent,
-                                                                           list_true_tags_sent, dict_precomputed_path,
-                                                                           dict_aspect_func)
+                                                                              list_text_sent,
+                                                                              list_true_tags_sent,
+                                                                              dict_precomputed_path,
+                                                                              dict_aspect_func)
     dict_span2aspect_val_pred, dict_span2sid_pred, dict_chunkid2span_pred = get_aspect_value(list_text_token,
-                                                                                          list_pred_tags_token,
-                                                                                          list_text_sent,
-                                                                                          list_pred_tags_sent,
-                                                                                          dict_precomputed_path,
-                                                                                          dict_aspect_func)
+                                                                                             list_pred_tags_token,
+                                                                                             list_text_sent,
+                                                                                             list_pred_tags_sent,
+                                                                                             dict_precomputed_path,
+                                                                                             dict_aspect_func)
 
     print(len(dict_chunkid2span), len(dict_chunkid2span_pred))
 
@@ -147,19 +148,6 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         print(k + ":\t" + str(v))
     print("")
 
-    def beautify_interval(interval):
-
-        if type(interval[0]) == type("string"):  ### pay attention to it
-            return interval[0]
-        else:
-            if len(interval) == 1:
-                bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
-                return bk_name
-            else:
-                range1_r = '(' + format(float(interval[0]), '.3g') + ','
-                range1_l = format(float(interval[1]), '.3g') + ')'
-                bk_name = range1_r + range1_l
-                return bk_name
 
     dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
@@ -167,7 +155,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautify_interval(bucket_name)
+            bucket_name = ea.beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
@@ -180,8 +168,8 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
 
             # instantiation
             dict_fine_grained[aspect].append({"bucket_name": bucket_name, "bucket_value": bucket_value, "num": n_sample,
-                                             "confidence_low": confidence_low, "confidence_up": confidence_up,
-                                             "bucket_error_case": error_entity_list})
+                                              "confidence_low": confidence_low, "confidence_up": confidence_up,
+                                              "bucket_error_case": error_entity_list})
 
     obj_json["task"] = task_type
     obj_json["data"]["language"] = "English"
@@ -199,7 +187,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     ea.save_json(obj_json, output_filename)
 
 
-def get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred):
+def get_error_case_pos(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict_chunkid2span_sent_pred):
     # print("debug-1:")
     # print()
 
@@ -323,7 +311,7 @@ def get_bucket_f1(dict_bucket2span, dict_bucket2span_pred, dict_span2sid, dict_s
     # print(dict_pos2tag_pred)
 
     if is_print_case:
-        error_case_list = get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
+        error_case_list = get_error_case_pos(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span, dict_chunkid2span_pred)
 
     for bucket_interval, spans_true in dict_bucket2span.items():
         spans_pred = []
