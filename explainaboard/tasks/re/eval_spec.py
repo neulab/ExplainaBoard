@@ -135,19 +135,6 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         print(k + ":\t" + str(v))
     print("")
 
-    def beautify_interval(interval):
-
-        if type(interval[0]) == type("string"):  ### pay attention to it
-            return interval[0]
-        else:
-            if len(interval) == 1:
-                bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
-                return bk_name
-            else:
-                range1_r = '(' + format(float(interval[0]), '.3g') + ','
-                range1_l = format(float(interval[1]), '.3g') + ')'
-                bk_name = range1_r + range1_l
-                return bk_name
 
     dict_fine_grained = {}
     for aspect, metadata in dict_bucket2f1.items():
@@ -155,7 +142,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
         for bucket_name, v in metadata.items():
             # print("---------debug--bucket name old---")
             # print(bucket_name)
-            bucket_name = beautify_interval(bucket_name)
+            bucket_name = ea.beautify_interval(bucket_name)
             # print("---------debug--bucket name new---")
             # print(bucket_name)
 
