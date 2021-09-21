@@ -3,7 +3,6 @@ import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 import os
 import numpy
-from collections import OrderedDict
 
 
 def get_aspect_value(sent_list, aspect_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
@@ -65,27 +64,6 @@ def get_aspect_value(sent_list, aspect_list, sample_list_tag, sample_list_tag_pr
     return dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sample
 
 
-def file_to_list(path_file):
-    sent1_list = []
-    sent2_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) < 4:
-            continue
-        sent1, sent2, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2], \
-                                               line.split("\t")[3]
-        sent1_list.append(sent1)
-        sent2_list.append(sent2)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent1_list, sent2_list, true_label_list, pred_label_list
-
-
 def get_error_case(aspect_list, sent_list, true_label_list, pred_label_list):
     error_case_list = []
     for aspect, sent, true_label, pred_label in zip(aspect_list, sent_list, true_label_list, pred_label_list):
@@ -102,7 +80,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='
     path_comb_output = "model_name" + "/" + path_text.split("/")[-1]
     dict_aspect_func, dict_precomputed_path, obj_json = ea.load_task_conf(task_dir=os.path.dirname(__file__))
 
-    aspect_list, sent_list, true_label_list, pred_label_list = file_to_list(path_text)
+    aspect_list, sent_list, true_label_list, pred_label_list = du.tsv_to_lists(path_text, col_ids=(0,1,2,3))
 
     error_case_list = []
     if is_print_case:

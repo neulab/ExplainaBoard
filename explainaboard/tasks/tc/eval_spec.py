@@ -63,7 +63,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='
     path_comb_output = "model_name" + "/" + path_text.split("/")[-1]
     dict_aspect_func, dict_precomputed_path, obj_json = ea.load_task_conf(task_dir=os.path.dirname(__file__))
 
-    sent_list, true_label_list, pred_label_list = file_to_list_tc(path_text)
+    sent_list, true_label_list, pred_label_list = du.tsv_to_lists(path_text, col_ids=(0,1,2))
 
     error_case_list = []
     if is_print_case:
@@ -168,20 +168,3 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='
 
     ea.save_json(obj_json, output_filename)
 
-
-def file_to_list_tc(path_file):
-    sent_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) != 5:
-            continue
-        sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
-        sent_list.append(sent)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent_list, true_label_list, pred_label_list
