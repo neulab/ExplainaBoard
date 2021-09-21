@@ -857,6 +857,21 @@ def load_conf(path_conf):
     return dict_aspect_func
 
 
+def beautify_interval(interval):
+
+    if type(interval[0]) == type("string"):  ### pay attention to it
+        return interval[0]
+    else:
+        if len(interval) == 1:
+            bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
+            return bk_name
+        else:
+            range1_r = '(' + format(float(interval[0]), '.3g') + ','
+            range1_l = format(float(interval[1]), '.3g') + ')'
+            bk_name = range1_r + range1_l
+            return bk_name
+
+
 def ensure_dir(f):
     if not os.path.exists(f):
         os.makedirs(f)
