@@ -91,7 +91,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     path_comb_output = "model_name" + "/" + path_text.split("/")[-1]
     dict_aspect_func, dict_precomputed_path, obj_json = ea.load_task_conf(task_dir=os.path.dirname(__file__))
 
-    sent1_list, sent2_list, true_label_list, pred_label_list = file_to_list(path_text)
+    sent1_list, sent2_list, true_label_list, pred_label_list = du.tsv_to_lists(path_text, col_ids=(0,1,2,3))
 
     error_case_list = []
     if is_print_case:
@@ -249,23 +249,3 @@ def get_error_case(sent1_list, sent2_list, true_label_list, pred_label_list):
                 true_label + "|||" + pred_label + "|||" + ea.format4json2(sent1) + "|||" + ea.format4json2(sent2))
     return error_case_list
 
-
-def file_to_list(path_file):
-    sent1_list = []
-    sent2_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) < 4:
-            continue
-        sent1, sent2, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2], \
-                                               line.split("\t")[3]
-        sent1_list.append(sent1)
-        sent2_list.append(sent2)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent1_list, sent2_list, true_label_list, pred_label_list

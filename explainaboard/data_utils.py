@@ -29,5 +29,26 @@ def get_probability_right_or_not(file_path, prob_col, right_or_not_col=None, ans
     else:
         raise ValueError('right_or_not_cols or answer_cols must not be None')
 
-
     return probability_list, right_or_not_list
+
+
+def tsv_to_lists(path_file, col_ids, fail_on_short_line=True):
+    """
+    Grab a list of columns from a tsv file
+    :param path_file: The path to the file
+    :param col_ids: The integer column IDs
+    :param fail_on_short_line: Whether to fail if there is a line that's too short
+    :return:
+    """
+    ret_lists = tuple([] for _ in col_ids)
+    max_col = max(col_ids)
+    with open(path_file, "r") as fin:
+        for line in fin:
+            line = line.rstrip("\n")
+            cols = line.split("\t")
+            if max_col < len(cols):
+                for col_id, col_list in zip(col_ids, ret_lists):
+                    col_list.append(cols[col_id])
+            elif fail_on_short_line:
+                raise ValueError(f'Illegal short line in {path_file}\n{line}')
+    return ret_lists
