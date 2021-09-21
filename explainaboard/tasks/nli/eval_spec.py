@@ -3,56 +3,7 @@ import explainaboard.error_analysis as ea
 import explainaboard.data_utils as du
 import os
 import numpy
-
-
-def process_all(file_path, size_of_bin=10, dataset='atis', model='lstm-self-attention'):
-    """
-
-    :param file_path: the file_path is the path to your file.
-
-    And the path must include file name.
-
-    the file name is in this format: test_dataset_model.tsv.
-
-    the file_path must in the format: /root/path/to/your/file/test_dataset.tsv
-
-    The file must in this format:
-    sentence1\tsentence2\tground_truth\tpredict_label\tprobability\tright_or_not
-    if prediction is right, right_or_not is assigned to 1, otherwise 0.
-
-    :param size_of_bin: the numbers of how many bins
-
-    :param dataset: the name of the dataset
-
-    :param model: the name of the model
-
-    :return:
-    ece :the ece of this file
-    dic :the details of the ECE information in json format
-    """
-    from collections import OrderedDict
-
-    probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=4, right_or_not_col=5)
-
-    raw_list = list(zip(probability_list, right_or_not_list))
-
-    bin_list = ea.divide_into_bin(size_of_bin, raw_list)
-
-    ece = ea.calculate_ece(bin_list)
-    dic = OrderedDict()
-    dic['dataset-name'] = dataset
-    dic['model-name'] = model
-    dic['ECE'] = ece
-    dic['details'] = []
-    basic_width = 1 / size_of_bin
-    for i in range(len(bin_list)):
-        tem_dic = {}
-        bin_name = format(i * basic_width, '.2g') + '-' + format((i + 1) * basic_width, '.2g')
-        tem_dic = {'interval': bin_name, 'average_accuracy': bin_list[i][1], 'average_confidence': bin_list[i][0],
-                   'samples_number_in_this_bin': bin_list[i][2]}
-        dic['details'].append(tem_dic)
-
-    return ece, dic
+from collections import OrderedDict
 
 
 def get_aspect_value(sent1_list, sent2_list, sample_list_tag, sample_list_tag_pred, dict_aspect_func):
@@ -242,8 +193,8 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     ece = 0
     dic_calibration = None
     if is_print_ece:
-        ece, dic_calibration = process_all(path_text,
-                                           size_of_bin=10, dataset="dataset_name", model="model_name")
+        ece, dic_calibration = ea.calculate_ece_by_file(path_text, prob_col=4, answer_cols=(2,3),
+                                                        size_of_bin=10, dataset="dataset_name", model="model_name")
 
     obj_json["model"]["results"]["calibration"] = dic_calibration
 
