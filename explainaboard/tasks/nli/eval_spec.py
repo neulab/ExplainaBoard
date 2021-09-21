@@ -114,8 +114,6 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
     print("------------------ Holistic Result----------------------")
     print(holistic_performance)
 
-    # print(f1(list_true_tags_token, list_pred_tags_token)["f1"])
-
     dict_bucket2span = {}
     dict_bucket2span_pred = {}
     dict_bucket2f1 = {}
@@ -176,9 +174,9 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
                                              "bucket_error_case": bucket_error_case})
 
     obj_json["task"] = task_type
+    obj_json["data"]["name"] = dataset_name
     obj_json["data"]["language"] = "English"
     obj_json["data"]["bias"] = dict_aspect2bias
-    obj_json["data"]["name"] = dataset_name
 
     obj_json["model"]["name"] = model_name
     obj_json["model"]["results"]["overall"]["performance"] = holistic_performance
