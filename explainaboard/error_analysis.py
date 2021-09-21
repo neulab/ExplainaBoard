@@ -2,9 +2,12 @@ import numpy as np
 import os
 import scipy.stats as statss
 import json
+import collections
 
 from seqeval.metrics import precision_score, recall_score, f1_score
 from nltk.tokenize import TweetTokenizer
+
+import explainaboard.data_utils as du
 
 from random import choices
 import scipy.stats
@@ -468,6 +471,19 @@ def get_error_case(dict_pos2tag, dict_pos2tag_pred, dict_chunkid2span_sent, dict
     return error_case_list
 
 
+def get_error_case_classification(true_label_list, pred_label_list, out1_list, out2_list=None):
+    error_case_list = []
+    if out2_list:
+        for true_label, pred_label, out1, out2 in zip(true_label_list, pred_label_list, out1_list, out2_list):
+            if true_label != pred_label:
+                error_case_list.append('|||'.join([true_label, pred_label, format4json2(out1), format4json2(out2)]))
+    else:
+        for true_label, pred_label, out1 in zip(true_label_list, pred_label_list, out1_list):
+            if true_label != pred_label:
+                error_case_list.append('|||'.join([true_label, pred_label, format4json2(out1)]))
+    return error_case_list
+
+
 def get_bucket_acc(dict_bucket2span, dict_bucket2span_pred):
     print('------------------ attribute')
     dict_bucket2f1 = {}
@@ -857,6 +873,21 @@ def load_conf(path_conf):
     return dict_aspect_func
 
 
+def beautify_interval(interval):
+
+    if type(interval[0]) == type("string"):  ### pay attention to it
+        return interval[0]
+    else:
+        if len(interval) == 1:
+            bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
+            return bk_name
+        else:
+            range1_r = '(' + format(float(interval[0]), '.3g') + ','
+            range1_l = format(float(interval[1]), '.3g') + ')'
+            bk_name = range1_r + range1_l
+            return bk_name
+
+
 def ensure_dir(f):
     if not os.path.exists(f):
         os.makedirs(f)
@@ -913,89 +944,6 @@ def get_token_position(test_word_sequences_sent):
             dict_ap2rp[pos] = i
             pos += 1
     return dict_ap2rp
-
-
-def file2list(path_file):
-    res_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        res_list.append(line)
-    fin.close()
-    return res_list
-
-
-def file_to_list_triple(path_file):
-    sent_list = []
-    true_label_list = []
-    pred_label_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        if len(line.split("\t")) != 3:
-            continue
-        sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
-        sent_list.append(sent)
-        true_label_list.append(true_label)
-        pred_label_list.append(pred_label)
-
-    fin.close()
-    return sent_list, true_label_list, pred_label_list
-
-
-# TODO: dead code?
-# def file_to_list_summ(path_file):
-#     doc_list = []
-#     hyp_list = []
-#     ref_list = []
-#     r1 = []
-#     r2 = []
-#     rl = []
-#     r1_overall = []
-#     r2_overall = []
-#     rl_overall = []
-#     fin = open(path_file, "r")
-#     for line in fin:
-#         line = line.rstrip("\n")
-#         if len(line.split("\t")) < 9:
-#             continue
-#         sent, true_label, pred_label = line.split("\t")[0], line.split("\t")[1], line.split("\t")[2]
-#         doc_list.append(line.split("\t")[0])
-#         hyp_list.append(line.split("\t")[1])
-#         ref_list.append(line.split("\t")[2])
-#         r1.append(line.split("\t")[3])
-#         r2.append(line.split("\t")[4])
-#         rl.append(line.split("\t")[5])
-#         r1_overall.append(line.split("\t")[6])
-#         r2_overall.append(line.split("\t")[7])
-#         rl_overall.append(line.split("\t")[8])
-#
-#     fin.close()
-#     return doc_list, hyp_list, ref_list, r1, r2, rl, r1_overall, r2_overall, rl_overall
-
-
-def file2list_pair(path_file):
-    sent1_list = []
-    sent2_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n")
-        sent1, sent2 = line.split("\t")[0], line.split("\t")[1]
-        sent1_list.append(sent1)
-        sent2_list.append(sent2)
-
-    fin.close()
-    return sent1_list, sent2_list
-
-
-def file2list_first_column(path_file):
-    res_list = []
-    fin = open(path_file, "r")
-    for line in fin:
-        line = line.rstrip("\n").split("\t")[0]
-        res_list.append(line)
-    fin.close()
-    return res_list
 
 
 def file2dict(path_file):
@@ -1236,6 +1184,62 @@ def calculate_ece(result_list):
         ece = ece + ((result_list[i][2] / size) * tem_list[i])
 
     return ece
+
+
+def calculate_ece_by_file(file_path, prob_col, right_or_not_col=None, answer_cols=None, size_of_bin=10, dataset='atis',
+                          model='lstm-self-attention'):
+    """
+
+    :param file_path: the file_path is the path to your file.
+
+    And the path must include file name.
+
+    the file name is in this format: test_dataset_model.tsv.
+
+    the file_path must in the format: /root/path/to/your/file/test_dataset.tsv
+
+    The file must in this format:
+    sentence1\tsentence2\tground_truth\tpredict_label\tprobability\tright_or_not
+    if prediction is right, right_or_not is assigned to 1, otherwise 0.
+
+    :param prob_col: The column of the probability value
+
+    :param right_or_not_col: The column of the value indicating correct or not
+
+    :param size_of_bin: the numbers of how many bins
+
+    :param dataset: the name of the dataset
+
+    :param model: the name of the model
+
+    :return:
+    ece :the ece of this file
+    dic :the details of the ECE information in json format
+    """
+
+    probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=prob_col,
+                                                                          right_or_not_col=right_or_not_col,
+                                                                          answer_cols=answer_cols)
+
+    raw_list = list(zip(probability_list, right_or_not_list))
+
+    bin_list = divide_into_bin(size_of_bin, raw_list)
+
+    ece = calculate_ece(bin_list)
+    dic = collections.OrderedDict()
+    dic['dataset-name'] = dataset
+    dic['model-name'] = model
+    dic['ECE'] = ece
+    dic['details'] = []
+    basic_width = 1 / size_of_bin
+    for i in range(len(bin_list)):
+        tem_dic = {}
+        bin_name = format(i * basic_width, '.2g') + '-' + format((i + 1) * basic_width, '.2g')
+        tem_dic = {'interval': bin_name, 'average_accuracy': bin_list[i][1], 'average_confidence': bin_list[i][0],
+                   'samples_number_in_this_bin': bin_list[i][2]}
+        dic['details'].append(tem_dic)
+
+    return ece, dic
 
 
 def divide_into_bin(size_of_bin, raw_list):
