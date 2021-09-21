@@ -95,7 +95,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name =
 
     error_case_list = []
     if is_print_case:
-        error_case_list = get_error_case(sent1_list, sent2_list, true_label_list, pred_label_list)
+        error_case_list = ea.get_error_case_classification(true_label_list, pred_label_list, sent1_list, sent2_list)
         print(" -*-*-*- the number of error casse:\t", len(error_case_list))
 
     # Confidence Interval of Holistic Performance
@@ -240,12 +240,4 @@ def get_bucket_acc_with_error_case(dict_bucket2span, dict_bucket2span_pred, dict
 
     return ea.sort_dict(dict_bucket2f1)
 
-
-def get_error_case(sent1_list, sent2_list, true_label_list, pred_label_list):
-    error_case_list = []
-    for sent1, sent2, true_label, pred_label in zip(sent1_list, sent2_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            error_case_list.append(
-                true_label + "|||" + pred_label + "|||" + ea.format4json2(sent1) + "|||" + ea.format4json2(sent2))
-    return error_case_list
 

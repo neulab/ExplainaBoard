@@ -64,15 +64,6 @@ def get_aspect_value(sent_list, aspect_list, sample_list_tag, sample_list_tag_pr
     return dict_span2aspect_val, dict_span2aspect_val_pred, dict_sid2sample
 
 
-def get_error_case(aspect_list, sent_list, true_label_list, pred_label_list):
-    error_case_list = []
-    for aspect, sent, true_label, pred_label in zip(aspect_list, sent_list, true_label_list, pred_label_list):
-        if true_label != pred_label:
-            error_case_list.append(
-                true_label + "|||" + pred_label + "|||" + ea.format4json2(aspect) + "|||" + ea.format4json2(sent))
-    return error_case_list
-
-
 def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='dataset_name', model_name='model_name',
              output_filename="./output.json", is_print_ci=False,
              is_print_case=False, is_print_ece=False):
@@ -84,7 +75,7 @@ def evaluate(task_type="ner", analysis_type="single", systems=[], dataset_name='
 
     error_case_list = []
     if is_print_case:
-        error_case_list = get_error_case(aspect_list, sent_list, true_label_list, pred_label_list)
+        error_case_list = ea.get_error_case_classification(true_label_list, pred_label_list, aspect_list, sent_list)
         print(" -*-*-*- the number of error casse:\t", len(error_case_list))
 
     # Confidence Interval of Holistic Performance
