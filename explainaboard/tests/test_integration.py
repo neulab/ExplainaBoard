@@ -15,6 +15,9 @@ class IntegrationTest(unittest.TestCase):
     def test_absa_single(self):
         em.run_explainaboard('absa', [os.path.join(self.example_dir, 'test-laptop.tsv')], os.devnull)
 
+    def test_absa_ece(self):
+        em.run_explainaboard('absa', [os.path.join(self.example_dir, 'test-laptop.tsv')], os.devnull, is_print_ece=True)
+
     def test_chunk_single(self):
         em.run_explainaboard('chunk', [os.path.join(self.example_dir, 'test-conll00.tsv')], os.devnull)
 
@@ -27,6 +30,9 @@ class IntegrationTest(unittest.TestCase):
     def test_nli_single(self):
         em.run_explainaboard('nli', [os.path.join(self.example_dir, 'test-snli.tsv')], os.devnull)
 
+    def test_nli_ece(self):
+        em.run_explainaboard('nli', [os.path.join(self.example_dir, 'test-snli.tsv')], os.devnull, is_print_ece=True)
+
     def test_pos_single(self):
         em.run_explainaboard('pos', [os.path.join(self.example_dir, 'test-ptb2.tsv')], os.devnull)
 
@@ -37,6 +43,8 @@ class IntegrationTest(unittest.TestCase):
     def test_tc_single(self):
         em.run_explainaboard('tc', [os.path.join(self.example_dir, 'test-atis.tsv')], os.devnull)
 
+    def test_tc_ece(self):
+        em.run_explainaboard('tc', [os.path.join(self.example_dir, 'test-atis.tsv')], os.devnull, is_print_ece=True)
 
 if __name__ == '__main__':
     unittest.main()

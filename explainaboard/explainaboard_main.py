@@ -4,7 +4,8 @@ import argparse
 import explainaboard.tasks
 
 
-def run_explainaboard(task, systems, output, dataset_name = 'dataset_name', model_name = 'model_name', analysis_type='single', is_print_ci=False, is_print_case=False,
+def run_explainaboard(task, systems, output, dataset_name = 'dataset_name', model_name = 'model_name',
+                      analysis_type='single', is_print_ci=False, is_print_case=False,
                       is_print_ece=False):
     '''
     Run ExplainaBoard analysis suite

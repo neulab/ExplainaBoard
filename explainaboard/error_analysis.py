@@ -2,9 +2,12 @@ import numpy as np
 import os
 import scipy.stats as statss
 import json
+import collections
 
 from seqeval.metrics import precision_score, recall_score, f1_score
 from nltk.tokenize import TweetTokenizer
+
+import explainaboard.data_utils as du
 
 from random import choices
 import scipy.stats
@@ -1251,6 +1254,62 @@ def calculate_ece(result_list):
         ece = ece + ((result_list[i][2] / size) * tem_list[i])
 
     return ece
+
+
+def calculate_ece_by_file(file_path, prob_col, right_or_not_col=None, answer_cols=None, size_of_bin=10, dataset='atis',
+                          model='lstm-self-attention'):
+    """
+
+    :param file_path: the file_path is the path to your file.
+
+    And the path must include file name.
+
+    the file name is in this format: test_dataset_model.tsv.
+
+    the file_path must in the format: /root/path/to/your/file/test_dataset.tsv
+
+    The file must in this format:
+    sentence1\tsentence2\tground_truth\tpredict_label\tprobability\tright_or_not
+    if prediction is right, right_or_not is assigned to 1, otherwise 0.
+
+    :param prob_col: The column of the probability value
+
+    :param right_or_not_col: The column of the value indicating correct or not
+
+    :param size_of_bin: the numbers of how many bins
+
+    :param dataset: the name of the dataset
+
+    :param model: the name of the model
+
+    :return:
+    ece :the ece of this file
+    dic :the details of the ECE information in json format
+    """
+
+    probability_list, right_or_not_list = du.get_probability_right_or_not(file_path, prob_col=prob_col,
+                                                                          right_or_not_col=right_or_not_col,
+                                                                          answer_cols=answer_cols)
+
+    raw_list = list(zip(probability_list, right_or_not_list))
+
+    bin_list = divide_into_bin(size_of_bin, raw_list)
+
+    ece = calculate_ece(bin_list)
+    dic = collections.OrderedDict()
+    dic['dataset-name'] = dataset
+    dic['model-name'] = model
+    dic['ECE'] = ece
+    dic['details'] = []
+    basic_width = 1 / size_of_bin
+    for i in range(len(bin_list)):
+        tem_dic = {}
+        bin_name = format(i * basic_width, '.2g') + '-' + format((i + 1) * basic_width, '.2g')
+        tem_dic = {'interval': bin_name, 'average_accuracy': bin_list[i][1], 'average_confidence': bin_list[i][0],
+                   'samples_number_in_this_bin': bin_list[i][2]}
+        dic['details'].append(tem_dic)
+
+    return ece, dic
 
 
 def divide_into_bin(size_of_bin, raw_list):
