@@ -1,0 +1,37 @@
+{
+  "task": "",
+
+  "data": {
+    "name": "",
+    "bias": {}
+  },
+
+  "model": {
+    "name": "",
+    "results": {
+      "overall":{
+        "performance": 0,
+        "confidence_low": 0,
+        "confidence_up": 0
+      },
+      "calibration": {
+        "ECE": 0
+      },
+      "fine_grained":
+        {
+          "eCon": [
+            {
+              "bucket_name": "",
+              "bucket_value": 0,
+              "num": 0,
+              "confidence_low": 0,
+              "confidence_up": 0
+            }
+          ]
+
+        }
+
+    }
+  }
+
+}
