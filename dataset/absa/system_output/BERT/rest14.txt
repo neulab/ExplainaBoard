@@ -1,0 +1,1120 @@
+bread 	The [[ bread ]] is top notch as well .	positive	positive	0.999013543
+delivery times 	I have to say they have one of the fastest [[ delivery times ]] in the city .	positive	positive	0.99884522
+Food 	[[ Food ]] is always fresh and hot- ready to eat !	positive	positive	0.998768389
+coffee 	Did I mention that the [[ coffee ]] is OUTSTANDING ?	positive	positive	0.998810649
+place 	"Certainly not the best sushi in New York , however , it is always fresh , and the [[ place ]] is very clean , sterile ."	positive	negative	0.967894614
+people 	"I trust the [[ people ]] at Go Sushi , it never disappoints ."	positive	positive	0.998519719
+Japanese food 	"Straight - forward , no surprises , very decent [[ Japanese food ]] ."	positive	positive	0.999035597
+asian salad 	"BEST spicy tuna roll , great [[ asian salad ]] ."	positive	positive	0.998984873
+spicy tuna roll 	"BEST [[ spicy tuna roll ]] , great asian salad ."	positive	positive	0.999061167
+rose roll 	Try the [[ rose roll ]] ( not on menu ) .	positive	neutral	0.660427988
+menu 	Try the rose roll ( not on [[ menu ]] ) .	neutral	neutral	0.980598092
+drinks 	"I love the [[ drinks ]] , esp lychee martini , and the food is also VERY good ."	positive	positive	0.999050677
+lychee martini 	"I love the drinks , esp [[ lychee martini ]] , and the food is also VERY good ."	positive	positive	0.999106586
+food 	"I love the drinks , esp lychee martini , and the [[ food ]] is also VERY good ."	positive	positive	0.999083877
+Nicoise salad 	"In fact , this was not a [[ Nicoise salad ]] and was barely eatable ."	negative	negative	0.994404435
+menu 	"While there 's a decent [[ menu ]] , it should n't take ten minutes to get your drinks and 45 for a dessert pizza ."	positive	positive	0.998293817
+drinks 	"While there 's a decent menu , it should n't take ten minutes to get your [[ drinks ]] and 45 for a dessert pizza ."	neutral	neutral	0.996550322
+dessert pizza 	"While there 's a decent menu , it should n't take ten minutes to get your drinks and 45 for a [[ dessert pizza ]] ."	neutral	neutral	0.996178389
+food 	"Once we sailed , the top - notch [[ food ]] and live entertainment sold us on a unforgettable evening ."	positive	positive	0.998988926
+live entertainment 	"Once we sailed , the top - notch food and [[ live entertainment ]] sold us on a unforgettable evening ."	positive	positive	0.998987973
+waiter 	Our [[ waiter ]] was horrible ; so rude and disinterested .	negative	negative	0.994790435
+sangria 	The [[ sangria ]] 's - watered down .	negative	positive	0.999010682
+menu 	"[[ menu ]] - uneventful , small ."	negative	positive	0.873162627
+sushi 	Anytime and everytime I find myself in the neighborhood I will go to Sushi Rose for fresh [[ sushi ]] and great portions all at a reasonable price .	positive	positive	0.998989284
+portions 	Anytime and everytime I find myself in the neighborhood I will go to Sushi Rose for fresh sushi and great [[ portions ]] all at a reasonable price .	positive	positive	0.999001443
+price 	Anytime and everytime I find myself in the neighborhood I will go to Sushi Rose for fresh sushi and great portions all at a reasonable [[ price ]] .	positive	positive	0.998928368
+food 	Great [[ food ]] but the service was dreadful !	positive	positive	0.99772805
+service 	Great food but the [[ service ]] was dreadful !	negative	negative	0.995803058
+portions of the food 	The [[ portions of the food ]] that came out were mediocre .	neutral	neutral	0.977211714
+waitress 's 	the two [[ waitress 's ]] looked like they had been sucking on lemons .	negative	negative	0.990251184
+staff memebers 	"From the beginning , we were met by friendly [[ staff memebers ]] , and the convienent parking at Chelsea Piers made it easy for us to get to the boat ."	positive	positive	0.998854041
+parking 	"From the beginning , we were met by friendly staff memebers , and the convienent [[ parking ]] at Chelsea Piers made it easy for us to get to the boat ."	positive	positive	0.99656266
+desserts 	We enjoyed ourselves thoroughly and will be going back for the [[ desserts ]] ....	positive	positive	0.779172719
+Desserts 	[[ Desserts ]] are almost incredible : my personal favorite is their Tart of the Day .	positive	positive	0.999038458
+Tart of the Day 	Desserts are almost incredible : my personal favorite is their [[ Tart of the Day ]] .	positive	positive	0.998298109
+food 	"The [[ food ]] was extremely tasty , creatively presented and the wine excellent ."	positive	positive	0.999067247
+wine 	"The food was extremely tasty , creatively presented and the [[ wine ]] excellent ."	positive	positive	0.999068797
+LASAGNA 	THE [[ LASAGNA ]] WAS PROBABLY THE BEST I HAVE TASTED .	positive	positive	0.998636901
+array of sushi 	Harumi Sushi has the freshest and most delicious [[ array of sushi ]] in NYC .	positive	positive	0.999083996
+cuisine 	"I highly recommend it for not just its superb [[ cuisine ]] , but also for its friendly owners and staff ."	positive	positive	0.998920918
+owners 	"I highly recommend it for not just its superb cuisine , but also for its friendly [[ owners ]] and staff ."	positive	positive	0.998949587
+staff 	"I highly recommend it for not just its superb cuisine , but also for its friendly owners and [[ staff ]] ."	positive	positive	0.998955846
+indian food 	"If you 're craving some serious [[ indian food ]] and desire a cozy ambiance , this is quite and exquisite choice ."	positive	positive	0.998494744
+ambiance 	"If you 're craving some serious indian food and desire a cozy [[ ambiance ]] , this is quite and exquisite choice ."	positive	positive	0.999038935
+food 	I definitely enjoyed the [[ food ]] as well .	positive	positive	0.998824656
+service 	"It was pleasantly uncrowded , the [[ service ]] was delightful , the garden adorable , the food ( from appetizers to entrees ) was delectable ."	positive	positive	0.999053299
+garden 	"It was pleasantly uncrowded , the service was delightful , the [[ garden ]] adorable , the food ( from appetizers to entrees ) was delectable ."	positive	positive	0.999041975
+food 	"It was pleasantly uncrowded , the service was delightful , the garden adorable , the [[ food ]] ( from appetizers to entrees ) was delectable ."	positive	positive	0.999066532
+appetizers 	"It was pleasantly uncrowded , the service was delightful , the garden adorable , the food ( from [[ appetizers ]] to entrees ) was delectable ."	positive	positive	0.996809185
+entrees 	"It was pleasantly uncrowded , the service was delightful , the garden adorable , the food ( from appetizers to [[ entrees ]] ) was delectable ."	positive	positive	0.998890579
+food 	"The [[ food ]] is surprisingly good , and the decor is nice ."	positive	positive	0.999040067
+decor 	"The food is surprisingly good , and the [[ decor ]] is nice ."	positive	positive	0.999020576
+lunch 	How pretentious and inappropriate for MJ Grill to claim that it provides power [[ lunch ]] and dinners !	negative	positive	0.927855372
+dinners 	How pretentious and inappropriate for MJ Grill to claim that it provides power lunch and [[ dinners ]] !	negative	positive	0.989050508
+steaks 	Two wasted [[ steaks ]] -- what a crime !	negative	negative	0.99256438
+staff 	The [[ staff ]] should be a bit more friendly .	negative	positive	0.994587183
+meatball parm 	I think the [[ meatball parm ]] is good .	positive	positive	0.998980582
+latin food 	"If you want good tasting , well seasoned [[ latin food ]] eat at Cabana and you ca n't go wrong ."	positive	positive	0.998420954
+taglierini with truffles 	Definitely try the [[ taglierini with truffles ]] - it was incredible .	positive	positive	0.999113381
+staff 	"Also , the [[ staff ]] is very attentive and really personable ."	positive	positive	0.998984873
+gnocchi 	The [[ gnocchi ]] literally melts in your mouth !	positive	positive	0.998830974
+staff 	Had a great experience at Trio ... [[ staff ]] was pleasant ; food was tasty and large in portion size - I would highly recommend the portobello / gorgonzola / sausage appetizer and the lobster risotto .	positive	positive	0.99906522
+food 	Had a great experience at Trio ... staff was pleasant ; [[ food ]] was tasty and large in portion size - I would highly recommend the portobello / gorgonzola / sausage appetizer and the lobster risotto .	positive	positive	0.999121964
+portion size 	Had a great experience at Trio ... staff was pleasant ; food was tasty and large in [[ portion size ]] - I would highly recommend the portobello / gorgonzola / sausage appetizer and the lobster risotto .	positive	positive	0.998817861
+portobello / gorgonzola / sausage appetizer 	Had a great experience at Trio ... staff was pleasant ; food was tasty and large in portion size - I would highly recommend the [[ portobello / gorgonzola / sausage appetizer ]] and the lobster risotto .	positive	positive	0.999027371
+lobster risotto 	Had a great experience at Trio ... staff was pleasant ; food was tasty and large in portion size - I would highly recommend the portobello / gorgonzola / sausage appetizer and the [[ lobster risotto ]] .	positive	positive	0.999118865
+Entrees 	"[[ Entrees ]] include classics like lasagna , fettuccine Alfredo and chicken parmigiana ."	neutral	positive	0.9986099
+lasagna 	"Entrees include classics like [[ lasagna ]] , fettuccine Alfredo and chicken parmigiana ."	neutral	positive	0.997917473
+fettuccine Alfredo 	"Entrees include classics like lasagna , [[ fettuccine Alfredo ]] and chicken parmigiana ."	neutral	positive	0.997572839
+chicken parmigiana 	"Entrees include classics like lasagna , fettuccine Alfredo and [[ chicken parmigiana ]] ."	neutral	positive	0.997522175
+food 	"The [[ food ]] is good , the teriyaki I recommend ."	positive	positive	0.999089479
+teriyaki 	"The food is good , the [[ teriyaki ]] I recommend ."	positive	positive	0.998975754
+Meal 	[[ Meal ]] was very expensive for what you get .	negative	negative	0.996248662
+Peanut Butter Sorbet 	Try the [[ Peanut Butter Sorbet ]] and the pizza with soy cheese !	positive	positive	0.998928726
+pizza with soy cheese 	Try the Peanut Butter Sorbet and the [[ pizza with soy cheese ]] !	positive	positive	0.999003708
+food 	"Good [[ food ]] at the right price , what more can you ask for ."	positive	positive	0.998859763
+price 	"Good food at the right [[ price ]] , what more can you ask for ."	positive	positive	0.998763084
+food 	"The [[ food ]] is top notch , the service is attentive , and the atmosphere is great ."	positive	positive	0.99907124
+service 	"The food is top notch , the [[ service ]] is attentive , and the atmosphere is great ."	positive	positive	0.999056995
+atmosphere 	"The food is top notch , the service is attentive , and the [[ atmosphere ]] is great ."	positive	positive	0.999076605
+food 	"Great [[ food ]] , great waitstaff , great atmosphere , and best of all GREAT beer !"	positive	positive	0.999055684
+waitstaff 	"Great food , great [[ waitstaff ]] , great atmosphere , and best of all GREAT beer !"	positive	positive	0.999055207
+atmosphere 	"Great food , great waitstaff , great [[ atmosphere ]] , and best of all GREAT beer !"	positive	positive	0.999040186
+beer 	"Great food , great waitstaff , great atmosphere , and best of all GREAT [[ beer ]] !"	positive	positive	0.999034286
+food 	this is still one of my most favorite restaurants in the area the [[ food ]] is inexpensive but very good ( kimono shrimp special was excellent ) and has a great atmosphere .	positive	positive	0.999112546
+kimono shrimp special 	this is still one of my most favorite restaurants in the area the food is inexpensive but very good ( [[ kimono shrimp special ]] was excellent ) and has a great atmosphere .	positive	positive	0.999169588
+atmosphere 	this is still one of my most favorite restaurants in the area the food is inexpensive but very good ( kimono shrimp special was excellent ) and has a great [[ atmosphere ]] .	positive	positive	0.999094129
+menu 	The [[ menu ]] is interesting and quite reasonably priced .	positive	positive	0.999069512
+priced 	The menu is interesting and quite reasonably [[ priced ]] .	positive	positive	0.999021769
+food 	The [[ food ]] was delicious and clearly fresh ingredients were used .	positive	positive	0.999110401
+ingredients 	The food was delicious and clearly fresh [[ ingredients ]] were used .	positive	positive	0.99890697
+food 	This made it obvious that the [[ food ]] was n't cooked fresh ; it was obviously made before hand and then reheated .	negative	negative	0.997170627
+Appetizer 	[[ Appetizer ]] are excellent here ; you can make a great ( and inexpensive ) meal out of them .	positive	positive	0.999029517
+meal 	Appetizer are excellent here ; you can make a great ( and inexpensive ) [[ meal ]] out of them .	positive	positive	0.998863578
+spicy mussels 	The [[ spicy mussels ]] are a highlight .	positive	positive	0.998950601
+Onion Rings 	Also get the [[ Onion Rings ]] -- best we 've ever had .	positive	positive	0.998811245
+food 	"However , being foodies , we were utterly disappointed with the [[ food ]] ."	negative	negative	0.997095823
+portions 	"Huge [[ portions ]] , great and attentive service , and pretty good prices ."	positive	positive	0.999044001
+service 	"Huge portions , great and attentive [[ service ]] , and pretty good prices ."	positive	positive	0.999059856
+prices 	"Huge portions , great and attentive service , and pretty good [[ prices ]] ."	positive	positive	0.999044359
+service 	I was highly disappointed by their [[ service ]] and food .	negative	negative	0.996679306
+food 	I was highly disappointed by their service and [[ food ]] .	negative	negative	0.996786356
+waiter 	"I complained to the [[ waiter ]] and then to the manager , but the intensity of rudeness from them just went up ."	negative	negative	0.965914607
+manager 	"I complained to the waiter and then to the [[ manager ]] , but the intensity of rudeness from them just went up ."	negative	negative	0.994917393
+food 	The [[ food ]] is great and the milkshakes are even better !	positive	positive	0.9990834
+milkshakes 	The food is great and the [[ milkshakes ]] are even better !	positive	positive	0.999094725
+mushroom barley soup 	the [[ mushroom barley soup ]] is amazing .	positive	positive	0.999131739
+food 	"I 'm glad I did as the [[ food ]] was very good and the staff was friendly , courteous and efficient ."	positive	positive	0.999071956
+staff 	"I 'm glad I did as the food was very good and the [[ staff ]] was friendly , courteous and efficient ."	positive	positive	0.99901855
+duck 	Their [[ duck ]] here is also absolutely delicious .	positive	positive	0.999023795
+drinks 	"While it was large and a bit noisy , the [[ drinks ]] were fantastic , and the food was superb ."	positive	positive	0.999081373
+food 	"While it was large and a bit noisy , the drinks were fantastic , and the [[ food ]] was superb ."	positive	positive	0.999097824
+curried casseroles 	One caveat : Some of the [[ curried casseroles ]] can be a trifle harsh .	negative	negative	0.994849741
+food 	The [[ food ]] was almost always EXCELLENT .	positive	positive	0.99897325
+taste 	I was pleasently surprised at the [[ taste ]] .	positive	positive	0.997493505
+seafood 	"A nice space , as long as it does n't get too crowded and a singleminded devotion to its chosen cuisine make Mare a great choice for [[ seafood ]] lovers ."	positive	positive	0.997910202
+cuisine 	"A nice space , as long as it does n't get too crowded and a singleminded devotion to its chosen [[ cuisine ]] make Mare a great choice for seafood lovers ."	positive	positive	0.998977661
+orange donut 	I never had an [[ orange donut ]] before so I gave it a shot .	neutral	neutral	0.992256761
+atmosphere 	"they really provide a relaxing , laid - back [[ atmosphere ]] ."	positive	positive	0.999019027
+meats 	This particular location certainly uses substandard [[ meats ]] .	negative	negative	0.99210006
+Management 	The [[ Management ]] was less than accomodating .	negative	negative	0.997204065
+ambience 	The [[ ambience ]] is also more laid - back and relaxed .	positive	positive	0.998963237
+teas 	the [[ teas ]] are great and all the sweets are homemade .	positive	positive	0.999105513
+sweets 	the teas are great and all the [[ sweets ]] are homemade .	positive	positive	0.999014378
+mojitos 	[[ mojitos ]] and the service are the best part in there	positive	positive	0.998985708
+service 	mojitos and the [[ service ]] are the best part in there	positive	positive	0.998755217
+Sandwiches 	"[[ Sandwiches ]] , burgers and salads , like the lemon - dressed cobb , are classic successes ."	positive	positive	0.99575609
+burgers 	"Sandwiches , [[ burgers ]] and salads , like the lemon - dressed cobb , are classic successes ."	positive	positive	0.997473657
+salads 	"Sandwiches , burgers and [[ salads ]] , like the lemon - dressed cobb , are classic successes ."	positive	positive	0.997699797
+lemon - dressed cobb 	"Sandwiches , burgers and salads , like the [[ lemon - dressed cobb ]] , are classic successes ."	positive	positive	0.997470856
+design 	The [[ design ]] is very intimate and romantic .	positive	positive	0.998665929
+food 	The [[ food ]] was wonderful and imaginative .	positive	positive	0.999104321
+staff 	The [[ staff ]] is very sharp and they look good too .	positive	positive	0.99902761
+taste 	The worst though was the [[ taste ]] .	negative	negative	0.995844305
+fajita 	The [[ fajita ]] we tried was tasteless and burned and the mole sauce was way too sweet .	negative	negative	0.996646106
+mole sauce 	The fajita we tried was tasteless and burned and the [[ mole sauce ]] was way too sweet .	negative	negative	0.996499538
+roasted chickens 	Stay with the [[ roasted chickens ]] and you 'll be fine .	positive	positive	0.995820761
+atmosphere 	"The [[ atmosphere ]] is warm , comfortable , artsy and sexy ."	positive	positive	0.999055564
+food 	"The [[ food ]] is great ( big selection , reasonable prices ) and the drinks are really good ."	positive	positive	0.999065578
+selection 	"The food is great ( big [[ selection ]] , reasonable prices ) and the drinks are really good ."	positive	positive	0.99884063
+prices 	"The food is great ( big selection , reasonable [[ prices ]] ) and the drinks are really good ."	positive	positive	0.998913169
+drinks 	"The food is great ( big selection , reasonable prices ) and the [[ drinks ]] are really good ."	positive	positive	0.999064386
+steak 	The [[ steak ]] melted in my mouth .	positive	positive	0.986439347
+waiters 	"The food did take a few extra minutes to come , but the cute [[ waiters ]] ' jokes and friendliness made up for it ."	positive	positive	0.998904467
+food 	"The [[ food ]] did take a few extra minutes to come , but the cute waiters ' jokes and friendliness made up for it ."	neutral	negative	0.995308459
+priced 	"Most importantly , it is reasonably [[ priced ]] ."	positive	positive	0.998791635
+selection of food 	"The [[ selection of food ]] is excellent ( I 'm not used to having much choice at restaurants ) , and the atmosphere is great ."	positive	positive	0.999124825
+atmosphere 	"The selection of food is excellent ( I 'm not used to having much choice at restaurants ) , and the [[ atmosphere ]] is great ."	positive	positive	0.999052823
+dessert 	"Only suggestion is that you skip the [[ dessert ]] , it was overpriced and fell short on taste ."	negative	negative	0.996657372
+taste 	"Only suggestion is that you skip the dessert , it was overpriced and fell short on [[ taste ]] ."	negative	negative	0.994933903
+Food 	"[[ Food ]] was decent , but not great ."	positive	neutral	0.99257201
+hot dog 	i do nt know what some people who rave about this [[ hot dog ]] are talking about .	negative	negative	0.960505128
+bar 	it is a hidden delight complete with a quaint [[ bar ]] and good food .	positive	positive	0.999020696
+food 	it is a hidden delight complete with a quaint bar and good [[ food ]] .	positive	positive	0.999068558
+waiters 	The [[ waiters ]] ALWAYS look angry and even ignore their high - tipping regulars .	negative	negative	0.997646868
+atmosphere 	"the [[ atmosphere ]] is very nice , and a welcome escape from the rest of the SI mall ."	positive	positive	0.999091983
+food 	"Yes , they 're a bit more expensive then typical , but then again , so is their [[ food ]] ."	positive	positive	0.983819306
+wraps 	"I can say that the [[ wraps ]] , burgers and salads were all fresh , tasty and the mango margareta at $ 9 was WELL WORTH the money ."	positive	positive	0.999093056
+burgers 	"I can say that the wraps , [[ burgers ]] and salads were all fresh , tasty and the mango margareta at $ 9 was WELL WORTH the money ."	positive	positive	0.999118626
+salads 	"I can say that the wraps , burgers and [[ salads ]] were all fresh , tasty and the mango margareta at $ 9 was WELL WORTH the money ."	positive	positive	0.99913007
+mango margareta 	"I can say that the wraps , burgers and salads were all fresh , tasty and the [[ mango margareta ]] at $ 9 was WELL WORTH the money ."	positive	positive	0.999122083
+prices 	"Anywhere else , the [[ prices ]] would be 3x as high !"	positive	negative	0.995488346
+service 	The [[ service ]] we experienced was friendly and good .	positive	positive	0.998956442
+waiter 	Our [[ waiter ]] was friendly and it is a shame that he did nt have a supportive staff to work with .	positive	positive	0.998810053
+staff 	Our waiter was friendly and it is a shame that he did nt have a supportive [[ staff ]] to work with .	negative	negative	0.926652491
+folding chair 	The [[ folding chair ]] I was seated at was uncomfortable .	negative	negative	0.996903837
+Service 	[[ Service ]] was among the best I have ever had in NYC .	positive	positive	0.998533964
+fettucino alfredo 	The [[ fettucino alfredo ]] was amazing .	positive	positive	0.999129832
+food 	The [[ food ]] was very good and I was pleasantly surprised to see so many vegan options .	positive	positive	0.999060333
+vegan options 	The food was very good and I was pleasantly surprised to see so many [[ vegan options ]] .	positive	positive	0.994724572
+Indian food 	I know real [[ Indian food ]] and this was n't it .	negative	neutral	0.981840312
+Smoked Trout 	"Be sure to try the [[ Smoked Trout ]] ... Lamb Chops , Veal Chops , Rabbit , the potato gratin , on and on and on ..."	positive	positive	0.997042954
+Lamb Chops 	"Be sure to try the Smoked Trout ... [[ Lamb Chops ]] , Veal Chops , Rabbit , the potato gratin , on and on and on ..."	positive	positive	0.998724759
+Veal Chops 	"Be sure to try the Smoked Trout ... Lamb Chops , [[ Veal Chops ]] , Rabbit , the potato gratin , on and on and on ..."	positive	positive	0.998578429
+Rabbit 	"Be sure to try the Smoked Trout ... Lamb Chops , Veal Chops , [[ Rabbit ]] , the potato gratin , on and on and on ..."	positive	positive	0.998529196
+potato gratin 	"Be sure to try the Smoked Trout ... Lamb Chops , Veal Chops , Rabbit , the [[ potato gratin ]] , on and on and on ..."	positive	positive	0.998431265
+chef 	"Even when the [[ chef ]] is not in the house , the food and service are right on target ."	neutral	positive	0.978726864
+food 	"Even when the chef is not in the house , the [[ food ]] and service are right on target ."	positive	positive	0.998952031
+service 	"Even when the chef is not in the house , the food and [[ service ]] are right on target ."	positive	positive	0.998948634
+eggs benedict 	Everything from the [[ eggs benedict ]] to the mussels and even the hamburger were done well and very tasty .	positive	positive	0.999053657
+mussels 	Everything from the eggs benedict to the [[ mussels ]] and even the hamburger were done well and very tasty .	positive	positive	0.999108851
+hamburger 	Everything from the eggs benedict to the mussels and even the [[ hamburger ]] were done well and very tasty .	positive	positive	0.999037504
+waiters 	"The [[ waiters ]] were very professional , courteous and attentive ."	positive	positive	0.999022365
+falafal 	The [[ falafal ]] was rather over cooked and dried but the chicken was fine .	negative	negative	0.996727467
+chicken 	The falafal was rather over cooked and dried but the [[ chicken ]] was fine .	positive	positive	0.998850822
+grand marnier shrimp 	"I highly reccomend the [[ grand marnier shrimp ]] , it 's insanely good ."	positive	positive	0.999038219
+food 	"We been there and we really enjoy the [[ food ]] , was areally great food , and the service was really good ."	positive	positive	0.999060929
+food 	"We been there and we really enjoy the food , was areally great [[ food ]] , and the service was really good ."	positive	positive	0.999064982
+service 	"We been there and we really enjoy the food , was areally great food , and the [[ service ]] was really good ."	positive	positive	0.999055922
+Desserts 	[[ Desserts ]] include flan and sopaipillas .	neutral	positive	0.808986545
+flan 	Desserts include [[ flan ]] and sopaipillas .	neutral	positive	0.763745666
+sopaipillas 	Desserts include flan and [[ sopaipillas ]] .	neutral	positive	0.658844233
+portions 	I was starving and the small [[ portions ]] were driving me crazy !	negative	negative	0.995419502
+wait staff 	The [[ wait staff ]] was loud and inconsiderate .	negative	negative	0.995355368
+food 	"However , the [[ food ]] and service and dramatically lacking ."	negative	negative	0.995592654
+service 	"However , the food and [[ service ]] and dramatically lacking ."	negative	negative	0.995704353
+sushi 	The [[ sushi ]] is cut in blocks bigger than my cell phone .	negative	negative	0.980121851
+service 	"The [[ service ]] is great , my soup always arrives nice and hot ."	positive	positive	0.999088883
+soup 	"The service is great , my [[ soup ]] always arrives nice and hot ."	positive	positive	0.999084711
+crepes 	It had been awhile and I forgot just how delicious [[ crepes ]] can be .	positive	positive	0.99721235
+desserts 	Montparnasse 's [[ desserts ]] --especially the silken creme brulee and paper - thin apple tart --are good enough on their own to make the restaurant worth the trip .	positive	positive	0.999068797
+creme brulee 	Montparnasse 's desserts --especially the silken [[ creme brulee ]] and paper - thin apple tart --are good enough on their own to make the restaurant worth the trip .	positive	positive	0.999064982
+apple tart 	Montparnasse 's desserts --especially the silken creme brulee and paper - thin [[ apple tart ]] --are good enough on their own to make the restaurant worth the trip .	positive	positive	0.99896419
+shrimp creole 	i had a delicious [[ shrimp creole ]] .	positive	positive	0.999117792
+chicken dinner 	The [[ chicken dinner ]] was real good .	positive	positive	0.999087572
+chili signed food items 	Beware of the [[ chili signed food items ]] not unless you want to call the fire department to douse the flames in your mouth .	negative	negative	0.960730612
+decor 	The [[ decor ]] is designed in a contemporary Japanese style restaurant .	neutral	positive	0.995300174
+food 	but the [[ food ]] was delicious .	positive	positive	0.999017715
+coconut rice 	"Try the ribs , sizzling beef and couple it with [[ coconut rice ]] ."	positive	neutral	0.79756701
+ribs 	"Try the [[ ribs ]] , sizzling beef and couple it with coconut rice ."	positive	positive	0.997000396
+beef 	"Try the ribs , sizzling [[ beef ]] and couple it with coconut rice ."	positive	positive	0.995417714
+avocado salad 	The [[ avocado salad ]] is a personal fave .	positive	positive	0.996852338
+honey BBQ rib tips 	"And , the [[ honey BBQ rib tips ]] are yummy !"	positive	positive	0.99909544
+Chinese food 	The BEST [[ Chinese food ]] Uptown !	positive	positive	0.999010444
+Service 	[[ Service ]] is known for bending over backwards to make everyone happy .	positive	positive	0.993728518
+staff 	The [[ staff ]] is very friendly .	positive	positive	0.999036193
+Waiters 	[[ Waiters ]] are very friendly and the pasta is out of this world .	positive	positive	0.999074221
+pasta 	Waiters are very friendly and the [[ pasta ]] is out of this world .	positive	positive	0.999068797
+wine list 	Great [[ wine list ]] and great cocktail menu .	positive	positive	0.999075532
+cocktail menu 	Great wine list and great [[ cocktail menu ]] .	positive	positive	0.999061286
+crab cakes 	The [[ crab cakes ]] are delicious and the BBQ rib was perfect .	positive	positive	0.999100566
+BBQ rib 	The crab cakes are delicious and the [[ BBQ rib ]] was perfect .	positive	positive	0.999111354
+food 	"The [[ food ]] is wonderful , artfully done and simply delicious ."	positive	positive	0.999072909
+service 	Tiny restaurant with very fast [[ service ]] .	positive	negative	0.607293189
+service 	My husband and I have been there at least 6 times and we 've always been given the highest [[ service ]] and often free desserts .	positive	positive	0.998903751
+desserts 	My husband and I have been there at least 6 times and we 've always been given the highest service and often free [[ desserts ]] .	positive	positive	0.998869002
+atmosphere 	"A beautiful [[ atmosphere ]] , perfect for drinks and/or appetizers ."	positive	positive	0.999025226
+drinks 	"A beautiful atmosphere , perfect for [[ drinks ]] and/or appetizers ."	neutral	positive	0.993891716
+appetizers 	"A beautiful atmosphere , perfect for drinks and/or [[ appetizers ]] ."	neutral	positive	0.893701911
+pizza 	They make the best [[ pizza ]] in New Jersey .	positive	positive	0.998938859
+service 	"What a difference , the [[ service ]] was very comforting and the food was better than average , but what really standed out was such a dynamic and extensive beer list ."	positive	positive	0.998838603
+food 	"What a difference , the service was very comforting and the [[ food ]] was better than average , but what really standed out was such a dynamic and extensive beer list ."	positive	positive	0.998478711
+beer list 	"What a difference , the service was very comforting and the food was better than average , but what really standed out was such a dynamic and extensive [[ beer list ]] ."	positive	positive	0.99897027
+chinese food 	"Frankly , the [[ chinese food ]] here is something I can make better at home ."	negative	positive	0.997929454
+waiter 	There was only one [[ waiter ]] for the whole restaurant upstairs .	neutral	negative	0.995055318
+scallops 	We started with the [[ scallops ]] and asparagus and also had the soft shell crab as well as the cheese plate .	neutral	neutral	0.959620714
+asparagus 	We started with the scallops and [[ asparagus ]] and also had the soft shell crab as well as the cheese plate .	neutral	neutral	0.973025203
+soft shell crab 	We started with the scallops and asparagus and also had the [[ soft shell crab ]] as well as the cheese plate .	neutral	positive	0.978543162
+cheese plate 	We started with the scallops and asparagus and also had the soft shell crab as well as the [[ cheese plate ]] .	neutral	neutral	0.902457237
+service 	"Not to be overlooked , the [[ service ]] is excellent ."	positive	positive	0.99895668
+hotdogs 	this without question is one of the worst [[ hotdogs ]] i have ever had .	negative	negative	0.99643898
+staff 	"The [[ staff ]] is unbelievably friendly , and I dream about their Saag gosht ... so good ."	positive	positive	0.999066412
+Saag gosht 	"The staff is unbelievably friendly , and I dream about their [[ Saag gosht ]] ... so good ."	positive	positive	0.999110639
+garlic knots 	I also recommend the [[ garlic knots ]] .	positive	positive	0.997925162
+Indian food 	Best [[ Indian food ]] I have ever eaten .	positive	positive	0.998577714
+pizza 	This place has the best [[ pizza ]] .	positive	positive	0.999032974
+music 	The [[ music ]] which is sometimes a little too heavy for my taste .	negative	negative	0.99715519
+service 	The [[ service ]] is excellent and always informative without an air .	positive	positive	0.999007642
+owner 	The [[ owner ]] and staff go to great lengths to make you feel comfortable .	positive	positive	0.998776972
+staff 	The owner and [[ staff ]] go to great lengths to make you feel comfortable .	positive	positive	0.998643219
+sushi 	The [[ sushi ]] is always fresh and yummy and the menu is pretty varied .	positive	positive	0.999113023
+menu 	The sushi is always fresh and yummy and the [[ menu ]] is pretty varied .	positive	positive	0.998502731
+food 	"The [[ food ]] was great - sushi was good , but the cooked food amazed us ."	positive	positive	0.998919964
+sushi 	"The food was great - [[ sushi ]] was good , but the cooked food amazed us ."	positive	positive	0.99874413
+cooked food 	"The food was great - sushi was good , but the [[ cooked food ]] amazed us ."	positive	negative	0.974727809
+dinner specials 	their [[ dinner specials ]] are fantastic .	positive	positive	0.999119341
+food 	"Great [[ food ]] , great drinks , nice dining atmosphere ."	positive	positive	0.999066412
+drinks 	"Great food , great [[ drinks ]] , nice dining atmosphere ."	positive	positive	0.999075055
+dining atmosphere 	"Great food , great drinks , nice [[ dining atmosphere ]] ."	positive	positive	0.999062598
+price 	"For the [[ price ]] you pay for the food here , you 'd expect it to be at least on par with other Japanese restaurants ."	negative	negative	0.942246675
+food 	"For the price you pay for the [[ food ]] here , you 'd expect it to be at least on par with other Japanese restaurants ."	negative	neutral	0.445415109
+Food portion 	[[ Food portion ]] was SMALL and below average .	negative	negative	0.996665895
+chairs 	Sit back in one of those comfortable [[ chairs ]] .	positive	positive	0.997642219
+Tacos Pastor 	My favs here are the [[ Tacos Pastor ]] and the Tostada de Tinga ...	positive	positive	0.995696664
+Tostada de Tinga 	My favs here are the Tacos Pastor and the [[ Tostada de Tinga ]] ...	positive	positive	0.995978832
+bartenders 	"The [[ bartenders ]] and the managers are really nice and the decor is very comfy and laid - back , all the while being trendy ."	positive	positive	0.999105513
+managers 	"The bartenders and the [[ managers ]] are really nice and the decor is very comfy and laid - back , all the while being trendy ."	positive	positive	0.999054134
+decor 	"The bartenders and the managers are really nice and the [[ decor ]] is very comfy and laid - back , all the while being trendy ."	positive	positive	0.999047697
+hot and sour soup 	"For a savory take on the soup and sandwich meal , try the [[ hot and sour soup ]] ."	positive	positive	0.998835027
+soup and sandwich meal 	"For a savory take on the [[ soup and sandwich meal ]] , try the hot and sour soup ."	positive	neutral	0.915547609
+drinks 	"This bar has it all - great [[ drinks ]] , cool atmosphere , excellent service and delicious food ."	positive	positive	0.99905616
+atmosphere 	"This bar has it all - great drinks , cool [[ atmosphere ]] , excellent service and delicious food ."	positive	positive	0.999042094
+service 	"This bar has it all - great drinks , cool atmosphere , excellent [[ service ]] and delicious food ."	positive	positive	0.999049127
+food 	"This bar has it all - great drinks , cool atmosphere , excellent service and delicious [[ food ]] ."	positive	positive	0.999056399
+chick peas with shrimp ( appetizer ) 	"Also , the [[ chick peas with shrimp ( appetizer ) ]] is divine ."	positive	positive	0.999112308
+service 	"Finally , I got sick of the bad [[ service ]] , obnoxious smirks , and snotty back talk ."	negative	negative	0.996183097
+lamb 	We ordered [[ lamb ]] which was perfectly cooked and tasted awesome .	positive	positive	0.999061286
+soft shell crab sandwich with fries 	i especially like their [[ soft shell crab sandwich with fries ]] .	positive	positive	0.999064982
+hong kong - style food 	"if you 're looking for authentic [[ hong kong - style food ]] , look no further ."	positive	positive	0.990557075
+food 	good [[ food ]] good wine that 's it .	positive	positive	0.998038232
+wine 	good food good [[ wine ]] that 's it .	positive	positive	0.997693002
+staff 	The [[ staff ]] was extremely friendly and pleasant .	positive	positive	0.999024153
+kitchen food 	"While their [[ kitchen food ]] is delicious , their Sushi is out of this world ."	positive	positive	0.999097347
+Sushi 	"While their kitchen food is delicious , their [[ Sushi ]] is out of this world ."	positive	positive	0.999072075
+service 	"everything is scrumptious , from the excellent [[ service ]] by cute waitresses , to the extremely lush atmosphere ."	positive	positive	0.999031067
+waitresses 	"everything is scrumptious , from the excellent service by cute [[ waitresses ]] , to the extremely lush atmosphere ."	positive	positive	0.999051154
+atmosphere 	"everything is scrumptious , from the excellent service by cute waitresses , to the extremely lush [[ atmosphere ]] ."	positive	positive	0.999032259
+italian food 	"It 's traditional , simple [[ italian food ]] ."	positive	positive	0.998743594
+food 	"The [[ food ]] is all - around good , with the rolls usually excellent and the sushi / sashimi not quite on the same level ."	positive	positive	0.998985469
+rolls 	"The food is all - around good , with the [[ rolls ]] usually excellent and the sushi / sashimi not quite on the same level ."	positive	positive	0.998938739
+sushi / sashimi 	"The food is all - around good , with the rolls usually excellent and the [[ sushi / sashimi ]] not quite on the same level ."	neutral	negative	0.951389015
+sashimi 	( The [[ sashimi ]] is cut a little thinly .	negative	neutral	0.990654051
+price 	Could have had better for 1/3 the [[ price ]] in Chinatown .	negative	negative	0.701626003
+hot dogs 	"In addition to great [[ hot dogs ]] , DOTP has wonderful breakfast sandwiches that feature , in addition to great things like tator tots and English muffins , a delicious NJ - based pork product know to us Jersey girls and boys as Taylor ham ."	positive	positive	0.999080539
+breakfast sandwiches 	"In addition to great hot dogs , DOTP has wonderful [[ breakfast sandwiches ]] that feature , in addition to great things like tator tots and English muffins , a delicious NJ - based pork product know to us Jersey girls and boys as Taylor ham ."	positive	positive	0.99906224
+tator tots 	"In addition to great hot dogs , DOTP has wonderful breakfast sandwiches that feature , in addition to great things like [[ tator tots ]] and English muffins , a delicious NJ - based pork product know to us Jersey girls and boys as Taylor ham ."	positive	positive	0.999112427
+English muffins 	"In addition to great hot dogs , DOTP has wonderful breakfast sandwiches that feature , in addition to great things like tator tots and [[ English muffins ]] , a delicious NJ - based pork product know to us Jersey girls and boys as Taylor ham ."	positive	positive	0.999118745
+Taylor ham 	"In addition to great hot dogs , DOTP has wonderful breakfast sandwiches that feature , in addition to great things like tator tots and English muffins , a delicious NJ - based pork product know to us Jersey girls and boys as [[ Taylor ham ]] ."	positive	neutral	0.663166583
+pork product 	"In addition to great hot dogs , DOTP has wonderful breakfast sandwiches that feature , in addition to great things like tator tots and English muffins , a delicious NJ - based [[ pork product ]] know to us Jersey girls and boys as Taylor ham ."	positive	positive	0.999023795
+manager 	"Well , it happened because of a graceless [[ manager ]] and a rude bartender who had us waiting 20 minutes for drinks , and then tells us to chill out ."	negative	negative	0.997187436
+bartender 	"Well , it happened because of a graceless manager and a rude [[ bartender ]] who had us waiting 20 minutes for drinks , and then tells us to chill out ."	negative	negative	0.997527897
+drinks 	"Well , it happened because of a graceless manager and a rude bartender who had us waiting 20 minutes for [[ drinks ]] , and then tells us to chill out ."	neutral	neutral	0.997803986
+waiting 	"Well , it happened because of a graceless manager and a rude bartender who had us [[ waiting ]] 20 minutes for drinks , and then tells us to chill out ."	negative	negative	0.997444749
+service 	"Not only is the [[ service ]] great , but forming conversation around a table is so easy beacuse the atmosphere can be both romantic and comfortable ."	positive	positive	0.998859525
+atmosphere 	"Not only is the service great , but forming conversation around a table is so easy beacuse the [[ atmosphere ]] can be both romantic and comfortable ."	positive	positive	0.998993933
+green chillis 	"When the dish arrived it was blazing with [[ green chillis ]] , definitely not edible by a human ."	negative	negative	0.993584096
+dish 	"When the [[ dish ]] arrived it was blazing with green chillis , definitely not edible by a human ."	negative	negative	0.986958086
+service 	The absolute worst [[ service ]] I 've ever experienced and the food was below average ( when they actually gave people the meals they ordered ) .	negative	negative	0.9970842
+food 	The absolute worst service I 've ever experienced and the [[ food ]] was below average ( when they actually gave people the meals they ordered ) .	negative	negative	0.997451723
+meals 	The absolute worst service I 've ever experienced and the food was below average ( when they actually gave people the [[ meals ]] they ordered ) .	neutral	neutral	0.99666059
+lunch 	It 's about $ 7 for [[ lunch ]] and they have take - out or dine - in .	neutral	neutral	0.959993124
+take - out 	It 's about $ 7 for lunch and they have [[ take - out ]] or dine - in .	neutral	neutral	0.994738758
+dine - in 	It 's about $ 7 for lunch and they have take - out or [[ dine - in ]] .	neutral	neutral	0.995270073
+food 	Be sure to accompany your [[ food ]] with one of their fresh juice concoctions .	neutral	neutral	0.994285524
+fresh juice concoctions 	Be sure to accompany your food with one of their [[ fresh juice concoctions ]] .	positive	positive	0.997395754
+food 	The [[ food ]] is great and the prices are reasonable .	positive	positive	0.999055564
+prices 	The food is great and the [[ prices ]] are reasonable .	positive	positive	0.998953819
+place 	"The [[ place ]] is clean , and if you like soul food , then this is the place to be !"	positive	positive	0.999009728
+soul food 	"The place is clean , and if you like [[ soul food ]] , then this is the place to be !"	positive	positive	0.998329699
+roast chicken 	I had [[ roast chicken ]] and a salad .	neutral	neutral	0.996522427
+salad 	I had roast chicken and a [[ salad ]] .	neutral	neutral	0.996907532
+chicken with avocado 	They have a very good [[ chicken with avocado ]] and good tuna as well .	positive	positive	0.998840153
+tuna 	They have a very good chicken with avocado and good [[ tuna ]] as well .	positive	positive	0.99888891
+meals 	But the [[ meals ]] were terrible .	negative	negative	0.995287299
+chicken 	My [[ chicken ]] was completely dried out and on the cold side and the sauce was not very flavorful .	negative	negative	0.996679187
+sauce 	My chicken was completely dried out and on the cold side and the [[ sauce ]] was not very flavorful .	negative	negative	0.996397316
+Malted Milk Ball Gelato 	[[ Malted Milk Ball Gelato ]] - have you ever in your life heard of anything so ridiculously wonderful ?	positive	positive	0.73223561
+meal 	Way too much money for such a terrible [[ meal ]] .	negative	negative	0.989814639
+service 	"However , the [[ service ]] is absolutely horrible ."	negative	negative	0.996452451
+bar service 	A con was the slow [[ bar service ]] .	negative	negative	0.996199429
+Dessert 	[[ Dessert ]] was also to die for !	positive	positive	0.995612502
+service 	"BTW , the [[ service ]] is very good ."	positive	positive	0.998930633
+black vinegar 	It 's eaten with [[ black vinegar ]] and shredded ginger .	neutral	neutral	0.984872043
+shredded ginger 	It 's eaten with black vinegar and [[ shredded ginger ]] .	neutral	neutral	0.981140733
+lighting 	"The unattractive [[ lighting ]] made me want to gag , the food was overpriced , there was the most awful disco pop duo performing - and my escargot looked like it might crawl off the plate ."	negative	negative	0.995488942
+food 	"The unattractive lighting made me want to gag , the [[ food ]] was overpriced , there was the most awful disco pop duo performing - and my escargot looked like it might crawl off the plate ."	negative	negative	0.996040344
+disco pop duo 	"The unattractive lighting made me want to gag , the food was overpriced , there was the most awful [[ disco pop duo ]] performing - and my escargot looked like it might crawl off the plate ."	negative	negative	0.995741487
+escargot 	"The unattractive lighting made me want to gag , the food was overpriced , there was the most awful disco pop duo performing - and my [[ escargot ]] looked like it might crawl off the plate ."	negative	negative	0.995365977
+place 	it is a cozy [[ place ]] to go with a couple of friends .	positive	positive	0.999026537
+service 	"The [[ service ]] is always great , and the owner walks around to make sure you enjoy ."	positive	positive	0.999064147
+owner 	"The service is always great , and the [[ owner ]] walks around to make sure you enjoy ."	positive	positive	0.998834312
+waiters 	because the [[ waiters ]] need SEVERE ATTITUE ADJUSTMENTS .	negative	negative	0.997104943
+food 	the [[ food ]] is delicious and highly recommended .	positive	positive	0.999074101
+waiter 	"When it came time to take the order the [[ waiter ]] gave us a hard time , walked away then came back with a paper and pen for us to write down what we wanted ... excuse me but is n't that his job ? ? ?"	negative	negative	0.997542977
+salads 	Dieters stick to [[ salads ]] or indulge in vegetarian platters .	positive	neutral	0.981511176
+vegetarian platters 	Dieters stick to salads or indulge in [[ vegetarian platters ]] .	positive	neutral	0.99082911
+meal 	So for a filling and healthy [[ meal ]] give it a go .	positive	positive	0.998559296
+food 	"Since I cook for a living , I 'm very fussy about the [[ food ]] I eat in restaurants ."	neutral	negative	0.832898974
+service 	The [[ service ]] was outstanding .	positive	positive	0.998845816
+pizza 	My friends and I stop here for [[ pizza ]] before hitting the Kips Bay movie theater .	neutral	neutral	0.997290134
+pizza 	We always enjoy the [[ pizza ]] .	positive	positive	0.998935997
+service 	The [[ service ]] is pretty good .	positive	positive	0.998363078
+chicken 	"Yum , the [[ chicken ]] is great here ."	positive	positive	0.999057472
+food 	"The [[ food ]] here was great , a treat from beginning to end ."	positive	positive	0.999080777
+host ( owner ) 	The [[ host ( owner ) ]] and servers are personable and caring .	positive	positive	0.996464074
+servers 	The host ( owner ) and [[ servers ]] are personable and caring .	positive	positive	0.998667479
+food 	"It 's just everything ... the [[ food ]] , the atmosphere ... the incrediby kind and gracious hostess ."	positive	positive	0.999081731
+atmosphere 	"It 's just everything ... the food , the [[ atmosphere ]] ... the incrediby kind and gracious hostess ."	positive	positive	0.999086857
+hostess 	"It 's just everything ... the food , the atmosphere ... the incrediby kind and gracious [[ hostess ]] ."	positive	positive	0.999031186
+food 	The [[ food ]] is very good and the service is great .	positive	positive	0.999081016
+service 	The food is very good and the [[ service ]] is great .	positive	positive	0.999047101
+Vietnamese Beef Noodle Soup 	I usually get one the [[ Vietnamese Beef Noodle Soup ]] .	neutral	neutral	0.993734777
+dining experience 	We were wondering why they were there to make our [[ dining experience ]] miserable ?	negative	negative	0.957093537
+Indian food 	"This place has the best [[ Indian food ]] in New York , hands down ."	positive	positive	0.998930037
+waiters 	The [[ waiters ]] are very friendly and helpful and if you frequent they will remember you .	positive	positive	0.999072552
+interior 	Intimate but charming [[ interior ]] with extremely friendly and attentive service .	positive	positive	0.998945057
+service 	Intimate but charming interior with extremely friendly and attentive [[ service ]] .	positive	positive	0.998994768
+food 	The [[ food ]] was as creative as the decor and both worked .	positive	positive	0.998735249
+decor 	The food was as creative as the [[ decor ]] and both worked .	positive	positive	0.998305082
+menu 	"The [[ menu ]] is great , with a good selection , and everything that I have tried is absolutely delicious ."	positive	positive	0.999095321
+selection 	"The menu is great , with a good [[ selection ]] , and everything that I have tried is absolutely delicious ."	positive	positive	0.999053419
+sauce 	The [[ sauce ]] is zesty and flavorful and the crust is nice and crispy .	positive	positive	0.999064863
+crust 	The sauce is zesty and flavorful and the [[ crust ]] is nice and crispy .	positive	positive	0.999050558
+sushi 	This place has the best [[ sushi ]] in the city .	positive	positive	0.999039173
+selection 	They have an excellent [[ selection ]] ( the rolls with crab are really great ) .	positive	positive	0.999030828
+rolls with crab 	They have an excellent selection ( the [[ rolls with crab ]] are really great ) .	positive	positive	0.999111235
+host 	"Everyone who works there ( the [[ host ]] , the bartender , the servers ) is so helpful ."	positive	positive	0.998981893
+bartender 	"Everyone who works there ( the host , the [[ bartender ]] , the servers ) is so helpful ."	positive	positive	0.99886775
+servers 	"Everyone who works there ( the host , the bartender , the [[ servers ]] ) is so helpful ."	positive	positive	0.998938978
+food 	And the [[ food ]] is fantastic .	positive	positive	0.999088407
+potato spinach gnocchi 	Favourites include : [[ potato spinach gnocchi ]] and the lamb .	positive	positive	0.998886287
+lamb 	Favourites include : potato spinach gnocchi and the [[ lamb ]] .	positive	positive	0.998830616
+lunch 	"Unfortunately , we chose this spot for [[ lunch ]] as we had done a lot of walking and ended up at the South St Seaport ."	neutral	neutral	0.996575773
+sandwiches 	But regulars know that the [[ sandwiches ]] are the real star here .	positive	positive	0.998845816
+port 	The skillfully chosen Portuguese cheese cart paired with quality [[ port ]] provides the perfect Iberian ending .	positive	positive	0.998999059
+Portuguese cheese cart 	The skillfully chosen [[ Portuguese cheese cart ]] paired with quality port provides the perfect Iberian ending .	positive	positive	0.999042094
+burger 	My friend had a [[ burger ]] and I had these wonderful blueberry pancakes .	neutral	positive	0.998089254
+blueberry pancakes 	My friend had a burger and I had these wonderful [[ blueberry pancakes ]] .	positive	positive	0.999085307
+food 	We were so happy with our [[ food ]] and were even more thrilled when we saw the bill .	positive	positive	0.998326004
+bill 	We were so happy with our food and were even more thrilled when we saw the [[ bill ]] .	positive	positive	0.96572113
+toppings 	"All [[ toppings ]] are so fresh you 'd think they had their own vegetable garden and the crust is so perfect , that one actually thinks of how it was made ."	positive	positive	0.999000251
+crust 	"All toppings are so fresh you 'd think they had their own vegetable garden and the [[ crust ]] is so perfect , that one actually thinks of how it was made ."	positive	positive	0.998989999
+service 	We 've always gotten amazing [[ service ]] and we love the food .	positive	positive	0.999023795
+food 	We 've always gotten amazing service and we love the [[ food ]] .	positive	positive	0.999064147
+waitstaff 	"The [[ waitstaff ]] is solicitous and friendly and always seems glad to see us , and the food is wonderful , if not stunningly creative ."	positive	positive	0.99905616
+food 	"The waitstaff is solicitous and friendly and always seems glad to see us , and the [[ food ]] is wonderful , if not stunningly creative ."	positive	positive	0.999095082
+lobster ravioli 	I 'm in love with the [[ lobster ravioli ]] !	positive	positive	0.999007285
+meal 	We came across this restaurant by accident while at a DUMBO art festival and thoroughly enjoyed our [[ meal ]] .	positive	positive	0.998890817
+Service 	"[[ Service ]] is excellent , no wait , and you get a lot for the price ."	positive	positive	0.999005735
+price 	"Service is excellent , no wait , and you get a lot for the [[ price ]] ."	positive	positive	0.9979406
+wait 	"Service is excellent , no [[ wait ]] , and you get a lot for the price ."	positive	positive	0.916843891
+food 	I thought the [[ food ]] is n't cheap at all compared to Chinatown .	negative	negative	0.99765563
+Coffee 	[[ Coffee ]] is a better deal than overpriced Cosi sandwiches .	positive	positive	0.967424989
+Cosi sandwiches 	Coffee is a better deal than overpriced [[ Cosi sandwiches ]] .	negative	neutral	0.544046819
+drink 	We did n't know if we should order a [[ drink ]] or leave ?	neutral	neutral	0.997617006
+prices 	") It 's not the best Japanese restaurant in the East Village , but it 's a pretty solid one for its modest [[ prices ]] , and worth repeat visits ."	positive	positive	0.998160183
+food 	The [[ food ]] is so good and so popular that waiting can really be a nightmare .	positive	positive	0.999047577
+waiting 	The food is so good and so popular that [[ waiting ]] can really be a nightmare .	negative	negative	0.995751143
+place 	First walking in the [[ place ]] seemed to have great ambience .	positive	positive	0.997192681
+ambience 	First walking in the place seemed to have great [[ ambience ]] .	positive	positive	0.998995364
+brunch 	I went to Kitchenette this weekend for [[ brunch ]] .	neutral	neutral	0.997336328
+food 	Even for two very hungry people there is plenty of [[ food ]] left to be taken home ( it reheats really well also ) .	positive	positive	0.995828927
+crust 	"Then they somehow made a dry and burnt [[ crust ]] , around a raw and cold inside ."	negative	negative	0.989337683
+food 	"It 's just good [[ food ]] , nothing more and that 's all we want !"	positive	positive	0.998784482
+cake 	Average [[ cake ]] that s been courted by a LOT of hype .	negative	negative	0.432959914
+dinner 	My wife and I recently visited the bistro for [[ dinner ]] and had a wonderful experience .	neutral	neutral	0.953104496
+SERVICE 	THE [[ SERVICE ]] IS PERFECT TOO NOTHING WRONG IN THIS ITALIAN / FRENCH RESTAURANT	positive	positive	0.999061882
+Delmonico steak 	The $ 72 [[ Delmonico steak ]] had to be sent back because it was not cooked to order .	negative	negative	0.99553138
+menu 	Everytime I go there I ca n't pick anything to eat and not because the [[ menu ]] is filled with great things to eat .	negative	positive	0.995542109
+rice 	Half a chicken with a mountain of [[ rice ]] and beans for $ 6.25 .	neutral	neutral	0.617385685
+beans 	Half a chicken with a mountain of rice and [[ beans ]] for $ 6.25 .	neutral	neutral	0.532677531
+chicken 	Half a [[ chicken ]] with a mountain of rice and beans for $ 6.25 .	neutral	neutral	0.759719014
+service 	"The [[ service ]] is really fast and friendly , and the value is great ."	positive	positive	0.999043167
+value 	"The service is really fast and friendly , and the [[ value ]] is great ."	positive	positive	0.99906379
+food 	We were very impressed with the [[ food ]] and value .	positive	positive	0.998907804
+value 	We were very impressed with the food and [[ value ]] .	positive	positive	0.998884857
+garlic soup 	You must try the [[ garlic soup ]] !	positive	positive	0.998415232
+falafel 	"Casablanca servces delicious [[ falafel ]] , tabouleh , humus and other Mediterranean delights , which are all very inexpensive ."	positive	positive	0.998867631
+tabouleh 	"Casablanca servces delicious falafel , [[ tabouleh ]] , humus and other Mediterranean delights , which are all very inexpensive ."	positive	positive	0.999021053
+humus 	"Casablanca servces delicious falafel , tabouleh , [[ humus ]] and other Mediterranean delights , which are all very inexpensive ."	positive	positive	0.999043524
+Mediterranean delights 	"Casablanca servces delicious falafel , tabouleh , humus and other [[ Mediterranean delights ]] , which are all very inexpensive ."	positive	positive	0.999046504
+pizza 's 	"The [[ pizza 's ]] are made fresh , crispy , and ready to serve ."	positive	positive	0.999011993
+Staff 	[[ Staff ]] is accomodating make sure you are satified .	positive	positive	0.995874465
+Chef 	[[ Chef ]] Waldy 's always measures up .	positive	positive	0.998315334
+sushi 	Reasonably priced with very fresh [[ sushi ]] .	positive	positive	0.999101162
+priced 	Reasonably [[ priced ]] with very fresh sushi .	positive	positive	0.998975754
+Seafood Paella for two 	Go for the [[ Seafood Paella for two ]] .	positive	positive	0.980281293
+apetizers 	All of the [[ apetizers ]] are good and the Sangria is very good .	positive	positive	0.999035239
+Sangria 	All of the apetizers are good and the [[ Sangria ]] is very good .	positive	positive	0.999076962
+service 	"The one positive thing I can say is that the [[ service ]] was prompt , we got seated right away and the server was very friendly ."	positive	positive	0.998832285
+server 	"The one positive thing I can say is that the service was prompt , we got seated right away and the [[ server ]] was very friendly ."	positive	positive	0.999055088
+staff 	The [[ staff ]] greeted me warmly at the door and I was seated promptly and the food was excellent .	positive	positive	0.998914719
+food 	The staff greeted me warmly at the door and I was seated promptly and the [[ food ]] was excellent .	positive	positive	0.99909842
+Service 	[[ Service ]] is usually pretty good .	positive	positive	0.994857669
+Host 	[[ Host ]] and Hostess was quite rude .	negative	negative	0.994768262
+Hostess 	Host and [[ Hostess ]] was quite rude .	negative	negative	0.994938612
+wait staff 	"the [[ wait staff ]] is very friendly , if your not rude or picky ....... our meal at Leon last weekend was great - ."	positive	positive	0.998731792
+meal 	"the wait staff is very friendly , if your not rude or picky ....... our [[ meal ]] at Leon last weekend was great - ."	positive	positive	0.998689234
+salmon dishes 	I recommend any of their [[ salmon dishes ]] ......	positive	positive	0.973603308
+foie gras 	The [[ foie gras ]] was sweet and luscious .	positive	positive	0.999070585
+menu 	"The [[ menu ]] , which changes seasonally , shows both regional and international influences ."	neutral	neutral	0.875676811
+mac cheese 	but their [[ mac cheese ]] was YUMMY !	positive	positive	0.999063313
+brunch menu 	their [[ brunch menu ]] had something for everyone .	positive	positive	0.973306239
+jazz singer 	[[ jazz singer ]] had a nice voice + she made us all get up to dance to shake some cals to eat some more .	positive	positive	0.998958826
+service 	They have very quick [[ service ]] which is great when you do n't have much time .	positive	positive	0.998847127
+food 	"The [[ food ]] is average : breakfast food , soups , salads , sandwiches , etc ."	neutral	neutral	0.99476862
+breakfast food 	"The food is average : [[ breakfast food ]] , soups , salads , sandwiches , etc ."	neutral	neutral	0.996072531
+soups 	"The food is average : breakfast food , [[ soups ]] , salads , sandwiches , etc ."	neutral	neutral	0.996674776
+salads 	"The food is average : breakfast food , soups , [[ salads ]] , sandwiches , etc ."	neutral	neutral	0.996647894
+sandwiches 	"The food is average : breakfast food , soups , salads , [[ sandwiches ]] , etc ."	neutral	neutral	0.997123182
+FOOD 	I WAS HIGHLY DISAPPOINTED BY THE [[ FOOD ]] .	negative	negative	0.997296393
+BANANA PUDDING 	"THE [[ BANANA PUDDING ]] THEY SERVE HAS NEVER SEEN AN OVEN , THE CRABCAKES ARE WAY OVER SALTED AND DON'T GET ME STARTED ON THE VERY GREASY MAC AND CHEESE ."	negative	positive	0.96998626
+CRABCAKES 	"THE BANANA PUDDING THEY SERVE HAS NEVER SEEN AN OVEN , THE [[ CRABCAKES ]] ARE WAY OVER SALTED AND DON'T GET ME STARTED ON THE VERY GREASY MAC AND CHEESE ."	negative	negative	0.995116234
+MAC AND CHEESE 	"THE BANANA PUDDING THEY SERVE HAS NEVER SEEN AN OVEN , THE CRABCAKES ARE WAY OVER SALTED AND DON'T GET ME STARTED ON THE VERY GREASY [[ MAC AND CHEESE ]] ."	negative	negative	0.996206999
+staff 	"The [[ staff ]] is arrogant , the prices are way high for Brooklyn ."	negative	negative	0.996902287
+prices 	"The staff is arrogant , the [[ prices ]] are way high for Brooklyn ."	negative	negative	0.996988833
+service 	the [[ service ]] is prompt friendly .	positive	positive	0.998916149
+food 	This is literally a hot spot when it comes to the [[ food ]] .	positive	positive	0.998726428
+downstairs bar scene 	The [[ downstairs bar scene ]] is very cool and chill ...	positive	positive	0.999043405
+food 	"The [[ food ]] was definitely good , but when all was said and done , I just could n't justify it for the price ( including 2 drinks , $ 100 / person ) ..."	positive	positive	0.998739183
+price 	"The food was definitely good , but when all was said and done , I just could n't justify it for the [[ price ]] ( including 2 drinks , $ 100 / person ) ..."	negative	negative	0.99401325
+drinks 	"The food was definitely good , but when all was said and done , I just could n't justify it for the price ( including 2 [[ drinks ]] , $ 100 / person ) ..."	neutral	neutral	0.995775163
+casual lunches 	I 've come here for [[ casual lunches ]] as well as for a friend 's birthday and I always enjoy myself .	neutral	positive	0.996747613
+Tequila 	If you are a [[ Tequila ]] fan you will not be disappointed .	positive	positive	0.968450606
+beer selection 	"Great [[ beer selection ]] too , something like 50 beers ."	positive	positive	0.998306513
+beers 	"Great beer selection too , something like 50 [[ beers ]] ."	neutral	positive	0.514929831
+delivary 	Not to sound too negative but be wary of the [[ delivary ]] .	negative	positive	0.923332036
+food 	"I found the [[ food ]] to be just as good as its owner , Da Silvano , just much less expensive ."	positive	positive	0.998570204
+owner 	"I found the food to be just as good as its [[ owner ]] , Da Silvano , just much less expensive ."	positive	positive	0.989052951
+homemade pastas 	They have [[ homemade pastas ]] of all kinds -- I recommend the gnocchi -- yum !	positive	positive	0.999036312
+gnocchi 	They have homemade pastas of all kinds -- I recommend the [[ gnocchi ]] -- yum !	positive	positive	0.999038219
+vegetable risotto 	"My [[ vegetable risotto ]] was burnt , and infused totally in a burnt flavor ."	negative	negative	0.996184289
+flavor 	"My vegetable risotto was burnt , and infused totally in a burnt [[ flavor ]] ."	negative	negative	0.996696591
+price 	The main draw of this place is the [[ price ]] .	positive	positive	0.950490177
+service 	How can hope to stay in business with [[ service ]] like this ?	negative	positive	0.862113833
+dinner 	"But [[ dinner ]] here is never disappointing , even if the prices are a bit over the top ."	positive	positive	0.997926235
+prices 	"But dinner here is never disappointing , even if the [[ prices ]] are a bit over the top ."	negative	negative	0.99123162
+sandwiches 	"Not only did they have amazing , [[ sandwiches ]] , soup , pizza etc , but their homemade sorbets are out of this world !"	positive	positive	0.998769581
+soup 	"Not only did they have amazing , sandwiches , [[ soup ]] , pizza etc , but their homemade sorbets are out of this world !"	positive	positive	0.998682678
+pizza 	"Not only did they have amazing , sandwiches , soup , [[ pizza ]] etc , but their homemade sorbets are out of this world !"	positive	positive	0.998820245
+homemade sorbets 	"Not only did they have amazing , sandwiches , soup , pizza etc , but their [[ homemade sorbets ]] are out of this world !"	positive	positive	0.998988926
+homemade Guacamole 	"the [[ homemade Guacamole ]] , the unbelievable entree , and thee most amazing deserts ."	positive	positive	0.999076128
+entree 	"the homemade Guacamole , the unbelievable [[ entree ]] , and thee most amazing deserts ."	positive	positive	0.999037147
+deserts 	"the homemade Guacamole , the unbelievable entree , and thee most amazing [[ deserts ]] ."	positive	positive	0.999013424
+sushi 	The [[ sushi ]] is reasonably priced and fresh .	positive	positive	0.999104083
+priced 	The sushi is reasonably [[ priced ]] and fresh .	positive	positive	0.999017715
+deserts 	Save room for [[ deserts ]] - they 're to die for .	positive	positive	0.735318422
+grill 	Best things to order are from the [[ grill ]] ( Churrasco and Ribs ) .	positive	positive	0.99770844
+Churrasco 	Best things to order are from the grill ( [[ Churrasco ]] and Ribs ) .	positive	positive	0.995801985
+Ribs 	Best things to order are from the grill ( Churrasco and [[ Ribs ]] ) .	positive	positive	0.994334996
+traditional Italian items 	The [[ traditional Italian items ]] are great - cheap and served in a cozy setting .	positive	positive	0.999106348
+setting 	The traditional Italian items are great - cheap and served in a cozy [[ setting ]] .	positive	positive	0.999015927
+served 	The traditional Italian items are great - cheap and [[ served ]] in a cozy setting .	positive	positive	0.998975873
+iced blended mocha 	Whether your choose the [[ iced blended mocha ]] or the hot white mocha you are sure to be extremely happy .	positive	positive	0.998836577
+hot white mocha 	Whether your choose the iced blended mocha or the [[ hot white mocha ]] you are sure to be extremely happy .	positive	positive	0.998922765
+late lunch 	last Tuesday for a [[ late lunch ]] with a friend .	neutral	neutral	0.996088862
+parmesan cheese 	Another friend had to ask 3 times for [[ parmesan cheese ]] .	neutral	neutral	0.975651324
+waitress 	"Our [[ waitress ]] had apparently never tried any of the food , and there was no one to recommend any wine ."	negative	negative	0.996704996
+food 	"Our waitress had apparently never tried any of the [[ food ]] , and there was no one to recommend any wine ."	neutral	neutral	0.996279538
+wine 	"Our waitress had apparently never tried any of the food , and there was no one to recommend any [[ wine ]] ."	neutral	neutral	0.995126486
+service 	"The [[ service ]] was a bit slow and the portions are a bit small so if you are hungry and in a rush , this is not the place for you ."	negative	negative	0.997298896
+portions 	"The service was a bit slow and the [[ portions ]] are a bit small so if you are hungry and in a rush , this is not the place for you ."	negative	negative	0.997122824
+salad 	The unfortunate lady next to us thought she had ordered a [[ salad ]] ( including asking for salad dressing ) and was instead given a quesedilla .	neutral	neutral	0.929557323
+salad dressing 	The unfortunate lady next to us thought she had ordered a salad ( including asking for [[ salad dressing ]] ) and was instead given a quesedilla .	neutral	neutral	0.923231721
+quesedilla 	The unfortunate lady next to us thought she had ordered a salad ( including asking for salad dressing ) and was instead given a [[ quesedilla ]] .	neutral	neutral	0.991985083
+pizza 's 	"El Nidos one of the best restaurants in New York which I 've ever been to , has a great variety of tasty , mouth watering [[ pizza 's ]] ."	positive	positive	0.999078274
+service 	"The [[ service ]] was pretty poor all around , the food was well below average relative to the cost , and outside there is a crazy bum who harasses every customer who leaves the place ."	negative	negative	0.997382462
+food 	"The service was pretty poor all around , the [[ food ]] was well below average relative to the cost , and outside there is a crazy bum who harasses every customer who leaves the place ."	negative	negative	0.99772495
+cost 	"The service was pretty poor all around , the food was well below average relative to the [[ cost ]] , and outside there is a crazy bum who harasses every customer who leaves the place ."	negative	negative	0.997330785
+food 	Although I moved uptown I try to stop in as often as possible for the GREAT cheap [[ food ]] and to pay the friendly staff a visit .	positive	positive	0.999077201
+staff 	Although I moved uptown I try to stop in as often as possible for the GREAT cheap food and to pay the friendly [[ staff ]] a visit .	positive	positive	0.999023914
+bar 	I had to wait for my friend at the [[ bar ]] for a few minutes	neutral	neutral	0.997674882
+Chef 	"[[ Chef ]] Vincenzo , always there if you need him , is a real talent and a real Roman ."	positive	positive	0.998990953
+Indian food 	"If you 're looking to taste some great [[ Indian food ]] and want good service , definitely visit Curry Leaf ."	positive	positive	0.997232735
+service 	"If you 're looking to taste some great Indian food and want good [[ service ]] , definitely visit Curry Leaf ."	positive	positive	0.996191025
+Odessa stew 	"You must try [[ Odessa stew ]] or Rabbit stew ; salads -all good ; and kompot is soo refreshing during the hot summer day ( they make it the way my mom does , reminds me of home a lot ) ."	positive	positive	0.998912454
+Rabbit stew 	"You must try Odessa stew or [[ Rabbit stew ]] ; salads -all good ; and kompot is soo refreshing during the hot summer day ( they make it the way my mom does , reminds me of home a lot ) ."	positive	positive	0.999055207
+salads 	"You must try Odessa stew or Rabbit stew ; [[ salads ]] -all good ; and kompot is soo refreshing during the hot summer day ( they make it the way my mom does , reminds me of home a lot ) ."	positive	positive	0.999109685
+kompot 	"You must try Odessa stew or Rabbit stew ; salads -all good ; and [[ kompot ]] is soo refreshing during the hot summer day ( they make it the way my mom does , reminds me of home a lot ) ."	positive	positive	0.999119937
+lunch 	My daughter and I left feeling satisfied ( not stuffed ) and it felt good to know we had a healthy [[ lunch ]] .	positive	positive	0.998887002
+waitress 	"When she complained , the [[ waitress ]] said , Sorry ."	neutral	negative	0.933193624
+quality of the meat 	The [[ quality of the meat ]] was on par with your local grocery store .	negative	positive	0.998313189
+smoothies 	They specialize in [[ smoothies ]] and fresh juices .	positive	positive	0.998406231
+fresh juices 	They specialize in smoothies and [[ fresh juices ]] .	positive	positive	0.998329461
+black roasted codfish 	"I recommend the [[ black roasted codfish ]] , it was the best dish of the evening ."	positive	positive	0.999096394
+dish 	"I recommend the black roasted codfish , it was the best [[ dish ]] of the evening ."	positive	positive	0.999070883
+waiter 	The manager then told us we could order from whatever menu we wanted but by that time we were so annoyed with the [[ waiter ]] and the resturant that we let and went some place else .	negative	negative	0.997618973
+menu 	The manager then told us we could order from whatever [[ menu ]] we wanted but by that time we were so annoyed with the waiter and the resturant that we let and went some place else .	neutral	neutral	0.98357302
+manager 	The [[ manager ]] then told us we could order from whatever menu we wanted but by that time we were so annoyed with the waiter and the resturant that we let and went some place else .	neutral	negative	0.986409426
+taste 	"In mi burrito , here was nothing but dark chicken that had that cooked last week and just warmed up in a microwave [[ taste ]] ."	negative	neutral	0.941050708
+chicken 	"In mi burrito , here was nothing but dark [[ chicken ]] that had that cooked last week and just warmed up in a microwave taste ."	negative	negative	0.996796668
+reservation 	"during busy hrs , i recommend that you make a [[ reservation ]] ."	neutral	neutral	0.969084978
+brunch 	I went to Common Stock for [[ brunch ]] and I was so impressed .	neutral	neutral	0.99539423
+sushi 	"now called nikki sushi , [[ sushi ]] is OK ."	neutral	neutral	0.997578442
+food 	The [[ food ]] is also outstanding and is served quite quickly .	positive	positive	0.999009848
+served 	The food is also outstanding and is [[ served ]] quite quickly .	positive	positive	0.998199344
+erbazzone emiliana 	"From the [[ erbazzone emiliana ]] to the mostarda on the cheese plate , the dishes at this restaurant are all handled with delicate care ."	positive	positive	0.998790443
+mostarda on the cheese plate 	"From the erbazzone emiliana to the [[ mostarda on the cheese plate ]] , the dishes at this restaurant are all handled with delicate care ."	positive	positive	0.997804821
+dishes 	"From the erbazzone emiliana to the mostarda on the cheese plate , the [[ dishes ]] at this restaurant are all handled with delicate care ."	positive	positive	0.998045921
+food 	The [[ food ]] is delicious and the bar has a great vibe .	positive	positive	0.99908793
+bar 	The food is delicious and the [[ bar ]] has a great vibe .	positive	positive	0.999043167
+vibe 	The food is delicious and the bar has a great [[ vibe ]] .	positive	positive	0.999046743
+candlelight 	There 's [[ candlelight ]] and music .	neutral	positive	0.997199059
+music 	There 's candlelight and [[ music ]] .	neutral	positive	0.996486068
+food 	Simple healthy unglamorous [[ food ]] cheap .	positive	positive	0.998825729
+dining experience 	"It was such a fantastic [[ dining experience ]] , that I returned again the same week ."	positive	positive	0.998990476
+food 	"To be fair , the [[ food ]] still is good and the service is quick and attentative even though its usually very busy ."	positive	positive	0.999025464
+service 	"To be fair , the food still is good and the [[ service ]] is quick and attentative even though its usually very busy ."	positive	positive	0.998624682
+place 	The [[ place ]] is absolutely adorable and the food is delicious .	positive	positive	0.999024153
+food 	The place is absolutely adorable and the [[ food ]] is delicious .	positive	positive	0.999068439
+Chicken Teriyaki 	I ordered the [[ Chicken Teriyaki ]] and my husband got Garlic Shrimp .	neutral	neutral	0.994717062
+Garlic Shrimp 	I ordered the Chicken Teriyaki and my husband got [[ Garlic Shrimp ]] .	neutral	neutral	0.994950771
+Japanese food 	I 've had better [[ Japanese food ]] at a mall food court .	negative	neutral	0.996132374
+staff members 	The [[ staff members ]] are extremely friendly and even replaced my drink once when I dropped it outside .	positive	positive	0.998808146
+drink 	The staff members are extremely friendly and even replaced my [[ drink ]] once when I dropped it outside .	neutral	neutral	0.986135066
+atmosphere 	Cool [[ atmosphere ]] but such a let down .	positive	positive	0.841964543
+Sashimi portion 	"The [[ Sashimi portion ]] are big enough to appease most people , but I did n't like the fact they used artifical lobster meat ."	positive	neutral	0.871888578
+artifical lobster meat 	"The Sashimi portion are big enough to appease most people , but I did n't like the fact they used [[ artifical lobster meat ]] ."	negative	negative	0.995142937
+wheat crusted pizza 	They have [[ wheat crusted pizza ]] made with really fresh and yummy ingredients .	positive	positive	0.998914599
+ingredients 	They have wheat crusted pizza made with really fresh and yummy [[ ingredients ]] .	positive	positive	0.998900414
+dinner 	"Had a lovely [[ dinner ]] in this dedicated seafood joint , food was well - prepared and -presented and the service was pleasant and prompt ."	positive	positive	0.999067724
+food 	"Had a lovely dinner in this dedicated seafood joint , [[ food ]] was well - prepared and -presented and the service was pleasant and prompt ."	positive	positive	0.999086976
+service 	"Had a lovely dinner in this dedicated seafood joint , food was well - prepared and -presented and the [[ service ]] was pleasant and prompt ."	positive	positive	0.999063075
+cake 	"the icing MADE this [[ cake ]] , it was fluffy , not ultra sweet , creamy and light ."	positive	positive	0.991173208
+staff 	"Finally let into the store 5 at a time , to buy expensive slices from a harried [[ staff ]] ."	negative	negative	0.686541975
+slices 	"Finally let into the store 5 at a time , to buy expensive [[ slices ]] from a harried staff ."	negative	positive	0.765175641
+wait staff 	We ended up having to just leave because we were essentially being ignored by the [[ wait staff ]] --even though the rest of the restaurant was largely empty .	negative	negative	0.99751246
+wine list 	"The [[ wine list ]] is extensive , well priced and covers alot of regions ."	positive	positive	0.998926342
+priced 	"The wine list is extensive , well [[ priced ]] and covers alot of regions ."	positive	positive	0.998546124
+salads 	Go here if you want fresh and tasty [[ salads ]] of any type you can imagine .	positive	positive	0.999066412
+bathroom 	Everything about this place is adorable - even the [[ bathroom ]] !	positive	positive	0.998833001
+delivers 	"Speedy [[ delivers ]] , great food , decent prices , and friendly service combine to ensure an enjoyable repast ."	positive	positive	0.998904586
+food 	"Speedy delivers , great [[ food ]] , decent prices , and friendly service combine to ensure an enjoyable repast ."	positive	positive	0.999017477
+prices 	"Speedy delivers , great food , decent [[ prices ]] , and friendly service combine to ensure an enjoyable repast ."	positive	positive	0.998966813
+service 	"Speedy delivers , great food , decent prices , and friendly [[ service ]] combine to ensure an enjoyable repast ."	positive	positive	0.998953819
+repast 	"Speedy delivers , great food , decent prices , and friendly service combine to ensure an enjoyable [[ repast ]] ."	positive	positive	0.998855114
+WAITERS 	THEY HAVE [[ WAITERS ]] ON THE SIDEWALK TRYING TO PULL YOU IN WHICH MADE US SUSPICIOUS .	neutral	negative	0.997291505
+ITALIAN MEAL 	IT WAS OUR ONLY OPPORTUNITY TO VISIT AND WANTED AN AUTHENTIC [[ ITALIAN MEAL ]] .	neutral	positive	0.998927891
+pizza 	It took 100 years for Parisi to get around to making [[ pizza ]] ( at least I do n't think they ever made it before this year) ... but it was worth the wait .	positive	neutral	0.94244653
+steak 	I asked for a simple medium rare [[ steak ]] .	neutral	neutral	0.70772624
+organic grilled burgers 	"Generously garnished , [[ organic grilled burgers ]] are the most popular dish , but the Jerusalem market - style falafel wraps and Mediterranean salads -- layered with beets , goat cheese and walnuts --are equally scrumptious ."	positive	positive	0.998887241
+dish 	"Generously garnished , organic grilled burgers are the most popular [[ dish ]] , but the Jerusalem market - style falafel wraps and Mediterranean salads -- layered with beets , goat cheese and walnuts --are equally scrumptious ."	positive	positive	0.998179436
+Jerusalem market - style falafel wraps 	"Generously garnished , organic grilled burgers are the most popular dish , but the [[ Jerusalem market - style falafel wraps ]] and Mediterranean salads -- layered with beets , goat cheese and walnuts --are equally scrumptious ."	positive	positive	0.997166574
+"Mediterranean salads -- layered with beets , goat cheese and walnuts "	"Generously garnished , organic grilled burgers are the most popular dish , but the Jerusalem market - style falafel wraps and [[ Mediterranean salads -- layered with beets , goat cheese and walnuts ]] --are equally scrumptious ."	positive	positive	0.998399675
+dining experience 	"Probably my worst [[ dining experience ]] in new york , and I 'm a former waiter so I know what I 'm talking about ."	negative	negative	0.975540459
+waiter 	"Probably my worst dining experience in new york , and I 'm a former [[ waiter ]] so I know what I 'm talking about ."	neutral	neutral	0.979151905
+texture 	"Result ( red velvet ) : Great [[ texture ]] , soft and velvety , nice hint of cocoa ."	positive	positive	0.998834789
+hint of cocoa 	"Result ( red velvet ) : Great texture , soft and velvety , nice [[ hint of cocoa ]] ."	positive	positive	0.998975039
+round corner table next to the large window 	Ask for the [[ round corner table next to the large window ]] .	positive	positive	0.955338895
+flavor 	"Their twist on pizza is heatlhy , but full of [[ flavor ]] ."	positive	positive	0.874047041
+twist on pizza 	"Their [[ twist on pizza ]] is heatlhy , but full of flavor ."	positive	positive	0.708341599
+AC 	The lack of [[ AC ]] and the fact that there are a million swarming bodies ( although everyone is polite and no one is pushing ) is a slight turn off .	negative	negative	0.997295201
+service 	"I love the Little Pie Company as much as anyone else who has written reviews , but must discourage anyone from visiting the Grand Central location due to their RUDE [[ service ]] from two sales people ."	negative	negative	0.99644655
+sales people 	"I love the Little Pie Company as much as anyone else who has written reviews , but must discourage anyone from visiting the Grand Central location due to their RUDE service from two [[ sales people ]] ."	negative	negative	0.996391833
+location 	"Unfortunately , unless you live in the neighborhood , it 's not in a convenient [[ location ]] but is more like a hidden treasure ."	negative	negative	0.993196249
+display and quality of the food 	Did n't seem like any effort was made to the [[ display and quality of the food ]] .	negative	negative	0.963768601
+food 	The [[ food ]] --though mostly deep - fried -- is simple and satisfying .	positive	positive	0.999076247
+food 	"Glechik might be way too tiny for a restaurant by Russian standards , but it is cozy and the [[ food ]] is simply GREAT ."	positive	positive	0.999074817
+food 	The [[ food ]] was excellent - authentic Italian cuisine made absolutely fresh .	positive	positive	0.999079227
+Italian cuisine 	The food was excellent - authentic [[ Italian cuisine ]] made absolutely fresh .	positive	positive	0.999034882
+atmoshere 	At night the [[ atmoshere ]] changes turning into this hidden jewel that is waiting to be discovered .	positive	neutral	0.761635125
+booth by the windows 	"The other times I 've gone it 's romantic date heaven , you can walk in get a [[ booth by the windows ]] , be treated like a VIP in a not - crowded place , with great food and service ."	neutral	positive	0.99098748
+place 	"The other times I 've gone it 's romantic date heaven , you can walk in get a booth by the windows , be treated like a VIP in a not - crowded [[ place ]] , with great food and service ."	positive	positive	0.995479107
+food 	"The other times I 've gone it 's romantic date heaven , you can walk in get a booth by the windows , be treated like a VIP in a not - crowded place , with great [[ food ]] and service ."	positive	positive	0.999072075
+service 	"The other times I 've gone it 's romantic date heaven , you can walk in get a booth by the windows , be treated like a VIP in a not - crowded place , with great food and [[ service ]] ."	positive	positive	0.999053895
+coffee 	I would only go for the [[ coffee ]] which is way better than Starbucks or the like .	positive	positive	0.971122861
+wine list 	Somewhat disappointing [[ wine list ]] ( only new vintages .	negative	negative	0.994688988
+vintages 	Somewhat disappointing wine list ( only new [[ vintages ]] .	negative	neutral	0.64034611
+priced 	If your looking for nasty high [[ priced ]] food with a dash of ghetto scenery cheap BX A$ $ this is the place to be ! !	negative	positive	0.612033188
+food 	If your looking for nasty high priced [[ food ]] with a dash of ghetto scenery cheap BX A$ $ this is the place to be ! !	negative	positive	0.860059798
+scenery 	If your looking for nasty high priced food with a dash of ghetto [[ scenery ]] cheap BX A$ $ this is the place to be ! !	negative	negative	0.679884911
+new hamburger with special sauce 	[[ new hamburger with special sauce ]] is ok - at least better than big mac !	positive	neutral	0.963971019
+big mac 	new hamburger with special sauce is ok - at least better than [[ big mac ]] !	negative	neutral	0.975529552
+pasta 	"Perfectly al dente [[ pasta ]] , not drowned in sauce -- generous portions ."	positive	positive	0.998897195
+sauce 	"Perfectly al dente pasta , not drowned in [[ sauce ]] -- generous portions ."	neutral	negative	0.677759707
+portions 	"Perfectly al dente pasta , not drowned in sauce -- generous [[ portions ]] ."	positive	positive	0.998865962
+prices 	"I can understand the [[ prices ]] if it served better food , like some Chinese restaurants in midtown / uptown area ."	negative	negative	0.992957354
+food 	"I can understand the prices if it served better [[ food ]] , like some Chinese restaurants in midtown / uptown area ."	negative	neutral	0.942911148
+Service 	[[ Service ]] was awful - mostly because staff were overwhelmed on a Saturday night .	negative	negative	0.996353388
+staff 	Service was awful - mostly because [[ staff ]] were overwhelmed on a Saturday night .	negative	negative	0.995883763
+owners 	"To the [[ owners ]] ; good job guys , this place is a keeper !"	positive	positive	0.997761726
+owner 	and the [[ owner ]] is simply lovely and friendly .	positive	positive	0.999037862
+place 	This little [[ place ]] is wonderfully warm welcoming .	positive	positive	0.999028206
+meal 	perfect for a quick [[ meal ]] .	positive	positive	0.998958349
+place 	Has the warmth of a family local yet it is a great [[ place ]] to watch sporting events .	positive	positive	0.998955131
+service 	"The [[ service ]] was great , and they have a whole great deal for birthdays ."	positive	positive	0.999042928
+staff 	The [[ staff ]] is 100 % Italian and the food is as authentic as it gets .	positive	positive	0.998831689
+food 	The staff is 100 % Italian and the [[ food ]] is as authentic as it gets .	positive	positive	0.998945773
+fortune cookies 	My only complaint might be the [[ fortune cookies ]] - I 've never had a cookie predict bad luck for me before I visited Kar .	negative	negative	0.98740226
+cookie 	My only complaint might be the fortune cookies - I 've never had a [[ cookie ]] predict bad luck for me before I visited Kar .	negative	neutral	0.952349186
+sushi lunch 	Good for a quick [[ sushi lunch ]] .	positive	positive	0.998854995
+mojito 	Have a [[ mojito ]] and sit in the back patio .	positive	neutral	0.833416343
+back patio 	Have a mojito and sit in the [[ back patio ]] .	positive	neutral	0.638333619
+service 	The [[ service ]] was dreadfully slow ( the place was only half full ) and a smile would have been nice ...	negative	negative	0.997081459
+meal 	I went this past Saturday and had a excellent [[ meal ]] of consisting of a braised lamb shank with mashed potatoes .	positive	positive	0.998991549
+braised lamb shank with mashed potatoes 	I went this past Saturday and had a excellent meal of consisting of a [[ braised lamb shank with mashed potatoes ]] .	positive	positive	0.998746037
+waitress 	The [[ waitress ]] came by to pick up the soy sauce WHILE we were eating our lunch ! ! ! ! !	negative	negative	0.764191568
+soy sauce 	The waitress came by to pick up the [[ soy sauce ]] WHILE we were eating our lunch ! ! ! ! !	neutral	neutral	0.994117975
+lunch 	The waitress came by to pick up the soy sauce WHILE we were eating our [[ lunch ]] ! ! ! ! !	neutral	neutral	0.99700433
+bar 	"So we sat at the [[ bar ]] , the bartender did n't seem like he wanted to be there ."	neutral	neutral	0.997658968
+bartender 	"So we sat at the bar , the [[ bartender ]] did n't seem like he wanted to be there ."	negative	negative	0.997250021
+fried pork dumplings 	"I reccomend the [[ fried pork dumplings ]] , the orange chicken / beef , and the fried rice ."	positive	neutral	0.954733372
+orange chicken / beef 	"I reccomend the fried pork dumplings , the [[ orange chicken / beef ]] , and the fried rice ."	positive	neutral	0.98620832
+fried rice 	"I reccomend the fried pork dumplings , the orange chicken / beef , and the [[ fried rice ]] ."	positive	neutral	0.992447495
+menu 	You will not be dissapointed by any of the choices in the [[ menu ]] .	positive	neutral	0.968021691
+french fries -- with the kalmata dip 	The [[ french fries -- with the kalmata dip ]] were terrific !	positive	positive	0.999207914
+wait 	"Would you ever believe that when you complain about over an hour [[ wait ]] , when they tell you it will be 20 - 30 minutes , the manager tells the bartender to spill the drinks you just paid for ?"	negative	negative	0.996682465
+manager 	"Would you ever believe that when you complain about over an hour wait , when they tell you it will be 20 - 30 minutes , the [[ manager ]] tells the bartender to spill the drinks you just paid for ?"	negative	negative	0.993420541
+bartender 	"Would you ever believe that when you complain about over an hour wait , when they tell you it will be 20 - 30 minutes , the manager tells the [[ bartender ]] to spill the drinks you just paid for ?"	neutral	negative	0.894556224
+drinks 	"Would you ever believe that when you complain about over an hour wait , when they tell you it will be 20 - 30 minutes , the manager tells the bartender to spill the [[ drinks ]] you just paid for ?"	neutral	neutral	0.994066358
+boutique selection of wines 	The [[ boutique selection of wines ]] covers a wide variety without being imposeing .	neutral	positive	0.998889029
+assortment of wraps 	They also have a great [[ assortment of wraps ]] if your not in the mood for traditional Mediterranean fare .	positive	positive	0.998738468
+traditional Mediterranean fare 	They also have a great assortment of wraps if your not in the mood for [[ traditional Mediterranean fare ]] .	neutral	neutral	0.939218342
+Fresh veggies 	"[[ Fresh veggies ]] , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999163628
+middle eastern spreads 	"Fresh veggies , all sorts of [[ middle eastern spreads ]] , cheese and falafel , soup , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.998835027
+cheese 	"Fresh veggies , all sorts of middle eastern spreads , [[ cheese ]] and falafel , soup , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.998737037
+falafel 	"Fresh veggies , all sorts of middle eastern spreads , cheese and [[ falafel ]] , soup , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.996040463
+soup 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , [[ soup ]] , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999084592
+fish 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , [[ fish ]] , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999088287
+rice 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , [[ rice ]] , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999101639
+root vegetables 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , [[ root vegetables ]] , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999110401
+rice medley 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , root vegetables , a [[ rice medley ]] , some spinach thing , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999085903
+spinach thing 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , root vegetables , a rice medley , some [[ spinach thing ]] , lamb kebabs , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.999085665
+lamb kebabs 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , root vegetables , a rice medley , some spinach thing , [[ lamb kebabs ]] , cheese baclava ... soooo much fooood , and all of it delicious ."	positive	positive	0.998987257
+cheese baclava 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , [[ cheese baclava ]] ... soooo much fooood , and all of it delicious ."	positive	positive	0.99904114
+fooood 	"Fresh veggies , all sorts of middle eastern spreads , cheese and falafel , soup , fish , rice , root vegetables , a rice medley , some spinach thing , lamb kebabs , cheese baclava ... soooo much [[ fooood ]] , and all of it delicious ."	positive	positive	0.999053061
+Saketini 	"Disappointingly , their wonderful [[ Saketini ]] has been taken off the bar menu ."	positive	positive	0.998350263
+bar menu 	"Disappointingly , their wonderful Saketini has been taken off the [[ bar menu ]] ."	negative	neutral	0.99342078
+look 	In Short The Black Sheep distinguishes itself from the Midtown pub herd with a [[ look ]] that 's a mix of sports - bar butch and ornate kitsch .	negative	positive	0.997924209
+martinis 	I would definitely go back -- if only for some of those exotic [[ martinis ]] on the blackboard .	positive	positive	0.99882561
+chairs 	then she made a fuss about not being able to add 1 or 2 [[ chairs ]] on either end of the table for additional people .	neutral	negative	0.973060191
+table 	then she made a fuss about not being able to add 1 or 2 chairs on either end of the [[ table ]] for additional people .	neutral	neutral	0.994261026
+happy hour 	"The [[ happy hour ]] is so cheap , but that does not reflect the service or the atmosphere ."	positive	positive	0.998760939
+service 	"The happy hour is so cheap , but that does not reflect the [[ service ]] or the atmosphere ."	positive	negative	0.892485738
+atmosphere 	"The happy hour is so cheap , but that does not reflect the service or the [[ atmosphere ]] ."	positive	negative	0.580880404
+waiter 	"After waiting for almost an hour , the [[ waiter ]] brusquely told us he 'd forgotten to give the kitchen our order ."	negative	negative	0.99635905
+kitchen 	"After waiting for almost an hour , the waiter brusquely told us he 'd forgotten to give the [[ kitchen ]] our order ."	neutral	neutral	0.961351395
+waiting 	"After [[ waiting ]] for almost an hour , the waiter brusquely told us he 'd forgotten to give the kitchen our order ."	negative	negative	0.992419302
+quaility 	With all the mundane or mediocre places on 8th avenue it is nice to have one that is a step above in [[ quaility ]] and atmosphere .	positive	positive	0.998851299
+atmosphere 	With all the mundane or mediocre places on 8th avenue it is nice to have one that is a step above in quaility and [[ atmosphere ]] .	positive	positive	0.998850226
+space 	"A mix of students and area residents crowd into this narrow , barely there [[ space ]] for its quick , tasty treats at dirt - cheap prices ."	negative	negative	0.992385864
+prices 	"A mix of students and area residents crowd into this narrow , barely there space for its quick , tasty treats at dirt - cheap [[ prices ]] ."	positive	positive	0.998665452
+treats 	"A mix of students and area residents crowd into this narrow , barely there space for its quick , tasty [[ treats ]] at dirt - cheap prices ."	positive	positive	0.998898268
+menu 	"Give it a try , [[ menu ]] is typical French but varied ."	neutral	neutral	0.553249478
+seats 	It gets crowded at lunchtime but there are lots of [[ seats ]] in back and everyone who works there is so nice .	positive	positive	0.998079181
+value 	"but for the [[ value ]] , it was a great affordable spot to enjoy a fun night out with small group ."	positive	positive	0.998848677
+food 	the negative reviews on city search are probably from jealous competing restaurants who realize they ca n't compete with Temple 's entire positive attitude about the proper way to treat their customers and deliver top quality [[ food ]] .	positive	positive	0.991184771
+attitude 	the negative reviews on city search are probably from jealous competing restaurants who realize they ca n't compete with Temple 's entire positive [[ attitude ]] about the proper way to treat their customers and deliver top quality food .	positive	negative	0.832009792
+glass of wine 	We ordered a [[ glass of wine ]] and were finished eating and paying before the wine came .	neutral	neutral	0.99669075
+flavors 	"It was good , but none of the [[ flavors ]] WOW ."	neutral	negative	0.995666981
+place 	"Overall , this is a nice [[ place ]] to take a few friends to hang out at and the service is excellent ."	positive	positive	0.998992145
+service 	"Overall , this is a nice place to take a few friends to hang out at and the [[ service ]] is excellent ."	positive	positive	0.999002278
+Food 	[[ Food ]] is excellent quality for a good restaurant price .	positive	positive	0.999014735
+price 	Food is excellent quality for a good restaurant [[ price ]] .	positive	positive	0.998586655
+burrito 	"for about eleven bucks you get a gigantic [[ burrito ]] ( or tacos ) , margarita , and dessert ."	positive	positive	0.988784075
+tacos 	"for about eleven bucks you get a gigantic burrito ( or [[ tacos ]] ) , margarita , and dessert ."	positive	positive	0.775809228
+margarita 	"for about eleven bucks you get a gigantic burrito ( or tacos ) , [[ margarita ]] , and dessert ."	neutral	positive	0.991935372
+dessert 	"for about eleven bucks you get a gigantic burrito ( or tacos ) , margarita , and [[ dessert ]] ."	neutral	positive	0.978596926
+space 	The [[ space ]] is traditional in feel .	neutral	positive	0.974148929
+reservations 	"the restaurant was completely empty , but she gave me a dirty look and asked , no [[ reservations ]] ?"	neutral	neutral	0.993067503
+food 	the [[ food ]] was mediocre to be kind - the interior is small and average - the owners are a tag - team of unpleasantries - so rude and snotty i actually let out a hearty guffaw whilst dining .	negative	neutral	0.992446005
+interior 	the food was mediocre to be kind - the [[ interior ]] is small and average - the owners are a tag - team of unpleasantries - so rude and snotty i actually let out a hearty guffaw whilst dining .	negative	negative	0.996408165
+owners 	the food was mediocre to be kind - the interior is small and average - the [[ owners ]] are a tag - team of unpleasantries - so rude and snotty i actually let out a hearty guffaw whilst dining .	negative	negative	0.995775998
+dining 	the food was mediocre to be kind - the interior is small and average - the owners are a tag - team of unpleasantries - so rude and snotty i actually let out a hearty guffaw whilst [[ dining ]] .	neutral	neutral	0.995439351
+service 	"Good [[ service ]] , great food , good value , and never have to wait in line !"	positive	positive	0.99899298
+food 	"Good service , great [[ food ]] , good value , and never have to wait in line !"	positive	positive	0.999016047
+value 	"Good service , great food , good [[ value ]] , and never have to wait in line !"	positive	positive	0.998976111
+wait 	"Good service , great food , good value , and never have to [[ wait ]] in line !"	positive	negative	0.771032095
+Egg McMuffin sandwich 	Offerings like hot cakes and the [[ Egg McMuffin sandwich ]] are available for breakfast .	neutral	neutral	0.828588307
+hot cakes 	Offerings like [[ hot cakes ]] and the Egg McMuffin sandwich are available for breakfast .	neutral	positive	0.868343771
+breakfast 	Offerings like hot cakes and the Egg McMuffin sandwich are available for [[ breakfast ]] .	neutral	neutral	0.983475447
+service 	"I have been going to this restaurant for years , in the past the [[ service ]] was average and the food inconsistant ."	neutral	negative	0.995604277
+food 	"I have been going to this restaurant for years , in the past the service was average and the [[ food ]] inconsistant ."	negative	negative	0.996765494
+music 	"The [[ music ]] was fascinating , but left room for conversation , and the bartender made superb drinks ."	positive	positive	0.998555362
+bartender 	"The music was fascinating , but left room for conversation , and the [[ bartender ]] made superb drinks ."	positive	positive	0.998898625
+drinks 	"The music was fascinating , but left room for conversation , and the bartender made superb [[ drinks ]] ."	positive	positive	0.998960495
+rice dishes 	[[ rice dishes ]] and noodle dishes rarely exceed $ 5 and add on a refreshing ice drink for $ 2 and you 're set for the night !	positive	positive	0.991498053
+noodle dishes 	rice dishes and [[ noodle dishes ]] rarely exceed $ 5 and add on a refreshing ice drink for $ 2 and you 're set for the night !	positive	positive	0.981503129
+ice drink 	rice dishes and noodle dishes rarely exceed $ 5 and add on a refreshing [[ ice drink ]] for $ 2 and you 're set for the night !	positive	positive	0.998961687
+Cuisine 	[[ Cuisine ]] is billed as asian fusion - does n't meet the bill .	negative	negative	0.925940216
+bill 	Cuisine is billed as asian fusion - does n't meet the [[ bill ]] .	negative	negative	0.94347477
+asian fusion 	Cuisine is billed as [[ asian fusion ]] - does n't meet the bill .	neutral	negative	0.973328471
+billed 	Cuisine is [[ billed ]] as asian fusion - does n't meet the bill .	negative	negative	0.962103009
+dishes 	Creative [[ dishes ]] like king crab salad with passion fruit vinaigrette and fettuccine with grilled seafood in a rosemary - orange sauce are unexpected elements on an otherwise predictable bistro menu .	positive	positive	0.998867869
+king crab salad with passion fruit vinaigrette 	Creative dishes like [[ king crab salad with passion fruit vinaigrette ]] and fettuccine with grilled seafood in a rosemary - orange sauce are unexpected elements on an otherwise predictable bistro menu .	positive	positive	0.998933613
+fettuccine with grilled seafood in a rosemary - orange sauce 	Creative dishes like king crab salad with passion fruit vinaigrette and [[ fettuccine with grilled seafood in a rosemary - orange sauce ]] are unexpected elements on an otherwise predictable bistro menu .	positive	positive	0.998752832
+bistro menu 	Creative dishes like king crab salad with passion fruit vinaigrette and fettuccine with grilled seafood in a rosemary - orange sauce are unexpected elements on an otherwise predictable [[ bistro menu ]] .	neutral	positive	0.918068469
+Dishes 	"[[ Dishes ]] denoted as "" Roy 's Classics "" ( marked on the menu with asterisks ) are tried - and - true recipes , such as macadamia - crusted mahi mahi , or subtly sweet honey - mustard beef short ribs ."	positive	positive	0.994283974
+ Roy 's Classics  	"Dishes denoted as [[ "" Roy 's Classics "" ]] ( marked on the menu with asterisks ) are tried - and - true recipes , such as macadamia - crusted mahi mahi , or subtly sweet honey - mustard beef short ribs ."	positive	positive	0.967520952
+menu 	"Dishes denoted as "" Roy 's Classics "" ( marked on the [[ menu ]] with asterisks ) are tried - and - true recipes , such as macadamia - crusted mahi mahi , or subtly sweet honey - mustard beef short ribs ."	neutral	neutral	0.995677054
+recipes 	"Dishes denoted as "" Roy 's Classics "" ( marked on the menu with asterisks ) are tried - and - true [[ recipes ]] , such as macadamia - crusted mahi mahi , or subtly sweet honey - mustard beef short ribs ."	positive	positive	0.998683035
+macadamia - crusted mahi mahi 	"Dishes denoted as "" Roy 's Classics "" ( marked on the menu with asterisks ) are tried - and - true recipes , such as [[ macadamia - crusted mahi mahi ]] , or subtly sweet honey - mustard beef short ribs ."	positive	positive	0.998273611
+sweet honey - mustard beef short ribs 	"Dishes denoted as "" Roy 's Classics "" ( marked on the menu with asterisks ) are tried - and - true recipes , such as macadamia - crusted mahi mahi , or subtly [[ sweet honey - mustard beef short ribs ]] ."	positive	positive	0.998457789
+cold sesame noodles 	"The [[ cold sesame noodles ]] , which are a freebie when you order $ 10 + , are delectable ."	positive	positive	0.999057353
+food 	"I came to fresh expecting a great meal , and all I got was marginally so - so [[ food ]] served in a restaurant that was just so freezing we could n't enjoy eating ."	negative	negative	0.996628821
+meal 	"I came to fresh expecting a great [[ meal ]] , and all I got was marginally so - so food served in a restaurant that was just so freezing we could n't enjoy eating ."	negative	positive	0.997722208
+served 	"I came to fresh expecting a great meal , and all I got was marginally so - so food [[ served ]] in a restaurant that was just so freezing we could n't enjoy eating ."	neutral	negative	0.995122969
+argentine chorizo appetizer 	The lone [[ argentine chorizo appetizer ]] at $ 8.95 was a heavy fennel flavored Italian sausage like the ones that sell for $ 2.99 / lb at the store .	negative	neutral	0.804421246
+fennel flavored Italian sausage 	The lone argentine chorizo appetizer at $ 8.95 was a heavy [[ fennel flavored Italian sausage ]] like the ones that sell for $ 2.99 / lb at the store .	negative	positive	0.915622294
+dinner 	"I went to Swiftys with some friends of the family and we had a very nice [[ dinner ]] , but nothing amazing ."	positive	positive	0.99650842
+delivery 	"Best Chinese on the Upper East , prompt [[ delivery ]] , good value ."	positive	positive	0.998760819
+value 	"Best Chinese on the Upper East , prompt delivery , good [[ value ]] ."	positive	positive	0.998755813
+sandwiches 	Most of the [[ sandwiches ]] are made with soy mayonaise which is actually pretty good .	positive	positive	0.506138623
+soy mayonaise 	Most of the sandwiches are made with [[ soy mayonaise ]] which is actually pretty good .	positive	positive	0.992909968
+hostess 	i went in one day asking for a table for a group and was greeted by a very rude [[ hostess ]] .	negative	negative	0.993081033
+table 	i went in one day asking for a [[ table ]] for a group and was greeted by a very rude hostess .	neutral	neutral	0.996012211
+dinner 	It 's worthwhile to take a cab to Chelsea just for an awesome [[ dinner ]] at My Chelsea .	positive	positive	0.999033689
+food 	"Not only is the [[ food ]] authentic , but the staff here are practically off - the - boat , they are young and hip and know what they are doing when it comes to food and wine ."	positive	positive	0.998806834
+staff 	"Not only is the food authentic , but the [[ staff ]] here are practically off - the - boat , they are young and hip and know what they are doing when it comes to food and wine ."	positive	positive	0.998734057
+food 	"Not only is the food authentic , but the staff here are practically off - the - boat , they are young and hip and know what they are doing when it comes to [[ food ]] and wine ."	positive	positive	0.965861797
+wine 	"Not only is the food authentic , but the staff here are practically off - the - boat , they are young and hip and know what they are doing when it comes to food and [[ wine ]] ."	positive	positive	0.923900604
+music 	"It has good [[ music ]] , nice tapas , an interesting selection of wines ( primarily Spanish ) and a lowkey hip neighborhood clientele ."	positive	positive	0.999010205
+tapas 	"It has good music , nice [[ tapas ]] , an interesting selection of wines ( primarily Spanish ) and a lowkey hip neighborhood clientele ."	positive	positive	0.999065578
+selection of wines ( primarily Spanish ) 	"It has good music , nice tapas , an interesting [[ selection of wines ( primarily Spanish ) ]] and a lowkey hip neighborhood clientele ."	positive	positive	0.993175924
+clientele 	"It has good music , nice tapas , an interesting selection of wines ( primarily Spanish ) and a lowkey hip neighborhood [[ clientele ]] ."	positive	positive	0.996401906
+food 	"The [[ food ]] is great , I love their dumplings , cold sesame noodles , chicken and shrimp dishs ."	positive	positive	0.999106705
+dumplings 	"The food is great , I love their [[ dumplings ]] , cold sesame noodles , chicken and shrimp dishs ."	positive	positive	0.999099612
+cold sesame noodles 	"The food is great , I love their dumplings , [[ cold sesame noodles ]] , chicken and shrimp dishs ."	positive	positive	0.999123752
+chicken 	"The food is great , I love their dumplings , cold sesame noodles , [[ chicken ]] and shrimp dishs ."	positive	positive	0.99909544
+shrimp dishs 	"The food is great , I love their dumplings , cold sesame noodles , chicken and [[ shrimp dishs ]] ."	positive	positive	0.999132931
+food 	"And the [[ food ]] , well the food will keep you coming back ."	positive	positive	0.997374058
+food 	"And the food , well the [[ food ]] will keep you coming back ."	positive	positive	0.996543586
+entrees 	Waiting three hours before getting our [[ entrees ]] was a treat as well .	neutral	neutral	0.738445759
+Waiting 	[[ Waiting ]] three hours before getting our entrees was a treat as well .	negative	negative	0.537106872
+place 	It 's the conversations that make this a fun [[ place ]] to be .	positive	positive	0.998864532
+duck confitte 	"My gf 's [[ duck confitte ]] was very solid as well , although i have little base of reference ."	positive	positive	0.998621941
+wine list 	"The [[ wine list ]] was superb , our tapas delightful , and the quiet atmosphere perfect for good conversation ."	positive	positive	0.999103367
+tapas 	"The wine list was superb , our [[ tapas ]] delightful , and the quiet atmosphere perfect for good conversation ."	positive	positive	0.999082088
+atmosphere 	"The wine list was superb , our tapas delightful , and the quiet [[ atmosphere ]] perfect for good conversation ."	positive	positive	0.99902904
+price 	You can eat gourmet food at a fast food [[ price ]] .	positive	neutral	0.920570254
+food 	You can eat gourmet [[ food ]] at a fast food price .	positive	neutral	0.987854421
+food 	"I 've eaten at all three locations and I always love , love the [[ food ]] , the service is always wonderful and the prices are really reasonable ."	positive	positive	0.99907589
+service 	"I 've eaten at all three locations and I always love , love the food , the [[ service ]] is always wonderful and the prices are really reasonable ."	positive	positive	0.999099731
+prices 	"I 've eaten at all three locations and I always love , love the food , the service is always wonderful and the [[ prices ]] are really reasonable ."	positive	positive	0.999065936
+food 	"Not because I was pregnant , but the [[ food ]] here is always delicious ."	positive	positive	0.999060333
+meal 	Had a great [[ meal ]] there this weekend before heading to the movies !	positive	positive	0.999008894
+food 	We had a birthday party here recently and the [[ food ]] and service was amazing .	positive	positive	0.999096632
+service 	We had a birthday party here recently and the food and [[ service ]] was amazing .	positive	positive	0.999084949
+dinner menu 	"the [[ dinner menu ]] offers a variety of great entrees , including fresh seafood and huge steaks , there 's also a couple of non - meat alternatives ."	positive	positive	0.999054372
+entrees 	"the dinner menu offers a variety of great [[ entrees ]] , including fresh seafood and huge steaks , there 's also a couple of non - meat alternatives ."	positive	positive	0.999035239
+seafood 	"the dinner menu offers a variety of great entrees , including fresh [[ seafood ]] and huge steaks , there 's also a couple of non - meat alternatives ."	positive	positive	0.999021292
+steaks 	"the dinner menu offers a variety of great entrees , including fresh seafood and huge [[ steaks ]] , there 's also a couple of non - meat alternatives ."	positive	positive	0.999074578
+non - meat alternatives 	"the dinner menu offers a variety of great entrees , including fresh seafood and huge steaks , there 's also a couple of [[ non - meat alternatives ]] ."	neutral	neutral	0.914818645
+menu 	This place has the strangest [[ menu ]] and the restaurants tries too hard to make fancy food .	negative	negative	0.995801151
+food 	This place has the strangest menu and the restaurants tries too hard to make fancy [[ food ]] .	negative	negative	0.98974216
+appetizers 	"The [[ appetizers ]] are ok , but the service is slow ."	neutral	neutral	0.997040808
+service 	"The appetizers are ok , but the [[ service ]] is slow ."	negative	negative	0.996434212
+food 	the [[ food ]] - not worth the price .	negative	negative	0.99511379
+price 	the food - not worth the [[ price ]] .	negative	negative	0.990745425
+waitress 	"What can you say about a place where the [[ waitress ]] brings out the wrong entree , then verbally assaults your 80 year old grandmother and gives her lip about sending it back ( which she did politely , by the way ) ."	negative	negative	0.997178793
+entree 	"What can you say about a place where the waitress brings out the wrong [[ entree ]] , then verbally assaults your 80 year old grandmother and gives her lip about sending it back ( which she did politely , by the way ) ."	neutral	negative	0.960612595
+prices 	The [[ prices ]] are not terrible .	positive	positive	0.994053781
+bill 	15 % gratuity automatically added to the [[ bill ]] .	negative	neutral	0.877900422
+gratuity 	15 % [[ gratuity ]] automatically added to the bill .	negative	neutral	0.659210742
+halibut cheek appetizer 	"The [[ halibut cheek appetizer ]] came with a generous portion of foie gras , but that 's about the only positive thing I can say about the meal ."	neutral	neutral	0.568855524
+portion of foie gras 	"The halibut cheek appetizer came with a generous [[ portion of foie gras ]] , but that 's about the only positive thing I can say about the meal ."	positive	neutral	0.517555654
+Food 	[[ Food ]] is excellent and they also have empenadas and plaintains which are good for an afternoon snack .	positive	positive	0.998897433
+empenadas 	Food is excellent and they also have [[ empenadas ]] and plaintains which are good for an afternoon snack .	positive	positive	0.998782814
+plaintains 	Food is excellent and they also have empenadas and [[ plaintains ]] which are good for an afternoon snack .	positive	positive	0.998661876
+afternoon snack 	Food is excellent and they also have empenadas and plaintains which are good for an [[ afternoon snack ]] .	positive	neutral	0.954492092
+pasta specials 	Both a number of the appetizer and [[ pasta specials ]] were amazing .	positive	positive	0.999080658
+appetizer 	Both a number of the [[ appetizer ]] and pasta specials were amazing .	positive	positive	0.999086976
+Big Mac 	"All - time favorites include the [[ Big Mac ]] , Chicken McNuggets , Filet - O - Fish sandwich and McDonald 's famous french fries ; lighter options like entree - sized salads are also available ."	positive	positive	0.998150766
+Chicken McNuggets 	"All - time favorites include the Big Mac , [[ Chicken McNuggets ]] , Filet - O - Fish sandwich and McDonald 's famous french fries ; lighter options like entree - sized salads are also available ."	positive	positive	0.9973526
+Filet - O - Fish sandwich 	"All - time favorites include the Big Mac , Chicken McNuggets , [[ Filet - O - Fish sandwich ]] and McDonald 's famous french fries ; lighter options like entree - sized salads are also available ."	positive	positive	0.988671899
+McDonald 's famous french fries 	"All - time favorites include the Big Mac , Chicken McNuggets , Filet - O - Fish sandwich and [[ McDonald 's famous french fries ]] ; lighter options like entree - sized salads are also available ."	positive	positive	0.995480537
+entree - sized salads 	"All - time favorites include the Big Mac , Chicken McNuggets , Filet - O - Fish sandwich and McDonald 's famous french fries ; lighter options like [[ entree - sized salads ]] are also available ."	neutral	neutral	0.985224485
+pizza 	"It 's a basic pizza joint , not much to look at , but the [[ pizza ]] is what I go for ."	positive	positive	0.997945368
+Tables 	"[[ Tables ]] are close , so you better be comfortable bumping elbows with other patrons ."	negative	negative	0.923859179
+lunch 	Was her Monday for [[ lunch ]] - was working on a film in the area - and found this rare jewel .	neutral	neutral	0.996567726
+scene 	"Not too much so , but enough that there 's a great [[ scene ]] ."	positive	positive	0.998819888
+blue bar area 	Dug the [[ blue bar area ]] too .	positive	negative	0.619500101
+upstrairs dining area 	"I got the opportunity to dine at your establishment again a few weeks ago , I was in your [[ upstrairs dining area ]] ."	neutral	neutral	0.991132796
+veggie burger 	"Meat - phobes are in luck with the extraordinary [[ veggie burger ]] , made from a distinctive blend of chickpeas , carrots and other vegetables and spices ."	positive	positive	0.998506069
+chickpeas 	"Meat - phobes are in luck with the extraordinary veggie burger , made from a distinctive blend of [[ chickpeas ]] , carrots and other vegetables and spices ."	positive	positive	0.996872365
+carrots 	"Meat - phobes are in luck with the extraordinary veggie burger , made from a distinctive blend of chickpeas , [[ carrots ]] and other vegetables and spices ."	positive	positive	0.996534348
+vegetables 	"Meat - phobes are in luck with the extraordinary veggie burger , made from a distinctive blend of chickpeas , carrots and other [[ vegetables ]] and spices ."	positive	positive	0.996483922
+spices 	"Meat - phobes are in luck with the extraordinary veggie burger , made from a distinctive blend of chickpeas , carrots and other vegetables and [[ spices ]] ."	positive	positive	0.997296035
+tables 	"At peak times , the restaurant is overcrowded and [[ tables ]] are uncomfortably close ."	negative	negative	0.996669948
+service 	The [[ service ]] was on point - what else you would expect from a Ritz ?	positive	positive	0.997963309
+Menus 	"[[ Menus ]] feature seasonal picks , like sweet corn - foie gras brulee ."	neutral	neutral	0.904757559
+sweet corn - foie gras brulee 	"Menus feature seasonal picks , like [[ sweet corn - foie gras brulee ]] ."	neutral	neutral	0.849176586
+Carinthia cheese ravioli with wild mushrooms 	"Innovations are just as assured , from the simple [[ Carinthia cheese ravioli with wild mushrooms ]] to the caviar - topped sturgeon , beautifully matched with a bright green spinach - vodka sauce ."	positive	positive	0.999005139
+caviar - topped sturgeon 	"Innovations are just as assured , from the simple Carinthia cheese ravioli with wild mushrooms to the [[ caviar - topped sturgeon ]] , beautifully matched with a bright green spinach - vodka sauce ."	positive	positive	0.999031782
+green spinach - vodka sauce 	"Innovations are just as assured , from the simple Carinthia cheese ravioli with wild mushrooms to the caviar - topped sturgeon , beautifully matched with a bright [[ green spinach - vodka sauce ]] ."	positive	positive	0.998751163
+burgers 	"And these are not small , wimpy fast food type [[ burgers ]] - these are real , full sized patties ."	positive	neutral	0.907559216
+patties 	"And these are not small , wimpy fast food type burgers - these are real , full sized [[ patties ]] ."	positive	positive	0.982515097
+lunch 	"There restaurant is very casual , but perfect for [[ lunch ]] , and their delivery service is always very fast ."	neutral	positive	0.940674841
+delivery service 	"There restaurant is very casual , but perfect for lunch , and their [[ delivery service ]] is always very fast ."	positive	positive	0.996850312
+quality 	Chinatown definitely has better [[ quality ]] with cheaper prices .	positive	negative	0.992698252
+prices 	Chinatown definitely has better quality with cheaper [[ prices ]] .	positive	negative	0.990146458
+staff person 	I had to flag down a third [[ staff person ]] for a fork ... so now it 's goodbye Little RUDE Pie Company .	neutral	negative	0.991517842
+fork 	I had to flag down a third staff person for a [[ fork ]] ... so now it 's goodbye Little RUDE Pie Company .	neutral	negative	0.982732534
+specials 	"Go with the [[ specials ]] , and stay away from the salmon ."	positive	positive	0.953597426
+salmon 	"Go with the specials , and stay away from the [[ salmon ]] ."	negative	negative	0.877934039
+pastas 	The [[ pastas ]] were pretty good .	positive	positive	0.998767138
+Atmosphere 	[[ Atmosphere ]] is a bore .	negative	negative	0.992423415
+decor 	The [[ decor ]] is what initially got me in the door .	positive	positive	0.989517152
+wait staff 	The [[ wait staff ]] was very attentive and polite .	positive	positive	0.998856187
+food 	"Great restaurant , and even greater [[ food ]] !"	positive	positive	0.999010086
+dishes 	The [[ dishes ]] are remarkably tasty and such a cozy and intimate place !	positive	positive	0.999063075
+place 	The dishes are remarkably tasty and such a cozy and intimate [[ place ]] !	positive	positive	0.998991311
+desserts 	Save room for the [[ desserts ]] ! ;-)	positive	positive	0.973656774
+food 	"I love the simplicity and respect which was given to the [[ food ]] , as well the staff was freindly and knowledgable ."	positive	positive	0.998764157
+staff 	"I love the simplicity and respect which was given to the food , as well the [[ staff ]] was freindly and knowledgable ."	positive	positive	0.998984635
+Service 	[[ Service ]] was good and so was the atmosphere .	positive	positive	0.998861074
+atmosphere 	Service was good and so was the [[ atmosphere ]] .	positive	positive	0.998772919
+Branzini 	MY date and I both ordered the [[ Branzini ]] and both felt the fish was very average .	neutral	neutral	0.943679631
+fish 	MY date and I both ordered the Branzini and both felt the [[ fish ]] was very average .	negative	negative	0.988399506
+food 	"The [[ food ]] was good , the service prompt , and the price very reasonable ."	positive	positive	0.999040067
+service 	"The food was good , the [[ service ]] prompt , and the price very reasonable ."	positive	positive	0.99894923
+price 	"The food was good , the service prompt , and the [[ price ]] very reasonable ."	positive	positive	0.998886883
+menu 	"Wonderful [[ menu ]] , warm inviting ambiance , great service the FOOD keeps me coming back !"	positive	positive	0.999076486
+ambiance 	"Wonderful menu , warm inviting [[ ambiance ]] , great service the FOOD keeps me coming back !"	positive	positive	0.999094844
+service 	"Wonderful menu , warm inviting ambiance , great [[ service ]] the FOOD keeps me coming back !"	positive	positive	0.999065459
+FOOD 	"Wonderful menu , warm inviting ambiance , great service the [[ FOOD ]] keeps me coming back !"	positive	positive	0.999062955
+food 	"Great [[ food ]] , good wine and an excellent host ."	positive	positive	0.99906379
+wine 	"Great food , good [[ wine ]] and an excellent host ."	positive	positive	0.999064386
+host 	"Great food , good wine and an excellent [[ host ]] ."	positive	positive	0.999028563
+Pizzas 	[[ Pizzas ]] were excellent in addition to appetizers and main courses .	positive	positive	0.999073744
+appetizers 	Pizzas were excellent in addition to [[ appetizers ]] and main courses .	positive	positive	0.995971501
+main courses 	Pizzas were excellent in addition to appetizers and [[ main courses ]] .	positive	positive	0.956906497
+calamari 	"Definitely try the [[ calamari ]] , any pasta , or even the Sliced steak entree ."	positive	positive	0.998825848
+pasta 	"Definitely try the calamari , any [[ pasta ]] , or even the Sliced steak entree ."	positive	positive	0.998310208
+Sliced steak entree 	"Definitely try the calamari , any pasta , or even the [[ Sliced steak entree ]] ."	positive	positive	0.997334242
+caeser salad 	The [[ caeser salad ]] was great .	positive	positive	0.999150157
+fried calamari 	The [[ fried calamari ]] was even better !	positive	positive	0.999012947
+food 	The [[ food ]] was good overall .	positive	positive	0.998984277
+food 	The [[ food ]] was outstanding and the service was tops .	positive	positive	0.999056399
+service 	The food was outstanding and the [[ service ]] was tops .	positive	positive	0.998850346
+portions 	The [[ portions ]] are very large and the service is fantastic ! !	positive	positive	0.999031067
+service 	The portions are very large and the [[ service ]] is fantastic ! !	positive	positive	0.99907434
+chicken milanese 	I recomend the [[ chicken milanese ]] .	positive	neutral	0.993396878
+tapas 	"excellent [[ tapas ]] at great prices , romantic , small but not overly crowed , excellent"	positive	positive	0.999045312
+prices 	"excellent tapas at great [[ prices ]] , romantic , small but not overly crowed , excellent"	positive	positive	0.998955131
+chocolate raspberry cake 	"The [[ chocolate raspberry cake ]] is heavenly- not too sweet , but full of flavor ."	positive	positive	0.999140978
+flavor 	"The chocolate raspberry cake is heavenly- not too sweet , but full of [[ flavor ]] ."	positive	positive	0.998839796
+waiter 	"Our [[ waiter ]] was helpful and charming , the food was perfect , and the wine was good , too ."	positive	positive	0.99903512
+food 	"Our waiter was helpful and charming , the [[ food ]] was perfect , and the wine was good , too ."	positive	positive	0.999091983
+wine 	"Our waiter was helpful and charming , the food was perfect , and the [[ wine ]] was good , too ."	positive	positive	0.999096513
+MEAL 	I HAVE NEVER HAD A BAD [[ MEAL ]] ( OR BAD SERVICE ) @ PIGALLE .	positive	positive	0.982203007
+SERVICE 	I HAVE NEVER HAD A BAD MEAL ( OR BAD [[ SERVICE ]] ) @ PIGALLE .	positive	positive	0.949861288
+hot dogs 	Best [[ hot dogs ]] in the tri - state area .	positive	positive	0.998559415
+service 	The [[ service ]] was very attentive and very generous .	positive	positive	0.999005139
+food 	"We had tons of great [[ food ]] , wine , and desserts ."	positive	positive	0.999083638
+wine 	"We had tons of great food , [[ wine ]] , and desserts ."	positive	positive	0.99907887
+desserts 	"We had tons of great food , wine , and [[ desserts ]] ."	positive	positive	0.999121368
+dining experience 	Really Lovely [[ dining experience ]] in the midst of buzzing midtown area .	positive	positive	0.999085784
+food 	The [[ food ]] really is n't very good and the service is terrible .	negative	negative	0.99652797
+service 	The food really is n't very good and the [[ service ]] is terrible .	negative	negative	0.99571842
+escargot 	"Not only do they have the best [[ escargot ]] in town , they always try to accomodate our toddler ."	positive	positive	0.99791497
+menu 	"Between my guest and I , we sampled at least 80 % of the [[ menu ]] , and they were all hits ."	positive	neutral	0.993977547
+Deco 	The [[ Deco ]] and ambiance was really romantic .	positive	positive	0.9989568
+ambiance 	The Deco and [[ ambiance ]] was really romantic .	positive	positive	0.999028087
+french food 	Just go in and sample the greatest [[ french food ]] west of Daniel .	positive	positive	0.997817039
+Indian food 	"For someone who used to hate [[ Indian food ]] , Baluchi 's has changed my mid ."	positive	neutral	0.97695893
+curry 	"Finally a [[ curry ]] that I can eat , enjoy and not suffer from gastritis from 3 hours later ."	positive	positive	0.998606026
+poori 	"All are GREAT - [[ poori ]] , naan , paratha all FRESH ."	positive	positive	0.999091029
+naan 	"All are GREAT - poori , [[ naan ]] , paratha all FRESH ."	positive	positive	0.999073744
+paratha 	"All are GREAT - poori , naan , [[ paratha ]] all FRESH ."	positive	positive	0.999082208
+homemade breads 	Try the [[ homemade breads ]] .	positive	positive	0.998999298
+sushi 	"This place has beautiful [[ sushi ]] , and it 's delicious CHEAP ."	positive	positive	0.999097824
+Korean dishes 	It also has lots of other [[ Korean dishes ]] that are affordable and just as yummy .	positive	positive	0.998815775
+prix fixe menu 	I went for restaurant week and ordered off the [[ prix fixe menu ]]	neutral	neutral	0.993493974
+waiter 	"Not only was the [[ waiter ]] efficient and courteous , but also extremely helpful ."	positive	positive	0.998860717
+place 	"This [[ place ]] is classy , chic , the service is warm and hospitable , and the food is outstanding ."	positive	positive	0.999013901
+service 	"This place is classy , chic , the [[ service ]] is warm and hospitable , and the food is outstanding ."	positive	positive	0.999029994
+food 	"This place is classy , chic , the service is warm and hospitable , and the [[ food ]] is outstanding ."	positive	positive	0.999075413
+burgers 	"Great [[ burgers ]] , grilled cheeses and french fries ."	positive	positive	0.999090791
+grilled cheeses 	"Great burgers , [[ grilled cheeses ]] and french fries ."	positive	positive	0.9991166
+french fries 	"Great burgers , grilled cheeses and [[ french fries ]] ."	positive	positive	0.999049842
+Yellowfin Tuna 	The [[ Yellowfin Tuna ]] and Calf 's liver are my favorites !	positive	positive	0.999016166
+Calf 's liver 	The Yellowfin Tuna and [[ Calf 's liver ]] are my favorites !	positive	positive	0.998995125
+Sushi 	[[ Sushi ]] so fresh that it crunches in your mouth .	positive	positive	0.998968482
+bill 	But make sure you have enough room on your credit card as the [[ bill ]] will leave a big dent in your wallet .	negative	negative	0.996528327
+steak 	They bring a sauce cart up to your table and offer you up to 7 or 8 choices of sauces for your [[ steak ]] ( I tried them ALL ) .	neutral	neutral	0.996338606
+choices of sauces 	They bring a sauce cart up to your table and offer you up to 7 or 8 [[ choices of sauces ]] for your steak ( I tried them ALL ) .	positive	neutral	0.988326967
+sauce cart 	They bring a [[ sauce cart ]] up to your table and offer you up to 7 or 8 choices of sauces for your steak ( I tried them ALL ) .	neutral	neutral	0.977174938
+table 	They bring a sauce cart up to your [[ table ]] and offer you up to 7 or 8 choices of sauces for your steak ( I tried them ALL ) .	neutral	neutral	0.995715439
+sushi 	"Not only was the [[ sushi ]] fresh , they also served other entrees allowed each guest something to choose from and we all left happy ( try the duck !"	positive	positive	0.999043405
+duck 	"Not only was the sushi fresh , they also served other entrees allowed each guest something to choose from and we all left happy ( try the [[ duck ]] !"	positive	positive	0.996779621
+entrees 	"Not only was the sushi fresh , they also served other [[ entrees ]] allowed each guest something to choose from and we all left happy ( try the duck !"	neutral	positive	0.998292983
+variety 	good [[ variety ]] but nothing surprising .	positive	positive	0.998351336
+utensils 	"After I paid for my purchase , I noticed they had not given me [[ utensils ]] so I could eat my pie ."	neutral	negative	0.629067123
+pie 	"After I paid for my purchase , I noticed they had not given me utensils so I could eat my [[ pie ]] ."	neutral	neutral	0.997400403
+thin crust 	Likewise if you like really [[ thin crust ]] or really big slices then Nick and Joe 's may not be your favorite .	negative	neutral	0.928631842
+slices 	Likewise if you like really thin crust or really big [[ slices ]] then Nick and Joe 's may not be your favorite .	negative	neutral	0.931710064
+green beans 	"No [[ green beans ]] , no egg , no anchovy dressing , no nicoise olives , no red onion ."	neutral	neutral	0.547531962
+egg 	"No green beans , no [[ egg ]] , no anchovy dressing , no nicoise olives , no red onion ."	neutral	neutral	0.838081717
+anchovy dressing 	"No green beans , no egg , no [[ anchovy dressing ]] , no nicoise olives , no red onion ."	neutral	negative	0.505448699
+nicoise olives 	"No green beans , no egg , no anchovy dressing , no [[ nicoise olives ]] , no red onion ."	neutral	neutral	0.833196163
+red onion 	"No green beans , no egg , no anchovy dressing , no nicoise olives , no [[ red onion ]] ."	neutral	neutral	0.883400261
+meal 	"Build a [[ meal ]] with side orders like Amazin ' Greens salads , Buffalo Chicken Kickers and Cinna Stix ."	neutral	positive	0.992491663
+Amazin ' Greens salads 	"Build a meal with side orders like [[ Amazin ' Greens salads ]] , Buffalo Chicken Kickers and Cinna Stix ."	neutral	positive	0.993254483
+Buffalo Chicken Kickers 	"Build a meal with side orders like Amazin ' Greens salads , [[ Buffalo Chicken Kickers ]] and Cinna Stix ."	neutral	positive	0.993675292
+Cinna Stix 	"Build a meal with side orders like Amazin ' Greens salads , Buffalo Chicken Kickers and [[ Cinna Stix ]] ."	neutral	positive	0.983464181
+side orders 	"Build a meal with [[ side orders ]] like Amazin ' Greens salads , Buffalo Chicken Kickers and Cinna Stix ."	neutral	positive	0.99211055
+fries 	"Thick [[ fries ]] , meaty chili and stuffed baked potatoes round out a menu that includes a cool , ultra - thick chocolate Frosty ."	neutral	positive	0.998804092
+meaty chili 	"Thick fries , [[ meaty chili ]] and stuffed baked potatoes round out a menu that includes a cool , ultra - thick chocolate Frosty ."	neutral	positive	0.999062479
+stuffed baked potatoes 	"Thick fries , meaty chili and [[ stuffed baked potatoes ]] round out a menu that includes a cool , ultra - thick chocolate Frosty ."	neutral	positive	0.999023676
+menu 	"Thick fries , meaty chili and stuffed baked potatoes round out a [[ menu ]] that includes a cool , ultra - thick chocolate Frosty ."	neutral	positive	0.998746276
+chocolate Frosty 	"Thick fries , meaty chili and stuffed baked potatoes round out a menu that includes a cool , ultra - thick [[ chocolate Frosty ]] ."	positive	positive	0.999059141
+waiter 	I always find myself asking the [[ waiter ]] to make something bland and different than what is on the menu .	neutral	negative	0.976709366
+menu 	I always find myself asking the waiter to make something bland and different than what is on the [[ menu ]] .	neutral	neutral	0.993780077
+cake 	"Good cake BUT : it was not the best [[ cake ]] i 've ever had , and definately not worth standing outside on the sidewalk being herded like cattle by indifferent and overworked employees ."	negative	negative	0.994794667
+employees 	"Good cake BUT : it was not the best cake i 've ever had , and definately not worth standing outside on the sidewalk being herded like cattle by indifferent and overworked [[ employees ]] ."	negative	negative	0.992620587
+Cherry Marscapone 	"The closest that I got was the [[ Cherry Marscapone ]] , but they were out of it that day ."	neutral	neutral	0.730885804
+roti canai appetizer 	"The homage to India is most evident in the delectable [[ roti canai appetizer ]] , a fried pancake served with pungent curry dipping sauce , while the mango chicken offers a surprisingly sophisticated , fresh take on sweet - and - sour ."	positive	positive	0.999076843
+mango chicken 	"The homage to India is most evident in the delectable roti canai appetizer , a fried pancake served with pungent curry dipping sauce , while the [[ mango chicken ]] offers a surprisingly sophisticated , fresh take on sweet - and - sour ."	positive	positive	0.999020696
+fried pancake served with pungent curry dipping sauce 	"The homage to India is most evident in the delectable roti canai appetizer , a [[ fried pancake served with pungent curry dipping sauce ]] , while the mango chicken offers a surprisingly sophisticated , fresh take on sweet - and - sour ."	positive	positive	0.998932421
+outside 	"It does n't look like much on the [[ outside ]] , but the minute you walk inside , it 's a whole other atmosphere ."	negative	negative	0.9125669
+atmosphere 	"It does n't look like much on the outside , but the minute you walk inside , it 's a whole other [[ atmosphere ]] ."	positive	positive	0.463105917
+ground chickpea soup 	The [[ ground chickpea soup ]] we sampled as a starter tasted somewhat thin .	negative	neutral	0.564535141
+starter 	The ground chickpea soup we sampled as a [[ starter ]] tasted somewhat thin .	neutral	neutral	0.980122626
+sushi 	"We requested they re - slice the [[ sushi ]] , and it was returned to us in small cheese - like cubes ."	negative	neutral	0.977322817
+service 	"The [[ service ]] , however , is a peg or two below the quality of food ( horrible bartenders ) , and the clientele , for the most part , are rowdy , loud - mouthed commuters ( this could explain the bad attitudes from the staff ) getting loaded for an AC / DC concert or a Knicks game ."	negative	negative	0.997743964
+quality of food 	"The service , however , is a peg or two below the [[ quality of food ]] ( horrible bartenders ) , and the clientele , for the most part , are rowdy , loud - mouthed commuters ( this could explain the bad attitudes from the staff ) getting loaded for an AC / DC concert or a Knicks game ."	positive	negative	0.875833869
+bartenders 	"The service , however , is a peg or two below the quality of food ( horrible [[ bartenders ]] ) , and the clientele , for the most part , are rowdy , loud - mouthed commuters ( this could explain the bad attitudes from the staff ) getting loaded for an AC / DC concert or a Knicks game ."	negative	negative	0.997087181
+clientele 	"The service , however , is a peg or two below the quality of food ( horrible bartenders ) , and the [[ clientele ]] , for the most part , are rowdy , loud - mouthed commuters ( this could explain the bad attitudes from the staff ) getting loaded for an AC / DC concert or a Knicks game ."	negative	negative	0.996926725
+staff 	"The service , however , is a peg or two below the quality of food ( horrible bartenders ) , and the clientele , for the most part , are rowdy , loud - mouthed commuters ( this could explain the bad attitudes from the [[ staff ]] ) getting loaded for an AC / DC concert or a Knicks game ."	negative	negative	0.996740758
+meal 	"If you 're in the neighborhood , definitely stop by for a great [[ meal ]] ."	positive	positive	0.998920202
+desserts 	"Unfortunately , with our show tickets , we did n't have time to sample any [[ desserts ]] ."	neutral	negative	0.514843822
+tables 	Make more [[ tables ]] - perhaps a rooftop bar ?	negative	neutral	0.968791425
+rooftop bar 	Make more tables - perhaps a [[ rooftop bar ]] ?	neutral	neutral	0.954917789
+decoration 	"The [[ decoration ]] was feeling like we was on the Cairo , actually the street is part of that adventure ."	positive	positive	0.546308339
+ambience 	"Although small , it has beautiful [[ ambience ]] , excellent food ( the catfish is delicious - if ya do n't mind it a lil salty ) and attentive service ."	positive	positive	0.999092102
+food 	"Although small , it has beautiful ambience , excellent [[ food ]] ( the catfish is delicious - if ya do n't mind it a lil salty ) and attentive service ."	positive	positive	0.99907279
+catfish 	"Although small , it has beautiful ambience , excellent food ( the [[ catfish ]] is delicious - if ya do n't mind it a lil salty ) and attentive service ."	positive	positive	0.999055684
+service 	"Although small , it has beautiful ambience , excellent food ( the catfish is delicious - if ya do n't mind it a lil salty ) and attentive [[ service ]] ."	positive	positive	0.999030232
+food 	I did n't go there for [[ food ]] so I ca n't comment .	neutral	neutral	0.98397845
+brisket 	"Stick to the items the place does best , [[ brisket ]] , ribs , wings , cajun shrimp is good , not great ."	positive	positive	0.999061048
+ribs 	"Stick to the items the place does best , brisket , [[ ribs ]] , wings , cajun shrimp is good , not great ."	positive	positive	0.999037743
+wings 	"Stick to the items the place does best , brisket , ribs , [[ wings ]] , cajun shrimp is good , not great ."	positive	positive	0.999024868
+cajun shrimp 	"Stick to the items the place does best , brisket , ribs , wings , [[ cajun shrimp ]] is good , not great ."	neutral	positive	0.999069035
+atmosphere 	"Hip boutiques and bars on Ludlow add to the artsy , laid - back [[ atmosphere ]] at this Israeli - style takeout and eat - in burger joint ."	positive	positive	0.99890542
+counter 	"Young neighborhood trendies graze at the [[ counter ]] during the day , while chic , art - house drinkers with heavy doses of the munchies pile in late at night ."	neutral	neutral	0.985603571
+bottle of wine 	Bring your date and a [[ bottle of wine ]] !	neutral	positive	0.798646331
+menu 	"My Chelsea 's impressive and creative [[ menu ]] includes modern , Westernized Japanese dishes such as Foie Gras Unagi Napolean , Jap style hamburger steak , spicy cod roe spaghetti , black cod with miso base , and rack of lamb in black truffle sauce , to name a few ."	positive	positive	0.998901486
+Japanese dishes 	"My Chelsea 's impressive and creative menu includes modern , Westernized [[ Japanese dishes ]] such as Foie Gras Unagi Napolean , Jap style hamburger steak , spicy cod roe spaghetti , black cod with miso base , and rack of lamb in black truffle sauce , to name a few ."	neutral	positive	0.998170733
+Foie Gras Unagi Napolean 	"My Chelsea 's impressive and creative menu includes modern , Westernized Japanese dishes such as [[ Foie Gras Unagi Napolean ]] , Jap style hamburger steak , spicy cod roe spaghetti , black cod with miso base , and rack of lamb in black truffle sauce , to name a few ."	neutral	positive	0.933750153
+Jap style hamburger steak 	"My Chelsea 's impressive and creative menu includes modern , Westernized Japanese dishes such as Foie Gras Unagi Napolean , [[ Jap style hamburger steak ]] , spicy cod roe spaghetti , black cod with miso base , and rack of lamb in black truffle sauce , to name a few ."	neutral	positive	0.981858492
+spicy cod roe spaghetti 	"My Chelsea 's impressive and creative menu includes modern , Westernized Japanese dishes such as Foie Gras Unagi Napolean , Jap style hamburger steak , [[ spicy cod roe spaghetti ]] , black cod with miso base , and rack of lamb in black truffle sauce , to name a few ."	neutral	positive	0.97968322
+black cod with miso base 	"My Chelsea 's impressive and creative menu includes modern , Westernized Japanese dishes such as Foie Gras Unagi Napolean , Jap style hamburger steak , spicy cod roe spaghetti , [[ black cod with miso base ]] , and rack of lamb in black truffle sauce , to name a few ."	neutral	neutral	0.801385164
+rack of lamb in black truffle sauce 	"My Chelsea 's impressive and creative menu includes modern , Westernized Japanese dishes such as Foie Gras Unagi Napolean , Jap style hamburger steak , spicy cod roe spaghetti , black cod with miso base , and [[ rack of lamb in black truffle sauce ]] , to name a few ."	neutral	neutral	0.773159921
+food 	"His [[ food ]] is excellent ( and not expensive by NYC standards- no entrees over $ 30 , most appetizers $ 12 to 14 ) ."	positive	positive	0.999007523
+appetizers 	"His food is excellent ( and not expensive by NYC standards- no entrees over $ 30 , most [[ appetizers ]] $ 12 to 14 ) ."	positive	neutral	0.996276319
+entrees 	"His food is excellent ( and not expensive by NYC standards- no [[ entrees ]] over $ 30 , most appetizers $ 12 to 14 ) ."	positive	neutral	0.91621381
+food 	The [[ food ]] is consistant and good but how it got name Best Diner In Manhattan is beyond me .	positive	positive	0.998993218
+pasta primavera 	"The [[ pasta primavera ]] was outstanding as well , lots of fresh veggies ."	positive	positive	0.999104679
+fresh veggies 	"The pasta primavera was outstanding as well , lots of [[ fresh veggies ]] ."	positive	positive	0.999140382
+sushi 	"do n't get me wrong - [[ sushi ]] was good , just not fantastic ."	positive	positive	0.996193528
+flan 	Being Puerto Rican I know a thing or two about [[ flan ]] and this place serves one of the best ( I hope Mom does n't read this ! ) .	positive	positive	0.994136214
+pizza 	"Been to the one in Brooklyn for over 25 years , now I do nt have to go over the bridge for the best [[ pizza ]] .... Hanx"	positive	positive	0.997225046
+dinner 	Had [[ dinner ]] here on a Friday and the food was great .	neutral	positive	0.841515362
+food 	Had dinner here on a Friday and the [[ food ]] was great .	positive	positive	0.999091148
+wine 	"We recently spent New Year 's Eve at the restaurant , and had a great experience , from the [[ wine ]] to the dessert menu ."	positive	positive	0.998973131
+dessert menu 	"We recently spent New Year 's Eve at the restaurant , and had a great experience , from the wine to the [[ dessert menu ]] ."	positive	positive	0.99782455
+place 	"Highly recommended ... As stated , I have n't dined * in * the restaurant but stopped by there to pick up takeout and it seems a very relaxing [[ place ]] ; also , the bar looks nice ."	positive	positive	0.999024391
+bar 	"Highly recommended ... As stated , I have n't dined * in * the restaurant but stopped by there to pick up takeout and it seems a very relaxing place ; also , the [[ bar ]] looks nice ."	positive	positive	0.999032259
+takeout 	"Highly recommended ... As stated , I have n't dined * in * the restaurant but stopped by there to pick up [[ takeout ]] and it seems a very relaxing place ; also , the bar looks nice ."	neutral	positive	0.974071264
+ambiance 	"The [[ ambiance ]] was fine , a little loud but still nice and romantic ."	positive	positive	0.998662233
+cocktail hour 	"but , the filet mignon was not very good at all [[ cocktail hour ]] includes free appetizers ( nice non - sushi selection ) ."	positive	positive	0.498424381
+filet mignon 	"but , the [[ filet mignon ]] was not very good at all cocktail hour includes free appetizers ( nice non - sushi selection ) ."	negative	negative	0.996918321
+non - sushi selection 	"but , the filet mignon was not very good at all cocktail hour includes free appetizers ( nice [[ non - sushi selection ]] ) ."	positive	positive	0.791187644
+appetizers 	"but , the filet mignon was not very good at all cocktail hour includes free [[ appetizers ]] ( nice non - sushi selection ) ."	positive	positive	0.937510133
+courses 	It took about 2 1/2 hours to be served our 2 [[ courses ]] .	neutral	neutral	0.975850821
+served 	It took about 2 1/2 hours to be [[ served ]] our 2 courses .	negative	neutral	0.760663033
+place 	Who said go when the [[ place ]] is quiet during the day ?	neutral	positive	0.948838353
+size 	Can be a bit busy around peak times because of the [[ size ]] .	negative	negative	0.996664226
+chicken tacos 	"I was on jury duty , rode my bike up Centre Street on my lunch break and came across this great little place with awesome [[ chicken tacos ]] and Hibiscus lemonade ."	positive	positive	0.999120057
+Hibiscus lemonade 	"I was on jury duty , rode my bike up Centre Street on my lunch break and came across this great little place with awesome chicken tacos and [[ Hibiscus lemonade ]] ."	positive	positive	0.997883976
+place 	"I was on jury duty , rode my bike up Centre Street on my lunch break and came across this great little [[ place ]] with awesome chicken tacos and Hibiscus lemonade ."	positive	positive	0.999051154
+place 	good [[ place ]] to hang out during the day after shopping or to grab a simple soup or classic french dish over a glass of wine .	positive	positive	0.998896122
+soup 	good place to hang out during the day after shopping or to grab a simple [[ soup ]] or classic french dish over a glass of wine .	neutral	positive	0.998875201
+french dish 	good place to hang out during the day after shopping or to grab a simple soup or classic [[ french dish ]] over a glass of wine .	neutral	positive	0.998998582
+glass of wine 	good place to hang out during the day after shopping or to grab a simple soup or classic french dish over a [[ glass of wine ]] .	neutral	neutral	0.865363538
+place 	Very nice touch that very much fits the [[ place ]] .	positive	positive	0.998205543
+casual drink 	"However , there is just something so great about being outdoors , in great landscaping , enjoying a [[ casual drink ]] that makes going to this place worthwhile ."	positive	positive	0.999004304
+outdoors 	"However , there is just something so great about being [[ outdoors ]] , in great landscaping , enjoying a casual drink that makes going to this place worthwhile ."	positive	positive	0.99891448
+place 	"However , there is just something so great about being outdoors , in great landscaping , enjoying a casual drink that makes going to this [[ place ]] worthwhile ."	positive	positive	0.995880604
+dance floor 	We were seated promptly in close proximity to the [[ dance floor ]] .	neutral	positive	0.848792434
+pre - show meal 	"If you are here as a [[ pre - show meal ]] , hop in a cab and take the extra 10 minutes to go to the uptown location ."	neutral	neutral	0.910768449
+fried foods 	"The comments about [[ fried foods ]] is correct ( below ) but the other dishes , including the lamb entree and many of the salads ( avocado shrimp ) were quite good ."	negative	neutral	0.98375386
+dishes 	"The comments about fried foods is correct ( below ) but the other [[ dishes ]] , including the lamb entree and many of the salads ( avocado shrimp ) were quite good ."	positive	positive	0.998812199
+lamb entree 	"The comments about fried foods is correct ( below ) but the other dishes , including the [[ lamb entree ]] and many of the salads ( avocado shrimp ) were quite good ."	positive	positive	0.99889636
+salads ( avocado shrimp ) 	"The comments about fried foods is correct ( below ) but the other dishes , including the lamb entree and many of the [[ salads ( avocado shrimp ) ]] were quite good ."	positive	positive	0.991503
+service 	"Slow [[ service ]] , but when you 're hanging around with groups of 10 or 20 , who really notices ?"	negative	negative	0.993754745
+dabs of real mozzarella 	The sauce is excellent ( very fresh ) with [[ dabs of real mozzarella ]] .	neutral	positive	0.999140739
+sauce 	The [[ sauce ]] is excellent ( very fresh ) with dabs of real mozzarella .	positive	positive	0.99910599
+drinks 	"Do n't ever bother - the [[ drinks ]] were awful , but it was the people who work there that really made this the worst experience at dining ."	negative	negative	0.996613085
+people 	"Do n't ever bother - the drinks were awful , but it was the [[ people ]] who work there that really made this the worst experience at dining ."	negative	negative	0.993525147
+dining 	"Do n't ever bother - the drinks were awful , but it was the people who work there that really made this the worst experience at [[ dining ]] ."	negative	neutral	0.988967717
+room 	"The [[ room ]] is a little plain , but it 's difficult to make such a small place exciting and I would not suggest that as a reason not to go ."	negative	negative	0.997153878
+place 	"The room is a little plain , but it 's difficult to make such a small [[ place ]] exciting and I would not suggest that as a reason not to go ."	negative	negative	0.975293994
+Prices 	[[ Prices ]] even outside of restaurant week were great .	positive	positive	0.998865008
+space 	"A small , outdoor eating area makes for a private , comfortable [[ space ]] to study alone or meet up with friends ."	positive	positive	0.99755162
+outdoor eating area 	"A small , [[ outdoor eating area ]] makes for a private , comfortable space to study alone or meet up with friends ."	positive	positive	0.9807809
+[ female ] servers 	"And all the [[ [ female ] servers ]] are cute too , which is always nice ."	positive	positive	0.999001563
+dessert 	"The best [[ dessert ]] , a chocolate and peanut butter tart , is n't particularly Hawaiian , but it 's a small world when it comes to sweets ."	positive	positive	0.990141332
+chocolate and peanut butter tart 	"The best dessert , a [[ chocolate and peanut butter tart ]] , is n't particularly Hawaiian , but it 's a small world when it comes to sweets ."	positive	positive	0.82723999
+sweets 	"The best dessert , a chocolate and peanut butter tart , is n't particularly Hawaiian , but it 's a small world when it comes to [[ sweets ]] ."	neutral	positive	0.906817138
+appetizer 	"for an [[ appetizer ]] , their calamari is a winner ."	neutral	positive	0.852106988
+calamari 	"for an appetizer , their [[ calamari ]] is a winner ."	positive	positive	0.99240303
+service 	Satay is one of those favorite haunts on Washington where the [[ service ]] and food is always on the money .	positive	positive	0.996081412
+food 	Satay is one of those favorite haunts on Washington where the service and [[ food ]] is always on the money .	positive	positive	0.994923651
+dinner 	After [[ dinner ]] I heard music playing and discovered that there is a lounge downstairs .	neutral	neutral	0.996890843
+music 	After dinner I heard [[ music ]] playing and discovered that there is a lounge downstairs .	neutral	neutral	0.982902944
+lounge 	After dinner I heard music playing and discovered that there is a [[ lounge ]] downstairs .	neutral	neutral	0.991470516
+room 	"The [[ room ]] is a gorgeous , bi - level space and the long bar perfect for a drink ."	positive	positive	0.999020457
+bi - level space 	"The room is a gorgeous , [[ bi - level space ]] and the long bar perfect for a drink ."	positive	positive	0.999056756
+long bar 	"The room is a gorgeous , bi - level space and the [[ long bar ]] perfect for a drink ."	positive	positive	0.999005258
+drink 	"The room is a gorgeous , bi - level space and the long bar perfect for a [[ drink ]] ."	neutral	positive	0.764957905
+appetizer selection 	"Two complaints- their [[ appetizer selection ]] stinks , it would be nice to get some mozzarella sticks on the menu ."	negative	negative	0.980408907
+mozzarella sticks 	"Two complaints- their appetizer selection stinks , it would be nice to get some [[ mozzarella sticks ]] on the menu ."	neutral	positive	0.996299803
+menu 	"Two complaints- their appetizer selection stinks , it would be nice to get some mozzarella sticks on the [[ menu ]] ."	negative	neutral	0.995369017
+waitstaff 	I was especially impressed during the bday party when the [[ waitstaff ]] went above and beyond in helping me decorate and bring out a bday cake as well as offering prompt and friendly service to a 15 person party .	positive	positive	0.998476923
+service 	I was especially impressed during the bday party when the waitstaff went above and beyond in helping me decorate and bring out a bday cake as well as offering prompt and friendly [[ service ]] to a 15 person party .	positive	positive	0.998606026
+chicken and falafel platters 	The [[ chicken and falafel platters ]] were nondescript combinations with fresh leaf salad .	neutral	negative	0.931104064
+fresh leaf salad 	The chicken and falafel platters were nondescript combinations with [[ fresh leaf salad ]] .	neutral	neutral	0.74507308
+atmosphere 	"The [[ atmosphere ]] takes you to that place , the place many dream of ."	positive	positive	0.998791873
+waiters 	"several times and put up with the [[ waiters ]] ' bad manners , knowing that their job is n't easy ."	negative	negative	0.997131586
+desserts 	"The service is great ( maybe even borderline nagging but at least you get attention ) , the [[ desserts ]] are excellent and the coffee is so very good ..."	positive	positive	0.999099493
+coffee 	"The service is great ( maybe even borderline nagging but at least you get attention ) , the desserts are excellent and the [[ coffee ]] is so very good ..."	positive	positive	0.999060929
+served 	They are [[ served ]] on Focacchia bread and are to die for .	neutral	positive	0.991880953
+Focacchia bread 	They are served on [[ Focacchia bread ]] and are to die for .	neutral	positive	0.996803641
+smoothies 	"While the [[ smoothies ]] are a little big for me , the fresh juices are the best I have ever had !"	negative	negative	0.994130313
+fresh juices 	"While the smoothies are a little big for me , the [[ fresh juices ]] are the best I have ever had !"	positive	positive	0.999100327
+pialla 	"The food is just OKAY , and it 's almost not worth going unless you 're getting the [[ pialla ]] , which is the only dish that 's really good ."	positive	positive	0.771852732
+dish 	"The food is just OKAY , and it 's almost not worth going unless you 're getting the pialla , which is the only [[ dish ]] that 's really good ."	positive	positive	0.995869577
+fresh salsa 	"The guac is fresh , yet lacking flavor , we like to add our [[ fresh salsa ]] into it ."	neutral	positive	0.998001635
+flavor 	"The guac is fresh , yet lacking [[ flavor ]] , we like to add our fresh salsa into it ."	negative	negative	0.968095005
+prices 	"The new menu has a few creative items , they were smart enough to keep some of the old favorites ( but they raised the [[ prices ]] ) , the staff is friendly most of the time , but I must agree with the person that wrote about their favorite words : No , ca n't , sorry ... , boy , they wo n't bend the rules for anyone ."	negative	negative	0.976321638
+new menu 	"The [[ new menu ]] has a few creative items , they were smart enough to keep some of the old favorites ( but they raised the prices ) , the staff is friendly most of the time , but I must agree with the person that wrote about their favorite words : No , ca n't , sorry ... , boy , they wo n't bend the rules for anyone ."	positive	positive	0.998224914
+lunch 	It ' only open for [[ lunch ]] but the food is so good !	neutral	neutral	0.997009337
+food 	It ' only open for lunch but the [[ food ]] is so good !	positive	positive	0.999053657
+seafood 	If you like [[ seafood ]] and/or Greek food you will love this place though it is not limited to just these things .	positive	positive	0.992631197
+Greek food 	If you like seafood and/or [[ Greek food ]] you will love this place though it is not limited to just these things .	positive	positive	0.996885955
+menu 	" The [[ menu ]] includes pub fare -- burgers , steaks and shepherds pie --and even a portabella lasagna for those black sheep known as  vegetarians ."	neutral	positive	0.744485855
+burgers 	" The menu includes pub fare -- [[ burgers ]] , steaks and shepherds pie --and even a portabella lasagna for those black sheep known as  vegetarians ."	neutral	neutral	0.749480784
+steaks 	" The menu includes pub fare -- burgers , [[ steaks ]] and shepherds pie --and even a portabella lasagna for those black sheep known as  vegetarians ."	neutral	neutral	0.702024281
+shepherds pie 	" The menu includes pub fare -- burgers , steaks and [[ shepherds pie ]] --and even a portabella lasagna for those black sheep known as  vegetarians ."	neutral	neutral	0.681191385
+portabella lasagna 	" The menu includes pub fare -- burgers , steaks and shepherds pie --and even a [[ portabella lasagna ]] for those black sheep known as  vegetarians ."	neutral	neutral	0.984768331
+pub fare 	" The menu includes [[ pub fare ]] -- burgers , steaks and shepherds pie --and even a portabella lasagna for those black sheep known as  vegetarians ."	neutral	neutral	0.745005608
+food 	How can they survive serving mediocre [[ food ]] at exorbitant prices ? !	neutral	neutral	0.966106474
+prices 	How can they survive serving mediocre food at exorbitant [[ prices ]] ? !	negative	negative	0.976738453
+service 	The food was mediocre and the [[ service ]] was severely slow .	negative	negative	0.996814072
+food 	The [[ food ]] was mediocre and the service was severely slow .	neutral	neutral	0.981177688
+food 	i have eaten here on a different occasion - the [[ food ]] is mediocre for the prices .	neutral	neutral	0.994751394
+prices 	i have eaten here on a different occasion - the food is mediocre for the [[ prices ]] .	negative	neutral	0.987786949
+menu 	I 'm looking forward to going back soon and eventually trying most everything on the [[ menu ]] !	positive	positive	0.653107882
+menu 	I just had my first visit to this place and ca n't wait to go back and slowly work my way through the [[ menu ]] .	neutral	neutral	0.993821204
+waiter 	I asked repeatedly what the status of the meal was and was pretty much grunted at by the unbelievably rude [[ waiter ]] .	negative	negative	0.994873106
+meal 	I asked repeatedly what the status of the [[ meal ]] was and was pretty much grunted at by the unbelievably rude waiter .	neutral	neutral	0.797884405
+brunch 	I stopped by for some [[ brunch ]] today and had the vegan cranberry pancakes and some rice milk .	neutral	neutral	0.996246755
+vegan cranberry pancakes 	I stopped by for some brunch today and had the [[ vegan cranberry pancakes ]] and some rice milk .	neutral	neutral	0.987049639
+rice milk 	I stopped by for some brunch today and had the vegan cranberry pancakes and some [[ rice milk ]] .	neutral	neutral	0.995336711
+bartender 	Sweet Irish [[ bartender ]] is always happy and able to bring a smile to my friends a my face .	positive	positive	0.999010205
+service 	Its good to go there for drinks if you do n't want to get drunk because you 'll be lucky if you can get one drink an hour the [[ service ]] is so bad .	negative	negative	0.996594846
+drink 	Its good to go there for drinks if you do n't want to get drunk because you 'll be lucky if you can get one [[ drink ]] an hour the service is so bad .	neutral	neutral	0.995185912
+drinks 	Its good to go there for [[ drinks ]] if you do n't want to get drunk because you 'll be lucky if you can get one drink an hour the service is so bad .	neutral	neutral	0.971496522
+owner 	"Anyway , the [[ owner ]] was fake ."	negative	negative	0.994920552
+Owner 	[[ Owner ]] is pleasant and entertaining .	positive	positive	0.999001443
+food 	"I have never in my life sent back [[ food ]] before , but I simply had to , and the waiter argued with me over this ."	negative	neutral	0.996736944
+waiter 	"I have never in my life sent back food before , but I simply had to , and the [[ waiter ]] argued with me over this ."	negative	negative	0.997136831
+food 	"Although the restaurant itself is nice , I prefer not to go for the [[ food ]] ."	negative	negative	0.544501245
+Creamy appetizers 	"[[ Creamy appetizers ]] -- taramasalata , eggplant salad , and Greek yogurt ( with cuccumber , dill , and garlic ) taste excellent when on warm pitas ."	positive	positive	0.999118268
+warm pitas 	"Creamy appetizers -- taramasalata , eggplant salad , and Greek yogurt ( with cuccumber , dill , and garlic ) taste excellent when on [[ warm pitas ]] ."	neutral	positive	0.617916584
+taramasalata 	"Creamy appetizers -- [[ taramasalata ]] , eggplant salad , and Greek yogurt ( with cuccumber , dill , and garlic ) taste excellent when on warm pitas ."	positive	positive	0.999034405
+eggplant salad 	"Creamy appetizers -- taramasalata , [[ eggplant salad ]] , and Greek yogurt ( with cuccumber , dill , and garlic ) taste excellent when on warm pitas ."	positive	positive	0.999076128
+"Greek yogurt ( with cuccumber , dill , and garlic ) "	"Creamy appetizers -- taramasalata , eggplant salad , and [[ Greek yogurt ( with cuccumber , dill , and garlic ) ]] taste excellent when on warm pitas ."	positive	positive	0.998233557
