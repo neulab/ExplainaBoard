@@ -10,7 +10,7 @@
 * Corresponding Author: Yiran Chen, Pengfei Liu, Xipeng Qiu.
 
 ## Structure
-The system_output contains 7 system outputs of FactualDiagnostics (FactCC, FactCC_sub_adv, Feqa, MnliBert, MnliRoberta, MnliElectra, Dae). The output file are named with pattern "test-{base test set name}\_{adversarial diagnostic set name}". Every output file is a tsv file, the text, claim, gold label and predicted label are concate with "\t".
+The system_output contains 7 system outputs of FactualDiagnostics (FactCC, FactCC_sub_adv, Feqa, MnliBert, MnliRoberta, MnliElectra, Dae). The output file are named with pattern "test-{base test set name}\_{adversarial diagnostic set name}". Every output file is a tsv file, every line in the output file is consists of the text, claim, gold label and predicted label separated with "\t".
 
 
 ## Reference
