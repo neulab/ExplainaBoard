@@ -4,7 +4,7 @@
 ## Model Description
 
 ## Meta Data
-* Download link for system output: [This link](https://drive.google.com/file/d/1X6dpPpw-cyYxERO67Ma65yoLfJH7Md87/view?usp=sharing)
+* Download link for system output: [This link](https://drive.google.com/drive/folders/142gaYfyzVSw7NlhPHIfxXgUdC5g32nCI?usp=sharing)
 * Github Repo: https://github.com/zide05/AdvFact
 * Paper: Factuality Checker is not Faithful: Adversarial Meta-evaluation of Factuality in Summarization
 * Corresponding Author: Yiran Chen, Pengfei Liu, Xipeng Qiu.
