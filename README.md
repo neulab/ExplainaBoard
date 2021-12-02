@@ -52,12 +52,9 @@ means, you can play with ExplainaBoard at following levels:
 
 ## API-based Toolkit: Quick Installation
 
-#### Method 1: Simple installation from PyPI (Python 3 only)
-```
-pip install explainaboard
-```
 
-#### Method 2: Install from the source and develop locally (Python 3 only)
+
+#### Method: Install from the source and develop locally (Python 3 only)
 ```bash
 # Clone current repo
 git clone https://github.com/neulab/ExplainaBoard.git
