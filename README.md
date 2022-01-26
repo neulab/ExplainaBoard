@@ -123,7 +123,7 @@ data = loader.load()
 processor = get_processor(TaskType.summarization, data = data)
 analysis = processor.process()
 analysis.write_to_directory("./")
-
+```
 
 
 ## Web-based Toolkit: Quick Learning
