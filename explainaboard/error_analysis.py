@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import scipy.stats as statss
+from random import choices
 import json
 import collections
 
@@ -9,7 +10,7 @@ from nltk.tokenize import TweetTokenizer
 
 import explainaboard.data_utils as du
 
-from random import choices
+
 import scipy.stats
 
 
