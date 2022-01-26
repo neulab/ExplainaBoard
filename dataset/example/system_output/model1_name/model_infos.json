@@ -1,0 +1,14 @@
+{
+  "model_name": "LSTM",
+  "dataset_name": "imdb",
+  "paper": {
+      "title": "LSTM for Sentiment Classification",
+      "conference": "",
+      "year": "",
+      "url": "",
+      "author": "Zhang San, Li Si",
+      "bib": ""
+  },
+  "github_repo": "",1
+  "output_file_url": "",
+}
