@@ -1,3 +1,5 @@
-include *.txt *.png
-recursive-include explainaboard/tasks/* *.aspects *.json
-recursive-include fig *.png
+include *.txt *.png *.json *.pkl
+recursive-include explainaboard/pre_computed/* *.aspects *.pkl
+recursive-include explainaboard/utils/resources/ *.json
+recursive-include explainaboard/datasets/squad/ *.json
+

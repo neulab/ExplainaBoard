@@ -1,0 +1,24 @@
+name: CI - Pull Reqeuest Review
+on:
+  pull_request
+
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - run: pip install .
+      - run: pip install coverage
+      - name: run unittest
+        run: coverage run -m unittest
+      - name: generate coverage report in xml
+        run: coverage xml
+      - name: add coverage report as a comment to PR
+        uses: 5monkeys/cobertura-action@master
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 20

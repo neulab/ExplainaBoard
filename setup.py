@@ -1,22 +1,15 @@
 from setuptools import setup, find_packages
-import unittest
 import codecs
-import explainaboard
-import explainaboard.tasks
-# def test_suite():
-#   test_loader = unittest.TestLoader()
-#
-#   return test_suite
-
-
+from version import __version__
+import os
 
 setup(
   name="explainaboard",
-  version=explainaboard.__version__,
+  version=__version__,
   description="Explainable Leaderboards for Natural Language Processing",
   long_description=codecs.open("README.md", encoding="utf-8").read(),
   long_description_content_type="text/markdown",
-  url="https://github.com/neulab/ExplainaBoard",
+  url="https://github.com/ExpressAI/ExplainaBoard",
   author="Pengfei Liu",
   license="MIT License",
   classifiers=[
@@ -44,7 +37,16 @@ setup(
       "matplotlib",
       "scikit-learn",
       "seqeval",
-      "pandas"
+      "pandas",
+      "pyarrow",
+      "eaas",
+      "wheel",
+      "tqdm",
+      "sacrebleu",
+      "datasets",
+      "lexicalrichness",
+      "spacy"
   ],
   include_package_data=True,
 )
+os.system("python -m spacy download en_core_web_sm")
