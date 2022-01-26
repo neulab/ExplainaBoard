@@ -1,1 +1,0 @@
-# System Outputs on REALSumm
