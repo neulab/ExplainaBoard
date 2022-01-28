@@ -79,7 +79,7 @@ _task_categories: List[TaskCategory] = [
     TaskCategory("question-answering", "question answering tasks",
                  [Task(TaskType.extractive_qa, True, ["f1_score_qa", "exact_match_qa"])]),
     TaskCategory("span-text-prediction", "prediction based on span and text",
-                 [Task(TaskType.aspect_based_sentiment_classification, True, ["f1_score_seqeval"])]),
+                 [Task(TaskType.aspect_based_sentiment_classification, True, ["F1score", "Accuracy"])]),
     TaskCategory("text-pair-classification", "predicting a class of two texts",
                  [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),
 ]
