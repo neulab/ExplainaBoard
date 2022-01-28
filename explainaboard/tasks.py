@@ -38,6 +38,36 @@ class TaskType(str, Enum):
 
 
 
+from dataclasses import dataclass, field
+from typing import List
+from enum import Enum
+
+
+@dataclass
+class Task:
+    """
+    TODO: add supported_file_types
+    """
+    name: str
+    supported: bool = field(default=False)
+    supported_metrics: List[str] = field(default_factory=list)
+
+
+@dataclass
+class TaskCategory:
+    name: str
+    description: str
+    tasks: List[Task]
+
+
+class TaskType(str, Enum):
+    text_classification = "text-classification"
+    named_entity_recognition = "named-entity-recognition"
+    extractive_qa = "extractive-qa"
+    summarization = "summarization"
+    aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
+
+
 _task_categories: List[TaskCategory] = [
     TaskCategory("conditional-text-generation",
                  "data-to-text and text transduction tasks such as translation or summarization",
@@ -52,13 +82,22 @@ _task_categories: List[TaskCategory] = [
     TaskCategory("structure-prediction", "predicting structural properties of the text, such as syntax",
                  [Task(TaskType.named_entity_recognition, True, ["f1_score_seqeval"])]),
     TaskCategory("question-answering", "question answering tasks",
-                 [
-                     Task(TaskType.extractive_qa, True, ["f1_score_qa", "exact_match_qa"]),
-                     Task(TaskType.hellaswag, True, ["Accuracy"]),
-                  ]),
+                 [Task(TaskType.extractive_qa, True, ["f1_score_qa", "exact_match_qa"])]),
+    TaskCategory("span-text-prediction", "prediction based on span and text",
+                 [Task(TaskType.aspect_based_sentiment_classification, True, ["f1_score_seqeval"])]),
     TaskCategory("text-pair-classification", "predict the relationship between two texts",
-                 [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),
+                 [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),    
 ]
+
+    
+    
+    
+    
+
+def get_task_categories():
+    """getter for task categories data"""
+    return _task_categories
+
 
 
 def get_task_categories():
