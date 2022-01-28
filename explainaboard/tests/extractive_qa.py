@@ -1,11 +1,11 @@
 import pathlib
 import os
 import unittest
-from explainaboard.constants import TaskType
+from explainaboard.tasks import TaskType
 from explainaboard import FileType, Source, TaskType, get_loader, get_processor
 
 artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
-class TestNER(unittest.TestCase):
+class TestExtractiveQA(unittest.TestCase):
 
     def test_generate_system_analysis(self):
         """TODO: should add harder tests"""
