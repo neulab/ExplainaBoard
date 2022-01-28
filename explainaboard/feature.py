@@ -244,6 +244,7 @@ class ClassLabel:
 
     num_classes: int = None
     names: List[str] = None
+    description: str = None
     names_file: Optional[str] = None
     id: Optional[str] = None
     is_bucket: bool = False
@@ -436,6 +437,7 @@ class Value:
     """
 
     dtype: str # must be initialized when created
+    description: str = None
     is_bucket: bool = False # don't need to be initialized
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
