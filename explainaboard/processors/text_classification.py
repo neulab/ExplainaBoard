@@ -20,18 +20,21 @@ class TextClassificationProcessor(Processor):
                                                      "0"
                                                      ], is_bucket=False),
         "label": feature.Value(dtype="string",
+                               description="category",
                                is_bucket=True,
                                bucket_info=feature.BucketInfo(
                                    _method="bucket_attribute_discrete_value",
                                    _number=4,
                                    _setting=1)),
         "sentence_length": feature.Value(dtype="float",
+                                         description="text length",
                                          is_bucket=True,
                                          bucket_info=feature.BucketInfo(
                                              _method="bucket_attribute_specified_bucket_value",
                                              _number=4,
                                              _setting=())),
         "token_number": feature.Value(dtype="float",
+                                      description="the number of chars",
                                       is_bucket=True,
                                       bucket_info=feature.BucketInfo(
                                           _method="bucket_attribute_specified_bucket_value",
@@ -39,12 +42,14 @@ class TextClassificationProcessor(Processor):
                                           _setting=())),
 
         "basic_words":feature.Value(dtype="float",
+                                    description="the ratio of basic words",
                                       is_bucket=True,
                                       bucket_info=feature.BucketInfo(
                                           _method="bucket_attribute_specified_bucket_value",
                                           _number=4,
                                           _setting=())),
         "lexical_richness": feature.Value(dtype="float",
+                                          description="lexical diversity",
                                      is_bucket=True,
                                      bucket_info=feature.BucketInfo(
                                          _method="bucket_attribute_specified_bucket_value",
@@ -52,6 +57,7 @@ class TextClassificationProcessor(Processor):
                                          _setting=())),
 
         "entity_number": feature.Value(dtype="float",
+                                       description="the number of entities",
                                        is_bucket=True,
                                        bucket_info=feature.BucketInfo(
                                            _method="bucket_attribute_specified_bucket_value",
