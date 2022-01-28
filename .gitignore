@@ -18,6 +18,7 @@ venv
 .vscode
 build
 dist
+*.sh
 *egg-info
 .coverage
 coverage.xml
