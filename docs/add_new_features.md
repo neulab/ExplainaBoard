@@ -1,12 +1,12 @@
 # Support New Features
 
-Take `text_classification` task for example, supposing we aim to add
+Take `text_classification` task for example, suppose that we aim to add
  a new feature `token_number` to bucket test set for fine-grained evaluation.
 
 ## Feature Declaration
 
-We need to declare the feature in the task processor module, for example:
-`explainaboard/processors/text_classification.py`
+We need to declare the new feature `token_number` in the task processor module
+corresponding to its task, in this case: `explainaboard/processors/text_classification.py`
 
 ```python
 class TextClassificationProcessor(Processor):
@@ -30,7 +30,7 @@ where
 * `is_bucket`: whether this feature will be used for bucketing test set
     * True
     * False
-* `bucekt_info`: the specific information for the bucketing operation
+* `bucket_info`: the specific information for the bucketing operation
     * `method`: bucketing methods
         * `bucket_attribute_specified_bucket_value`: when `dtype = "float"`
         * `bucket_attribute_discrete_value`: when `dtype = "string"`
@@ -42,18 +42,20 @@ where
 
 ## Feature Implementation and Calculation
 
-We need to define the feature function and apply it to each sample
-of the dataset in the module: `explainaboard/builders/text_classification`
+After declaring the new feature `token_number`, we need to define a corresponding
+feature function `_get_token_number(self, text)` and apply it to each sample
+of the dataset in the module: `explainaboard/builders/text_classification.py`
 
-There are flexible way to achieve this but remember the final goal is:
+There are a couple of flexible ways to achieve this but remember the final goal is:
 
 (1) given raw features stored in the dictionary `dict_sysout`, for example,
 * `dict_sysout['text']`: the raw input text
 * `dict_sysout['label']`: the gold label of the input text
-(2) how to calculate the new feature and add it into `dict_sysout`, here
-  is `dict_sysout[token_number]`
+
+(2) how to calculate the new feature and add it into `dict_sysout`, which
+  is `dict_sysout[token_number]` in the current context
   
-Following highlights the core implementation inside the `class TCExplainaboardBuilder` in `explainaboard/builders/summarization`
+The following highlights the core implementation inside `class TCExplainaboardBuilder` in `explainaboard/builders/summarization`
 ```python
 class TCExplainaboardBuilder:
     ...
@@ -75,3 +77,10 @@ class TCExplainaboardBuilder:
 
 
 ```
+
+
+## Features and Unittest
+
+Note that you may need to change the test cases in the module relevant to your task
+in `explainaboard/tests/` upon adding a new feature, such as changing the number of
+features in asserts to match the current number of features.
