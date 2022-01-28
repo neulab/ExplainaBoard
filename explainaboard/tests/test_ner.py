@@ -22,8 +22,8 @@ class TestNER(unittest.TestCase):
         #self.assertEqual(len(processor._features), 4)
 
         analysis = processor.process()
-        # analysis.write_to_directory("./")
-        # print(analysis)
+        analysis.write_to_directory("./")
+
         self.assertListEqual(analysis.metric_names, metadata["metric_names"])
         self.assertIsNotNone(analysis.results.fine_grained)
         self.assertGreater(len(analysis.results.overall), 0)

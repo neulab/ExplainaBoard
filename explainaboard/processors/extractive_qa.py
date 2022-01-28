@@ -16,18 +16,21 @@ class QASqudProcessor(Processor):
         "true_answers": feature.Sequence(feature.Value("string")),
         "predicted_answer":feature.Value("string"),
         "context_length": feature.Value(dtype="float",
+                                        description="context length",
                                          is_bucket=True,
                                          bucket_info=feature.BucketInfo(
                                              _method="bucket_attribute_specified_bucket_value",
                                              _number=4,
                                              _setting=())),
         "question_length": feature.Value(dtype="float",
+                                         description="question length",
                                       is_bucket=True,
                                       bucket_info=feature.BucketInfo(
                                           _method="bucket_attribute_specified_bucket_value",
                                           _number=4,
                                           _setting=())),
         "answer_length": feature.Value(dtype="float",
+                                       description="answer length",
                                          is_bucket=True,
                                          bucket_info=feature.BucketInfo(
                                              _method="bucket_attribute_specified_bucket_value",
