@@ -34,6 +34,7 @@ class NERProcessor(Processor):
             "I-MISC",
         ])),
         "sentence_length": feature.Value(dtype="float",
+                                         description="sentence length",
                                          is_bucket=True,
                                          bucket_info=feature.BucketInfo(
                                              _method="bucket_attribute_specified_bucket_value",
@@ -42,6 +43,7 @@ class NERProcessor(Processor):
         "true_entity_info":feature.Sequence(feature.Set({
             "span_text":feature.Value("string"),
             "span_len":feature.Value(dtype="float",
+                                     description="entity length",
                                          is_bucket=True,
                                          bucket_info=feature.BucketInfo(
                                              _method="bucket_attribute_specified_bucket_value",
@@ -50,6 +52,7 @@ class NERProcessor(Processor):
             "span_pos":feature.Position(positions=[0,0]),
             "span_tag":feature.Value("string"),
             "eCon":feature.Value(dtype="float",
+                                 description="entity label consistency",
                                          is_bucket=True,
                                          is_pre_computed=True,
                                          bucket_info=feature.BucketInfo(
@@ -57,6 +60,7 @@ class NERProcessor(Processor):
                                              _number=4,
                                              _setting=())),
             "eFre":feature.Value(dtype="float",
+                                 description="entity frequency",
                                          is_bucket=True,
                                          is_pre_computed=True,
                                          bucket_info=feature.BucketInfo(

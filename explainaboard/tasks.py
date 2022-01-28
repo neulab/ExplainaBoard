@@ -25,16 +25,16 @@ class TaskType(str, Enum):
     named_entity_recognition = "named-entity-recognition"
     extractive_qa = "extractive-qa"
     summarization = "summarization"
-
     text_pair_classification = "text-pair-classification"
     hellaswag = "hellaswag"
+    aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
 
     @staticmethod
     def list():
         return list(map(lambda c: c.value, TaskType))
 
 
-    aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
+
 
 
 
@@ -60,12 +60,7 @@ class TaskCategory:
     tasks: List[Task]
 
 
-class TaskType(str, Enum):
-    text_classification = "text-classification"
-    named_entity_recognition = "named-entity-recognition"
-    extractive_qa = "extractive-qa"
-    summarization = "summarization"
-    aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
+
 
 
 _task_categories: List[TaskCategory] = [
@@ -84,9 +79,9 @@ _task_categories: List[TaskCategory] = [
     TaskCategory("question-answering", "question answering tasks",
                  [Task(TaskType.extractive_qa, True, ["f1_score_qa", "exact_match_qa"])]),
     TaskCategory("span-text-prediction", "prediction based on span and text",
-                 [Task(TaskType.aspect_based_sentiment_classification, True, ["f1_score_seqeval"])]),
-    TaskCategory("text-pair-classification", "predict the relationship between two texts",
-                 [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),    
+                 [Task(TaskType.aspect_based_sentiment_classification, True, ["F1score", "Accuracy"])]),
+    TaskCategory("text-pair-classification", "predicting a class of two texts",
+                 [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),
 ]
 
     
