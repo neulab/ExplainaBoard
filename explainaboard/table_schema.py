@@ -1,6 +1,5 @@
 from explainaboard.tasks import TaskType
 
-
 """
 Each schema is a list of dictionary, which is used to instruct how to print bucket-level cases 
 in the frontend table (the number of list denotes the number of table columns)
@@ -30,10 +29,6 @@ supposing we have `system_output` file and `sample_id`, then we can get "answer"
 answer = system_output[A][B] 
 """
 
-
-
-
-
 table_schemas = {}
 """Text Classification
 text | true_label | predicted_label 
@@ -43,10 +38,10 @@ Text | True Label | Prediction
 
 table_schemas[TaskType.text_classification] = [
     {
-        "field_key":"text",
-        "sort":False,
-        "filter":False,
-        "label":"Text"
+        "field_key": "text",
+        "sort": False,
+        "filter": False,
+        "label": "Text"
     },
     {
         "field_key": "true_label",
@@ -61,6 +56,8 @@ table_schemas[TaskType.text_classification] = [
         "label": "Prediction"
     },
 ]
+
+
 
 
 
@@ -94,13 +91,14 @@ table_schemas[TaskType.text_pair_classification] = [
 
 
 
+
 # the case will be directly stored in system_metadata
 table_schemas[TaskType.named_entity_recognition] = [
     {
-        "field_key":"span",
-        "sort":False,
-        "filter":True,
-        "label":"Entity"
+        "field_key": "span",
+        "sort": False,
+        "filter": True,
+        "label": "Entity"
     },
     {
         "field_key": "text",
@@ -122,50 +120,44 @@ table_schemas[TaskType.named_entity_recognition] = [
     },
 ]
 
-
-
-
 table_schemas[TaskType.summarization] = [
     {
-        "field_key":"source",
-        "sort":False,
-        "filter":True,
-        "label":"Source Document"
+        "field_key": "source",
+        "sort": False,
+        "filter": True,
+        "label": "Source Document"
     },
     {
         "field_key": "references",
-        "sort":False,
-        "filter":True,
+        "sort": False,
+        "filter": True,
         "label": "Gold References"
     },
     {
         "field_key": "hypothesis",
-        "sort":False,
-        "filter":True,
+        "sort": False,
+        "filter": True,
         "label": "Generated Summary"
     }
 ]
 
-
-
-
 table_schemas[TaskType.extractive_qa] = [
     {
-        "field_key":"context",
-        "sort":False,
-        "filter":True,
-        "label":"Context"
+        "field_key": "context",
+        "sort": False,
+        "filter": True,
+        "label": "Context"
     },
     {
         "field_key": "question",
-        "sort":False,
-        "filter":True,
+        "sort": False,
+        "filter": True,
         "label": "Question"
     },
     {
         "field_key": "true_answers.text",
-        "sort":False,
-        "filter":True,
+        "sort": False,
+        "filter": True,
         "label": "True Answers"
     },
     {
@@ -173,5 +165,32 @@ table_schemas[TaskType.extractive_qa] = [
         "sort": False,
         "filter": True,
         "label": "Predicted Answer"
+    }
+]
+
+table_schemas[TaskType.aspect_based_sentiment_classification] = [
+    {
+        "field_key": "aspect",
+        "sort": False,
+        "filter": False,
+        "label": "Aspect"
+    },
+    {
+        "field_key": "text",
+        "sort": False,
+        "filter": False,
+        "label": "Text"
+    },
+    {
+        "field_key": "true_label",
+        "sort": True,
+        "filter": True,
+        "label": "True Label"
+    },
+    {
+        "field_key": "predicted_label",
+        "sort": True,
+        "filter": True,
+        "label": "Prediction"
     }
 ]
