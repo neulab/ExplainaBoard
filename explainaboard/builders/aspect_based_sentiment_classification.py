@@ -16,6 +16,7 @@ from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
 from metric import Accuracy
 from metric import F1score
+from tqdm import tqdm
 
 
 class ABSCExplainaboardBuilder:
@@ -69,9 +70,9 @@ class ABSCExplainaboardBuilder:
         :return:
         """
         # Get names of bucketing features
-        print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
+        #print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
         bucket_features = self._info.features.get_bucket_features()
-        for _id, dict_sysout in enumerate(self._system_output):
+        for _id, dict_sysout in tqdm(enumerate(self._system_output), desc="featurizing"):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
                 feature_value = eval(ABSCExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
@@ -123,18 +124,18 @@ class ABSCExplainaboardBuilder:
                     feature_to_sample_address_to_value[feature_name][sample_address] = dict_sysout[feature_name]
 
         # Bucketing
-        for feature_name in self._info.features.get_bucket_features():
-            print(f"Feature Name: {feature_name}\n"
-                  f"Bucket Hyper:\n function_name: {self._info.features[feature_name].bucket_info._method} \n"
-                  f"bucket_number: {self._info.features[feature_name].bucket_info._number}\n"
-                  f"bucket_setting: {self._info.features[feature_name].bucket_info._setting}\n")
+        for feature_name in tqdm(self._info.features.get_bucket_features(), desc="bucketing"):
+            # print(f"Feature Name: {feature_name}\n"
+            #       f"Bucket Hyper:\n function_name: {self._info.features[feature_name].bucket_info._method} \n"
+            #       f"bucket_number: {self._info.features[feature_name].bucket_info._number}\n"
+            #       f"bucket_setting: {self._info.features[feature_name].bucket_info._setting}\n")
 
             self._samples_over_bucket[feature_name] = eval(self._info.features[feature_name].bucket_info._method)(
                 dict_obj=feature_to_sample_address_to_value[feature_name],
                 bucket_number=self._info.features[feature_name].bucket_info._number,
                 bucket_setting=self._info.features[feature_name].bucket_info._setting)
 
-            print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket.keys()}")
+            # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket.keys()}")
 
             # evaluating bucket: get bucket performance
             self._performances_over_bucket[feature_name] = self.get_bucket_performance(feature_name)
@@ -180,11 +181,11 @@ class ABSCExplainaboardBuilder:
                 confidence_score_low = bucket_value_json["confidence_score_low"]
                 confidence_score_up = bucket_value_json["confidence_score_up"]
 
-                print(f"name:\t {one_metric._name} \n"
-                      f"value:\t {bucket_value}\n"
-                      f"confidence low\t {confidence_score_low}\n"
-                      f"confidence up \t {confidence_score_up}\n"
-                      f"---------------------------------")
+                # print(f"name:\t {one_metric._name} \n"
+                #       f"value:\t {bucket_value}\n"
+                #       f"confidence low\t {confidence_score_low}\n"
+                #       f"confidence up \t {confidence_score_up}\n"
+                #       f"---------------------------------")
 
                 bucket_performance = BucketPerformance(bucket_name=bucket_interval,
                                                        metric_name=metric_name,
@@ -219,6 +220,6 @@ class ABSCExplainaboardBuilder:
         eb_generator = self._complete_feature()
         self._bucketing_samples(eb_generator)
         self.get_overall_performance()
-        # self._print_bucket_info()
+        self._print_bucket_info()
         self._generate_report()
         return self._info
