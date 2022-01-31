@@ -80,34 +80,7 @@ python setup.py install
 ```shell
 explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv
 ```
-  
-* named-entity-recognition:
-```shell
-  explainaboard --task named-entity-recognition --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
-```
 
-* extractive-qa:
-
-```shell
-    explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/testset-en.json
-```
-
-
-* summarization:
-```shell
-    explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart
-```
-
-* text-pair-classification:
-```shell
-    explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert
-```
-
-* hellaswag
-
-```shell
-    explainaboard --task hellaswag --system_outputs ./data/system_outputs/hellaswag/hellaswag.random
-```
 
 
 
@@ -127,47 +100,10 @@ analysis.write_to_directory("./")
 
 
 ## Web-based Toolkit: Quick Learning
-We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks, 
+We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes more than 10 NLP tasks, 
 40 datasets and 300 systems. Detailed information is as follows.
 <img src="./fig/demo.gif" width="800" class="center">
 
-
-#### So far, ExplainaBoard covers following  tasks 
-
-| Task                     | Sub-task         | Dataset | Model | Attribute | 
-|--------------------------|------------------|---------|-------|-----------|  
-|				           | Sentiment		  | 8       | 40    | 2         |
-| Text Classification      | Topics           | 4       | 18    | 2         |
-|					       | Intention        | 1       | 3     | 2         |
-| Text-Span Classification | Aspect Sentiment | 4       | 20    | 4         |
-| Text pair Classification | NLI              | 2       | 6     | 7         |
-|                          | NER              | 3       | 74    | 9         |
-| Sequence Labeling	       | POS              | 3       | 14    | 4         |	
-| 					       | Chunking         | 3       | 14    | 9         |
-| 					       | CWS              | 7       | 64    | 7         |
-| Structure Prediction     | Semantic Parsing | 4       | 12    | 4         | 
-| Text Generation          | Summarization    | 2       | 36    | 7         | 
-
-
-
-
-
-
-## Submit Your Results
-You can submit your system's output by this 
-[form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) 
-following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
-
-
-
-## Download System Outputs
-We haven't released datasets or corresponding system outputs that require licenses. But If you have licenses please fill in this [form](https://docs.google.com/forms/d/1rl7dgOTroT4hazUsd8CaSbGPKFbo2HNOO5pFBsM8IY0/edit) and we will send them to you privately. (Description of output's format can refer [here](https://github.com/neulab/ExplainaBoard/tree/main/output_format)
-If these system outputs are useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
-
-
-### Currently Covered Systems
-So far, ExplainaBoard support more than 10 NLP tasks, including sequence classification, labeling, extraction and generation.
-Click [here](http://explainaboard.nlpedia.ai/) to see more.
 
 
 
@@ -178,3 +114,4 @@ We thanks all authors who share their system outputs with us: Ikuya Yamada, Stef
 Colin Raffel, Yang Liu, Li Dong. We also thank
 Vijay Viswanathan, Yiran Chen, Hiroaki Hayashi for useful discussion and feedback about ExplainaBoard.
 
+If ExplainaBoard is useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
