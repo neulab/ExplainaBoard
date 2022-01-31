@@ -39,89 +39,22 @@ How do you get started?
 3. *Run Your Own Analyses Offline*: You can follow the installation instructions below to run analyses on your own system data offline. We also plan to [support command-line upload to the web interface](https://github.com/neulab/ExplainaBoard/issues/60) soon!
 
 
-## API-based Toolkit: Quick Installation
+## Web-based Toolkit
 
-
-
-#### Method 1: Simple installation from PyPI (Python 3 only)
-```
-pip install explainaboard
-```
-
-#### Method 2: Install from the source and develop locally (Python 3 only)
-```bash
-# Clone current repo
-git clone https://github.com/neulab/ExplainaBoard.git
-cd ExplainaBoard
-
-# Requirements
-pip install -r requirements.txt
-
-# Install the package
-python setup.py install
-```
-#### Then, you can run following examples via bash
-
-
-## Example for CLI
-
-* text-classification:
-```shell
-explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv
-```
-  
-* named-entity-recognition:
-```shell
-  explainaboard --task named-entity-recognition --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
-```
-
-* extractive-qa:
-
-```shell
-    explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/testset-en.json
-```
-
-
-* summarization:
-```shell
-    explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart
-```
-
-* text-pair-classification:
-```shell
-    explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert
-```
-
-* hellaswag
-
-```shell
-    explainaboard --task hellaswag --system_outputs ./data/system_outputs/hellaswag/hellaswag.random
-```
-
-
-
-
-## Example for Python SDK
-
-```python
-from explainaboard import TaskType, get_loader, get_processor
-
-path_data = "./explainaboard/tests/artifacts/test-summ.tsv"
-loader = get_loader(TaskType.summarization, data = path_data)
-data = loader.load()
-processor = get_processor(TaskType.summarization, data = data)
-analysis = processor.process()
-analysis.write_to_directory("./")
-```
-
-
-## Web-based Toolkit: Quick Learning
-We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks, 
+We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks, 
 40 datasets and 300 systems. Detailed information is as follows.
 <img src="./fig/demo.gif" width="800" class="center">
 
+### Submit Your Results
+You can submit your system's output by this 
+[form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) 
+following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
 
-#### So far, ExplainaBoard covers following  tasks 
+### Download System Outputs
+We haven't released datasets or corresponding system outputs that require licenses. But If you have licenses please fill in this [form](https://docs.google.com/forms/d/1rl7dgOTroT4hazUsd8CaSbGPKFbo2HNOO5pFBsM8IY0/edit) and we will send them to you privately. (Description of output's format can refer [here](https://github.com/neulab/ExplainaBoard/tree/main/output_format)
+If these system outputs are useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
+
+### Currently Covered Tasks 
 
 | Task                     | Sub-task         | Dataset | Model | Attribute | 
 |--------------------------|------------------|---------|-------|-----------|  
@@ -137,29 +70,85 @@ We deploy ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), wh
 | Structure Prediction     | Semantic Parsing | 4       | 12    | 4         | 
 | Text Generation          | Summarization    | 2       | 36    | 7         | 
 
-
-
-
-
-
-## Submit Your Results
-You can submit your system's output by this 
-[form](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) 
-following the format [description](https://github.com/neulab/ExplainaBoard/tree/main/output_format).
-
-
-
-## Download System Outputs
-We haven't released datasets or corresponding system outputs that require licenses. But If you have licenses please fill in this [form](https://docs.google.com/forms/d/1rl7dgOTroT4hazUsd8CaSbGPKFbo2HNOO5pFBsM8IY0/edit) and we will send them to you privately. (Description of output's format can refer [here](https://github.com/neulab/ExplainaBoard/tree/main/output_format)
-If these system outputs are useful for you, you can [cite our work](http://explainaboard.nlpedia.ai/explainaboard.bib).
-
-
 ### Currently Covered Systems
 So far, ExplainaBoard support more than 10 NLP tasks, including sequence classification, labeling, extraction and generation.
 Click [here](http://explainaboard.nlpedia.ai/) to see more.
 
 
+## API-based Toolkit
 
+### Quick Installation
+
+**Method 1:** Simple installation from PyPI (Python 3 only)
+
+```
+pip install explainaboard
+```
+
+**Method 2:** Install from the source and develop locally (Python 3 only)
+
+```bash
+# Clone current repo
+git clone https://github.com/neulab/ExplainaBoard.git
+cd ExplainaBoard
+
+# Requirements
+pip install -r requirements.txt
+
+# Install the package
+python setup.py install
+```
+
+Then, you can run following examples via bash
+
+
+### Example for CLI
+
+* text-classification:
+```shell
+explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv
+```
+  
+* named-entity-recognition:
+```shell
+explainaboard --task named-entity-recognition --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+```
+
+* extractive-qa:
+
+```shell
+explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/testset-en.json
+```
+
+
+* summarization:
+```shell
+explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart
+```
+
+* text-pair-classification:
+```shell
+explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert
+```
+
+* hellaswag
+
+```shell
+explainaboard --task hellaswag --system_outputs ./data/system_outputs/hellaswag/hellaswag.random
+```
+
+### Example for Python SDK
+
+```python
+from explainaboard import TaskType, get_loader, get_processor
+
+path_data = "./explainaboard/tests/artifacts/test-summ.tsv"
+loader = get_loader(TaskType.summarization, data = path_data)
+data = loader.load()
+processor = get_processor(TaskType.summarization, data = data)
+analysis = processor.process()
+analysis.write_to_directory("./")
+```
 
 
 ## Acknowledgement
