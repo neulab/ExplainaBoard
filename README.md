@@ -17,37 +17,26 @@
   <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
 </p>
 
+## What is ExplainaBoard?
 
+When developing a natural language processing (or AI) system, often one of the hardest things is to understand where your system is working and where it is failing, and deciding what to do next. ExplainaBoard is a tool that *inspects your system outputs*, *identifies what is working and what is not working*, and helps *inspire you with ideas of where to go next*.
 
+It offers a number of different ways with which you can evaluate and understand your data:
 
-
-
-
-
-
-
-
-## Introduction
-### ExplainaBoard is an interpretable, interactive and reliable leaderboard with seven (so far) new features (F) compared with generic leaderboard.
-* F1: *Single-system Analysis*: What is a system good or bad at?
-* F2: *Pairwise Analysis*: Where is one system better (worse) than another?
-* F3: *Data Bias Analysis*: What are the characteristics of different evaluated datasets?
-* F5: *Common errors*: What are common mistakes that top-5 systems made?
-* F6: *Fine-grained errors*: where will errors occur?
-* F7: *System Combination*: Is there potential complementarity between different systems?
-
+1. *Single-system Analysis*: What is a system good or bad at?
+2. *Pairwise Analysis*: Where is one system better (worse) than another?
+3. *Data Bias Analysis*: What are the characteristics of different evaluated datasets?
+4. *Common Errors*: What are common mistakes that top-5 systems made?
+5. *Fine-grained Error Analysis*: where do errors occur?
+6. *System Combination*: Is there potential complementarity between different systems?
 
 <img src="./fig/intro.png" width="400" class="center">
 
+How do you get started?
 
-### Usage
-We not only provide a Web-based Interactive Toolkit but also release an API that users can flexible evaluate their systems offline, which
-means, you can play with ExplainaBoard at following levels:
-
-* U1: *Just playing with it*: You can walk around, track NLP progress, understand relative merits of different top-performing systems.
-* U2: *We help you analyze your model*: You submit your model outputs and deploy them into online ExplainaBoard
-* U3: *Do it by yourself*: You can process your model outputs by yourself using our API.
-
+1. *Browse Outputs Online*: We provide an [online interface](http://explainaboard.nlpedia.ai/) where you can browse and understand outputs from various state-of-the-art systems.
+2. *Upload Your Own Outputs*: You can also [upload your own system outputs](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) through the online interace, and we will process them so you can view them alongside other systems.
+3. *Run Your Own Analyses Offline*: You can follow the installation instructions below to run analyses on your own system data offline. We also plan to [support command-line upload to the web interface](https://github.com/neulab/ExplainaBoard/issues/60) soon!
 
 
 ## API-based Toolkit: Quick Installation
