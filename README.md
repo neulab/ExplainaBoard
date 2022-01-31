@@ -93,11 +93,8 @@ pip install explainaboard
 git clone https://github.com/neulab/ExplainaBoard.git
 cd ExplainaBoard
 
-# Requirements
-pip install -r requirements.txt
-
 # Install the package
-python setup.py install
+pip install .
 ```
 
 Then, you can run following examples via bash

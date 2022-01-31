@@ -18,18 +18,23 @@ class Loader:
 
     def _load_raw_data_points(self) -> Iterable:
         """
-        loads data and return an iterable of data points. element type depends on file_typ
+        loads data and return an iterable of data points. element type depends on file_type
         TODO: error handling
         """
         if self._source == Source.in_memory:
             if self._file_type == FileType.tsv:
                 file = StringIO(self._data)
                 return csv.reader(file, delimiter='\t')
-            raise NotImplementedError
+            elif self._file_type == FileType.conll:
+                return self._data.splitlines()
+            elif self._file_type == FileType.json:
+                return json.loads(self._data)
+            else:
+                raise NotImplementedError
 
         elif self._source == Source.local_filesystem:
             if self._file_type == FileType.tsv:
-                content = []
+                content: List[str] = []
                 with open(self._data, "r", encoding="utf8") as fin:
                     for record in csv.reader(fin, delimiter='\t'):
                         content.append(record)
@@ -40,7 +45,7 @@ class Loader:
                     for record in fin:
                         content.append(record)
                 return content
-            elif self._file_type == "json":
+            elif self._file_type == FileType.json:
                 with open(self._data, 'r', encoding="utf8") as json_file:
                     data = json_file.read()
                 obj = json.loads(data)

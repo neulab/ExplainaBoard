@@ -34,15 +34,6 @@ class TaskType(str, Enum):
         return list(map(lambda c: c.value, TaskType))
 
 
-
-
-
-
-from dataclasses import dataclass, field
-from typing import List
-from enum import Enum
-
-
 @dataclass
 class Task:
     """
@@ -58,9 +49,6 @@ class TaskCategory:
     name: str
     description: str
     tasks: List[Task]
-
-
-
 
 
 _task_categories: List[TaskCategory] = [
@@ -84,15 +72,10 @@ _task_categories: List[TaskCategory] = [
                  [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),
 ]
 
-    
-    
-    
-    
 
 def get_task_categories():
     """getter for task categories data"""
     return _task_categories
-
 
 
 def get_task_categories():
