@@ -77,6 +77,8 @@ Then, you can run following examples via bash
 ```shell
 explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv
 ```
+See detailed [description](https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.md) and 
+more [CLI examples](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_examples.md).
 
 
 ### Example for Python SDK
