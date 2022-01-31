@@ -1,24 +1,19 @@
-name: CI - Pull Reqeuest Review
-on:
-  pull_request
-
+name: Continuous Integration
+on: [push]
 jobs:
-  unittest:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9]
     steps:
-      - uses: actions/checkout@master
-      - name: Set up Python 3.9
+      - uses: actions/checkout@v2
+      - name: Set up Python all python version
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
-      - run: pip install .
-      - run: pip install coverage
-      - name: run unittest
-        run: coverage run -m unittest
-      - name: generate coverage report in xml
-        run: coverage xml
-      - name: add coverage report as a comment to PR
-        uses: 5monkeys/cobertura-action@master
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          minimum_coverage: 20
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
+     - name: Install dependencies
+       run: pip install -r requirements.txt 
+     - name: Run Test
+       run: python -m unittest discover tests
