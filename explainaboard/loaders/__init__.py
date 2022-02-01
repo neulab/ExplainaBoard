@@ -11,3 +11,4 @@ from . import hellaswag
 
 from . import aspect_based_sentiment_classification
 
+from . import kg_link_tail_prediction
