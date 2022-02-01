@@ -52,6 +52,7 @@ We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.a
 
 ```
 pip install explainaboard
+python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
 ```
 
 **Method 2:** Install from the source and develop locally (Python 3 only)
