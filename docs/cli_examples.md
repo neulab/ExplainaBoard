@@ -15,7 +15,7 @@ explainaboard --task text-classification --system_outputs ./data/system_outputs/
 * extractive-qa:
 
 ```shell
-    explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/testset-en.json
+    explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/test-qa-squad.json
 ```
 
 
