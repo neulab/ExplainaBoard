@@ -15,7 +15,7 @@
   <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
   <a href="https://pypi.org/project//"><img alt="PyPI" src="https://img.shields.io/pypi/v/explainaboard" /></a>
   <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-  <a href=".github/workflows/ci.yml"><img alt="Integration Tests", src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg" /></a>
+  <a href=".github/workflows/ci.yml"><img alt="Integration Tests", src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
 </p>
 
 ## What is ExplainaBoard?
@@ -52,6 +52,7 @@ We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.a
 
 ```
 pip install explainaboard
+python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
 ```
 
 **Method 2:** Install from the source and develop locally (Python 3 only)
