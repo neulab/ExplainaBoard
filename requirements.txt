@@ -1,7 +1,0 @@
-nltk>=3.2
-numpy
-scipy
-matplotlib
-scikit-learn
-seqeval
-pandas
