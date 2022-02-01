@@ -1,25 +1,13 @@
-from typing import Optional
-import os
-import sys
-import spacy
-spacy_nlp = spacy.load("en_core_web_sm")
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from info import *
-from typing import Iterable
-from info import SysOutputInfo
-from info import BucketPerformance
-from info import Performance
-from info import Table
+from typing import Optional, Iterable
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
 from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
-from metric import Accuracy
-from metric import F1score
+from explainaboard.metric import Accuracy
+from explainaboard.metric import F1score
 from tqdm import tqdm
 from explainaboard.utils.feature_funcs import *
-"""TODO
-"""
+from explainaboard.utils.spacy_loader import spacy_loader
 
 
 class TCExplainaboardBuilder:
@@ -69,7 +57,7 @@ class TCExplainaboardBuilder:
         return len(existing_feature["text"])
 
     def _get_entity_number(self, existing_feature: dict):
-        return len(spacy_nlp(existing_feature["text"]).ents)
+        return len(spacy_loader.get_model("en_core_web_sm")(existing_feature["text"]).ents)
     
     def _get_label(self, existing_feature: dict):
         return existing_feature["true_label"]
