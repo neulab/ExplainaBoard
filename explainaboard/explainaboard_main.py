@@ -1,5 +1,3 @@
-import sys
-import string
 import argparse
 from explainaboard import FileType, Source, get_loader, get_processor
 from explainaboard import TaskType
