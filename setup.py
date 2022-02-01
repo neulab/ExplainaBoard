@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 import codecs
 from version import __version__
+import os
 
 setup(
     name="explainaboard",
@@ -45,7 +46,7 @@ setup(
         "datasets",
         "lexicalrichness",
         "spacy",
-        "en_core_web_sm@https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.2.0/en_core_web_sm-3.2.0-py3-none-any.whl"
     ],
     include_package_data=True,
 )
+os.system("python -m spacy download en_core_web_sm")
