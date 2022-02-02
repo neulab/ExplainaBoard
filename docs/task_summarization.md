@@ -39,6 +39,8 @@ where
 ## Bucketing Features
 * `source_len`: the length of the source document
 * `compression`: the compression ratio `len(src)/len(ref)`
-* `copy_len`: TODO
-* `coverage`: TODO
-* `novelty`: TODO
+* [`copy_len`](https://aclanthology.org/2020.findings-emnlp.329.pdf): measures the average length of segments in summary copied from source document.
+* [`coverage`](https://aclanthology.org/2020.findings-emnlp.329.pdf): illustrates the overlap rate between document and summary, it is defined as the proportion of the copied segments in
+summary.
+* [`novelty`]((https://aclanthology.org/2020.findings-emnlp.329.pdf)): is defined as the proportion of segments in the summaries that haven’t
+appeared in source documents. The segments is instantiated as 2-grams.
