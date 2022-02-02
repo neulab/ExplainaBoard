@@ -40,14 +40,14 @@ class TextClassificationLoader(Loader):
         if self._file_type == FileType.tsv:
             for id, dp in enumerate(raw_data):
                 text, true_label, predicted_label = dp[:3]
-                data.append({"id": id,
+                data.append({"id": str(id),
                              "text": text.strip(),
                              "true_label": true_label.strip(),
                              "predicted_label": predicted_label.strip()})
         elif self._file_type == FileType.json:
             for id, info in enumerate(raw_data):
                 text, true_label, predicted_label = info["text"], info["true_label"], info["predicted_label"]
-                data.append({"id": id,
+                data.append({"id": str(id),
                              "text": text.strip(),
                              "true_label": true_label.strip(),
                              "predicted_label": predicted_label.strip()})
