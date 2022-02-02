@@ -205,7 +205,8 @@ class QASquadExplainaboardBuilder:
                         # bucket_case = {"true_answer": (sample_id, ["true_answers","text"]),
                         #                "predicted_answer": (sample_id, ["predicted_answer"]),
                         #                "question": (sample_id, ["question"])}
-                        bucket_case = str(sample_id)
+                        system_output_id = self._data[int(sample_id)]["id"]
+                        bucket_case = system_output_id
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
