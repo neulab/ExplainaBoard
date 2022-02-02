@@ -42,7 +42,7 @@ class HellaswagLoader(Loader):
         if self._file_type == FileType.tsv:
             for id, dp in enumerate(raw_data):
                 sample_id, predicted_label = dp[:2]
-                data.append({"id": sample_id,
+                data.append({"id": str(sample_id),
                              "ind":dataset[int(sample_id)]['ind'],
                              "activity_label": dataset[int(sample_id)]['activity_label'],
                              "ctx_a": dataset[int(sample_id)]['ctx_a'],

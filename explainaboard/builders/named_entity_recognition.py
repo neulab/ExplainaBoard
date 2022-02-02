@@ -357,7 +357,7 @@ class NERExplainaboardBuilder:
             #error_case = span+ "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
                 "span":span,
-                "text":system_output_id,
+                "text":str(system_output_id),
                 "true_label":true_label,
                 "predicted_label":pred_label,
             }

@@ -42,14 +42,14 @@ class TextSummarizationLoader(Loader):
         if self._file_type == FileType.tsv:
             for id, dp in enumerate(raw_data):
                 source, reference, hypothesis = dp[:3]
-                data.append({"id": id,
+                data.append({"id": str(id),
                              "source": source.strip(),
                              "reference": reference.strip(),
                              "hypothesis": hypothesis.strip()})
         elif self._file_type == FileType.json: # This function has been unittested
             for id, info in enumerate(raw_data):
                 source, reference, hypothesis = info["source"], info["references"], info["hypothesis"]
-                data.append({"id": id,
+                data.append({"id": str(id),
                              "source": source.strip(),
                              "reference": reference.strip(),
                              "hypothesis": hypothesis.strip()})
