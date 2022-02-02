@@ -45,7 +45,7 @@ Classification of pairs of text, such as natural language inference.
 explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert
 ```
 
-## Summarization
+## [Summarization](task_summarization.md)
 
 Summarization of longer texts into shorter texts.
 
