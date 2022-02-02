@@ -343,6 +343,7 @@ class NERExplainaboardBuilder:
             pred_label = ""
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
+            system_output_id = self._data[int(sent_id)]["id"]
 
 
             span_sentence = " ".join(self._data[sent_id]["tokens"])
@@ -356,7 +357,7 @@ class NERExplainaboardBuilder:
             #error_case = span+ "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
                 "span":span,
-                "text":span_sentence,
+                "text":system_output_id,
                 "true_label":true_label,
                 "predicted_label":pred_label,
             }
@@ -370,6 +371,8 @@ class NERExplainaboardBuilder:
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
             span_sentence = " ".join(self._data[sent_id]["tokens"])
+            system_output_id = self._data[int(sent_id)]["id"]
+            # print(span_sentence)
 
             if pos in dict_pos2tag.keys():
                 true_label = dict_pos2tag[pos]
@@ -380,7 +383,7 @@ class NERExplainaboardBuilder:
             #error_case = span + "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
                 "span":span,
-                "text":span_sentence,
+                "text":system_output_id,
                 "true_label":true_label,
                 "predicted_label":pred_label,
             }
