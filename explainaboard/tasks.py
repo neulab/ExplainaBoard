@@ -40,6 +40,7 @@ class Task:
     TODO: add supported_file_types
     """
     name: str
+    description:str = "task description"
     supported: bool = field(default=False)
     supported_metrics: List[str] = field(default_factory=list)
 
@@ -55,21 +56,52 @@ _task_categories: List[TaskCategory] = [
     TaskCategory("conditional-text-generation",
                  "data-to-text and text transduction tasks such as translation or summarization",
                  [
-                     Task("machine-translation"),
-                     Task("sentence-splitting-fusion"),
-                     Task(TaskType.summarization, True, [
-                          "bleu", "chrf","bart_score_summ","bleu","comet","mover_score","prism"])
+                     Task(name = "machine-translation",
+                          description = "The process of using AI to automatically translate text from one language to another."),
+                     Task(name = TaskType.summarization,
+                          description = "Summarize long documents into short texts.",
+                          supported = True,
+                          supported_metrics = ["bleu", "chrf","bart_score_summ","bleu","comet","mover_score","prism"],
+                          )
                  ]),
     TaskCategory("text-classification", "predicting a class index or boolean value",
-                 [Task(TaskType.text_classification, True, ["F1score", "Accuracy"])]),
+                 [
+                     Task(name = TaskType.text_classification,
+                          description= "Classify a text into one or multiple predefined categories",
+                          supported = True,
+                          supported_metrics = ["F1score", "Accuracy"],
+                          )]
+                 ),
     TaskCategory("structure-prediction", "predicting structural properties of the text, such as syntax",
-                 [Task(TaskType.named_entity_recognition, True, ["f1_score_seqeval"])]),
+                 [
+                     Task(name = TaskType.named_entity_recognition,
+                          description = "Recognize named entities from a given text",
+                          supported = True,
+                          supported_metrics = ["f1_score_seqeval"],
+                          )]
+                 ),
     TaskCategory("question-answering", "question answering tasks",
-                 [Task(TaskType.extractive_qa, True, ["f1_score_qa", "exact_match_qa"])]),
+                 [
+                     Task(name = TaskType.extractive_qa,
+                          description = "A task of extracting an answer from a text given a question",
+                          supported = True,
+                          supported_metrics = ["f1_score_qa", "exact_match_qa"]),
+                 ]
+                 ),
     TaskCategory("span-text-prediction", "prediction based on span and text",
-                 [Task(TaskType.aspect_based_sentiment_classification, True, ["F1score", "Accuracy"])]),
+                 [
+                     Task(name = TaskType.aspect_based_sentiment_classification,
+                          description = "Predict the sentiment of a text based on a specific aspect",
+                          supported = True,
+                          supported_metrics = ["F1score", "Accuracy"]),
+                 ]),
     TaskCategory("text-pair-classification", "predicting a class of two texts",
-                 [Task(TaskType.text_pair_classification, True, ["F1score", "Accuracy"])]),
+                 [
+                     Task(name = TaskType.text_pair_classification,
+                          description = "predict the relationship of two texts",
+                          supported = True,
+                          supported_metrics = ["F1score", "Accuracy"]),
+                 ]),
 ]
 
 
