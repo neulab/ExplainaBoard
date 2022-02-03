@@ -43,6 +43,7 @@ class Task:
     description:str = "task description"
     supported: bool = field(default=False)
     supported_metrics: List[str] = field(default_factory=list)
+    supported_formats: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -62,6 +63,7 @@ _task_categories: List[TaskCategory] = [
                           description = "Summarize long documents into short texts.",
                           supported = True,
                           supported_metrics = ["bleu", "chrf","bart_score_summ","bleu","comet","mover_score","prism"],
+                          supported_formats= ["tsv"],
                           )
                  ]),
     TaskCategory("text-classification", "predicting a class index or boolean value",
@@ -70,6 +72,7 @@ _task_categories: List[TaskCategory] = [
                           description= "Classify a text into one or multiple predefined categories",
                           supported = True,
                           supported_metrics = ["F1score", "Accuracy"],
+                          supported_formats= ["tsv"],
                           )]
                  ),
     TaskCategory("structure-prediction", "predicting structural properties of the text, such as syntax",
@@ -78,6 +81,7 @@ _task_categories: List[TaskCategory] = [
                           description = "Recognize named entities from a given text",
                           supported = True,
                           supported_metrics = ["f1_score_seqeval"],
+                            supported_formats= ["conll"],
                           )]
                  ),
     TaskCategory("question-answering", "question answering tasks",
@@ -85,7 +89,9 @@ _task_categories: List[TaskCategory] = [
                      Task(name = TaskType.extractive_qa,
                           description = "A task of extracting an answer from a text given a question",
                           supported = True,
-                          supported_metrics = ["f1_score_qa", "exact_match_qa"]),
+                          supported_metrics = ["f1_score_qa", "exact_match_qa"],
+                          supported_formats=["json"],
+                          ),
                  ]
                  ),
     TaskCategory("span-text-prediction", "prediction based on span and text",
@@ -93,14 +99,19 @@ _task_categories: List[TaskCategory] = [
                      Task(name = TaskType.aspect_based_sentiment_classification,
                           description = "Predict the sentiment of a text based on a specific aspect",
                           supported = True,
-                          supported_metrics = ["F1score", "Accuracy"]),
+                          supported_metrics = ["F1score", "Accuracy"],
+                          supported_formats=["tsv"],
+                          ),
+
                  ]),
     TaskCategory("text-pair-classification", "predicting a class of two texts",
                  [
                      Task(name = TaskType.text_pair_classification,
                           description = "predict the relationship of two texts",
                           supported = True,
-                          supported_metrics = ["F1score", "Accuracy"]),
+                          supported_metrics = ["F1score", "Accuracy"],
+                          supported_formats=["tsv"],
+                          ),
                  ]),
 ]
 
