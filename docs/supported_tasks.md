@@ -51,8 +51,9 @@ Summarization of longer texts into shorter texts.
 
 **CLI Example**
 ```shell
-explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart
+explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ bleu
 ```
+where different metrics should be separated by space
 
 **Class**
 * `TaskType.summarization`
@@ -62,9 +63,17 @@ explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/
   
 **Supported Metrics**
 * `bleu`
-* `rouge1`
-* `rouge2`
-* `rougel`
+* `chrf`
+* `bart_score_summ`
+* `bleu`
+* `comet`
+* `mover_score`
+* `prism`
+* `bert_score` (debuging)
+* `rouge1` (debuging)
+* `rouge2` (debuging)
+* `rougeL` (debuging)
+
 
 
 ## Named Entity Recognition
