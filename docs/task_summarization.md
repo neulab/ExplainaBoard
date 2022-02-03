@@ -31,7 +31,7 @@ where
 * `--system_outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`: optional, denotes the dataset name
-* `--metrics`: optional, different metrics should be separated by space
+* `--metrics`: optional, different metrics should be separated by space. See [more supported metrics](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md#summarization)
 * `report.json`: the generated analysis file with json format. Tips: you can use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) or Python's `python -m json.tool` to convert
                   the JSON into a prettified and readable format.
