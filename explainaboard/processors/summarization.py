@@ -57,6 +57,7 @@ class TextSummarizationProcessor(Processor):
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.summarization.value
         if "metric_names" not in metadata.keys():
+            #metadata["metric_names"] = ["chrf","bart_score_summ","bleu","comet","mover_score","prism"]
             metadata["metric_names"] = ["bleu"]
 
         super().__init__(metadata, system_output_data)

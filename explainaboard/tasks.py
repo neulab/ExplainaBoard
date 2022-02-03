@@ -58,7 +58,7 @@ _task_categories: List[TaskCategory] = [
                      Task("machine-translation"),
                      Task("sentence-splitting-fusion"),
                      Task(TaskType.summarization, True, [
-                          "bleu", "rouge1", "rouge2", "rougel"])
+                          "bleu", "chrf","bart_score_summ","bleu","comet","mover_score","prism"])
                  ]),
     TaskCategory("text-classification", "predicting a class index or boolean value",
                  [Task(TaskType.text_classification, True, ["F1score", "Accuracy"])]),
