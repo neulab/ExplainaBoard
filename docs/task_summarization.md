@@ -23,13 +23,15 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart > report.json
+explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ bleu
 ```
+
 where
 * `--task`: denotes the task name. 
 * `--system_outputs`: denote the path of system outputs. Multiple one should be 
-  separated by comma, for example, system1,system2 (no space)
+  separated by space, for example, system1 system2
 * `--dataset`: optional, denotes the dataset name
+* `--metrics`: optional, different metrics should be separated by space
 * `report.json`: the generated analysis file with json format. Tips: you can use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) or Python's `python -m json.tool` to convert
                   the JSON into a prettified and readable format.

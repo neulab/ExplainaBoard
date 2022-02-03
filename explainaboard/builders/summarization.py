@@ -171,8 +171,9 @@ class SummExplainaboardBuilder:
                     bucket_case = str(sample_id)
                     bucket_cases.append(bucket_case)
 
+
                 for metric_name in self._info.metric_names:
-                    metric_value = self.score_dic["sample_level"][int(sample_id)][metric_name]
+                    metric_value = self.score_dic["sample_level"][int(sample_id)][metric_name] # This would be modified later
                     if metric_name not in dict_metric_to_values.keys():
                         dict_metric_to_values[metric_name] = [metric_value]
                     else:

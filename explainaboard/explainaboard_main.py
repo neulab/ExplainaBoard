@@ -30,8 +30,8 @@ def main():
     parser.add_argument('--task', type=str, required=True,
                         help="the task name")
 
-    parser.add_argument('--system_outputs', type=str, required=True,
-                        help="the directories of system outputs. Multiple one should be separated by comma, for example, system1,system2 (no space)")
+    parser.add_argument('--system_outputs', type=str, required=True, nargs="*",
+                        help="the directories of system outputs. Multiple one should be separated by space, for example: system1 system2")
 
     parser.add_argument('--type', type=str, required=False, default="single",
                         help="analysis type: single|pair|combine")
@@ -39,17 +39,22 @@ def main():
     parser.add_argument('--dataset', type=str, required=False, default="dataset_name",
                         help="the name of dataset")
 
+    parser.add_argument('--metrics', type=str, required=False, nargs="*",
+                        help="multiple metrics should be separated by space")
+
 
     args = parser.parse_args()
 
 
     dataset = args.dataset
     task = args.task
-    system_outputs = args.system_outputs.split(",")
+    system_outputs = args.system_outputs
+    metric_names = args.metrics
 
     metadata = {
         "dataset_name":dataset,
-        "task_name":task
+        "task_name":task,
+        "metric_names":metric_names,
     }
 
     if len(system_outputs) == 1: # individual system analysis
