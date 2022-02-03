@@ -52,10 +52,14 @@ def main():
     metric_names = args.metrics
 
     metadata = {
-        "dataset_name":dataset,
-        "task_name":task,
-        "metric_names":metric_names,
+        "dataset_name": dataset,
+        "task_name": task
     }
+
+    if metric_names != None:
+        metadata["metric_names"] = metric_names
+
+
 
     if len(system_outputs) == 1: # individual system analysis
         run_explainaboard(task, system_outputs[0], metadata=metadata)
