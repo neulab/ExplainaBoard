@@ -30,7 +30,7 @@ def main():
     parser.add_argument('--task', type=str, required=True,
                         help="the task name")
 
-    parser.add_argument('--system_outputs', type=str, required=True, nargs="*",
+    parser.add_argument('--system_outputs', type=str, required=True, nargs="+",
                         help="the directories of system outputs. Multiple one should be separated by space, for example: system1 system2")
 
     parser.add_argument('--type', type=str, required=False, default="single",
