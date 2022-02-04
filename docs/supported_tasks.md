@@ -51,7 +51,7 @@ Summarization of longer texts into shorter texts.
 
 **CLI Example**
 ```shell
-explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ bleu
+explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ rouge2
 ```
 where different metrics should be separated by space
 
@@ -62,17 +62,24 @@ where different metrics should be separated by space
 * `FileType.tsv`
   
 **Supported Metrics**
+* `bart_score_cnn_hypo_ref`
+* `bart_score_summ`
+* `bart_score_mt`
+* `bert_score_p`
+* `bert_score_r`
+* `bert_score_f`
 * `bleu`
 * `chrf`
-* `bart_score_summ`
-* `bleu`
 * `comet`
+* `comet_qe`
 * `mover_score`
 * `prism`
-* `bert_score` (debuging)
-* `rouge1` (debuging)
-* `rouge2` (debuging)
-* `rougeL` (debuging)
+* `prism_qe`
+* `rouge1`
+* `rouge2`
+* `rougeL`
+
+
 
 
 

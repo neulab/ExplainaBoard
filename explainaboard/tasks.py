@@ -62,7 +62,9 @@ _task_categories: List[TaskCategory] = [
                      Task(name = TaskType.summarization,
                           description = "Summarize long documents into short texts.",
                           supported = True,
-                          supported_metrics = ["bleu", "chrf","bart_score_summ","bleu","comet","mover_score","prism"],
+                          supported_metrics = ["bleu", "bart_score_summ", "bart_score_mt", "bart_score_cnn_hypo_ref"
+                                               "rouge1", "rouge2", "rougeL","bert_score_f","bert_score_p","bert_score_r",
+                                                "chrf","bleu","comet","mover_score","prism"],
                           supported_formats= ["tsv"],
                           )
                  ]),
