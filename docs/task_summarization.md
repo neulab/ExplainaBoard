@@ -23,7 +23,7 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ bleu
+explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ rouge2
 ```
 
 where
