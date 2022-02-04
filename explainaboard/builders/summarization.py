@@ -90,15 +90,16 @@ class SummExplainaboardBuilder:
             confidence_score_up = 0.0
             overall_performance = Performance(
                                                    metric_name=metric_name,
-                                                   value=format(overall_value, '.4g'),
-                                                   confidence_score_low=format(confidence_score_low, '.4g'),
-                                                   confidence_score_up=format(confidence_score_up, '.4g')
+                                                   value=float(format(overall_value, '.4g')),
+                                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
+                                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
             if self._info.results.overall == None:
-                self._info.results.overall = [overall_performance]
+                self._info.results.overall = {}
+                self._info.results.overall[metric_name] = overall_performance
             else:
-                self._info.results.overall.append(overall_performance)
+                self._info.results.overall[metric_name] = overall_performance
 
     def _bucketing_samples(self, sysout_iterator):
 
