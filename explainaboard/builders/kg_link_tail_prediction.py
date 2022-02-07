@@ -1,16 +1,5 @@
-from typing import Optional
-import os
-import sys
-import spacy
-spacy_nlp = spacy.load("en_core_web_sm")
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from info import *
-from typing import Iterable
-from info import SysOutputInfo
-from info import BucketPerformance
-from info import Performance
-from info import Table
+from typing import Optional, Iterable
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
 from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
@@ -19,6 +8,8 @@ from metric import F1score
 from metric import Hits
 from tqdm import tqdm
 from explainaboard.utils.feature_funcs import *
+from explainaboard.utils.spacy_loader import spacy_loader
+
 """TODO
 """
 
