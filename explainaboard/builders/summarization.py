@@ -90,15 +90,16 @@ class SummExplainaboardBuilder:
             confidence_score_up = 0.0
             overall_performance = Performance(
                                                    metric_name=metric_name,
-                                                   value=format(overall_value, '.4g'),
-                                                   confidence_score_low=format(confidence_score_low, '.4g'),
-                                                   confidence_score_up=format(confidence_score_up, '.4g')
+                                                   value=float(format(overall_value, '.4g')),
+                                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
+                                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
             if self._info.results.overall == None:
-                self._info.results.overall = [overall_performance]
+                self._info.results.overall = {}
+                self._info.results.overall[metric_name] = overall_performance
             else:
-                self._info.results.overall.append(overall_performance)
+                self._info.results.overall[metric_name] = overall_performance
 
     def _bucketing_samples(self, sysout_iterator):
 
@@ -171,8 +172,9 @@ class SummExplainaboardBuilder:
                     bucket_case = str(sample_id)
                     bucket_cases.append(bucket_case)
 
+
                 for metric_name in self._info.metric_names:
-                    metric_value = self.score_dic["sample_level"][int(sample_id)][metric_name]
+                    metric_value = self.score_dic["sample_level"][int(sample_id)][metric_name] # This would be modified later
                     if metric_name not in dict_metric_to_values.keys():
                         dict_metric_to_values[metric_name] = [metric_value]
                     else:

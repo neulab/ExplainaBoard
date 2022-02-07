@@ -124,16 +124,16 @@ class QASquadExplainaboardBuilder:
             confidence_score_low = 0
             confidence_score_up = 0
             overall_performance = Performance(
-                                                   metric_name=metric_name,
-                                                   value=format(overall_value, '.4g'),
-                                                   confidence_score_low=format(confidence_score_low, '.4g'),
-                                                   confidence_score_up=format(confidence_score_up, '.4g')
+                                   metric_name=metric_name,
+                                   value=float(format(overall_value, '.4g')),
+                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
+                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
-
             if self._info.results.overall == None:
-                self._info.results.overall = [overall_performance]
+                self._info.results.overall = {}
+                self._info.results.overall[metric_name] = overall_performance
             else:
-                self._info.results.overall.append(overall_performance)
+                self._info.results.overall[metric_name] = overall_performance
 
 
     def _bucketing_samples(self, sysout_iterator):
@@ -205,7 +205,8 @@ class QASquadExplainaboardBuilder:
                         # bucket_case = {"true_answer": (sample_id, ["true_answers","text"]),
                         #                "predicted_answer": (sample_id, ["predicted_answer"]),
                         #                "question": (sample_id, ["question"])}
-                        bucket_case = str(sample_id)
+                        system_output_id = self._data[int(sample_id)]["id"]
+                        bucket_case = system_output_id
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
