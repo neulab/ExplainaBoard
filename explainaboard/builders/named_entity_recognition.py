@@ -214,14 +214,15 @@ class NERExplainaboardBuilder:
             confidence_score_up = 0
             overall_performance = Performance(
                                    metric_name=metric_name,
-                                   value=format(overall_value, '.4g'),
-                                   confidence_score_low=format(confidence_score_low, '.4g'),
-                                   confidence_score_up=format(confidence_score_up, '.4g')
+                                   value=float(format(overall_value, '.4g')),
+                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
+                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
             if self._info.results.overall == None:
-                self._info.results.overall = [overall_performance]
+                self._info.results.overall = {}
+                self._info.results.overall[metric_name] = overall_performance
             else:
-                self._info.results.overall.append(overall_performance)
+                self._info.results.overall[metric_name] = overall_performance
 
 
 
@@ -343,6 +344,7 @@ class NERExplainaboardBuilder:
             pred_label = ""
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
+            system_output_id = self._data[int(sent_id)]["id"]
 
 
             span_sentence = " ".join(self._data[sent_id]["tokens"])
@@ -356,7 +358,7 @@ class NERExplainaboardBuilder:
             #error_case = span+ "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
                 "span":span,
-                "text":span_sentence,
+                "text":str(system_output_id),
                 "true_label":true_label,
                 "predicted_label":pred_label,
             }
@@ -370,6 +372,8 @@ class NERExplainaboardBuilder:
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
             span_sentence = " ".join(self._data[sent_id]["tokens"])
+            system_output_id = self._data[int(sent_id)]["id"]
+            # print(span_sentence)
 
             if pos in dict_pos2tag.keys():
                 true_label = dict_pos2tag[pos]
@@ -380,7 +384,7 @@ class NERExplainaboardBuilder:
             #error_case = span + "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
                 "span":span,
-                "text":span_sentence,
+                "text":system_output_id,
                 "true_label":true_label,
                 "predicted_label":pred_label,
             }

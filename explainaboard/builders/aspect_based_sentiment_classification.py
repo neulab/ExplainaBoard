@@ -97,16 +97,16 @@ class ABSCExplainaboardBuilder:
             confidence_score_low = overall_value_json["confidence_score_low"]
             confidence_score_up = overall_value_json["confidence_score_up"]
             overall_performance = Performance(
-                metric_name=metric_name,
-                value=format(overall_value, '.4g'),
-                confidence_score_low=format(confidence_score_low, '.4g'),
-                confidence_score_up=format(confidence_score_up, '.4g')
+                                   metric_name=metric_name,
+                                   value=float(format(overall_value, '.4g')),
+                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
+                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
-
             if self._info.results.overall == None:
-                self._info.results.overall = [overall_performance]
+                self._info.results.overall = {}
+                self._info.results.overall[metric_name] = overall_performance
             else:
-                self._info.results.overall.append(overall_performance)
+                self._info.results.overall[metric_name] = overall_performance
 
     def _bucketing_samples(self, sysout_iterator):
 
@@ -220,6 +220,6 @@ class ABSCExplainaboardBuilder:
         eb_generator = self._complete_feature()
         self._bucketing_samples(eb_generator)
         self.get_overall_performance()
-        self._print_bucket_info()
+        # self._print_bucket_info()
         self._generate_report()
         return self._info

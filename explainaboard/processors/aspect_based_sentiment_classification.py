@@ -71,7 +71,10 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.aspect_based_sentiment_classification.value
-        if "metric_names" not in metadata.keys():
+        if "metric_names" not in metadata.keys() or metadata["metric_names"] == None:
             metadata["metric_names"] = ["Accuracy"]
+        # print(metadata)
         super().__init__(metadata, system_output_data)
         self._builder = ABSCExplainaboardBuilder(self._system_output_info, system_output_data)
+
+        # explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv

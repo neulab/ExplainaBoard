@@ -32,7 +32,7 @@ In order to perform your basic analysis, we can run the following command:
 where
 * `--task`: denotes the task name. this could be applied for any sentence pair classification subtasks.
 * `--system_outputs`: denote the path of system outputs. Multiple one should be 
-  separated by comma, for example, system1,system2 (no space)
+  separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
 * `report.json`: the generated analysis file with json format. . Tips: use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) for better interpretation.

@@ -63,7 +63,7 @@ class BucketPerformance(Performance):
 
 @dataclass
 class Result:
-    overall:List[Performance] = None
+    overall:Any = None
     calibration: List[Performance] = None
     fine_grained:Any = None
     is_print_case:bool = True
