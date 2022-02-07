@@ -40,7 +40,7 @@ class TextPairClassificationLoader(Loader):
         if self._file_type == FileType.tsv:
             for id, dp in enumerate(raw_data):
                 text1, text2, true_label, predicted_label = dp[:4]
-                data.append({"id": id,
+                data.append({"id": str(id),
                              "text1": text1.strip(),
                              "text2": text2.strip(),
                              "true_label": true_label.strip(),
