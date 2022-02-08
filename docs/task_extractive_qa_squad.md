@@ -1,4 +1,4 @@
-# Analyzing Extractive QA Task
+# Analyzing Extractive QA (on SQuAD) Task
 
 
 In this file we describe how to analyze models trained on extractive QA datasets, for example
@@ -32,7 +32,7 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/test-qa-squad.json > report.json
+    explainaboard --task extractive-qa-squad --system_outputs ./data/system_outputs/squad/test-qa-squad.json > report.json
 ```
 where
 * `--task`: denotes the task name. 
