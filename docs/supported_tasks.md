@@ -14,6 +14,29 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Named Entity Recognition](#named-entity-recognition)
 * [Extractive QA](#extractive-qa)
 * [Hellaswag](#hellaswag)
+* [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
+
+
+
+
+
+
+
+## [KG-Link-Tail-Prediction](task_kg_link_tail_prediction.md)
+Predicting the tail entity of missing links in knowledge graphs
+
+**CLI Example**
+```shell
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-link-tail-prediction.json > report.json
+```
+
+**Supported Formats**
+* `FileType.json`
+  
+**Supported Metrics**
+* `Hits`
+
+
 
 
 ## [Text Classification](task_text_classification.md)
