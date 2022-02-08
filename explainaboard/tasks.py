@@ -29,6 +29,9 @@ class TaskType(str, Enum):
     hellaswag = "hellaswag"
     aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
 
+    kg_link_tail_prediction = "kg-link-tail-prediction"
+
+
     @staticmethod
     def list():
         return list(map(lambda c: c.value, TaskType))
@@ -113,6 +116,15 @@ _task_categories: List[TaskCategory] = [
                           supported = True,
                           supported_metrics = ["F1score", "Accuracy"],
                           supported_formats=["tsv"],
+                          ),
+                 ]),
+    TaskCategory("kg-link-tail-prediction", "predicting the tail entity of missing links in knowledge graphs",
+                 [
+                     Task(name = TaskType.kg_link_tail_prediction, 
+                          description = "predicting the tail entity of missing links in knowledge graphs", 
+                          supported = True, 
+                          supported_metrics = ["Hits"],
+                          supported_formats = ["json"],
                           ),
                  ]),
 ]
