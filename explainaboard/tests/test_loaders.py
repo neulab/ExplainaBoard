@@ -28,7 +28,7 @@ class TextClassificationLoader(TestCase):
 
 class QASquadLoader(TestCase):
     def test_load_json(self):
-        loader = get_loader(TaskType.extractive_qa, Source.local_filesystem, FileType.json,
+        loader = get_loader(TaskType.extractive_qa_squad, Source.local_filesystem, FileType.json,
                             f"{artifacts_path}test-qa-squad.json")
         data = loader.load()
         # print(data[0].keys())
