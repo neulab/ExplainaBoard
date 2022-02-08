@@ -6,7 +6,7 @@ import json
 import os
 from explainaboard.tasks import TaskType
 
-@register_loader(TaskType.extractive_qa)
+@register_loader(TaskType.extractive_qa_squad)
 class QASquadLoader(Loader):
     """
 

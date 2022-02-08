@@ -23,7 +23,7 @@ class TaskCategory:
 class TaskType(str, Enum):
     text_classification = "text-classification"
     named_entity_recognition = "named-entity-recognition"
-    extractive_qa = "extractive-qa"
+    extractive_qa_squad = "extractive-qa-squad"
     summarization = "summarization"
     text_pair_classification = "text-pair-classification"
     hellaswag = "hellaswag"
@@ -91,8 +91,8 @@ _task_categories: List[TaskCategory] = [
                  ),
     TaskCategory("question-answering", "question answering tasks",
                  [
-                     Task(name = TaskType.extractive_qa,
-                          description = "A task of extracting an answer from a text given a question",
+                     Task(name = TaskType.extractive_qa_squad,
+                          description = "A task of extracting an answer from a text given a question on the SQuAD dataset",
                           supported = True,
                           supported_metrics = ["f1_score_qa", "exact_match_qa"],
                           supported_formats=["json"],
