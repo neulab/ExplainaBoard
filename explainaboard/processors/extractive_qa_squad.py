@@ -5,9 +5,9 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.builders.extractive_qa import QASquadExplainaboardBuilder
 
-@register_processor(TaskType.extractive_qa)
+@register_processor(TaskType.extractive_qa_squad)
 class QASqudProcessor(Processor):
-    _task_type = TaskType.extractive_qa
+    _task_type = TaskType.extractive_qa_squad
     _features = feature.Features({
         "title": feature.Value("string"),
         "context": feature.Value("string"),
@@ -48,7 +48,7 @@ class QASqudProcessor(Processor):
         if metadata == None:
             metadata = {}
         if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.extractive_qa.value
+            metadata["task_name"] = TaskType.extractive_qa_squad.value
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["f1_score_qa","exact_match_qa"]
         super().__init__(metadata, system_output_data)

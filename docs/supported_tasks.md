@@ -12,10 +12,9 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Text Pair Classification](#text-pair-classification)
 * [Summarization](#summarization)
 * [Named Entity Recognition](#named-entity-recognition)
-* [Extractive QA](#extractive-qa)
+* [Extractive QA_SQuAD](#extractive-qa-squad)
 * [Hellaswag](#hellaswag)
 * [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
-
 
 
 
@@ -125,17 +124,17 @@ explainaboard --task named-entity-recognition --system_outputs ./data/system_out
 * `f1_score_seqeval`
  
 
-## [Extractive QA](task_extractive_qa.md)
+## [Extractive QA_SQuAD](task_extractive_qa_squad.md)
 
 Extractive QA tasks, such as SQuAD.
 
 **CLI Example**
 ```shell
-explainaboard --task extractive-qa --system_outputs ./data/system_outputs/squad/test-qa-squad.json
+explainaboard --task extractive-qa-squad --system_outputs ./data/system_outputs/squad/test-qa-squad.json
 ```
 
 **Class**
-* `TaskType.extractive_qa`
+* `TaskType.extractive_qa_squad`
 
 **Supported Format**
 * `FileType.json` (same format with squad)

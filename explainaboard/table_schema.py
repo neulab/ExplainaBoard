@@ -10,7 +10,7 @@ Currently, the table schema is characterized by:
 (4) label:str: the text to be printed of this column in the table head
 
 
-For some tasks (e.g., extractive_qa), whose system output format involves nested dict, for example, extractive QA tasks
+For some tasks (e.g., extractive_qa_squad), whose system output format involves nested dict, for example, extractive QA tasks
 {
     "title": title,
     "context": context,
@@ -141,7 +141,7 @@ table_schemas[TaskType.summarization] = [
     }
 ]
 
-table_schemas[TaskType.extractive_qa] = [
+table_schemas[TaskType.extractive_qa_squad] = [
     {
         "field_key": "context",
         "sort": False,
