@@ -101,4 +101,27 @@ class F1score(Metric):
         return self._evaluate(self._true_labels, self._predicted_labels, average='micro')
 
 
+def hits(true_labels, predicted_labels):
+    num_hits = 0
+    for i in range(len(true_labels)):
+        i_true = true_labels[i]
+        i_preds = predicted_labels[i]
+        if i_true in i_preds:
+            num_hits += 1
+    return num_hits/len(true_labels)
+
+class Hits(Metric):
+    def __init__(self, true_labels, predicted_labels, is_print_confidence_interval=False):
+        super(Hits, self).__init__()
+        # Metric.__init__(self)
+        self._name = self.__class__.__name__
+        self._true_labels = true_labels
+        self._predicted_labels = predicted_labels
+        self._eval_function = hits
+        self._is_print_confidence_interval = is_print_confidence_interval
+        self._n_samples = len(self._true_labels)
+
+    def evaluate(self):
+
+        return self._evaluate(self._true_labels, self._predicted_labels)
 
