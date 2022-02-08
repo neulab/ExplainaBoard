@@ -11,14 +11,14 @@ class TestExtractiveQA(unittest.TestCase):
         """TODO: should add harder tests"""
 
         path_data = artifacts_path+ "test-qa-squad.json"
-        loader = get_loader(TaskType.extractive_qa, Source.local_filesystem, FileType.json, path_data)
+        loader = get_loader(TaskType.extractive_qa_squad, Source.local_filesystem, FileType.json, path_data)
         data = loader.load()
 
-        metadata = {"task_name": TaskType.extractive_qa.value,
+        metadata = {"task_name": TaskType.extractive_qa_squad.value,
                     "dataset_name":"squad",
                     "metric_names": ["f1_score_qa","exact_match_qa"]}
 
-        processor = get_processor(TaskType.extractive_qa, metadata, data)
+        processor = get_processor(TaskType.extractive_qa_squad, metadata, data)
         #self.assertEqual(len(processor._features), 4)
 
         analysis = processor.process()
