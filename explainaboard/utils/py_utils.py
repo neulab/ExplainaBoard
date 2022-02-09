@@ -1,4 +1,9 @@
 import itertools
+import sys
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 def zip_dict(*dicts):
     """Iterate over items of dictionaries grouped by their keys."""
@@ -18,12 +23,12 @@ def sort_dict(dict_obj, flag="key"):
 
 def print_dict(dict_obj, print_infomation="dict"):
     # print("-----------------------------------------------")
-    print("the information of #" + print_infomation + "#")
-    print("Bucket_interval\tF1\tEntity-Number")
+    eprint("the information of #" + print_infomation + "#")
+    eprint("Bucket_interval\tF1\tEntity-Number")
     for k, v in dict_obj.items():
         if len(k) == 1:
-            print("[" + str(k[0]) + ",]" + "\t" + str(v[0].value) + "\t" + str(v[0].n_samples))
+            eprint("[" + str(k[0]) + ",]" + "\t" + str(v[0].value) + "\t" + str(v[0].n_samples))
         else:
-            print("[" + str(k[0]) + ", " + str(k[1]) + "]" + "\t" + str(v[0].value) + "\t" + str(v[0].n_samples))
+            eprint("[" + str(k[0]) + ", " + str(k[1]) + "]" + "\t" + str(v[0].value) + "\t" + str(v[0].n_samples))
 
-    print("")
+    eprint("")
