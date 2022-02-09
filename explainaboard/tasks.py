@@ -47,6 +47,7 @@ class Task:
     supported: bool = field(default=False)
     supported_metrics: List[str] = field(default_factory=list)
     supported_formats: List[str] = field(default_factory=list)
+    supported_datasets: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -69,6 +70,7 @@ _task_categories: List[TaskCategory] = [
                                                "rouge1", "rouge2", "rougeL","bert_score_f","bert_score_p","bert_score_r",
                                                 "chrf","bleu","comet","mover_score","prism"],
                           supported_formats= ["tsv"],
+                          supported_datasets=[],
                           )
                  ]),
     TaskCategory("text-classification", "predicting a class index or boolean value",
@@ -78,6 +80,7 @@ _task_categories: List[TaskCategory] = [
                           supported = True,
                           supported_metrics = ["F1score", "Accuracy"],
                           supported_formats= ["tsv"],
+                          supported_datasets=[],
                           )]
                  ),
     TaskCategory("structure-prediction", "predicting structural properties of the text, such as syntax",
@@ -86,16 +89,18 @@ _task_categories: List[TaskCategory] = [
                           description = "Recognize named entities from a given text",
                           supported = True,
                           supported_metrics = ["f1_score_seqeval"],
-                            supported_formats= ["conll"],
+                          supported_formats= ["conll"],
+                          supported_datasets=[],
                           )]
                  ),
     TaskCategory("question-answering", "question answering tasks",
                  [
-                     Task(name = TaskType.extractive_qa_squad,
+                     Task(name = TaskType.extractive_qa,
                           description = "A task of extracting an answer from a text given a question on the SQuAD dataset",
                           supported = True,
                           supported_metrics = ["f1_score_qa", "exact_match_qa"],
                           supported_formats=["json"],
+                          supported_datasets=["squad"],
                           ),
                  ]
                  ),
@@ -106,6 +111,7 @@ _task_categories: List[TaskCategory] = [
                           supported = True,
                           supported_metrics = ["F1score", "Accuracy"],
                           supported_formats=["tsv"],
+                          supported_datasets=[],
                           ),
 
                  ]),
@@ -116,6 +122,7 @@ _task_categories: List[TaskCategory] = [
                           supported = True,
                           supported_metrics = ["F1score", "Accuracy"],
                           supported_formats=["tsv"],
+                          supported_datasets=[],
                           ),
                  ]),
     TaskCategory("kg-link-tail-prediction", "predicting the tail entity of missing links in knowledge graphs",
@@ -125,6 +132,7 @@ _task_categories: List[TaskCategory] = [
                           supported = True, 
                           supported_metrics = ["Hits"],
                           supported_formats = ["json"],
+                          supported_datasets=[],
                           ),
                  ]),
 ]
