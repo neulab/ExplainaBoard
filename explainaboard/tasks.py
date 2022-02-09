@@ -95,7 +95,7 @@ _task_categories: List[TaskCategory] = [
                  ),
     TaskCategory("question-answering", "question answering tasks",
                  [
-                     Task(name = TaskType.extractive_qa,
+                     Task(name = TaskType.extractive_qa_squad,
                           description = "A task of extracting an answer from a text given a question on the SQuAD dataset",
                           supported = True,
                           supported_metrics = ["f1_score_qa", "exact_match_qa"],
