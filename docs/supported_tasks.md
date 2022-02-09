@@ -27,7 +27,11 @@ Predicting the tail entity of missing links in knowledge graphs
 **CLI Example**
 ```shell
     explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-link-tail-prediction.json > report.json
+    # or
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-link-tail-prediction.json --dataset fb15k_237 > report.json
 ```
+
+
 
 **Supported Formats**
 * `FileType.json`

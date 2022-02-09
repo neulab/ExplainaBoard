@@ -10,13 +10,12 @@ from explainaboard.builders.kg_link_tail_prediction import KGLTPExplainaboardBui
 class KGLinkTailPredictionProcessor(Processor):
     _task_type = TaskType.kg_link_tail_prediction
     _features = feature.Features({
+        "true_head": feature.Value("string"),
         "link": feature.Value("string"),
         "true_tail": feature.Value("string"),
         "predicted_tails": feature.Sequence(feature.Value("string")),
-
         # ============================================
         # START WARM-UP TASKS
-
         "tail_entity_length": feature.Value(
             dtype = "float",
             description = "number of words in the tail entity",
@@ -27,10 +26,46 @@ class KGLinkTailPredictionProcessor(Processor):
                 _setting = ()
             )
         ),
-
-        # END WARM-UP TASKS
-        # ============================================
-
+        "head_entity_length": feature.Value(
+            dtype="float",
+            description="number of words in the head entity",
+            is_bucket=True,
+            bucket_info=feature.BucketInfo(
+                _method="bucket_attribute_specified_bucket_value",
+                _number=4,
+                _setting=()
+            )
+        ),
+        "tail_fre": feature.Value(
+            dtype="float",
+            description="the frequency of tail entity in the training set",
+            is_bucket=True,
+            bucket_info=feature.BucketInfo(
+                _method="bucket_attribute_specified_bucket_value",
+                _number=4,
+                _setting=()
+            )
+        ),
+        "link_fre": feature.Value(
+            dtype="float",
+            description="the frequency of link relation in the training set",
+            is_bucket=True,
+            bucket_info=feature.BucketInfo(
+                _method="bucket_attribute_specified_bucket_value",
+                _number=4,
+                _setting=()
+            )
+        ),
+        "head_fre": feature.Value(
+            dtype="float",
+            description="the frequency of head relation in the training set",
+            is_bucket=True,
+            bucket_info=feature.BucketInfo(
+                _method="bucket_attribute_specified_bucket_value",
+                _number=4,
+                _setting=()
+            )
+        ),
 
     })
 
