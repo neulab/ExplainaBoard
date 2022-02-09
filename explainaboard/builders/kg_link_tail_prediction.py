@@ -9,9 +9,11 @@ from metric import Hits
 from tqdm import tqdm
 from explainaboard.utils.feature_funcs import *
 from explainaboard.utils.spacy_loader import spacy_loader
+from datalabs import load_dataset
 
-"""TODO
-"""
+from aggregate import *
+
+
 
 
 class KGLTPExplainaboardBuilder:
@@ -36,6 +38,14 @@ class KGLTPExplainaboardBuilder:
         self._performances_over_bucket = {}
 
 
+        if self._info.dataset_name != "fb15k_237": # to be generalized
+            self.statistics = None
+        else:
+            dataset = load_dataset(self._info.dataset_name, 'readable')
+            self.statistics = next(dataset['train'].apply(get_statistics))
+
+
+
     @staticmethod
     def get_bucket_feature_value(feature_name:str):
         return "self._get_" + feature_name
@@ -43,6 +53,35 @@ class KGLTPExplainaboardBuilder:
     # define function for incomplete features
     def _get_tail_entity_length(self, existing_features: dict):
         return len(existing_features["true_tail"].split(" "))
+
+
+    # define function for incomplete features
+    def _get_head_entity_length(self, existing_features: dict):
+        return len(existing_features["true_head"].split(" "))
+
+
+    # define function for incomplete features
+    def _get_tail_fre(self, existing_features: dict):
+        if self.statistics is None or existing_features["true_tail"] not in self.statistics['tail_fre'].keys():
+            return 0
+        else:
+            return self.statistics['tail_fre'][existing_features["true_tail"]]
+
+    # define function for incomplete features
+    def _get_head_fre(self, existing_features: dict):
+        if self.statistics is None or existing_features["true_head"] not in self.statistics['head_fre'].keys():
+            return 0
+        else:
+            return self.statistics['head_fre'][existing_features["true_head"]]
+
+    # define function for incomplete features
+    def _get_link_fre(self, existing_features: dict):
+        if self.statistics is None or existing_features["link"] not in self.statistics['link_fre'].keys():
+            return 0
+        else:
+            return self.statistics['link_fre'][existing_features["link"]]
+
+
 
 
     def _complete_feature(self):
@@ -218,14 +257,14 @@ class KGLTPExplainaboardBuilder:
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
             print_dict(self._performances_over_bucket[feature_name], feature_name)
-        print("")
+
 
 
     def run(self) -> SysOutputInfo:
         eb_generator = self._complete_feature()
         self._bucketing_samples(eb_generator)
         self.get_overall_performance()
-        # self._print_bucket_info()
+        self._print_bucket_info()
         self._generate_report()
         return self._info
 
