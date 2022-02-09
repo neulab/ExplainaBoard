@@ -4,6 +4,8 @@
 ## How to load the dataset using `DataLab`?
 
 ```python
+# pip install --upgrade pip
+# pip install datalabs
 from datalabs import load_dataset
 dataset = load_dataset("fb15k_237",'readable') # you can print one example by: print(dataset['test'][0])
 ```
