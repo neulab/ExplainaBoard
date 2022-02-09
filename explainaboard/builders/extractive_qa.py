@@ -268,7 +268,7 @@ class QASquadExplainaboardBuilder:
         eb_generator = self._complete_feature()
         self._bucketing_samples(eb_generator)
         self.get_overall_performance()
-        # self._print_bucket_info()
+        self._print_bucket_info()
         self._generate_report()
         return self._info
 
