@@ -247,7 +247,7 @@ class HellaswagExplainaboardBuilder:
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
             print_dict(self._performances_over_bucket[feature_name], feature_name)
-        print("")
+
 
 
     def run(self) -> SysOutputInfo:
