@@ -45,4 +45,10 @@ TODO: add insights
 
 ## Advanced Analysis Options
 
-TODO: describe some more advanced options
+One also can perform pair-wise analysis:
+```shell
+explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv ./data/system_outputs/sst2/sst2-cnn.tsv > report.json
+```
+where two system outputs are fed separated by space.
+* `report.json`: the generated analysis file with json format, whose schema is similar to the above one with single system evaluation except that
+   all performance values are obtained using the sys1 subtract sys2.
