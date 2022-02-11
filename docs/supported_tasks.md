@@ -116,6 +116,11 @@ Recognizing the entities in text.
 **CLI Example**
 ```shell
 explainaboard --task named-entity-recognition --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+
+or 
+
+explainaboard --task named-entity-recognition --dataset conll2003 --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+
 ```
 
 **Class**
