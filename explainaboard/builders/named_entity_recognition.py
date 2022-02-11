@@ -48,8 +48,10 @@ class NERExplainaboardBuilder:
 
         self._path_pre_computed_models = None
         self.dict_pre_computed_models = None
+
+        scriptpath = os.path.dirname(__file__)
         if self._info.dataset_name and self._info.task_name:
-            self._path_pre_computed_models = "../pre_computed/" + self._info.task_name.replace("-","_") + "/" + self._info.dataset_name+"/"
+            self._path_pre_computed_models = os.path.join(scriptpath, "../pre_computed/" + self._info.task_name.replace("-","_") + "/" + self._info.dataset_name+"/")
             # print(self._path_pre_computed_models)
             # print(os.path.isdir(self._path_pre_computed_models))
             # exit()
@@ -319,10 +321,12 @@ class NERExplainaboardBuilder:
     """
     Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
     """
-    def get_bucket_cases_ner(self, feature_name:str) -> list:
+    def get_bucket_cases_ner(self, feature_name:str, bucket_interval) -> list:
         # predict:  2_3 -> NER
         dict_pos2tag_pred = {}
         for k_bucket_eval, spans_pred in self._samples_over_bucket_pred[feature_name].items():
+            if k_bucket_eval != bucket_interval:
+                continue
             for span_pred in spans_pred:
                 pos_pred = "|||".join(span_pred.split("|||")[0:4])
                 tag_pred = span_pred.split("|||")[-1]
@@ -332,6 +336,8 @@ class NERExplainaboardBuilder:
         # true:  2_3 -> NER
         dict_pos2tag = {}
         for k_bucket_eval, spans in self._samples_over_bucket_true[feature_name].items():
+            if k_bucket_eval != bucket_interval:
+                continue
             for span in spans:
                 pos = "|||".join(span.split("|||")[0:4])
                 tag = span.split("|||")[-1]
@@ -411,7 +417,7 @@ class NERExplainaboardBuilder:
             """
             Get bucket samples for ner task
             """
-            bucket_samples = self.get_bucket_cases_ner(feature_name)
+            bucket_samples = self.get_bucket_cases_ner(feature_name, bucket_interval)
 
             for metric_name in self._info.metric_names:
                 """
