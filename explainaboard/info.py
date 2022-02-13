@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from typing import Any, List, Optional
 from explainaboard.feature import Features
 import json
@@ -98,7 +98,7 @@ class SysOutputInfo:
     # download_link: str = None
     # paper_info: PaperInfo = PaperInfo()
     features: Features = None
-    results: Result = Result()
+    results: Result = field(default_factory=lambda: Result())
 
 
     def write_to_directory(self, dataset_info_dir):
