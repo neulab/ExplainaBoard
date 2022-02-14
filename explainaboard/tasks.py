@@ -62,7 +62,7 @@ _task_categories: List[TaskCategory] = [
                      Task(name=TaskType.summarization,
                           description="Summarize long documents into short texts. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_summarization.md",
                           supported=True,
-                          supported_metrics=["bleu", "bart_score_summ", "bart_score_mt", "bart_score_cnn_hypo_ref"
+                          supported_metrics=["bleu", "bart_score_summ", "bart_score_mt", "bart_score_cnn_hypo_ref",
                                              "rouge1", "rouge2", "rougeL", "bert_score_f", "bert_score_p", "bert_score_r",
                                              "chrf", "comet", "mover_score", "prism"],
                           supported_formats=["tsv"],
