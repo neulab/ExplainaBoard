@@ -54,7 +54,8 @@ class NERLoader(Loader):
                     ner_true_tags = []
                     ner_pred_tags = []
             else:
-                splits = line.split("\t")
+                # splits = line.split("\t")
+                splits = line.split("\t") if len(line.split("\t")) == 3 else line.split(" ")
                 tokens.append(splits[0].strip())
                 ner_true_tags.append(splits[1].strip())
                 ner_pred_tags.append(splits[2].strip())
