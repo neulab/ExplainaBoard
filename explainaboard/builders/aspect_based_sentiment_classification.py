@@ -2,7 +2,9 @@ from typing import Optional
 import os
 import sys
 import spacy
-spacy_nlp = spacy.load("en_core_web_sm")
+
+
+from explainaboard.utils.spacy_loader import spacy_loader
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from info import *
@@ -18,6 +20,7 @@ from metric import Accuracy
 from metric import F1score
 from tqdm import tqdm
 
+spacy_nlp = spacy_loader.get_model("en_core_web_sm")
 
 class ABSCExplainaboardBuilder:
     """
