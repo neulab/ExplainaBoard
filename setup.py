@@ -46,7 +46,7 @@ setup(
         "datasets",
         "lexicalrichness",
         "spacy",
-        "datalabs==0.2.6",
+        "datalabs==0.2.7",
     ],
     include_package_data=True,
 )
