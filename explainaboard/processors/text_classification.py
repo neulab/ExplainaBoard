@@ -55,7 +55,6 @@ class TextClassificationProcessor(Processor):
                                          _method="bucket_attribute_specified_bucket_value",
                                          _number=4,
                                          _setting=())),
-
         "entity_number": feature.Value(dtype="float",
                                        description="the number of entities",
                                        is_bucket=True,
