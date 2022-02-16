@@ -35,7 +35,7 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
-        "scikit-learn",
+        "scikit-learn==0.23.2",
         "seqeval",
         "pandas",
         "pyarrow",
