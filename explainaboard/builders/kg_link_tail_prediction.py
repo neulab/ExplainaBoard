@@ -42,7 +42,8 @@ class KGLTPExplainaboardBuilder:
             self.statistics = None
         else:
             dataset = load_dataset(self._info.dataset_name, 'readable')
-            self.statistics = next(dataset['train'].apply(get_statistics))
+            new_train = dataset['train'].apply(get_statistics)
+            self.statistics = new_train._stat
 
 
 
