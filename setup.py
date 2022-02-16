@@ -35,7 +35,7 @@ setup(
         "numpy",
         "scipy",
         "matplotlib",
-        "scikit-learn==0.23.2",
+        "scikit-learn",
         "seqeval",
         "pandas",
         "pyarrow",
@@ -46,7 +46,7 @@ setup(
         "datasets",
         "lexicalrichness",
         "spacy",
-        "datalabs==0.2.4.dev0",
+        "datalabs==0.2.5.dev0",
     ],
     include_package_data=True,
 )
