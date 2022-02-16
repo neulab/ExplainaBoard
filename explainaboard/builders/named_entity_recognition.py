@@ -16,6 +16,7 @@ from explainaboard.utils.eval_bucket import *
 from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_basic import *
 from explainaboard.utils.eval_bucket import *
+from explainaboard.utils.feature_funcs import *
 from metric import Accuracy
 from metric import F1score
 from config import BuilderConfig
@@ -122,7 +123,13 @@ class NERExplainaboardBuilder:
             span_text = ' '.join(sentence[sid:eid])
             span_len = eid - sid
             span_pos = (sid, eid)
-            span_dic = {'span_text': span_text, 'span_len': span_len, 'span_pos': span_pos, 'span_tag': tag}
+            span_dic = {'span_text': span_text, 'span_len': span_len, 
+                        'span_pos': span_pos, 'span_tag': tag,
+                        'span_capitalness':cap_feature(span_text),
+                        'span_position':eid*1.0/len(sentence),
+                        'span_chars':len(span_text),
+                        'span_density':len(chunks)*1.0/len(sentence),
+                        }
             # print('span_dic: ',span_dic)
             span_dics.append(span_dic)
         # self.span_dics = span_dics

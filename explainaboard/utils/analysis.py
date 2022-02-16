@@ -1,6 +1,24 @@
 from .py_utils import *
 import json
 
+def cap_feature(s):
+    """
+    Capitalization feature:
+    0 = low caps
+    1 = all caps
+    2 = first letter caps
+    3 = one capital (not first letter)
+    """
+    if s.lower() == s:
+        return "low_caps"
+    elif s.upper() == s:
+        return "full_caps"
+    elif s[0].upper() == s[0]:
+        return "first_caps"
+    else:
+        return "not_first_caps"
+
+
 def save_json(obj_json, path):
     with open(path, "w") as f:
         json.dump(obj_json, f, indent=4, ensure_ascii=False)
