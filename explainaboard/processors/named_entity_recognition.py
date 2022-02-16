@@ -67,7 +67,6 @@ class NERProcessor(Processor):
             "span_position": feature.Value(dtype="float",
                                   description="The relative position of an entity in a sentence",
                                   is_bucket=True,
-                                  is_pre_computed=True,
                                   bucket_info=feature.BucketInfo(
                                       _method="bucket_attribute_specified_bucket_value",
                                       _number=4,
@@ -75,7 +74,6 @@ class NERProcessor(Processor):
             "span_chars": feature.Value(dtype="float",
                                            description="The number of characters of an entity",
                                            is_bucket=True,
-                                           is_pre_computed=True,
                                            bucket_info=feature.BucketInfo(
                                                _method="bucket_attribute_specified_bucket_value",
                                                _number=4,
@@ -83,7 +81,6 @@ class NERProcessor(Processor):
             "span_density": feature.Value(dtype="float",
                                         description="Entity density. GIven a sentence (or a sample), entity density tallies the ratio between the number of all entity tokens and tokens in this sentence",
                                         is_bucket=True,
-                                        is_pre_computed=True,
                                         bucket_info=feature.BucketInfo(
                                             _method="bucket_attribute_specified_bucket_value",
                                             _number=4,
