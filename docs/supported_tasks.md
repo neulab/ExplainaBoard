@@ -88,22 +88,22 @@ where different metrics should be separated by space
 * `FileType.tsv`
   
 **Supported Metrics**
-* `bart_score_cnn_hypo_ref`
-* `bart_score_summ`
-* `bart_score_mt`
-* `bert_score_p`
-* `bert_score_r`
-* `bert_score_f`
-* `bleu`
-* `chrf`
-* `comet`
-* `comet_qe`
+* `bart_score_cnn_hypo_ref`: [BARTScore](https://arxiv.org/abs/2106.11520) is a sequence to sequence framework based on pre-trained language model BART.  `bart_score_cnn_hypo_ref` uses the CNNDM finetuned BART. It calculates the average generation score of `Score(hypothesis|reference)` and `Score(reference|hypothesis)`.
+* `bart_score_summ`: [BARTScore](https://arxiv.org/abs/2106.11520) using the CNNDM finetuned BART. It calculates `Score(hypothesis|source)`.
+* `bart_score_mt`: [BARTScore](https://arxiv.org/abs/2106.11520) using the Parabank2 finetuned BART. It calculates the average generation score of `Score(hypothesis|reference)` and `Score(reference|hypothesis)`.
+* `bert_score_p`: [BERTScore](https://arxiv.org/abs/1904.09675) is a metric designed for evaluating translated text using BERT-based matching framework. `bert_score_p` calculates the BERTScore precision.
+* `bert_score_r`: [BERTScore](https://arxiv.org/abs/1904.09675) recall.
+* `bert_score_f`: [BERTScore](https://arxiv.org/abs/1904.09675) f score.
+* `bleu`: [BLEU](https://aclanthology.org/P02-1040.pdf) measures modified ngram matches between each candidate translation and the reference translations. 
+* `chrf`: [CHRF](https://aclanthology.org/W15-3049/) measures the character-level ngram matches between hypothesis and reference.
+* `comet`: [COMET](https://aclanthology.org/2020.emnlp-main.213/) is a neural framework for training multilingual machine translation evaluation models. `comet` uses the `wmt20-comet-da` checkpoint which utilizes source, hypothesis and reference.
+* `comet_qe`: [COMET](https://aclanthology.org/2020.emnlp-main.213/) for quality estimation. `comet_qe` uses the `wmt20-comet-qe-da` checkpoint which utilizes only source and hypothesis.
 * `mover_score`
-* `prism`
-* `prism_qe`
-* `rouge1`
-* `rouge2`
-* `rougeL`
+* `prism`: [PRISM](https://arxiv.org/abs/2004.14564) is a sequence to sequence framework trained from scratch. `prism` calculates the average generation score of `Score(hypothesis| reference)` and Score(reference | hypothesis).
+* `prism_qe`: [PRISM](https://arxiv.org/abs/2004.14564) for quality estimation. It calculates `Score(hypothesis| source)`.
+* `rouge1`: [ROUGE-1](https://aclanthology.org/W04-1013/) refers to the overlap of unigram (each word) between the system and reference summaries.
+* `rouge2`: [ROUGE-2](https://aclanthology.org/W04-1013/) refers to the overlap of bigrams between the system and reference summaries.
+* `rougeL`: [ROUGE-L](https://aclanthology.org/W04-1013/) refers to the longest common subsequence between the system and reference summaries.
 
 
 
