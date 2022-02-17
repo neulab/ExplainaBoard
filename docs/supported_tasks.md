@@ -15,6 +15,7 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Extractive QA_SQuAD](#extractive-qa-squad)
 * [Hellaswag](#hellaswag)
 * [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
+* [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 
 
 
@@ -159,3 +160,21 @@ explainaboard --task extractive-qa-squad --system_outputs ./data/system_outputs/
 ```shell
 explainaboard --task hellaswag --system_outputs ./data/system_outputs/hellaswag/hellaswag.random
 ```
+
+## [Aspect-based Sentiment Classification](task_aspect_based_sentiment_classification.md)
+Predict the sentiment of a text based on a specific aspect.
+
+**CLI Example**
+```shell
+explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv > ./data/reports/report_absa.json
+```
+
+**Class**
+* `TaskType.aspect_based_sentiment_classification`
+
+**Supported Formats**
+* `FileType.tsv`
+  
+**Supported Metrics**
+* `F1score`
+* `Accuracy`
