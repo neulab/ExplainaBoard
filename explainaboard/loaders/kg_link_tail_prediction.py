@@ -41,7 +41,7 @@ class KgLinkTailPredictionLoader(Loader):
         if self._file_type == FileType.json:
             for id, (link, predictions) in enumerate(raw_data.items()):
                 data.append({
-                    "id": id,
+                    "id": str(id), # should be string type
                     "link": link.strip(),
                     "true_head": link.split('\t')[0].strip(),
                     "true_tail": link.split('\t')[-1].strip(),
