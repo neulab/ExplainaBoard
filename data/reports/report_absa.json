@@ -1,0 +1,520 @@
+{
+    "task_name": "aspect-based-sentiment-classification",
+    "model_name": null,
+    "dataset_name": "dataset_name",
+    "metric_names": [
+        "Accuracy"
+    ],
+    "features": {
+        "aspect": {
+            "dtype": "string",
+            "description": null,
+            "is_bucket": false,
+            "is_pre_computed": false,
+            "bucket_info": null,
+            "id": null,
+            "_type": "Value"
+        },
+        "text": {
+            "dtype": "string",
+            "description": null,
+            "is_bucket": false,
+            "is_pre_computed": false,
+            "bucket_info": null,
+            "id": null,
+            "_type": "Value"
+        },
+        "true_label": {
+            "num_classes": 2,
+            "names": [
+                "positive",
+                "negative"
+            ],
+            "description": null,
+            "names_file": null,
+            "id": null,
+            "is_bucket": false,
+            "is_pre_computed": false,
+            "bucket_info": null,
+            "_type": "ClassLabel"
+        },
+        "predicted_label": {
+            "num_classes": 2,
+            "names": [
+                "positive",
+                "negative"
+            ],
+            "description": null,
+            "names_file": null,
+            "id": null,
+            "is_bucket": false,
+            "is_pre_computed": false,
+            "bucket_info": null,
+            "_type": "ClassLabel"
+        },
+        "label": {
+            "dtype": "string",
+            "description": "category",
+            "is_bucket": true,
+            "is_pre_computed": false,
+            "bucket_info": {
+                "_method": "bucket_attribute_discrete_value",
+                "_number": 4,
+                "_setting": 1
+            },
+            "id": null,
+            "_type": "Value"
+        },
+        "sentence_length": {
+            "dtype": "float32",
+            "description": "sentence length",
+            "is_bucket": true,
+            "is_pre_computed": false,
+            "bucket_info": {
+                "_method": "bucket_attribute_specified_bucket_value",
+                "_number": 4,
+                "_setting": []
+            },
+            "id": null,
+            "_type": "Value"
+        },
+        "token_number": {
+            "dtype": "float32",
+            "description": "the number of chars",
+            "is_bucket": true,
+            "is_pre_computed": false,
+            "bucket_info": {
+                "_method": "bucket_attribute_specified_bucket_value",
+                "_number": 4,
+                "_setting": []
+            },
+            "id": null,
+            "_type": "Value"
+        },
+        "entity_number": {
+            "dtype": "float32",
+            "description": "entity numbers",
+            "is_bucket": true,
+            "is_pre_computed": false,
+            "bucket_info": {
+                "_method": "bucket_attribute_specified_bucket_value",
+                "_number": 4,
+                "_setting": []
+            },
+            "id": null,
+            "_type": "Value"
+        },
+        "aspect_length": {
+            "dtype": "float32",
+            "description": "aspect length",
+            "is_bucket": true,
+            "is_pre_computed": false,
+            "bucket_info": {
+                "_method": "bucket_attribute_specified_bucket_value",
+                "_number": 4,
+                "_setting": []
+            },
+            "id": null,
+            "_type": "Value"
+        },
+        "aspect_index": {
+            "dtype": "float32",
+            "description": "aspect position",
+            "is_bucket": true,
+            "is_pre_computed": false,
+            "bucket_info": {
+                "_method": "bucket_attribute_specified_bucket_value",
+                "_number": 4,
+                "_setting": []
+            },
+            "id": null,
+            "_type": "Value"
+        }
+    },
+    "results": {
+        "overall": {
+            "Accuracy": {
+                "metric_name": "Accuracy",
+                "value": 0.91,
+                "confidence_score_low": 0.85,
+                "confidence_score_up": 0.9625
+            }
+        },
+        "calibration": null,
+        "fine_grained": {
+            "label": [
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8636",
+                        "confidence_score_low": "0.7059",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            "negative"
+                        ],
+                        "n_samples": 22,
+                        "bucket_samples": [
+                            "32",
+                            "68",
+                            "70"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.5",
+                        "confidence_score_low": "0",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            "neutral"
+                        ],
+                        "n_samples": 6,
+                        "bucket_samples": [
+                            "8",
+                            "78",
+                            "79"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.9577",
+                        "confidence_score_low": "0.8929",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            "positive"
+                        ],
+                        "n_samples": 71,
+                        "bucket_samples": [
+                            "6",
+                            "28",
+                            "74"
+                        ]
+                    }
+                ]
+            ],
+            "sentence_length": [
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8846",
+                        "confidence_score_low": "0.75",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            5.0,
+                            11.0
+                        ],
+                        "n_samples": 26,
+                        "bucket_samples": [
+                            "68",
+                            "28",
+                            "8"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "1",
+                        "confidence_score_low": "1",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            12.0,
+                            16.0
+                        ],
+                        "n_samples": 28,
+                        "bucket_samples": []
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.9231",
+                        "confidence_score_low": "0.8",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            17.0,
+                            23.0
+                        ],
+                        "n_samples": 26,
+                        "bucket_samples": [
+                            "32",
+                            "70"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.7895",
+                        "confidence_score_low": "0.6",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            24.0,
+                            1000000
+                        ],
+                        "n_samples": 19,
+                        "bucket_samples": [
+                            "74",
+                            "78",
+                            "79",
+                            "6"
+                        ]
+                    }
+                ]
+            ],
+            "token_number": [
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.88",
+                        "confidence_score_low": "0.75",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            17.0,
+                            51.0
+                        ],
+                        "n_samples": 25,
+                        "bucket_samples": [
+                            "68",
+                            "28",
+                            "8"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "1",
+                        "confidence_score_low": "1",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            52.0,
+                            68.0
+                        ],
+                        "n_samples": 25,
+                        "bucket_samples": []
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.92",
+                        "confidence_score_low": "0.8",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            70.0,
+                            97.0
+                        ],
+                        "n_samples": 25,
+                        "bucket_samples": [
+                            "32",
+                            "70"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8333",
+                        "confidence_score_low": "0.6842",
+                        "confidence_score_up": "0.9474",
+                        "bucket_name": [
+                            99.0,
+                            1000000
+                        ],
+                        "n_samples": 24,
+                        "bucket_samples": [
+                            "78",
+                            "79",
+                            "74",
+                            "6"
+                        ]
+                    }
+                ]
+            ],
+            "entity_number": [
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.918",
+                        "confidence_score_low": "0.8333",
+                        "confidence_score_up": "0.9792",
+                        "bucket_name": [
+                            0.0
+                        ],
+                        "n_samples": 61,
+                        "bucket_samples": [
+                            "8",
+                            "28",
+                            "32",
+                            "68",
+                            "70"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8966",
+                        "confidence_score_low": "0.7391",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            1.0
+                        ],
+                        "n_samples": 29,
+                        "bucket_samples": [
+                            "74",
+                            "78",
+                            "79"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8889",
+                        "confidence_score_low": "0.5714",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            2.0,
+                            1000000
+                        ],
+                        "n_samples": 9,
+                        "bucket_samples": [
+                            "6"
+                        ]
+                    }
+                ]
+            ],
+            "aspect_length": [
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.9412",
+                        "confidence_score_low": "0.85",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            1.0
+                        ],
+                        "n_samples": 51,
+                        "bucket_samples": [
+                            "28",
+                            "70",
+                            "78"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8919",
+                        "confidence_score_low": "0.7586",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            2.0
+                        ],
+                        "n_samples": 37,
+                        "bucket_samples": [
+                            "6",
+                            "32",
+                            "68",
+                            "79"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8182",
+                        "confidence_score_low": "0.5",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            3.0,
+                            1000000
+                        ],
+                        "n_samples": 11,
+                        "bucket_samples": [
+                            "8",
+                            "74"
+                        ]
+                    }
+                ]
+            ],
+            "aspect_index": [
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.88",
+                        "confidence_score_low": "0.7",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            -1.0,
+                            10.0
+                        ],
+                        "n_samples": 25,
+                        "bucket_samples": [
+                            "8",
+                            "28",
+                            "68"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.92",
+                        "confidence_score_low": "0.8",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            12.0,
+                            33.0
+                        ],
+                        "n_samples": 25,
+                        "bucket_samples": [
+                            "74",
+                            "32"
+                        ]
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "1",
+                        "confidence_score_low": "1",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            34.0,
+                            56.0
+                        ],
+                        "n_samples": 26,
+                        "bucket_samples": []
+                    }
+                ],
+                [
+                    {
+                        "metric_name": "Accuracy",
+                        "value": "0.8261",
+                        "confidence_score_low": "0.6667",
+                        "confidence_score_up": "1",
+                        "bucket_name": [
+                            58.0,
+                            1000000
+                        ],
+                        "n_samples": 23,
+                        "bucket_samples": [
+                            "78",
+                            "70",
+                            "79",
+                            "6"
+                        ]
+                    }
+                ]
+            ]
+        },
+        "is_print_case": true,
+        "is_print_confidence_interval": true
+    }
+}
