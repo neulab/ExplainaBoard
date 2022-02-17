@@ -103,7 +103,7 @@ _task_categories: List[TaskCategory] = [
     TaskCategory("span-text-prediction", "prediction based on span and text",
                  [
                      Task(name=TaskType.aspect_based_sentiment_classification,
-                          description="Predict the sentiment of a text based on a specific aspect.",
+                          description="Predict the sentiment of a text based on a specific aspect. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv",
                           supported=True,
                           supported_metrics=["F1score", "Accuracy"],
                           supported_formats=["tsv"],
