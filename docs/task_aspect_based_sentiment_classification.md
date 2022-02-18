@@ -1,6 +1,6 @@
-# Analyzing Text Classification
+# Analyzing Aspect-based Sentiment Classification
 
-In this file we describe how to analyze text classification models.
+In this file we describe how to analyze aspect-based sentiment classification models.
 We will give an example using the `aspect-based-sentiment-classification` [laptop](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv) dataset, but other datasets
 can be analyzed in a similar way.
 
