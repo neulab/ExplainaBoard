@@ -22,7 +22,7 @@ client = Client()
 client.load_config(config)  # The config you have created above
 
 
-class SummExplainaboardBuilder:
+class CondGenExplainaboardBuilder:
 
     def __init__(self, info: SysOutputInfo,
                  system_output_object: Iterable[dict],
