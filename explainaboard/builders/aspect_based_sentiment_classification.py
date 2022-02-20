@@ -1,23 +1,9 @@
-from typing import Optional
-import os
-import sys
-import spacy
-
-
 from explainaboard.utils.spacy_loader import spacy_loader
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from info import *
 from typing import Iterable
-from info import SysOutputInfo
-from info import BucketPerformance
-from info import Performance
-from info import Table
-from explainaboard.utils import analysis
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
-from metric import Accuracy
-from metric import F1score
+from explainaboard.metric import *
 from tqdm import tqdm
 
 spacy_nlp = spacy_loader.get_model("en_core_web_sm")
@@ -207,7 +193,7 @@ class ABSCExplainaboardBuilder:
         for feature_name, metadata in self._performances_over_bucket.items():
             dict_fine_grained[feature_name] = []
             for bucket_name, bucket_performance in metadata.items():
-                bucket_name = analysis.beautify_interval(bucket_name)
+                bucket_name = beautify_interval(bucket_name)
 
                 # instantiation
                 dict_fine_grained[feature_name].append(bucket_performance)

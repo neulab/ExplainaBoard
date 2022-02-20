@@ -1,22 +1,12 @@
-from dataclasses import dataclass, field, fields
-from typing import Any, ClassVar, Dict, List, Optional
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from info import *
-import feature
 from typing import Iterable
-from info import SysOutputInfo, Performance, BucketPerformance, Table
-from explainaboard.utils import analysis
+from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Table
 from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
 import copy
-from config import BuilderConfig
 import numpy
 from tqdm import tqdm
 
-from eaas import Config
-from eaas import Client
+from eaas import Config, Client
 config = Config()
 client = Client()
 client.load_config(config)  # The config you have created above
@@ -218,7 +208,7 @@ class SummExplainaboardBuilder:
         for feature_name, metadata in self._performances_over_bucket.items():
             dict_fine_grained[feature_name] = []
             for bucket_name, bucket_performance in metadata.items():
-                bucket_name = analysis.beautify_interval(bucket_name)
+                bucket_name = beautify_interval(bucket_name)
 
                 # instantiation
                 dict_fine_grained[feature_name].append(bucket_performance)
