@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+from explainaboard.constants import Source, FileType
+from enum import Enum
 from .loader import register_loader
 from .loader import Loader
 import json
@@ -13,9 +14,9 @@ class QASquadLoader(Loader):
 
     def __init__(self, source: Source, file_type: Enum, data: str = None):
 
-        if source == None:
+        if source is None:
             source = Source.local_filesystem
-        if file_type == None:
+        if file_type is None:
             file_type = FileType.json
 
         self._source = source
@@ -30,7 +31,6 @@ class QASquadLoader(Loader):
         """
         raw_data = self._load_raw_data_points()
 
-        print_json = {}
         if self._file_type == FileType.json:
             pred_json = raw_data
         else:

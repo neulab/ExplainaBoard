@@ -283,7 +283,7 @@ class ClassLabel:
     _type: str = field(default="ClassLabel", init=False, repr=False)
 
     def __post_init__(self):
-        if self.is_bucket and self.bucket_info == None:
+        if self.is_bucket and self.bucket_info is None:
             self.bucket_info = BucketInfo(
                 _method="bucket_attribute_discrete_value", _number=4, _setting=1
             )
@@ -479,7 +479,7 @@ class Value:
     # is_bucket: str = field(default=False, init=False, repr=False)
 
     def __post_init__(self):
-        if self.is_bucket and self.bucket_info == None:
+        if self.is_bucket and self.bucket_info is None:
             self.bucket_info = BucketInfo(
                 _method="bucket_attribute_specified_bucket_value",
                 _number=4,

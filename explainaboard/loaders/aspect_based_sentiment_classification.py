@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+from explainaboard.constants import Source, FileType
+from enum import Enum
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader

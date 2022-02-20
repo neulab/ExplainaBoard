@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+from explainaboard.constants import Source, FileType
+from enum import Enum
 from .loader import register_loader
 from .loader import Loader
 from explainaboard.tasks import TaskType
@@ -18,9 +19,9 @@ class ConditionalGenerationLoader(Loader):
 
     def __init__(self, source: Source, file_type: Enum, data: str = None):
 
-        if source == None:
+        if source is None:
             source = Source.local_filesystem
-        if file_type == None:
+        if file_type is None:
             file_type = FileType.tsv
 
         self._source = source

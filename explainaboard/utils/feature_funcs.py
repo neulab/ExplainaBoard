@@ -1,5 +1,3 @@
-import os
-import sys
 import sacrebleu
 from lexicalrichness import LexicalRichness
 
