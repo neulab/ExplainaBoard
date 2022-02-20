@@ -11,8 +11,6 @@ import copy
 logger = get_logger(__name__)
 
 
-
-
 @dataclass
 class Table:
     # def __init__(self,
@@ -25,7 +23,6 @@ class Table:
     # def __post_init__(self):
 
 
-
 @dataclass
 class PaperInfo:
     """
@@ -36,6 +33,7 @@ class PaperInfo:
     "url": "xx",
     "bib": "xx"
     """
+
     year: Optional[str] = None
     venue: Optional[str] = None
     title: Optional[str] = None
@@ -44,31 +42,28 @@ class PaperInfo:
     bib: Optional[str] = None
 
 
-
-
-
 @dataclass
 class Performance:
     metric_name: float = None
     value: float = None
     confidence_score_low: float = None
-    confidence_score_up:float = None
+    confidence_score_up: float = None
+
 
 @dataclass
 class BucketPerformance(Performance):
-    bucket_name:str = None
-    n_samples:float = None
+    bucket_name: str = None
+    n_samples: float = None
     bucket_samples: Any = None
 
 
 @dataclass
 class Result:
-    overall:Any = None
+    overall: Any = None
     calibration: List[Performance] = None
-    fine_grained:Any = None
-    is_print_case:bool = True
-    is_print_confidence_interval:bool = True
-
+    fine_grained: Any = None
+    is_print_case: bool = True
+    is_print_confidence_interval: bool = True
 
 
 @dataclass
@@ -100,24 +95,22 @@ class SysOutputInfo:
     features: Features = None
     results: Result = field(default_factory=lambda: Result())
 
-
     def write_to_directory(self, dataset_info_dir):
-        """Write `SysOutputInfo` as JSON to `dataset_info_dir`.
-        """
-        with open(os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "wb") as f:
+        """Write `SysOutputInfo` as JSON to `dataset_info_dir`."""
+        with open(
+            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "wb"
+        ) as f:
             self._dump_info(f)
-    
+
     def to_dict(self) -> dict:
         return asdict(self)
 
     def to_memory(self):
         print(json.dumps(self.to_dict(), indent=4))
 
-
     def _dump_info(self, file):
         """SystemOutputInfo => JSON"""
         file.write(json.dumps(self.to_dict(), indent=4).encode("utf-8"))
-
 
     @classmethod
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
@@ -128,9 +121,15 @@ class SysOutputInfo:
         """
         logger.info("Loading Dataset info from %s", sys_output_info_dir)
         if not sys_output_info_dir:
-            raise ValueError("Calling DatasetInfo.from_directory() with undefined dataset_info_dir.")
+            raise ValueError(
+                "Calling DatasetInfo.from_directory() with undefined dataset_info_dir."
+            )
 
-        with open(os.path.join(sys_output_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "r", encoding="utf-8") as f:
+        with open(
+            os.path.join(sys_output_info_dir, config.SYS_OUTPUT_INFO_FILENAME),
+            "r",
+            encoding="utf-8",
+        ) as f:
             sys_output_info_dict = json.load(f)
         return cls.from_dict(sys_output_info_dict)
 
@@ -142,8 +141,9 @@ class SysOutputInfo:
     @classmethod
     def from_dict(cls, sys_output_info_dict: dict) -> "SysOutputInfo":
         field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(**{k: v for k, v in sys_output_info_dict.items() if k in field_names})
-
+        return cls(
+            **{k: v for k, v in sys_output_info_dict.items() if k in field_names}
+        )
 
     def update(self, other_sys_output_info: "SysOutputInfo", ignore_none=True):
         self_dict = self.__dict__

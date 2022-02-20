@@ -34,19 +34,32 @@ class AspectBasedSentimentClassificationLoader(Loader):
         if self._file_type == FileType.tsv:
             for id, dp in enumerate(raw_data):
                 aspect, text, true_label, predicted_label = dp[:4]
-                data.append({"id": str(id),
-                             "aspect": aspect.strip(),
-                             "text": text.strip(),
-                             "true_label": true_label.strip(),
-                             "predicted_label": predicted_label.strip()})
+                data.append(
+                    {
+                        "id": str(id),
+                        "aspect": aspect.strip(),
+                        "text": text.strip(),
+                        "true_label": true_label.strip(),
+                        "predicted_label": predicted_label.strip(),
+                    }
+                )
         elif self._file_type == FileType.json:
             for id, info in enumerate(raw_data):
-                aspect, text, true_label, predicted_label = info["aspect"], info["text"], info["true_label"], info["predicted_label"]
-                data.append({"id": str(id),
-                             "aspect": aspect.strip,
-                             "text": text.strip(),
-                             "true_label": true_label.strip(),
-                             "predicted_label": predicted_label.strip()})
+                aspect, text, true_label, predicted_label = (
+                    info["aspect"],
+                    info["text"],
+                    info["true_label"],
+                    info["predicted_label"],
+                )
+                data.append(
+                    {
+                        "id": str(id),
+                        "aspect": aspect.strip,
+                        "text": text.strip(),
+                        "true_label": true_label.strip(),
+                        "predicted_label": predicted_label.strip(),
+                    }
+                )
         else:
             raise NotImplementedError
         return data

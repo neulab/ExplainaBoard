@@ -6,6 +6,7 @@ from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
 from explainaboard.utils.analysis import *
 from explainaboard.metric import *
 from tqdm import tqdm
+
 """TODO
 """
 
@@ -16,11 +17,13 @@ class TextPairClassificationExplainaboardBuilder:
     Output: Analysis
     """
 
-    def __init__(self, info: SysOutputInfo,
-                 system_output_object: Iterable[dict],
-                 feature_table: Optional[Table] = {},
-                 gen_kwargs:dict = None
-                 ):
+    def __init__(
+        self,
+        info: SysOutputInfo,
+        system_output_object: Iterable[dict],
+        feature_table: Optional[Table] = {},
+        gen_kwargs: dict = None,
+    ):
         self._info = info
         self._system_output: Iterable[dict] = system_output_object
         self.gen_kwargs = gen_kwargs
@@ -31,20 +34,17 @@ class TextPairClassificationExplainaboardBuilder:
         # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
         self._performances_over_bucket = {}
 
-
-
     @staticmethod
-    def get_bucket_feature_value(feature_name:str):
+    def get_bucket_feature_value(feature_name: str):
         return "self._get_" + feature_name
-
-
 
     # get_similarity_by_sacrebleu
 
     # define function for incomplete features
     def _get_similarity(self, existing_features: dict):
-        return get_similarity_by_sacrebleu(existing_features["text1"],
-                                           existing_features["text2"])
+        return get_similarity_by_sacrebleu(
+            existing_features["text1"], existing_features["text2"]
+        )
 
     # define function for incomplete features
     def _get_text1_length(self, existing_features: dict):
@@ -54,7 +54,7 @@ class TextPairClassificationExplainaboardBuilder:
         return len(existing_feature["text2"])
 
     def _get_text1_divided_text2(self, existing_feature: dict):
-        return len(existing_feature["text1"])*1.0/len(existing_feature["text2"])
+        return len(existing_feature["text1"]) * 1.0 / len(existing_feature["text2"])
 
     def _get_label(self, existing_feature: dict):
         # print(f"print_existing_feature: \t {existing_feature}")
@@ -67,12 +67,18 @@ class TextPairClassificationExplainaboardBuilder:
         :return:
         """
         # Get names of bucketing features
-        #print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
+        # print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
         bucket_features = self._info.features.get_bucket_features()
-        for _id, dict_sysout in tqdm(enumerate(self._system_output), desc="featurizing"):
+        for _id, dict_sysout in tqdm(
+            enumerate(self._system_output), desc="featurizing"
+        ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                feature_value = eval(TextPairClassificationExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+                feature_value = eval(
+                    TextPairClassificationExplainaboardBuilder.get_bucket_feature_value(
+                        bucket_feature
+                    )
+                )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data == None:
             #     self._data = {}
@@ -80,31 +86,29 @@ class TextPairClassificationExplainaboardBuilder:
             yield _id, dict_sysout
 
     def get_overall_performance(self):
-        predicted_labels,true_labels = [], []
+        predicted_labels, true_labels = [], []
 
         for _id, feature_table in self._data.items():
 
             predicted_labels.append(feature_table["predicted_label"])
             true_labels.append(feature_table["true_label"])
 
-
-
         for metric_name in self._info.metric_names:
-            one_metric = eval(metric_name)(true_labels = true_labels,
-                                           predicted_labels = predicted_labels,
-                                           is_print_confidence_interval = self._info.results.is_print_confidence_interval)
+            one_metric = eval(metric_name)(
+                true_labels=true_labels,
+                predicted_labels=predicted_labels,
+                is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+            )
             overall_value_json = one_metric.evaluate()
-
-
 
             overall_value = overall_value_json["value"]
             confidence_score_low = overall_value_json["confidence_score_low"]
             confidence_score_up = overall_value_json["confidence_score_up"]
             overall_performance = Performance(
-                                                   metric_name=metric_name,
-                                                   value=float(format(overall_value, '.4g')),
-                                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
-                                                   confidence_score_up=float(format(confidence_score_up, '.4g'))
+                metric_name=metric_name,
+                value=float(format(overall_value, '.4g')),
+                confidence_score_low=float(format(confidence_score_low, '.4g')),
+                confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
             if self._info.results.overall == None:
@@ -115,39 +119,47 @@ class TextPairClassificationExplainaboardBuilder:
 
     def _bucketing_samples(self, sysout_iterator):
 
-        sample_address= ""
+        sample_address = ""
         feature_to_sample_address_to_value = {}
-
 
         # Preparation for bucketing
         for _id, dict_sysout in sysout_iterator:
 
-            sample_address = str(_id) # this could be abstracted later
+            sample_address = str(_id)  # this could be abstracted later
             for feature_name in self._info.features.get_bucket_features():
                 if feature_name not in feature_to_sample_address_to_value.keys():
                     feature_to_sample_address_to_value[feature_name] = {}
                 else:
-                    feature_to_sample_address_to_value[feature_name][sample_address] = dict_sysout[feature_name]
+                    feature_to_sample_address_to_value[feature_name][
+                        sample_address
+                    ] = dict_sysout[feature_name]
 
         # Bucketing
-        for feature_name in tqdm(self._info.features.get_bucket_features(), desc="bucketing"):
+        for feature_name in tqdm(
+            self._info.features.get_bucket_features(), desc="bucketing"
+        ):
 
             # print(f"Feature Name: {feature_name}\n"
             #       f"Bucket Hyper:\n function_name: {self._info.features[feature_name].bucket_info._method} \n"
             #       f"bucket_number: {self._info.features[feature_name].bucket_info._number}\n"
             #       f"bucket_setting: {self._info.features[feature_name].bucket_info._setting}\n")
 
-            self._samples_over_bucket[feature_name] = eval(self._info.features[feature_name].bucket_info._method)(
-                                dict_obj = feature_to_sample_address_to_value[feature_name],
-                                bucket_number = self._info.features[feature_name].bucket_info._number,
-                                bucket_setting = self._info.features[feature_name].bucket_info._setting)
+            self._samples_over_bucket[feature_name] = eval(
+                self._info.features[feature_name].bucket_info._method
+            )(
+                dict_obj=feature_to_sample_address_to_value[feature_name],
+                bucket_number=self._info.features[feature_name].bucket_info._number,
+                bucket_setting=self._info.features[feature_name].bucket_info._setting,
+            )
 
             # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket.keys()}")
 
             # evaluating bucket: get bucket performance
-            self._performances_over_bucket[feature_name] = self.get_bucket_performance(feature_name)
+            self._performances_over_bucket[feature_name] = self.get_bucket_performance(
+                feature_name
+            )
 
-    def get_bucket_performance(self, feature_name:str):
+    def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param feature_name: the name of a feature, e.g., sentence length
@@ -155,12 +167,13 @@ class TextPairClassificationExplainaboardBuilder:
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in self._samples_over_bucket[feature_name].items():
+        for bucket_interval, sample_ids in self._samples_over_bucket[
+            feature_name
+        ].items():
 
-            bucket_true_labels      = []
+            bucket_true_labels = []
             bucket_predicted_labels = []
             bucket_cases = []
-
 
             for sample_id in sample_ids:
 
@@ -182,12 +195,12 @@ class TextPairClassificationExplainaboardBuilder:
             bucket_name_to_performance[bucket_interval] = []
             for metric_name in self._info.metric_names:
 
-                one_metric = eval(metric_name)(true_labels = bucket_true_labels,
-                                           predicted_labels = bucket_predicted_labels,
-                                           is_print_confidence_interval = self._info.results.is_print_confidence_interval)
+                one_metric = eval(metric_name)(
+                    true_labels=bucket_true_labels,
+                    predicted_labels=bucket_predicted_labels,
+                    is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+                )
                 bucket_value_json = one_metric.evaluate()
-
-
 
                 bucket_value = bucket_value_json["value"]
                 confidence_score_low = bucket_value_json["confidence_score_low"]
@@ -199,21 +212,19 @@ class TextPairClassificationExplainaboardBuilder:
                 #       f"confidence up \t {confidence_score_up}\n"
                 #       f"---------------------------------")
 
-                bucket_performance = BucketPerformance(bucket_name=bucket_interval,
-                                  metric_name = metric_name,
-                                  value = format(bucket_value, '.4g'),
-                                  confidence_score_low = format(confidence_score_low, '.4g'),
-                                  confidence_score_up = format(confidence_score_up, '.4g'),
-                                  n_samples = len(bucket_true_labels),
-                                  bucket_samples=bucket_cases)
+                bucket_performance = BucketPerformance(
+                    bucket_name=bucket_interval,
+                    metric_name=metric_name,
+                    value=format(bucket_value, '.4g'),
+                    confidence_score_low=format(confidence_score_low, '.4g'),
+                    confidence_score_up=format(confidence_score_up, '.4g'),
+                    n_samples=len(bucket_true_labels),
+                    bucket_samples=bucket_cases,
+                )
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-
-
-
         return sort_dict(bucket_name_to_performance)
-
 
     def _generate_report(self):
         dict_fine_grained = {}
@@ -231,8 +242,6 @@ class TextPairClassificationExplainaboardBuilder:
         for feature_name in self._performances_over_bucket.keys():
             print_dict(self._performances_over_bucket[feature_name], feature_name)
 
-
-
     def run(self) -> SysOutputInfo:
         eb_generator = self._complete_feature()
         self._bucketing_samples(eb_generator)
@@ -240,6 +249,3 @@ class TextPairClassificationExplainaboardBuilder:
         self._print_bucket_info()
         self._generate_report()
         return self._info
-
-
-
