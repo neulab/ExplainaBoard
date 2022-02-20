@@ -1,7 +1,7 @@
 from unittest import TestCase
 from explainaboard import TaskType, FileType, Source, get_loader
 from explainaboard.tests.utils import load_file_as_str
-from loaders.loader import Loader
+from explainaboard.loaders.loader import Loader
 import pathlib
 import os
 

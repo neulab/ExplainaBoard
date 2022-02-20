@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from typing import Any, ClassVar, Dict, List, Optional
 from collections.abc import Iterable
 from typing import Tuple, Union
@@ -9,6 +9,7 @@ from explainaboard.utils.py_utils import zip_dict
 import pyarrow as pa
 import re
 import copy
+import sys
 
 
 
@@ -18,47 +19,47 @@ def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
     In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
     """
 
-    if pyarrow.types.is_null(arrow_type):
+    if pa.types.is_null(arrow_type):
         return "null"
-    elif pyarrow.types.is_boolean(arrow_type):
+    elif pa.types.is_boolean(arrow_type):
         return "bool"
-    elif pyarrow.types.is_int8(arrow_type):
+    elif pa.types.is_int8(arrow_type):
         return "int8"
-    elif pyarrow.types.is_int16(arrow_type):
+    elif pa.types.is_int16(arrow_type):
         return "int16"
-    elif pyarrow.types.is_int32(arrow_type):
+    elif pa.types.is_int32(arrow_type):
         return "int32"
-    elif pyarrow.types.is_int64(arrow_type):
+    elif pa.types.is_int64(arrow_type):
         return "int64"
-    elif pyarrow.types.is_uint8(arrow_type):
+    elif pa.types.is_uint8(arrow_type):
         return "uint8"
-    elif pyarrow.types.is_uint16(arrow_type):
+    elif pa.types.is_uint16(arrow_type):
         return "uint16"
-    elif pyarrow.types.is_uint32(arrow_type):
+    elif pa.types.is_uint32(arrow_type):
         return "uint32"
-    elif pyarrow.types.is_uint64(arrow_type):
+    elif pa.types.is_uint64(arrow_type):
         return "uint64"
-    elif pyarrow.types.is_float16(arrow_type):
+    elif pa.types.is_float16(arrow_type):
         return "float16"  # pyarrow dtype is "halffloat"
-    elif pyarrow.types.is_float32(arrow_type):
+    elif pa.types.is_float32(arrow_type):
         return "float32"  # pyarrow dtype is "float"
-    elif pyarrow.types.is_float64(arrow_type):
+    elif pa.types.is_float64(arrow_type):
         return "float64"  # pyarrow dtype is "double"
-    elif pyarrow.types.is_timestamp(arrow_type):
-        assert isinstance(arrow_type, TimestampType)
+    elif pa.types.is_timestamp(arrow_type):
+        assert isinstance(arrow_type, pa.TimestampType)
         if arrow_type.tz is None:
             return f"timestamp[{arrow_type.unit}]"
         elif arrow_type.tz:
             return f"timestamp[{arrow_type.unit}, tz={arrow_type.tz}]"
         else:
             raise ValueError(f"Unexpected timestamp object {arrow_type}.")
-    elif pyarrow.types.is_binary(arrow_type):
+    elif pa.types.is_binary(arrow_type):
         return "binary"
-    elif pyarrow.types.is_large_binary(arrow_type):
+    elif pa.types.is_large_binary(arrow_type):
         return "large_binary"
-    elif pyarrow.types.is_string(arrow_type):
+    elif pa.types.is_string(arrow_type):
         return "string"
-    elif pyarrow.types.is_large_string(arrow_type):
+    elif pa.types.is_large_string(arrow_type):
         return "large_string"
     else:
         raise ValueError(f"Arrow type {arrow_type} does not have a datasets dtype equivalent.")
