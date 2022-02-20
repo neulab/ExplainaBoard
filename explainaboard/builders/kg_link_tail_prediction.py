@@ -1,19 +1,12 @@
-from typing import Optional, Iterable
+from typing import Iterable
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
-from metric import Accuracy
-from metric import F1score
-from metric import Hits
+from explainaboard.utils.analysis import *
+from explainaboard.metric import *
 from tqdm import tqdm
-from explainaboard.utils.feature_funcs import *
-from explainaboard.utils.spacy_loader import spacy_loader
 from datalabs import load_dataset
-
-from aggregate import *
-
-
+from datalabs.operations import aggregate
 
 
 class KGLTPExplainaboardBuilder:
@@ -42,7 +35,7 @@ class KGLTPExplainaboardBuilder:
             self.statistics = None
         else:
             dataset = load_dataset(self._info.dataset_name, 'readable')
-            new_train = dataset['train'].apply(get_statistics)
+            new_train = dataset['train'].apply(aggregate.get_statistics)
             self.statistics = new_train._stat
 
 

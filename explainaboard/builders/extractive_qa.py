@@ -1,22 +1,10 @@
-from dataclasses import dataclass, field, fields
-from typing import Any, ClassVar, Dict, List, Optional
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from info import *
-import feature
 from typing import Iterable
-from info import SysOutputInfo
-from info import BucketPerformance
-from info import Performance
-from info import Table
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_bucket import *
+from explainaboard.utils.analysis import *
 from explainaboard.utils.eval_basic_qa import *
-from metric import Accuracy
-from metric import F1score
-from config import BuilderConfig
+from explainaboard.metric import *
 from tqdm import tqdm
 
 from eaas import Config, Client
