@@ -1,10 +1,10 @@
-from typing import Iterable
+from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.eval_bucket import *
-from explainaboard.utils.analysis import *
-from explainaboard.utils.eval_basic_qa import *
-from explainaboard.metric import *
+from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.utils.eval_basic_qa import *  # noqa
+from explainaboard.metric import *  # noqa
 from tqdm import tqdm
 
 from eaas import Config, Client
@@ -81,7 +81,7 @@ class QASquadExplainaboardBuilder:
                     QASquadExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
                 )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
-            # if self._data == None:
+            # if self._data is None:
             #     self._data = {}
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
@@ -106,7 +106,7 @@ class QASquadExplainaboardBuilder:
                 confidence_score_low=float(format(confidence_score_low, '.4g')),
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -176,7 +176,7 @@ class QASquadExplainaboardBuilder:
                 true_label = self._data[int(sample_id)]["true_answers"]["text"]
 
                 predicted_label = self._data[int(sample_id)]["predicted_answer"]
-                sent = self._data[int(sample_id)]["question"]
+                sent = self._data[int(sample_id)]["question"]  # noqa
 
                 # get a bucket of true/predicted labels
                 bucket_true_labels.append(true_label)
@@ -221,7 +221,7 @@ class QASquadExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
 
@@ -239,7 +239,9 @@ class QASquadExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self):
 

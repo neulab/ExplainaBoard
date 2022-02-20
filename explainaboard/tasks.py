@@ -3,24 +3,6 @@ from typing import List
 from enum import Enum
 
 
-@dataclass
-class Task:
-    """
-    TODO: add supported_file_types
-    """
-
-    name: str
-    supported: bool = field(default=False)
-    supported_metrics: List[str] = field(default_factory=list)
-
-
-@dataclass
-class TaskCategory:
-    name: str
-    description: str
-    tasks: List[Task]
-
-
 class TaskType(str, Enum):
     text_classification = "text-classification"
     named_entity_recognition = "named-entity-recognition"
@@ -192,11 +174,6 @@ _task_categories: List[TaskCategory] = [
         ],
     ),
 ]
-
-
-def get_task_categories():
-    """getter for task categories data"""
-    return _task_categories
 
 
 def get_task_categories():

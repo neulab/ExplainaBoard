@@ -1,9 +1,9 @@
-from typing import Iterable
+from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.eval_bucket import *
-from explainaboard.utils.analysis import *
-from explainaboard.metric import *
+from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.metric import *  # noqa
 from tqdm import tqdm
 from datalabs import load_dataset
 from datalabs.operations import aggregate
@@ -99,7 +99,7 @@ class KGLTPExplainaboardBuilder:
                     KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
                 )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
-            # if self._data == None:
+            # if self._data is None:
             #     self._data = {}
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
@@ -130,7 +130,7 @@ class KGLTPExplainaboardBuilder:
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -191,14 +191,14 @@ class KGLTPExplainaboardBuilder:
         ].items():
 
             bucket_true_labels = []
-            bucket_predicted_labels = []  #  list of (lists of top-k ranked tails)
+            bucket_predicted_labels = []  # list of (lists of top-k ranked tails)
             bucket_cases = []
 
             for sample_id in sample_ids:
 
                 true_label = self._data[int(sample_id)]["true_tail"]
                 predicted_label = self._data[int(sample_id)]["predicted_tails"]
-                sent = self._data[int(sample_id)]["link"]
+                sent = self._data[int(sample_id)]["link"]  # noqa
                 s_id = self._data[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
@@ -246,7 +246,7 @@ class KGLTPExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
         dict_fine_grained = {}
@@ -262,7 +262,9 @@ class KGLTPExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self) -> SysOutputInfo:
         eb_generator = self._complete_feature()

@@ -83,11 +83,11 @@ class AspectBasedSentimentClassificationProcessor(Processor):
     )
 
     def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata == None:
+        if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.aspect_based_sentiment_classification.value
-        if "metric_names" not in metadata.keys() or metadata["metric_names"] == None:
+        if "metric_names" not in metadata.keys() or metadata["metric_names"] is None:
             metadata["metric_names"] = ["Accuracy"]
         # print(metadata)
         super().__init__(metadata, system_output_data)

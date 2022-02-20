@@ -71,7 +71,7 @@ class KGLinkTailPredictionProcessor(Processor):
     )
 
     def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata == None:
+        if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.kg_link_tail_prediction.value
