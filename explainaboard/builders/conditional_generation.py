@@ -1,7 +1,7 @@
-from typing import Iterable
+from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Table
-from explainaboard.utils.analysis import *
-from explainaboard.utils.eval_bucket import *
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.utils.eval_bucket import *  # noqa
 import copy
 import numpy
 from tqdm import tqdm
@@ -69,8 +69,8 @@ class CondGenExplainaboardBuilder:
 
     def get_overall_performance(self):
 
-        inputs = []
-        metrics = self._info.metric_names
+        inputs = []  # noqa
+        metrics = self._info.metric_names  # noqa
 
         for metric_name in self._info.metric_names:
 
@@ -84,7 +84,7 @@ class CondGenExplainaboardBuilder:
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -144,8 +144,8 @@ class CondGenExplainaboardBuilder:
             feature_name
         ].items():
 
-            bucket_true_labels = []
-            bucket_predicted_labels = []
+            bucket_true_labels = []  # noqa
+            bucket_predicted_labels = []  # noqa
             bucket_cases = []
 
             bucket_inputs = []
@@ -208,7 +208,7 @@ class CondGenExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
 
@@ -216,7 +216,7 @@ class CondGenExplainaboardBuilder:
         for feature_name, metadata in self._performances_over_bucket.items():
             dict_fine_grained[feature_name] = []
             for bucket_name, bucket_performance in metadata.items():
-                bucket_name = beautify_interval(bucket_name)
+                bucket_name = beautify_interval(bucket_name)  # noqa
 
                 # instantiation
                 dict_fine_grained[feature_name].append(bucket_performance)
@@ -225,7 +225,9 @@ class CondGenExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self):
         eb_generator = self._complete_feature()

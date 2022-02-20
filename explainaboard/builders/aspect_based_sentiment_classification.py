@@ -1,9 +1,9 @@
 from explainaboard.utils.spacy_loader import spacy_loader
-from typing import Iterable
+from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.utils.analysis import *
-from explainaboard.utils.eval_bucket import *
-from explainaboard.metric import *
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.metric import *  # noqa
 from tqdm import tqdm
 
 spacy_nlp = spacy_loader.get_model("en_core_web_sm")
@@ -100,7 +100,7 @@ class ABSCExplainaboardBuilder:
                 confidence_score_low=float(format(confidence_score_low, '.4g')),
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -167,7 +167,7 @@ class ABSCExplainaboardBuilder:
 
                 true_label = self._data[int(sample_id)]["true_label"]
                 predicted_label = self._data[int(sample_id)]["predicted_label"]
-                sent = self._data[int(sample_id)]["text"]
+                sent = self._data[int(sample_id)]["text"]  # noqa
                 s_id = self._data[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
@@ -210,14 +210,14 @@ class ABSCExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
         dict_fine_grained = {}
         for feature_name, metadata in self._performances_over_bucket.items():
             dict_fine_grained[feature_name] = []
             for bucket_name, bucket_performance in metadata.items():
-                bucket_name = beautify_interval(bucket_name)
+                bucket_name = beautify_interval(bucket_name)  # noqa
 
                 # instantiation
                 dict_fine_grained[feature_name].append(bucket_performance)
@@ -226,7 +226,9 @@ class ABSCExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self) -> SysOutputInfo:
         eb_generator = self._complete_feature()

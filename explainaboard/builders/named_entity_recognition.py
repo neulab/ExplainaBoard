@@ -1,9 +1,10 @@
-from typing import Iterable
+import os
+from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.analysis import *
-from explainaboard.utils.eval_bucket import *
-from explainaboard.utils.feature_funcs import *
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.utils.feature_funcs import *  # noqa
 import pickle
 from tqdm import tqdm
 
@@ -103,7 +104,7 @@ class NERExplainaboardBuilder:
 
     def _complete_feature_raw_span_features(self, sentence, tags):
         # span_text, span_len, span_pos, span_tag
-        chunks = get_chunks(tags)
+        chunks = get_chunks(tags)  # noqa
         span_dics = []
         span_dic = {}
         for chunk in chunks:
@@ -117,7 +118,7 @@ class NERExplainaboardBuilder:
                 'span_len': span_len,
                 'span_pos': span_pos,
                 'span_tag': tag,
-                'span_capitalness': cap_feature(span_text),
+                'span_capitalness': cap_feature(span_text),  # noqa
                 'span_position': eid * 1.0 / len(sentence),
                 'span_chars': len(span_text),
                 'span_density': len(chunks) * 1.0 / len(sentence),
@@ -145,7 +146,7 @@ class NERExplainaboardBuilder:
         for span_dic in span_dics:
             span_text = span_dic['span_text']
             span_tag = span_dic['span_tag']
-            span_pos = span_dic['span_pos']
+            span_pos = span_dic['span_pos']  # noqa
 
             if self.dict_pre_computed_models:
                 # compute the entity-level label consistency...
@@ -174,7 +175,7 @@ class NERExplainaboardBuilder:
         """
         # Get names of bucketing features
         # print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
-        bucket_features = self._info.features.get_bucket_features()
+        bucket_features = self._info.features.get_bucket_features()  # noqa
         for _id, dict_sysout in tqdm(
             enumerate(self._system_output), desc="featurizing"
         ):
@@ -195,13 +196,13 @@ class NERExplainaboardBuilder:
             # for bucket_feature in bucket_features:
             #     feature_value = eval(NERExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
             #     dict_sysout[bucket_feature] = feature_value
-            if self._data == None:
+            if self._data is None:
                 self._data = {}
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
 
     def get_overall_performance(self):
-        predicted_labels, true_labels = [], []
+        predicted_labels, true_labels = [], []  # noqa
 
         true_tags_list = []
         pred_tags_list = []
@@ -227,7 +228,7 @@ class NERExplainaboardBuilder:
                 confidence_score_low=float(format(confidence_score_low, '.4g')),
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -235,7 +236,7 @@ class NERExplainaboardBuilder:
 
     def _bucketing_samples(self, sysout_iterator):
 
-        sample_address = ""
+        sample_address = ""  # noqa
         feature_to_sample_address_to_value_true = {}
         feature_to_sample_address_to_value_pred = {}
 
@@ -342,7 +343,7 @@ class NERExplainaboardBuilder:
             # print(f"debug-1: {self._samples_over_bucket_true[feature_name]}")
             self._samples_over_bucket_pred[
                 feature_name
-            ] = bucket_attribute_specified_bucket_interval(
+            ] = bucket_attribute_specified_bucket_interval(  # noqa
                 dict_obj=feature_to_sample_address_to_value_pred[feature_name],
                 bucket_number=_bucket_info._number,
                 bucket_setting=self._samples_over_bucket_true[feature_name].keys(),
@@ -418,7 +419,7 @@ class NERExplainaboardBuilder:
 
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
-            span_sentence = " ".join(self._data[sent_id]["tokens"])
+            span_sentence = " ".join(self._data[sent_id]["tokens"])  # noqa
             system_output_id = self._data[int(sent_id)]["id"]
             # print(span_sentence)
 
@@ -488,7 +489,7 @@ class NERExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
         dict_fine_grained = {}
@@ -504,7 +505,9 @@ class NERExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self):
         eb_generator = self._complete_feature()

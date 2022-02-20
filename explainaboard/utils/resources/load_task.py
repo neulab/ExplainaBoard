@@ -1,7 +1,6 @@
 import json
 import enum
 from typing import List, Dict
-import sys, os
 
 
 PATH_OF_TASKS_JSON = "./tasks.json"
@@ -28,7 +27,3 @@ for task_name in all_tasks:
     all_tasks_dict[task_name.replace("-", "_")] = task_name
 
 TaskType = enum.Enum('TaskType', all_tasks_dict)
-
-
-# TEST
-# print(TaskType.summarization.value)
