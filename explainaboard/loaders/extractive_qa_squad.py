@@ -6,25 +6,21 @@ import json
 import os
 from explainaboard.tasks import TaskType
 
+
 @register_loader(TaskType.extractive_qa_squad)
 class QASquadLoader(Loader):
-    """
+    """ """
 
-    """
-    def __init__(self, source: Source, file_type: Enum, data :str = None):
+    def __init__(self, source: Source, file_type: Enum, data: str = None):
 
         if source == None:
             source = Source.local_filesystem
         if file_type == None:
             file_type = FileType.json
 
-
-
         self._source = source
         self._file_type = file_type
         self._data = data
-
-
 
     def load(self) -> Iterable[Dict]:
         """
@@ -41,7 +37,9 @@ class QASquadLoader(Loader):
             raise NotImplementedError
 
         # this will be replaced by introducing dataset
-        path_test_set = os.path.abspath(os.path.join(os.path.dirname(__file__), "../datasets/squad/testset-en.json"))
+        path_test_set = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../datasets/squad/testset-en.json")
+        )
 
         key = 0
         data: List[Dict] = []
@@ -50,9 +48,13 @@ class QASquadLoader(Loader):
             for article in squad["data"]:
                 title = article.get("title", "")
                 for paragraph in article["paragraphs"]:
-                    context = paragraph["context"]  # do not strip leading blank spaces GH-2585
+                    context = paragraph[
+                        "context"
+                    ]  # do not strip leading blank spaces GH-2585
                     for qa in paragraph["qas"]:
-                        answer_starts = [answer["answer_start"] for answer in qa["answers"]]
+                        answer_starts = [
+                            answer["answer_start"] for answer in qa["answers"]
+                        ]
                         answers = [answer["text"] for answer in qa["answers"]]
 
                         pred_answer = ""
@@ -61,16 +63,18 @@ class QASquadLoader(Loader):
 
                         # Features currently used are "context", "question", and "answers".
                         # Others are extracted here for the ease of future expansions.
-                        data.append({
-                            "title": title,
-                            "context": context,
-                            "question": qa["question"],
-                            "id": qa["id"],
-                            "true_answers": {
-                                "answer_start": answer_starts,
-                                "text": answers,
-                            },
-                            "predicted_answer":pred_answer
-                        })
+                        data.append(
+                            {
+                                "title": title,
+                                "context": context,
+                                "question": qa["question"],
+                                "id": qa["id"],
+                                "true_answers": {
+                                    "answer_start": answer_starts,
+                                    "text": answers,
+                                },
+                                "predicted_answer": pred_answer,
+                            }
+                        )
                         key += 1
         return data

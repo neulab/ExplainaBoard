@@ -18,12 +18,11 @@ class Metric:
         self._is_print_confidence_interval = False
 
     def get_confidence_interval(self, *args, **kwargs):
-
         def mean_confidence_interval(data, confidence=0.95):
             a = 1.0 * np.array(data)
             n = len(a)
             m, se = np.mean(a), scipy.stats.sem(a)
-            h = se * scipy.stats.t.ppf((1 + confidence) / 2., n - 1)
+            h = se * scipy.stats.t.ppf((1 + confidence) / 2.0, n - 1)
             return m - h, m + h
 
         n_sampling = int(self._n_samples * self._sampling_rate)
@@ -37,7 +36,11 @@ class Metric:
         confidence_low, confidence_up = 0, 0
         for i in range(self._n_times):
             sample_index_list = choices(range(self._n_samples), k=n_sampling)
-            performance = self._eval_function(np.array(args[0])[sample_index_list], np.array(args[1])[sample_index_list], **kwargs)
+            performance = self._eval_function(
+                np.array(args[0])[sample_index_list],
+                np.array(args[1])[sample_index_list],
+                **kwargs
+            )
             performance_list.append(performance)
 
         if self._n_times != 1000:
@@ -57,17 +60,20 @@ class Metric:
             self._results["confidence_score_low"] = 0
             self._results["confidence_score_up"] = 0
         else:
-             confidence_interval_low, confidence_interval_up = self.get_confidence_interval(*args, **kwargs)
-             self._results["confidence_score_low"] = confidence_interval_low
-             self._results["confidence_score_up"] = confidence_interval_up
+            (
+                confidence_interval_low,
+                confidence_interval_up,
+            ) = self.get_confidence_interval(*args, **kwargs)
+            self._results["confidence_score_low"] = confidence_interval_low
+            self._results["confidence_score_up"] = confidence_interval_up
 
         return self._results
 
 
-
-
 class Accuracy(Metric):
-    def __init__(self, true_labels, predicted_labels, is_print_confidence_interval=False):
+    def __init__(
+        self, true_labels, predicted_labels, is_print_confidence_interval=False
+    ):
         super(Accuracy, self).__init__()
         # Metric.__init__(self)
         self._name = self.__class__.__name__
@@ -83,7 +89,9 @@ class Accuracy(Metric):
 
 
 class F1score(Metric):
-    def __init__(self, true_labels, predicted_labels, is_print_confidence_interval=False):
+    def __init__(
+        self, true_labels, predicted_labels, is_print_confidence_interval=False
+    ):
         super(F1score, self).__init__()
         # Metric.__init__(self)
         self._name = self.__class__.__name__
@@ -98,7 +106,9 @@ class F1score(Metric):
         # print(self._predicted_labels[0:10])
         # print(sklearn.metrics.f1_score(self._true_labels[0:10], self._predicted_labels[0:10], average='micro'))
         # exit()
-        return self._evaluate(self._true_labels, self._predicted_labels, average='micro')
+        return self._evaluate(
+            self._true_labels, self._predicted_labels, average='micro'
+        )
 
 
 def hits(true_labels, predicted_labels):
@@ -108,10 +118,13 @@ def hits(true_labels, predicted_labels):
         i_preds = predicted_labels[i]
         if i_true in i_preds:
             num_hits += 1
-    return num_hits/len(true_labels)
+    return num_hits / len(true_labels)
+
 
 class Hits(Metric):
-    def __init__(self, true_labels, predicted_labels, is_print_confidence_interval=False):
+    def __init__(
+        self, true_labels, predicted_labels, is_print_confidence_interval=False
+    ):
         super(Hits, self).__init__()
         # Metric.__init__(self)
         self._name = self.__class__.__name__
@@ -124,4 +137,3 @@ class Hits(Metric):
     def evaluate(self):
 
         return self._evaluate(self._true_labels, self._predicted_labels)
-

@@ -14,12 +14,13 @@ from tqdm import tqdm
 
 
 class NERExplainaboardBuilder:
-
-    def __init__(self, info: SysOutputInfo,
-                 system_output_object: Iterable[dict],
-                 feature_table: Optional[Table] = {},
-                 gen_kwargs:dict = None
-                 ):
+    def __init__(
+        self,
+        info: SysOutputInfo,
+        system_output_object: Iterable[dict],
+        feature_table: Optional[Table] = {},
+        gen_kwargs: dict = None,
+    ):
         self._info = info
         self._system_output: Iterable[dict] = system_output_object
         self.gen_kwargs = gen_kwargs
@@ -36,15 +37,19 @@ class NERExplainaboardBuilder:
 
         scriptpath = os.path.dirname(__file__)
         if self._info.dataset_name and self._info.task_name:
-            self._path_pre_computed_models = os.path.join(scriptpath, "../pre_computed/" + self._info.task_name.replace("-","_") + "/" + self._info.dataset_name+"/")
+            self._path_pre_computed_models = os.path.join(
+                scriptpath,
+                "../pre_computed/"
+                + self._info.task_name.replace("-", "_")
+                + "/"
+                + self._info.dataset_name
+                + "/",
+            )
             # print(self._path_pre_computed_models)
             # print(os.path.isdir(self._path_pre_computed_models))
             # exit()
             if os.path.isdir(self._path_pre_computed_models):
                 self.dict_pre_computed_models = self.get_pre_computed_features()
-
-
-
 
     def get_pre_computed_features(self):
         dict_pre_computed_models = {}
@@ -52,28 +57,29 @@ class NERExplainaboardBuilder:
             if os.path.exists(self._path_pre_computed_models):
                 # print('load the hard dictionary of entity span in test set...')
                 # print(self._path_pre_computed_models + "/" + feature_name + ".pkl")
-                fread = open(self._path_pre_computed_models + "/" + feature_name + ".pkl", 'rb')
+                fread = open(
+                    self._path_pre_computed_models + "/" + feature_name + ".pkl", 'rb'
+                )
                 dict_pre_computed_models[feature_name] = pickle.load(fread)
             else:
-                raise ValueError("can not load hard dictionary" + feature_name + "\t" + self._path_pre_computed_models)
+                raise ValueError(
+                    "can not load hard dictionary"
+                    + feature_name
+                    + "\t"
+                    + self._path_pre_computed_models
+                )
 
         return dict_pre_computed_models
 
-
-
-
     @staticmethod
-    def get_bucket_feature_value(feature_name:str):
+    def get_bucket_feature_value(feature_name: str):
         return "self._get_" + feature_name
 
     # define function for incomplete features
     def _get_sentence_length(self, existing_features: dict):
         return len(existing_features["sentence"].split(" "))
 
-
-
-
-    def _get_eCon_value(self, span_dic:dict, span_text:str, span_tag:str):
+    def _get_eCon_value(self, span_dic: dict, span_text: str, span_tag: str):
         """
         Since keys and values of span_dic have been lower-cased, we also need to lowercase span_tag and span_text
 
@@ -95,7 +101,6 @@ class NERExplainaboardBuilder:
             eFre_value = float(span_dic[span_text])
         return eFre_value
 
-
     def _complete_feature_raw_span_features(self, sentence, tags):
         # span_text, span_len, span_pos, span_tag
         chunks = get_chunks(tags)
@@ -103,17 +108,20 @@ class NERExplainaboardBuilder:
         span_dic = {}
         for chunk in chunks:
             tag, sid, eid = chunk
-            #span_text = ' '.join(sentence[sid:eid]).lower()
+            # span_text = ' '.join(sentence[sid:eid]).lower()
             span_text = ' '.join(sentence[sid:eid])
             span_len = eid - sid
             span_pos = (sid, eid)
-            span_dic = {'span_text': span_text, 'span_len': span_len, 
-                        'span_pos': span_pos, 'span_tag': tag,
-                        'span_capitalness':cap_feature(span_text),
-                        'span_position':eid*1.0/len(sentence),
-                        'span_chars':len(span_text),
-                        'span_density':len(chunks)*1.0/len(sentence),
-                        }
+            span_dic = {
+                'span_text': span_text,
+                'span_len': span_len,
+                'span_pos': span_pos,
+                'span_tag': tag,
+                'span_capitalness': cap_feature(span_text),
+                'span_position': eid * 1.0 / len(sentence),
+                'span_chars': len(span_text),
+                'span_density': len(chunks) * 1.0 / len(sentence),
+            }
             # print('span_dic: ',span_dic)
             span_dics.append(span_dic)
         # self.span_dics = span_dics
@@ -122,12 +130,18 @@ class NERExplainaboardBuilder:
     def _complete_feature_advanced_span_features(self, sentence, tags):
         span_dics = self._complete_feature_raw_span_features(sentence, tags)
 
+        eCon_dic = (
+            self.dict_pre_computed_models['eCon']
+            if self.dict_pre_computed_models
+            else None
+        )
+        eFre_dic = (
+            self.dict_pre_computed_models['eFre']
+            if self.dict_pre_computed_models
+            else None
+        )
 
-
-        eCon_dic = self.dict_pre_computed_models['eCon'] if self.dict_pre_computed_models else None
-        eFre_dic = self.dict_pre_computed_models['eFre']if self.dict_pre_computed_models else None
-
-        span_dics_list= []
+        span_dics_list = []
         for span_dic in span_dics:
             span_text = span_dic['span_text']
             span_tag = span_dic['span_tag']
@@ -148,12 +162,9 @@ class NERExplainaboardBuilder:
             else:
                 span_dic['eFre'] = 0
 
-
             # print('span_dic list: ', span_dic)
             span_dics_list.append(span_dic)
         return span_dics_list
-
-
 
     def _complete_feature(self):
         """
@@ -164,7 +175,9 @@ class NERExplainaboardBuilder:
         # Get names of bucketing features
         # print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
         bucket_features = self._info.features.get_bucket_features()
-        for _id, dict_sysout in tqdm(enumerate(self._system_output), desc="featurizing"):
+        for _id, dict_sysout in tqdm(
+            enumerate(self._system_output), desc="featurizing"
+        ):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
             true_tags = dict_sysout["true_tags"]
@@ -172,8 +185,12 @@ class NERExplainaboardBuilder:
 
             dict_sysout["sentence_length"] = len(tokens)
 
-            dict_sysout["true_entity_info"] = self._complete_feature_advanced_span_features(tokens, true_tags)
-            dict_sysout["pred_entity_info"] = self._complete_feature_advanced_span_features(tokens, pred_tags)
+            dict_sysout[
+                "true_entity_info"
+            ] = self._complete_feature_advanced_span_features(tokens, true_tags)
+            dict_sysout[
+                "pred_entity_info"
+            ] = self._complete_feature_advanced_span_features(tokens, pred_tags)
 
             # for bucket_feature in bucket_features:
             #     feature_value = eval(NERExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
@@ -183,9 +200,8 @@ class NERExplainaboardBuilder:
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
 
-
     def get_overall_performance(self):
-        predicted_labels,true_labels = [], []
+        predicted_labels, true_labels = [], []
 
         true_tags_list = []
         pred_tags_list = []
@@ -206,10 +222,10 @@ class NERExplainaboardBuilder:
             confidence_score_low = 0
             confidence_score_up = 0
             overall_performance = Performance(
-                                   metric_name=metric_name,
-                                   value=float(format(overall_value, '.4g')),
-                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
-                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
+                metric_name=metric_name,
+                value=float(format(overall_value, '.4g')),
+                confidence_score_low=float(format(confidence_score_low, '.4g')),
+                confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
             if self._info.results.overall == None:
                 self._info.results.overall = {}
@@ -217,16 +233,11 @@ class NERExplainaboardBuilder:
             else:
                 self._info.results.overall[metric_name] = overall_performance
 
-
-
-
     def _bucketing_samples(self, sysout_iterator):
 
-        sample_address= ""
+        sample_address = ""
         feature_to_sample_address_to_value_true = {}
         feature_to_sample_address_to_value_pred = {}
-
-
 
         # Preparation for bucketing
         for _id, feature_table in sysout_iterator:
@@ -235,54 +246,87 @@ class NERExplainaboardBuilder:
             true_entity_info_list = feature_table["true_entity_info"]
             for span_info in true_entity_info_list:
                 span_text = span_info["span_text"]
-                span_pos  = span_info["span_pos"]
+                span_pos = span_info["span_pos"]
                 span_label = span_info["span_tag"]
 
-
-                span_address = str(_id) + "|||" + str(span_pos[0]) + "|||" + str(span_pos[1]) + "|||" + span_text + "|||" + span_label
-
+                span_address = (
+                    str(_id)
+                    + "|||"
+                    + str(span_pos[0])
+                    + "|||"
+                    + str(span_pos[1])
+                    + "|||"
+                    + span_text
+                    + "|||"
+                    + span_label
+                )
 
                 for feature_name in self._info.features.get_bucket_features():
-                    if feature_name not in feature_to_sample_address_to_value_true.keys():
+                    if (
+                        feature_name
+                        not in feature_to_sample_address_to_value_true.keys()
+                    ):
                         feature_to_sample_address_to_value_true[feature_name] = {}
                     else:
                         if feature_name not in feature_table.keys():
-                            feature_to_sample_address_to_value_true[feature_name][span_address] = span_info[feature_name]
+                            feature_to_sample_address_to_value_true[feature_name][
+                                span_address
+                            ] = span_info[feature_name]
                         else:
-                            feature_to_sample_address_to_value_true[feature_name][span_address] = feature_table[feature_name]
+                            feature_to_sample_address_to_value_true[feature_name][
+                                span_address
+                            ] = feature_table[feature_name]
 
             # pred tag
             pred_entity_info_list = feature_table["pred_entity_info"]
             for span_info in pred_entity_info_list:
                 span_text = span_info["span_text"]
-                span_pos  = span_info["span_pos"]
+                span_pos = span_info["span_pos"]
                 span_label = span_info["span_tag"]
 
-
-                span_address = str(_id) + "|||" + str(span_pos[0]) + "|||" + str(span_pos[1]) + "|||" + span_text + "|||" + span_label
-
+                span_address = (
+                    str(_id)
+                    + "|||"
+                    + str(span_pos[0])
+                    + "|||"
+                    + str(span_pos[1])
+                    + "|||"
+                    + span_text
+                    + "|||"
+                    + span_label
+                )
 
                 for feature_name in self._info.features.get_bucket_features():
-                    if feature_name not in feature_to_sample_address_to_value_pred.keys():
+                    if (
+                        feature_name
+                        not in feature_to_sample_address_to_value_pred.keys()
+                    ):
                         feature_to_sample_address_to_value_pred[feature_name] = {}
                     else:
                         if feature_name not in feature_table.keys():
-                            feature_to_sample_address_to_value_pred[feature_name][span_address] = span_info[feature_name]
+                            feature_to_sample_address_to_value_pred[feature_name][
+                                span_address
+                            ] = span_info[feature_name]
                         else:
-                            feature_to_sample_address_to_value_pred[feature_name][span_address] = feature_table[feature_name]
-
-
-
+                            feature_to_sample_address_to_value_pred[feature_name][
+                                span_address
+                            ] = feature_table[feature_name]
 
         # Bucketing
-        for feature_name in tqdm(self._info.features.get_bucket_features(), desc="bucketing"):
+        for feature_name in tqdm(
+            self._info.features.get_bucket_features(), desc="bucketing"
+        ):
 
             _bucket_info = ""
             if feature_name in self._info.features.keys():
                 _bucket_info = self._info.features[feature_name].bucket_info
             else:
                 # print(self._info.features)
-                _bucket_info = self._info.features["true_entity_info"].feature.feature[feature_name].bucket_info
+                _bucket_info = (
+                    self._info.features["true_entity_info"]
+                    .feature.feature[feature_name]
+                    .bucket_info
+                )
 
             # print(f"Feature Name: {feature_name}\n"
             #       f"Bucket Hyper:\n function_name: {_bucket_info._method} \n"
@@ -290,32 +334,37 @@ class NERExplainaboardBuilder:
             #       f"bucket_setting: {_bucket_info._setting}\n")
 
             self._samples_over_bucket_true[feature_name] = eval(_bucket_info._method)(
-                                dict_obj = feature_to_sample_address_to_value_true[feature_name],
-                                bucket_number = _bucket_info._number,
-                                bucket_setting = _bucket_info._setting)
-
-
+                dict_obj=feature_to_sample_address_to_value_true[feature_name],
+                bucket_number=_bucket_info._number,
+                bucket_setting=_bucket_info._setting,
+            )
 
             # print(f"debug-1: {self._samples_over_bucket_true[feature_name]}")
-            self._samples_over_bucket_pred[feature_name] = bucket_attribute_specified_bucket_interval(
-                                dict_obj = feature_to_sample_address_to_value_pred[feature_name],
-                                bucket_number = _bucket_info._number,
-                                bucket_setting = self._samples_over_bucket_true[feature_name].keys())
-
+            self._samples_over_bucket_pred[
+                feature_name
+            ] = bucket_attribute_specified_bucket_interval(
+                dict_obj=feature_to_sample_address_to_value_pred[feature_name],
+                bucket_number=_bucket_info._number,
+                bucket_setting=self._samples_over_bucket_true[feature_name].keys(),
+            )
 
             # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket_true.keys()}")
 
             # evaluating bucket: get bucket performance
-            self._performances_over_bucket[feature_name] = self.get_bucket_performance(feature_name)
-
+            self._performances_over_bucket[feature_name] = self.get_bucket_performance(
+                feature_name
+            )
 
     """
     Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
     """
-    def get_bucket_cases_ner(self, feature_name:str, bucket_interval) -> list:
+
+    def get_bucket_cases_ner(self, feature_name: str, bucket_interval) -> list:
         # predict:  2_3 -> NER
         dict_pos2tag_pred = {}
-        for k_bucket_eval, spans_pred in self._samples_over_bucket_pred[feature_name].items():
+        for k_bucket_eval, spans_pred in self._samples_over_bucket_pred[
+            feature_name
+        ].items():
             if k_bucket_eval != bucket_interval:
                 continue
             for span_pred in spans_pred:
@@ -326,7 +375,9 @@ class NERExplainaboardBuilder:
 
         # true:  2_3 -> NER
         dict_pos2tag = {}
-        for k_bucket_eval, spans in self._samples_over_bucket_true[feature_name].items():
+        for k_bucket_eval, spans in self._samples_over_bucket_true[
+            feature_name
+        ].items():
             if k_bucket_eval != bucket_interval:
                 continue
             for span in spans:
@@ -343,7 +394,6 @@ class NERExplainaboardBuilder:
             span = pos.split("|||")[-1]
             system_output_id = self._data[int(sent_id)]["id"]
 
-
             span_sentence = " ".join(self._data[sent_id]["tokens"])
 
             if pos in dict_pos2tag_pred.keys():
@@ -352,12 +402,12 @@ class NERExplainaboardBuilder:
                     continue
             else:
                 pred_label = "O"
-            #error_case = span+ "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
+            # error_case = span+ "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
-                "span":span,
-                "text":str(system_output_id),
-                "true_label":true_label,
-                "predicted_label":pred_label,
+                "span": span,
+                "text": str(system_output_id),
+                "true_label": true_label,
+                "predicted_label": pred_label,
             }
             errorCase_list.append(error_case)
 
@@ -378,18 +428,18 @@ class NERExplainaboardBuilder:
                     continue
             else:
                 true_label = "O"
-            #error_case = span + "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
+            # error_case = span + "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
-                "span":span,
-                "text":system_output_id,
-                "true_label":true_label,
-                "predicted_label":pred_label,
+                "span": span,
+                "text": system_output_id,
+                "true_label": true_label,
+                "predicted_label": pred_label,
             }
             errorCase_list.append(error_case)
 
         return errorCase_list
 
-    def get_bucket_performance(self, feature_name:str):
+    def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param feature_name: the name of a feature, e.g., sentence length
@@ -397,13 +447,20 @@ class NERExplainaboardBuilder:
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, spans_true in self._samples_over_bucket_true[feature_name].items():
+        for bucket_interval, spans_true in self._samples_over_bucket_true[
+            feature_name
+        ].items():
 
             spans_pred = []
-            if bucket_interval not in self._samples_over_bucket_pred[feature_name].keys():
+            if (
+                bucket_interval
+                not in self._samples_over_bucket_pred[feature_name].keys()
+            ):
                 raise ValueError("Predict Label Bucketing Errors")
             else:
-                spans_pred = self._samples_over_bucket_pred[feature_name][bucket_interval]
+                spans_pred = self._samples_over_bucket_pred[feature_name][
+                    bucket_interval
+                ]
 
             """
             Get bucket samples for ner task
@@ -414,25 +471,24 @@ class NERExplainaboardBuilder:
                 """
                 # Note that: for NER task, the bucket-wise evaluation function is a little different from overall evaluation function
                 # for overall: f1_score_seqeval
-                # for bucket:  f1_score_seqeval_bucket_bucket                
+                # for bucket:  f1_score_seqeval_bucket_bucket
                 """
-                f1, p, r = eval(metric_name+"_bucket")(spans_pred, spans_true)
-
+                f1, p, r = eval(metric_name + "_bucket")(spans_pred, spans_true)
 
                 bucket_name_to_performance[bucket_interval] = []
-                bucket_performance = BucketPerformance(bucket_name=bucket_interval,
-                                                       metric_name=metric_name,
-                                                       value=format(f1, '.4g'),
-                                                       confidence_score_low= 0.0,
-                                                       confidence_score_up= 0.0,
-                                                       n_samples=len(spans_pred),
-                                                       bucket_samples=bucket_samples)
+                bucket_performance = BucketPerformance(
+                    bucket_name=bucket_interval,
+                    metric_name=metric_name,
+                    value=format(f1, '.4g'),
+                    confidence_score_low=0.0,
+                    confidence_score_up=0.0,
+                    n_samples=len(spans_pred),
+                    bucket_samples=bucket_samples,
+                )
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-
         return sort_dict(bucket_name_to_performance)
-
 
     def _generate_report(self):
         dict_fine_grained = {}
@@ -450,9 +506,6 @@ class NERExplainaboardBuilder:
         for feature_name in self._performances_over_bucket.keys():
             print_dict(self._performances_over_bucket[feature_name], feature_name)
 
-
-
-
     def run(self):
         eb_generator = self._complete_feature()
         self._bucketing_samples(eb_generator)
@@ -460,5 +513,3 @@ class NERExplainaboardBuilder:
         self._print_bucket_info()
         self._generate_report()
         return self._info
-
-
