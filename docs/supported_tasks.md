@@ -10,7 +10,7 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 **Table of Contents**
 * [Text Classification](#text-classification)
 * [Text Pair Classification](#text-pair-classification)
-* [Summarization](#summarization)
+* [Conditional Text Generation](#conditional-generation)
 * [Named Entity Recognition](#named-entity-recognition)
 * [Extractive QA_SQuAD](#extractive-qa-squad)
 * [Hellaswag](#hellaswag)
@@ -72,9 +72,9 @@ Classification of pairs of text, such as natural language inference.
 explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert
 ```
 
-## [Summarization](task_summarization.md)
+## [Conditional Text Generation](task_conditional_generation.md)
 
-Summarization of longer texts into shorter texts.
+Generation of one text based on other texts, including tasks like summarization and machine translation.
 
 **CLI Example**
 ```shell
@@ -84,6 +84,7 @@ where different metrics should be separated by space
 
 **Class**
 * `TaskType.summarization`
+* `TaskType.machine_translation`
   
 **Supported Formats**
 * `FileType.tsv`
