@@ -6,7 +6,9 @@ from io import StringIO
 import csv
 from explainaboard.constants import FileType, Source
 from explainaboard.tasks import TaskType
-JSON = t.Union[str, int, float, bool, None, t.Mapping[str, 'JSON'], t.List['JSON']] # type: ignore
+
+JSON = t.Union[str, int, float, bool, None, t.Mapping[str, 'JSON'], t.List['JSON']]  # type: ignore
+
 
 class Loader:
     """base class of loader"""
@@ -61,8 +63,9 @@ class Loader:
 _loader_registry: Dict = {}
 
 
-def get_loader(task: TaskType, source: Source = None,
-               file_type: FileType = None, data :str = None) -> Loader:
+def get_loader(
+    task: TaskType, source: Source = None, file_type: FileType = None, data: str = None
+) -> Loader:
 
     return _loader_registry[task](source, file_type, data)
 
@@ -72,12 +75,9 @@ def register_loader(task_type: TaskType):
     a register for different data loaders, for example
     For example, `@register_loader(TaskType.text_classification)`
     """
+
     def register_loader_fn(cls):
         _loader_registry[task_type] = cls
         return cls
+
     return register_loader_fn
-
-
-
-
-

@@ -5,7 +5,6 @@ from .loader import register_loader
 from .loader import Loader
 
 
-
 @register_loader(TaskType.text_classification)
 class TextClassificationLoader(Loader):
     """
@@ -16,18 +15,16 @@ class TextClassificationLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: Enum, data :str = None):
+    def __init__(self, source: Source, file_type: Enum, data: str = None):
 
         if source == None:
             source = Source.local_filesystem
         if file_type == None:
             file_type = FileType.tsv
 
-
         self._source = source
         self._file_type = file_type
         self._data = data
-
 
     def load(self) -> Iterable[Dict]:
         """
@@ -40,17 +37,29 @@ class TextClassificationLoader(Loader):
         if self._file_type == FileType.tsv:
             for id, dp in enumerate(raw_data):
                 text, true_label, predicted_label = dp[:3]
-                data.append({"id": str(id),
-                             "text": text.strip(),
-                             "true_label": true_label.strip(),
-                             "predicted_label": predicted_label.strip()})
+                data.append(
+                    {
+                        "id": str(id),
+                        "text": text.strip(),
+                        "true_label": true_label.strip(),
+                        "predicted_label": predicted_label.strip(),
+                    }
+                )
         elif self._file_type == FileType.json:
             for id, info in enumerate(raw_data):
-                text, true_label, predicted_label = info["text"], info["true_label"], info["predicted_label"]
-                data.append({"id": str(id),
-                             "text": text.strip(),
-                             "true_label": true_label.strip(),
-                             "predicted_label": predicted_label.strip()})
+                text, true_label, predicted_label = (
+                    info["text"],
+                    info["true_label"],
+                    info["predicted_label"],
+                )
+                data.append(
+                    {
+                        "id": str(id),
+                        "text": text.strip(),
+                        "true_label": true_label.strip(),
+                        "predicted_label": predicted_label.strip(),
+                    }
+                )
         else:
             raise NotImplementedError
         return data

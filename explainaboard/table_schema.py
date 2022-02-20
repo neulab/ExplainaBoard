@@ -37,160 +37,84 @@ Text | True Label | Prediction
 """
 
 table_schemas[TaskType.text_classification] = [
-    {
-        "field_key": "text",
-        "sort": False,
-        "filter": False,
-        "label": "Text"
-    },
-    {
-        "field_key": "true_label",
-        "sort": True,
-        "filter": True,
-        "label": "True Label"
-    },
+    {"field_key": "text", "sort": False, "filter": False, "label": "Text"},
+    {"field_key": "true_label", "sort": True, "filter": True, "label": "True Label"},
     {
         "field_key": "predicted_label",
         "sort": True,
         "filter": True,
-        "label": "Prediction"
+        "label": "Prediction",
     },
 ]
-
-
-
 
 
 table_schemas[TaskType.text_pair_classification] = [
-    {
-        "field_key":"text1",
-        "sort":False,
-        "filter":False,
-        "label":"Text1"
-    },
-    {
-        "field_key": "text2",
-        "sort": False,
-        "filter": False,
-        "label": "Text2"
-    },
-    {
-        "field_key": "true_label",
-        "sort": True,
-        "filter": True,
-        "label": "True Label"
-    },
+    {"field_key": "text1", "sort": False, "filter": False, "label": "Text1"},
+    {"field_key": "text2", "sort": False, "filter": False, "label": "Text2"},
+    {"field_key": "true_label", "sort": True, "filter": True, "label": "True Label"},
     {
         "field_key": "predicted_label",
         "sort": True,
         "filter": True,
-        "label": "Prediction"
+        "label": "Prediction",
     },
 ]
-
-
-
 
 
 # the case will be directly stored in system_metadata
 table_schemas[TaskType.named_entity_recognition] = [
-    {
-        "field_key": "span",
-        "sort": False,
-        "filter": True,
-        "label": "Entity"
-    },
-    {
-        "field_key": "text",
-        "sort": False,
-        "filter": True,
-        "label": "Sentence"
-    },
-    {
-        "field_key": "true_label",
-        "sort": True,
-        "filter": True,
-        "label": "True Label"
-    },
+    {"field_key": "span", "sort": False, "filter": True, "label": "Entity"},
+    {"field_key": "text", "sort": False, "filter": True, "label": "Sentence"},
+    {"field_key": "true_label", "sort": True, "filter": True, "label": "True Label"},
     {
         "field_key": "predicted_label",
         "sort": True,
         "filter": True,
-        "label": "Prediction"
+        "label": "Prediction",
     },
 ]
 
 table_schemas[TaskType.summarization] = [
-    {
-        "field_key": "source",
-        "sort": False,
-        "filter": True,
-        "label": "Source Document"
-    },
+    {"field_key": "source", "sort": False, "filter": True, "label": "Source Document"},
     {
         "field_key": "references",
         "sort": False,
         "filter": True,
-        "label": "Gold References"
+        "label": "Gold References",
     },
     {
         "field_key": "hypothesis",
         "sort": False,
         "filter": True,
-        "label": "Generated Summary"
-    }
+        "label": "Generated Summary",
+    },
 ]
 
 table_schemas[TaskType.extractive_qa_squad] = [
-    {
-        "field_key": "context",
-        "sort": False,
-        "filter": True,
-        "label": "Context"
-    },
-    {
-        "field_key": "question",
-        "sort": False,
-        "filter": True,
-        "label": "Question"
-    },
+    {"field_key": "context", "sort": False, "filter": True, "label": "Context"},
+    {"field_key": "question", "sort": False, "filter": True, "label": "Question"},
     {
         "field_key": "true_answers.text",
         "sort": False,
         "filter": True,
-        "label": "True Answers"
+        "label": "True Answers",
     },
     {
         "field_key": "predicted_answer",
         "sort": False,
         "filter": True,
-        "label": "Predicted Answer"
-    }
+        "label": "Predicted Answer",
+    },
 ]
 
 table_schemas[TaskType.aspect_based_sentiment_classification] = [
-    {
-        "field_key": "aspect",
-        "sort": False,
-        "filter": False,
-        "label": "Aspect"
-    },
-    {
-        "field_key": "text",
-        "sort": False,
-        "filter": False,
-        "label": "Text"
-    },
-    {
-        "field_key": "true_label",
-        "sort": True,
-        "filter": True,
-        "label": "True Label"
-    },
+    {"field_key": "aspect", "sort": False, "filter": False, "label": "Aspect"},
+    {"field_key": "text", "sort": False, "filter": False, "label": "Text"},
+    {"field_key": "true_label", "sort": True, "filter": True, "label": "True Label"},
     {
         "field_key": "predicted_label",
         "sort": True,
         "filter": True,
-        "label": "Prediction"
-    }
+        "label": "Prediction",
+    },
 ]

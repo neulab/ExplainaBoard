@@ -1,6 +1,7 @@
 from .py_utils import *
 import json
 
+
 def cap_feature(s):
     """
     Capitalization feature:
@@ -23,6 +24,7 @@ def save_json(obj_json, path):
     with open(path, "w") as f:
         json.dump(obj_json, f, indent=4, ensure_ascii=False)
 
+
 def beautify_interval(interval):
 
     if type(interval[0]) == type("string"):  ### pay attention to it
@@ -37,11 +39,13 @@ def beautify_interval(interval):
             bk_name = range1_r + range1_l
             return bk_name
 
+
 def tuple2str(triplet):
     res = ""
     for v in triplet:
         res += str(v) + "|||"
     return res.rstrip("|||")
+
 
 def interval_transformer(inter_list):
     dict_old2new = {}
@@ -69,8 +73,6 @@ def find_key(dict_obj, x):
             return k
 
 
-
-
 def reverse_dict(dict_a2b):
     dict_b2a = {}
     for k, v in dict_a2b.items():
@@ -81,6 +83,7 @@ def reverse_dict(dict_a2b):
             dict_b2a[float(v)].append(k)
 
     return dict_b2a
+
 
 def reverse_dict_discrete(dict_a2b):
     dict_b2a = {}
@@ -94,7 +97,9 @@ def reverse_dict_discrete(dict_a2b):
     return dict_b2a
 
 
-def bucket_attribute_specified_bucket_value(dict_obj = "", bucket_number = 4, bucket_setting = ""):
+def bucket_attribute_specified_bucket_value(
+    dict_obj="", bucket_number=4, bucket_setting=""
+):
     ################       Bucketing different Attributes
     dict_span2att_val = dict_obj
     n_buckets = bucket_number
@@ -173,7 +178,9 @@ def bucket_attribute_specified_bucket_value(dict_obj = "", bucket_number = 4, bu
     return dict_bucket2span
 
 
-def bucket_attribute_discrete_value(dict_obj=None, bucket_number=100000000, bucket_setting=1):
+def bucket_attribute_discrete_value(
+    dict_obj=None, bucket_number=100000000, bucket_setting=1
+):
     ################          Bucketing different Attributes
 
     # print("!!!!!debug---------")
@@ -208,16 +215,16 @@ def bucket_attribute_discrete_value(dict_obj=None, bucket_number=100000000, buck
     return dict_bucket2span
 
 
-def bucket_attribute_specified_bucket_interval(dict_obj = None, bucket_number = None, bucket_setting = None):
+def bucket_attribute_specified_bucket_interval(
+    dict_obj=None, bucket_number=None, bucket_setting=None
+):
     ################       Bucketing different Attributes
-
 
     # hardcoded_bucket_values = [set([float(0), float(1)])]
 
     # intervals = [0, (0,0.5], (0.5,0.9], (0.99,1]]
     dict_span2att_val = dict_obj
     intervals = bucket_setting
-
 
     dict_bucket2span = {}
     n_spans = len(dict_span2att_val)
@@ -226,7 +233,9 @@ def bucket_attribute_specified_bucket_interval(dict_obj = None, bucket_number = 
 
     # print(intervals)
 
-    if type(list(intervals)[0][0]) == type("string"):  # discrete value, such as entity tags
+    if type(list(intervals)[0][0]) == type(
+        "string"
+    ):  # discrete value, such as entity tags
         dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
         dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
         for att_val, entity in dict_att_val2span.items():

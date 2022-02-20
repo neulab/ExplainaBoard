@@ -12,7 +12,6 @@ import copy
 import sys
 
 
-
 def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
     """
     _arrow_to_datasets_dtype takes a pyarrow.DataType and converts it to a datasets string dtype.
@@ -62,7 +61,9 @@ def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
     elif pa.types.is_large_string(arrow_type):
         return "large_string"
     else:
-        raise ValueError(f"Arrow type {arrow_type} does not have a datasets dtype equivalent.")
+        raise ValueError(
+            f"Arrow type {arrow_type} does not have a datasets dtype equivalent."
+        )
 
 
 def string_to_arrow(datasets_dtype: str) -> pa.DataType:
@@ -140,24 +141,42 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
         if not only_1d_for_numpy or obj.ndim == 1:
             return obj, False
         else:
-            return [_cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0] for x in obj], True
-    elif config.TORCH_AVAILABLE and "torch" in sys.modules and isinstance(obj, torch.Tensor):
+            return [
+                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                for x in obj
+            ], True
+    elif (
+        config.TORCH_AVAILABLE
+        and "torch" in sys.modules
+        and isinstance(obj, torch.Tensor)
+    ):
         if not only_1d_for_numpy or obj.ndim == 1:
             return obj.detach().cpu().numpy(), True
         else:
             return [
-                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0] for x in obj.detach().cpu().numpy()
+                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                for x in obj.detach().cpu().numpy()
             ], True
-    elif config.TF_AVAILABLE and "tensorflow" in sys.modules and isinstance(obj, tf.Tensor):
+    elif (
+        config.TF_AVAILABLE
+        and "tensorflow" in sys.modules
+        and isinstance(obj, tf.Tensor)
+    ):
         if not only_1d_for_numpy or obj.ndim == 1:
             return obj.numpy(), True
         else:
-            return [_cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0] for x in obj.numpy()], True
+            return [
+                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                for x in obj.numpy()
+            ], True
     elif config.JAX_AVAILABLE and "jax" in sys.modules and isinstance(obj, jnp.ndarray):
         if not only_1d_for_numpy or obj.ndim == 1:
             return np.asarray(obj), True
         else:
-            return [_cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0] for x in np.asarray(obj)], True
+            return [
+                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                for x in np.asarray(obj)
+            ], True
     elif isinstance(obj, pd.Series):
         return obj.values.tolist(), True
     elif isinstance(obj, pd.DataFrame):
@@ -166,7 +185,9 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
         output = {}
         has_changed = False
         for k, v in obj.items():
-            casted_v, has_changed_v = _cast_to_python_objects(v, only_1d_for_numpy=only_1d_for_numpy)
+            casted_v, has_changed_v = _cast_to_python_objects(
+                v, only_1d_for_numpy=only_1d_for_numpy
+            )
             has_changed |= has_changed_v
             output[k] = casted_v
         return output if has_changed else obj, has_changed
@@ -179,7 +200,12 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
                 first_elmt, only_1d_for_numpy=only_1d_for_numpy
             )
             if has_changed_first_elmt:
-                return [_cast_to_python_objects(elmt, only_1d_for_numpy=only_1d_for_numpy)[0] for elmt in obj], True
+                return [
+                    _cast_to_python_objects(elmt, only_1d_for_numpy=only_1d_for_numpy)[
+                        0
+                    ]
+                    for elmt in obj
+                ], True
             else:
                 if isinstance(obj, list):
                     return obj, False
@@ -206,7 +232,6 @@ def cast_to_python_objects(obj: Any, only_1d_for_numpy=False) -> Any:
     return _cast_to_python_objects(obj, only_1d_for_numpy=only_1d_for_numpy)[0]
 
 
-
 @dataclass
 class BucketInfo:
     """
@@ -216,10 +241,10 @@ class BucketInfo:
         _number: the number of buckets to be bucketed
         _settting: hyper-paraterms of bucketing
     """
+
     _method: str = "bucket_attribute_specified_bucket_value"
     _number: int = 4
-    _setting: Any =  1 # For different bucket_methods, the settings are diverse
-
+    _setting: Any = 1  # For different bucket_methods, the settings are diverse
 
 
 @dataclass
@@ -252,35 +277,43 @@ class ClassLabel:
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     # Class Variables
-    dtype:ClassVar[str] = "int64"
-    _str2int: ClassVar[Dict[str,int]] = None
-    _int2str: ClassVar[Dict[int,int]] = None
+    dtype: ClassVar[str] = "int64"
+    _str2int: ClassVar[Dict[str, int]] = None
+    _int2str: ClassVar[Dict[int, int]] = None
     _type: str = field(default="ClassLabel", init=False, repr=False)
-
 
     def __post_init__(self):
         if self.is_bucket and self.bucket_info == None:
-            self.bucket_info = BucketInfo(_method="bucket_attribute_discrete_value", _number=4, _setting=1)
+            self.bucket_info = BucketInfo(
+                _method="bucket_attribute_discrete_value", _number=4, _setting=1
+            )
         if self.names_file is not None and self.names is not None:
             raise ValueError("Please provide either names or names_file but not both")
         # Set self.names
         if self.names is None:
             if self.names_file is not None:
-                self.names =  self._load_names_from_file(self.names_file)
+                self.names = self._load_names_from_file(self.names_file)
             elif self.num_classes is not None:
                 self.names = [str(i) for i in range(self.num_classes)]
             else:
-                raise ValueError("Please either provide num_classes, names or names_file.")
+                raise ValueError(
+                    "Please either provide num_classes, names or names_file."
+                )
         # Set self.num_classes
         if self.num_classes is None:
             self.num_classes = len(self.names)
         elif self.num_classes != len(self.names):
-            raise ValueError("ClassLabel number of names do not match the defined num_classes.")
+            raise ValueError(
+                "ClassLabel number of names do not match the defined num_classes."
+            )
         # Prepare mappings
         self._int2str = [str(name) for name in self.names]
-        self._str2int = {name: i for i,name in enumerate(self._int2str)}
+        self._str2int = {name: i for i, name in enumerate(self._int2str)}
         if len(self._int2str) != len(self._str2int):
-            raise ValueError("Some label names are duplicated. Each label name should be unique.")
+            raise ValueError(
+                "Some label names are duplicated. Each label name should be unique."
+            )
+
     def str2int(self, values: Union[str, Iterable]):
         """Conversion class name string => integer."""
         assert isinstance(values, str) or isinstance(
@@ -344,15 +377,17 @@ class ClassLabel:
         # Allowing -1 to mean no label.
         if not -1 <= example_data < self.num_classes:
             raise ValueError(
-                "Class label %d greater than configured num_classes %d" % (example_data, self.num_classes)
+                "Class label %d greater than configured num_classes %d"
+                % (example_data, self.num_classes)
             )
         return example_data
 
     @staticmethod
     def _load_names_from_file(names_filepath):
         with open(names_filepath, "r", encoding="utf-8") as f:
-            return [name.strip() for name in f.read().split("\n") if name.strip()]  # Filter empty names
-
+            return [
+                name.strip() for name in f.read().split("\n") if name.strip()
+            ]  # Filter empty names
 
 
 @dataclass
@@ -371,10 +406,9 @@ class Sequence:
     _type: str = field(default="Sequence", init=False, repr=False)
 
 
-
 @dataclass
 class Set:
-    feature:dict
+    feature: dict
 
     dtype: ClassVar[str] = "dict"
     is_bucket: bool = False
@@ -385,11 +419,9 @@ class Set:
     pa_type: ClassVar[Any] = None
 
 
-
-
 @dataclass
 class Position:
-    positions:list = None
+    positions: list = None
     dtype: ClassVar[str] = Any
     is_bucket: bool = False
     is_pre_computed: bool = False
@@ -408,8 +440,6 @@ class Span:
     _type: str = field(default="Span", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
-
-
 
 
 @dataclass
@@ -437,9 +467,9 @@ class Value:
     large_string
     """
 
-    dtype: str # must be initialized when created
+    dtype: str  # must be initialized when created
     description: str = None
-    is_bucket: bool = False # don't need to be initialized
+    is_bucket: bool = False  # don't need to be initialized
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     id: Optional[str] = None
@@ -450,7 +480,11 @@ class Value:
 
     def __post_init__(self):
         if self.is_bucket and self.bucket_info == None:
-            self.bucket_info = BucketInfo(_method="bucket_attribute_specified_bucket_value", _number=4, _setting=())
+            self.bucket_info = BucketInfo(
+                _method="bucket_attribute_specified_bucket_value",
+                _number=4,
+                _setting=(),
+            )
         if self.dtype == "double":  # fix inferred type
             self.dtype = "float64"
         if self.dtype == "float":  # fix inferred type
@@ -471,10 +505,7 @@ class Value:
             return value
 
 
-
-
-
-FeatureType = Union [
+FeatureType = Union[
     dict,
     list,
     tuple,
@@ -485,7 +516,6 @@ FeatureType = Union [
 ]
 
 
-
 def encode_nested_example(schema, obj):
     """Encode a nested example.
     This is used since some features (in particular ClassLabel) have some logic during encoding.
@@ -493,11 +523,16 @@ def encode_nested_example(schema, obj):
     # Nested structures: we allow dict, list/tuples, sequences
     if isinstance(schema, dict):
         return {
-            k: encode_nested_example(sub_schema, sub_obj) for k, (sub_schema, sub_obj) in zip_dict(schema, obj)
+            k: encode_nested_example(sub_schema, sub_obj)
+            for k, (sub_schema, sub_obj) in zip_dict(schema, obj)
         }
     elif isinstance(schema, (list, tuple)):
         sub_schema = schema[0]
-        return [encode_nested_example(sub_schema, o) for o in obj] if obj is not None else None
+        return (
+            [encode_nested_example(sub_schema, o) for o in obj]
+            if obj is not None
+            else None
+        )
     elif isinstance(schema, Sequence):
         # We allow to reverse list of dict => dict of list for compatiblity with tfds
         if isinstance(schema.feature, dict):
@@ -506,26 +541,34 @@ def encode_nested_example(schema, obj):
             if isinstance(obj, (list, tuple)):
                 # obj is a list of dict
                 for k, dict_tuples in zip_dict(schema.feature, *obj):
-                    list_dict[k] = [encode_nested_example(dict_tuples[0], o) for o in dict_tuples[1:]]
+                    list_dict[k] = [
+                        encode_nested_example(dict_tuples[0], o)
+                        for o in dict_tuples[1:]
+                    ]
                 return list_dict
             else:
                 # obj is a single dict
                 for k, (sub_schema, sub_objs) in zip_dict(schema.feature, obj):
-                    list_dict[k] = [encode_nested_example(sub_schema, o) for o in sub_objs]
+                    list_dict[k] = [
+                        encode_nested_example(sub_schema, o) for o in sub_objs
+                    ]
                 return list_dict
         # schema.feature is not a dict
         if isinstance(obj, str):  # don't interpret a string as a list
-            raise ValueError("Got a string but expected a list instead: '{}'".format(obj))
-        return [encode_nested_example(schema.feature, o) for o in obj] if obj is not None else None
+            raise ValueError(
+                "Got a string but expected a list instead: '{}'".format(obj)
+            )
+        return (
+            [encode_nested_example(schema.feature, o) for o in obj]
+            if obj is not None
+            else None
+        )
     # Object with special encoding:
     # ClassLabel will convert from string to int, TranslationVariableLanguages does some checks
     elif isinstance(schema, (ClassLabel, Value)):
         return schema.encode_example(obj)
     # Other object should be directly convertible to a native Arrow type (like Translation and Translation)
     return obj
-
-
-
 
 
 class Features(dict):
@@ -548,22 +591,24 @@ class Features(dict):
             dict_feature = copy.deepcopy(self[feature_name])
 
             if isinstance(dict_feature, type(Value("float"))):
-                dict_res[feature_name] =  dict_feature
+                dict_res[feature_name] = dict_feature
 
             elif isinstance(dict_feature, dict):
-                for k,v in dict_feature.items():
-                    dict_res[k] =v
+                for k, v in dict_feature.items():
+                    dict_res[k] = v
             else:
-                while not isinstance(dict_feature, dict) and "feature" in dict_feature.__dict__.keys():
+                while (
+                    not isinstance(dict_feature, dict)
+                    and "feature" in dict_feature.__dict__.keys()
+                ):
                     dict_feature = dict_feature.feature
 
                 if isinstance(dict_feature, type(Value("float"))):
-                    dict_res[feature_name] =  dict_feature
+                    dict_res[feature_name] = dict_feature
 
                 if isinstance(dict_feature, dict):
-                    for k,v in dict_feature.items():
-                        dict_res[k] =v
-
+                    for k, v in dict_feature.items():
+                        dict_res[k] = v
 
             # curr_feature = self[feature_name].copy()
             # while "feature" in self[feature_name].__dict__.keys():
@@ -579,7 +624,6 @@ class Features(dict):
 
         return bucket_features
 
-
     # def get_pre_computed_features(self) -> List:
     #     """
     #     Get features that reply on pre-computed models
@@ -591,7 +635,6 @@ class Features(dict):
     #         if self[feature_name].is_pre_computed:
     #             pre_computed_features.append(feature_name)
     #     return pre_computed_features
-
 
     def get_pre_computed_features(self) -> List:
         """
@@ -606,22 +649,24 @@ class Features(dict):
             dict_feature = copy.deepcopy(self[feature_name])
 
             if isinstance(dict_feature, type(Value("float"))):
-                dict_res[feature_name] =  dict_feature
+                dict_res[feature_name] = dict_feature
 
             elif isinstance(dict_feature, dict):
-                for k,v in dict_feature.items():
-                    dict_res[k] =v
+                for k, v in dict_feature.items():
+                    dict_res[k] = v
             else:
-                while not isinstance(dict_feature, dict) and "feature" in dict_feature.__dict__.keys():
+                while (
+                    not isinstance(dict_feature, dict)
+                    and "feature" in dict_feature.__dict__.keys()
+                ):
                     dict_feature = dict_feature.feature
 
                 if isinstance(dict_feature, type(Value("float"))):
-                    dict_res[feature_name] =  dict_feature
+                    dict_res[feature_name] = dict_feature
 
                 if isinstance(dict_feature, dict):
-                    for k,v in dict_feature.items():
-                        dict_res[k] =v
-
+                    for k, v in dict_feature.items():
+                        dict_res[k] = v
 
             # curr_feature = self[feature_name].copy()
             # while "feature" in self[feature_name].__dict__.keys():
@@ -639,12 +684,6 @@ class Features(dict):
 
         return pre_computed_features
 
-
-
-
-
-
-
     def encode_example(self, example):
         """
         Encode example. (The original version of huggingface is prepared for arrow.)
@@ -655,4 +694,3 @@ class Features(dict):
         """
         example = cast_to_python_objects(example)
         return encode_nested_example(self, example)
-
