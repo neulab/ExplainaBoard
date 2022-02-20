@@ -3,11 +3,10 @@ from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.builders.summarization import SummExplainaboardBuilder
+from explainaboard.builders.conditional_generation import CondGenExplainaboardBuilder
 
-@register_processor(TaskType.summarization)
-class TextSummarizationProcessor(Processor):
-    _task_type = TaskType.summarization
+
+class ConditionalGenerationProcessor(Processor):
     _features = feature.Features({
         "source": feature.Value("string"),
         "reference": feature.Value("string"),
@@ -61,4 +60,14 @@ class TextSummarizationProcessor(Processor):
             metadata["metric_names"] = ["bleu"]
 
         super().__init__(metadata, system_output_data)
-        self._builder = SummExplainaboardBuilder(self._system_output_info, system_output_data)
+        self._builder = CondGenExplainaboardBuilder(self._system_output_info, system_output_data)
+
+
+@register_processor(TaskType.summarization)
+class SummarizationProcessor(ConditionalGenerationProcessor):
+    _task_type = TaskType.summarization
+
+
+@register_processor(TaskType.machine_translation)
+class MachineTranslationProcessor(ConditionalGenerationProcessor):
+    _task_type = TaskType.machine_translation
