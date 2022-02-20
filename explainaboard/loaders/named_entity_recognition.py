@@ -1,9 +1,10 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+
 from .loader import register_loader
 from .loader import Loader
 from explainaboard.constants import FileType, Source
 from explainaboard.tasks import TaskType
+from enum import Enum
 
 
 @register_loader(TaskType.named_entity_recognition)
@@ -18,9 +19,9 @@ class NERLoader(Loader):
 
     def __init__(self, source: Source, file_type: Enum, data: str = None):
 
-        if source == None:
+        if source is None:
             source = Source.local_filesystem
-        if file_type == None:
+        if file_type is None:
             file_type = FileType.conll
 
         self._source = source

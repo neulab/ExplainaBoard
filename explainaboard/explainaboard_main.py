@@ -1,6 +1,6 @@
 import argparse
 import json
-from explainaboard import FileType, Source, get_loader, get_processor
+from explainaboard import get_loader, get_processor
 from explainaboard import TaskType
 
 
@@ -99,7 +99,7 @@ def main():
 
     metadata = {"dataset_name": dataset, "task_name": task}
 
-    if metric_names != None:
+    if metric_names is not None:
         metadata["metric_names"] = metric_names
 
     if len(system_outputs) == 1:  # individual system analysis

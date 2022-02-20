@@ -1,9 +1,8 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+from explainaboard.constants import Source, FileType
+from enum import Enum
 from .loader import register_loader
 from .loader import Loader
-import json
-import os
 from datasets import load_dataset
 from explainaboard.tasks import TaskType
 
@@ -14,9 +13,9 @@ class HellaswagLoader(Loader):
 
     def __init__(self, source: Source, file_type: Enum, data: str = None):
 
-        if source == None:
+        if source is None:
             source = Source.local_filesystem
-        if file_type == None:
+        if file_type is None:
             file_type = FileType.tsv  # easy to make mistake
 
         self._source = source

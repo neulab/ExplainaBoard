@@ -1,10 +1,10 @@
-from typing import Iterable
+from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.eval_bucket import *
+from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
-from explainaboard.utils.analysis import *
-from explainaboard.metric import *
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.metric import *  # noqa
 from tqdm import tqdm
 
 """TODO
@@ -80,7 +80,7 @@ class TextPairClassificationExplainaboardBuilder:
                     )
                 )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
-            # if self._data == None:
+            # if self._data is None:
             #     self._data = {}
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
@@ -111,7 +111,7 @@ class TextPairClassificationExplainaboardBuilder:
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -179,8 +179,8 @@ class TextPairClassificationExplainaboardBuilder:
 
                 true_label = self._data[int(sample_id)]["true_label"]
                 predicted_label = self._data[int(sample_id)]["predicted_label"]
-                text1 = self._data[int(sample_id)]["text1"]
-                text2 = self._data[int(sample_id)]["text2"]
+                text1 = self._data[int(sample_id)]["text1"]  # noqa
+                text2 = self._data[int(sample_id)]["text2"]  # noqa
                 s_id = self._data[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
@@ -224,7 +224,7 @@ class TextPairClassificationExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
         dict_fine_grained = {}
@@ -240,7 +240,9 @@ class TextPairClassificationExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self) -> SysOutputInfo:
         eb_generator = self._complete_feature()

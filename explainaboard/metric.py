@@ -1,9 +1,7 @@
 from sklearn.metrics import accuracy_score
 from random import choices
 import numpy as np
-import os
 import scipy
-import scipy.stats as statss
 import sklearn.metrics
 
 

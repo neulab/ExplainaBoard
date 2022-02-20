@@ -1,12 +1,12 @@
 from typing import Optional, Iterable
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
-from explainaboard.utils.analysis import *
-from explainaboard.utils.eval_bucket import *
-from explainaboard.metric import Accuracy
-from explainaboard.metric import F1score
+from explainaboard.utils.analysis import *  # noqa
+from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.metric import Accuracy  # noqa
+from explainaboard.metric import F1score  # noqa
 from tqdm import tqdm
-from explainaboard.utils.feature_funcs import *
+from explainaboard.utils.feature_funcs import *  # noqa
 from explainaboard.utils.spacy_loader import spacy_loader
 
 
@@ -65,10 +65,10 @@ class TCExplainaboardBuilder:
         return existing_feature["true_label"]
 
     def _get_basic_words(self, existing_feature: dict):
-        return get_basic_words(existing_feature["text"])
+        return get_basic_words(existing_feature["text"])  # noqa
 
     def _get_lexical_richness(self, existing_feature: dict):
-        return get_lexical_richness(existing_feature["text"])
+        return get_lexical_richness(existing_feature["text"])  # noqa
 
     def _complete_feature(self):
         """
@@ -88,7 +88,7 @@ class TCExplainaboardBuilder:
                     TCExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
                 )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
-            # if self._data == None:
+            # if self._data is None:
             #     self._data = {}
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
@@ -119,7 +119,7 @@ class TCExplainaboardBuilder:
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
-            if self._info.results.overall == None:
+            if self._info.results.overall is None:
                 self._info.results.overall = {}
                 self._info.results.overall[metric_name] = overall_performance
             else:
@@ -187,7 +187,7 @@ class TCExplainaboardBuilder:
 
                 true_label = self._data[int(sample_id)]["true_label"]
                 predicted_label = self._data[int(sample_id)]["predicted_label"]
-                sent = self._data[int(sample_id)]["text"]
+                sent = self._data[int(sample_id)]["text"]  # noqa
                 s_id = self._data[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
@@ -235,7 +235,7 @@ class TCExplainaboardBuilder:
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)
+        return sort_dict(bucket_name_to_performance)  # noqa
 
     def _generate_report(self):
         dict_fine_grained = {}
@@ -251,7 +251,9 @@ class TCExplainaboardBuilder:
 
     def _print_bucket_info(self):
         for feature_name in self._performances_over_bucket.keys():
-            print_dict(self._performances_over_bucket[feature_name], feature_name)
+            print_dict(  # noqa
+                self._performances_over_bucket[feature_name], feature_name
+            )
 
     def run(self) -> SysOutputInfo:
         eb_generator = self._complete_feature()

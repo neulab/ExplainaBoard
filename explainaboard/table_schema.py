@@ -1,7 +1,7 @@
 from explainaboard.tasks import TaskType
 
 """
-Each schema is a list of dictionary, which is used to instruct how to print bucket-level cases 
+Each schema is a list of dictionary, which is used to instruct how to print bucket-level cases
 in the frontend table (the number of list denotes the number of table columns)
 Currently, the table schema is characterized by:
 (1) field_key:str:  this is used to retrieve data from system output file
@@ -26,14 +26,14 @@ For some tasks (e.g., extractive_qa_squad), whose system output format involves 
 
 For this case,  the field_key will be with the format "answer = A.B", suggesting a nested dict, for example
 supposing we have `system_output` file and `sample_id`, then we can get "answer"
-answer = system_output[A][B] 
+answer = system_output[A][B]
 """
 
 table_schemas = {}
 """Text Classification
-text | true_label | predicted_label 
+text | true_label | predicted_label
 
-Text | True Label | Prediction 
+Text | True Label | Prediction
 """
 
 table_schemas[TaskType.text_classification] = [
