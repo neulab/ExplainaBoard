@@ -25,6 +25,7 @@ class TaskType(str, Enum):
     named_entity_recognition = "named-entity-recognition"
     extractive_qa_squad = "extractive-qa-squad"
     summarization = "summarization"
+    machine_translation = "machine-translation"
     text_pair_classification = "text-pair-classification"
     hellaswag = "hellaswag"
     aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
@@ -58,7 +59,14 @@ _task_categories: List[TaskCategory] = [
                  "data-to-text and text transduction tasks such as translation or summarization",
                  [
                      Task(name="machine-translation",
-                          description="The process of using AI to automatically translate text from one language to another."),
+                          description="The process of using AI to automatically translate text from one language to another.",
+                          supported_metrics=["bleu", "bart_score_summ", "bart_score_mt", "bart_score_cnn_hypo_ref",
+                                             "rouge1", "rouge2", "rougeL", "bert_score_f", "bert_score_p",
+                                             "bert_score_r",
+                                             "chrf", "comet", "mover_score", "prism"],
+                          supported_formats=["tsv"],
+                          supported_datasets=[],
+                          ),
                      Task(name=TaskType.summarization,
                           description="Summarize long documents into short texts. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_summarization.md",
                           supported=True,
