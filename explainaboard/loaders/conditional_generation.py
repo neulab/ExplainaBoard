@@ -7,7 +7,8 @@ from explainaboard.tasks import TaskType
 
 
 @register_loader(TaskType.summarization)
-class TextSummarizationLoader(Loader):
+@register_loader(TaskType.machine_translation)
+class ConditionalGenerationLoader(Loader):
     """
     Validate and Reformat system output file with tsv format:
     text \t true_label \t predicted_label
