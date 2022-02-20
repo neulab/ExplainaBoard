@@ -16,6 +16,8 @@ from typing import Any, ClassVar, Dict, List, Optional
 '''
 Sequence Labeling
 '''
+
+
 def f1_score_seqeval(labels, predictions, language=None):
     f1 = f1_score(labels, predictions)
     precision = precision_score(labels, predictions)
@@ -79,8 +81,7 @@ def get_chunk_type(tok):
     return tok_split[0], tok_split[-1]
 
 
-
-def accuracy(labels:List[str], predictions:List[str], language=None):
+def accuracy(labels: List[str], predictions: List[str], language=None):
     correct = sum([int(p == l) for p, l in zip(predictions, labels)])
     accuracy_value = float(correct) / len(predictions)
     return accuracy_value * 100
@@ -90,13 +91,11 @@ def mean_confidence_interval(data, confidence=0.95):
     a = 1.0 * np.array(data)
     n = len(a)
     m, se = np.mean(a), scipy.stats.sem(a)
-    h = se * scipy.stats.t.ppf((1 + confidence) / 2., n - 1)
+    h = se * scipy.stats.t.ppf((1 + confidence) / 2.0, n - 1)
     return m - h, m + h
 
 
-
 def compute_confidence_interval_acc(true_label_list, pred_label_list, n_times=1000):
-
     def get_sample_rate(n_data):
         res = 0.8
         if n_data > 300000:
@@ -120,8 +119,10 @@ def compute_confidence_interval_acc(true_label_list, pred_label_list, n_times=10
     for i in range(n_times):
         sample_index_list = choices(range(n_data), k=n_sampling)
 
-        performance = accuracy(list(np.array(true_label_list)[sample_index_list]),
-                               list(np.array(pred_label_list)[sample_index_list]))
+        performance = accuracy(
+            list(np.array(true_label_list)[sample_index_list]),
+            list(np.array(pred_label_list)[sample_index_list]),
+        )
         performance_list.append(performance)
 
     if n_times != 1000:

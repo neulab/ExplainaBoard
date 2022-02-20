@@ -8,17 +8,20 @@ from tqdm import tqdm
 
 spacy_nlp = spacy_loader.get_model("en_core_web_sm")
 
+
 class ABSCExplainaboardBuilder:
     """
-        Input: System Output file List[dict];  Metadata info
-        Output: Analysis
+    Input: System Output file List[dict];  Metadata info
+    Output: Analysis
     """
 
-    def __init__(self, info: SysOutputInfo,
-                 system_output_object: Iterable[dict],
-                 feature_table: Optional[Table] = {},
-                 gen_kwargs: dict = None
-                 ):
+    def __init__(
+        self,
+        info: SysOutputInfo,
+        system_output_object: Iterable[dict],
+        feature_table: Optional[Table] = {},
+        gen_kwargs: dict = None,
+    ):
         self._info = info
         self._system_output: Iterable[dict] = system_output_object
         self.gen_kwargs = gen_kwargs
@@ -59,12 +62,16 @@ class ABSCExplainaboardBuilder:
         :return:
         """
         # Get names of bucketing features
-        #print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
+        # print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
         bucket_features = self._info.features.get_bucket_features()
-        for _id, dict_sysout in tqdm(enumerate(self._system_output), desc="featurizing"):
+        for _id, dict_sysout in tqdm(
+            enumerate(self._system_output), desc="featurizing"
+        ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                feature_value = eval(ABSCExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+                feature_value = eval(
+                    ABSCExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
+                )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
@@ -77,19 +84,21 @@ class ABSCExplainaboardBuilder:
             true_labels.append(feature_table["true_label"])
 
         for metric_name in self._info.metric_names:
-            one_metric = eval(metric_name)(true_labels=true_labels,
-                                           predicted_labels=predicted_labels,
-                                           is_print_confidence_interval=self._info.results.is_print_confidence_interval)
+            one_metric = eval(metric_name)(
+                true_labels=true_labels,
+                predicted_labels=predicted_labels,
+                is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+            )
             overall_value_json = one_metric.evaluate()
 
             overall_value = overall_value_json["value"]
             confidence_score_low = overall_value_json["confidence_score_low"]
             confidence_score_up = overall_value_json["confidence_score_up"]
             overall_performance = Performance(
-                                   metric_name=metric_name,
-                                   value=float(format(overall_value, '.4g')),
-                                   confidence_score_low=float(format(confidence_score_low, '.4g')),
-                                   confidence_score_up=float(format(confidence_score_up, '.4g')),
+                metric_name=metric_name,
+                value=float(format(overall_value, '.4g')),
+                confidence_score_low=float(format(confidence_score_low, '.4g')),
+                confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
             if self._info.results.overall == None:
                 self._info.results.overall = {}
@@ -110,24 +119,33 @@ class ABSCExplainaboardBuilder:
                 if feature_name not in feature_to_sample_address_to_value.keys():
                     feature_to_sample_address_to_value[feature_name] = {}
                 else:
-                    feature_to_sample_address_to_value[feature_name][sample_address] = dict_sysout[feature_name]
+                    feature_to_sample_address_to_value[feature_name][
+                        sample_address
+                    ] = dict_sysout[feature_name]
 
         # Bucketing
-        for feature_name in tqdm(self._info.features.get_bucket_features(), desc="bucketing"):
+        for feature_name in tqdm(
+            self._info.features.get_bucket_features(), desc="bucketing"
+        ):
             # print(f"Feature Name: {feature_name}\n"
             #       f"Bucket Hyper:\n function_name: {self._info.features[feature_name].bucket_info._method} \n"
             #       f"bucket_number: {self._info.features[feature_name].bucket_info._number}\n"
             #       f"bucket_setting: {self._info.features[feature_name].bucket_info._setting}\n")
 
-            self._samples_over_bucket[feature_name] = eval(self._info.features[feature_name].bucket_info._method)(
+            self._samples_over_bucket[feature_name] = eval(
+                self._info.features[feature_name].bucket_info._method
+            )(
                 dict_obj=feature_to_sample_address_to_value[feature_name],
                 bucket_number=self._info.features[feature_name].bucket_info._number,
-                bucket_setting=self._info.features[feature_name].bucket_info._setting)
+                bucket_setting=self._info.features[feature_name].bucket_info._setting,
+            )
 
             # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket.keys()}")
 
             # evaluating bucket: get bucket performance
-            self._performances_over_bucket[feature_name] = self.get_bucket_performance(feature_name)
+            self._performances_over_bucket[feature_name] = self.get_bucket_performance(
+                feature_name
+            )
 
     def get_bucket_performance(self, feature_name: str):
         """
@@ -137,7 +155,9 @@ class ABSCExplainaboardBuilder:
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in self._samples_over_bucket[feature_name].items():
+        for bucket_interval, sample_ids in self._samples_over_bucket[
+            feature_name
+        ].items():
 
             bucket_true_labels = []
             bucket_predicted_labels = []
@@ -161,9 +181,11 @@ class ABSCExplainaboardBuilder:
 
             bucket_name_to_performance[bucket_interval] = []
             for metric_name in self._info.metric_names:
-                one_metric = eval(metric_name)(true_labels=bucket_true_labels,
-                                               predicted_labels=bucket_predicted_labels,
-                                               is_print_confidence_interval=self._info.results.is_print_confidence_interval)
+                one_metric = eval(metric_name)(
+                    true_labels=bucket_true_labels,
+                    predicted_labels=bucket_predicted_labels,
+                    is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+                )
                 bucket_value_json = one_metric.evaluate()
 
                 bucket_value = bucket_value_json["value"]
@@ -176,13 +198,15 @@ class ABSCExplainaboardBuilder:
                 #       f"confidence up \t {confidence_score_up}\n"
                 #       f"---------------------------------")
 
-                bucket_performance = BucketPerformance(bucket_name=bucket_interval,
-                                                       metric_name=metric_name,
-                                                       value=format(bucket_value, '.4g'),
-                                                       confidence_score_low=format(confidence_score_low, '.4g'),
-                                                       confidence_score_up=format(confidence_score_up, '.4g'),
-                                                       n_samples=len(bucket_true_labels),
-                                                       bucket_samples=bucket_cases)
+                bucket_performance = BucketPerformance(
+                    bucket_name=bucket_interval,
+                    metric_name=metric_name,
+                    value=format(bucket_value, '.4g'),
+                    confidence_score_low=format(confidence_score_low, '.4g'),
+                    confidence_score_up=format(confidence_score_up, '.4g'),
+                    n_samples=len(bucket_true_labels),
+                    bucket_samples=bucket_cases,
+                )
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
