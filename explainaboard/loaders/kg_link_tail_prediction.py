@@ -43,6 +43,7 @@ class KgLinkTailPredictionLoader(Loader):
                 data.append({
                     "id": str(id), # should be string type
                     "link": link.strip(),
+                    "relation": link.split('\t')[1].strip(),
                     "true_head": link.split('\t')[0].strip(),
                     "true_tail": link.split('\t')[-1].strip(),
                     "predicted_tails": predictions
