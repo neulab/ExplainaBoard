@@ -14,8 +14,7 @@ class KGLinkTailPredictionProcessor(Processor):
         "link": feature.Value("string"),
         "true_tail": feature.Value("string"),
         "predicted_tails": feature.Sequence(feature.Value("string")),
-        # ============================================
-        # START WARM-UP TASKS
+        
         "tail_entity_length": feature.Value(
             dtype = "float",
             description = "number of words in the tail entity",
@@ -66,6 +65,17 @@ class KGLinkTailPredictionProcessor(Processor):
                 _setting=()
             )
         ),
+        "symmetry": feature.Value(
+            dtype="string",
+            description="boolean feature: 'symmetric' or 'asymmetric'; more granularity to be added",
+            is_bucket=True,
+            bucket_info=feature.BucketInfo(
+                _method="bucket_attribute_discrete_value",
+                _number=2,
+                _setting=1
+            )
+        ),
+
 
     })
 
