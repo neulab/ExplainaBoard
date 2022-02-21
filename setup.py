@@ -48,6 +48,7 @@ setup(
         "spacy",
         "datalabs==0.2.7",
     ],
+    extras_require={"dev": ["black", "flake8", "pre-commit"]},
     include_package_data=True,
 )
 os.system("python -m spacy download en_core_web_sm")

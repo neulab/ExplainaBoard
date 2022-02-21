@@ -10,8 +10,11 @@ artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 
 class BaseLoaderTests(TestCase):
     def test_load_in_memory_tsv(self):
-        loader = Loader(Source.in_memory, FileType.tsv,
-                        load_file_as_str(f"{artifacts_path}sys_out1.tsv"))
+        loader = Loader(
+            Source.in_memory,
+            FileType.tsv,
+            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
+        )
         samples = [sample for sample in loader._load_raw_data_points()]
         self.assertEqual(len(samples), 10)
         self.assertEqual(len(samples[0]), 3)
@@ -19,29 +22,45 @@ class BaseLoaderTests(TestCase):
 
 class TextClassificationLoader(TestCase):
     def test_load_in_memory_tsv(self):
-        loader = get_loader(TaskType.text_classification, Source.in_memory, FileType.tsv,
-                            load_file_as_str(f"{artifacts_path}sys_out1.tsv"))
+        loader = get_loader(
+            TaskType.text_classification,
+            Source.in_memory,
+            FileType.tsv,
+            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
+        )
         data = loader.load()
         self.assertEqual(len(data), 10)
         self.assertListEqual(
-            list(data[0].keys()), ["id", "text", "true_label", "predicted_label"])
+            list(data[0].keys()), ["id", "text", "true_label", "predicted_label"]
+        )
+
 
 class QASquadLoader(TestCase):
     def test_load_json(self):
-        loader = get_loader(TaskType.extractive_qa_squad, Source.local_filesystem, FileType.json,
-                            f"{artifacts_path}test-qa-squad.json")
+        loader = get_loader(
+            TaskType.extractive_qa_squad,
+            Source.local_filesystem,
+            FileType.json,
+            f"{artifacts_path}test-qa-squad.json",
+        )
         data = loader.load()
         # print(data[0].keys())
         # print(len(data))
         self.assertEqual(len(data), 1190)
         self.assertListEqual(
-            list(data[0].keys()), ['title', 'context', 'question', 'id', 'true_answers', 'predicted_answer'])
+            list(data[0].keys()),
+            ['title', 'context', 'question', 'id', 'true_answers', 'predicted_answer'],
+        )
 
 
 class SummSquadLoader(TestCase):
     def test_load_json(self):
-        loader = get_loader(TaskType.summarization, Source.local_filesystem, FileType.tsv,
-                            f"{artifacts_path}test-summ.tsv")
+        loader = get_loader(
+            TaskType.summarization,
+            Source.local_filesystem,
+            FileType.tsv,
+            f"{artifacts_path}test-summ.tsv",
+        )
         data = loader.load()
         # print(data[0].keys())
         # print(len(data))
