@@ -8,6 +8,20 @@ from tqdm import tqdm
 from datalabs import load_dataset
 from datalabs.operations import aggregate
 
+# TODO: is this the best place to put this?
+SYMMETRIC_RELATIONS = [
+    '/base/popstra/celebrity/breakup./base/popstra/breakup/participant',
+    '/base/popstra/celebrity/canoodled./base/popstra/canoodled/participant',
+    '/base/popstra/celebrity/dated./base/popstra/dated/participant',
+    '/base/popstra/celebrity/friendship./base/popstra/friendship/participant',
+    '/celebrities/celebrity/celebrity_friends./celebrities/friendship/friend',
+    '/celebrities/celebrity/sexual_relationships./celebrities/romantic_relationship/celebrity',
+    '/influence/influence_node/peers./influence/peer_relationship/peers',
+    '/location/location/adjoin_s./location/adjoining_relationship/adjoins',
+    '/people/person/spouse_s./people/marriage/spouse',
+    '/people/person/sibling_s./people/sibling relationship/sibling'
+]
+
 
 class KGLTPExplainaboardBuilder:
     """
@@ -75,7 +89,12 @@ class KGLTPExplainaboardBuilder:
         else:
             return self.statistics['link_fre'][existing_features["link"]]
 
-
+    # define function for incomplete features
+    def _get_symmetry(self, existing_features: dict):
+        if existing_features['relation'] in SYMMETRIC_RELATIONS:
+            return 'symmetric'
+        else:
+            return 'asymmetric'
 
 
     def _complete_feature(self):
