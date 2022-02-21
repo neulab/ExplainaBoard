@@ -117,11 +117,47 @@ class Hits(Metric):
         self._name = self.__class__.__name__
         self._true_labels = true_labels
         self._predicted_labels = predicted_labels
-        self._eval_function = hits
+        self._eval_function = self.hits
         self._is_print_confidence_interval = is_print_confidence_interval
         self._n_samples = len(self._true_labels)
+
+    @staticmethod
+    def hits(true_labels, predicted_labels):
+        num_hits = 0
+        for i in range(len(true_labels)):
+            i_true = true_labels[i]
+            i_preds = predicted_labels[i]
+            if i_true in i_preds:
+                num_hits += 1
+        return num_hits/len(true_labels)
 
     def evaluate(self):
 
         return self._evaluate(self._true_labels, self._predicted_labels)
 
+
+class MeanReciprocalRank(Metric):
+    def __init__(self, true_labels, predicted_labels, is_print_confidence_interval=False):
+        super(MeanReciprocalRank, self).__init__()
+        # Metric.__init__(self)
+        self._name = self.__class__.__name__
+        self._true_labels = true_labels
+        self._predicted_labels = predicted_labels
+        self._eval_function = self.mean_reciprocal_rank
+        self._is_print_confidence_interval = is_print_confidence_interval
+        self._n_samples = len(self._true_labels)
+
+    @staticmethod
+    def mean_reciprocal_rank(true_labels, predicted_labels):
+        total_reciprocal_rank = 0
+        for i in range(len(true_labels)):
+            i_true = true_labels[i]
+            i_preds = predicted_labels[i]
+            if i_true in i_preds:
+                true_rank = list(i_preds).index(i_true) + 1  # 1-indexed
+                total_reciprocal_rank += 1/true_rank
+        return total_reciprocal_rank/len(true_labels)
+
+    def evaluate(self):
+
+        return self._evaluate(self._true_labels, self._predicted_labels)

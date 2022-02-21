@@ -86,6 +86,6 @@ class KGLinkTailPredictionProcessor(Processor):
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.kg_link_tail_prediction.value
         if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["Hits"]
+            metadata["metric_names"] = ["Hits", "MeanReciprocalRank"]
         super().__init__(metadata, system_output_data)
         self._builder = KGLTPExplainaboardBuilder(self._system_output_info, system_output_data)
