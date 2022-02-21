@@ -62,9 +62,17 @@ python -m spacy download en_core_web_sm  # if you plan to use the TextClassifica
 git clone https://github.com/neulab/ExplainaBoard.git
 cd ExplainaBoard
 
-# Install the package
-pip install .
+# Install the required dependencies and dev dependencies
+pip install .[dev]
+pre-commit install
 ```
+- This project uses flake8 (linter) and black (formatter). They are enforced in the pre-commit hook and in the CI pipeline.
+    - run `python -m black .` to format code
+    - run `flake8` to lint code
+    - You can also configure your IDE to automatically format and lint the files as you are writing code.
+    - There are various ways to skip formatting or linting if you find it necessary. The following are some examples (please refer to official documentation for more options)
+        - `# noqa` signals flake8 to ignore the current line. (`flake8: noqa` ignores the current file.)
+        - lines between `# fmt: on` and `# fmt: off` are skipped by black. 
 
 Then, you can run following examples via bash
 
