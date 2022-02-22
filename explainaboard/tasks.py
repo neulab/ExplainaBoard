@@ -43,8 +43,9 @@ _task_categories: List[TaskCategory] = [
         "data-to-text and text transduction tasks such as translation or summarization",
         [
             Task(
-                name="machine-translation",
+                name=TaskType.machine_translation,
                 description="The process of using AI to automatically translate text from one language to another.",
+                supported=True,
                 supported_metrics=[
                     "bleu",
                     "bart_score_summ",
