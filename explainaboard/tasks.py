@@ -12,8 +12,8 @@ class TaskType(str, Enum):
     text_pair_classification = "text-pair-classification"
     hellaswag = "hellaswag"
     aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
-
     kg_link_tail_prediction = "kg-link-tail-prediction"
+    qa_multiple_choices = "qa-multiple-choices"
 
     @staticmethod
     def list():
@@ -171,6 +171,20 @@ _task_categories: List[TaskCategory] = [
                 supported_formats=["json"],
                 supported_datasets=[],
             ),
+        ],
+    ),
+    TaskCategory(
+        "qa-multiple-choices",
+        "Answer a question from multiple options",
+        [
+            Task(
+                name=TaskType.qa_multiple_choices,
+                description="Answer a question from multiple options",
+                supported=True,
+                supported_metrics=["F1score", "Accuracy"],
+                supported_formats=["json"],
+                supported_datasets=[],
+            )
         ],
     ),
 ]
