@@ -11,5 +11,5 @@ from . import hellaswag
 from . import aspect_based_sentiment_classification
 
 from . import kg_link_tail_prediction
-
+from . import qa_multiple_choices
 from .processor_registry import get_processor
