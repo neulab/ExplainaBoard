@@ -104,7 +104,7 @@ def main():
     # Run analysis
     reports = [get_processor(task, metadata=metadata, data=x).process() for x in system_datasets]
     if len(system_outputs) == 1:  # individual system analysis
-        reports[0].to_memory()
+        reports[0].print_as_json()
     else:                         # pairwise analysis
         compare_analysis = get_performance_gap(reports[0].to_dict(), reports[1].to_dict())
         print(json.dumps(compare_analysis, indent=4))
