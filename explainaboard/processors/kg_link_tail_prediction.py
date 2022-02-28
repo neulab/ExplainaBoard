@@ -75,6 +75,16 @@ class KGLinkTailPredictionProcessor(Processor):
                 _setting=1
             )
         ),
+        "entity_type_level": feature.Value(
+            dtype="string",
+            description="most specific (highest) entity type level of true tail entity",
+            is_bucket=True,
+            bucket_info=feature.BucketInfo(
+                _method="bucket_attribute_discrete_value",
+                _number=8,
+                _setting=1
+            )
+        ),
 
 
     })
