@@ -52,11 +52,36 @@ class KGLTPExplainaboardBuilder:
             new_train = dataset['train'].apply(aggregate.get_statistics)
             self.statistics = new_train._stat
 
+        # entity types
+        if self._info.dataset_name != "fb15k_237": # to be generalized
+            self.entity_type_level_map = None
+        else:
+            f = open('entity_type_level_map.json')
+            self.entity_type_level_map = json.load(f)
+            print(self.entity_type_level_map.keys())
+
 
 
     @staticmethod
     def get_bucket_feature_value(feature_name:str):
         return "self._get_" + feature_name
+
+    # define function for incomplete features
+    def _get_entity_type_level(self, existing_features: dict):
+
+        # list of entity types at each level: [type_level_0, type_level_1, ... type_level_6]
+        # e.g. ["Thing", "Agent", "Person", None, None, None, None]
+        tail_entity_type_levels = self.entity_type_level_map.get(existing_features['true_tail'], None)
+        if tail_entity_type_levels is None:
+            return "-1"  # entity types not found
+
+        # find the index of the first occurrence of None in the list
+        if None in tail_entity_type_levels:  
+            most_specific_level = tail_entity_type_levels.index(None) - 1
+        else:  # tail has entity types at every level
+            most_specific_level = len(tail_entity_type_levels) - 1
+        return str(most_specific_level)
+        
 
     # define function for incomplete features
     def _get_tail_entity_length(self, existing_features: dict):
