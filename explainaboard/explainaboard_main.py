@@ -4,27 +4,6 @@ from explainaboard import get_loader, get_processor
 from explainaboard import TaskType
 
 
-def run_explainaboard(task: TaskType, path_system_output: str, metadata: dict = {}):
-    '''
-    task:TaskType:  the task name supported by ExplainaBoard
-    path_system_output:str:  the file path of system output
-    metadata:dict: other metadata information for analysis report, such as dataset names.
-    '''
-
-    if task not in TaskType.list():
-        raise ValueError(
-            f'{task} can not been recognized. ExplainaBoard currently supports: {TaskType.list()}'
-        )
-
-    loader = get_loader(task, data=path_system_output)
-    data = loader.load()
-    processor = get_processor(task, metadata=metadata, data=data)
-    analysis = processor.process()
-
-    return analysis
-    # analysis = processor.process().to_memory()
-
-
 def get_performance_gap(sys1, sys2):
 
     for metric_name, performance_unit in sys1["results"]["overall"].items():
@@ -95,28 +74,39 @@ def main():
     dataset = args.dataset
     task = args.task
     system_outputs = args.system_outputs
+    num_outputs = len(system_outputs)
     metric_names = args.metrics
 
-    metadata = {"dataset_name": dataset, "task_name": task}
+    # Checks on inputs
+    if num_outputs > 2:
+        raise ValueError(
+            f'ExplainaBoard currently only supports 1 or 2 system outputs, but received {num_outputs}'
+        )
+    if task not in TaskType.list():
+        raise ValueError(
+            f'Task name {task} was not recognized. ExplainaBoard currently supports: {TaskType.list()}'
+        )
 
+    # Read in data and check validity
+    system_datasets = [get_loader(task, data=x).load() for x in system_outputs]
+    if len(system_datasets) == 2 and len(system_datasets[0]) != len(system_datasets[1]):
+        num0 = len(system_datasets[0])
+        num1 = len(system_datasets[1])
+        raise ValueError(
+            f'Data must be identical for pairwise analysis, but length of files {system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
+        )
+
+    # Setup metadata
+    metadata = {"dataset_name": dataset, "task_name": task}
     if metric_names is not None:
         metadata["metric_names"] = metric_names
 
+    # Run analysis
+    reports = [get_processor(task, metadata=metadata, data=x).process() for x in system_datasets]
     if len(system_outputs) == 1:  # individual system analysis
-        run_explainaboard(task, system_outputs[0], metadata=metadata).to_memory()
-    else:
-        # raise NotImplementedError
-        report_sys1 = run_explainaboard(
-            task, system_outputs[0], metadata=metadata
-        ).to_dict()
-        report_sys2 = run_explainaboard(
-            task, system_outputs[1], metadata=metadata
-        ).to_dict()
-
-        # To be implemented: we should validate the format consistency of these two system reports
-
-        compare_analysis = get_performance_gap(report_sys1, report_sys2)
-
+        reports[0].print_as_json()
+    else:                         # pairwise analysis
+        compare_analysis = get_performance_gap(reports[0].to_dict(), reports[1].to_dict())
         print(json.dumps(compare_analysis, indent=4))
 
 
