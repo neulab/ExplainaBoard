@@ -51,6 +51,10 @@ class NERExplainaboardBuilder:
             # exit()
             if os.path.isdir(self._path_pre_computed_models):
                 self.dict_pre_computed_models = self.get_pre_computed_features()
+            else:
+                raise FileNotFoundError(
+                    f'Dataset {self._info.dataset_name} does not have pre-computed features ({self._path_pre_computed_models} not found)'
+                )
 
     def get_pre_computed_features(self):
         dict_pre_computed_models = {}
@@ -63,7 +67,7 @@ class NERExplainaboardBuilder:
                 )
                 dict_pre_computed_models[feature_name] = pickle.load(fread)
             else:
-                raise ValueError(
+                raise FileNotFoundError(
                     "can not load hard dictionary"
                     + feature_name
                     + "\t"
@@ -130,42 +134,24 @@ class NERExplainaboardBuilder:
 
     def _complete_feature_advanced_span_features(self, sentence, tags):
         span_dics = self._complete_feature_raw_span_features(sentence, tags)
+        if not self.dict_pre_computed_models:
+            return span_dics
 
-        eCon_dic = (
-            self.dict_pre_computed_models['eCon']
-            if self.dict_pre_computed_models
-            else None
-        )
-        eFre_dic = (
-            self.dict_pre_computed_models['eFre']
-            if self.dict_pre_computed_models
-            else None
-        )
+        eCon_dic = self.dict_pre_computed_models['eCon']
+        eFre_dic = self.dict_pre_computed_models['eFre']
 
-        span_dics_list = []
         for span_dic in span_dics:
             span_text = span_dic['span_text']
             span_tag = span_dic['span_tag']
-            span_pos = span_dic['span_pos']  # noqa
 
-            if self.dict_pre_computed_models:
-                # compute the entity-level label consistency...
-                eCon_value = self._get_eCon_value(eCon_dic, span_text, span_tag)
-                if 'eCon' not in span_dic:
-                    span_dic['eCon'] = eCon_value
-            else:
-                span_dic['eCon'] = 0
-            if self.dict_pre_computed_models:
-                # compute the entity-level frequency...
-                eFre_value = self._get_eFre_value(eFre_dic, span_text, span_tag)
-                if 'eFre' not in span_dic:
-                    span_dic['eFre'] = eFre_value
-            else:
-                span_dic['eFre'] = 0
+            # compute the entity-level label consistency
+            if 'eCon' not in span_dic:
+                span_dic['eCon'] = self._get_eCon_value(eCon_dic, span_text, span_tag)
+            # compute the entity-level frequency
+            if 'eFre' not in span_dic:
+                span_dic['eFre'] = self._get_eFre_value(eFre_dic, span_text, span_tag)
 
-            # print('span_dic list: ', span_dic)
-            span_dics_list.append(span_dic)
-        return span_dics_list
+        return span_dics
 
     def _complete_feature(self):
         """
@@ -234,84 +220,50 @@ class NERExplainaboardBuilder:
             else:
                 self._info.results.overall[metric_name] = overall_performance
 
+    def _bucketing_samples_add_feats(self, id, bucket_features, pcf_set, feature_table, entity_info_list, feature_to_sample_address_to_value):
+
+        for span_info in entity_info_list:
+            span_text = span_info["span_text"]
+            span_pos = span_info["span_pos"]
+            span_label = span_info["span_tag"]
+
+            span_address = f'{id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
+
+            for feature_name in bucket_features:
+                if (
+                        feature_name
+                        not in feature_to_sample_address_to_value.keys()
+                ):
+                    feature_to_sample_address_to_value[feature_name] = {}
+                elif feature_name in feature_table:
+                    feature_to_sample_address_to_value[feature_name][
+                        span_address
+                    ] = feature_table[feature_name]
+                elif feature_name in span_info:
+                    feature_to_sample_address_to_value[feature_name][
+                        span_address
+                    ] = span_info[feature_name]
+                elif feature_name not in pcf_set:
+                    import pprint
+                    pp = pprint.PrettyPrinter(indent=2)
+                    pp.pprint(self._info.features.keys())
+                    raise ValueError(f'Missing feature {self.feature_name} not found and not pre-computed')
+
     def _bucketing_samples(self, sysout_iterator):
 
         sample_address = ""  # noqa
         feature_to_sample_address_to_value_true = {}
         feature_to_sample_address_to_value_pred = {}
 
+        bucket_features = self._info.features.get_bucket_features()
+        pcf_set = set(self._info.features.get_pre_computed_features())
+
+
         # Preparation for bucketing
         for _id, feature_table in sysout_iterator:
 
-            # true tag
-            true_entity_info_list = feature_table["true_entity_info"]
-            for span_info in true_entity_info_list:
-                span_text = span_info["span_text"]
-                span_pos = span_info["span_pos"]
-                span_label = span_info["span_tag"]
-
-                span_address = (
-                    str(_id)
-                    + "|||"
-                    + str(span_pos[0])
-                    + "|||"
-                    + str(span_pos[1])
-                    + "|||"
-                    + span_text
-                    + "|||"
-                    + span_label
-                )
-
-                for feature_name in self._info.features.get_bucket_features():
-                    if (
-                        feature_name
-                        not in feature_to_sample_address_to_value_true.keys()
-                    ):
-                        feature_to_sample_address_to_value_true[feature_name] = {}
-                    else:
-                        if feature_name not in feature_table.keys():
-                            feature_to_sample_address_to_value_true[feature_name][
-                                span_address
-                            ] = span_info[feature_name]
-                        else:
-                            feature_to_sample_address_to_value_true[feature_name][
-                                span_address
-                            ] = feature_table[feature_name]
-
-            # pred tag
-            pred_entity_info_list = feature_table["pred_entity_info"]
-            for span_info in pred_entity_info_list:
-                span_text = span_info["span_text"]
-                span_pos = span_info["span_pos"]
-                span_label = span_info["span_tag"]
-
-                span_address = (
-                    str(_id)
-                    + "|||"
-                    + str(span_pos[0])
-                    + "|||"
-                    + str(span_pos[1])
-                    + "|||"
-                    + span_text
-                    + "|||"
-                    + span_label
-                )
-
-                for feature_name in self._info.features.get_bucket_features():
-                    if (
-                        feature_name
-                        not in feature_to_sample_address_to_value_pred.keys()
-                    ):
-                        feature_to_sample_address_to_value_pred[feature_name] = {}
-                    else:
-                        if feature_name not in feature_table.keys():
-                            feature_to_sample_address_to_value_pred[feature_name][
-                                span_address
-                            ] = span_info[feature_name]
-                        else:
-                            feature_to_sample_address_to_value_pred[feature_name][
-                                span_address
-                            ] = feature_table[feature_name]
+            self._bucketing_samples_add_feats(_id, bucket_features, pcf_set, feature_table, feature_table["true_entity_info"], feature_to_sample_address_to_value_true)
+            self._bucketing_samples_add_feats(_id, bucket_features, pcf_set, feature_table, feature_table["pred_entity_info"], feature_to_sample_address_to_value_pred)
 
         # Bucketing
         for feature_name in tqdm(
@@ -333,6 +285,12 @@ class NERExplainaboardBuilder:
             #       f"Bucket Hyper:\n function_name: {_bucket_info._method} \n"
             #       f"bucket_number: {_bucket_info._number}\n"
             #       f"bucket_setting: {_bucket_info._setting}\n")
+
+            # The following indicates that there are no examples, probably because necessary data for bucketing
+            # was not available.
+            if (len(feature_to_sample_address_to_value_true[feature_name]) == 0 or
+                len(feature_to_sample_address_to_value_pred[feature_name]) == 0):
+                continue
 
             self._samples_over_bucket_true[feature_name] = eval(_bucket_info._method)(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
