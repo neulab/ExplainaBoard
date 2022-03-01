@@ -105,7 +105,7 @@ class SysOutputInfo:
     def to_dict(self) -> dict:
         return asdict(self)
 
-    def to_memory(self):
+    def print_as_json(self):
         print(json.dumps(self.to_dict(), indent=4))
 
     def _dump_info(self, file):
