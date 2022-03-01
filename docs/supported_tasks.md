@@ -16,9 +16,27 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Hellaswag](#hellaswag)
 * [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
+* [QA-Multiple-Choices](#qa-multiple-choices)
 
 
+## [QA-Multiple-Choices](task_qa_multiple_choices.md)
 
+Answer a question from multiple options.
+
+**CLI Example**
+```shell
+explainaboard --task qa-multiple-choices --system_outputs ./data/system_outputs/metaphor_qa/synthetic.json > report.json
+```
+
+**Class**
+* `TaskType.qa_multiple_choices`
+
+**Supported Formats**
+* `FileType.tsv`
+  
+**Supported Metrics**
+* `F1score`
+* `Accuracy`
 
 
 
