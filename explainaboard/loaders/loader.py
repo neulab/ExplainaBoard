@@ -66,7 +66,10 @@ _loader_registry: Dict = {}
 def get_loader(task: TaskType, source: Source = None,
                file_type: FileType = None, data :str = None, metadata: dict = None) -> Loader:
 
-    return _loader_registry[task](source, file_type, data, metadata)
+    if metadata is not None:
+        return _loader_registry[task](source, file_type, data, metadata)
+    else:
+        return _loader_registry[task](source, file_type, data)
 
 
 def register_loader(task_type: TaskType):
