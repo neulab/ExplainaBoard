@@ -31,11 +31,13 @@ class KGLTPExplainaboardBuilder:
 
     def __init__(self, info: SysOutputInfo,
                  system_output_object: Iterable[dict],
+                 user_defined_features_configs = None,
                  feature_table: Optional[Table] = {},
                  gen_kwargs:dict = None
                  ):
         self._info = info
         self._system_output: Iterable[dict] = system_output_object
+        self._user_defined_features_configs = user_defined_features_configs
         self.gen_kwargs = gen_kwargs
         self._data: Table = feature_table
         # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
@@ -134,7 +136,16 @@ class KGLTPExplainaboardBuilder:
         for _id, dict_sysout in tqdm(enumerate(self._system_output), desc="featurizing"):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+                if self._user_defined_features_configs is not None:
+                    # if current feature is a user-defined feature, the value is already there
+                    if bucket_feature in self._user_defined_features_configs.keys():
+                        feature_value = dict_sysout[bucket_feature]
+                    # else, this is a normal feature which should be calculated by the _get_*() methods
+                    else:
+                        feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+                else:  # no user-defined features
+                    feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+
                 dict_sysout[bucket_feature] = feature_value
             # if self._data == None:
             #     self._data = {}

@@ -98,4 +98,8 @@ class KGLinkTailPredictionProcessor(Processor):
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Hits", "MeanReciprocalRank"]
         super().__init__(metadata, system_output_data)
-        self._builder = KGLTPExplainaboardBuilder(self._system_output_info, system_output_data)
+        self._builder = KGLTPExplainaboardBuilder(
+            self._system_output_info, 
+            system_output_data,
+            user_defined_features_configs = metadata.get("user_defined_features_configs", None)
+        )
