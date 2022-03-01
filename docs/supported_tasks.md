@@ -16,23 +16,23 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Hellaswag](#hellaswag)
 * [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
-* [QA-Multiple-Choices](#qa-multiple-choices)
+* [QA-Multiple-Choice](#qa-multiple-choice)
 
 
-## [QA-Multiple-Choices](task_qa_multiple_choices.md)
+## [QA-Multiple-Choice](task_qa_multiple_choice.md)
 
 Answer a question from multiple options.
 
 **CLI Example**
 ```shell
-explainaboard --task qa-multiple-choices --system_outputs ./data/system_outputs/metaphor_qa/synthetic.json > report.json
+explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/metaphor_qa/gpt2.json > report.json
 ```
 
 **Class**
 * `TaskType.qa_multiple_choices`
 
 **Supported Formats**
-* `FileType.tsv`
+* `FileType.json`
   
 **Supported Metrics**
 * `F1score`

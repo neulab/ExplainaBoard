@@ -6,8 +6,8 @@ from .loader import register_loader
 from .loader import Loader
 
 
-@register_loader(TaskType.qa_multiple_choices)
-class  QAMultipleChoicesLoader(Loader):
+@register_loader(TaskType.qa_multiple_choice)
+class  QAMultipleChoiceLoader(Loader):
     """
     Validate and Reformat system output file with json format:
     "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],

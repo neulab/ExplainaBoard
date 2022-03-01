@@ -3,12 +3,12 @@ from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.builders.qa_multiple_choices import QAMultipleChoicesExplainaboardBuilder
+from explainaboard.builders.qa_multiple_choice import QAMultipleChoiceExplainaboardBuilder
 
 
-@register_processor(TaskType.qa_multiple_choices)
-class QAMultipleChoicesProcessor(Processor):
-    _task_type = TaskType.qa_multiple_choices
+@register_processor(TaskType.qa_multiple_choice)
+class QAMultipleChoiceProcessor(Processor):
+    _task_type = TaskType.qa_multiple_choice
     _features = feature.Features(
         {
             "context": feature.Value("string"),
@@ -55,10 +55,10 @@ class QAMultipleChoicesProcessor(Processor):
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.qa_multiple_choices.value
+            metadata["task_name"] = TaskType.qa_multiple_choice.value
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Accuracy"]
         super().__init__(metadata, system_output_data)
-        self._builder = QAMultipleChoicesExplainaboardBuilder(
+        self._builder = QAMultipleChoiceExplainaboardBuilder(
             self._system_output_info, system_output_data
         )

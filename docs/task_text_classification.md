@@ -28,11 +28,11 @@ In order to perform your basic analysis, we can run the following command:
     explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv > report.json
 ```
 where
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/ExpressAI/ExplainaBoard/blob/feat_docs_task/docs/existing_supports.md)
+* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
 * `--system_outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
-* `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer
+* `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/neulab/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
 
