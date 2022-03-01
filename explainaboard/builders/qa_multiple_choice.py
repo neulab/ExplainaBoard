@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 
 
-class QAMultipleChoicesExplainaboardBuilder:
+class QAMultipleChoiceExplainaboardBuilder:
     """
     Input: System Output file List[dict];  Metadata info
     Output: Analysis
@@ -70,7 +70,7 @@ class QAMultipleChoicesExplainaboardBuilder:
             # Get values of bucketing features
             for bucket_feature in bucket_features:
                 feature_value = eval(
-                    QAMultipleChoicesExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
+                    QAMultipleChoiceExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
                 )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:

@@ -6,23 +6,23 @@ from explainaboard import FileType, Source, TaskType, get_loader, get_processor
 artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 
 
-class TestQAMultipleChoices(unittest.TestCase):
+class TestQAMultipleChoice(unittest.TestCase):
     def test_generate_system_analysis(self):
         """TODO: should add harder tests"""
 
         path_data = artifacts_path + "synthetic_metaphor_qa.json"
         loader = get_loader(
-            TaskType.qa_multiple_choices, Source.local_filesystem, FileType.json, path_data
+            TaskType.qa_multiple_choice, Source.local_filesystem, FileType.json, path_data
         )
         data = loader.load()
 
         metadata = {
-            "task_name": TaskType.qa_multiple_choices.value,
+            "task_name": TaskType.qa_multiple_choice.value,
             "dataset_name": "metaphor_qa",
             "metric_names": ["Accuracy"],
         }
 
-        processor = get_processor(TaskType.qa_multiple_choices.value, metadata, data)
+        processor = get_processor(TaskType.qa_multiple_choice.value, metadata, data)
         # self.assertEqual(len(processor._features), 4)
 
         analysis = processor.process()

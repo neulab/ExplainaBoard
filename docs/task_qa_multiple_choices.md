@@ -42,7 +42,7 @@ where
     
 
 Let's say we have several files such as 
-* [synthetic.json](xx) 
+* [gpt2.json](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/metaphor_qa/gpt2.json) 
 
 
 etc. from different systems.
@@ -53,10 +53,10 @@ etc. from different systems.
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task qa-multiple-choices --system_outputs ./data/system_outputs/metaphor_qa/synthetic.json > report.json
+    explainaboard --task qa-multiple-choices --system_outputs ./data/system_outputs/metaphor_qa/gpt2.json > report.json
 ```
 where
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/ExpressAI/ExplainaBoard/blob/feat_docs_task/docs/existing_supports.md)
+* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
 * `--system_outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
