@@ -7,6 +7,7 @@ from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.feature_funcs import *  # noqa
 import pickle
 from tqdm import tqdm
+from explainaboard.utils.py_utils import eprint
 
 """
 - [ ] Automatically delete features without pre-trained dict
@@ -49,30 +50,46 @@ class NERExplainaboardBuilder:
             # print(self._path_pre_computed_models)
             # print(os.path.isdir(self._path_pre_computed_models))
             # exit()
-            if os.path.isdir(self._path_pre_computed_models):
+
+            try:
                 self.dict_pre_computed_models = self.get_pre_computed_features()
-            else:
-                raise FileNotFoundError(
-                    f'Dataset {self._info.dataset_name} does not have pre-computed features ({self._path_pre_computed_models} not found)'
-                )
+            except FileNotFoundError as err:
+                eprint(f'Dataset {self._info.dataset_name} does not have pre-computed features ({self._path_pre_computed_models} not found)')
+
 
     def get_pre_computed_features(self):
         dict_pre_computed_models = {}
         for feature_name in self._info.features.get_pre_computed_features():
-            if os.path.exists(self._path_pre_computed_models):
-                # print('load the hard dictionary of entity span in test set...')
-                # print(self._path_pre_computed_models + "/" + feature_name + ".pkl")
+
+            try:
                 fread = open(
                     self._path_pre_computed_models + "/" + feature_name + ".pkl", 'rb'
                 )
                 dict_pre_computed_models[feature_name] = pickle.load(fread)
-            else:
-                raise FileNotFoundError(
+                fread.close()
+            except FileNotFoundError as err:
+                eprint(
                     "can not load hard dictionary"
                     + feature_name
                     + "\t"
                     + self._path_pre_computed_models
                 )
+
+
+            # if os.path.exists(self._path_pre_computed_models):
+            #     # print('load the hard dictionary of entity span in test set...')
+            #     # print(self._path_pre_computed_models + "/" + feature_name + ".pkl")
+            #     fread = open(
+            #         self._path_pre_computed_models + "/" + feature_name + ".pkl", 'rb'
+            #     )
+            #     dict_pre_computed_models[feature_name] = pickle.load(fread)
+            # else:
+            #     raise FileNotFoundError(
+            #         "can not load hard dictionary"
+            #         + feature_name
+            #         + "\t"
+            #         + self._path_pre_computed_models
+            #     )
 
         return dict_pre_computed_models
 
