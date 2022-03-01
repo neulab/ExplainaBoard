@@ -11,10 +11,12 @@ JSON = t.Union[str, int, float, bool, None, t.Mapping[str, 'JSON'], t.List['JSON
 class Loader:
     """base class of loader"""
 
-    def __init__(self, source: Source, file_type: Enum, data: str):
+    def __init__(self, source: Source, file_type: Enum, data: str, metadata: dict = None):
         self._source = source
         self._file_type = file_type
         self._data = data
+        self._metadata = metadata
+
 
     def _load_raw_data_points(self) -> Iterable:
         """
@@ -62,9 +64,9 @@ _loader_registry: Dict = {}
 
 
 def get_loader(task: TaskType, source: Source = None,
-               file_type: FileType = None, data :str = None) -> Loader:
+               file_type: FileType = None, data :str = None, metadata: dict = None) -> Loader:
 
-    return _loader_registry[task](source, file_type, data)
+    return _loader_registry[task](source, file_type, data, metadata)
 
 
 def register_loader(task_type: TaskType):
