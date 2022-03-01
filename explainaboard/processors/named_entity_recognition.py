@@ -109,7 +109,7 @@ class NERProcessor(Processor):
                         ),
                         "span_density": feature.Value(
                             dtype="float",
-                            description="Entity density. GIven a sentence (or a sample), entity density tallies the ratio between the number of all entity tokens and tokens in this sentence",
+                            description="Entity density. Given a sentence (or a sample), entity density tallies the ratio between the number of all entity tokens and tokens in this sentence",
                             is_bucket=True,
                             bucket_info=feature.BucketInfo(
                                 _method="bucket_attribute_specified_bucket_value",

@@ -78,7 +78,7 @@ def main():
         '--dataset',
         type=str,
         required=False,
-        default="dataset_name",
+        default=None,
         help="the name of dataset",
     )
 

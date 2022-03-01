@@ -98,8 +98,10 @@ def reverse_dict_discrete(dict_a2b):
 
 
 def bucket_attribute_specified_bucket_value(
-    dict_obj="", bucket_number=4, bucket_setting=""
+    dict_obj=None, bucket_number=4, bucket_setting=None
 ):
+    if not dict_obj or len(dict_obj) == 0:
+        return None
     # Bucketing different Attributes
     dict_span2att_val = dict_obj
     n_buckets = bucket_number
@@ -114,12 +116,12 @@ def bucket_attribute_specified_bucket_value(
     dict_att_val2span = sort_dict(dict_att_val2span)  # noqa
     dict_bucket2span = {}
 
-    for backet_value in hardcoded_bucket_values:
-        if backet_value in dict_att_val2span.keys():
+    for bucket_value in hardcoded_bucket_values:
+        if bucket_value in dict_att_val2span.keys():
             # print("------------work!!!!---------")
-            # print(backet_value)
-            dict_bucket2span[(backet_value,)] = dict_att_val2span[backet_value]
-            n_spans -= len(dict_att_val2span[backet_value])
+            # print(bucket_value)
+            dict_bucket2span[(bucket_value,)] = dict_att_val2span[bucket_value]
+            n_spans -= len(dict_att_val2span[bucket_value])
             n_buckets -= 1
 
     avg_entity = n_spans * 1.0 / n_buckets
@@ -229,8 +231,6 @@ def bucket_attribute_specified_bucket_interval(
     n_spans = len(dict_span2att_val)  # noqa
 
     # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
-
-    # print(intervals)
 
     if type(list(intervals)[0][0]) == type(  # noqa
         "string"
