@@ -14,7 +14,7 @@ def run_explainaboard(task:TaskType, path_system_output:str, metadata:dict={}):
     if task not in TaskType.list():
         raise ValueError(f'{task} can not been recognized. ExplainaBoard currently supports: {TaskType.list()}')
 
-    loader = get_loader(task, data = path_system_output)
+    loader = get_loader(task, data = path_system_output, metadata = metadata)
     data = loader.load()
     processor = get_processor(task, metadata = metadata, data = data)
     analysis = processor.process()
@@ -51,6 +51,9 @@ def main():
     parser.add_argument('--system_outputs', type=str, required=True, nargs="+",
                         help="the directories of system outputs. Multiple one should be separated by space, for example: system1 system2")
 
+    parser.add_argument('--user_defined_features_configs', type=str, required=False, nargs="+",
+                        help="the directories of the config file if using user-defined features. Multiple one should be separated by space, for example: config1 config2. Must be the same length as --system_outputs")
+
     parser.add_argument('--type', type=str, required=False, default="single",
                         help="analysis type: single|pair|combine")
 
@@ -67,6 +70,7 @@ def main():
     dataset = args.dataset
     task = args.task
     system_outputs = args.system_outputs
+    user_defined_features_configs = args.user_defined_features_configs
     metric_names = args.metrics
 
     metadata = {
@@ -80,6 +84,13 @@ def main():
 
 
     if len(system_outputs) == 1: # individual system analysis
+
+        # if user has requested to analyze user-defined features, update metadata
+        if user_defined_features_configs is not None:
+            f = open(user_defined_features_configs[0])
+            features_configs = json.load(f)
+            metadata['user_defined_features_configs'] = features_configs
+            
         run_explainaboard(task, system_outputs[0], metadata=metadata).to_memory()
     else:
         #raise NotImplementedError
