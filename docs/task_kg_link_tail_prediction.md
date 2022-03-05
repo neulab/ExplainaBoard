@@ -72,7 +72,7 @@ To provide your own bucketing features, submit a system output containing a decl
             "num_buckets": 6
         },
     },
-    
+
 
     "predictions":
     {
@@ -93,5 +93,15 @@ To provide your own bucketing features, submit a system output containing a decl
         ...
     }
 }
+```
+
+An example system output is provided, and you can test it using the following command:
+
+```shell
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-user-defined-features-prediction-short.json --dataset fb15k_237 > report.json
+
+or
+
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-user-defined-features-prediction-short.json > report.json
 ```
 
