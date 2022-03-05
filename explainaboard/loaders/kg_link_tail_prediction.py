@@ -16,7 +16,7 @@ class KgLinkTailPredictionLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: Enum, data :str = None, metadata: dict = None):
+    def __init__(self, source: Source, file_type: Enum, data :str = None):
 
         if source == None:
             source = Source.local_filesystem
@@ -27,7 +27,14 @@ class KgLinkTailPredictionLoader(Loader):
         self._source = source
         self._file_type = file_type
         self._data = data
-        self._metadata = metadata
+        self.user_defined_features_configs = None
+
+
+    def load_user_defined_features_configs(self):
+
+        raw_data = self._load_raw_data_points() # for json files: loads the entire json
+        self.user_defined_features_configs = raw_data.get("user_defined_features_configs", None)
+        return self.user_defined_features_configs
 
 
     def load(self) -> Iterable[Dict]:
@@ -40,9 +47,8 @@ class KgLinkTailPredictionLoader(Loader):
         raw_data = self._load_raw_data_points() # for json files: loads the entire json
         data: List[Dict] = []
         if self._file_type == FileType.json:
-            user_defined_features_configs = self._metadata.get("user_defined_features_configs", None)
-            if user_defined_features_configs is not None:  # user defined features are present
-                for id, (link, features_dict) in enumerate(raw_data.items()):
+            if self.user_defined_features_configs is not None:  # user defined features are present
+                for id, (link, features_dict) in enumerate(raw_data['predictions'].items()):
 
                     data_i = {
                         "id": str(id), # should be string type
@@ -55,7 +61,8 @@ class KgLinkTailPredictionLoader(Loader):
 
                     # additional user-defined features
                     data_i.update({
-                        feature_name: features_dict[feature_name] for feature_name in user_defined_features_configs.keys()
+                        feature_name: features_dict[feature_name] 
+                        for feature_name in self.user_defined_features_configs.keys()
                     })
 
                     # save
