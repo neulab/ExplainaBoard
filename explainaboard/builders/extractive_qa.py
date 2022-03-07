@@ -14,16 +14,9 @@ client = Client()
 client.load_config(config)
 
 
-""" TODO:
-- [done] debug f1score metric for squad
-- [ ] do we need a parent builder node?
-- [ ] confidence interval
-- [ ] metric class
-- [ ] store sample_id instead of real examples
-"""
 
 
-class QASquadExplainaboardBuilder:
+class QAExtractiveExplainaboardBuilder:
     def __init__(
         self,
         info: SysOutputInfo,
@@ -53,7 +46,10 @@ class QASquadExplainaboardBuilder:
         return len(existing_features["question"].split(" "))
 
     def _get_answer_length(self, existing_features: dict):
-        return len(existing_features["true_answers"]["text"][0].split(" "))
+        if isinstance(existing_features["answers"]["text"], list):
+            return len(existing_features["answers"]["text"][0].split(" "))
+        else:
+            return len(existing_features["answers"]["text"].split(" "))
 
     def _get_sim_context_question(self, existing_features: dict):
 
@@ -78,7 +74,7 @@ class QASquadExplainaboardBuilder:
             # Get values of bucketing features
             for bucket_feature in bucket_features:
                 feature_value = eval(
-                    QASquadExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
+                    QAExtractiveExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
                 )(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
@@ -91,8 +87,8 @@ class QASquadExplainaboardBuilder:
 
         for _id, feature_table in self._data.items():
 
-            predicted_answers.append(feature_table["predicted_answer"])
-            true_answers.append(feature_table["true_answers"]["text"])
+            predicted_answers.append(feature_table["predicted_answers"]["text"])
+            true_answers.append(feature_table["answers"]["text"])
 
         for metric_name in self._info.metric_names:
             overall_value = eval(metric_name)(true_answers, predicted_answers)
@@ -173,9 +169,9 @@ class QASquadExplainaboardBuilder:
 
             for sample_id in sample_ids:
 
-                true_label = self._data[int(sample_id)]["true_answers"]["text"]
+                true_label = self._data[int(sample_id)]["answers"]["text"]
 
-                predicted_label = self._data[int(sample_id)]["predicted_answer"]
+                predicted_label = self._data[int(sample_id)]["predicted_answers"]["text"]
                 sent = self._data[int(sample_id)]["question"]  # noqa
 
                 # get a bucket of true/predicted labels
