@@ -61,6 +61,22 @@ class TextClassificationLoader(Loader):
                         "predicted_label": predicted_label.strip(),
                     }
                 )
+        elif self._file_type == FileType.datalab:
+            for id, info in enumerate(raw_data):
+                text, true_label, predicted_label = (
+                    info["text"],
+                    info["label"],
+                    info["prediction"],
+                )
+
+                data.append(
+                    {
+                        "id": str(id),
+                        "text": text.strip(),
+                        "true_label": true_label,
+                        "predicted_label": predicted_label,
+                    }
+                )
         else:
             raise NotImplementedError
         return data

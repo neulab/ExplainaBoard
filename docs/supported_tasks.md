@@ -29,7 +29,7 @@ explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/m
 ```
 
 **Class**
-* `TaskType.qa_multiple_choices`
+* `TaskType.qa_multiple_choice`
 
 **Supported Formats**
 * `FileType.json`
@@ -139,7 +139,7 @@ explainaboard --task named-entity-recognition --system_outputs ./data/system_out
 
 or 
 
-explainaboard --task named-entity-recognition --dataset conll2003 --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+explainaboard --task named-entity-recognition --dataset conll2003 --sub_dataset ner  --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
 
 ```
 

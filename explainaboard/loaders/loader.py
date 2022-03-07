@@ -31,6 +31,8 @@ class Loader:
                 return self._data.splitlines()
             elif self._file_type == FileType.json:
                 return json.loads(self._data)
+            elif self._file_type == FileType.datalab:
+                return self._data
             else:
                 raise NotImplementedError
 
