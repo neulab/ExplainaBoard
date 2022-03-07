@@ -274,6 +274,7 @@ class ClassLabel:
     names_file: Optional[str] = None
     id: Optional[str] = None
     is_bucket: bool = False
+    require_training_set: bool = False
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     # Class Variables
@@ -400,6 +401,7 @@ class Sequence:
     length: int = -1
     id: Optional[str] = None
     is_bucket: bool = False
+    require_training_set: bool = False
     # Automatically constructed
     dtype: ClassVar[str] = "list"
     pa_type: ClassVar[Any] = None
@@ -412,6 +414,7 @@ class Set:
 
     dtype: ClassVar[str] = "dict"
     is_bucket: bool = False
+    require_training_set: bool = False
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     _type: str = field(default="Set", init=False, repr=False)
@@ -424,6 +427,7 @@ class Position:
     positions: list = None
     dtype: ClassVar[str] = Any
     is_bucket: bool = False
+    require_training_set: bool = False
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     _type: str = field(default="Position", init=False, repr=False)
@@ -435,6 +439,7 @@ class Position:
 class Span:
     dtype: ClassVar[str] = Any
     is_bucket: bool = False
+    require_training_set: bool = False
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     _type: str = field(default="Span", init=False, repr=False)
@@ -470,6 +475,7 @@ class Value:
     dtype: str  # must be initialized when created
     description: str = None
     is_bucket: bool = False  # don't need to be initialized
+    require_training_set: bool = False
     is_pre_computed: bool = False
     bucket_info: BucketInfo = None
     id: Optional[str] = None
@@ -673,9 +679,9 @@ class Features(dict):
         # print("--++----- leaf features ---++------")
         for feature_name, feature_info in dict_res.items():
             # print(k,v)
-            if "is_pre_computed" not in feature_info.__dict__.keys():
+            if "require_training_set" not in feature_info.__dict__.keys():
                 continue
-            if feature_info.is_pre_computed:
+            if feature_info.require_training_set:
                 pre_computed_features.append(feature_name)
 
         # print("--++----- pre_computed features ---++------")

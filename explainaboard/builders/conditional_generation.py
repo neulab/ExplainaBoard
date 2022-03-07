@@ -6,11 +6,52 @@ import copy
 import numpy
 from tqdm import tqdm
 
+from typing import Iterator, Dict, List
+from datalabs import load_dataset
+from datalabs.operations.aggregate.summarization import summarization_aggregating
+
+
 from eaas import Config, Client
 
 config = Config()
 client = Client()
 client.load_config(config)  # The config you have created above
+
+
+@summarization_aggregating(name="get_statistics", contributor="datalab",
+                                 task="summarization",
+                                 description="Calculate the overall statistics (e.g., density) of a given summarization dataset")
+def get_statistics(samples: Iterator):
+    """
+    Input:
+    samples: [{
+     "text":
+     "summary":
+    }]
+    Output:dict:
+    """
+
+    vocab = {}
+    length_fre = {}
+    for sample in tqdm(samples):
+
+        text, summary = sample["text"], sample["summary"]
+
+        # Vocabulary info
+        for w in (text + summary).split(" "):
+            if w in vocab.keys():
+                vocab[w] += 1
+            else:
+                vocab[w] = 1
+
+    # the rank of each word based on its frequency
+    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)}
+    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+
+
+    return {"vocab":vocab,
+            "vocab_rank":vocab_rank,
+            }
 
 
 class CondGenExplainaboardBuilder:
@@ -31,6 +72,55 @@ class CondGenExplainaboardBuilder:
         # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
         self._performances_over_bucket = {}
         self.score_dic = None
+
+        # Calculate statistics of training set
+        self.statistics = None
+        if None != self._info.dataset_name:
+            try:
+                dataset = load_dataset(self._info.dataset_name, self._info.sub_dataset_name)
+                if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                    new_train = dataset['train'].apply(get_statistics, mode = "local")
+                    self.statistics = new_train._stat
+                else:
+                    self.statistics = dataset["train"]._stat
+            except FileNotFoundError as err:
+                eprint(
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
+
+
+
+
+    @staticmethod
+    def get_bucket_feature_value(feature_name: str):
+        return "self._get_" + feature_name
+
+    # training set dependent features
+    def _get_num_oov(self, existing_features: dict):
+
+        # exit()
+        num_oov = 0
+
+        for w in existing_features["source"].split(" "):  # should this be normalized for the consistency with DataLab?
+            if w not in self.statistics['vocab'].keys():
+                num_oov += 1
+        # print(num_oov)
+        return num_oov
+
+
+    # training set dependent features (this could be merged into the above one for further optimization)
+    def _get_fre_rank(self, existing_features: dict):
+        fre_rank = 0
+
+        for w in existing_features["source"].split(" "):
+            if w not in self.statistics['vocab_rank'].keys():
+                fre_rank += len(self.statistics['vocab_rank'])
+            else:
+                fre_rank += self.statistics['vocab_rank'][w]
+
+        fre_rank = fre_rank * 1.0 / len(existing_features["source"].split(" "))
+        return fre_rank
+
 
     def _complete_feature(self):
         """
@@ -60,10 +150,28 @@ class CondGenExplainaboardBuilder:
 
         for _id, dict_sysout in self._data.items():
             for bucket_feature in bucket_features:
-                feature_value = self.score_dic["sample_level"][_id][bucket_feature]
-                dict_sysout[
-                    bucket_feature
-                ] = feature_value  # !!!!!!!!!!!!!!!!!!!! string to float !!!!!
+
+                # this is need due to `del self._info.features[bucket_feature]`
+                if bucket_feature not in self._info.features.keys():
+                    continue
+                # If there is a training set dependent feature while no pre-computed statistics for it,
+                # then skip bucketing along this feature
+                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                    del self._info.features[bucket_feature]
+                    continue
+
+                if bucket_feature in self.score_dic["sample_level"][_id].keys(): # features calculated from EaaS
+                    feature_value = self.score_dic["sample_level"][_id][bucket_feature]
+                    dict_sysout[
+                        bucket_feature
+                    ] = feature_value  # !!!!!!!!!!!!!!!!!!!! string to float !!!!!
+                else:
+                    feature_value = eval(
+                        CondGenExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
+                    )(dict_sysout)
+
+                    dict_sysout[bucket_feature] = feature_value
+
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
 
