@@ -3,12 +3,12 @@
         "id": "0",
         "context": "The Panthers defense gave up just 308 points, ranking sixth in the league, while also leading the NFL in interceptions with 24 and boasting four Pro Bowl selections. Pro Bowl defensive tackle Kawann Short led the team in sacks with 11, while also forcing three fumbles and recovering two. Fellow lineman Mario Addison added 6½ sacks. The Panthers line also featured veteran defensive end Jared Allen, a 5-time pro bowler who was the NFL's active career sack leader with 136, along with defensive end Kony Ealy, who had 5 sacks in just 9 starts. Behind them, two of the Panthers three starting linebackers were also selected to pl",
         "question": "How many points did the Panthers defense surrender?",
-        "answers": [
+        "answers":
           {
             "answer_start": 470,
             "text": "136"
           }
-        ],
+        ,
         "predicted_answers": {
             "text": "The girl was not down-to-earth at all."
         }
@@ -17,12 +17,12 @@
         "id": "1",
         "context": "The Panthers defense gave up just 308 points, ranking sixth in the league, while also leading the NFL in interceptions with 24 and boasting four Pro Bowl selections. Pro Bowl defensive tackle Kawann Short led the team in sacks with 11, while also forcing three fumbles and recovering two. Fellow lineman Mario Addison added 6½ sacks. The Panthers line also featured veteran defensive end Jared Allen, a 5-time pro bowler who was the NFL's active career sack leader with 136, along with defensive end Kony Ealy, who had 5 sacks in just 9 starts. Behind them, two of the Panthers three starting linebackers were also selected to pl",
         "question": "How many career sacks did Jared Allen have?",
-        "answers": [
+        "answers":
           {
             "answer_start": 789,
             "text": "118"
           }
-        ],
+        ,
         "predicted_answers": {
             "text": "118"
         }
@@ -31,12 +31,12 @@
         "id": "3",
         "context": "The Panthers defense gave up just 308 points, ranking sixth in the league, while also leading the NFL in interceptions with 24 and boasting four Pro Bowl selections. Pro Bowl defensive tackle Kawann Short led the team in sacks with 11, while also forcing three fumbles and recovering two. Fellow lineman Mario Addison added 6½ sacks. The Panthers line also featured veteran defensive end Jared Allen, a 5-time pro bowler who was the NFL's active career sack leader with 136, along with defensive end Kony Ealy, who had 5 sacks in just 9 starts. Behind them, two of the Panthers three starting linebackers were also selected to pl",
         "question": "How many tackles did Luke Kuechly register?",
-        "answers": [
+        "answers":
           {
             "answer_start": 140,
             "text": "four"
           }
-        ],
+        ,
         "predicted_answers": {
             "text": "four"
         }
@@ -45,12 +45,12 @@
         "id": "4",
         "context": "The Panthers defense gave up just 308 points, ranking sixth in the league, while also leading the NFL in interceptions with 24 and boasting four Pro Bowl selections. Pro Bowl defensive tackle Kawann Short led the team in sacks with 11, while also forcing three fumbles and recovering two. Fellow lineman Mario Addison added 6½ sacks. The Panthers line also featured veteran defensive end Jared Allen, a 5-time pro bowler who was the NFL's active career sack leader with 136, along with defensive end Kony Ealy, who had 5 sacks in just 9 starts. Behind them, two of the Panthers three starting linebackers were also selected to pl",
         "question": "How many balls did Josh Norman intercept?",
-        "answers": [
+        "answers":
           {
             "answer_start": 192,
             "text": "Kawann Short"
           }
-        ],
+        ,
         "predicted_answers": {
             "text": "Kawann Short"
         }
@@ -59,12 +59,12 @@
         "id": "5",
         "context": "The Panthers defense gave up just 308 points, ranking sixth in the league, while also leading the NFL in interceptions with 24 and boasting four Pro Bowl selections. Pro Bowl defensive tackle Kawann Short led the team in sacks with 11, while also forcing three fumbles and recovering two. Fellow lineman Mario Addison added 6½ sacks. The Panthers line also featured veteran defensive end Jared Allen, a 5-time pro bowler who was the NFL's active career sack leader with 136, along with defensive end Kony Ealy, who had 5 sacks in just 9 starts. Behind them, two of the Panthers three starting linebackers were also selected to pl",
         "question": "Who registered the most sacks on the team this season?",
-        "answers": [
+        "answers":
           {
             "answer_start": 124,
             "text": "24"
           }
-        ],
+        ,
         "predicted_answers": {
             "text": "24"
         }
