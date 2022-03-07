@@ -85,7 +85,9 @@ class SysOutputInfo:
     task_name: str
     model_name: Optional[str] = None
     dataset_name: Optional[str] = None
+    sub_dataset_name: Optional[str] = None
     metric_names: Optional[List[str]] = None
+    reload_stat: bool = True
     # language : str = "English"
 
     # set later

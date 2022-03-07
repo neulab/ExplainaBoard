@@ -62,6 +62,23 @@ def main():
     )
 
     parser.add_argument(
+        '--sub_dataset',
+        type=str,
+        required=False,
+        default=None,
+        help="the name of sub-dataset",
+    )
+
+    parser.add_argument(
+        '--reload_stat',
+        type=str,
+        required=False,
+        default=None,
+        help="reload precomputed statistics over training set (if exists)",
+    )
+
+
+    parser.add_argument(
         '--metrics',
         type=str,
         required=False,
@@ -72,7 +89,9 @@ def main():
     args = parser.parse_args()
 
     dataset = args.dataset
+    sub_dataset = args.sub_dataset
     task = args.task
+    reload_stat = False if args.reload_stat == "0" else True
     system_outputs = args.system_outputs
     num_outputs = len(system_outputs)
     metric_names = args.metrics
@@ -97,7 +116,12 @@ def main():
         )
 
     # Setup metadata
-    metadata = {"dataset_name": dataset, "task_name": task}
+    metadata = {
+        "dataset_name": dataset,
+        "sub_dataset_name": sub_dataset,
+        "task_name": task,
+        "reload_stat":reload_stat,
+                }
     if metric_names is not None:
         metadata["metric_names"] = metric_names
 
