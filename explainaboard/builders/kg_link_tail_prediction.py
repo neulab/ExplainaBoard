@@ -7,6 +7,52 @@ from explainaboard.metric import *  # noqa
 from tqdm import tqdm
 from datalabs import load_dataset
 from datalabs.operations import aggregate
+from datalabs.operations.aggregate.kg_link_prediction import kg_link_prediction_aggregating
+from typing import Iterator, Dict, List
+
+
+@kg_link_prediction_aggregating(name = "get_statistics", contributor= "datalab",
+                                 task="kg-link-prediction", description="aggregation function",
+                                 )
+def get_statistics(samples:List[Dict]):
+    """
+    `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
+    # pip install datalabs
+    dataset = load_dataset("fb15k_237", 'readable')
+    print(dataset['train'])
+    """
+    dict_head = {}
+    dict_link = {}
+    dict_tail = {}
+
+    for sample in tqdm(samples):
+
+        if sample['tail'] not in dict_tail.keys():
+            dict_tail[sample['tail']] = 1
+        else:
+            dict_tail[sample['tail']] += 1
+
+
+        if sample['head'] not in dict_head.keys():
+            dict_head[sample['head']] = 1
+        else:
+            dict_head[sample['head']] += 1
+
+        if sample['link'] not in dict_link.keys():
+            dict_link[sample['link']] = 1
+        else:
+            dict_link[sample['link']] += 1
+
+
+
+    return {
+        "head_fre":dict_head,
+        "link_fre":dict_link,
+        "tail_fre":dict_tail,
+    }
+
+
+
 
 
 class KGLTPExplainaboardBuilder:
@@ -32,12 +78,39 @@ class KGLTPExplainaboardBuilder:
         # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
         self._performances_over_bucket = {}
 
-        if self._info.dataset_name != "fb15k_237":  # to be generalized
-            self.statistics = None
-        else:
-            dataset = load_dataset(self._info.dataset_name, 'readable')
-            new_train = dataset['train'].apply(aggregate.get_statistics)
-            self.statistics = new_train._stat
+        # Calculate statistics of training set
+        self.statistics = None
+        if None != self._info.dataset_name:
+            try:
+                dataset = load_dataset(self._info.dataset_name, "readable")
+                if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                    new_train = dataset['train'].apply(get_statistics, mode = "local")
+                    self.statistics = new_train._stat
+                else:
+                    self.statistics = dataset["train"]._stat
+            except FileNotFoundError as err:
+                eprint(
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
+
+
+
+
+
+
+        # if self._info.dataset_name != "fb15k_237":  # to be generalized
+        #     self.statistics = None
+        # else:
+        #     dataset = load_dataset(self._info.dataset_name, 'readable')
+        #     #new_train = dataset['train'].apply(aggregate.get_statistics)
+        #     new_train = dataset['train'].apply(get_statistics)
+        #     self.statistics = new_train._stat
+
+
+
+
+
+
 
     @staticmethod
     def get_bucket_feature_value(feature_name: str):
@@ -95,6 +168,16 @@ class KGLTPExplainaboardBuilder:
         ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
+
+                # this is need due to `del self._info.features[bucket_feature]`
+                if bucket_feature not in self._info.features.keys():
+                    continue
+                # If there is a training set dependent feature while no pre-computed statistics for it,
+                # then skip bucketing along this feature
+                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                    del self._info.features[bucket_feature]
+                    continue
+
                 feature_value = eval(
                     KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
                 )(dict_sysout)
