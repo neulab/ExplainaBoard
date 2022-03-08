@@ -46,6 +46,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     _number=4,
                     _setting=(),
                 ),
+                require_training_set=True,
             ),
             "link_fre": feature.Value(
                 dtype="float",
@@ -56,6 +57,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     _number=4,
                     _setting=(),
                 ),
+                require_training_set=True,
             ),
             "head_fre": feature.Value(
                 dtype="float",
@@ -66,6 +68,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     _number=4,
                     _setting=(),
                 ),
+                require_training_set=True,
             ),
         }
     )
