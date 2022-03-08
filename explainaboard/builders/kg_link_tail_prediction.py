@@ -54,6 +54,20 @@ def get_statistics(samples:List[Dict]):
 
 
 
+# TODO: is this the best place to put this?
+SYMMETRIC_RELATIONS = [
+    '/base/popstra/celebrity/breakup./base/popstra/breakup/participant',
+    '/base/popstra/celebrity/canoodled./base/popstra/canoodled/participant',
+    '/base/popstra/celebrity/dated./base/popstra/dated/participant',
+    '/base/popstra/celebrity/friendship./base/popstra/friendship/participant',
+    '/celebrities/celebrity/celebrity_friends./celebrities/friendship/friend',
+    '/celebrities/celebrity/sexual_relationships./celebrities/romantic_relationship/celebrity',
+    '/influence/influence_node/peers./influence/peer_relationship/peers',
+    '/location/location/adjoin_s./location/adjoining_relationship/adjoins',
+    '/people/person/spouse_s./people/marriage/spouse',
+    '/people/person/sibling_s./people/sibling relationship/sibling'
+]
+
 
 class KGLTPExplainaboardBuilder:
     """
@@ -61,15 +75,18 @@ class KGLTPExplainaboardBuilder:
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = {},
-        gen_kwargs: dict = None,
-    ):
+
+    def __init__(self, 
+                 info: SysOutputInfo,
+                 system_output_object: Iterable[dict],
+                 user_defined_features_configs = None,
+                 feature_table: Optional[Table] = {},
+                 gen_kwargs:dict = None
+                 ):
+
         self._info = info
         self._system_output: Iterable[dict] = system_output_object
+        self._user_defined_features_configs = user_defined_features_configs
         self.gen_kwargs = gen_kwargs
         self._data: Table = feature_table
         # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
@@ -110,11 +127,36 @@ class KGLTPExplainaboardBuilder:
 
 
 
+        # entity types
+        if self._info.dataset_name != "fb15k_237": # to be generalized
+            self.entity_type_level_map = None
+        else:
+            f = open('entity_type_level_map.json')
+            self.entity_type_level_map = json.load(f)
+            print(self.entity_type_level_map.keys())
+
 
 
     @staticmethod
     def get_bucket_feature_value(feature_name: str):
         return "self._get_" + feature_name
+
+    # define function for incomplete features
+    def _get_entity_type_level(self, existing_features: dict):
+
+        # list of entity types at each level: [type_level_0, type_level_1, ... type_level_6]
+        # e.g. ["Thing", "Agent", "Person", None, None, None, None]
+        tail_entity_type_levels = self.entity_type_level_map.get(existing_features['true_tail'], None)
+        if tail_entity_type_levels is None:
+            return "-1"  # entity types not found
+
+        # find the index of the first occurrence of None in the list
+        if None in tail_entity_type_levels:  
+            most_specific_level = tail_entity_type_levels.index(None) - 1
+        else:  # tail has entity types at every level
+            most_specific_level = len(tail_entity_type_levels) - 1
+        return str(most_specific_level)
+        
 
     # define function for incomplete features
     def _get_tail_entity_length(self, existing_features: dict):
@@ -154,6 +196,15 @@ class KGLTPExplainaboardBuilder:
         else:
             return self.statistics['link_fre'][existing_features["link"]]
 
+
+    # define function for incomplete features
+    def _get_symmetry(self, existing_features: dict):
+        if existing_features['relation'] in SYMMETRIC_RELATIONS:
+            return 'symmetric'
+        else:
+            return 'asymmetric'
+
+
     def _complete_feature(self):
         """
         This function is used to calculate features used for bucekting, such as sentence_length
@@ -168,19 +219,36 @@ class KGLTPExplainaboardBuilder:
         ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
+                if self._user_defined_features_configs is not None:
+                    # if current feature is a user-defined feature, the value is already there
+                    if bucket_feature in self._user_defined_features_configs.keys():
+                        feature_value = dict_sysout[bucket_feature]
+                    # else, this is a normal feature which should be calculated by the _get_*() methods
+                    else:
+                  
+                        
+                        # this is need due to `del self._info.features[bucket_feature]`
+                        if bucket_feature not in self._info.features.keys():
+                            continue
+                        # If there is a training set dependent feature while no pre-computed statistics for it,
+                        # then skip bucketing along this feature
+                        if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                            del self._info.features[bucket_feature]
+                            continue
+                        feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)    
+                else:  # no user-defined features
 
-                # this is need due to `del self._info.features[bucket_feature]`
-                if bucket_feature not in self._info.features.keys():
-                    continue
-                # If there is a training set dependent feature while no pre-computed statistics for it,
-                # then skip bucketing along this feature
-                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
-                    del self._info.features[bucket_feature]
-                    continue
+                    # this is need due to `del self._info.features[bucket_feature]`
+                    if bucket_feature not in self._info.features.keys():
+                        continue
+                    # If there is a training set dependent feature while no pre-computed statistics for it,
+                    # then skip bucketing along this feature
+                    if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                        del self._info.features[bucket_feature]
+                        continue
+                    feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
 
-                feature_value = eval(
-                    KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
-                )(dict_sysout)
+
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}
