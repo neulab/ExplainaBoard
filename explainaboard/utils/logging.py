@@ -1,5 +1,4 @@
 import logging
-import os
 from typing import Optional
 
 log_levels = {
@@ -15,6 +14,7 @@ _default_log_level = logging.WARNING
 
 def _get_library_name() -> str:
     return __name__.split(".")[0]
+
 
 def get_logger(name: Optional[str] = None) -> logging.Logger:
     """Return a logger with the specified name.

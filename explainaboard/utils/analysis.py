@@ -1,5 +1,6 @@
-from .py_utils import *
+from .py_utils import *  # noqa
 import json
+
 
 def cap_feature(s):
     """
@@ -23,9 +24,10 @@ def save_json(obj_json, path):
     with open(path, "w") as f:
         json.dump(obj_json, f, indent=4, ensure_ascii=False)
 
+
 def beautify_interval(interval):
 
-    if type(interval[0]) == type("string"):  ### pay attention to it
+    if type(interval[0]) == type("string"):  # pay attention to it # noqa
         return interval[0]
     else:
         if len(interval) == 1:
@@ -37,11 +39,13 @@ def beautify_interval(interval):
             bk_name = range1_r + range1_l
             return bk_name
 
+
 def tuple2str(triplet):
     res = ""
     for v in triplet:
         res += str(v) + "|||"
     return res.rstrip("|||")
+
 
 def interval_transformer(inter_list):
     dict_old2new = {}
@@ -69,8 +73,6 @@ def find_key(dict_obj, x):
             return k
 
 
-
-
 def reverse_dict(dict_a2b):
     dict_b2a = {}
     for k, v in dict_a2b.items():
@@ -81,6 +83,7 @@ def reverse_dict(dict_a2b):
             dict_b2a[float(v)].append(k)
 
     return dict_b2a
+
 
 def reverse_dict_discrete(dict_a2b):
     dict_b2a = {}
@@ -94,8 +97,12 @@ def reverse_dict_discrete(dict_a2b):
     return dict_b2a
 
 
-def bucket_attribute_specified_bucket_value(dict_obj = "", bucket_number = 4, bucket_setting = ""):
-    ################       Bucketing different Attributes
+def bucket_attribute_specified_bucket_value(
+    dict_obj=None, bucket_number=4, bucket_setting=None
+):
+    if not dict_obj or len(dict_obj) == 0:
+        return None
+    # Bucketing different Attributes
     dict_span2att_val = dict_obj
     n_buckets = bucket_number
     hardcoded_bucket_values = bucket_setting
@@ -106,15 +113,15 @@ def bucket_attribute_specified_bucket_value(dict_obj = "", bucket_number = 4, bu
     n_infinity = -1000000
     n_spans = len(dict_span2att_val)
     dict_att_val2span = reverse_dict(dict_span2att_val)
-    dict_att_val2span = sort_dict(dict_att_val2span)
+    dict_att_val2span = sort_dict(dict_att_val2span)  # noqa
     dict_bucket2span = {}
 
-    for backet_value in hardcoded_bucket_values:
-        if backet_value in dict_att_val2span.keys():
+    for bucket_value in hardcoded_bucket_values:
+        if bucket_value in dict_att_val2span.keys():
             # print("------------work!!!!---------")
-            # print(backet_value)
-            dict_bucket2span[(backet_value,)] = dict_att_val2span[backet_value]
-            n_spans -= len(dict_att_val2span[backet_value])
+            # print(bucket_value)
+            dict_bucket2span[(bucket_value,)] = dict_att_val2span[bucket_value]
+            n_spans -= len(dict_att_val2span[bucket_value])
             n_buckets -= 1
 
     avg_entity = n_spans * 1.0 / n_buckets
@@ -173,8 +180,10 @@ def bucket_attribute_specified_bucket_value(dict_obj = "", bucket_number = 4, bu
     return dict_bucket2span
 
 
-def bucket_attribute_discrete_value(dict_obj=None, bucket_number=100000000, bucket_setting=1):
-    ################          Bucketing different Attributes
+def bucket_attribute_discrete_value(
+    dict_obj=None, bucket_number=100000000, bucket_setting=1
+):
+    # Bucketing different Attributes
 
     # print("!!!!!debug---------")
     # 	hardcoded_bucket_values = [set([float(0), float(1)])]
@@ -187,14 +196,13 @@ def bucket_attribute_discrete_value(dict_obj=None, bucket_number=100000000, buck
     dict_bucket2span = {}
 
     dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
-    dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
-
+    dict_att_val2span = sort_dict(dict_att_val2span, flag="value")  # noqa
     # dict["q_id"] = 2
 
-    avg_entity = n_spans * 1.0 / n_buckets
-    n_tmp = 0
-    entity_list = []
-    val_list = []
+    avg_entity = n_spans * 1.0 / n_buckets  # noqa
+    n_tmp = 0  # noqa
+    entity_list = []  # noqa
+    val_list = []  # noqa
 
     n_total = 1
     for att_val, entity in dict_att_val2span.items():
@@ -208,9 +216,10 @@ def bucket_attribute_discrete_value(dict_obj=None, bucket_number=100000000, buck
     return dict_bucket2span
 
 
-def bucket_attribute_specified_bucket_interval(dict_obj = None, bucket_number = None, bucket_setting = None):
-    ################       Bucketing different Attributes
-
+def bucket_attribute_specified_bucket_interval(
+    dict_obj=None, bucket_number=None, bucket_setting=None
+):
+    # Bucketing different Attributes
 
     # hardcoded_bucket_values = [set([float(0), float(1)])]
 
@@ -218,17 +227,16 @@ def bucket_attribute_specified_bucket_interval(dict_obj = None, bucket_number = 
     dict_span2att_val = dict_obj
     intervals = bucket_setting
 
-
     dict_bucket2span = {}
-    n_spans = len(dict_span2att_val)
+    n_spans = len(dict_span2att_val)  # noqa
 
     # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
 
-    # print(intervals)
-
-    if type(list(intervals)[0][0]) == type("string"):  # discrete value, such as entity tags
+    if type(list(intervals)[0][0]) == type(  # noqa
+        "string"
+    ):  # discrete value, such as entity tags
         dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
-        dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
+        dict_att_val2span = sort_dict(dict_att_val2span, flag="value")  # noqa
         for att_val, entity in dict_att_val2span.items():
             att_val_tuple = (att_val,)
             if att_val_tuple in intervals:
@@ -245,7 +253,7 @@ def bucket_attribute_specified_bucket_interval(dict_obj = None, bucket_number = 
         # print("---debug----5")
         # print(intervals)
         dict_att_val2span = reverse_dict(dict_span2att_val)
-        dict_att_val2span = sort_dict(dict_att_val2span)
+        dict_att_val2span = sort_dict(dict_att_val2span)  # noqa
         for v in intervals:
             if len(v) == 1:
                 dict_bucket2span[v] = []
@@ -257,7 +265,7 @@ def bucket_attribute_specified_bucket_interval(dict_obj = None, bucket_number = 
         for att_val, entity in dict_att_val2span.items():
             res_key = find_key(dict_bucket2span, att_val)
             # print("res-key:\t"+ str(res_key))
-            if res_key == None:
+            if res_key is None:
                 continue
             dict_bucket2span[res_key] += entity
 
