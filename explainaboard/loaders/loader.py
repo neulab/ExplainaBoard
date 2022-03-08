@@ -18,6 +18,7 @@ class Loader:
         self._file_type = file_type
         self._data = data
 
+
     def _load_raw_data_points(self) -> Iterable:
         """
         loads data and return an iterable of data points. element type depends on file_type

@@ -108,6 +108,14 @@ def main():
 
     # Read in data and check validity
     system_datasets = [get_loader(task, data=x).load() for x in system_outputs]
+    
+    
+    # Get user_defined_features_configs (this should be generalized later
+    loader = get_loader(task, data = system_outputs[0])
+    user_defined_features_configs = loader.load_user_defined_features_configs()
+  
+    
+
     if len(system_datasets) == 2 and len(system_datasets[0]) != len(system_datasets[1]):
         num0 = len(system_datasets[0])
         num1 = len(system_datasets[1])
@@ -121,6 +129,7 @@ def main():
         "sub_dataset_name": sub_dataset,
         "task_name": task,
         "reload_stat":reload_stat,
+        "user_defined_features_configs":user_defined_features_configs,
                 }
     if metric_names is not None:
         metadata["metric_names"] = metric_names
