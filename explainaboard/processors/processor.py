@@ -6,6 +6,7 @@ from explainaboard.info import SysOutputInfo
 
 class Processor:
     """Base case for task-based processor"""
+
     _features: feature.Features
     _task_type: TaskType
 

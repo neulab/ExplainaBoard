@@ -1,9 +1,11 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+
 from .loader import register_loader
 from .loader import Loader
 from explainaboard.constants import FileType, Source
 from explainaboard.tasks import TaskType
+from enum import Enum
+
 
 @register_loader(TaskType.named_entity_recognition)
 class NERLoader(Loader):
@@ -15,11 +17,11 @@ class NERLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: Enum, data :str = None):
+    def __init__(self, source: Source, file_type: Enum, data: str = None):
 
-        if source == None:
+        if source is None:
             source = Source.local_filesystem
-        if file_type == None:
+        if file_type is None:
             file_type = FileType.conll
 
         self._source = source
@@ -39,32 +41,37 @@ class NERLoader(Loader):
         ner_true_tags = []
         ner_pred_tags = []
 
-
         for id, line in enumerate(raw_data):
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
                 if tokens:
-                    data.append({
-                        "id": str(guid),
-                        "tokens":tokens,
-                        "true_tags":ner_true_tags,
-                        "pred_tags":ner_pred_tags,
-                    })
+                    data.append(
+                        {
+                            "id": str(guid),
+                            "tokens": tokens,
+                            "true_tags": ner_true_tags,
+                            "pred_tags": ner_pred_tags,
+                        }
+                    )
                     guid += 1
                     tokens = []
                     ner_true_tags = []
                     ner_pred_tags = []
             else:
                 # splits = line.split("\t")
-                splits = line.split("\t") if len(line.split("\t")) == 3 else line.split(" ")
+                splits = (
+                    line.split("\t") if len(line.split("\t")) == 3 else line.split(" ")
+                )
                 tokens.append(splits[0].strip())
                 ner_true_tags.append(splits[1].strip())
                 ner_pred_tags.append(splits[2].strip())
 
         # last example
-        data.append({
-            "id": str(guid),
-            "tokens": tokens,
-            "true_tags": ner_true_tags,
-            "pred_tags": ner_pred_tags
-        })
+        data.append(
+            {
+                "id": str(guid),
+                "tokens": tokens,
+                "true_tags": ner_true_tags,
+                "pred_tags": ner_pred_tags,
+            }
+        )
         return data

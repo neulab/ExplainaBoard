@@ -1,9 +1,9 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import *
+from explainaboard.constants import Source, FileType
+from enum import Enum
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
-
 
 
 @register_loader(TaskType.kg_link_tail_prediction)
@@ -16,13 +16,12 @@ class KgLinkTailPredictionLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: Enum, data :str = None):
+    def __init__(self, source: Source, file_type: Enum, data: str = None):
 
-        if source == None:
+        if source is None:
             source = Source.local_filesystem
-        if file_type == None:
+        if file_type is None:
             file_type = FileType.json
-
 
         self._source = source
         self._file_type = file_type
@@ -36,7 +35,6 @@ class KgLinkTailPredictionLoader(Loader):
         self.user_defined_features_configs = raw_data.get("user_defined_features_configs", None)
         return self.user_defined_features_configs
 
-
     def load(self) -> Iterable[Dict]:
         """
         :param path_system_output: the path of system output file with following format:
@@ -44,7 +42,7 @@ class KgLinkTailPredictionLoader(Loader):
 
         :return: class object
         """
-        raw_data = self._load_raw_data_points() # for json files: loads the entire json
+        raw_data = self._load_raw_data_points()  # for json files: loads the entire json
         data: List[Dict] = []
         if self._file_type == FileType.json:
             if self.user_defined_features_configs is not None:  # user defined features are present

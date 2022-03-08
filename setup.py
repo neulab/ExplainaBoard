@@ -46,8 +46,10 @@ setup(
         "datasets",
         "lexicalrichness",
         "spacy",
-        "datalabs==0.2.7",
+        # "datalabs==0.2.9",
+        "datalabs",
     ],
+    extras_require={"dev": ["black", "flake8", "pre-commit"]},
     include_package_data=True,
 )
 os.system("python -m spacy download en_core_web_sm")
