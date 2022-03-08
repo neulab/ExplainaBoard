@@ -13,3 +13,4 @@ class FileType(str, Enum):
     tsv = "tsv"
     csv = "csv"
     conll = "conll"  # for tagging task such as named entity recognition
+    datalab = "datalab"

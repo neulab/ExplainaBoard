@@ -6,7 +6,7 @@ from enum import Enum
 class TaskType(str, Enum):
     text_classification = "text-classification"
     named_entity_recognition = "named-entity-recognition"
-    extractive_qa_squad = "extractive-qa-squad"
+    question_answering_extractive = "question-answering-extractive"
     summarization = "summarization"
     machine_translation = "machine-translation"
     text_pair_classification = "text-pair-classification"
@@ -123,12 +123,12 @@ _task_categories: List[TaskCategory] = [
         "question answering tasks",
         [
             Task(
-                name=TaskType.extractive_qa_squad,
-                description="A task of extracting an answer from a text given a question on the SQuAD dataset. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.md",
+                name=TaskType.question_answering_extractive,
+                description="A task of extracting an answer from a text given a question. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.md",
                 supported=True,
                 supported_metrics=["f1_score_qa", "exact_match_qa"],
                 supported_formats=["json"],
-                supported_datasets=["squad"],
+                supported_datasets=[],
             ),
         ],
     ),
