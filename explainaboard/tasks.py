@@ -168,7 +168,7 @@ _task_categories: List[TaskCategory] = [
                 name=TaskType.kg_link_tail_prediction,
                 description="predicting the tail entity of missing links in knowledge graphs. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_prediction.md",
                 supported=True,
-                supported_metrics=["Hits"],
+                supported_metrics=["Hits", "MeanReciprocalRank"],
                 supported_formats=["json"],
                 supported_datasets=[],
             ),
