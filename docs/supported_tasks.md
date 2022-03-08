@@ -12,13 +12,31 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Text Pair Classification](#text-pair-classification)
 * [Conditional Text Generation](#conditional-generation)
 * [Named Entity Recognition](#named-entity-recognition)
-* [Extractive QA_SQuAD](#extractive-qa-squad)
+* [Extractive QA](#extractive-qa-extractive)
 * [Hellaswag](#hellaswag)
 * [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
+* [QA-Multiple-Choice](#qa-multiple-choice)
 
 
+## [QA-Multiple-Choice](task_qa_multiple_choice.md)
 
+Answer a question from multiple options.
+
+**CLI Example**
+```shell
+explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/metaphor_qa/gpt2.json > report.json
+```
+
+**Class**
+* `TaskType.qa_multiple_choice`
+
+**Supported Formats**
+* `FileType.json`
+  
+**Supported Metrics**
+* `F1score`
+* `Accuracy`
 
 
 
@@ -121,7 +139,7 @@ explainaboard --task named-entity-recognition --system_outputs ./data/system_out
 
 or 
 
-explainaboard --task named-entity-recognition --dataset conll2003 --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+explainaboard --task named-entity-recognition --dataset conll2003 --sub_dataset ner  --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
 
 ```
 
@@ -135,17 +153,17 @@ explainaboard --task named-entity-recognition --dataset conll2003 --system_outpu
 * `f1_score_seqeval`
  
 
-## [Extractive QA_SQuAD](task_extractive_qa_squad.md)
+## [Extractive QA](task_extractive_qa.md)
 
 Extractive QA tasks, such as SQuAD.
 
 **CLI Example**
 ```shell
-explainaboard --task extractive-qa-squad --system_outputs ./data/system_outputs/squad/test-qa-squad.json
+explainaboard --task question_answering_extractive --system_outputs ./data/system_outputs/squad/test-qa-extractive.json > report.json
 ```
 
 **Class**
-* `TaskType.extractive_qa_squad`
+* `TaskType.extractive_qa`
 
 **Supported Format**
 * `FileType.json` (same format with squad)

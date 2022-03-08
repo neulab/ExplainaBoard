@@ -43,7 +43,8 @@ class KGLinkTailPredictionProcessor(Processor):
                 _method="bucket_attribute_specified_bucket_value",
                 _number=4,
                 _setting=()
-            )
+            ),
+            require_training_set=True,
         ),
         "link_fre": feature.Value(
             dtype="float",
@@ -53,7 +54,8 @@ class KGLinkTailPredictionProcessor(Processor):
                 _method="bucket_attribute_specified_bucket_value",
                 _number=4,
                 _setting=()
-            )
+            ),
+            require_training_set=True,
         ),
         "head_fre": feature.Value(
             dtype="float",
@@ -63,7 +65,8 @@ class KGLinkTailPredictionProcessor(Processor):
                 _method="bucket_attribute_specified_bucket_value",
                 _number=4,
                 _setting=()
-            )
+            ),
+            require_training_set=True,
         ),
         "symmetry": feature.Value(
             dtype="string",
@@ -91,7 +94,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
 
     def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata == None:
+        if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.kg_link_tail_prediction.value
@@ -103,3 +106,4 @@ class KGLinkTailPredictionProcessor(Processor):
             system_output_data,
             user_defined_features_configs = metadata.get("user_defined_features_configs", None)
         )
+

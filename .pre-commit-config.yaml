@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/python/black.git
+    rev: 22.1.0
+    hooks:
+      - id: black
+  - repo: https://gitlab.com/pycqa/flake8.git
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-black>=0.1.1
+        entry: flake8
