@@ -31,10 +31,10 @@ class QAExtractiveLoader(Loader):
         """
         raw_data = self._load_raw_data_points()
 
-        if self._file_type == FileType.json:
-            pred_json = raw_data
-        else:
-            raise NotImplementedError
+        # if self._file_type == FileType.json:
+        #     pred_json = raw_data
+        # else:
+        #     raise NotImplementedError
 
         # this will be replaced by introducing dataset
         # path_test_set = os.path.abspath(
@@ -52,6 +52,17 @@ class QAExtractiveLoader(Loader):
                         "question": data_info["question"],
                         "answers": data_info["answers"],
                         "predicted_answers": data_info["predicted_answers"],
+                    }
+                )
+        elif self._file_type == FileType.datalab:
+            for id, data_info in enumerate(raw_data):
+                data.append(
+                    {
+                        "id": str(id),  # should be string type
+                        "context":data_info["context"],
+                        "question": data_info["question"],
+                        "answers": data_info["answers"],
+                        "predicted_answers": {"text":data_info["prediction"]},
                     }
                 )
         else:
