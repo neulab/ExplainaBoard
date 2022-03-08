@@ -63,6 +63,28 @@ class TextPairClassificationProcessor(Processor):
                     _setting=(),
                 ),
             ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+                require_training_set=True,
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description="the average rank of each work based on its frequency in training set",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+                require_training_set=True,
+            ),
         }
     )
 

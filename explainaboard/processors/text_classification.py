@@ -6,6 +6,8 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.builders.text_classification import TCExplainaboardBuilder
 
 
+
+
 @register_processor(TaskType.text_classification)
 class TextClassificationProcessor(Processor):
     _task_type = TaskType.text_classification
@@ -72,6 +74,40 @@ class TextClassificationProcessor(Processor):
                     _setting=(),
                 ),
             ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+                require_training_set=True,
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description="the average rank of each work based on its frequency in training set",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+                require_training_set=True,
+            ),
+            "length_fre": feature.Value(
+                dtype="float",
+                description="the frequency of text length in training set",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+                require_training_set=True,
+            ),
+
         }
     )
 
