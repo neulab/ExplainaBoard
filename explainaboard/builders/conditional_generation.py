@@ -8,9 +8,10 @@ from tqdm import tqdm
 
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
-from datalabs.operations.featurize.plugins.summarization.sum_attribute import SUMAttribute
-from datalabs.operations.aggregate.summarization import summarization_aggregating
 
+from datalabs.operations.aggregate.summarization import summarization_aggregating
+from datalabs.operations.featurize.plugins.summarization.sum_attribute import SUMAttribute
+from datalabs.operations.featurize.summarization import get_oracle_summary
 
 from eaas import Config, Client
 
@@ -138,6 +139,32 @@ class CondGenExplainaboardBuilder:
         fre_rank = fre_rank * 1.0 / len(existing_features["source"].split(" "))
         return fre_rank
 
+    @staticmethod
+    def get_oracle(existing_features: dict):
+        """
+        oracle_info =
+            {
+            "source":src,
+            "reference":ref,
+            "oracle_summary":oracle,
+            "oracle_labels":labels,
+            "oracle_score":max_score
+            }
+        """
+
+        sample = {"text":existing_features["source"],"summary":existing_features["reference"]}
+        oracle_info = get_oracle_summary.func(sample)
+
+        index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
+        oracle_position = numpy.mean(index_of_oracles)
+
+
+        return {
+            "oracle_position": oracle_position,
+            "oracle_score": oracle_info["oracle_score"],
+        }
+
+
 
     def _complete_feature(self):
         """
@@ -185,6 +212,8 @@ class CondGenExplainaboardBuilder:
                     dict_sysout[
                         bucket_feature
                     ] = feature_value  # !!!!!!!!!!!!!!!!!!!! string to float !!!!!
+                elif bucket_feature in set(["oracle_position", "oracle_score"]):
+                    dict_sysout[bucket_feature] = CondGenExplainaboardBuilder.get_oracle(dict_sysout)[bucket_feature]
                 else:
                     feature_value = eval(
                         CondGenExplainaboardBuilder.get_bucket_feature_value(bucket_feature)

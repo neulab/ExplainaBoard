@@ -18,6 +18,9 @@ class Loader:
         self._file_type = file_type
         self._data = data
 
+    def load_user_defined_features_configs(self):
+        return False
+
 
     def _load_raw_data_points(self) -> Iterable:
         """
