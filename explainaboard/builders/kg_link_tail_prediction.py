@@ -129,7 +129,7 @@ class KGLTPExplainaboardBuilder:
 
         # entity types
         if self._info.dataset_name != "fb15k_237": # to be generalized
-            self.entity_type_level_map = None
+            self.entity_type_level_map = {}
         else:
             f = open('entity_type_level_map.json')
             self.entity_type_level_map = json.load(f)

@@ -38,7 +38,7 @@ class TextClassificationLoader(TestCase):
 class QASquadLoader(TestCase):
     def test_load_json(self):
         loader = get_loader(
-            TaskType.extractive_qa_squad,
+            TaskType.question_answering_extractive,
             Source.local_filesystem,
             FileType.json,
             f"{artifacts_path}test-qa-squad.json",
@@ -46,11 +46,8 @@ class QASquadLoader(TestCase):
         data = loader.load()
         # print(data[0].keys())
         # print(len(data))
-        self.assertEqual(len(data), 1190)
-        self.assertListEqual(
-            list(data[0].keys()),
-            ['title', 'context', 'question', 'id', 'true_answers', 'predicted_answer'],
-        )
+        self.assertEqual(len(data), 5)
+
 
 
 class SummSquadLoader(TestCase):

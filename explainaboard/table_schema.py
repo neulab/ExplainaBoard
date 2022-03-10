@@ -92,7 +92,7 @@ table_schemas[TaskType.summarization] = [
     },
 ]
 
-table_schemas[TaskType.extractive_qa_squad] = [
+table_schemas[TaskType.question_answering_extractive] = [
     {"field_key": "context", "sort": False, "filter": True, "label": "Context"},
     {"field_key": "question", "sort": False, "filter": True, "label": "Question"},
     {
