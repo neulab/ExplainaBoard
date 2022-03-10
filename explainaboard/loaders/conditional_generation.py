@@ -28,6 +28,15 @@ class ConditionalGenerationLoader(Loader):
         self._file_type = file_type
         self._data = data
 
+    # def load_user_defined_features_configs(self):
+    #     return False
+        # raw_data = self._load_raw_data_points() # for json files: loads the entire json
+        # self.user_defined_features_configs = raw_data.get("user_defined_features_configs", None)
+
+
+        #return self.user_defined_features_configs
+
+
     def load(self) -> Iterable[Dict]:
         """
         :param path_system_output: the path of system output file with following format:
