@@ -1,6 +1,7 @@
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.metric import *  # noqa
@@ -58,7 +59,7 @@ def get_statistics(samples: Iterator):
 
 
 
-class QAMultipleChoiceExplainaboardBuilder:
+class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
     """
     Input: System Output file List[dict];  Metadata info
     Output: Analysis
@@ -69,18 +70,12 @@ class QAMultipleChoiceExplainaboardBuilder:
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
+        user_defined_feature_configs = None,
         gen_kwargs: dict = None,
     ):
-        self._info = info
-        self._system_output: Iterable[dict] = system_output_object
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
+        super.__init__(info, system_output_object, feature_table, user_defined_feature_configs, **gen_kwargs)
 
+        # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:

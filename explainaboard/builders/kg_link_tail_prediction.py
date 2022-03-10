@@ -1,6 +1,7 @@
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.metric import *  # noqa
@@ -69,7 +70,7 @@ SYMMETRIC_RELATIONS = [
 ]
 
 
-class KGLTPExplainaboardBuilder:
+class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     """
     Input: System Output file List[dict];  Metadata info
     Output: Analysis
@@ -79,22 +80,13 @@ class KGLTPExplainaboardBuilder:
     def __init__(self, 
                  info: SysOutputInfo,
                  system_output_object: Iterable[dict],
-                 user_defined_features_configs = None,
                  feature_table: Optional[Table] = {},
+                 user_defined_features_configs = None,
                  gen_kwargs:dict = None
                  ):
+        super.__init__(info, system_output_object, feature_table, user_defined_features_configs, **gen_kwargs)
 
-        self._info = info
-        self._system_output: Iterable[dict] = system_output_object
-        self._user_defined_features_configs = user_defined_features_configs
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
-
+        # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
@@ -109,23 +101,6 @@ class KGLTPExplainaboardBuilder:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
-
-
-
-
-
-
-        # if self._info.dataset_name != "fb15k_237":  # to be generalized
-        #     self.statistics = None
-        # else:
-        #     dataset = load_dataset(self._info.dataset_name, 'readable')
-        #     #new_train = dataset['train'].apply(aggregate.get_statistics)
-        #     new_train = dataset['train'].apply(get_statistics)
-        #     self.statistics = new_train._stat
-
-
-
-
 
         # entity types
         if self._info.dataset_name != "fb15k_237": # to be generalized

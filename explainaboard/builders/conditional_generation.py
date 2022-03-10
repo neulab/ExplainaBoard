@@ -1,23 +1,20 @@
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Table
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.utils.eval_bucket import *  # noqa
-import copy
 import numpy
 from tqdm import tqdm
 
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
+# TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
 
 
-from eaas import Config, Client
-
-config = Config()
-client = Client()
-client.load_config(config)  # The config you have created above
-
-
+# TODO(gneubig) this should be a member function
+# TODO(gneubig) we should try to git rid of this task-specific decorator
+# TODO(gneubig) should be conditional generation, not summarization
 @summarization_aggregating(name="get_statistics", contributor="datalab",
                                  task="summarization",
                                  description="Calculate the overall statistics (e.g., density) of a given summarization dataset")
@@ -54,25 +51,18 @@ def get_statistics(samples: Iterator):
             }
 
 
-class CondGenExplainaboardBuilder:
+class CondGenExplainaboardBuilder(ExplainaboardBuilder):
     def __init__(
         self,
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
+        user_defined_feature_configs = None,
         gen_kwargs: dict = None,
     ):
-        self._info = copy.deepcopy(info)
-        self._system_output: Iterable[dict] = system_output_object
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
-        self.score_dic = None
+        super.__init__(info, system_output_object, feature_table, user_defined_feature_configs, **gen_kwargs)
 
+        # TODO(gneubig) to be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
