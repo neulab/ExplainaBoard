@@ -82,9 +82,8 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                  system_output_object: Iterable[dict],
                  feature_table: Optional[Table] = {},
                  user_defined_features_configs = None,
-                 gen_kwargs:dict = None
                  ):
-        super.__init__(info, system_output_object, feature_table, user_defined_features_configs, **gen_kwargs)
+        super().__init__(info, system_output_object, feature_table, user_defined_features_configs)
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
