@@ -19,7 +19,7 @@ class Loader:
         self._data = data
 
     def load_user_defined_features_configs(self):
-        return False
+        return {}
 
 
     def _load_raw_data_points(self) -> Iterable:
