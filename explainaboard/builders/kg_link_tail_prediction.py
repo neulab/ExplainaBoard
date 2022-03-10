@@ -110,12 +110,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
             print(self.entity_type_level_map.keys())
 
 
-
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
 
         # list of entity types at each level: [type_level_0, type_level_1, ... type_level_6]
@@ -131,16 +126,12 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
             most_specific_level = len(tail_entity_type_levels) - 1
         return str(most_specific_level)
         
-
-    # define function for incomplete features
     def _get_tail_entity_length(self, existing_features: dict):
         return len(existing_features["true_tail"].split(" "))
 
-    # define function for incomplete features
     def _get_head_entity_length(self, existing_features: dict):
         return len(existing_features["true_head"].split(" "))
 
-    # define function for incomplete features
     def _get_tail_fre(self, existing_features: dict):
         if (
             self.statistics is None
@@ -150,7 +141,6 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         else:
             return self.statistics['tail_fre'][existing_features["true_tail"]]
 
-    # define function for incomplete features
     def _get_head_fre(self, existing_features: dict):
         if (
             self.statistics is None
@@ -160,7 +150,6 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         else:
             return self.statistics['head_fre'][existing_features["true_head"]]
 
-    # define function for incomplete features
     def _get_link_fre(self, existing_features: dict):
         if (
             self.statistics is None
@@ -170,13 +159,12 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         else:
             return self.statistics['link_fre'][existing_features["link"]]
 
-
-    # define function for incomplete features
     def _get_symmetry(self, existing_features: dict):
         if existing_features['relation'] in SYMMETRIC_RELATIONS:
             return 'symmetric'
         else:
             return 'asymmetric'
+    # --- End feature functions
 
 
     def _complete_feature(self):
@@ -193,36 +181,16 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                if self._user_defined_feature_config is not None:
-                    # if current feature is a user-defined feature, the value is already there
-                    if bucket_feature in self._user_defined_feature_config.keys():
-                        feature_value = dict_sysout[bucket_feature]
-                    # else, this is a normal feature which should be calculated by the _get_*() methods
-                    else:
-                  
-                        
-                        # this is need due to `del self._info.features[bucket_feature]`
-                        if bucket_feature not in self._info.features.keys():
-                            continue
-                        # If there is a training set dependent feature while no pre-computed statistics for it,
-                        # then skip bucketing along this feature
-                        if self._info.features[bucket_feature].require_training_set and self.statistics == None:
-                            del self._info.features[bucket_feature]
-                            continue
-                        feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)    
-                else:  # no user-defined features
-
-                    # this is need due to `del self._info.features[bucket_feature]`
-                    if bucket_feature not in self._info.features.keys():
-                        continue
+                if self._user_defined_feature_config is not None and bucket_feature in self._user_defined_feature_config.keys():
+                    feature_value = dict_sysout[bucket_feature]
+                # this is needed due to `del self._info.features[bucket_feature]`
+                elif bucket_feature in self._info.features.keys():
                     # If there is a training set dependent feature while no pre-computed statistics for it,
                     # then skip bucketing along this feature
                     if self._info.features[bucket_feature].require_training_set and self.statistics == None:
                         del self._info.features[bucket_feature]
-                        continue
-                    feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
-
-
+                    else:
+                        feature_value = self.get_feature_func(bucket_feature)(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}

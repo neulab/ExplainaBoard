@@ -26,13 +26,7 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
         super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
 
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # get_similarity_by_sacrebleu
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity_ctx_true_answer(self, existing_features: dict):
         true_label = int(existing_features["true_label"])
         true_answer = existing_features["endings"][true_label]
@@ -61,6 +55,7 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
 
     def _get_ind(self, existing_feature: dict):
         return float(existing_feature["ind"])
+    # --- End feature functions
 
     def _complete_feature(self):
         """

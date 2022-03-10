@@ -28,6 +28,9 @@ class ExplainaboardBuilder:
         self._eaas_config = None
         self._eaas_client = None
 
+    def _get_feature_func(self, func_name):
+        return getattr(self, f'_get_{func_name}')
+
     def _get_eaas_client(self):
         if not self._eaas_client:
             self._eaas_config = Config()

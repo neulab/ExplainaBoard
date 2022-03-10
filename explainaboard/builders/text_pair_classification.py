@@ -91,20 +91,12 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
 
-
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # get_similarity_by_sacrebleu
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity(self, existing_features: dict):
         return get_similarity_by_sacrebleu(
             existing_features["text1"], existing_features["text2"]
         )
 
-    # define function for incomplete features
     def _get_text1_length(self, existing_features: dict):
         return len(existing_features["text1"].split(" "))
 
@@ -141,7 +133,7 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
 
         fre_rank = fre_rank * 1.0 / len((existing_features["text1"] + existing_features["text2"]).split(" "))
         return fre_rank
-
+    # --- End feature functions
 
 
 
@@ -169,11 +161,7 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
                     del self._info.features[bucket_feature]
                     continue
 
-                feature_value = eval(
-                    TextPairClassificationExplainaboardBuilder.get_bucket_feature_value(
-                        bucket_feature
-                    )
-                )(dict_sysout)
+                feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}

@@ -91,14 +91,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
-
-
-
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
         return len(existing_features["source"].split(" "))
 
@@ -107,7 +100,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     def _get_hypothesis_length(self, existing_features: dict):
         return len(existing_features["hypothesis"].split(" "))
-
+    # --- End feature functions
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict):
@@ -211,10 +204,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
                 elif bucket_feature in set(["oracle_position", "oracle_score"]):
                     dict_sysout[bucket_feature] = CondGenExplainaboardBuilder.get_oracle(dict_sysout)[bucket_feature]
                 else:
-                    feature_value = eval(
-                        CondGenExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
-                    )(dict_sysout)
-
+                    feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                     dict_sysout[bucket_feature] = feature_value
 
             self._data[_id] = dict_sysout
