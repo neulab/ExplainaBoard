@@ -2,6 +2,7 @@ import os
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.feature_funcs import *  # noqa
@@ -197,27 +198,19 @@ def get_statistics(samples: Iterator, tag_id2str = []):
 
 
 
-class NERExplainaboardBuilder:
+class NERExplainaboardBuilder(ExplainaboardBuilder):
     def __init__(
         self,
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
+        user_defined_feature_configs = None,
         gen_kwargs: dict = None,
     ):
-        self._info = info
-        self._system_output: Iterable[dict] = system_output_object
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket_true = {}
+        super.__init__(info, system_output_object, feature_table, user_defined_feature_configs, **gen_kwargs)
         self._samples_over_bucket_pred = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
 
-
-
+        # TODO(gneubig): this is a bit different than others, and probably should override the parent class
         # Calculate statistics of training set
         eprint(self._info.dataset_name, self._info.sub_dataset_name)
         self.statistics = None
@@ -494,7 +487,7 @@ class NERExplainaboardBuilder:
                 len(feature_to_sample_address_to_value_pred[feature_name]) == 0):
                 continue
 
-            self._samples_over_bucket_true[feature_name] = eval(_bucket_info._method)(
+            self._samples_over_bucket[feature_name] = eval(_bucket_info._method)(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
                 bucket_number=_bucket_info._number,
                 bucket_setting=_bucket_info._setting,
@@ -506,7 +499,7 @@ class NERExplainaboardBuilder:
             ] = bucket_attribute_specified_bucket_interval(  # noqa
                 dict_obj=feature_to_sample_address_to_value_pred[feature_name],
                 bucket_number=_bucket_info._number,
-                bucket_setting=self._samples_over_bucket_true[feature_name].keys(),
+                bucket_setting=self._samples_over_bucket[feature_name].keys(),
             )
 
             # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket_true.keys()}")
@@ -536,7 +529,7 @@ class NERExplainaboardBuilder:
 
         # true:  2_3 -> NER
         dict_pos2tag = {}
-        for k_bucket_eval, spans in self._samples_over_bucket_true[
+        for k_bucket_eval, spans in self._samples_over_bucket[
             feature_name
         ].items():
             if k_bucket_eval != bucket_interval:
@@ -608,7 +601,7 @@ class NERExplainaboardBuilder:
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, spans_true in self._samples_over_bucket_true[
+        for bucket_interval, spans_true in self._samples_over_bucket[
             feature_name
         ].items():
 
