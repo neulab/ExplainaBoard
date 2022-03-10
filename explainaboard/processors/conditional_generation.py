@@ -104,6 +104,26 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 require_training_set=True,
             ),
+            "oracle_score": feature.Value(
+                dtype="float",
+                description="the sample-level oracle score",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
+            "oracle_position": feature.Value(
+                dtype="float",
+                description="the sample-level oracle position",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
         }
     )
 
