@@ -104,6 +104,6 @@ class KGLinkTailPredictionProcessor(Processor):
         self._builder = KGLTPExplainaboardBuilder(
             self._system_output_info, 
             system_output_data,
-            user_defined_features_configs = metadata.get("user_defined_features_configs", None)
+            user_defined_feature_config = metadata.get("user_defined_features_configs", None)
         )
 

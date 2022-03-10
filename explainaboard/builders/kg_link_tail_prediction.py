@@ -1,6 +1,7 @@
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.metric import *  # noqa
@@ -69,7 +70,7 @@ SYMMETRIC_RELATIONS = [
 ]
 
 
-class KGLTPExplainaboardBuilder:
+class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     """
     Input: System Output file List[dict];  Metadata info
     Output: Analysis
@@ -79,22 +80,12 @@ class KGLTPExplainaboardBuilder:
     def __init__(self, 
                  info: SysOutputInfo,
                  system_output_object: Iterable[dict],
-                 user_defined_features_configs = None,
                  feature_table: Optional[Table] = {},
-                 gen_kwargs:dict = None
+                 user_defined_feature_config = None,
                  ):
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
-        self._info = info
-        self._system_output: Iterable[dict] = system_output_object
-        self._user_defined_features_configs = user_defined_features_configs
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
-
+        # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
@@ -110,23 +101,6 @@ class KGLTPExplainaboardBuilder:
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
-
-
-
-
-
-        # if self._info.dataset_name != "fb15k_237":  # to be generalized
-        #     self.statistics = None
-        # else:
-        #     dataset = load_dataset(self._info.dataset_name, 'readable')
-        #     #new_train = dataset['train'].apply(aggregate.get_statistics)
-        #     new_train = dataset['train'].apply(get_statistics)
-        #     self.statistics = new_train._stat
-
-
-
-
-
         # entity types
         if self._info.dataset_name != "fb15k_237": # to be generalized
             self.entity_type_level_map = {}
@@ -136,12 +110,7 @@ class KGLTPExplainaboardBuilder:
             print(self.entity_type_level_map.keys())
 
 
-
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
 
         # list of entity types at each level: [type_level_0, type_level_1, ... type_level_6]
@@ -157,16 +126,12 @@ class KGLTPExplainaboardBuilder:
             most_specific_level = len(tail_entity_type_levels) - 1
         return str(most_specific_level)
         
-
-    # define function for incomplete features
     def _get_tail_entity_length(self, existing_features: dict):
         return len(existing_features["true_tail"].split(" "))
 
-    # define function for incomplete features
     def _get_head_entity_length(self, existing_features: dict):
         return len(existing_features["true_head"].split(" "))
 
-    # define function for incomplete features
     def _get_tail_fre(self, existing_features: dict):
         if (
             self.statistics is None
@@ -176,7 +141,6 @@ class KGLTPExplainaboardBuilder:
         else:
             return self.statistics['tail_fre'][existing_features["true_tail"]]
 
-    # define function for incomplete features
     def _get_head_fre(self, existing_features: dict):
         if (
             self.statistics is None
@@ -186,7 +150,6 @@ class KGLTPExplainaboardBuilder:
         else:
             return self.statistics['head_fre'][existing_features["true_head"]]
 
-    # define function for incomplete features
     def _get_link_fre(self, existing_features: dict):
         if (
             self.statistics is None
@@ -196,13 +159,12 @@ class KGLTPExplainaboardBuilder:
         else:
             return self.statistics['link_fre'][existing_features["link"]]
 
-
-    # define function for incomplete features
     def _get_symmetry(self, existing_features: dict):
         if existing_features['relation'] in SYMMETRIC_RELATIONS:
             return 'symmetric'
         else:
             return 'asymmetric'
+    # --- End feature functions
 
 
     def _complete_feature(self):
@@ -219,36 +181,16 @@ class KGLTPExplainaboardBuilder:
         ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                if self._user_defined_features_configs is not None:
-                    # if current feature is a user-defined feature, the value is already there
-                    if bucket_feature in self._user_defined_features_configs.keys():
-                        feature_value = dict_sysout[bucket_feature]
-                    # else, this is a normal feature which should be calculated by the _get_*() methods
-                    else:
-                  
-                        
-                        # this is need due to `del self._info.features[bucket_feature]`
-                        if bucket_feature not in self._info.features.keys():
-                            continue
-                        # If there is a training set dependent feature while no pre-computed statistics for it,
-                        # then skip bucketing along this feature
-                        if self._info.features[bucket_feature].require_training_set and self.statistics == None:
-                            del self._info.features[bucket_feature]
-                            continue
-                        feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)    
-                else:  # no user-defined features
-
-                    # this is need due to `del self._info.features[bucket_feature]`
-                    if bucket_feature not in self._info.features.keys():
-                        continue
+                if self._user_defined_feature_config is not None and bucket_feature in self._user_defined_feature_config.keys():
+                    feature_value = dict_sysout[bucket_feature]
+                # this is needed due to `del self._info.features[bucket_feature]`
+                elif bucket_feature in self._info.features.keys():
                     # If there is a training set dependent feature while no pre-computed statistics for it,
                     # then skip bucketing along this feature
                     if self._info.features[bucket_feature].require_training_set and self.statistics == None:
                         del self._info.features[bucket_feature]
-                        continue
-                    feature_value = eval(KGLTPExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
-
-
+                    else:
+                        feature_value = self.get_feature_func(bucket_feature)(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}
