@@ -12,9 +12,29 @@ class ConditionalGenerationProcessor(Processor):
             "source": feature.Value("string"),
             "reference": feature.Value("string"),
             "hypothesis": feature.Value("string"),
-            "attr_source_len": feature.Value(
+            "source_length": feature.Value(
                 dtype="float",
-                description="length of source document",
+                description="the length of source document",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
+            "reference_length": feature.Value(
+                dtype="float",
+                description="the length of gold summary",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
+            "hypothesis_length": feature.Value(
+                dtype="float",
+                description="the length of gold summary",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
                     _method="bucket_attribute_specified_bucket_value",
