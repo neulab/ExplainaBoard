@@ -8,8 +8,22 @@ from tqdm import tqdm
 
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
+
 # TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
+from datalabs.operations.featurize.plugins.summarization.sum_attribute import SUMAttribute
+from datalabs.operations.featurize.summarization import get_oracle_summary
+
+from eaas import Config, Client
+
+config = Config()
+client = Client()
+client.load_config(config)  # The config you have created above
+
+
+
+# to calculate advanced features
+summary_attribute = SUMAttribute()
 
 
 # TODO(gneubig) this should be a member function
@@ -85,6 +99,17 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
     def get_bucket_feature_value(feature_name: str):
         return "self._get_" + feature_name
 
+
+    def _get_source_length(self, existing_features: dict):
+        return len(existing_features["source"].split(" "))
+
+    def _get_reference_length(self, existing_features: dict):
+        return len(existing_features["reference"].split(" "))
+
+    def _get_hypothesis_length(self, existing_features: dict):
+        return len(existing_features["hypothesis"].split(" "))
+
+
     # training set dependent features
     def _get_num_oov(self, existing_features: dict):
 
@@ -111,6 +136,32 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         fre_rank = fre_rank * 1.0 / len(existing_features["source"].split(" "))
         return fre_rank
 
+    @staticmethod
+    def get_oracle(existing_features: dict):
+        """
+        oracle_info =
+            {
+            "source":src,
+            "reference":ref,
+            "oracle_summary":oracle,
+            "oracle_labels":labels,
+            "oracle_score":max_score
+            }
+        """
+
+        sample = {"text":existing_features["source"],"summary":existing_features["reference"]}
+        oracle_info = get_oracle_summary.func(sample)
+
+        index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
+        oracle_position = numpy.mean(index_of_oracles)
+
+
+        return {
+            "oracle_position": oracle_position,
+            "oracle_score": oracle_info["oracle_score"],
+        }
+
+
 
     def _complete_feature(self):
         """
@@ -130,7 +181,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             self._data[_id] = feature_table
 
         self.score_dic = client.score(
-            inputs, task="sum", metrics=self._info.metric_names.copy(), lang="en"
+            inputs, task="sum", metrics=self._info.metric_names.copy(), lang="en", cal_attributes=False,
         )
         # print(self.score_dic["sample_level"][0].keys())
 
@@ -139,6 +190,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         bucket_features = self._info.features.get_bucket_features()
 
         for _id, dict_sysout in self._data.items():
+            dict_advanced_features = None
             for bucket_feature in bucket_features:
 
                 # this is need due to `del self._info.features[bucket_feature]`
@@ -150,11 +202,15 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
                     del self._info.features[bucket_feature]
                     continue
 
-                if bucket_feature in self.score_dic["sample_level"][_id].keys(): # features calculated from EaaS
-                    feature_value = self.score_dic["sample_level"][_id][bucket_feature]
+                if bucket_feature in summary_attribute.get_schema().keys():
+                    if dict_advanced_features == None:
+                        dict_advanced_features = summary_attribute.cal_attributes_each(dict_sysout["source"], dict_sysout["reference"])
+                    feature_value = dict_advanced_features[bucket_feature]
                     dict_sysout[
                         bucket_feature
                     ] = feature_value  # !!!!!!!!!!!!!!!!!!!! string to float !!!!!
+                elif bucket_feature in set(["oracle_position", "oracle_score"]):
+                    dict_sysout[bucket_feature] = CondGenExplainaboardBuilder.get_oracle(dict_sysout)[bucket_feature]
                 else:
                     feature_value = eval(
                         CondGenExplainaboardBuilder.get_bucket_feature_value(bucket_feature)

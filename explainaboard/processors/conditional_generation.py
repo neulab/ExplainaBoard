@@ -12,9 +12,29 @@ class ConditionalGenerationProcessor(Processor):
             "source": feature.Value("string"),
             "reference": feature.Value("string"),
             "hypothesis": feature.Value("string"),
-            "attr_source_len": feature.Value(
+            "source_length": feature.Value(
                 dtype="float",
-                description="length of source document",
+                description="the length of source document",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
+            "reference_length": feature.Value(
+                dtype="float",
+                description="the length of gold summary",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
+            "hypothesis_length": feature.Value(
+                dtype="float",
+                description="the length of gold summary",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
                     _method="bucket_attribute_specified_bucket_value",
@@ -83,6 +103,26 @@ class ConditionalGenerationProcessor(Processor):
                     _setting=(),
                 ),
                 require_training_set=True,
+            ),
+            "oracle_score": feature.Value(
+                dtype="float",
+                description="the sample-level oracle score",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+            ),
+            "oracle_position": feature.Value(
+                dtype="float",
+                description="the sample-level oracle position",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
             ),
         }
     )
