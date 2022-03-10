@@ -42,7 +42,7 @@ How do you get started?
 
 ## Web-based Toolkit
 
-We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks, 
+We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks and will be more, 
 40 datasets and 300 systems. Detailed information is as follows.
 <img src="./fig/demo.gif" width="800" class="center">
 
