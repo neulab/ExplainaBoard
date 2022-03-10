@@ -204,9 +204,9 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_configs = None,
+        user_defined_feature_config = None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_configs)
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
         self._samples_over_bucket_pred = {}
 
         # TODO(gneubig): this is a bit different than others, and probably should override the parent class

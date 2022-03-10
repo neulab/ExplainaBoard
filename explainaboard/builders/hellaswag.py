@@ -21,9 +21,9 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_configs = None
+        user_defined_feature_config = None
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_configs)
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
 
     @staticmethod
