@@ -31,3 +31,4 @@ report.json
 gen_samples.py
 log.res
 gen_samples.py
+explainaboard/tests/test_api.py
