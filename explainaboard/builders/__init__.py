@@ -11,11 +11,11 @@ class ExplainaboardBuilder:
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_configs = None,
+        user_defined_feature_config = None,
     ):
         self._info = copy.deepcopy(info)
         self._system_output: Iterable[dict] = system_output_object
-        self._user_defined_feature_configs = user_defined_feature_configs
+        self._user_defined_feature_config = user_defined_feature_config
         self._data: Table = feature_table
         # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
         # samples in different buckets

@@ -81,9 +81,9 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                  info: SysOutputInfo,
                  system_output_object: Iterable[dict],
                  feature_table: Optional[Table] = {},
-                 user_defined_features_configs = None,
+                 user_defined_feature_config = None,
                  ):
-        super().__init__(info, system_output_object, feature_table, user_defined_features_configs)
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
@@ -193,9 +193,9 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                if self._user_defined_features_configs is not None:
+                if self._user_defined_feature_config is not None:
                     # if current feature is a user-defined feature, the value is already there
-                    if bucket_feature in self._user_defined_features_configs.keys():
+                    if bucket_feature in self._user_defined_feature_config.keys():
                         feature_value = dict_sysout[bucket_feature]
                     # else, this is a normal feature which should be calculated by the _get_*() methods
                     else:
