@@ -1,14 +1,15 @@
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Table
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.utils.eval_bucket import *  # noqa
-import copy
 import numpy
 from tqdm import tqdm
 
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
 
+# TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import SUMAttribute
 from datalabs.operations.featurize.summarization import get_oracle_summary
@@ -25,6 +26,9 @@ client.load_config(config)  # The config you have created above
 summary_attribute = SUMAttribute()
 
 
+# TODO(gneubig) this should be a member function
+# TODO(gneubig) we should try to git rid of this task-specific decorator
+# TODO(gneubig) should be conditional generation, not summarization
 @summarization_aggregating(name="get_statistics", contributor="datalab",
                                  task="summarization",
                                  description="Calculate the overall statistics (e.g., density) of a given summarization dataset")
@@ -61,25 +65,17 @@ def get_statistics(samples: Iterator):
             }
 
 
-class CondGenExplainaboardBuilder:
+class CondGenExplainaboardBuilder(ExplainaboardBuilder):
     def __init__(
         self,
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        gen_kwargs: dict = None,
+        user_defined_feature_config = None,
     ):
-        self._info = copy.deepcopy(info)
-        self._system_output: Iterable[dict] = system_output_object
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
-        self.score_dic = None
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
+        # TODO(gneubig) to be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
@@ -95,14 +91,7 @@ class CondGenExplainaboardBuilder:
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
-
-
-
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
         return len(existing_features["source"].split(" "))
 
@@ -111,7 +100,7 @@ class CondGenExplainaboardBuilder:
 
     def _get_hypothesis_length(self, existing_features: dict):
         return len(existing_features["hypothesis"].split(" "))
-
+    # --- End feature functions
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict):
@@ -215,10 +204,7 @@ class CondGenExplainaboardBuilder:
                 elif bucket_feature in set(["oracle_position", "oracle_score"]):
                     dict_sysout[bucket_feature] = CondGenExplainaboardBuilder.get_oracle(dict_sysout)[bucket_feature]
                 else:
-                    feature_value = eval(
-                        CondGenExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
-                    )(dict_sysout)
-
+                    feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                     dict_sysout[bucket_feature] = feature_value
 
             self._data[_id] = dict_sysout

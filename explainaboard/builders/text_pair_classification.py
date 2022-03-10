@@ -1,5 +1,6 @@
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils import analysis
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
@@ -58,7 +59,7 @@ def get_statistics(samples: Iterator):
             }
 
 
-class TextPairClassificationExplainaboardBuilder:
+class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
     """
     Input: System Output file List[dict];  Metadata info
     Output: Analysis
@@ -69,18 +70,11 @@ class TextPairClassificationExplainaboardBuilder:
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        gen_kwargs: dict = None,
+        user_defined_feature_config = None,
     ):
-        self._info = info
-        self._system_output: Iterable[dict] = system_output_object
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
+        # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
@@ -97,20 +91,12 @@ class TextPairClassificationExplainaboardBuilder:
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
 
-
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # get_similarity_by_sacrebleu
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity(self, existing_features: dict):
         return get_similarity_by_sacrebleu(
             existing_features["text1"], existing_features["text2"]
         )
 
-    # define function for incomplete features
     def _get_text1_length(self, existing_features: dict):
         return len(existing_features["text1"].split(" "))
 
@@ -147,7 +133,7 @@ class TextPairClassificationExplainaboardBuilder:
 
         fre_rank = fre_rank * 1.0 / len((existing_features["text1"] + existing_features["text2"]).split(" "))
         return fre_rank
-
+    # --- End feature functions
 
 
 
@@ -175,11 +161,7 @@ class TextPairClassificationExplainaboardBuilder:
                     del self._info.features[bucket_feature]
                     continue
 
-                feature_value = eval(
-                    TextPairClassificationExplainaboardBuilder.get_bucket_feature_value(
-                        bucket_feature
-                    )
-                )(dict_sysout)
+                feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}

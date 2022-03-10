@@ -2,6 +2,7 @@ import os
 from typing import Iterable, Optional
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
+from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.feature_funcs import *  # noqa
@@ -197,27 +198,18 @@ def get_statistics(samples: Iterator, tag_id2str = []):
 
 
 
-class NERExplainaboardBuilder:
+class NERExplainaboardBuilder(ExplainaboardBuilder):
     def __init__(
         self,
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        gen_kwargs: dict = None,
+        user_defined_feature_config = None,
     ):
-        self._info = info
-        self._system_output: Iterable[dict] = system_output_object
-        self.gen_kwargs = gen_kwargs
-        self._data: Table = feature_table
-        # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
-        # samples in different buckets
-        self._samples_over_bucket_true = {}
+        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
         self._samples_over_bucket_pred = {}
-        # _performances_over_bucket: performance in different bucket: Dict(feature_name, bucket_name, performance)
-        self._performances_over_bucket = {}
 
-
-
+        # TODO(gneubig): this is a bit different than others, and probably should override the parent class
         # Calculate statistics of training set
         eprint(self._info.dataset_name, self._info.sub_dataset_name)
         self.statistics = None
@@ -238,11 +230,7 @@ class NERExplainaboardBuilder:
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
 
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
         return len(existing_features["sentence"].split(" "))
 
@@ -267,6 +255,31 @@ class NERExplainaboardBuilder:
         if span_text in span_dic.keys():
             eFre_value = float(span_dic[span_text])
         return eFre_value
+
+    # training set dependent features
+    def _get_num_oov(self, tokens):
+        num_oov = 0
+
+        for w in tokens:
+            if w not in self.statistics['vocab'].keys():
+                num_oov += 1
+        # print(num_oov)
+        return num_oov
+
+    # training set dependent features (this could be merged into the above one for further optimization)
+    def _get_fre_rank(self, tokens):
+        fre_rank = 0
+
+        for w in tokens:
+            if w not in self.statistics['vocab_rank'].keys():
+                fre_rank += len(self.statistics['vocab_rank'])
+            else:
+                fre_rank += self.statistics['vocab_rank'][w]
+
+
+        fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
+        return fre_rank
+    # --- End feature functions
 
     def _complete_feature_raw_span_features(self, sentence, tags):
         # span_text, span_len, span_pos, span_tag
@@ -324,35 +337,6 @@ class NERExplainaboardBuilder:
         return span_dics
 
 
-    # training set dependent features
-    def _get_num_oov(self, tokens):
-        num_oov = 0
-
-        for w in tokens:
-            if w not in self.statistics['vocab'].keys():
-                num_oov += 1
-        # print(num_oov)
-        return num_oov
-
-
-    # training set dependent features (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, tokens):
-        fre_rank = 0
-
-        for w in tokens:
-            if w not in self.statistics['vocab_rank'].keys():
-                fre_rank += len(self.statistics['vocab_rank'])
-            else:
-                fre_rank += self.statistics['vocab_rank'][w]
-
-
-        fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
-        return fre_rank
-
-
-
-
-
     def _complete_feature(self):
         """
         This function is used to calculate features used for bucketing, such as sentence_length
@@ -384,7 +368,7 @@ class NERExplainaboardBuilder:
             ] = self._complete_feature_advanced_span_features(tokens, pred_tags)
 
             # for bucket_feature in bucket_features:
-            #     feature_value = eval(NERExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+            #     feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
             #     dict_sysout[bucket_feature] = feature_value
             if self._data is None:
                 self._data = {}
@@ -494,7 +478,7 @@ class NERExplainaboardBuilder:
                 len(feature_to_sample_address_to_value_pred[feature_name]) == 0):
                 continue
 
-            self._samples_over_bucket_true[feature_name] = eval(_bucket_info._method)(
+            self._samples_over_bucket[feature_name] = eval(_bucket_info._method)(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
                 bucket_number=_bucket_info._number,
                 bucket_setting=_bucket_info._setting,
@@ -506,7 +490,7 @@ class NERExplainaboardBuilder:
             ] = bucket_attribute_specified_bucket_interval(  # noqa
                 dict_obj=feature_to_sample_address_to_value_pred[feature_name],
                 bucket_number=_bucket_info._number,
-                bucket_setting=self._samples_over_bucket_true[feature_name].keys(),
+                bucket_setting=self._samples_over_bucket[feature_name].keys(),
             )
 
             # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket_true.keys()}")
@@ -536,7 +520,7 @@ class NERExplainaboardBuilder:
 
         # true:  2_3 -> NER
         dict_pos2tag = {}
-        for k_bucket_eval, spans in self._samples_over_bucket_true[
+        for k_bucket_eval, spans in self._samples_over_bucket[
             feature_name
         ].items():
             if k_bucket_eval != bucket_interval:
@@ -608,7 +592,7 @@ class NERExplainaboardBuilder:
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, spans_true in self._samples_over_bucket_true[
+        for bucket_interval, spans_true in self._samples_over_bucket[
             feature_name
         ].items():
 
