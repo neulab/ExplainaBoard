@@ -12,12 +12,10 @@ class ExplainaboardBuilder:
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
         user_defined_feature_configs = None,
-        gen_kwargs: dict = None,
     ):
         self._info = copy.deepcopy(info)
         self._system_output: Iterable[dict] = system_output_object
         self._user_defined_feature_configs = user_defined_feature_configs
-        self.gen_kwargs = gen_kwargs
         self._data: Table = feature_table
         # _samples_over_bucket_true: Dict(feature_name, bucket_name, sample_id_true_label):
         # samples in different buckets
