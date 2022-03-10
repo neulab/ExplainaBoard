@@ -230,11 +230,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
 
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
         return len(existing_features["sentence"].split(" "))
 
@@ -259,6 +255,31 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         if span_text in span_dic.keys():
             eFre_value = float(span_dic[span_text])
         return eFre_value
+
+    # training set dependent features
+    def _get_num_oov(self, tokens):
+        num_oov = 0
+
+        for w in tokens:
+            if w not in self.statistics['vocab'].keys():
+                num_oov += 1
+        # print(num_oov)
+        return num_oov
+
+    # training set dependent features (this could be merged into the above one for further optimization)
+    def _get_fre_rank(self, tokens):
+        fre_rank = 0
+
+        for w in tokens:
+            if w not in self.statistics['vocab_rank'].keys():
+                fre_rank += len(self.statistics['vocab_rank'])
+            else:
+                fre_rank += self.statistics['vocab_rank'][w]
+
+
+        fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
+        return fre_rank
+    # --- End feature functions
 
     def _complete_feature_raw_span_features(self, sentence, tags):
         # span_text, span_len, span_pos, span_tag
@@ -316,35 +337,6 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         return span_dics
 
 
-    # training set dependent features
-    def _get_num_oov(self, tokens):
-        num_oov = 0
-
-        for w in tokens:
-            if w not in self.statistics['vocab'].keys():
-                num_oov += 1
-        # print(num_oov)
-        return num_oov
-
-
-    # training set dependent features (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, tokens):
-        fre_rank = 0
-
-        for w in tokens:
-            if w not in self.statistics['vocab_rank'].keys():
-                fre_rank += len(self.statistics['vocab_rank'])
-            else:
-                fre_rank += self.statistics['vocab_rank'][w]
-
-
-        fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
-        return fre_rank
-
-
-
-
-
     def _complete_feature(self):
         """
         This function is used to calculate features used for bucketing, such as sentence_length
@@ -376,7 +368,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             ] = self._complete_feature_advanced_span_features(tokens, pred_tags)
 
             # for bucket_feature in bucket_features:
-            #     feature_value = eval(NERExplainaboardBuilder.get_bucket_feature_value(bucket_feature))(dict_sysout)
+            #     feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
             #     dict_sysout[bucket_feature] = feature_value
             if self._data is None:
                 self._data = {}

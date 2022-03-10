@@ -114,11 +114,7 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
 
 
-    @staticmethod
-    def get_bucket_feature_value(feature_name: str):
-        return "self._get_" + feature_name
-
-    # define function for incomplete features
+    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
         return len(existing_features["text"].split(" "))
 
@@ -172,9 +168,8 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
         if length in self.statistics['length_fre'].keys():
             length_fre = self.statistics['length_fre'][length]
 
-
         return length_fre
-
+    # --- End feature functions
 
     def _complete_feature(self):
         """
@@ -200,9 +195,7 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
                     del self._info.features[bucket_feature]
                     continue
 
-                feature_value = eval(
-                    TCExplainaboardBuilder.get_bucket_feature_value(bucket_feature)
-                )(dict_sysout)
+                feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}
