@@ -190,7 +190,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                     if self._info.features[bucket_feature].require_training_set and self.statistics == None:
                         del self._info.features[bucket_feature]
                     else:
-                        feature_value = self.get_feature_func(bucket_feature)(dict_sysout)
+                        feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}

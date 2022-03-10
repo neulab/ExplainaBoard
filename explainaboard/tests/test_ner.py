@@ -21,7 +21,7 @@ class TestNER(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.named_entity_recognition.value,
-            "dataset_name": "conll2003",
+            # "dataset_name": "conll2003",
             # "sub_dataset_name":"ner",
             "metric_names": ["f1_score_seqeval"],
         }
