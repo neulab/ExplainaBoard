@@ -25,7 +25,9 @@ class TestExtractiveQA(unittest.TestCase):
             "metric_names": ["f1_score_qa", "exact_match_qa"],
         }
 
-        processor = get_processor(TaskType.question_answering_extractive, metadata, data)
+        processor = get_processor(
+            TaskType.question_answering_extractive, metadata, data
+        )
         # self.assertEqual(len(processor._features), 4)
 
         analysis = processor.process()

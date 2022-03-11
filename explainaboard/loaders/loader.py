@@ -21,7 +21,6 @@ class Loader:
     def load_user_defined_features_configs(self):
         return {}
 
-
     def _load_raw_data_points(self) -> Iterable:
         """
         loads data and return an iterable of data points. element type depends on file_type

@@ -48,8 +48,6 @@ table_schemas[TaskType.text_classification] = [
 ]
 
 
-
-
 table_schemas[TaskType.text_pair_classification] = [
     {"field_key": "text1", "sort": False, "filter": False, "label": "Text1"},
     {"field_key": "text2", "sort": False, "filter": False, "label": "Text2"},

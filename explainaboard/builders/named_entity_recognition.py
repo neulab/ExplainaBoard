@@ -13,7 +13,9 @@ import re
 
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
-from datalabs.operations.aggregate.sequence_labeling import sequence_labeling_aggregating
+from datalabs.operations.aggregate.sequence_labeling import (
+    sequence_labeling_aggregating,
+)
 
 
 def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
@@ -47,9 +49,16 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
         # Determine if the same position in pred list giving a right prediction.
         entity_span_new = ' ' + entity_span + ' '
 
-        entity_span_new = entity_span_new.replace('(', '').replace(')', '').replace('*', '').replace('+', '')
+        entity_span_new = (
+            entity_span_new.replace('(', '')
+            .replace(')', '')
+            .replace('*', '')
+            .replace('+', '')
+        )
         # print('entity_span_new', entity_span_new)
-        entity_str_sid = [m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)]
+        entity_str_sid = [
+            m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)
+        ]
         # print('count_find_span:', len(entity_str_sid))
         if len(entity_str_sid) > 0:
             label_list = []
@@ -61,7 +70,7 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
             entity_len = len(entity_span.split())
 
             for sid in entity_sids:
-                label_candi_list = tag_sequences_train[sid:sid + entity_len]
+                label_candi_list = tag_sequences_train[sid : sid + entity_len]
                 for label in label_candi_list:
                     klab = 'o'
                     if len(label.split('-')) > 1:
@@ -70,7 +79,9 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
 
             label_norep = list(set(label_list))
             for lab_norep in label_norep:
-                hard = float('%.3f' % (float(label_list.count(lab_norep)) / len(label_list)))
+                hard = float(
+                    '%.3f' % (float(label_list.count(lab_norep)) / len(label_list))
+                )
                 eCon_dic[entity_span][lab_norep] = hard
 
     # fwrite = open(path_write, 'wb')
@@ -83,9 +94,6 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
     """
     # exit()
     return eCon_dic
-
-
-
 
 
 def get_eFre_dic(train_word_sequences, tag_sequences_train):
@@ -109,8 +117,15 @@ def get_eFre_dic(train_word_sequences, tag_sequences_train):
 
         # Determine if the same position in pred list giving a right prediction.
         entity_span_new = ' ' + entity_span + ' '
-        entity_span_new = entity_span_new.replace('(', '').replace(')', '').replace('*', '').replace('+', '')
-        entity_str_sid = [m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)]
+        entity_span_new = (
+            entity_span_new.replace('(', '')
+            .replace(')', '')
+            .replace('*', '')
+            .replace('+', '')
+        )
+        entity_str_sid = [
+            m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)
+        ]
 
         eFre_dic[entity_span] = len(entity_str_sid)
 
@@ -134,18 +149,14 @@ def get_eFre_dic(train_word_sequences, tag_sequences_train):
     return eFre_dic_keep
 
 
-
-
-
-
-
-
-
-@sequence_labeling_aggregating(name="get_statistics", contributor="datalab",
-                                 task="sequence-labeling, named-entity-recognition, structure-prediction",
-                                 description="Calculate the overall statistics (e.g., average length) of "
-                                             "a given sequence labeling datasets (e.g., named entity recognition)")
-def get_statistics(samples: Iterator, tag_id2str = []):
+@sequence_labeling_aggregating(
+    name="get_statistics",
+    contributor="datalab",
+    task="sequence-labeling, named-entity-recognition, structure-prediction",
+    description="Calculate the overall statistics (e.g., average length) of "
+    "a given sequence labeling datasets (e.g., named entity recognition)",
+)
+def get_statistics(samples: Iterator, tag_id2str=[]):
     """
     Input:
     samples: [{
@@ -159,8 +170,9 @@ def get_statistics(samples: Iterator, tag_id2str = []):
 
     tokens_sequences = []
     tags_sequences = []
-    tags_without_bio = list(set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str]))
-
+    tags_without_bio = list(
+        set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
+    )
 
     vocab = {}
     for sample in tqdm(samples):
@@ -174,10 +186,8 @@ def get_statistics(samples: Iterator, tag_id2str = []):
             else:
                 vocab[w] = 1
 
-
         tokens_sequences += tokens
         tags_sequences += tags
-
 
     # eFre_dic
     eCon_dic = get_eCon_dic(tokens_sequences, tags_sequences, tags_without_bio)
@@ -185,17 +195,18 @@ def get_statistics(samples: Iterator, tag_id2str = []):
     # eCon_dic
     eFre_dic = get_eFre_dic(tokens_sequences, tags_sequences)
     # vocab_rank: the rank of each word based on its frequency
-    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)}
+    sorted_dict = {
+        key: rank
+        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+    }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
 
-
     return {
-        "eFre_dic":eFre_dic,
-        "eCon_dic":eCon_dic,
+        "eFre_dic": eFre_dic,
+        "eCon_dic": eCon_dic,
         "vocab": vocab,
         "vocab_rank": vocab_rank,
     }
-
 
 
 class NERExplainaboardBuilder(ExplainaboardBuilder):
@@ -204,9 +215,11 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None,
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
         self._samples_over_bucket_pred = {}
 
         # TODO(gneubig): this is a bit different than others, and probably should override the parent class
@@ -216,8 +229,12 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         if None != self._info.dataset_name:
             try:
 
-                dataset = load_dataset(self._info.dataset_name, self._info.sub_dataset_name)
-                if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                dataset = load_dataset(
+                    self._info.dataset_name, self._info.sub_dataset_name
+                )
+                if (
+                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     tag_id2str = dataset['train']._info.task_templates[0].labels
                     get_statistics.resources = {"tag_id2str": tag_id2str}
                     new_train = dataset['train'].apply(get_statistics, mode="local")
@@ -227,8 +244,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             except FileNotFoundError as err:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
-
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
@@ -276,9 +293,9 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             else:
                 fre_rank += self.statistics['vocab_rank'][w]
 
-
         fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
         return fre_rank
+
     # --- End feature functions
 
     def _complete_feature_raw_span_features(self, sentence, tags):
@@ -312,12 +329,13 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         # if not self.dict_pre_computed_models:
         #     return span_dics
 
-        if self.statistics == None or len(self.statistics) == 0: # there is no training set dependent features
+        if (
+            self.statistics == None or len(self.statistics) == 0
+        ):  # there is no training set dependent features
             return span_dics
 
-
-        #eCon_dic = self.dict_pre_computed_models['eCon']
-        #eCon_dic = self.statistics["eCon_dic"]
+        # eCon_dic = self.dict_pre_computed_models['eCon']
+        # eCon_dic = self.statistics["eCon_dic"]
         eCon_dic = self.statistics["eCon_dic"]
         # eFre_dic = self.dict_pre_computed_models['eFre']
         eFre_dic = self.statistics["eFre_dic"]
@@ -335,7 +353,6 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 span_dic['eFre'] = self._get_eFre_value(eFre_dic, span_text, span_tag)
 
         return span_dics
-
 
     def _complete_feature(self):
         """
@@ -355,10 +372,11 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             dict_sysout["sentence_length"] = len(tokens)
 
             # sentence-level training set dependent features
-            if self.statistics != None: # there are pre-computed statistics for training set dependent features
-                dict_sysout["num_oov"]  = self._get_num_oov(tokens)
+            if (
+                self.statistics != None
+            ):  # there are pre-computed statistics for training set dependent features
+                dict_sysout["num_oov"] = self._get_num_oov(tokens)
                 dict_sysout["fre_rank"] = self._get_fre_rank(tokens)
-
 
             dict_sysout[
                 "true_entity_info"
@@ -408,34 +426,44 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             else:
                 self._info.results.overall[metric_name] = overall_performance
 
-    def _bucketing_samples_add_feats(self, id, bucket_features, pcf_set, feature_table, entity_info_list, feature_to_sample_address_to_value):
+    def _bucketing_samples_add_feats(
+        self,
+        id,
+        bucket_features,
+        pcf_set,
+        feature_table,
+        entity_info_list,
+        feature_to_sample_address_to_value,
+    ):
 
         for span_info in entity_info_list:
             span_text = span_info["span_text"]
             span_pos = span_info["span_pos"]
             span_label = span_info["span_tag"]
 
-            span_address = f'{id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
+            span_address = (
+                f'{id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
+            )
 
             for feature_name in bucket_features:
-                if (
-                        feature_name
-                        not in feature_to_sample_address_to_value.keys()
-                ):
+                if feature_name not in feature_to_sample_address_to_value.keys():
                     feature_to_sample_address_to_value[feature_name] = {}
-                elif feature_name in feature_table: # first-level features
+                elif feature_name in feature_table:  # first-level features
                     feature_to_sample_address_to_value[feature_name][
                         span_address
                     ] = feature_table[feature_name]
-                elif feature_name in span_info: # second-level features
+                elif feature_name in span_info:  # second-level features
                     feature_to_sample_address_to_value[feature_name][
                         span_address
                     ] = span_info[feature_name]
                 elif feature_name not in pcf_set:
                     import pprint
+
                     pp = pprint.PrettyPrinter(indent=2)
                     pp.pprint(self._info.features.keys())
-                    raise ValueError(f'Missing feature {self.feature_name} not found and not pre-computed')
+                    raise ValueError(
+                        f'Missing feature {self.feature_name} not found and not pre-computed'
+                    )
 
     def _bucketing_samples(self, sysout_iterator):
 
@@ -446,18 +474,30 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         bucket_features = self._info.features.get_bucket_features()
         pcf_set = set(self._info.features.get_pre_computed_features())
 
-
         # Preparation for bucketing
         for _id, feature_table in sysout_iterator:
 
-            self._bucketing_samples_add_feats(_id, bucket_features, pcf_set, feature_table, feature_table["true_entity_info"], feature_to_sample_address_to_value_true)
-            self._bucketing_samples_add_feats(_id, bucket_features, pcf_set, feature_table, feature_table["pred_entity_info"], feature_to_sample_address_to_value_pred)
+            self._bucketing_samples_add_feats(
+                _id,
+                bucket_features,
+                pcf_set,
+                feature_table,
+                feature_table["true_entity_info"],
+                feature_to_sample_address_to_value_true,
+            )
+            self._bucketing_samples_add_feats(
+                _id,
+                bucket_features,
+                pcf_set,
+                feature_table,
+                feature_table["pred_entity_info"],
+                feature_to_sample_address_to_value_pred,
+            )
 
         # Bucketing
         for feature_name in tqdm(
             self._info.features.get_bucket_features(), desc="bucketing"
         ):
-
 
             _bucket_info = ""
             if feature_name in self._info.features.keys():
@@ -470,12 +510,12 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                     .bucket_info
                 )
 
-
-
             # The following indicates that there are no examples, probably because necessary data for bucketing
             # was not available.
-            if (len(feature_to_sample_address_to_value_true[feature_name]) == 0 or
-                len(feature_to_sample_address_to_value_pred[feature_name]) == 0):
+            if (
+                len(feature_to_sample_address_to_value_true[feature_name]) == 0
+                or len(feature_to_sample_address_to_value_pred[feature_name]) == 0
+            ):
                 continue
 
             self._samples_over_bucket[feature_name] = eval(_bucket_info._method)(
@@ -520,9 +560,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
         # true:  2_3 -> NER
         dict_pos2tag = {}
-        for k_bucket_eval, spans in self._samples_over_bucket[
-            feature_name
-        ].items():
+        for k_bucket_eval, spans in self._samples_over_bucket[feature_name].items():
             if k_bucket_eval != bucket_interval:
                 continue
             for span in spans:
