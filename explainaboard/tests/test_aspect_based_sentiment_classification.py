@@ -1,6 +1,7 @@
 import pathlib
 import os
 import unittest
+import tqdm
 from explainaboard import FileType, Source, TaskType, get_loader, get_processor
 from explainaboard.tests.utils import load_file_as_str
 

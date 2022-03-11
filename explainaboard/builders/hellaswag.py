@@ -20,7 +20,7 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
         self,
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = {},
+        feature_table: Optional[Table] = None,
         user_defined_feature_config=None,
     ):
         super().__init__(
@@ -83,79 +83,6 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
             #     self._data = {}
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
-
-    def get_overall_performance(self):
-        predicted_labels, true_labels = [], []
-
-        for _id, feature_table in self._data.items():
-
-            predicted_labels.append(feature_table["predicted_label"])
-            true_labels.append(feature_table["true_label"])
-
-        for metric_name in self._info.metric_names:
-            one_metric = eval(metric_name)(
-                true_labels=true_labels,
-                predicted_labels=predicted_labels,
-                is_print_confidence_interval=self._info.results.is_print_confidence_interval,
-            )
-            overall_value_json = one_metric.evaluate()
-
-            overall_value = overall_value_json["value"]
-            confidence_score_low = overall_value_json["confidence_score_low"]
-            confidence_score_up = overall_value_json["confidence_score_up"]
-            overall_performance = Performance(
-                metric_name=metric_name,
-                value=float(format(overall_value, '.4g')),
-                confidence_score_low=float(format(confidence_score_low, '.4g')),
-                confidence_score_up=float(format(confidence_score_up, '.4g')),
-            )
-            if self._info.results.overall is None:
-                self._info.results.overall = {}
-                self._info.results.overall[metric_name] = overall_performance
-            else:
-                self._info.results.overall[metric_name] = overall_performance
-
-    def _bucketing_samples(self, sysout_iterator):
-
-        sample_address = ""
-        feature_to_sample_address_to_value = {}
-
-        # Preparation for bucketing
-        for _id, dict_sysout in sysout_iterator:
-
-            sample_address = str(_id)  # this could be abstracted later
-            for feature_name in self._info.features.get_bucket_features():
-                if feature_name not in feature_to_sample_address_to_value.keys():
-                    feature_to_sample_address_to_value[feature_name] = {}
-                else:
-                    feature_to_sample_address_to_value[feature_name][
-                        sample_address
-                    ] = dict_sysout[feature_name]
-
-        # Bucketing
-        for feature_name in tqdm(
-            self._info.features.get_bucket_features(), desc="bucketing"
-        ):
-
-            # print(f"Feature Name: {feature_name}\n"
-            #       f"Bucket Hyper:\n function_name: {self._info.features[feature_name].bucket_info._method} \n"
-            #       f"bucket_number: {self._info.features[feature_name].bucket_info._number}\n"
-            #       f"bucket_setting: {self._info.features[feature_name].bucket_info._setting}\n")
-
-            self._samples_over_bucket[feature_name] = eval(
-                self._info.features[feature_name].bucket_info._method
-            )(
-                dict_obj=feature_to_sample_address_to_value[feature_name],
-                bucket_number=self._info.features[feature_name].bucket_info._number,
-                bucket_setting=self._info.features[feature_name].bucket_info._setting,
-            )
-
-            # print(f"self._samples_over_bucket.keys():\n{self._samples_over_bucket.keys()}")
-
-            # evaluating bucket: get bucket performance
-            self._performances_over_bucket[feature_name] = self.get_bucket_performance(
-                feature_name
-            )
 
     def get_bucket_performance(self, feature_name: str):
         """
@@ -221,29 +148,3 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
         return sort_dict(bucket_name_to_performance)  # noqa
-
-    def _generate_report(self):
-        dict_fine_grained = {}
-        for feature_name, metadata in self._performances_over_bucket.items():
-            dict_fine_grained[feature_name] = []
-            for bucket_name, bucket_performance in metadata.items():
-                bucket_name = analysis.beautify_interval(bucket_name)
-
-                # instantiation
-                dict_fine_grained[feature_name].append(bucket_performance)
-
-        self._info.results.fine_grained = dict_fine_grained
-
-    def _print_bucket_info(self):
-        for feature_name in self._performances_over_bucket.keys():
-            print_dict(  # noqa
-                self._performances_over_bucket[feature_name], feature_name
-            )
-
-    def run(self) -> SysOutputInfo:
-        eb_generator = self._complete_feature()
-        self._bucketing_samples(eb_generator)
-        self.get_overall_performance()
-        self._print_bucket_info()
-        self._generate_report()
-        return self._info
