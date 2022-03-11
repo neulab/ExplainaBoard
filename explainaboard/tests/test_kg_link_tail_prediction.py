@@ -20,7 +20,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237",
+            "dataset_name": "fb15k-237-subset",
             "metric_names": ["Hits"],
         }
 
