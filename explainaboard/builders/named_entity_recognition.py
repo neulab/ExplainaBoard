@@ -214,7 +214,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         self,
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = {},
+        feature_table: Optional[Table] = None,
         user_defined_feature_config=None,
     ):
         super().__init__(
@@ -393,6 +393,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
 
+    # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(self):
         predicted_labels, true_labels = [], []  # noqa
 
@@ -672,29 +673,3 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
         return sort_dict(bucket_name_to_performance)  # noqa
-
-    def _generate_report(self):
-        dict_fine_grained = {}
-        for feature_name, metadata in self._performances_over_bucket.items():
-            dict_fine_grained[feature_name] = []
-            for bucket_name, bucket_performance in metadata.items():
-                bucket_name = analysis.beautify_interval(bucket_name)
-
-                # instantiation
-                dict_fine_grained[feature_name].append(bucket_performance)
-
-        self._info.results.fine_grained = dict_fine_grained
-
-    def _print_bucket_info(self):
-        for feature_name in self._performances_over_bucket.keys():
-            print_dict(  # noqa
-                self._performances_over_bucket[feature_name], feature_name
-            )
-
-    def run(self):
-        eb_generator = self._complete_feature()
-        self._bucketing_samples(eb_generator)
-        self.get_overall_performance()
-        self._print_bucket_info()
-        self._generate_report()
-        return self._info
