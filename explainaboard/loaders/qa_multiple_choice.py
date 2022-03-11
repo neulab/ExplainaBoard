@@ -7,7 +7,7 @@ from .loader import Loader
 
 
 @register_loader(TaskType.qa_multiple_choice)
-class  QAMultipleChoiceLoader(Loader):
+class QAMultipleChoiceLoader(Loader):
     """
     Validate and Reformat system output file with json format:
     "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
@@ -41,7 +41,7 @@ class  QAMultipleChoiceLoader(Loader):
                 data.append(
                     {
                         "id": str(id),  # should be string type
-                        "context":data_info["context"],
+                        "context": data_info["context"],
                         "question": data_info["question"],
                         "answers": data_info["answers"],
                         "predicted_answers": data_info["predicted_answers"],

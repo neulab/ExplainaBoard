@@ -21,13 +21,13 @@ client = Client()
 client.load_config(config)
 
 
-
-
-
-@qa_extractive_aggregating(name="get_statistics", contributor="datalab",
-                                 task="qa-extractive",
-                                 description="Calculate the overall statistics (e.g., average length) of "
-                                             "a given text classification dataset")
+@qa_extractive_aggregating(
+    name="get_statistics",
+    contributor="datalab",
+    task="qa-extractive",
+    description="Calculate the overall statistics (e.g., average length) of "
+    "a given text classification dataset",
+)
 def get_statistics(samples: Iterator):
     """
     Input:
@@ -45,7 +45,6 @@ def get_statistics(samples: Iterator):
     for sample in tqdm(samples):
         context, answers = sample["context"], sample["answers"]
 
-
         # update vocabulary
         for w in context.split(" "):
             if w in vocab.keys():
@@ -54,18 +53,20 @@ def get_statistics(samples: Iterator):
                 vocab[w] = 1
 
     # the rank of each word based on its frequency
-    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)}
+    sorted_dict = {
+        key: rank
+        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+    }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
 
     # print(vocab)
     # print(vocab_rank)
     # exit()
 
-    return {"vocab":vocab,
-            "vocab_rank":vocab_rank,
-            }
-
-
+    return {
+        "vocab": vocab,
+        "vocab_rank": vocab_rank,
+    }
 
 
 class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
@@ -74,28 +75,34 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict] = None,
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None,
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
 
         # TODO(gneubig) to be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
             try:
-                dataset = load_dataset(self._info.dataset_name, self._info.sub_dataset_name)
+                dataset = load_dataset(
+                    self._info.dataset_name, self._info.sub_dataset_name
+                )
                 if "train" not in dataset.keys():
                     self.statistics = None
-                elif len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(get_statistics, mode = "local")
+                elif (
+                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                    new_train = dataset['train'].apply(get_statistics, mode="local")
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError as err:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
-
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, existing_features: dict):
@@ -118,7 +125,6 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         res_json = client.bleu([[references]], [hypothesis], lang="en")
         return res_json["corpus_bleu"]
 
-
     # training set dependent features
     def _get_num_oov(self, existing_features: dict):
         num_oov = 0
@@ -128,7 +134,6 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 num_oov += 1
         # print(num_oov)
         return num_oov
-
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict):
@@ -142,6 +147,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
         fre_rank = fre_rank * 1.0 / len(existing_features["context"].split(" "))
         return fre_rank
+
     # --- End feature functions
 
     def _complete_feature(self):
@@ -164,7 +170,10 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                     continue
                 # If there is a training set dependent feature while no pre-computed statistics for it,
                 # then skip bucketing along this feature
-                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                if (
+                    self._info.features[bucket_feature].require_training_set
+                    and self.statistics == None
+                ):
                     del self._info.features[bucket_feature]
                     continue
 
@@ -262,12 +271,13 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
             for sample_id in sample_ids:
 
-
                 true_label = self._data[int(sample_id)]["answers"]["text"]
                 if isinstance(true_label, list):
                     true_label = true_label[0]
 
-                predicted_label = self._data[int(sample_id)]["predicted_answers"]["text"]
+                predicted_label = self._data[int(sample_id)]["predicted_answers"][
+                    "text"
+                ]
                 sent = self._data[int(sample_id)]["question"]  # noqa
                 s_id = self._data[int(sample_id)]["id"]
 

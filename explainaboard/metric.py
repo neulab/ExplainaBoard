@@ -140,16 +140,17 @@ class Hits(Metric):
             i_preds = predicted_labels[i]
             if i_true in i_preds:
                 num_hits += 1
-        return num_hits/len(true_labels)
+        return num_hits / len(true_labels)
 
     def evaluate(self):
 
         return self._evaluate(self._true_labels, self._predicted_labels)
 
 
-
 class MeanReciprocalRank(Metric):
-    def __init__(self, true_labels, predicted_labels, is_print_confidence_interval=False):
+    def __init__(
+        self, true_labels, predicted_labels, is_print_confidence_interval=False
+    ):
         super(MeanReciprocalRank, self).__init__()
         # Metric.__init__(self)
         self._name = self.__class__.__name__
@@ -167,10 +168,9 @@ class MeanReciprocalRank(Metric):
             i_preds = predicted_labels[i]
             if i_true in i_preds:
                 true_rank = list(i_preds).index(i_true) + 1  # 1-indexed
-                total_reciprocal_rank += 1/true_rank
-        return total_reciprocal_rank/len(true_labels)
+                total_reciprocal_rank += 1 / true_rank
+        return total_reciprocal_rank / len(true_labels)
 
     def evaluate(self):
 
         return self._evaluate(self._true_labels, self._predicted_labels)
-

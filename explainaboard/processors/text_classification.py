@@ -6,8 +6,6 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.builders.text_classification import TCExplainaboardBuilder
 
 
-
-
 @register_processor(TaskType.text_classification)
 class TextClassificationProcessor(Processor):
     _task_type = TaskType.text_classification
@@ -107,7 +105,6 @@ class TextClassificationProcessor(Processor):
                 ),
                 require_training_set=True,
             ),
-
         }
     )
 

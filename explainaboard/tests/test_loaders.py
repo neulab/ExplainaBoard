@@ -49,7 +49,6 @@ class QASquadLoader(TestCase):
         self.assertEqual(len(data), 5)
 
 
-
 class SummSquadLoader(TestCase):
     def test_load_json(self):
         loader = get_loader(

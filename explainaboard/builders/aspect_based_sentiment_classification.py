@@ -19,9 +19,11 @@ class ABSCExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None,
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
         self._spacy_nlp = spacy_loader.get_model("en_core_web_sm")
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
@@ -42,6 +44,7 @@ class ABSCExplainaboardBuilder(ExplainaboardBuilder):
 
     def _get_aspect_index(self, existing_features: dict):
         return existing_features["text"].find(existing_features["aspect"])
+
     # --- End feature functions
 
     def _complete_feature(self):

@@ -48,7 +48,7 @@ class QAExtractiveLoader(Loader):
                 data.append(
                     {
                         "id": str(id),  # should be string type
-                        "context":data_info["context"],
+                        "context": data_info["context"],
                         "question": data_info["question"],
                         "answers": data_info["answers"],
                         "predicted_answers": data_info["predicted_answers"],
@@ -59,18 +59,15 @@ class QAExtractiveLoader(Loader):
                 data.append(
                     {
                         "id": str(id),  # should be string type
-                        "context":data_info["context"],
+                        "context": data_info["context"],
                         "question": data_info["question"],
                         "answers": data_info["answers"],
-                        "predicted_answers": {"text":data_info["prediction"]},
+                        "predicted_answers": {"text": data_info["prediction"]},
                     }
                 )
         else:
             raise NotImplementedError
         return data
-
-
-
 
         #
         #
