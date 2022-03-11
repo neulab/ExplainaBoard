@@ -14,13 +14,6 @@ from datalabs import load_dataset
 
 from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregating
 
-from eaas import Config, Client
-
-config = Config()
-client = Client()
-client.load_config(config)
-
-
 @qa_extractive_aggregating(
     name="get_statistics",
     contributor="datalab",
@@ -122,7 +115,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         references = existing_features["context"]
         hypothesis = existing_features["question"]
 
-        res_json = client.bleu([[references]], [hypothesis], lang="en")
+        res_json = self._get_eaas_client().bleu([[references]], [hypothesis], lang="en")
         return res_json["corpus_bleu"]
 
     # training set dependent features

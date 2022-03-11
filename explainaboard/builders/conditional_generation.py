@@ -16,13 +16,6 @@ from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
 )
 from datalabs.operations.featurize.summarization import get_oracle_summary
 
-from eaas import Config, Client
-
-config = Config()
-client = Client()
-client.load_config(config)  # The config you have created above
-
-
 # to calculate advanced features
 summary_attribute = SUMAttribute()
 
@@ -203,7 +196,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             )
             self._data[_id] = feature_table
 
-        self.score_dic = client.score(
+        self.score_dic = self._get_eaas_client().score(
             inputs,
             task="sum",
             metrics=self._info.metric_names.copy(),
