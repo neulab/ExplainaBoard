@@ -22,25 +22,25 @@ class Processor:
             for feature_name, feature_config in feature_configs.items():
                 if feature_config["dtype"] == "string":
                     self._features[feature_name] = feature.Value(
-                        dtype        = "string",
-                        description  = feature_config["description"],
-                        is_bucket    = True,
-                        bucket_info  = feature.BucketInfo(
-                            _method  = "bucket_attribute_discrete_value",
-                            _number  = feature_config["num_buckets"],
-                            _setting = 1
-                        )
+                        dtype="string",
+                        description=feature_config["description"],
+                        is_bucket=True,
+                        bucket_info=feature.BucketInfo(
+                            _method="bucket_attribute_discrete_value",
+                            _number=feature_config["num_buckets"],
+                            _setting=1,
+                        ),
                     )
                 elif feature_config['dtype'] == 'float':
                     self._features[feature_name] = feature.Value(
-                        dtype        = "float",
-                        description  = feature_config["description"],
-                        is_bucket    = True,
-                        bucket_info  = feature.BucketInfo(
-                            _method  = "bucket_attribute_specified_bucket_value",
-                            _number  = feature_config["num_buckets"],
-                            _setting = ()
-                        )
+                        dtype="float",
+                        description=feature_config["description"],
+                        is_bucket=True,
+                        bucket_info=feature.BucketInfo(
+                            _method="bucket_attribute_specified_bucket_value",
+                            _number=feature_config["num_buckets"],
+                            _setting=(),
+                        ),
                     )
                 else:
                     raise NotImplementedError

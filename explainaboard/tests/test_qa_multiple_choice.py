@@ -12,7 +12,10 @@ class TestQAMultipleChoice(unittest.TestCase):
 
         path_data = artifacts_path + "synthetic_metaphor_qa.json"
         loader = get_loader(
-            TaskType.qa_multiple_choice, Source.local_filesystem, FileType.json, path_data
+            TaskType.qa_multiple_choice,
+            Source.local_filesystem,
+            FileType.json,
+            path_data,
         )
         data = loader.load()
 

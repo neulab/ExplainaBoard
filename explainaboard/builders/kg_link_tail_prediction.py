@@ -8,14 +8,19 @@ from explainaboard.metric import *  # noqa
 from tqdm import tqdm
 from datalabs import load_dataset
 from datalabs.operations import aggregate
-from datalabs.operations.aggregate.kg_link_prediction import kg_link_prediction_aggregating
+from datalabs.operations.aggregate.kg_link_prediction import (
+    kg_link_prediction_aggregating,
+)
 from typing import Iterator, Dict, List
 
 
-@kg_link_prediction_aggregating(name = "get_statistics", contributor= "datalab",
-                                 task="kg-link-prediction", description="aggregation function",
-                                 )
-def get_statistics(samples:List[Dict]):
+@kg_link_prediction_aggregating(
+    name="get_statistics",
+    contributor="datalab",
+    task="kg-link-prediction",
+    description="aggregation function",
+)
+def get_statistics(samples: List[Dict]):
     """
     `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
     # pip install datalabs
@@ -33,7 +38,6 @@ def get_statistics(samples:List[Dict]):
         else:
             dict_tail[sample['tail']] += 1
 
-
         if sample['head'] not in dict_head.keys():
             dict_head[sample['head']] = 1
         else:
@@ -44,15 +48,11 @@ def get_statistics(samples:List[Dict]):
         else:
             dict_link[sample['link']] += 1
 
-
-
     return {
-        "head_fre":dict_head,
-        "link_fre":dict_link,
-        "tail_fre":dict_tail,
+        "head_fre": dict_head,
+        "link_fre": dict_link,
+        "tail_fre": dict_tail,
     }
-
-
 
 
 # TODO: is this the best place to put this?
@@ -66,7 +66,7 @@ SYMMETRIC_RELATIONS = [
     '/influence/influence_node/peers./influence/peer_relationship/peers',
     '/location/location/adjoin_s./location/adjoining_relationship/adjoins',
     '/people/person/spouse_s./people/marriage/spouse',
-    '/people/person/sibling_s./people/sibling relationship/sibling'
+    '/people/person/sibling_s./people/sibling relationship/sibling',
 ]
 
 
@@ -76,14 +76,16 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-
-    def __init__(self, 
-                 info: SysOutputInfo,
-                 system_output_object: Iterable[dict],
-                 feature_table: Optional[Table] = {},
-                 user_defined_feature_config = None,
-                 ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+    def __init__(
+        self,
+        info: SysOutputInfo,
+        system_output_object: Iterable[dict],
+        feature_table: Optional[Table] = {},
+        user_defined_feature_config=None,
+    ):
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
@@ -91,41 +93,45 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         if None != self._info.dataset_name:
             try:
                 dataset = load_dataset(self._info.dataset_name, "readable")
-                if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(get_statistics, mode = "local")
+                if (
+                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                    new_train = dataset['train'].apply(get_statistics, mode="local")
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError as err:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                )
 
         # entity types
-        if self._info.dataset_name != "fb15k_237": # to be generalized
+        if self._info.dataset_name != "fb15k_237":  # to be generalized
             self.entity_type_level_map = {}
         else:
             f = open('entity_type_level_map.json')
             self.entity_type_level_map = json.load(f)
             print(self.entity_type_level_map.keys())
 
-
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
 
         # list of entity types at each level: [type_level_0, type_level_1, ... type_level_6]
         # e.g. ["Thing", "Agent", "Person", None, None, None, None]
-        tail_entity_type_levels = self.entity_type_level_map.get(existing_features['true_tail'], None)
+        tail_entity_type_levels = self.entity_type_level_map.get(
+            existing_features['true_tail'], None
+        )
         if tail_entity_type_levels is None:
             return "-1"  # entity types not found
 
         # find the index of the first occurrence of None in the list
-        if None in tail_entity_type_levels:  
+        if None in tail_entity_type_levels:
             most_specific_level = tail_entity_type_levels.index(None) - 1
         else:  # tail has entity types at every level
             most_specific_level = len(tail_entity_type_levels) - 1
         return str(most_specific_level)
-        
+
     def _get_tail_entity_length(self, existing_features: dict):
         return len(existing_features["true_tail"].split(" "))
 
@@ -164,8 +170,8 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
             return 'symmetric'
         else:
             return 'asymmetric'
-    # --- End feature functions
 
+    # --- End feature functions
 
     def _complete_feature(self):
         """
@@ -181,16 +187,24 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         ):
             # Get values of bucketing features
             for bucket_feature in bucket_features:
-                if self._user_defined_feature_config is not None and bucket_feature in self._user_defined_feature_config.keys():
+                if (
+                    self._user_defined_feature_config is not None
+                    and bucket_feature in self._user_defined_feature_config.keys()
+                ):
                     feature_value = dict_sysout[bucket_feature]
                 # this is needed due to `del self._info.features[bucket_feature]`
                 elif bucket_feature in self._info.features.keys():
                     # If there is a training set dependent feature while no pre-computed statistics for it,
                     # then skip bucketing along this feature
-                    if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                    if (
+                        self._info.features[bucket_feature].require_training_set
+                        and self.statistics == None
+                    ):
                         del self._info.features[bucket_feature]
                     else:
-                        feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
+                        feature_value = self._get_feature_func(bucket_feature)(
+                            dict_sysout
+                        )
                 dict_sysout[bucket_feature] = feature_value
             # if self._data is None:
             #     self._data = {}

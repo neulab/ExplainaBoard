@@ -11,7 +11,9 @@ from datalabs import load_dataset
 
 # TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
-from datalabs.operations.featurize.plugins.summarization.sum_attribute import SUMAttribute
+from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
+    SUMAttribute,
+)
 from datalabs.operations.featurize.summarization import get_oracle_summary
 
 from eaas import Config, Client
@@ -21,7 +23,6 @@ client = Client()
 client.load_config(config)  # The config you have created above
 
 
-
 # to calculate advanced features
 summary_attribute = SUMAttribute()
 
@@ -29,9 +30,12 @@ summary_attribute = SUMAttribute()
 # TODO(gneubig) this should be a member function
 # TODO(gneubig) we should try to git rid of this task-specific decorator
 # TODO(gneubig) should be conditional generation, not summarization
-@summarization_aggregating(name="get_statistics", contributor="datalab",
-                                 task="summarization",
-                                 description="Calculate the overall statistics (e.g., density) of a given summarization dataset")
+@summarization_aggregating(
+    name="get_statistics",
+    contributor="datalab",
+    task="summarization",
+    description="Calculate the overall statistics (e.g., density) of a given summarization dataset",
+)
 def get_statistics(samples: Iterator):
     """
     Input:
@@ -52,15 +56,15 @@ def get_statistics(samples: Iterator):
 
         # oracle_position_fre
         oracle_info = get_oracle_summary.func(sample)
-        index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
+        index_of_oracles = [
+            i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0
+        ]
         oracle_position = str(int(numpy.mean(index_of_oracles)))
 
         if oracle_position not in oracle_position_fre.keys():
             oracle_position_fre[oracle_position] = 1
         else:
             oracle_position_fre[oracle_position] += 1
-
-
 
         # Vocabulary info
         for w in (text + summary).split(" "):
@@ -69,22 +73,24 @@ def get_statistics(samples: Iterator):
             else:
                 vocab[w] = 1
 
-    for k, v in vocab.items(): # pruning for the availability of database storage
+    for k, v in vocab.items():  # pruning for the availability of database storage
         if v > 20:
             vocab_pruning[k] = v
         if len(vocab_pruning) > 100:
             break
 
-
     # the rank of each word based on its frequency
-    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab_pruning.values()), reverse=True), 1)}
+    sorted_dict = {
+        key: rank
+        for rank, key in enumerate(sorted(set(vocab_pruning.values()), reverse=True), 1)
+    }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab_pruning.items()}
 
-
-    return {"vocab":vocab_pruning,
-            "vocab_rank":vocab_rank,
-            "oracle_position_fre": oracle_position_fre,
-            }
+    return {
+        "vocab": vocab_pruning,
+        "vocab_rank": vocab_rank,
+        "oracle_position_fre": oracle_position_fre,
+    }
 
 
 class CondGenExplainaboardBuilder(ExplainaboardBuilder):
@@ -93,9 +99,11 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None,
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
 
         # TODO(gneubig) to be deduplicated
         self._init_statistics(get_statistics)
@@ -109,6 +117,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     def _get_hypothesis_length(self, existing_features: dict):
         return len(existing_features["hypothesis"].split(" "))
+
     # --- End feature functions
 
     # training set dependent features
@@ -117,12 +126,13 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         # exit()
         num_oov = 0
 
-        for w in existing_features["source"].split(" "):  # should this be normalized for the consistency with DataLab?
+        for w in existing_features["source"].split(
+            " "
+        ):  # should this be normalized for the consistency with DataLab?
             if w not in self.statistics['vocab'].keys():
                 num_oov += 1
         # print(num_oov)
         return num_oov
-
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict):
@@ -137,12 +147,6 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         fre_rank = fre_rank * 1.0 / len(existing_features["source"].split(" "))
         return fre_rank
 
-
-
-
-
-
-
     def get_oracle(self, existing_features: dict):
         """
         oracle_info =
@@ -155,27 +159,32 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             }
         """
 
-        sample = {"text":existing_features["source"],"summary":existing_features["reference"]}
+        sample = {
+            "text": existing_features["source"],
+            "summary": existing_features["reference"],
+        }
         oracle_info = get_oracle_summary.func(sample)
 
-        index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
+        index_of_oracles = [
+            i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0
+        ]
         oracle_position = numpy.mean(index_of_oracles)
 
-
-
         oracle_position_fre = 0
-        if self.statistics != None and str(int(oracle_position)) in self.statistics['oracle_position_fre'].keys():
-            oracle_position_fre = self.statistics['oracle_position_fre'][str(int(oracle_position))]
-
-
+        if (
+            self.statistics != None
+            and str(int(oracle_position))
+            in self.statistics['oracle_position_fre'].keys()
+        ):
+            oracle_position_fre = self.statistics['oracle_position_fre'][
+                str(int(oracle_position))
+            ]
 
         return {
             "oracle_position": oracle_position,
             "oracle_score": oracle_info["oracle_score"],
-            "oracle_position_fre":oracle_position_fre,
+            "oracle_position_fre": oracle_position_fre,
         }
-
-
 
     def _complete_feature(self):
         """
@@ -195,7 +204,11 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             self._data[_id] = feature_table
 
         self.score_dic = client.score(
-            inputs, task="sum", metrics=self._info.metric_names.copy(), lang="en", cal_attributes=False,
+            inputs,
+            task="sum",
+            metrics=self._info.metric_names.copy(),
+            lang="en",
+            cal_attributes=False,
         )
         # print(self.score_dic["sample_level"][0].keys())
 
@@ -212,19 +225,28 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
                     continue
                 # If there is a training set dependent feature while no pre-computed statistics for it,
                 # then skip bucketing along this feature
-                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                if (
+                    self._info.features[bucket_feature].require_training_set
+                    and self.statistics == None
+                ):
                     del self._info.features[bucket_feature]
                     continue
 
                 if bucket_feature in summary_attribute.get_schema().keys():
                     if dict_advanced_features == None:
-                        dict_advanced_features = summary_attribute.cal_attributes_each(dict_sysout["source"], dict_sysout["reference"])
+                        dict_advanced_features = summary_attribute.cal_attributes_each(
+                            dict_sysout["source"], dict_sysout["reference"]
+                        )
                     feature_value = dict_advanced_features[bucket_feature]
                     dict_sysout[
                         bucket_feature
                     ] = feature_value  # !!!!!!!!!!!!!!!!!!!! string to float !!!!!
-                elif bucket_feature in set(["oracle_position", "oracle_score", "oracle_position_fre"]):
-                    dict_sysout[bucket_feature] = self.get_oracle(dict_sysout)[bucket_feature]
+                elif bucket_feature in set(
+                    ["oracle_position", "oracle_score", "oracle_position_fre"]
+                ):
+                    dict_sysout[bucket_feature] = self.get_oracle(dict_sysout)[
+                        bucket_feature
+                    ]
                 else:
                     feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                     dict_sysout[bucket_feature] = feature_value

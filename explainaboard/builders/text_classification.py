@@ -11,15 +11,21 @@ from explainaboard.utils.feature_funcs import *  # noqa
 from explainaboard.utils.spacy_loader import spacy_loader
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
-from datalabs.operations.aggregate.text_classification import text_classification_aggregating
+from datalabs.operations.aggregate.text_classification import (
+    text_classification_aggregating,
+)
 import requests
 import json
 from explainaboard.utils.db_api import *
 
-@text_classification_aggregating(name="get_statistics", contributor="datalab",
-                                 task="text-classification",
-                                 description="Calculate the overall statistics (e.g., average length) of "
-                                             "a given text classification dataset")
+
+@text_classification_aggregating(
+    name="get_statistics",
+    contributor="datalab",
+    task="text-classification",
+    description="Calculate the overall statistics (e.g., average length) of "
+    "a given text classification dataset",
+)
 def get_statistics(samples: Iterator):
     """
     Input:
@@ -48,16 +54,16 @@ def get_statistics(samples: Iterator):
                 vocab[w] = 1
 
     # the rank of each word based on its frequency
-    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)}
+    sorted_dict = {
+        key: rank
+        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+    }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
 
-
     for k, v in length_fre.items():
-        length_fre[k] = length_fre[k]*1.0/len(samples)
+        length_fre[k] = length_fre[k] * 1.0 / len(samples)
 
-    return {"vocab":vocab,
-            "vocab_rank":vocab_rank,
-            "length_fre":length_fre}
+    return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
 
 
 class TCExplainaboardBuilder(ExplainaboardBuilder):
@@ -71,14 +77,15 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None,
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self._init_statistics(get_statistics)
-
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
@@ -101,7 +108,6 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
     def _get_lexical_richness(self, existing_feature: dict):
         return get_lexical_richness(existing_feature["text"])  # noqa
 
-
     # training set dependent features
     def _get_num_oov(self, existing_features: dict):
         num_oov = 0
@@ -111,7 +117,6 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
                 num_oov += 1
         # print(num_oov)
         return num_oov
-
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict):
@@ -135,6 +140,7 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
             length_fre = self.statistics['length_fre'][length]
 
         return length_fre
+
     # --- End feature functions
 
     def _complete_feature(self):
@@ -157,7 +163,10 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
                     continue
                 # If there is a training set dependent feature while no pre-computed statistics for it,
                 # then skip bucketing along this feature
-                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                if (
+                    self._info.features[bucket_feature].require_training_set
+                    and self.statistics == None
+                ):
                     del self._info.features[bucket_feature]
                     continue
 
@@ -212,7 +221,6 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
             for feature_name in self._info.features.get_bucket_features():
                 # If there is a training set dependent feature while no pre-computed statistics for it,
                 # then skip bucketing along this feature
-
 
                 if feature_name not in feature_to_sample_address_to_value.keys():
                     feature_to_sample_address_to_value[feature_name] = {}
@@ -295,8 +303,6 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
                 bucket_value = bucket_value_json["value"]
                 confidence_score_low = bucket_value_json["confidence_score_low"]
                 confidence_score_up = bucket_value_json["confidence_score_up"]
-
-
 
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
