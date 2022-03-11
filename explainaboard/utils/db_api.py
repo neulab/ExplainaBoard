@@ -35,9 +35,7 @@ def write_statistics_from_db(dataset_name,
         'dataset_name': dataset_name,
         'subset_name': subset_name,
         'version': version,
-        'transformation': {
-            'type': transformation
-        },
+        'transformation': transformation,
         'content': content,
     }
     response = requests.post(end_point_upload_dataset, json=data_info)
