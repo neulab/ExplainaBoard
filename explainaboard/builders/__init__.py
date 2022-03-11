@@ -148,7 +148,7 @@ class ExplainaboardBuilder:
 
         # Bucketing
         for feature_name in tqdm(
-                self._info.features.get_bucket_features(), desc="bucketing"
+            self._info.features.get_bucket_features(), desc="bucketing"
         ):
             # print(f"Feature Name: {feature_name}\n"
             #       f"Bucket Hyper:\n function_name: {self._info.features[feature_name].bucket_info._method} \n"

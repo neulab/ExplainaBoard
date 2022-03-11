@@ -65,8 +65,6 @@ class ABSCExplainaboardBuilder(ExplainaboardBuilder):
             self._data[_id] = dict_sysout
             yield _id, dict_sysout
 
-
-
     def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
@@ -131,4 +129,3 @@ class ABSCExplainaboardBuilder(ExplainaboardBuilder):
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
         return sort_dict(bucket_name_to_performance)  # noqa
-

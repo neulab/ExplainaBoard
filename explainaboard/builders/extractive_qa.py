@@ -14,6 +14,7 @@ from datalabs import load_dataset
 
 from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregating
 
+
 @qa_extractive_aggregating(
     name="get_statistics",
     contributor="datalab",
