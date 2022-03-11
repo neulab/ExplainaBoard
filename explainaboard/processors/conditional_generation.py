@@ -124,6 +124,17 @@ class ConditionalGenerationProcessor(Processor):
                     _setting=(),
                 ),
             ),
+            "oracle_position_fre": feature.Value(
+                dtype="float",
+                description="the frequency of oracle sentence's position in training set",
+                is_bucket=True,
+                bucket_info=feature.BucketInfo(
+                    _method="bucket_attribute_specified_bucket_value",
+                    _number=4,
+                    _setting=(),
+                ),
+                require_training_set=True,
+            ),
         }
     )
 

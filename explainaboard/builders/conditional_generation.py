@@ -43,10 +43,24 @@ def get_statistics(samples: Iterator):
     """
 
     vocab = {}
+    vocab_pruning = {}
     length_fre = {}
+    oracle_position_fre = {}
     for sample in tqdm(samples):
 
         text, summary = sample["text"], sample["summary"]
+
+        # oracle_position_fre
+        oracle_info = get_oracle_summary.func(sample)
+        index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
+        oracle_position = str(int(numpy.mean(index_of_oracles)))
+
+        if oracle_position not in oracle_position_fre.keys():
+            oracle_position_fre[oracle_position] = 1
+        else:
+            oracle_position_fre[oracle_position] += 1
+
+
 
         # Vocabulary info
         for w in (text + summary).split(" "):
@@ -55,13 +69,21 @@ def get_statistics(samples: Iterator):
             else:
                 vocab[w] = 1
 
+    for k, v in vocab.items(): # pruning for the availability of database storage
+        if v > 20:
+            vocab_pruning[k] = v
+        if len(vocab_pruning) > 100:
+            break
+
+
     # the rank of each word based on its frequency
-    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)}
-    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab_pruning.values()), reverse=True), 1)}
+    vocab_rank = {k: sorted_dict[v] for k, v in vocab_pruning.items()}
 
 
-    return {"vocab":vocab,
+    return {"vocab":vocab_pruning,
             "vocab_rank":vocab_rank,
+            "oracle_position_fre": oracle_position_fre,
             }
 
 
@@ -76,20 +98,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
 
         # TODO(gneubig) to be deduplicated
-        # Calculate statistics of training set
-        self.statistics = None
-        if None != self._info.dataset_name:
-            try:
-                dataset = load_dataset(self._info.dataset_name, self._info.sub_dataset_name)
-                if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(get_statistics, mode = "local")
-                    self.statistics = new_train._stat
-                else:
-                    self.statistics = dataset["train"]._stat
-            except FileNotFoundError as err:
-                eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
+        self._init_statistics(get_statistics)
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
@@ -128,8 +137,13 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         fre_rank = fre_rank * 1.0 / len(existing_features["source"].split(" "))
         return fre_rank
 
-    @staticmethod
-    def get_oracle(existing_features: dict):
+
+
+
+
+
+
+    def get_oracle(self, existing_features: dict):
         """
         oracle_info =
             {
@@ -148,9 +162,17 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         oracle_position = numpy.mean(index_of_oracles)
 
 
+
+        oracle_position_fre = 0
+        if self.statistics != None and str(int(oracle_position)) in self.statistics['oracle_position_fre'].keys():
+            oracle_position_fre = self.statistics['oracle_position_fre'][str(int(oracle_position))]
+
+
+
         return {
             "oracle_position": oracle_position,
             "oracle_score": oracle_info["oracle_score"],
+            "oracle_position_fre":oracle_position_fre,
         }
 
 
@@ -201,8 +223,8 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
                     dict_sysout[
                         bucket_feature
                     ] = feature_value  # !!!!!!!!!!!!!!!!!!!! string to float !!!!!
-                elif bucket_feature in set(["oracle_position", "oracle_score"]):
-                    dict_sysout[bucket_feature] = CondGenExplainaboardBuilder.get_oracle(dict_sysout)[bucket_feature]
+                elif bucket_feature in set(["oracle_position", "oracle_score", "oracle_position_fre"]):
+                    dict_sysout[bucket_feature] = self.get_oracle(dict_sysout)[bucket_feature]
                 else:
                     feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
                     dict_sysout[bucket_feature] = feature_value

@@ -77,41 +77,7 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
-        self.statistics = None
-        if None != self._info.dataset_name:
-            try:
-                dataset_name = self._info.dataset_name
-                sub_dataset = None if self._info.sub_dataset_name == "default" else self._info.sub_dataset_name
-
-                # read statistics from db
-                response = read_statistics_from_db(dataset_name, sub_dataset)
-                message = json.loads(response.text.replace("null", ""))["message"]
-                eprint(message)
-                if message == "success" and self._info.reload_stat == True:
-                    self.statistics = json.loads(response.content)['content']
-                elif message == "success" and self._info.reload_stat == False or message == "the dataset does not include the information of _stat":
-                    dataset = load_dataset(self._info.dataset_name, self._info.sub_dataset_name)
-
-                    if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                        new_train = dataset['train'].apply(get_statistics, mode = "local")
-                        self.statistics = new_train._stat
-                        # write statistics to db
-                        response = write_statistics_from_db(dataset_name, sub_dataset, content = new_train._stat)
-                else: # dataset does not exist
-                    eprint(
-                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
-
-
-
-
-
-
-
-            except FileNotFoundError as err:
-                eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
+        self._init_statistics(get_statistics)
 
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
