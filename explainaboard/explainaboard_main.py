@@ -1,8 +1,9 @@
 import argparse
 import json
-from analysers import get_pairwise_performance_gap
+
 from explainaboard import get_loader, get_processor
 from explainaboard import TaskType
+from explainaboard import get_pairwise_performance_gap
 
 def main():
 
