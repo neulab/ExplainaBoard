@@ -12,10 +12,14 @@ from typing import Iterator, Dict, List
 from datalabs import load_dataset
 from datalabs.operations.aggregate.text_matching import text_matching_aggregating
 
-@text_matching_aggregating(name = "get_statistics", contributor= "datalab",
-                                 task="text-matching, natural-language-inference",
-                           description="Calculate the overall statistics (e.g., average length) of a given "
-                                       "text pair classification datasets. e,g. natural language inference")
+
+@text_matching_aggregating(
+    name="get_statistics",
+    contributor="datalab",
+    task="text-matching, natural-language-inference",
+    description="Calculate the overall statistics (e.g., average length) of a given "
+    "text pair classification datasets. e,g. natural language inference",
+)
 def get_statistics(samples: Iterator):
     """
     Input:
@@ -46,17 +50,20 @@ def get_statistics(samples: Iterator):
                 vocab[w] = 1
 
     # the rank of each word based on its frequency
-    sorted_dict = {key: rank for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)}
+    sorted_dict = {
+        key: rank
+        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+    }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
 
     # for k, v in length_fre.items():
     #     length_fre[k] /= len(samples)
 
-    return {"vocab":vocab,
-            "vocab_rank":vocab_rank,
-            # "length_fre":length_fre,
-            }
+    return {
+        "vocab": vocab,
+        "vocab_rank": vocab_rank,
+        # "length_fre":length_fre,
+    }
 
 
 class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
@@ -70,26 +77,32 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None,
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
         if None != self._info.dataset_name:
             try:
-                dataset = load_dataset(self._info.dataset_name, self._info.sub_dataset_name)
-                if len(dataset['train']._stat) == 0 or self._info.reload_stat == False: # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(get_statistics, mode = "local")
+                dataset = load_dataset(
+                    self._info.dataset_name, self._info.sub_dataset_name
+                )
+                if (
+                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                    new_train = dataset['train'].apply(get_statistics, mode="local")
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError as err:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md")
-
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity(self, existing_features: dict):
@@ -120,7 +133,6 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
         # print(num_oov)
         return num_oov
 
-
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict):
         fre_rank = 0
@@ -131,11 +143,14 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
             else:
                 fre_rank += self.statistics['vocab_rank'][w]
 
-        fre_rank = fre_rank * 1.0 / len((existing_features["text1"] + existing_features["text2"]).split(" "))
+        fre_rank = (
+            fre_rank
+            * 1.0
+            / len((existing_features["text1"] + existing_features["text2"]).split(" "))
+        )
         return fre_rank
+
     # --- End feature functions
-
-
 
     def _complete_feature(self):
         """
@@ -157,7 +172,10 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
                     continue
                 # If there is a training set dependent feature while no pre-computed statistics for it,
                 # then skip bucketing along this feature
-                if self._info.features[bucket_feature].require_training_set and self.statistics == None:
+                if (
+                    self._info.features[bucket_feature].require_training_set
+                    and self.statistics == None
+                ):
                     del self._info.features[bucket_feature]
                     continue
 

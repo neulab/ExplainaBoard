@@ -3,7 +3,9 @@ from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.builders.qa_multiple_choice import QAMultipleChoiceExplainaboardBuilder
+from explainaboard.builders.qa_multiple_choice import (
+    QAMultipleChoiceExplainaboardBuilder,
+)
 
 
 @register_processor(TaskType.qa_multiple_choice)
@@ -14,9 +16,9 @@ class QAMultipleChoiceProcessor(Processor):
             "context": feature.Value("string"),
             "question": feature.Value("string"),
             "options": feature.Sequence(feature.Value("string")),
-            "answers":{
+            "answers": {
                 "text": feature.Value("string"),
-                "option_index": feature.Value("int32")
+                "option_index": feature.Value("int32"),
             },
             "context_length": feature.Value(
                 dtype="float",

@@ -21,10 +21,11 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
         info: SysOutputInfo,
         system_output_object: Iterable[dict],
         feature_table: Optional[Table] = {},
-        user_defined_feature_config = None
+        user_defined_feature_config=None,
     ):
-        super().__init__(info, system_output_object, feature_table, user_defined_feature_config)
-
+        super().__init__(
+            info, system_output_object, feature_table, user_defined_feature_config
+        )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity_ctx_true_answer(self, existing_features: dict):
@@ -55,6 +56,7 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
 
     def _get_ind(self, existing_feature: dict):
         return float(existing_feature["ind"])
+
     # --- End feature functions
 
     def _complete_feature(self):

@@ -5,6 +5,7 @@ from explainaboard import get_loader, get_processor
 from explainaboard import TaskType
 from explainaboard import get_pairwise_performance_gap
 
+
 def main():
 
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
@@ -51,7 +52,6 @@ def main():
         help="reload precomputed statistics over training set (if exists)",
     )
 
-
     parser.add_argument(
         '--metrics',
         type=str,
@@ -82,13 +82,10 @@ def main():
 
     # Read in data and check validity
     system_datasets = [get_loader(task, data=x).load() for x in system_outputs]
-    
-    
+
     # Get user_defined_features_configs (this should be generalized later
-    loader = get_loader(task, data = system_outputs[0])
+    loader = get_loader(task, data=system_outputs[0])
     user_defined_features_configs = loader.load_user_defined_features_configs()
-  
-    
 
     if len(system_datasets) == 2 and len(system_datasets[0]) != len(system_datasets[1]):
         num0 = len(system_datasets[0])
@@ -102,18 +99,23 @@ def main():
         "dataset_name": dataset,
         "sub_dataset_name": sub_dataset,
         "task_name": task,
-        "reload_stat":reload_stat,
-        "user_defined_features_configs":user_defined_features_configs,
-                }
+        "reload_stat": reload_stat,
+        "user_defined_features_configs": user_defined_features_configs,
+    }
     if metric_names is not None:
         metadata["metric_names"] = metric_names
 
     # Run analysis
-    reports = [get_processor(task, metadata=metadata, data=x).process() for x in system_datasets]
+    reports = [
+        get_processor(task, metadata=metadata, data=x).process()
+        for x in system_datasets
+    ]
     if len(system_outputs) == 1:  # individual system analysis
         reports[0].print_as_json()
-    else:                         # pairwise analysis
-        compare_analysis = get_pairwise_performance_gap(reports[0].to_dict(), reports[1].to_dict())
+    else:  # pairwise analysis
+        compare_analysis = get_pairwise_performance_gap(
+            reports[0].to_dict(), reports[1].to_dict()
+        )
         print(json.dumps(compare_analysis, indent=4))
 
 
