@@ -138,40 +138,6 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
 
     # --- End feature functions
 
-    def _complete_feature(self):
-        """
-        This function is used to calculate features used for bucekting, such as sentence_length
-        :param feature_table_iterator:
-        :return:
-        """
-        # Get names of bucketing features
-        # print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
-        bucket_features = self._info.features.get_bucket_features()
-        for _id, dict_sysout in tqdm(
-            enumerate(self._system_output), desc="featurizing"
-        ):
-            # Get values of bucketing features
-            for bucket_feature in bucket_features:
-
-                # this is need due to `del self._info.features[bucket_feature]`
-                if bucket_feature not in self._info.features.keys():
-                    continue
-                # If there is a training set dependent feature while no pre-computed statistics for it,
-                # then skip bucketing along this feature
-                if (
-                    self._info.features[bucket_feature].require_training_set
-                    and self.statistics == None
-                ):
-                    del self._info.features[bucket_feature]
-                    continue
-
-                feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
-                dict_sysout[bucket_feature] = feature_value
-            # if self._data is None:
-            #     self._data = {}
-            self._data[_id] = dict_sysout
-            yield _id, dict_sysout
-
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(self):
         predicted_labels, true_labels = [], []
