@@ -59,6 +59,7 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
 
     # --- End feature functions
 
+    # TODO(gneubig): this should be generalized
     def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
