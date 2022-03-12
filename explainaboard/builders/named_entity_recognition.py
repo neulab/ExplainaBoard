@@ -354,10 +354,10 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
         return span_dics
 
+    # TODO(gneubig): can this be generalized or is it specialized?
     def _complete_feature(self):
         """
         This function is used to calculate features used for bucketing, such as sentence_length
-        :param feature_table_iterator:
         :return:
         """
         for _id, dict_sysout in tqdm(
@@ -623,6 +623,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
         return errorCase_list
 
+    # TODO(gneubig): this may be able to be generalized
     def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
