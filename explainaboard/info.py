@@ -63,7 +63,7 @@ class Result:
     calibration: List[Performance] = None
     fine_grained: Any = None
     is_print_case: bool = True
-    is_print_confidence_interval: bool = True
+    is_print_confidence_interval: bool = False
 
 
 @dataclass
