@@ -354,10 +354,10 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
         return span_dics
 
+    # TODO(gneubig): can this be generalized or is it specialized?
     def _complete_feature(self):
         """
         This function is used to calculate features used for bucketing, such as sentence_length
-        :param feature_table_iterator:
         :return:
         """
         for _id, dict_sysout in tqdm(

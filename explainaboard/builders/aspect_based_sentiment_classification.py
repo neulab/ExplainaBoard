@@ -47,24 +47,6 @@ class ABSCExplainaboardBuilder(ExplainaboardBuilder):
 
     # --- End feature functions
 
-    def _complete_feature(self):
-        """
-        This function is used to calculate features used for bucekting, such as sentence_length
-        :return:
-        """
-        # Get names of bucketing features
-        # print(f"self._info.features.get_bucket_features()\n {self._info.features.get_bucket_features()}")
-        bucket_features = self._info.features.get_bucket_features()
-        for _id, dict_sysout in tqdm(
-            enumerate(self._system_output), desc="featurizing"
-        ):
-            # Get values of bucketing features
-            for bucket_feature in bucket_features:
-                feature_value = self._get_feature_func(bucket_feature)(dict_sysout)
-                dict_sysout[bucket_feature] = feature_value
-            self._data[_id] = dict_sysout
-            yield _id, dict_sysout
-
     def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)

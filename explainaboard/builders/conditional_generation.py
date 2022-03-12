@@ -179,10 +179,10 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             "oracle_position_fre": oracle_position_fre,
         }
 
+    # TODO(gneubig): can this be de-duplicated or is it specialized?
     def _complete_feature(self):
         """
         This function is used to calculate features used for bucekting, such as sentence_length
-        :param feature_table_iterator:
         :return:
         """
         inputs = []
