@@ -12,6 +12,8 @@ from datalabs.operations.aggregate.kg_link_prediction import (
     kg_link_prediction_aggregating,
 )
 from typing import Iterator, Dict, List
+import sys
+import os
 
 
 @kg_link_prediction_aggregating(
@@ -110,9 +112,20 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         if self._info.dataset_name != "fb15k_237":  # to be generalized
             self.entity_type_level_map = {}
         else:
-            f = open('entity_type_level_map.json')
-            self.entity_type_level_map = json.load(f)
-            print(self.entity_type_level_map.keys())
+            scriptpath = os.path.dirname(__file__)
+            with open(
+                os.path.join(
+                    scriptpath, '../pre_computed/kg/entity_type_level_map.json'
+                ),
+                'r',
+            ) as file:
+                self.entity_type_level_map = json.loads(file.read())
+        # print(self.entity_type_level_map)
+        # exit()
+
+        # f = open('entity_type_level_map.json')
+        # self.entity_type_level_map = json.load(f)
+        # print(self.entity_type_level_map.keys())
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
