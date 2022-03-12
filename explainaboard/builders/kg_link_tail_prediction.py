@@ -186,7 +186,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
     # --- End feature functions
 
-    # TODO(gneubig): should this be generalized or is it task specific?
+    # TODO(gneubig): this can probably be generalized to single-metric
     def get_overall_performance(self):
         predicted_labels, true_labels = [], []
 
@@ -219,6 +219,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
             else:
                 self._info.results.overall[metric_name] = overall_performance
 
+    # TODO(gneubig): the only difficult part in generalizing this is specifing "in" instead of "=="
     def get_bucket_performance(self, feature_name: str):
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)

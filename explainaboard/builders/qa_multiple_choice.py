@@ -138,99 +138,18 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
 
     # --- End feature functions
 
-    # TODO(gneubig): should this be generalized or is it task specific?
-    def get_overall_performance(self):
-        predicted_labels, true_labels = [], []
-
-        for _id, feature_table in self._data.items():
-            true_labels.append(feature_table["answers"]["option_index"])
-            predicted_labels.append(feature_table["predicted_answers"]["option_index"])
-
-        for metric_name in self._info.metric_names:
-            one_metric = eval(metric_name)(
-                true_labels=true_labels,
-                predicted_labels=predicted_labels,
-                is_print_confidence_interval=self._info.results.is_print_confidence_interval,
-            )
-            overall_value_json = one_metric.evaluate()
-
-            overall_value = overall_value_json["value"]
-            confidence_score_low = overall_value_json["confidence_score_low"]
-            confidence_score_up = overall_value_json["confidence_score_up"]
-            overall_performance = Performance(
-                metric_name=metric_name,
-                value=float(format(overall_value, '.4g')),
-                confidence_score_low=float(format(confidence_score_low, '.4g')),
-                confidence_score_up=float(format(confidence_score_up, '.4g')),
-            )
-            if self._info.results.overall is None:
-                self._info.results.overall = {}
-                self._info.results.overall[metric_name] = overall_performance
-            else:
-                self._info.results.overall[metric_name] = overall_performance
-
-    def get_bucket_performance(self, feature_name: str):
+    def _get_true_label(self, data_point):
         """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param feature_name: the name of a feature, e.g., sentence length
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
+        Get the true label from a data point. Overloaded from parent class.
+        :param data_point: the data point under consideration
+        :return: the true label for the output
         """
+        return data_point["answers"]["option_index"]
 
-        bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in self._samples_over_bucket[
-            feature_name
-        ].items():
-
-            bucket_true_labels = []
-            bucket_predicted_labels = []
-            bucket_cases = []
-
-            for sample_id in sample_ids:
-
-                true_label = self._data[int(sample_id)]["answers"]["option_index"]
-                predicted_label = self._data[int(sample_id)]["predicted_answers"][
-                    "option_index"
-                ]
-                s_id = self._data[int(sample_id)]["id"]
-
-                # get a bucket of true/predicted labels
-                bucket_true_labels.append(true_label)
-                bucket_predicted_labels.append(predicted_label)
-                # get a bucket of cases (e.g., errors)
-                if self._info.results.is_print_case:
-                    if true_label != predicted_label:
-                        bucket_case = str(s_id)
-                        bucket_cases.append(bucket_case)
-
-            bucket_name_to_performance[bucket_interval] = []
-            for metric_name in self._info.metric_names:
-                one_metric = eval(metric_name)(
-                    true_labels=bucket_true_labels,
-                    predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=self._info.results.is_print_confidence_interval,
-                )
-                bucket_value_json = one_metric.evaluate()
-
-                bucket_value = bucket_value_json["value"]
-                confidence_score_low = bucket_value_json["confidence_score_low"]
-                confidence_score_up = bucket_value_json["confidence_score_up"]
-
-                # print(f"name:\t {one_metric._name} \n"
-                #       f"value:\t {bucket_value}\n"
-                #       f"confidence low\t {confidence_score_low}\n"
-                #       f"confidence up \t {confidence_score_up}\n"
-                #       f"---------------------------------")
-
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=format(bucket_value, '.4g'),
-                    confidence_score_low=format(confidence_score_low, '.4g'),
-                    confidence_score_up=format(confidence_score_up, '.4g'),
-                    n_samples=len(bucket_true_labels),
-                    bucket_samples=bucket_cases,
-                )
-
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
-
-        return sort_dict(bucket_name_to_performance)  # noqa
+    def _get_predicted_label(self, data_point):
+        """
+        Get the predicted label from a data point. Overloaded from parent class.
+        :param data_point: the data point under consideration
+        :return: the predicted label for the output
+        """
+        return data_point["predicted_answers"]["option_index"]

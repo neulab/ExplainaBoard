@@ -1,5 +1,5 @@
 from typing import Optional, Iterable
-from explainaboard.info import SysOutputInfo, BucketPerformance, Table
+from explainaboard.info import SysOutputInfo, Table
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.utils.eval_bucket import *  # noqa
@@ -8,14 +8,10 @@ from explainaboard.metric import F1score  # noqa
 from tqdm import tqdm
 from explainaboard.utils.feature_funcs import *  # noqa
 from explainaboard.utils.spacy_loader import spacy_loader
-from typing import Iterator, Dict, List
-from datalabs import load_dataset
+from typing import Iterator
 from datalabs.operations.aggregate.text_classification import (
     text_classification_aggregating,
 )
-import requests
-import json
-from explainaboard.utils.db_api import *
 
 
 @text_classification_aggregating(
@@ -141,67 +137,3 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
         return length_fre
 
     # --- End feature functions
-
-    def get_bucket_performance(self, feature_name: str):
-        """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param feature_name: the name of a feature, e.g., sentence length
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
-        """
-
-        bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in self._samples_over_bucket[
-            feature_name
-        ].items():
-
-            bucket_true_labels = []
-            bucket_predicted_labels = []
-            bucket_cases = []
-
-            for sample_id in sample_ids:
-
-                true_label = self._data[int(sample_id)]["true_label"]
-                predicted_label = self._data[int(sample_id)]["predicted_label"]
-                sent = self._data[int(sample_id)]["text"]  # noqa
-                s_id = self._data[int(sample_id)]["id"]
-
-                # get a bucket of true/predicted labels
-                bucket_true_labels.append(true_label)
-                bucket_predicted_labels.append(predicted_label)
-                # get a bucket of cases (e.g., errors)
-                if self._info.results.is_print_case:
-                    if true_label != predicted_label:
-                        # bucket_case = true_label + "|||" + predicted_label + "|||" + sent
-                        # bucket_case = {"true_label":(s_id,["true_label"]),
-                        #                "predicted_label":(s_id,["predicted_label"]),
-                        #                "text":(s_id,["text"])}
-                        bucket_case = str(s_id)
-                        bucket_cases.append(bucket_case)
-
-            bucket_name_to_performance[bucket_interval] = []
-            for metric_name in self._info.metric_names:
-
-                one_metric = eval(metric_name)(
-                    true_labels=bucket_true_labels,
-                    predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=self._info.results.is_print_confidence_interval,
-                )
-                bucket_value_json = one_metric.evaluate()
-
-                bucket_value = bucket_value_json["value"]
-                confidence_score_low = bucket_value_json["confidence_score_low"]
-                confidence_score_up = bucket_value_json["confidence_score_up"]
-
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=format(bucket_value, '.4g'),
-                    confidence_score_low=format(confidence_score_low, '.4g'),
-                    confidence_score_up=format(confidence_score_up, '.4g'),
-                    n_samples=len(bucket_true_labels),
-                    bucket_samples=bucket_cases,
-                )
-
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
-
-        return sort_dict(bucket_name_to_performance)  # noqa
