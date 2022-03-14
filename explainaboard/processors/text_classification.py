@@ -1,5 +1,6 @@
-from typing import Iterable
+from typing import Iterable, List
 from explainaboard import feature
+from explainaboard.info import SysOutputInfo, Result
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -108,15 +109,19 @@ class TextClassificationProcessor(Processor):
         }
     )
 
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def process(self,
+                metadata: dict,
+                sys_output: List[dict]) -> Result:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.text_classification.value
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Accuracy"]
-        super().__init__(metadata, system_output_data)
-        self._builder = TCExplainaboardBuilder()
-
-    def process(self):
-        self._builder.run(self._system_output_info, system_output_data)
+        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info.features = self._features
+        builder = TCExplainaboardBuilder()
+        return builder.run(sys_info, sys_output)
