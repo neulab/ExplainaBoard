@@ -16,16 +16,8 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity_ctx_true_answer(self, existing_features: dict):

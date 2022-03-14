@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from typing import Callable
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
 from explainaboard.builders import ExplainaboardBuilder
@@ -71,37 +71,41 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
 
-        # TODO(gneubig): this should be deduplicated
+    # TODO(gneubig): this should be deduplicated
+    def _init_statistics(self,
+                         sys_info: SysOutputInfo,
+                         get_statistics: Callable):
+        """Take in information about the system outputs and a statistic calculating function and return a dictionary
+        of statistics.
+
+        :param sys_info: Information about the system outputs
+        :param get_statistics: The function used to get the statistics
+        :return: Statistics from, usually, the training set that are used to calculate other features
+        """
+
         # Calculate statistics of training set
-        self.statistics = None
-        if None != self._info.dataset_name:
+        statistics = None
+        if None != sys_info.dataset_name:
             try:
                 dataset = load_dataset(
-                    self._info.dataset_name, self._info.sub_dataset_name
+                    sys_info.dataset_name, sys_info.sub_dataset_name
                 )
                 if (
-                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                    len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     new_train = dataset['train'].apply(get_statistics, mode="local")
-                    self.statistics = new_train._stat
+                    statistics = new_train._stat
                 else:
-                    self.statistics = dataset["train"]._stat
+                    statistics = dataset["train"]._stat
             except FileNotFoundError as err:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
+        return statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, existing_features: dict):

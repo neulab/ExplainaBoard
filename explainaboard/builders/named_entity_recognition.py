@@ -1,12 +1,11 @@
 import os
-from typing import Iterable, Optional
+from typing import Callable
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.utils import analysis
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.utils.feature_funcs import *  # noqa
-import pickle
+from explainaboard.utils.analysis import *
+from explainaboard.utils.eval_bucket import *
+from explainaboard.utils.feature_funcs import *
 from tqdm import tqdm
 from explainaboard.utils.py_utils import eprint
 import re
@@ -210,42 +209,46 @@ def get_statistics(samples: Iterator, tag_id2str=[]):
 
 
 class NERExplainaboardBuilder(ExplainaboardBuilder):
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
         self._samples_over_bucket_pred = {}
+
+    def _init_statistics(self,
+                         sys_info: SysOutputInfo,
+                         get_statistics: Callable):
+        """Take in information about the system outputs and a statistic calculating function and return a dictionary
+        of statistics.
+
+        :param sys_info: Information about the system outputs
+        :param get_statistics: The function used to get the statistics
+        :return: Statistics from, usually, the training set that are used to calculate other features
+        """
 
         # TODO(gneubig): this is a bit different than others, and probably should override the parent class
         # Calculate statistics of training set
-        eprint(self._info.dataset_name, self._info.sub_dataset_name)
-        self.statistics = None
-        if None != self._info.dataset_name:
+        eprint(sys_info.dataset_name, sys_info.sub_dataset_name)
+        statistics = None
+        if None != sys_info.dataset_name:
             try:
 
                 dataset = load_dataset(
-                    self._info.dataset_name, self._info.sub_dataset_name
+                    sys_info.dataset_name, sys_info.sub_dataset_name
                 )
                 if (
-                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                    len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     tag_id2str = dataset['train']._info.task_templates[0].labels
                     get_statistics.resources = {"tag_id2str": tag_id2str}
                     new_train = dataset['train'].apply(get_statistics, mode="local")
-                    self.statistics = new_train._stat
+                    statistics = new_train._stat
                 else:
-                    self.statistics = dataset["train"]._stat
+                    statistics = dataset["train"]._stat
             except FileNotFoundError as err:
                 eprint(
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
+        return statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
@@ -466,7 +469,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                         f'Missing feature {self.feature_name} not found and not pre-computed'
                     )
 
-    def _bucketing_samples(self, sysout_iterator):
+    def _bucketing_samples(self, sys_output):
 
         sample_address = ""  # noqa
         feature_to_sample_address_to_value_true = {}
@@ -476,7 +479,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         pcf_set = set(self._info.features.get_pre_computed_features())
 
         # Preparation for bucketing
-        for _id, feature_table in sysout_iterator:
+        for _id, feature_table in sys_output:
 
             self._bucketing_samples_add_feats(
                 _id,
@@ -519,10 +522,10 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             ):
                 continue
 
-            self._samples_over_bucket[feature_name] = eval(_bucket_info._method)(
+            self._samples_over_bucket[feature_name] = eval(_bucket_info.method)(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
-                bucket_number=_bucket_info._number,
-                bucket_setting=_bucket_info._setting,
+                bucket_number=_bucket_info.number,
+                bucket_setting=_bucket_info.setting,
             )
 
             # print(f"debug-1: {self._samples_over_bucket_true[feature_name]}")
@@ -530,7 +533,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 feature_name
             ] = bucket_attribute_specified_bucket_interval(  # noqa
                 dict_obj=feature_to_sample_address_to_value_pred[feature_name],
-                bucket_number=_bucket_info._number,
+                bucket_number=_bucket_info.number,
                 bucket_setting=self._samples_over_bucket[feature_name].keys(),
             )
 

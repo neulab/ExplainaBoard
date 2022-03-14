@@ -20,7 +20,7 @@ class TextPairClassificationProcessor(Processor):
                 dtype="string",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=4, _setting=1
+                    method="bucket_attribute_discrete_value", number=4, setting=1
                 ),
             ),
             "text1_length": feature.Value(
@@ -28,9 +28,9 @@ class TextPairClassificationProcessor(Processor):
                 description="text1 length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "text2_length": feature.Value(
@@ -38,9 +38,9 @@ class TextPairClassificationProcessor(Processor):
                 description="text2 length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "similarity": feature.Value(
@@ -48,9 +48,9 @@ class TextPairClassificationProcessor(Processor):
                 description="two texts' similarity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "text1_divided_text2": feature.Value(
@@ -58,9 +58,9 @@ class TextPairClassificationProcessor(Processor):
                 description="diff of two texts' length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "num_oov": feature.Value(
@@ -68,9 +68,9 @@ class TextPairClassificationProcessor(Processor):
                 description="the number of out-of-vocabulary words",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -79,9 +79,9 @@ class TextPairClassificationProcessor(Processor):
                 description="the average rank of each work based on its frequency in training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -96,6 +96,5 @@ class TextPairClassificationProcessor(Processor):
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Accuracy"]
         super().__init__(metadata, system_output_data)
-        self._builder = TextPairClassificationExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )
+        self._builder = TextPairClassificationExplainaboardBuilder()
+        self._builder.run(self._system_output_info, system_output_data)

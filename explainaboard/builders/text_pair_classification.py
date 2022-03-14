@@ -1,10 +1,10 @@
-from typing import Iterable, Optional
+from typing import Callable
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.utils.eval_bucket import *
 from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.metric import *  # noqa
+from explainaboard.utils.analysis import *
+from explainaboard.metric import *
 from tqdm import tqdm
 
 from typing import Iterator
@@ -71,17 +71,19 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
 
+    def _init_statistics(self,
+                         sys_info: SysOutputInfo,
+                         get_statistics: Callable):
+        """Take in information about the system outputs and a statistic calculating function and return a dictionary
+        of statistics.
+
+        :param sys_info: Information about the system outputs
+        :param get_statistics: The function used to get the statistics
+        :return: Statistics from, usually, the training set that are used to calculate other features
+        """
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None

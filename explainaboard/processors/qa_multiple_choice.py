@@ -25,9 +25,9 @@ class QAMultipleChoiceProcessor(Processor):
                 description="the length of context",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "question_length": feature.Value(
@@ -35,9 +35,9 @@ class QAMultipleChoiceProcessor(Processor):
                 description="the length of question",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "answer_length": feature.Value(
@@ -45,9 +45,9 @@ class QAMultipleChoiceProcessor(Processor):
                 description="the length of answer",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "num_oov": feature.Value(
@@ -55,9 +55,9 @@ class QAMultipleChoiceProcessor(Processor):
                 description="the number of out-of-vocabulary words",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -66,9 +66,9 @@ class QAMultipleChoiceProcessor(Processor):
                 description="the average rank of each work based on its frequency in training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -83,6 +83,5 @@ class QAMultipleChoiceProcessor(Processor):
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Accuracy"]
         super().__init__(metadata, system_output_data)
-        self._builder = QAMultipleChoiceExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )
+        self._builder = QAMultipleChoiceExplainaboardBuilder()
+        self._builder.run(self._system_output_info, system_output_data)

@@ -9,56 +9,6 @@ from tqdm import tqdm
 from explainaboard.utils.feature_funcs import *  # noqa
 from explainaboard.utils.spacy_loader import spacy_loader
 from typing import Iterator
-from datalabs.operations.aggregate.text_classification import (
-    text_classification_aggregating,
-)
-
-
-@text_classification_aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="text-classification",
-    description="Calculate the overall statistics (e.g., average length) of "
-    "a given text classification dataset",
-)
-def get_statistics(samples: Iterator):
-    """
-    Input:
-    samples: [{
-     "text":
-     "label":
-    }]
-    """
-
-    vocab = {}
-    length_fre = {}
-    for sample in tqdm(samples):
-        text, label = sample["text"], sample["label"]
-        length = len(text.split(" "))
-
-        if length in length_fre.keys():
-            length_fre[length] += 1
-        else:
-            length_fre[length] = 1
-
-        # update vocabulary
-        for w in text.split(" "):
-            if w in vocab.keys():
-                vocab[w] += 1
-            else:
-                vocab[w] = 1
-
-    # the rank of each word based on its frequency
-    sorted_dict = {
-        key: rank
-        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-    }
-    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
-    for k, v in length_fre.items():
-        length_fre[k] = length_fre[k] * 1.0 / len(samples)
-
-    return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
 
 
 class TCExplainaboardBuilder(ExplainaboardBuilder):
@@ -67,20 +17,47 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
 
-        # TODO(gneubig): this should be deduplicated
-        # Calculate statistics of training set
-        self._init_statistics(get_statistics)
+    def get_statistics(samples: Iterator):
+        """
+        Input:
+        samples: [{
+         "text":
+         "label":
+        }]
+        """
+
+        vocab = {}
+        length_fre = {}
+        for sample in tqdm(samples):
+            text, label = sample["text"], sample["label"]
+            length = len(text.split(" "))
+
+            if length in length_fre.keys():
+                length_fre[length] += 1
+            else:
+                length_fre[length] = 1
+
+            # update vocabulary
+            for w in text.split(" "):
+                if w in vocab.keys():
+                    vocab[w] += 1
+                else:
+                    vocab[w] = 1
+
+        # the rank of each word based on its frequency
+        sorted_dict = {
+            key: rank
+            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+        }
+        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+
+        for k, v in length_fre.items():
+            length_fre[k] = length_fre[k] * 1.0 / len(samples)
+
+        return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):

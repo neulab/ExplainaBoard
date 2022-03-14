@@ -237,14 +237,14 @@ class BucketInfo:
     """
     The class is used to define a dataclass for bucketing strategy
     Args:
-        _method: the bucket strategy
-        _number: the number of buckets to be bucketed
-        _settting: hyper-paraterms of bucketing
+        method: the bucket strategy
+        number: the number of buckets to be bucketed
+        setting: hyper-paraterms of bucketing
     """
 
-    _method: str = "bucket_attribute_specified_bucket_value"
-    _number: int = 4
-    _setting: Any = 1  # For different bucket_methods, the settings are diverse
+    method: str = "bucket_attribute_specified_bucket_value"
+    number: int = 4
+    setting: Any = 1  # For different bucket_methods, the settings are diverse
 
 
 @dataclass
