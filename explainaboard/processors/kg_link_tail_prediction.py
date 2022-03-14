@@ -20,9 +20,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="number of words in the tail entity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "head_entity_length": feature.Value(
@@ -30,9 +30,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="number of words in the head entity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "tail_fre": feature.Value(
@@ -40,9 +40,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="the frequency of tail entity in the training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -51,9 +51,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="the frequency of link relation in the training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -62,9 +62,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="the frequency of head relation in the training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -73,7 +73,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="boolean feature: 'symmetric' or 'asymmetric'; more granularity to be added",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=2, _setting=1
+                    method="bucket_attribute_discrete_value", number=2, setting=1
                 ),
             ),
             "entity_type_level": feature.Value(
@@ -81,7 +81,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="most specific (highest) entity type level of true tail entity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=8, _setting=1
+                    method="bucket_attribute_discrete_value", number=8, setting=1
                 ),
             ),
         }

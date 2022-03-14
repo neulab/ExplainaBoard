@@ -26,9 +26,9 @@ class Processor:
                         description=feature_config["description"],
                         is_bucket=True,
                         bucket_info=feature.BucketInfo(
-                            _method="bucket_attribute_discrete_value",
-                            _number=feature_config["num_buckets"],
-                            _setting=1,
+                            method="bucket_attribute_discrete_value",
+                            number=feature_config["num_buckets"],
+                            setting=1,
                         ),
                     )
                 elif feature_config['dtype'] == 'float':
@@ -37,15 +37,13 @@ class Processor:
                         description=feature_config["description"],
                         is_bucket=True,
                         bucket_info=feature.BucketInfo(
-                            _method="bucket_attribute_specified_bucket_value",
-                            _number=feature_config["num_buckets"],
-                            _setting=(),
+                            method="bucket_attribute_specified_bucket_value",
+                            number=feature_config["num_buckets"],
+                            setting=(),
                         ),
                     )
                 else:
                     raise NotImplementedError
 
     def process(self) -> SysOutputInfo:
-        if not self._builder:
-            raise NotImplementedError
-        return self._builder.run()
+        raise NotImplementedError

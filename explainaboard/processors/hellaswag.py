@@ -21,52 +21,52 @@ class HellaswagProcessor(Processor):
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "activity_label": feature.Value(
                 "string",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=10, _setting=1
+                    method="bucket_attribute_discrete_value", number=10, setting=1
                 ),
             ),
             "ctx_length": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "ctx_a_length_divided_b": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "true_answer_length": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "similarity_ctx_true_answer": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
         }
@@ -80,6 +80,5 @@ class HellaswagProcessor(Processor):
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Accuracy"]
         super().__init__(metadata, system_output_data)
-        self._builder = HellaswagExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )  # easy to make mistake
+        self._builder = HellaswagExplainaboardBuilder()
+        self._builder.run(self._system_output_info, system_output_data)

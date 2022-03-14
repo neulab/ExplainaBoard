@@ -13,16 +13,8 @@ class ABSCExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
         self._spacy_nlp = spacy_loader.get_model("en_core_web_sm")
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()

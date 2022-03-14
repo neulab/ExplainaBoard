@@ -78,16 +78,20 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
+        # entity types
+        if self._info.dataset_name != "fb15k_237":  # to be generalized
+            self.entity_type_level_map = {}
+        else:
+            scriptpath = os.path.dirname(__file__)
+            with open(
+                    os.path.join(
+                        scriptpath, '../pre_computed/kg/entity_type_level_map.json'
+                    ),
+                    'r',
+            ) as file:
+                self.entity_type_level_map = json.loads(file.read())
 
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
@@ -108,18 +112,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
 
-        # entity types
-        if self._info.dataset_name != "fb15k_237":  # to be generalized
-            self.entity_type_level_map = {}
-        else:
-            scriptpath = os.path.dirname(__file__)
-            with open(
-                os.path.join(
-                    scriptpath, '../pre_computed/kg/entity_type_level_map.json'
-                ),
-                'r',
-            ) as file:
-                self.entity_type_level_map = json.loads(file.read())
+
         # print(self.entity_type_level_map)
         # exit()
 

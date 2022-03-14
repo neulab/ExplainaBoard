@@ -26,7 +26,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description="category",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=4, _setting=1
+                    method="bucket_attribute_discrete_value", number=4, setting=1
                 ),
             ),
             "sentence_length": feature.Value(
@@ -34,9 +34,9 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description="sentence length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "token_number": feature.Value(
@@ -44,9 +44,9 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description="the number of chars",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "entity_number": feature.Value(
@@ -54,9 +54,9 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description="entity numbers",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "aspect_length": feature.Value(
@@ -64,9 +64,9 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description="aspect length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "aspect_index": feature.Value(
@@ -74,9 +74,9 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description="aspect position",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
         }
@@ -91,8 +91,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             metadata["metric_names"] = ["Accuracy"]
         # print(metadata)
         super().__init__(metadata, system_output_data)
-        self._builder = ABSCExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )
+        self._builder = ABSCExplainaboardBuilder()
+        self._builder.run(self._system_output_info, system_output_data)
 
         # explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv

@@ -94,12 +94,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         feature_table: Optional[Table] = None,
         user_defined_feature_config=None,
     ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
-
-        # TODO(gneubig) to be deduplicated
-        self._init_statistics(get_statistics)
+        super().__init__()
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
