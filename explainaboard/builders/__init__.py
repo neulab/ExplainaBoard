@@ -1,7 +1,6 @@
-from typing import Iterable, Optional, Callable, List, Tuple, Dict
-from explainaboard.info import SysOutputInfo, Table, Performance, BucketPerformance
+from typing import Callable, List, Tuple, Dict
+from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Result
 import explainaboard.metric
-import copy
 from tqdm import tqdm
 from eaas import Config, Client
 from datalabs import load_dataset
@@ -283,10 +282,11 @@ class ExplainaboardBuilder:
     def run(self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
-    ) -> SysOutputInfo:
+    ) -> Result:
         statistics = self._init_statistics(sys_info, self.get_statistics)
         active_features = self._complete_features(sys_info, sys_output, statistics=statistics)
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(sys_info, sys_output, active_features)
         overall_results = self.get_overall_performance(sys_info, sys_output)
         self._print_bucket_info(performance_over_bucket)
-        return sys_info
+        result = Result(overall = overall_results, fine_grained=performance_over_bucket)
+        return result
