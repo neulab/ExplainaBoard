@@ -223,7 +223,10 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             # Get values of bucketing features
             for (
                 bucket_key,
-                (bucket_func, training_dependent,),
+                (
+                    bucket_func,
+                    training_dependent,
+                ),
             ) in bucket_feature_funcs.items():
 
                 # TODO(gneubig): this logic seems complicated, can it be simplified?
@@ -243,7 +246,9 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-        self, sys_info: SysOutputInfo, sys_output: List[dict],
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
     ) -> Dict[str, Performance]:
 
         inputs = []  # noqa

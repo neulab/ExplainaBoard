@@ -182,7 +182,9 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): this can probably be generalized to single-metric
     def get_overall_performance(
-        self, sys_info: SysOutputInfo, sys_output: List[dict],
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
     ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []
 
