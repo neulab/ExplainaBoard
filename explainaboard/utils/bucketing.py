@@ -1,4 +1,9 @@
-from explainaboard.utils.analysis import reverse_dict, reverse_dict_discrete, sort_dict, find_key
+from explainaboard.utils.analysis import (
+    reverse_dict,
+    reverse_dict_discrete,
+    sort_dict,
+    find_key,
+)
 
 
 def bucket_attribute_specified_bucket_value(

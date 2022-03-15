@@ -74,9 +74,7 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
         super().__init__()
 
     # TODO(gneubig): this should be deduplicated
-    def _init_statistics(self,
-                         sys_info: SysOutputInfo,
-                         get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -89,9 +87,7 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
         statistics = None
         if None != sys_info.dataset_name:
             try:
-                dataset = load_dataset(
-                    sys_info.dataset_name, sys_info.sub_dataset_name
-                )
+                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if (
                     len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False

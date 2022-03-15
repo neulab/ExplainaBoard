@@ -112,9 +112,7 @@ class TextClassificationProcessor(Processor):
     def __init__(self) -> None:
         super().__init__()
 
-    def process(self,
-                metadata: dict,
-                sys_output: List[dict]) -> Result:
+    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():

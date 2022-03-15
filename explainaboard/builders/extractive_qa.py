@@ -64,9 +64,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         super().__init__()
 
     # TODO(gneubig) to be deduplicated
-    def _init_statistics(self,
-                         sys_info: SysOutputInfo,
-                         get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -79,9 +77,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         statistics = None
         if None != sys_info.dataset_name:
             try:
-                dataset = load_dataset(
-                    sys_info.dataset_name, sys_info.sub_dataset_name
-                )
+                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if "train" not in dataset.keys():
                     statistics = None
                 elif (
@@ -146,9 +142,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): this can probably be generalized as well
     def get_overall_performance(
-            self,
-            sys_info: SysOutputInfo,
-            sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
         predicted_answers, true_answers = [], []
 
@@ -161,9 +155,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
             # TODO(gneubig): is it necessary to have this as a separate interface than the other metrics?
             #                probably not. it'd be good to unify these.
             metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
-            overall_value = metric_func(
-                true_answers, predicted_answers
-            )
+            overall_value = metric_func(true_answers, predicted_answers)
 
             overall_value = overall_value
             confidence_score_low = 0
@@ -227,9 +219,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 # TODO(gneubig): is it necessary to have this as a separate interface than the other metrics?
                 #                probably not. it'd be good to unify these.
                 metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
-                bucket_value = metric_func(
-                    bucket_true_labels, bucket_predicted_labels
-                )
+                bucket_value = metric_func(bucket_true_labels, bucket_predicted_labels)
 
                 bucket_value = bucket_value
                 confidence_score_low = 0

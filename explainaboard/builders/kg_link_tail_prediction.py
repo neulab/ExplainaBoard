@@ -76,7 +76,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(self, user_defined_feature_config = None):
+    def __init__(self, user_defined_feature_config=None):
         super().__init__()
         self._user_defined_feature_config = user_defined_feature_config
         self.entity_type_level_map = None
@@ -89,10 +89,10 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         else:
             scriptpath = os.path.dirname(__file__)
             with open(
-                    os.path.join(
-                        scriptpath, '../pre_computed/kg/entity_type_level_map.json'
-                    ),
-                    'r',
+                os.path.join(
+                    scriptpath, '../pre_computed/kg/entity_type_level_map.json'
+                ),
+                'r',
             ) as file:
                 self.entity_type_level_map = json.loads(file.read())
 
@@ -113,7 +113,6 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                     "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
-
 
         # print(self.entity_type_level_map)
         # exit()
@@ -183,9 +182,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): this can probably be generalized to single-metric
     def get_overall_performance(
-            self,
-            sys_info: SysOutputInfo,
-            sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []
 
