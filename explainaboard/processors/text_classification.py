@@ -108,18 +108,5 @@ class TextClassificationProcessor(Processor):
             ),
         }
     )
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.text_classification.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["Accuracy"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = TCExplainaboardBuilder()
-        return builder.run(sys_info, sys_output)
+    _builder = TCExplainaboardBuilder()
+    _default_metrics = ["Accuracy"]

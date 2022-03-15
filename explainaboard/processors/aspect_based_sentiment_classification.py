@@ -82,20 +82,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             ),
         }
     )
+    _builder = ABSCExplainaboardBuilder()
+    _default_metrics = ["Accuracy"]
 
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.aspect_based_sentiment_classification.value
-        if "metric_names" not in metadata.keys() or metadata["metric_names"] is None:
-            metadata["metric_names"] = ["Accuracy"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = ABSCExplainaboardBuilder()
-        return builder.run(sys_info, sys_output)
-
-        # explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv
+    # explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv
