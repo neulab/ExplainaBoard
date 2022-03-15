@@ -1,6 +1,7 @@
 from dataclasses import dataclass, asdict, field
 from typing import Any, List, Optional
 from explainaboard.feature import Features
+import sys
 import json
 import os
 from explainaboard import config
@@ -62,8 +63,6 @@ class Result:
     overall: Any = None
     calibration: List[Performance] = None
     fine_grained: Any = None
-    is_print_case: bool = True
-    is_print_confidence_interval: bool = False
 
 
 @dataclass
@@ -79,6 +78,8 @@ class SysOutputInfo:
         paper (Paper, optional): the published paper of the system.
         features (Features, optional): the features used to describe system output's
                                         column type.
+        is_print_case (bool): Whether or not to print out cases
+        is_print_confidence_interval (bool): Whether or not to print out confidence intervals
     """
 
     # set in the system_output scripts
@@ -88,6 +89,8 @@ class SysOutputInfo:
     sub_dataset_name: Optional[str] = None
     metric_names: Optional[List[str]] = None
     reload_stat: bool = True
+    is_print_case: bool = True
+    is_print_confidence_interval: bool = False
     # language : str = "English"
 
     # set later
@@ -107,8 +110,29 @@ class SysOutputInfo:
     def to_dict(self) -> dict:
         return asdict(self)
 
+    def replace_bad_keys(self, data):
+        if isinstance(data, list):
+            for value in data:
+                if isinstance(value, dict):
+                    self.replace_bad_keys(value)
+        else:
+            replace_keys = []
+            for key, value in data.items():
+                if not isinstance(key, str):
+                    replace_keys.append(key)
+                if isinstance(value, dict) or isinstance(value, list):
+                    self.replace_bad_keys(value)
+            for key in replace_keys:
+                data[str(key)] = data[key]
+                del data[key]
+
     def print_as_json(self):
-        print(json.dumps(self.to_dict(), indent=4))
+        data_dict = self.to_dict()
+        self.replace_bad_keys(data_dict)
+        try:
+            print(json.dumps(data_dict, indent=4))
+        except TypeError as e:
+            raise e
 
     def _dump_info(self, file):
         """SystemOutputInfo => JSON"""

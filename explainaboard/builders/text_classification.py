@@ -1,14 +1,10 @@
-from typing import Optional, Iterable
-from explainaboard.info import SysOutputInfo, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.metric import Accuracy  # noqa
-from explainaboard.metric import F1score  # noqa
-from tqdm import tqdm
-from explainaboard.utils.feature_funcs import *  # noqa
-from explainaboard.utils.spacy_loader import spacy_loader
 from typing import Iterator
+
+from tqdm import tqdm
+
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.utils.feature_funcs import *
+from explainaboard.utils.spacy_loader import spacy_loader
 from datalabs.operations.aggregate.text_classification import (
     text_classification_aggregating,
 )
@@ -18,8 +14,7 @@ from datalabs.operations.aggregate.text_classification import (
     name="get_statistics",
     contributor="datalab",
     task="text-classification",
-    description="Calculate the overall statistics (e.g., average length) of "
-    "a given text classification dataset",
+    description="Calculate the overall statistics (e.g., density) of a given text classification dataset",
 )
 def get_statistics(samples: Iterator):
     """
@@ -67,20 +62,9 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
-
-        # TODO(gneubig): this should be deduplicated
-        # Calculate statistics of training set
-        self._init_statistics(get_statistics)
+    def __init__(self):
+        super().__init__()
+        self._statistics_func = get_statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):

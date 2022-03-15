@@ -63,7 +63,7 @@ class SUMAttribute:
             density, coverage, compression = 0, 0, 0
         else:
             # Density
-            density = sum(o.length ** 2 for o in matches) / summary_len
+            density = sum(o.length**2 for o in matches) / summary_len
             # Coverage
             coverage = sum(o.length for o in matches) / summary_len
             # Compression

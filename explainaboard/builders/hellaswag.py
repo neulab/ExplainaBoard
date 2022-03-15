@@ -1,10 +1,9 @@
-from typing import Iterable, Optional
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.utils import analysis
+from typing import List, Dict
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.info import BucketPerformance, SysOutputInfo
 from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
-from tqdm import tqdm
+import explainaboard.metric
+from explainaboard.utils.py_utils import sort_dict
 
 """TODO
 """
@@ -16,16 +15,8 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity_ctx_true_answer(self, existing_features: dict):
@@ -60,17 +51,22 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
     # --- End feature functions
 
     # TODO(gneubig): this should be generalized
-    def get_bucket_performance(self, feature_name: str):
+    def get_bucket_performance(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        samples_over_bucket: Dict[str, List[int]],
+    ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param feature_name: the name of a feature, e.g., sentence length
+        :param sys_info: Information about the system output
+        :param sys_output: The system output itself
+        :param samples_over_bucket: a dictionary mapping bucket interval names to lists of sample IDs for that bucket
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in self._samples_over_bucket[
-            feature_name
-        ].items():
+        for bucket_interval, sample_ids in samples_over_bucket.items():
 
             bucket_true_labels = []
             bucket_predicted_labels = []
@@ -78,26 +74,26 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
 
             for sample_id in sample_ids:
 
-                true_label = self._data[int(sample_id)]["true_label"]
-                predicted_label = self._data[int(sample_id)]["predicted_label"]
-                s_id = self._data[int(sample_id)]["id"]
+                true_label = sys_output[int(sample_id)]["true_label"]
+                predicted_label = sys_output[int(sample_id)]["predicted_label"]
+                s_id = sys_output[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
                 bucket_true_labels.append(true_label)
                 bucket_predicted_labels.append(predicted_label)
                 # get a bucket of cases (e.g., errors)
-                if self._info.results.is_print_case:
+                if sys_info.is_print_case:
                     if true_label != predicted_label:
                         bucket_case = str(s_id)
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in self._info.metric_names:
-
-                one_metric = eval(metric_name)(
+            for metric_name in sys_info.metric_names:
+                metric_func = getattr(explainaboard.metric, metric_name)
+                one_metric = metric_func(
                     true_labels=bucket_true_labels,
                     predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+                    is_print_confidence_interval=sys_info.is_print_confidence_interval,
                 )
                 bucket_value_json = one_metric.evaluate()
 
@@ -114,13 +110,13 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
-                    value=format(bucket_value, '.4g'),
-                    confidence_score_low=format(confidence_score_low, '.4g'),
-                    confidence_score_up=format(confidence_score_up, '.4g'),
+                    value=bucket_value,
+                    confidence_score_low=confidence_score_low,
+                    confidence_score_up=confidence_score_up,
                     n_samples=len(bucket_true_labels),
                     bucket_samples=bucket_cases,
                 )
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)  # noqa
+        return sort_dict(bucket_name_to_performance)

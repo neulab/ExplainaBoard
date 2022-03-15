@@ -1,15 +1,14 @@
-from typing import Iterable, Optional
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.metric import *  # noqa
-from tqdm import tqdm
-
+from typing import Callable
 from typing import Iterator
+
 from datalabs import load_dataset
 from datalabs.operations.aggregate.text_matching import text_matching_aggregating
+from tqdm import tqdm
+
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
+from explainaboard.utils.analysis import *
+from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
 
 
 @text_matching_aggregating(
@@ -71,27 +70,28 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
     Output: Analysis
     """
 
-    def __init__(
-        self,
-        info: SysOutputInfo,
-        system_output_object: Iterable[dict],
-        feature_table: Optional[Table] = None,
-        user_defined_feature_config=None,
-    ):
-        super().__init__(
-            info, system_output_object, feature_table, user_defined_feature_config
-        )
+    def __init__(self):
+        super().__init__()
+        self._statistics_func = get_statistics
 
+    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
+        """Take in information about the system outputs and a statistic calculating function and return a dictionary
+        of statistics.
+
+        :param sys_info: Information about the system outputs
+        :param get_statistics: The function used to get the statistics
+        :return: Statistics from, usually, the training set that are used to calculate other features
+        """
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
-        if None != self._info.dataset_name:
+        if None != sys_info.dataset_name:
             try:
-                dataset = load_dataset(
-                    self._info.dataset_name, self._info.sub_dataset_name
-                )
+                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if (
-                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                    len(dataset['train'], BucketPerformance, Performance, Table._stat)
+                    == 0
+                    or sys_info.reload_stat == False
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     new_train = dataset['train'].apply(get_statistics, mode="local")
                     self.statistics = new_train._stat

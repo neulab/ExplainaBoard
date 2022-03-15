@@ -25,16 +25,14 @@ class TestExtractiveQA(unittest.TestCase):
             "metric_names": ["f1_score_qa", "exact_match_qa"],
         }
 
-        processor = get_processor(
-            TaskType.question_answering_extractive, metadata, data
-        )
+        processor = get_processor(TaskType.question_answering_extractive)
         # self.assertEqual(len(processor._features), 4)
 
-        analysis = processor.process()
+        sys_info = processor.process(metadata, data)
+
         # analysis.write_to_directory("./")
-        # print(analysis)
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
 
 
 if __name__ == '__main__':

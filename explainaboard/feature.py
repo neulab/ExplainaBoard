@@ -141,10 +141,13 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
         if not only_1d_for_numpy or obj.ndim == 1:
             return obj, False
         else:
-            return [
-                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
-                for x in obj
-            ], True
+            return (
+                [
+                    _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                    for x in obj
+                ],
+                True,
+            )
     elif (
         config.TORCH_AVAILABLE
         and "torch" in sys.modules
@@ -153,10 +156,13 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
         if not only_1d_for_numpy or obj.ndim == 1:
             return obj.detach().cpu().numpy(), True
         else:
-            return [
-                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
-                for x in obj.detach().cpu().numpy()
-            ], True
+            return (
+                [
+                    _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                    for x in obj.detach().cpu().numpy()
+                ],
+                True,
+            )
     elif (
         config.TF_AVAILABLE
         and "tensorflow" in sys.modules
@@ -165,18 +171,24 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
         if not only_1d_for_numpy or obj.ndim == 1:
             return obj.numpy(), True
         else:
-            return [
-                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
-                for x in obj.numpy()
-            ], True
+            return (
+                [
+                    _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                    for x in obj.numpy()
+                ],
+                True,
+            )
     elif config.JAX_AVAILABLE and "jax" in sys.modules and isinstance(obj, jnp.ndarray):
         if not only_1d_for_numpy or obj.ndim == 1:
             return np.asarray(obj), True
         else:
-            return [
-                _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
-                for x in np.asarray(obj)
-            ], True
+            return (
+                [
+                    _cast_to_python_objects(x, only_1d_for_numpy=only_1d_for_numpy)[0]
+                    for x in np.asarray(obj)
+                ],
+                True,
+            )
     elif isinstance(obj, pd.Series):
         return obj.values.tolist(), True
     elif isinstance(obj, pd.DataFrame):
@@ -200,12 +212,15 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, boo
                 first_elmt, only_1d_for_numpy=only_1d_for_numpy
             )
             if has_changed_first_elmt:
-                return [
-                    _cast_to_python_objects(elmt, only_1d_for_numpy=only_1d_for_numpy)[
-                        0
-                    ]
-                    for elmt in obj
-                ], True
+                return (
+                    [
+                        _cast_to_python_objects(
+                            elmt, only_1d_for_numpy=only_1d_for_numpy
+                        )[0]
+                        for elmt in obj
+                    ],
+                    True,
+                )
             else:
                 if isinstance(obj, list):
                     return obj, False
@@ -237,14 +252,14 @@ class BucketInfo:
     """
     The class is used to define a dataclass for bucketing strategy
     Args:
-        _method: the bucket strategy
-        _number: the number of buckets to be bucketed
-        _settting: hyper-paraterms of bucketing
+        method: the bucket strategy
+        number: the number of buckets to be bucketed
+        setting: hyper-paraterms of bucketing
     """
 
-    _method: str = "bucket_attribute_specified_bucket_value"
-    _number: int = 4
-    _setting: Any = 1  # For different bucket_methods, the settings are diverse
+    method: str = "bucket_attribute_specified_bucket_value"
+    number: int = 4
+    setting: Any = 1  # For different bucket_methods, the settings are diverse
 
 
 @dataclass

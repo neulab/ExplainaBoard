@@ -1,4 +1,5 @@
-from typing import Iterable
+from typing import List
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
@@ -17,9 +18,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the length of source document",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "reference_length": feature.Value(
@@ -27,9 +28,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the length of gold summary",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "hypothesis_length": feature.Value(
@@ -37,9 +38,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the length of gold summary",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "attr_compression": feature.Value(
@@ -47,9 +48,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="compression",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "attr_copy_len": feature.Value(
@@ -57,9 +58,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="copy length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "attr_coverage": feature.Value(
@@ -67,9 +68,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="coverage",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "attr_novelty": feature.Value(
@@ -77,9 +78,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="novelty",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "num_oov": feature.Value(
@@ -87,9 +88,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the number of out-of-vocabulary words",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -98,9 +99,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the average rank of each work based on its frequency in training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -109,9 +110,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the sample-level oracle score",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "oracle_position": feature.Value(
@@ -119,9 +120,9 @@ class ConditionalGenerationProcessor(Processor):
                 description="the sample-level oracle position",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "oracle_position_fre": feature.Value(
@@ -129,35 +130,24 @@ class ConditionalGenerationProcessor(Processor):
                 description="the frequency of oracle sentence's position in training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
         }
     )
-
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.summarization.value
-        if "metric_names" not in metadata.keys():
-            # metadata["metric_names"] = ["chrf","bart_score_summ","bleu","comet","mover_score","prism"]
-            metadata["metric_names"] = ["bleu"]
-
-        super().__init__(metadata, system_output_data)
-        self._builder = CondGenExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )
+    _builder = CondGenExplainaboardBuilder()
 
 
 @register_processor(TaskType.summarization)
 class SummarizationProcessor(ConditionalGenerationProcessor):
     _task_type = TaskType.summarization
+    _default_metrics = ["rouge1", "rouge2", "rougeL"]
 
 
 @register_processor(TaskType.machine_translation)
 class MachineTranslationProcessor(ConditionalGenerationProcessor):
     _task_type = TaskType.machine_translation
+    _default_metrics = ["bleu"]

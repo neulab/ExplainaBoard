@@ -20,12 +20,11 @@ class TestTextClassification(unittest.TestCase):
             FileType.tsv,
             load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
         )
-        data = loader.load()
-        processor = get_processor(TaskType.text_classification, metadata, data)
+        data = list(loader.load())
+        processor = get_processor(TaskType.text_classification)
 
-        analysis = processor.process()
+        sys_info = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)

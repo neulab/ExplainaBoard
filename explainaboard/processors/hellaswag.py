@@ -1,4 +1,5 @@
-from typing import Iterable
+from typing import List
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
@@ -21,65 +22,55 @@ class HellaswagProcessor(Processor):
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "activity_label": feature.Value(
                 "string",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=10, _setting=1
+                    method="bucket_attribute_discrete_value", number=10, setting=1
                 ),
             ),
             "ctx_length": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "ctx_a_length_divided_b": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "true_answer_length": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "similarity_ctx_true_answer": feature.Value(
                 dtype="float",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
         }
     )
-
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.text_classification.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["Accuracy"]
-        super().__init__(metadata, system_output_data)
-        self._builder = HellaswagExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )  # easy to make mistake
+    _builder = HellaswagExplainaboardBuilder()
+    _default_metrics = ["Accuracy"]
