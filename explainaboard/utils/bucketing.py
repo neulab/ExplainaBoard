@@ -101,17 +101,11 @@ def bucket_attribute_discrete_value(
     n_buckets = bucket_number
     n_entities = bucket_setting
 
-    n_spans = len(dict_span2att_val)
     dict_bucket2span = {}
 
     dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
     dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
     # dict["q_id"] = 2
-
-    avg_entity = n_spans * 1.0 / n_buckets
-    n_tmp = 0
-    entity_list = []
-    val_list = []
 
     n_total = 1
     for att_val, entity in dict_att_val2span.items():
@@ -126,7 +120,7 @@ def bucket_attribute_discrete_value(
 
 
 def bucket_attribute_specified_bucket_interval(
-    dict_obj=None, bucket_number=None, bucket_setting=None
+    dict_obj=None, bucket_number=None, bucket_setting=None  # noqa
 ):
     # Bucketing different Attributes
 
@@ -137,7 +131,6 @@ def bucket_attribute_specified_bucket_interval(
     intervals = bucket_setting
 
     dict_bucket2span = {}
-    n_spans = len(dict_span2att_val)
 
     # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
 
