@@ -17,11 +17,11 @@ from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.eval_basic import get_chunks, f1_score_seqeval
 
 
-def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
+def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
     """
     Note: when matching, the text span and tag have been lowercased.
     """
-    eCon_dic = dict()
+    econ_dic = dict()
     chunks_train = set(get_chunks(tag_sequences_train))
 
     print('tags: ', tags)
@@ -33,17 +33,16 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
         count_idx += 1
         # print()
         # print('progress: %d / %d: ' % (count_idx, len(chunks_train)))
-        type = true_chunk[0].lower()
         idx_start = true_chunk[1]
         idx_end = true_chunk[2]
 
         entity_span = ' '.join(train_word_sequences[idx_start:idx_end]).lower()
-        if entity_span in eCon_dic:
+        if entity_span in econ_dic:
             continue
         else:
-            eCon_dic[entity_span] = dict()
+            econ_dic[entity_span] = dict()
             for tag in tags:
-                eCon_dic[entity_span][tag] = 0.0
+                econ_dic[entity_span][tag] = 0.0
 
         # Determine if the same position in pred list giving a right prediction.
         entity_span_new = ' ' + entity_span + ' '
@@ -69,7 +68,7 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
             entity_len = len(entity_span.split())
 
             for sid in entity_sids:
-                label_candi_list = tag_sequences_train[sid : sid + entity_len]
+                label_candi_list = tag_sequences_train[sid:sid + entity_len]
                 for label in label_candi_list:
                     klab = 'o'
                     if len(label.split('-')) > 1:
@@ -81,10 +80,10 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
                 hard = float(
                     '%.3f' % (float(label_list.count(lab_norep)) / len(label_list))
                 )
-                eCon_dic[entity_span][lab_norep] = hard
+                econ_dic[entity_span][lab_norep] = hard
 
     # fwrite = open(path_write, 'wb')
-    # pickle.dump(eCon_dic, fwrite)
+    # pickle.dump(econ_dic, fwrite)
     # fwrite.close()
     """
     {
@@ -92,27 +91,26 @@ def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
     }
     """
     # exit()
-    return eCon_dic
+    return econ_dic
 
 
-def get_eFre_dic(train_word_sequences, tag_sequences_train):
-    eFre_dic = dict()
+def get_efre_dic(train_word_sequences, tag_sequences_train):
+    efre_dic = dict()
     chunks_train = set(get_chunks(tag_sequences_train))
     count_idx = 0
     word_sequences_train_str = ' '.join(train_word_sequences).lower()
     for true_chunk in tqdm(chunks_train):
         count_idx += 1
         # print('progress: %d / %d: ' % (count_idx, len(chunks_train)))
-        type = true_chunk[0].lower()
         idx_start = true_chunk[1]
         idx_end = true_chunk[2]
 
         entity_span = ' '.join(train_word_sequences[idx_start:idx_end]).lower()
         # print('entity_span', entity_span)
-        if entity_span in eFre_dic:
+        if entity_span in efre_dic:
             continue
         else:
-            eFre_dic[entity_span] = []
+            efre_dic[entity_span] = []
 
         # Determine if the same position in pred list giving a right prediction.
         entity_span_new = ' ' + entity_span + ' '
@@ -126,26 +124,26 @@ def get_eFre_dic(train_word_sequences, tag_sequences_train):
             m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)
         ]
 
-        eFre_dic[entity_span] = len(entity_str_sid)
+        efre_dic[entity_span] = len(entity_str_sid)
 
-    sorted_eFre_dic = sorted(eFre_dic.items(), key=lambda item: item[1], reverse=True)
+    sorted_efre_dic = sorted(efre_dic.items(), key=lambda item: item[1], reverse=True)
 
-    eFre_dic_keep = {}
-    count_bigerThan_maxFreq = 0
-    max_freq = sorted_eFre_dic[4][1]
-    for span, freq in eFre_dic.items():
+    efre_dic_keep = {}
+    count_bigger_than_max_freq = 0
+    max_freq = float(sorted_efre_dic[4][1])
+    for span, freq in efre_dic.items():
         if freq <= max_freq:
-            eFre_dic_keep[span] = '%.3f' % (float(freq) / max_freq)
+            efre_dic_keep[span] = '%.3f' % (float(freq) / max_freq)
         else:
-            count_bigerThan_maxFreq += 1
+            count_bigger_than_max_freq += 1
     # print('The number of words whose word frequency exceeds the threshold: %d is %d' % (
-    #     max_freq, count_bigerThan_maxFreq))
+    #     max_freq, count_bigger_than_max_freq))
 
     # fwrite = open(path_write, 'wb')
-    # pickle.dump(eFre_dic_keep, fwrite)
+    # pickle.dump(efre_dic_keep, fwrite)
     # fwrite.close()
 
-    return eFre_dic_keep
+    return efre_dic_keep
 
 
 @sequence_labeling_aggregating(
@@ -155,7 +153,7 @@ def get_eFre_dic(train_word_sequences, tag_sequences_train):
     description="Calculate the overall statistics (e.g., average length) of "
     "a given sequence labeling datasets (e.g., named entity recognition)",
 )
-def get_statistics(samples: Iterator, tag_id2str=[]):
+def get_statistics(samples: Iterator, tag_id2str=None):
     """
     Input:
     samples: [{
@@ -167,6 +165,8 @@ def get_statistics(samples: Iterator, tag_id2str=[]):
 
     # tag_id2str = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
 
+    if tag_id2str is None:
+        tag_id2str = []
     tokens_sequences = []
     tags_sequences = []
     tags_without_bio = list(
@@ -188,11 +188,11 @@ def get_statistics(samples: Iterator, tag_id2str=[]):
         tokens_sequences += tokens
         tags_sequences += tags
 
-    # eFre_dic
-    eCon_dic = get_eCon_dic(tokens_sequences, tags_sequences, tags_without_bio)
-    # eCon_dic = {"a":1} # for debugging purpose
-    # eCon_dic
-    eFre_dic = get_eFre_dic(tokens_sequences, tags_sequences)
+    # efre_dic
+    econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)
+    # econ_dic = {"a":1} # for debugging purpose
+    # econ_dic
+    efre_dic = get_efre_dic(tokens_sequences, tags_sequences)
     # vocab_rank: the rank of each word based on its frequency
     sorted_dict = {
         key: rank
@@ -201,8 +201,8 @@ def get_statistics(samples: Iterator, tag_id2str=[]):
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
 
     return {
-        "eFre_dic": eFre_dic,
-        "eCon_dic": eCon_dic,
+        "efre_dic": efre_dic,
+        "econ_dic": econ_dic,
         "vocab": vocab,
         "vocab_rank": vocab_rank,
     }
@@ -213,12 +213,12 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         super().__init__()
         self._statistics_func = get_statistics
 
-    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
         :param sys_info: Information about the system outputs
-        :param get_statistics: The function used to get the statistics
+        :param statistics_func: The function used to get the statistics
         :return: Statistics from, usually, the training set that are used to calculate other features
         """
 
@@ -226,23 +226,23 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         # Calculate statistics of training set
         eprint(sys_info.dataset_name, sys_info.sub_dataset_name)
         statistics = None
-        if None != sys_info.dataset_name:
+        if sys_info.dataset_name is not None:
             try:
 
                 dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if (
-                    len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
+                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     tag_id2str = dataset['train']._info.task_templates[0].labels
-                    get_statistics.resources = {"tag_id2str": tag_id2str}
-                    new_train = dataset['train'].apply(get_statistics, mode="local")
+                    statistics_func.resources = {"tag_id2str": tag_id2str}
+                    new_train = dataset['train'].apply(statistics_func, mode="local")
                     statistics = new_train._stat
                 else:
                     statistics = dataset["train"]._stat
-            except FileNotFoundError as err:
+            except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
                 )
         return statistics
 
@@ -250,7 +250,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
     def _get_sentence_length(self, existing_features: dict):
         return len(existing_features["tokens"])
 
-    def _get_eCon_value(self, span_dic: dict, span_text: str, span_tag: str):
+    def _get_econ_value(self, span_dic: dict, span_text: str, span_tag: str):
         """
         Since keys and values of span_dic have been lower-cased, we also need to lowercase span_tag and span_text
 
@@ -258,19 +258,18 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         span_tag = span_tag.lower()
         span_text = span_text.lower()
 
-        eCon_value = 0.0
+        econ_value = 0.0
         if span_text in span_dic.keys():
             if span_tag in span_dic[span_text]:
-                eCon_value = float(span_dic[span_text][span_tag])
-        return eCon_value
+                econ_value = float(span_dic[span_text][span_tag])
+        return econ_value
 
-    def _get_eFre_value(self, span_dic, span_text, span_tag):
-        eFre_value = 0.0
-        span_tag = span_tag.lower()
+    def _get_efre_value(self, span_dic, span_text):
+        efre_value = 0.0
         span_text = span_text.lower()
         if span_text in span_dic.keys():
-            eFre_value = float(span_dic[span_text])
-        return eFre_value
+            efre_value = float(span_dic[span_text])
+        return efre_value
 
     # training set dependent features
     def _get_num_oov(self, tokens, statistics):
@@ -301,7 +300,6 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         # span_text, span_len, span_pos, span_tag
         chunks = get_chunks(tags)
         span_dics = []
-        span_dic = {}
         for chunk in chunks:
             tag, sid, eid = chunk
             # span_text = ' '.join(sentence[sid:eid]).lower()
@@ -329,15 +327,15 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         #     return span_dics
 
         if (
-            statistics == None or len(statistics) == 0
+            statistics is None or len(statistics) == 0
         ):  # there is no training set dependent features
             return span_dics
 
-        # eCon_dic = self.dict_pre_computed_models['eCon']
-        # eCon_dic = statistics["eCon_dic"]
-        eCon_dic = statistics["eCon_dic"]
-        # eFre_dic = self.dict_pre_computed_models['eFre']
-        eFre_dic = statistics["eFre_dic"]
+        # econ_dic = self.dict_pre_computed_models['econ']
+        # econ_dic = statistics["econ_dic"]
+        econ_dic = statistics["econ_dic"]
+        # efre_dic = self.dict_pre_computed_models['efre']
+        efre_dic = statistics["efre_dic"]
 
         for span_dic in span_dics:
             span_text = span_dic['span_text']
@@ -345,11 +343,11 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
             # compute the entity-level label consistency
 
-            if 'eCon' not in span_dic:
-                span_dic['eCon'] = self._get_eCon_value(eCon_dic, span_text, span_tag)
+            if 'econ' not in span_dic:
+                span_dic['econ'] = self._get_econ_value(econ_dic, span_text, span_tag)
             # compute the entity-level frequency
-            if 'eFre' not in span_dic:
-                span_dic['eFre'] = self._get_eFre_value(eFre_dic, span_text, span_tag)
+            if 'efre' not in span_dic:
+                span_dic['efre'] = self._get_efre_value(efre_dic, span_text)
 
         return span_dics
 
@@ -358,8 +356,13 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
     ) -> List[str]:
         """
-        This function is used to calculate features used for bucketing, such as sentence_length
-        :return:
+        This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
+        information, then calculates feature functions and modifies `sys_output` to add these feature values
+
+        :param sys_info: Information about the system output
+        :param sys_output: The system output itself
+        :param statistics: Training set statistics that are used to calculate training set specific features
+        :return: The features that are active (e.g. skipping training set features when no training set available)
         """
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
@@ -370,8 +373,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
             # sentence-level training set dependent features
             if statistics is not None:
-                dict_sysout["num_oov"] = self._get_num_oov(tokens)
-                dict_sysout["fre_rank"] = self._get_fre_rank(tokens)
+                dict_sysout["num_oov"] = self._get_num_oov(tokens, statistics)
+                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, statistics)
 
             dict_sysout[
                 "true_entity_info"
@@ -383,6 +386,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             ] = self._complete_feature_advanced_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=statistics
             )
+        # This should return a list, but this list isn't used in the overridden function so ignore for now
+        return None # noqa
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
@@ -421,7 +426,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
     def _bucketing_samples_add_feats(
         self,
-        id,
+        sample_id,
         bucket_features,
         pcf_set,
         feature_table,
@@ -435,7 +440,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             span_label = span_info["span_tag"]
 
             span_address = (
-                f'{id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
+                f'{sample_id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
             )
 
             for feature_name in bucket_features:
@@ -451,7 +456,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                     ] = span_info[feature_name]
                 elif feature_name not in pcf_set:
                     raise ValueError(
-                        f'Missing feature {self.feature_name} not found and not pre-computed'
+                        f'Missing feature {feature_name} not found and not pre-computed'
                     )
 
     def _bucketing_samples(
@@ -549,45 +554,35 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
     Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
     """
 
-    def get_bucket_cases_ner(
-        self,
-        bucket_interval,
-        sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[int]],
-        samples_over_bucket_pred: Dict[str, List[int]],
-    ) -> list:
-        # predict:  2_3 -> NER
-        dict_pos2tag_pred = {}
-        for k_bucket_eval, spans_pred in samples_over_bucket_pred.items():
-            if k_bucket_eval != bucket_interval:
-                continue
-            for span_pred in spans_pred:
-                pos_pred = "|||".join(span_pred.split("|||")[0:4])
-                tag_pred = span_pred.split("|||")[-1]
-                dict_pos2tag_pred[pos_pred] = tag_pred
-        # print(dict_pos2tag_pred)
-
-        # true:  2_3 -> NER
+    def _create_sample_dict(self, samp_bucket, interval):
         dict_pos2tag = {}
-        for k_bucket_eval, spans in samples_over_bucket.items():
-            if k_bucket_eval != bucket_interval:
+        for k_bucket_eval, spans in samp_bucket.items():
+            if k_bucket_eval != interval:
                 continue
             for span in spans:
                 pos = "|||".join(span.split("|||")[0:4])
                 tag = span.split("|||")[-1]
                 dict_pos2tag[pos] = tag
+        return dict_pos2tag
 
-        errorCase_list = []
+    def get_bucket_cases_ner(
+        self,
+        bucket_interval,
+        sys_output: List[dict],
+        samples_over_bucket: Dict[str, List[str]],
+        samples_over_bucket_pred: Dict[str, List[str]],
+    ) -> list:
+        # predict:  2_3 -> NER
+        dict_pos2tag_pred = self._create_sample_dict(samples_over_bucket_pred, bucket_interval)
+        dict_pos2tag = self._create_sample_dict(samples_over_bucket, bucket_interval)
+
+        error_case_list = []
         for pos, tag in dict_pos2tag.items():
 
             true_label = tag
-            pred_label = ""
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
             system_output_id = sys_output[int(sent_id)]["id"]
-
-            span_sentence = " ".join(sys_output[sent_id]["tokens"])
 
             if pos in dict_pos2tag_pred.keys():
                 pred_label = dict_pos2tag_pred[pos]
@@ -595,18 +590,16 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                     continue
             else:
                 pred_label = "O"
-            # error_case = span+ "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
             error_case = {
                 "span": span,
                 "text": str(system_output_id),
                 "true_label": true_label,
                 "predicted_label": pred_label,
             }
-            errorCase_list.append(error_case)
+            error_case_list.append(error_case)
 
         for pos, tag in dict_pos2tag_pred.items():
 
-            true_label = ""
             pred_label = tag
 
             sent_id = int(pos.split("|||")[0])
@@ -628,28 +621,29 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 "true_label": true_label,
                 "predicted_label": pred_label,
             }
-            errorCase_list.append(error_case)
+            error_case_list.append(error_case)
 
-        return errorCase_list
+        return error_case_list
 
-    # TODO(gneubig): this may be able to be generalized
     def get_bucket_performance_ner(
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[int]],
-        samples_over_bucket_pred: Dict[str, List[int]],
+        samples_over_bucket_true: Dict[str, List[str]],
+        samples_over_bucket_pred: Dict[str, List[str]],
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param feature_name: the name of a feature, e.g., sentence length
+        :param sys_info: Information about the system output
+        :param sys_output: The system output itself
+        :param samples_over_bucket_true: a dictionary mapping bucket interval names to true sample IDs
+        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to predicted sample IDs
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, spans_true in samples_over_bucket.items():
+        for bucket_interval, spans_true in samples_over_bucket_true.items():
 
-            spans_pred = []
             if bucket_interval not in samples_over_bucket_pred.keys():
                 raise ValueError("Predict Label Bucketing Errors")
             else:
@@ -660,15 +654,15 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             """
             bucket_samples = self.get_bucket_cases_ner(
                 bucket_interval,
-                sys_info,
                 sys_output,
-                samples_over_bucket,
+                samples_over_bucket_true,
                 samples_over_bucket_pred,
             )
 
             for metric_name in sys_info.metric_names:
                 """
-                # Note that: for NER task, the bucket-wise evaluation function is a little different from overall evaluation function
+                # Note that: for NER task, the bucket-wise evaluation function is a little different from overall
+                #            evaluation function
                 # for overall: f1_score_seqeval
                 # for bucket:  f1_score_seqeval_bucket
                 """

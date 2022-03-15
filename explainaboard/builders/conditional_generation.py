@@ -40,7 +40,6 @@ def get_statistics(samples: Iterator):
 
     vocab = {}
     vocab_pruning = {}
-    length_fre = {}
     oracle_position_fre = {}
     for sample in tqdm(samples):
 
@@ -102,32 +101,12 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     # --- End feature functions
 
-    # training set dependent features
+    # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
+        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['source'])
 
-        # exit()
-        num_oov = 0
-
-        for w in existing_features["source"].split(
-            " "
-        ):  # should this be normalized for the consistency with DataLab?
-            if w not in statistics['vocab'].keys():
-                num_oov += 1
-        # print(num_oov)
-        return num_oov
-
-    # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        fre_rank = 0
-
-        for w in existing_features["source"].split(" "):
-            if w not in statistics['vocab_rank'].keys():
-                fre_rank += len(statistics['vocab_rank'])
-            else:
-                fre_rank += statistics['vocab_rank'][w]
-
-        fre_rank = fre_rank * 1.0 / len(existing_features["source"].split(" "))
-        return fre_rank
+        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['source'])
 
     def get_oracle(self, existing_features: dict, statistics: Any):
         """
@@ -232,7 +211,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
                 # TODO(gneubig): this logic seems complicated, can it be simplified?
                 if bucket_key in advanced_feat_names:
-                    if dict_advanced_features == None:
+                    if dict_advanced_features is None:
                         dict_advanced_features = summary_attribute.cal_attributes_each(
                             dict_sysout["source"], dict_sysout["reference"]
                         )
@@ -282,15 +261,13 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to lists of sample IDs for that bucket
+        :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
         bucket_name_to_performance = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
-            bucket_true_labels = []
-            bucket_predicted_labels = []
             bucket_cases = []
 
             bucket_inputs = []
