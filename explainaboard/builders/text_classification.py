@@ -5,7 +5,10 @@ from tqdm import tqdm
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.feature_funcs import *
 from explainaboard.utils.spacy_loader import spacy_loader
-from datalabs.operations.aggregate.text_classification import text_classification_aggregating
+from datalabs.operations.aggregate.text_classification import (
+    text_classification_aggregating,
+)
+
 
 @text_classification_aggregating(
     name="get_statistics",

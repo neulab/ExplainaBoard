@@ -60,7 +60,6 @@ def get_statistics(samples: Iterator):
 
 
 class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
-
     def __init__(self):
         super().__init__()
         self._statistics_func = get_statistics
