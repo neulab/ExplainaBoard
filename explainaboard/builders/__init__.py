@@ -6,7 +6,7 @@ from tqdm import tqdm
 from eaas import Config, Client
 from datalabs import load_dataset
 import explainaboard.utils.bucketing
-from explainaboard.utils.analysis import (
+from explainaboard.utils.py_utils import (
     eprint,
     print_dict,
     sort_dict,

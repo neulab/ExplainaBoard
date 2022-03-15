@@ -5,7 +5,7 @@ from datalabs.operations.aggregate.text_matching import text_matching_aggregatin
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.analysis import eprint
+from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
 
 

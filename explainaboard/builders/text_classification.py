@@ -3,6 +3,7 @@ from typing import Iterator, Any
 from tqdm import tqdm
 
 from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.spacy_loader import spacy_loader
 from datalabs.operations.aggregate.text_classification import (
     text_classification_aggregating,
@@ -84,10 +85,10 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
         return existing_feature["true_label"]
 
     def _get_basic_words(self, existing_feature: dict):
-        return get_basic_words(existing_feature["text"])  # noqa
+        return get_basic_words(existing_feature["text"])
 
     def _get_lexical_richness(self, existing_feature: dict):
-        return get_lexical_richness(existing_feature["text"])  # noqa
+        return get_lexical_richness(existing_feature["text"])
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):

@@ -6,7 +6,7 @@ from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregatin
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
-from explainaboard.utils.analysis import eprint
+from explainaboard.utils.py_utils import eprint, sort_dict
 import explainaboard.utils.eval_basic_qa
 
 
@@ -64,8 +64,8 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                     statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
         return statistics
 
@@ -165,7 +165,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 predicted_label = sys_output[int(sample_id)]["predicted_answers"][
                     "text"
                 ]
-                sent = sys_output[int(sample_id)]["question"]  # noqa
+                sent = sys_output[int(sample_id)]["question"]
                 s_id = sys_output[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
@@ -210,4 +210,4 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)  # noqa
+        return sort_dict(bucket_name_to_performance)
