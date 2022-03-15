@@ -239,13 +239,13 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         for metric_name in sys_info.metric_names:
 
             overall_value = self.score_dic["corpus_level"]["corpus_" + metric_name]
-            confidence_score_low = 0.0
-            confidence_score_up = 0.0
+            confidence_score_low = None
+            confidence_score_high = None
             overall_performance = Performance(
                 metric_name=metric_name,
-                value=float(format(overall_value, '.4g')),
-                confidence_score_low=float(format(confidence_score_low, '.4g')),
-                confidence_score_up=float(format(confidence_score_up, '.4g')),
+                value=overall_value,
+                confidence_score_low=confidence_score_low,
+                confidence_score_high=confidence_score_high,
             )
 
             overall[metric_name] = overall_performance
@@ -306,21 +306,19 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             for metric_name in sys_info.metric_names:
 
                 bucket_value = numpy.average(dict_metric_to_values[metric_name])
-                confidence_score_low = 0.0
-                confidence_score_up = 0.0
 
                 # print(
                 #       f"value:\t {bucket_value}\n"
                 #       f"confidence low\t {confidence_score_low}\n"
-                #       f"confidence up \t {confidence_score_up}\n"
+                #       f"confidence up \t {confidence_score_high}\n"
                 #       f"---------------------------------")
 
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
                     value=bucket_value,
-                    confidence_score_low=confidence_score_low,
-                    confidence_score_up=confidence_score_up,
+                    confidence_score_low=None,
+                    confidence_score_high=None,
                     n_samples=len(dict_metric_to_values[metric_name]),
                     bucket_samples=bucket_cases,
                 )

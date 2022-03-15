@@ -417,8 +417,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
-                confidence_score_low=0.0,
-                confidence_score_up=0.0,
+                confidence_score_low=None,
+                confidence_score_high=None,
             )
             overall[metric_name] = overall_performance
         return overall
@@ -671,8 +671,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
                     value=f1,
-                    confidence_score_low=0.0,
-                    confidence_score_up=0.0,
+                    confidence_score_low=None,
+                    confidence_score_high=None,
                     n_samples=len(spans_pred),
                     bucket_samples=bucket_samples,
                 )
