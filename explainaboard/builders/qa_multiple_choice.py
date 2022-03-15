@@ -8,7 +8,7 @@ from datalabs.operations.aggregate.qa_multiple_choice import (
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.analysis import *
+from explainaboard.utils.analysis import eprint
 
 
 @qa_multiple_choice_aggregating(
