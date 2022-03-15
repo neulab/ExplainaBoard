@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, Any
 
 from tqdm import tqdm
 
@@ -27,6 +27,7 @@ def get_statistics(samples: Iterator):
 
     vocab = {}
     length_fre = {}
+    total_samps = 0
     for sample in tqdm(samples):
         text, label = sample["text"], sample["label"]
         length = len(text.split(" "))
@@ -43,6 +44,8 @@ def get_statistics(samples: Iterator):
             else:
                 vocab[w] = 1
 
+        total_samps += 1
+
     # the rank of each word based on its frequency
     sorted_dict = {
         key: rank
@@ -51,7 +54,7 @@ def get_statistics(samples: Iterator):
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
 
     for k, v in length_fre.items():
-        length_fre[k] = length_fre[k] * 1.0 / len(samples)
+        length_fre[k] = v * 1.0 / total_samps
 
     return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
 
@@ -88,35 +91,20 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
         return get_lexical_richness(existing_feature["text"])  # noqa
 
     # training set dependent features
-    def _get_num_oov(self, existing_features: dict):
-        num_oov = 0
-
-        for w in existing_features["text"].split(" "):
-            if w not in self.statistics['vocab'].keys():
-                num_oov += 1
-        # print(num_oov)
-        return num_oov
+    def _get_num_oov(self, existing_features: dict, statistics: Any):
+        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['text'])
 
     # training set dependent features (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, existing_features: dict):
-        fre_rank = 0
-
-        for w in existing_features["text"].split(" "):
-            if w not in self.statistics['vocab_rank'].keys():
-                fre_rank += len(self.statistics['vocab_rank'])
-            else:
-                fre_rank += self.statistics['vocab_rank'][w]
-
-        fre_rank = fre_rank * 1.0 / len(existing_features["text"].split(" "))
-        return fre_rank
+    def _get_fre_rank(self, existing_features: dict, statistics: Any):
+        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['text'])
 
     # training set dependent features
-    def _get_length_fre(self, existing_features: dict):
+    def _get_length_fre(self, existing_features: dict, statistics: Any):
         length_fre = 0
         length = len(existing_features["text"].split(" "))
 
-        if length in self.statistics['length_fre'].keys():
-            length_fre = self.statistics['length_fre'][length]
+        if length in statistics['length_fre'].keys():
+            length_fre = statistics['length_fre'][length]
 
         return length_fre
 

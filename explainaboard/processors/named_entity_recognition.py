@@ -147,7 +147,7 @@ class NERProcessor(Processor):
                         #                                  method="bucket_attribute_specified_bucket_value",
                         #                                  number=4,
                         #                                  setting=())),
-                        "eCon": feature.Value(
+                        "econ": feature.Value(
                             dtype="float",
                             description="entity label consistency",
                             is_bucket=True,
@@ -158,7 +158,7 @@ class NERProcessor(Processor):
                                 setting=(),
                             ),
                         ),
-                        "eFre": feature.Value(
+                        "efre": feature.Value(
                             dtype="float",
                             description="entity frequency",
                             is_bucket=True,

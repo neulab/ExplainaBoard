@@ -82,7 +82,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
         self._statistics_func = get_statistics
         self.entity_type_level_map = None
 
-    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
 
         # TODO(gneubig): this will be reloaded for every dataset, maybe should be fixed for multiple analysis
         if sys_info.dataset_name != "fb15k_237":  # to be generalized
@@ -99,20 +99,20 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
         # Calculate statistics of training set
         self.statistics = None
-        if None != sys_info.dataset_name:
+        if sys_info.dataset_name is not None:
             try:
                 dataset = load_dataset(sys_info.dataset_name, "readable")
                 if (
-                    len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
+                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(get_statistics, mode="local")
+                    new_train = dataset['train'].apply(statistics_func, mode="local")
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat
-            except FileNotFoundError as err:
+            except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
                 )
 
         # print(self.entity_type_level_map)
