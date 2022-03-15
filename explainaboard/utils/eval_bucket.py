@@ -1,10 +1,5 @@
-from .eval_basic import *  # noqa
-from .py_utils import *  # noqa
-
-
 def f1_score_seqeval_bucket(pred_chunks, true_chunks):
 
-    correct_preds, total_correct, total_preds = 0.0, 0.0, 0.0
     correct_preds = len(set(true_chunks) & set(pred_chunks))
     total_preds = len(pred_chunks)
     total_correct = len(true_chunks)

@@ -1,14 +1,10 @@
-from typing import Optional, Iterable
-from explainaboard.info import SysOutputInfo, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.metric import Accuracy  # noqa
-from explainaboard.metric import F1score  # noqa
-from tqdm import tqdm
-from explainaboard.utils.feature_funcs import *  # noqa
-from explainaboard.utils.spacy_loader import spacy_loader
 from typing import Iterator
+
+from tqdm import tqdm
+
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.utils.feature_funcs import *
+from explainaboard.utils.spacy_loader import spacy_loader
 
 
 class TCExplainaboardBuilder(ExplainaboardBuilder):

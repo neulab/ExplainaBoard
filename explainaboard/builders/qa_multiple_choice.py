@@ -1,15 +1,15 @@
 from typing import Callable, Any
-from explainaboard.info import SysOutputInfo
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *
-from explainaboard.utils.analysis import *
-from explainaboard.metric import *
-from tqdm import tqdm
-from typing import Iterator, Dict, List
+from typing import Iterator
+
 from datalabs import load_dataset
 from datalabs.operations.aggregate.qa_multiple_choice import (
     qa_multiple_choice_aggregating,
 )
+from tqdm import tqdm
+
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.info import SysOutputInfo
+from explainaboard.utils.analysis import *
 
 
 @qa_multiple_choice_aggregating(

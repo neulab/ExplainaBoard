@@ -1,8 +1,5 @@
-from explainaboard.utils.spacy_loader import spacy_loader
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.metric import *  # noqa
+from explainaboard.utils.spacy_loader import spacy_loader
 
 
 class ABSCExplainaboardBuilder(ExplainaboardBuilder):

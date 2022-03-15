@@ -1,18 +1,20 @@
-from typing import Callable, Tuple
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.analysis import *
-from explainaboard.utils.eval_bucket import *
-from tqdm import tqdm
-from explainaboard.utils.py_utils import eprint
 import re
-import explainaboard.utils.bucketing
-
+from typing import Callable, Tuple
 from typing import Iterator, Dict, List
+
 from datalabs import load_dataset
 from datalabs.operations.aggregate.sequence_labeling import (
     sequence_labeling_aggregating,
 )
+from explainaboard.utils.eval_bucket import f1_score_seqeval_bucket
+from tqdm import tqdm
+
+import explainaboard.utils.bucketing
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
+from explainaboard.utils.analysis import *
+from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.eval_basic import get_chunks, f1_score_seqeval
 
 
 def get_eCon_dic(train_word_sequences, tag_sequences_train, tags):
@@ -275,24 +277,24 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         return eFre_value
 
     # training set dependent features
-    def _get_num_oov(self, tokens):
+    def _get_num_oov(self, tokens, statistics):
         num_oov = 0
 
         for w in tokens:
-            if w not in self.statistics['vocab'].keys():
+            if w not in statistics['vocab'].keys():
                 num_oov += 1
         # print(num_oov)
         return num_oov
 
     # training set dependent features (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, tokens):
+    def _get_fre_rank(self, tokens, statistics):
         fre_rank = 0
 
         for w in tokens:
-            if w not in self.statistics['vocab_rank'].keys():
-                fre_rank += len(self.statistics['vocab_rank'])
+            if w not in statistics['vocab_rank'].keys():
+                fre_rank += len(statistics['vocab_rank'])
             else:
-                fre_rank += self.statistics['vocab_rank'][w]
+                fre_rank += statistics['vocab_rank'][w]
 
         fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
         return fre_rank
@@ -301,7 +303,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
     def _complete_feature_raw_span_features(self, sentence, tags):
         # span_text, span_len, span_pos, span_tag
-        chunks = get_chunks(tags)  # noqa
+        chunks = get_chunks(tags)
         span_dics = []
         span_dic = {}
         for chunk in chunks:
@@ -402,8 +404,9 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
         overall = {}
         for metric_name in sys_info.metric_names:
-
-            res_json = eval(metric_name)(true_tags_list, pred_tags_list)
+            if metric_name != 'f1_score_seqeval':
+                raise NotImplementedError(f'Unsupported metric {metric_name}')
+            res_json = f1_score_seqeval(true_tags_list, pred_tags_list)
 
             overall_value = res_json["f1"]
             # overall_value = f1_score_seqeval(true_tags_list, pred_tags_list)["f1"]
@@ -449,10 +452,6 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                         span_address
                     ] = span_info[feature_name]
                 elif feature_name not in pcf_set:
-                    import pprint
-
-                    pp = pprint.PrettyPrinter(indent=2)
-                    pp.pprint(sys_info.features.keys())
                     raise ValueError(
                         f'Missing feature {self.feature_name} not found and not pre-computed'
                     )
@@ -665,9 +664,11 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 """
                 # Note that: for NER task, the bucket-wise evaluation function is a little different from overall evaluation function
                 # for overall: f1_score_seqeval
-                # for bucket:  f1_score_seqeval_bucket_bucket
+                # for bucket:  f1_score_seqeval_bucket
                 """
-                f1, p, r = eval(metric_name + "_bucket")(spans_pred, spans_true)
+                if metric_name != 'f1_score_seqeval':
+                    raise NotImplementedError(f'Unsupported metric {metric_name}')
+                f1, p, r = f1_score_seqeval_bucket(spans_pred, spans_true)
 
                 bucket_name_to_performance[bucket_interval] = []
                 bucket_performance = BucketPerformance(
