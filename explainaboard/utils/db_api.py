@@ -1,5 +1,4 @@
 import requests
-import json
 
 
 def read_statistics_from_db(
@@ -21,7 +20,7 @@ def read_statistics_from_db(
     return response
 
 
-def write_statistics_from_db(
+def write_statistics_to_db(
     dataset_name,
     subset_name=None,
     version='Hugging Face',

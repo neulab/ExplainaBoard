@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict, field
 from typing import Any, List, Optional
 from explainaboard.feature import Features
-import sys
 import json
 import os
 from explainaboard import config
