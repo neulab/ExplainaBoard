@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import List
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.info import SysOutputInfo

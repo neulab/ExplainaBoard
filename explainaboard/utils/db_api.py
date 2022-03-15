@@ -1,5 +1,4 @@
 import requests
-import json
 
 
 def read_statistics_from_db(

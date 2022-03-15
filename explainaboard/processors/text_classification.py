@@ -1,6 +1,4 @@
-from typing import Iterable, List
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, Result
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor

@@ -25,7 +25,7 @@ def get_statistics(samples: Iterator):
      "label":
     }]
     """
-    return ExplainaboardBuilder.accumulate_vocab_from_samples(samples, lambda x: x['text1']+x['text2'])
+    return ExplainaboardBuilder.accumulate_vocab_from_samples(samples, lambda x: x['text1'] + x['text2'])
 
 
 class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):

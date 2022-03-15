@@ -1,7 +1,6 @@
-from typing import Callable, Mapping, Iterator
+from typing import Iterator
 from explainaboard import get_processor
 from explainaboard import get_loader
-from explainaboard import get_task_categories, TaskType
 from explainaboard import FileType, Source
 from datalabs.operations.aggregate.auto_eval import auto_eval
 

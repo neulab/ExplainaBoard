@@ -1,7 +1,7 @@
-from typing import Iterable, List
+from typing import List
 from explainaboard import feature
 from explainaboard.tasks import TaskType
-from explainaboard.info import Result, SysOutputInfo
+from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.builders.kg_link_tail_prediction import KGLTPExplainaboardBuilder

@@ -324,7 +324,7 @@ class ExplainaboardBuilder:
         vocab = {}
         for sample in tqdm(samples):
             for w in text_from_sample(sample).split(" "):
-                vocab[w] = vocab.get(w, 0)+1
+                vocab[w] = vocab.get(w, 0) + 1
         # the rank of each word based on its frequency
         sorted_dict = {
             key: rank

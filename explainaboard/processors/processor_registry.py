@@ -1,4 +1,3 @@
-from typing import Iterable
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 
