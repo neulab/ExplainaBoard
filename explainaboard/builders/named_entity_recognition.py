@@ -386,7 +386,9 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-        self, sys_info: SysOutputInfo, sys_output: List[dict],
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
     ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []  # noqa
 
@@ -513,7 +515,10 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             ):
                 continue
 
-            bucket_func = getattr(explainaboard.utils.bucketing, _bucket_info.method,)
+            bucket_func = getattr(
+                explainaboard.utils.bucketing,
+                _bucket_info.method,
+            )
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
                 bucket_number=_bucket_info.number,
