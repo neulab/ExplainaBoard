@@ -24,10 +24,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             "metric_names": ["Hits"],
         }
 
-        processor = get_processor(
-            TaskType.kg_link_tail_prediction.value
-        )
-
+        processor = get_processor(TaskType.kg_link_tail_prediction.value)
         results = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
