@@ -1,17 +1,14 @@
 from typing import Callable, Any
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.utils.eval_basic_qa import *  # noqa
-from explainaboard.metric import *  # noqa
+from typing import Iterator, Dict, List
+
+from datalabs import load_dataset
+from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregating
 from tqdm import tqdm
 
-
-from typing import Iterator, Dict, List
-from datalabs import load_dataset
-
-from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregating
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
+from explainaboard.utils.analysis import *
+import explainaboard.utils.eval_basic_qa
 
 
 @qa_extractive_aggregating(
@@ -161,16 +158,21 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
         overall = {}
         for metric_name in sys_info.metric_names:
-            overall_value = eval(metric_name)(true_answers, predicted_answers)
+            # TODO(gneubig): is it necessary to have this as a separate interface than the other metrics?
+            #                probably not. it'd be good to unify these.
+            metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
+            overall_value = metric_func(
+                true_answers, predicted_answers
+            )
 
             overall_value = overall_value
             confidence_score_low = 0
             confidence_score_up = 0
             overall_performance = Performance(
                 metric_name=metric_name,
-                value=float(format(overall_value, '.4g')),
-                confidence_score_low=float(format(confidence_score_low, '.4g')),
-                confidence_score_up=float(format(confidence_score_up, '.4g')),
+                value=overall_value,
+                confidence_score_low=confidence_score_low,
+                confidence_score_up=confidence_score_up,
             )
             overall[metric_name] = overall_performance
         return overall
@@ -222,8 +224,10 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
             bucket_name_to_performance[bucket_interval] = []
             for metric_name in sys_info.metric_names:
-
-                bucket_value = eval(metric_name)(
+                # TODO(gneubig): is it necessary to have this as a separate interface than the other metrics?
+                #                probably not. it'd be good to unify these.
+                metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
+                bucket_value = metric_func(
                     bucket_true_labels, bucket_predicted_labels
                 )
 

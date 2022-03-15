@@ -1,15 +1,14 @@
 from typing import Callable
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *
-from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
-from explainaboard.utils.analysis import *
-from explainaboard.metric import *
-from tqdm import tqdm
-
 from typing import Iterator
+
 from datalabs import load_dataset
 from datalabs.operations.aggregate.text_matching import text_matching_aggregating
+from tqdm import tqdm
+
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
+from explainaboard.utils.analysis import *
+from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
 
 
 @text_matching_aggregating(

@@ -1,18 +1,17 @@
-from typing import Callable, List
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *
-from explainaboard.utils.analysis import *
-from explainaboard.metric import *
-from tqdm import tqdm
+import os
+from typing import Callable
+from typing import Dict, List
+
 from datalabs import load_dataset
-from datalabs.operations import aggregate
 from datalabs.operations.aggregate.kg_link_prediction import (
     kg_link_prediction_aggregating,
 )
-from typing import Iterator, Dict, List
-import sys
-import os
+from tqdm import tqdm
+
+from explainaboard.builders import ExplainaboardBuilder
+from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
+from explainaboard.utils.analysis import *
+import explainaboard.metric
 
 
 @kg_link_prediction_aggregating(
@@ -197,23 +196,20 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
         overall = {}
         for metric_name in sys_info.metric_names:
-            one_metric = eval(metric_name)(
+            metric_func = getattr(explainaboard.metric, metric_name)
+            one_metric = metric_func(
                 true_labels=true_labels,
                 predicted_labels=predicted_labels,
                 is_print_confidence_interval=sys_info.is_print_confidence_interval,
             )
-            overall_value_json = one_metric.evaluate()
+            metric_result = one_metric.evaluate()
 
-            overall_value = overall_value_json["value"]
-            confidence_score_low = overall_value_json["confidence_score_low"]
-            confidence_score_up = overall_value_json["confidence_score_up"]
             overall_performance = Performance(
                 metric_name=metric_name,
-                value=float(format(overall_value, '.4g')),
-                confidence_score_low=float(format(confidence_score_low, '.4g')),
-                confidence_score_up=float(format(confidence_score_up, '.4g')),
+                value=metric_result["value"],
+                confidence_score_low=metric_result["confidence_score_low"],
+                confidence_score_up=metric_result["confidence_score_up"],
             )
-
             overall[metric_name] = overall_performance
         return overall
 
@@ -226,7 +222,6 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param feature_name: the name of a feature, e.g., sentence length
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
@@ -260,32 +255,50 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
             bucket_name_to_performance[bucket_interval] = []
             for metric_name in sys_info.metric_names:
 
-                one_metric = eval(metric_name)(
+                metric_func = getattr(explainaboard.metric, metric_name)
+                one_metric = metric_func(
                     true_labels=bucket_true_labels,
                     predicted_labels=bucket_predicted_labels,
                     is_print_confidence_interval=sys_info.is_print_confidence_interval,
                 )
-                bucket_value_json = one_metric.evaluate()
-
-                bucket_value = bucket_value_json["value"]
-                confidence_score_low = bucket_value_json["confidence_score_low"]
-                confidence_score_up = bucket_value_json["confidence_score_up"]
-
-                # print(f"name:\t {one_metric._name} \n"
-                #       f"value:\t {bucket_value}\n"
-                #       f"confidence low\t {confidence_score_low}\n"
-                #       f"confidence up \t {confidence_score_up}\n"
-                #       f"---------------------------------")
+                metric_result = one_metric.evaluate()
 
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
-                    value=bucket_value,
-                    confidence_score_low=confidence_score_low,
-                    confidence_score_up=confidence_score_up,
+                    value=metric_result["value"],
+                    confidence_score_low=metric_result["confidence_score_low"],
+                    confidence_score_up=metric_result["confidence_score_up"],
                     n_samples=len(bucket_true_labels),
                     bucket_samples=bucket_cases,
                 )
+
+                # one_metric = eval(metric_name)(
+                #     true_labels=bucket_true_labels,
+                #     predicted_labels=bucket_predicted_labels,
+                #     is_print_confidence_interval=sys_info.is_print_confidence_interval,
+                # )
+                # bucket_value_json = one_metric.evaluate()
+
+                # bucket_value = bucket_value_json["value"]
+                # confidence_score_low = bucket_value_json["confidence_score_low"]
+                # confidence_score_up = bucket_value_json["confidence_score_up"]
+
+                # # print(f"name:\t {one_metric._name} \n"
+                # #       f"value:\t {bucket_value}\n"
+                # #       f"confidence low\t {confidence_score_low}\n"
+                # #       f"confidence up \t {confidence_score_up}\n"
+                # #       f"---------------------------------")
+
+                # bucket_performance = BucketPerformance(
+                #     bucket_name=bucket_interval,
+                #     metric_name=metric_name,
+                #     value=bucket_value,
+                #     confidence_score_low=confidence_score_low,
+                #     confidence_score_up=confidence_score_up,
+                #     n_samples=len(bucket_true_labels),
+                #     bucket_samples=bucket_cases,
+                # )
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 

@@ -1,10 +1,6 @@
-from typing import Iterable, Optional
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.utils import analysis
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *  # noqa
+from explainaboard.info import BucketPerformance
 from explainaboard.utils.feature_funcs import get_similarity_by_sacrebleu
-from tqdm import tqdm
 
 """TODO
 """
