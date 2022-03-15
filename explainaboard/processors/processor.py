@@ -1,7 +1,8 @@
 from typing import Any, List, Optional
 from explainaboard import feature
 from explainaboard.tasks import TaskType
-from explainaboard.info import Result
+from explainaboard.info import SysOutputInfo
+from explainaboard.builders import ExplainaboardBuilder
 
 
 class Processor:
@@ -9,41 +10,21 @@ class Processor:
 
     _features: feature.Features
     _task_type: TaskType
+    # TODO(gneubig): this could potentially be moved directly into the task definition
+    _default_metrics: List[str]
+    _builder: ExplainaboardBuilder
 
     def __init__(self) -> None:
         pass
-        # self._metadata = {**metadata, "features": self._features}
-        # self._system_output_info = SysOutputInfo.from_dict(self._metadata)
-        # should really be a base type of builders
-        # self._builder: Optional[Any] = None
-        # # add user-defined features into features list
-        # feature_configs = metadata.get("user_defined_features_configs", None)
-        # if feature_configs is not None:
-        #     for feature_name, feature_config in feature_configs.items():
-        #         if feature_config["dtype"] == "string":
-        #             self._features[feature_name] = feature.Value(
-        #                 dtype="string",
-        #                 description=feature_config["description"],
-        #                 is_bucket=True,
-        #                 bucket_info=feature.BucketInfo(
-        #                     method="bucket_attribute_discrete_value",
-        #                     number=feature_config["num_buckets"],
-        #                     setting=1,
-        #                 ),
-        #             )
-        #         elif feature_config['dtype'] == 'float':
-        #             self._features[feature_name] = feature.Value(
-        #                 dtype="float",
-        #                 description=feature_config["description"],
-        #                 is_bucket=True,
-        #                 bucket_info=feature.BucketInfo(
-        #                     method="bucket_attribute_specified_bucket_value",
-        #                     number=feature_config["num_buckets"],
-        #                     setting=(),
-        #                 ),
-        #             )
-        #         else:
-        #             raise NotImplementedError
 
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        raise NotImplementedError
+    def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
+        if metadata is None:
+            metadata = {}
+        if "task_name" not in metadata.keys():
+            metadata["task_name"] = self._task_type.value
+        if "metric_names" not in metadata.keys():
+            metadata["metric_names"] = self._default_metrics
+        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info.features = self._features
+        sys_info.results = self._builder.run(sys_info, sys_output)
+        return sys_info

@@ -88,18 +88,5 @@ class TextPairClassificationProcessor(Processor):
             ),
         }
     )
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.qa_multiple_choice.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["Accuracy"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = TextPairClassificationExplainaboardBuilder()
-        return builder.run(sys_info, sys_output)
+    _builder = TextPairClassificationExplainaboardBuilder()
+    _default_metrics = ["Accuracy"]

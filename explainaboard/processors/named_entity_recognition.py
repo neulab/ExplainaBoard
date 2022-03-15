@@ -174,18 +174,5 @@ class NERProcessor(Processor):
             ),
         }
     )
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.named_entity_recognition.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["f1_score_seqeval"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = NERExplainaboardBuilder()
-        return builder.run(sys_info, sys_output)
+    _builder = NERExplainaboardBuilder()
+    _default_metrics = ["f1_score_seqeval"]

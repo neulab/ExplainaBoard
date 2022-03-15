@@ -78,18 +78,5 @@ class QASquadProcessor(Processor):
             #                                    setting=()))
         }
     )
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.question_answering_extractive.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["f1_score_qa", "exact_match_qa"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = QAExtractiveExplainaboardBuilder()
-        return builder.run(sys_info, sys_output)
+    _builder = QAExtractiveExplainaboardBuilder()
+    _default_metrics = ["f1_score_qa", "exact_match_qa"]

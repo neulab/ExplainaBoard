@@ -138,29 +138,16 @@ class ConditionalGenerationProcessor(Processor):
             ),
         }
     )
-
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.summarization.value
-        if "metric_names" not in metadata.keys():
-            # metadata["metric_names"] = ["chrf","bart_score_summ","bleu","comet","mover_score","prism"]
-            metadata["metric_names"] = ["bleu"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = CondGenExplainaboardBuilder()
-        return builder.run(sys_info, sys_output)
+    _builder = CondGenExplainaboardBuilder()
 
 
 @register_processor(TaskType.summarization)
 class SummarizationProcessor(ConditionalGenerationProcessor):
     _task_type = TaskType.summarization
+    _default_metrics = ["rouge1", "rouge2", "rougeL"]
 
 
 @register_processor(TaskType.machine_translation)
 class MachineTranslationProcessor(ConditionalGenerationProcessor):
     _task_type = TaskType.machine_translation
+    _default_metrics = ["bleu"]

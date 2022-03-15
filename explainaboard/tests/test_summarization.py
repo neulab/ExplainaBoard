@@ -25,12 +25,11 @@ class TestSummarization(unittest.TestCase):
         processor = get_processor(TaskType.summarization.value)
         # self.assertEqual(len(processor._features), 4)
 
-        results = processor.process(metadata, data)
-        # analysis.write_to_directory("./")
-        # print(analysis)
-        self.assertIsNotNone(results.fine_grained)
-        self.assertGreater(len(results.overall), 0)
+        sys_info = processor.process(metadata, data)
 
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
 
 if __name__ == '__main__':
     unittest.main()

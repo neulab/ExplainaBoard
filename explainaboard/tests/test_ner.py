@@ -29,10 +29,11 @@ class TestNER(unittest.TestCase):
         processor = get_processor(TaskType.named_entity_recognition)
         # self.assertEqual(len(processor._features), 4)
 
-        results = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(results.fine_grained)
-        self.assertGreater(len(results.overall), 0)
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
 
 
 if __name__ == '__main__':

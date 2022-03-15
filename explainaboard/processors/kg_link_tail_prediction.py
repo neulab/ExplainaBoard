@@ -87,22 +87,12 @@ class KGLinkTailPredictionProcessor(Processor):
             ),
         }
     )
+    _default_metrics = ["Hits", "MeanReciprocalRank"]
 
-    def __init__(self) -> None:
-        super().__init__()
-
-    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.kg_link_tail_prediction.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["Hits", "MeanReciprocalRank"]
-        sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        builder = KGLTPExplainaboardBuilder(
+    def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
+        self._builder = KGLTPExplainaboardBuilder(
             user_defined_feature_config=metadata.get(
                 "user_defined_features_configs", None
             )
         )
-        return builder.run(sys_info, sys_output)
+        return super().process(metadata, sys_output)

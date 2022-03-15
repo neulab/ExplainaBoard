@@ -103,7 +103,7 @@ def main():
 
     # Run analysis
     reports = [
-        get_processor(task, metadata=metadata, data=x).process()
+        get_processor(task).process(metadata=metadata, sys_output=x)
         for x in system_datasets
     ]
     if len(system_outputs) == 1:  # individual system analysis
