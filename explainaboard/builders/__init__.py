@@ -18,6 +18,7 @@ class ExplainaboardBuilder:
         # Things to use only if necessary
         self._eaas_config = None
         self._eaas_client = None
+        self._statistics_func = None
 
     def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
@@ -291,9 +292,6 @@ class ExplainaboardBuilder:
             overall_results[metric_name] = overall_performance
         return overall_results
 
-    def get_statistics(self):
-        raise NotImplementedError
-
     def _print_bucket_info(
         self, performances_over_bucket: Dict[str, Dict[str, List[BucketPerformance]]]
     ):
@@ -309,7 +307,7 @@ class ExplainaboardBuilder:
         sys_info: SysOutputInfo,
         sys_output: List[dict],
     ) -> Result:
-        statistics = self._init_statistics(sys_info, self.get_statistics)
+        statistics = self._init_statistics(sys_info, self._statistics_func)
         active_features = self._complete_features(
             sys_info, sys_output, statistics=statistics
         )

@@ -72,6 +72,7 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
 
     def __init__(self):
         super().__init__()
+        self._statistics_func = get_statistics
 
     def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary

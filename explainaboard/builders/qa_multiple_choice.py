@@ -72,6 +72,7 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
 
     def __init__(self):
         super().__init__()
+        self._statistics_func = get_statistics
 
     # TODO(gneubig): this should be deduplicated
     def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
