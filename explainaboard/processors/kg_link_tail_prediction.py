@@ -1,6 +1,7 @@
-from typing import Iterable
+from typing import Iterable, List
 from explainaboard import feature
 from explainaboard.tasks import TaskType
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.builders.kg_link_tail_prediction import KGLTPExplainaboardBuilder
@@ -87,18 +88,23 @@ class KGLinkTailPredictionProcessor(Processor):
         }
     )
 
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def process(self,
+                metadata: dict,
+                sys_output: List[dict]) -> Result:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.kg_link_tail_prediction.value
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Hits", "MeanReciprocalRank"]
-        super().__init__(metadata, system_output_data)
-        self._builder = KGLTPExplainaboardBuilder(
-            self._system_output_info,
-            system_output_data,
+        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info.features = self._features
+        builder = KGLTPExplainaboardBuilder(
             user_defined_feature_config=metadata.get(
                 "user_defined_features_configs", None
-            ),
+            )
         )
+        return builder.run(sys_info, sys_output)
