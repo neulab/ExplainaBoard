@@ -25,7 +25,9 @@ def get_statistics(samples: Iterator):
      "label":
     }]
     """
-    return ExplainaboardBuilder.accumulate_vocab_from_samples(samples, lambda x: x['text1'] + x['text2'])
+    return ExplainaboardBuilder.accumulate_vocab_from_samples(
+        samples, lambda x: x['text1'] + x['text2']
+    )
 
 
 class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
@@ -53,8 +55,7 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
             try:
                 dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if (
-                    len(dataset['train']._stat) == 0
-                    or not sys_info.reload_stat
+                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     new_train = dataset['train'].apply(statistics_func, mode="local")
                     self.statistics = new_train._stat
@@ -62,8 +63,8 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
@@ -87,10 +88,14 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['text1'] + x['text2'])
+        return ExplainaboardBuilder.feat_num_oov(
+            existing_features, statistics, lambda x: x['text1'] + x['text2']
+        )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['text1'] + x['text2'])
+        return ExplainaboardBuilder.feat_freq_rank(
+            existing_features, statistics, lambda x: x['text1'] + x['text2']
+        )
 
     # --- End feature functions

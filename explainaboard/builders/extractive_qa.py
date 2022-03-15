@@ -28,7 +28,9 @@ def get_statistics(samples: Iterator):
      "options"
     }]
     """
-    return ExplainaboardBuilder.accumulate_vocab_from_samples(samples, lambda x: x['context'])
+    return ExplainaboardBuilder.accumulate_vocab_from_samples(
+        samples, lambda x: x['context']
+    )
 
 
 class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
@@ -62,8 +64,8 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                     statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
         return statistics
 
@@ -90,10 +92,14 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['context'])
+        return ExplainaboardBuilder.feat_num_oov(
+            existing_features, statistics, lambda x: x['context']
+        )
 
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['context'])
+        return ExplainaboardBuilder.feat_freq_rank(
+            existing_features, statistics, lambda x: x['context']
+        )
 
     # --- End feature functions
 

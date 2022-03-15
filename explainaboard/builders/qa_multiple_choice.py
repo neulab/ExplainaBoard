@@ -29,7 +29,9 @@ def get_statistics(samples: Iterator):
      "options"
     }]
     """
-    return ExplainaboardBuilder.accumulate_vocab_from_samples(samples, lambda x: x['context'])
+    return ExplainaboardBuilder.accumulate_vocab_from_samples(
+        samples, lambda x: x['context']
+    )
 
 
 class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
@@ -66,8 +68,8 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
                     statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
         return statistics
 
@@ -83,11 +85,15 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['context'])
+        return ExplainaboardBuilder.feat_num_oov(
+            existing_features, statistics, lambda x: x['context']
+        )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['context'])
+        return ExplainaboardBuilder.feat_freq_rank(
+            existing_features, statistics, lambda x: x['context']
+        )
 
     # --- End feature functions
 

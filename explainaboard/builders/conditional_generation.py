@@ -102,10 +102,14 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['source'])
+        return ExplainaboardBuilder.feat_num_oov(
+            existing_features, statistics, lambda x: x['source']
+        )
 
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['source'])
+        return ExplainaboardBuilder.feat_freq_rank(
+            existing_features, statistics, lambda x: x['source']
+        )
 
     def get_oracle(self, existing_features: dict, statistics: Any):
         """
