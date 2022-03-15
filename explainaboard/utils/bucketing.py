@@ -1,4 +1,5 @@
-from explainaboard.utils.analysis import reverse_dict, reverse_dict_discrete, sort_dict
+from explainaboard.utils.analysis import reverse_dict, reverse_dict_discrete, sort_dict, find_key
+
 
 def bucket_attribute_specified_bucket_value(
     dict_obj=None, bucket_number=4, bucket_setting=None

@@ -87,13 +87,13 @@ class TextPairClassificationExplainaboardBuilder(ExplainaboardBuilder):
         # TODO(gneubig): this should be deduplicated
         # Calculate statistics of training set
         self.statistics = None
-        if None != self._info.dataset_name:
+        if None != sys_info.dataset_name:
             try:
                 dataset = load_dataset(
-                    self._info.dataset_name, self._info.sub_dataset_name
+                    sys_info.dataset_name, sys_info.sub_dataset_name
                 )
                 if (
-                    len(dataset['train']._stat) == 0 or self._info.reload_stat == False
+                    len(dataset['train'], BucketPerformance, Performance, Table._stat) == 0 or sys_info.reload_stat == False
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                     new_train = dataset['train'].apply(get_statistics, mode="local")
                     self.statistics = new_train._stat

@@ -1,10 +1,9 @@
-from typing import Callable
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.utils import analysis
+from typing import Callable, Any
+from explainaboard.info import SysOutputInfo
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.eval_bucket import *  # noqa
-from explainaboard.utils.analysis import *  # noqa
-from explainaboard.metric import *  # noqa
+from explainaboard.utils.eval_bucket import *
+from explainaboard.utils.analysis import *
+from explainaboard.metric import *
 from tqdm import tqdm
 from typing import Iterator, Dict, List
 from datalabs import load_dataset
@@ -118,24 +117,24 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
         return len(existing_features["answers"]["text"].split(" "))
 
     # training set dependent features
-    def _get_num_oov(self, existing_features: dict):
+    def _get_num_oov(self, existing_features: dict, statistics: Any):
         num_oov = 0
 
         for w in existing_features["context"].split(" "):
-            if w not in self.statistics['vocab'].keys():
+            if w not in statistics['vocab'].keys():
                 num_oov += 1
         # print(num_oov)
         return num_oov
 
     # training set dependent features (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, existing_features: dict):
+    def _get_fre_rank(self, existing_features: dict, statistics: Any):
         fre_rank = 0
 
         for w in existing_features["context"].split(" "):
-            if w not in self.statistics['vocab_rank'].keys():
-                fre_rank += len(self.statistics['vocab_rank'])
+            if w not in statistics['vocab_rank'].keys():
+                fre_rank += len(statistics['vocab_rank'])
             else:
-                fre_rank += self.statistics['vocab_rank'][w]
+                fre_rank += statistics['vocab_rank'][w]
 
         fre_rank = fre_rank * 1.0 / len(existing_features["context"].split(" "))
         return fre_rank

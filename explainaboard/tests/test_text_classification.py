@@ -20,7 +20,7 @@ class TestTextClassification(unittest.TestCase):
             FileType.tsv,
             load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
         )
-        data = loader.load()
+        data = list(loader.load())
         processor = get_processor(TaskType.text_classification)
 
         results = processor.process(metadata, data)

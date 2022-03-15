@@ -22,13 +22,12 @@ class TestAspectBasedSentimentClassification(unittest.TestCase):
         )
         data = loader.load()
         processor = get_processor(
-            TaskType.aspect_based_sentiment_classification, metadata, data
+            TaskType.aspect_based_sentiment_classification
         )
         self.assertEqual(len(processor._features), 10)
 
-        analysis = processor.process()
+        results = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(results.fine_grained)
+        self.assertGreater(len(results.overall), 0)

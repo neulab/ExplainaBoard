@@ -21,14 +21,13 @@ class TestTextPairClassification(unittest.TestCase):
             FileType.tsv,
             path_data,
         )
-        data = loader.load()
-        processor = get_processor(TaskType.text_pair_classification, metadata, data)
+        data = list(loader.load())
+        processor = get_processor(TaskType.text_pair_classification)
         # self.assertEqual(len(processor._features), 8)
 
-        analysis = processor.process()
+        results = processor.process(metadata, data)
         # analysis.to_memory()
 
         # analysis.write_to_directory("./")
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        # self.assertIsNotNone(analysis.results.fine_grained)
-        # self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(results.fine_grained)
+        self.assertGreater(len(results.overall), 0)

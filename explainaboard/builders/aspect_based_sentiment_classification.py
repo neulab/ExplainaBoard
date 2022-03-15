@@ -1,6 +1,4 @@
 from explainaboard.utils.spacy_loader import spacy_loader
-from typing import Iterable, Optional
-from explainaboard.info import SysOutputInfo, Table
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.analysis import *  # noqa
 from explainaboard.utils.eval_bucket import *  # noqa

@@ -26,15 +26,15 @@ class TestExtractiveQA(unittest.TestCase):
         }
 
         processor = get_processor(
-            TaskType.question_answering_extractive, metadata, data
+            TaskType.question_answering_extractive
         )
         # self.assertEqual(len(processor._features), 4)
 
-        analysis = processor.process()
+        results = processor.process(metadata, data)
         # analysis.write_to_directory("./")
         # print(analysis)
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(results.fine_grained)
+        self.assertGreater(len(results.overall), 0)
 
 
 if __name__ == '__main__':

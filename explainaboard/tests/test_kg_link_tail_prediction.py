@@ -25,15 +25,14 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         }
 
         processor = get_processor(
-            TaskType.kg_link_tail_prediction.value, metadata, data
+            TaskType.kg_link_tail_prediction.value
         )
 
-        analysis = processor.process()
+        results = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(results.fine_grained)
+        self.assertGreater(len(results.overall), 0)
 
 
 if __name__ == '__main__':

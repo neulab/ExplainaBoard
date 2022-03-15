@@ -62,9 +62,6 @@ class Result:
     overall: Any = None
     calibration: List[Performance] = None
     fine_grained: Any = None
-    is_print_case: bool = True
-    is_print_confidence_interval: bool = False
-
 
 @dataclass
 class SysOutputInfo:
@@ -79,6 +76,8 @@ class SysOutputInfo:
         paper (Paper, optional): the published paper of the system.
         features (Features, optional): the features used to describe system output's
                                         column type.
+        is_print_case (bool): Whether or not to print out cases
+        is_print_confidence_interval (bool): Whether or not to print out confidence intervals
     """
 
     # set in the system_output scripts
@@ -88,6 +87,8 @@ class SysOutputInfo:
     sub_dataset_name: Optional[str] = None
     metric_names: Optional[List[str]] = None
     reload_stat: bool = True
+    is_print_case: bool = True
+    is_print_confidence_interval: bool = False
     # language : str = "English"
 
     # set later
