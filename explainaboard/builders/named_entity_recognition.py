@@ -12,8 +12,9 @@ from tqdm import tqdm
 import explainaboard.utils.bucketing
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
-from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.py_utils import eprint, sort_dict
 from explainaboard.utils.eval_basic import get_chunks, f1_score_seqeval
+from explainaboard.utils.analysis import cap_feature
 
 
 def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
@@ -310,7 +311,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 'span_len': span_len,
                 'span_pos': span_pos,
                 'span_tag': tag,
-                'span_capitalness': cap_feature(span_text),  # noqa
+                'span_capitalness': cap_feature(span_text),
                 'span_position': eid * 1.0 / len(sentence),
                 'span_chars': len(span_text),
                 'span_density': len(chunks) * 1.0 / len(sentence),
@@ -394,7 +395,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
     ) -> Dict[str, Performance]:
-        predicted_labels, true_labels = [], []  # noqa
+        predicted_labels, true_labels = [], []
 
         true_tags_list = []
         pred_tags_list = []
@@ -463,7 +464,6 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         active_features: List[str],
     ) -> Tuple[dict, dict]:
 
-        sample_address = ""  # noqa
         feature_to_sample_address_to_value_true = {}
         feature_to_sample_address_to_value_pred = {}
 
@@ -603,9 +603,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
             sent_id = int(pos.split("|||")[0])
             span = pos.split("|||")[-1]
-            span_sentence = " ".join(sys_output[sent_id]["tokens"])  # noqa
             system_output_id = sys_output[int(sent_id)]["id"]
-            # print(span_sentence)
 
             if pos in dict_pos2tag.keys():
                 true_label = dict_pos2tag[pos]
@@ -682,4 +680,4 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)  # noqa
+        return sort_dict(bucket_name_to_performance)

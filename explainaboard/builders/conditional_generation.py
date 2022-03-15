@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
+from explainaboard.utils.py_utils import sort_dict
 
 # to calculate advanced features
 summary_attribute = SUMAttribute()
@@ -234,9 +235,6 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         sys_output: List[dict],
     ) -> Dict[str, Performance]:
 
-        inputs = []  # noqa
-        metrics = sys_info.metric_names  # noqa
-
         overall = {}
         for metric_name in sys_info.metric_names:
 
@@ -329,4 +327,4 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
-        return sort_dict(bucket_name_to_performance)  # noqa
+        return sort_dict(bucket_name_to_performance)
