@@ -1,6 +1,5 @@
 import json
 import requests
-import ast
 
 if __name__ == "__main__":
     # end_point_upload_dataset = "https://datalab.nlpedia.ai/api/normal_dataset/update_stat"
@@ -29,7 +28,7 @@ if __name__ == "__main__":
     }
     response = requests.post(end_point_upload_dataset, json=data_info)
 
-    message = json.loads(response.text.replace("null",""))["message"]
+    message = json.loads(response.text.replace("null", ""))["message"]
     print(message)
     """
     (1) success
@@ -38,5 +37,3 @@ if __name__ == "__main__":
     """
     return_content = json.loads(response.content)
     print(return_content['content'])
-
-

@@ -3,8 +3,6 @@ from explainaboard.constants import Source, FileType
 from enum import Enum
 from .loader import register_loader
 from .loader import Loader
-import json
-import os
 from explainaboard.tasks import TaskType
 
 

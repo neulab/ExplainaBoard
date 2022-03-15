@@ -28,7 +28,7 @@ def get_statistics(samples: Iterator):
     length_fre = {}
     total_samps = 0
     for sample in tqdm(samples):
-        text, label = sample["text"], sample["label"]
+        text = sample["text"]
         length = len(text.split(" "))
 
         if length in length_fre.keys():
