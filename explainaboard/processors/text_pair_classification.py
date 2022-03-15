@@ -1,5 +1,3 @@
-from typing import List
-from explainaboard.info import Result, SysOutputInfo
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor

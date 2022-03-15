@@ -61,7 +61,7 @@ class HellaswagExplainaboardBuilder(ExplainaboardBuilder):
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to lists of sample IDs for that bucket
+        :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 

@@ -5,11 +5,10 @@ from datalabs import load_dataset
 from datalabs.operations.aggregate.qa_multiple_choice import (
     qa_multiple_choice_aggregating,
 )
-from tqdm import tqdm
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.analysis import *
+from explainaboard.utils.py_utils import eprint
 
 
 @qa_multiple_choice_aggregating(
@@ -30,38 +29,9 @@ def get_statistics(samples: Iterator):
      "options"
     }]
     """
-
-    vocab = {}
-    length_fre = {}
-    for sample in tqdm(samples):
-        context, answers, options = (
-            sample["context"],
-            sample["answers"],
-            sample["options"],
-        )
-
-        # update vocabulary
-        for w in context.split(" "):
-            if w in vocab.keys():
-                vocab[w] += 1
-            else:
-                vocab[w] = 1
-
-    # the rank of each word based on its frequency
-    sorted_dict = {
-        key: rank
-        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-    }
-    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
-    # print(vocab)
-    # print(vocab_rank)
-    # exit()
-
-    return {
-        "vocab": vocab,
-        "vocab_rank": vocab_rank,
-    }
+    return ExplainaboardBuilder.accumulate_vocab_from_samples(
+        samples, lambda x: x['context']
+    )
 
 
 class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
@@ -75,31 +45,31 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
         self._statistics_func = get_statistics
 
     # TODO(gneubig): this should be deduplicated
-    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
         :param sys_info: Information about the system outputs
-        :param get_statistics: The function used to get the statistics
+        :param statistics_func: The function used to get the statistics
         :return: Statistics from, usually, the training set that are used to calculate other features
         """
 
         # Calculate statistics of training set
         statistics = None
-        if None != sys_info.dataset_name:
+        if sys_info.dataset_name is not None:
             try:
                 dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if (
-                    len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
+                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(get_statistics, mode="local")
+                    new_train = dataset['train'].apply(statistics_func, mode="local")
                     statistics = new_train._stat
                 else:
                     statistics = dataset["train"]._stat
-            except FileNotFoundError as err:
+            except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
         return statistics
 
@@ -115,26 +85,15 @@ class QAMultipleChoiceExplainaboardBuilder(ExplainaboardBuilder):
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
-        num_oov = 0
-
-        for w in existing_features["context"].split(" "):
-            if w not in statistics['vocab'].keys():
-                num_oov += 1
-        # print(num_oov)
-        return num_oov
+        return ExplainaboardBuilder.feat_num_oov(
+            existing_features, statistics, lambda x: x['context']
+        )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        fre_rank = 0
-
-        for w in existing_features["context"].split(" "):
-            if w not in statistics['vocab_rank'].keys():
-                fre_rank += len(statistics['vocab_rank'])
-            else:
-                fre_rank += statistics['vocab_rank'][w]
-
-        fre_rank = fre_rank * 1.0 / len(existing_features["context"].split(" "))
-        return fre_rank
+        return ExplainaboardBuilder.feat_freq_rank(
+            existing_features, statistics, lambda x: x['context']
+        )
 
     # --- End feature functions
 

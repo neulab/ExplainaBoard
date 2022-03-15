@@ -1,9 +1,9 @@
 from explainaboard.utils.analysis import (
     reverse_dict,
     reverse_dict_discrete,
-    sort_dict,
     find_key,
 )
+from explainaboard.utils.py_utils import sort_dict
 
 
 def bucket_attribute_specified_bucket_value(
@@ -22,7 +22,7 @@ def bucket_attribute_specified_bucket_value(
     n_infinity = -1000000
     n_spans = len(dict_span2att_val)
     dict_att_val2span = reverse_dict(dict_span2att_val)
-    dict_att_val2span = sort_dict(dict_att_val2span)  # noqa
+    dict_att_val2span = sort_dict(dict_att_val2span)
     dict_bucket2span = {}
 
     for bucket_value in hardcoded_bucket_values:
@@ -101,17 +101,11 @@ def bucket_attribute_discrete_value(
     n_buckets = bucket_number
     n_entities = bucket_setting
 
-    n_spans = len(dict_span2att_val)
     dict_bucket2span = {}
 
     dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
-    dict_att_val2span = sort_dict(dict_att_val2span, flag="value")  # noqa
+    dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
     # dict["q_id"] = 2
-
-    avg_entity = n_spans * 1.0 / n_buckets  # noqa
-    n_tmp = 0  # noqa
-    entity_list = []  # noqa
-    val_list = []  # noqa
 
     n_total = 1
     for att_val, entity in dict_att_val2span.items():
@@ -126,7 +120,7 @@ def bucket_attribute_discrete_value(
 
 
 def bucket_attribute_specified_bucket_interval(
-    dict_obj=None, bucket_number=None, bucket_setting=None
+    dict_obj=None, bucket_number=None, bucket_setting=None  # noqa
 ):
     # Bucketing different Attributes
 
@@ -137,13 +131,12 @@ def bucket_attribute_specified_bucket_interval(
     intervals = bucket_setting
 
     dict_bucket2span = {}
-    n_spans = len(dict_span2att_val)  # noqa
 
     # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
 
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
         dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
-        dict_att_val2span = sort_dict(dict_att_val2span, flag="value")  # noqa
+        dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
         for att_val, entity in dict_att_val2span.items():
             att_val_tuple = (att_val,)
             if att_val_tuple in intervals:
@@ -160,7 +153,7 @@ def bucket_attribute_specified_bucket_interval(
         # print("---debug----5")
         # print(intervals)
         dict_att_val2span = reverse_dict(dict_span2att_val)
-        dict_att_val2span = sort_dict(dict_att_val2span)  # noqa
+        dict_att_val2span = sort_dict(dict_att_val2span)
         for v in intervals:
             if len(v) == 1:
                 dict_bucket2span[v] = []

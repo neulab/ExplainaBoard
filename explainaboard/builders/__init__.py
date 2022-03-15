@@ -1,16 +1,17 @@
-from typing import Callable, List, Tuple, Dict
+from typing import Callable, List, Tuple, Dict, Iterator, Any
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Result
 import explainaboard.metric
+import json
 from tqdm import tqdm
 from eaas import Config, Client
 from datalabs import load_dataset
 import explainaboard.utils.bucketing
-from explainaboard.utils.analysis import (
+from explainaboard.utils.py_utils import (
     eprint,
     print_dict,
     sort_dict,
 )
-from explainaboard.utils.db_api import *
+from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
 
 
 class ExplainaboardBuilder:
@@ -20,12 +21,12 @@ class ExplainaboardBuilder:
         self._eaas_client = None
         self._statistics_func = None
 
-    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
         :param sys_info: Information about the system outputs
-        :param get_statistics: The function used to get the statistics
+        :param statistics_func: The function used to get the statistics
         :return: Statistics from, usually, the training set that are used to calculate other features
         """
         statistics = None
@@ -57,26 +58,26 @@ class ExplainaboardBuilder:
                         len(dataset[split_name]._stat) == 0 or not sys_info.reload_stat
                     ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                         new_train = dataset[split_name].apply(
-                            get_statistics, mode="local"
+                            statistics_func, mode="local"
                         )
 
                         statistics = new_train._stat
                         # self.statistics = dataset['train']._stat
                         # write statistics to db
                         eprint("saving to database")
-                        response = write_statistics_from_db(
+                        response = write_statistics_to_db(
                             dataset_name, sub_dataset, content=statistics
                         )
                         eprint(response.content)
                 else:  # dataset does not exist
                     eprint(
-                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                     )
-            except FileNotFoundError as err:
+            except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
         return statistics
 
@@ -162,8 +163,6 @@ class ExplainaboardBuilder:
             performances_over_bucket: a dictionary of feature name -> list of performances by bucket
         """
 
-        feature_to_sample_address_to_value = {}
-
         # Bucketing
         samples_over_bucket = {}
         performances_over_bucket = {}
@@ -204,7 +203,7 @@ class ExplainaboardBuilder:
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to lists of sample IDs for that bucket
+        :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
@@ -318,3 +317,47 @@ class ExplainaboardBuilder:
         self._print_bucket_info(performance_over_bucket)
         result = Result(overall=overall_results, fine_grained=performance_over_bucket)
         return result
+
+    # ------ Below are utility functions for feature calculation -------
+    @staticmethod
+    def accumulate_vocab_from_samples(samples: Iterator, text_from_sample: Callable):
+        vocab = {}
+        for sample in tqdm(samples):
+            for w in text_from_sample(sample).split(" "):
+                vocab[w] = vocab.get(w, 0) + 1
+        # the rank of each word based on its frequency
+        sorted_dict = {
+            key: rank
+            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+        }
+        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+        return {
+            "vocab": vocab,
+            "vocab_rank": vocab_rank,
+        }
+
+    @staticmethod
+    def feat_freq_rank(
+        existing_features: dict, statistics: Any, text_from_sample: Callable
+    ):
+        fre_rank = 0
+
+        tokens = text_from_sample(existing_features).split(" ")
+        for w in tokens:
+            if w not in statistics['vocab_rank']:
+                fre_rank += len(statistics['vocab_rank'])
+            else:
+                fre_rank += statistics['vocab_rank'][w]
+
+        fre_rank = fre_rank * 1.0 / len(tokens)
+        return fre_rank
+
+    @staticmethod
+    def feat_num_oov(
+        existing_features: dict, statistics: Any, text_from_sample: Callable
+    ):
+        num_oov = 0
+        for w in text_from_sample(existing_features).split(" "):
+            if w not in statistics['vocab'].keys():
+                num_oov += 1
+        return num_oov
