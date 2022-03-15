@@ -180,19 +180,23 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     # --- End feature functions
 
     # TODO(gneubig): this can probably be generalized to single-metric
-    def get_overall_performance(self):
+    def get_overall_performance(
+            self,
+            sys_info: SysOutputInfo,
+            sys_output: List[dict],
+    ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []
 
-        for _id, feature_table in self._data.items():
+        for _id, feature_table in sys_output.items():
 
             predicted_labels.append(feature_table["predicted_tails"])
             true_labels.append(feature_table["true_tail"])
 
-        for metric_name in self._info.metric_names:
+        for metric_name in sys_info.metric_names:
             one_metric = eval(metric_name)(
                 true_labels=true_labels,
                 predicted_labels=predicted_labels,
-                is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+                is_print_confidence_interval=results.is_print_confidence_interval,
             )
             overall_value_json = one_metric.evaluate()
 
@@ -206,11 +210,11 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
 
-            if self._info.results.overall is None:
-                self._info.results.overall = {}
-                self._info.results.overall[metric_name] = overall_performance
+            if results.overall is None:
+                results.overall = {}
+                results.overall[metric_name] = overall_performance
             else:
-                self._info.results.overall[metric_name] = overall_performance
+                results.overall[metric_name] = overall_performance
 
     # TODO(gneubig): the only difficult part in generalizing this is specifing "in" instead of "=="
     def get_bucket_performance(self, feature_name: str):
@@ -231,16 +235,16 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
             for sample_id in sample_ids:
 
-                true_label = self._data[int(sample_id)]["true_tail"]
-                predicted_label = self._data[int(sample_id)]["predicted_tails"]
-                sent = self._data[int(sample_id)]["link"]  # noqa
-                s_id = self._data[int(sample_id)]["id"]
+                true_label = sys_output[int(sample_id)]["true_tail"]
+                predicted_label = sys_output[int(sample_id)]["predicted_tails"]
+                sent = sys_output[int(sample_id)]["link"]  # noqa
+                s_id = sys_output[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
                 bucket_true_labels.append(true_label)
                 bucket_predicted_labels.append(predicted_label)
                 # get a bucket of cases (e.g., errors)
-                if self._info.results.is_print_case:
+                if sys_info.is_print_case:
                     if true_label not in predicted_label:
                         # bucket_case = true_label + "|||" + predicted_label + "|||" + sent
                         # bucket_case = {"true_label":(s_id,["true_label"]),
@@ -250,12 +254,12 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in self._info.metric_names:
+            for metric_name in sys_info.metric_names:
 
                 one_metric = eval(metric_name)(
                     true_labels=bucket_true_labels,
                     predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=self._info.results.is_print_confidence_interval,
+                    is_print_confidence_interval=results.is_print_confidence_interval,
                 )
                 bucket_value_json = one_metric.evaluate()
 

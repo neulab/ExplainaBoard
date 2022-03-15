@@ -1,6 +1,5 @@
-from typing import Callable
+from typing import Callable, Any
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance, Table
-from explainaboard.utils import analysis
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.utils.eval_bucket import *  # noqa
 from explainaboard.utils.analysis import *  # noqa
@@ -124,24 +123,24 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         return res_json["corpus_bleu"]
 
     # training set dependent features
-    def _get_num_oov(self, existing_features: dict):
+    def _get_num_oov(self, existing_features: dict, statistics: Any):
         num_oov = 0
 
         for w in existing_features["context"].split(" "):
-            if w not in self.statistics['vocab'].keys():
+            if w not in statistics['vocab'].keys():
                 num_oov += 1
         # print(num_oov)
         return num_oov
 
     # training set dependent features (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, existing_features: dict):
+    def _get_fre_rank(self, existing_features: dict, statistics: Any):
         fre_rank = 0
 
         for w in existing_features["context"].split(" "):
-            if w not in self.statistics['vocab_rank'].keys():
-                fre_rank += len(self.statistics['vocab_rank'])
+            if w not in statistics['vocab_rank'].keys():
+                fre_rank += len(statistics['vocab_rank'])
             else:
-                fre_rank += self.statistics['vocab_rank'][w]
+                fre_rank += statistics['vocab_rank'][w]
 
         fre_rank = fre_rank * 1.0 / len(existing_features["context"].split(" "))
         return fre_rank
@@ -149,14 +148,19 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
     # --- End feature functions
 
     # TODO(gneubig): this can probably be generalized as well
-    def get_overall_performance(self):
+    def get_overall_performance(
+            self,
+            sys_info: SysOutputInfo,
+            sys_output: List[dict],
+    ) -> Dict[str, Performance]:
         predicted_answers, true_answers = [], []
 
-        for _id, feature_table in self._data.items():
+        for _id, feature_table in enumerate(sys_output):
             predicted_answers.append(feature_table["predicted_answers"]["text"])
             true_answers.append(feature_table["answers"]["text"])
 
-        for metric_name in self._info.metric_names:
+        overall = {}
+        for metric_name in sys_info.metric_names:
             overall_value = eval(metric_name)(true_answers, predicted_answers)
 
             overall_value = overall_value
@@ -168,14 +172,16 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 confidence_score_low=float(format(confidence_score_low, '.4g')),
                 confidence_score_up=float(format(confidence_score_up, '.4g')),
             )
-            if self._info.results.overall is None:
-                self._info.results.overall = {}
-                self._info.results.overall[metric_name] = overall_performance
-            else:
-                self._info.results.overall[metric_name] = overall_performance
+            overall[metric_name] = overall_performance
+        return overall
 
     # TODO(gneubig): this should be generalized
-    def get_bucket_performance(self, feature_name: str):
+    def get_bucket_performance(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        samples_over_bucket: Dict[str, List[int]],
+    ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param feature_name: the name of a feature, e.g., sentence length
@@ -183,9 +189,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
         """
 
         bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in self._samples_over_bucket[
-            feature_name
-        ].items():
+        for bucket_interval, sample_ids in samples_over_bucket.items():
 
             bucket_true_labels = []
             bucket_predicted_labels = []
@@ -193,21 +197,21 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
 
             for sample_id in sample_ids:
 
-                true_label = self._data[int(sample_id)]["answers"]["text"]
+                true_label = sys_output[int(sample_id)]["answers"]["text"]
                 if isinstance(true_label, list):
                     true_label = true_label[0]
 
-                predicted_label = self._data[int(sample_id)]["predicted_answers"][
+                predicted_label = sys_output[int(sample_id)]["predicted_answers"][
                     "text"
                 ]
-                sent = self._data[int(sample_id)]["question"]  # noqa
-                s_id = self._data[int(sample_id)]["id"]
+                sent = sys_output[int(sample_id)]["question"]  # noqa
+                s_id = sys_output[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
                 bucket_true_labels.append(true_label)
                 bucket_predicted_labels.append(predicted_label)
                 # get a bucket of cases (e.g., errors)
-                if self._info.results.is_print_case:
+                if sys_info.is_print_case:
                     if true_label != predicted_label:
                         # bucket_case = true_label[0] + "|||" + predicted_label + "|||" + sent
                         # bucket_case = {"true_answer": (sample_id, ["true_answers","text"]),
@@ -217,7 +221,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in self._info.metric_names:
+            for metric_name in sys_info.metric_names:
 
                 bucket_value = eval(metric_name)(
                     bucket_true_labels, bucket_predicted_labels
@@ -236,9 +240,9 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
-                    value=format(bucket_value, '.4g'),
-                    confidence_score_low=format(confidence_score_low, '.4g'),
-                    confidence_score_up=format(confidence_score_up, '.4g'),
+                    value=bucket_value,
+                    confidence_score_low=confidence_score_low,
+                    confidence_score_up=confidence_score_up,
                     n_samples=len(bucket_true_labels),
                     bucket_samples=bucket_cases,
                 )

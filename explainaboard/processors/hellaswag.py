@@ -1,4 +1,5 @@
-from typing import Iterable
+from typing import List
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
@@ -72,13 +73,19 @@ class HellaswagProcessor(Processor):
         }
     )
 
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def process(self,
+                metadata: dict,
+                sys_output: List[dict]) -> Result:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.text_classification.value
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = ["Accuracy"]
-        super().__init__(metadata, system_output_data)
-        self._builder = HellaswagExplainaboardBuilder()
-        self._builder.run(self._system_output_info, system_output_data)
+        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info.features = self._features
+        builder = HellaswagExplainaboardBuilder()
+        return builder.run(sys_info, sys_output)

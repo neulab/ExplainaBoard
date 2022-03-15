@@ -11,11 +11,11 @@ class Processor:
     _task_type: TaskType
 
     def __init__(self) -> None:
+        pass
         # self._metadata = {**metadata, "features": self._features}
         # self._system_output_info = SysOutputInfo.from_dict(self._metadata)
         # should really be a base type of builders
-        self._builder: Optional[Any] = None
-
+        # self._builder: Optional[Any] = None
         # # add user-defined features into features list
         # feature_configs = metadata.get("user_defined_features_configs", None)
         # if feature_configs is not None:

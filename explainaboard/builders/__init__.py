@@ -5,7 +5,11 @@ from tqdm import tqdm
 from eaas import Config, Client
 from datalabs import load_dataset
 import explainaboard.utils.bucketing
-from explainaboard.utils.analysis import eprint, print_dict, sort_dict, beautify_interval
+from explainaboard.utils.analysis import (
+    eprint,
+    print_dict,
+    sort_dict,
+)
 from explainaboard.utils.db_api import *
 
 
@@ -15,9 +19,7 @@ class ExplainaboardBuilder:
         self._eaas_config = None
         self._eaas_client = None
 
-    def _init_statistics(self,
-                         sys_info: SysOutputInfo,
-                         get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -51,8 +53,7 @@ class ExplainaboardBuilder:
                         sys_info.dataset_name, sys_info.sub_dataset_name
                     )
                     if (
-                        len(dataset[split_name]._stat) == 0
-                        or not sys_info.reload_stat
+                        len(dataset[split_name]._stat) == 0 or not sys_info.reload_stat
                     ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
                         new_train = dataset[split_name].apply(
                             get_statistics, mode="local"
@@ -78,8 +79,7 @@ class ExplainaboardBuilder:
                 )
         return statistics
 
-    def _get_feature_func(self,
-                          func_name: str):
+    def _get_feature_func(self, func_name: str):
         return getattr(self, f'_get_{func_name}')
 
     def _get_eaas_client(self):
@@ -107,10 +107,9 @@ class ExplainaboardBuilder:
         """
         return data_point["predicted_label"]
 
-    def _complete_features(self,
-                           sys_info: SysOutputInfo,
-                           sys_output: List[dict],
-                           statistics=None) -> List[str]:
+    def _complete_features(
+        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+    ) -> List[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
         information, then calculates feature functions and modifies `sys_output` to add these feature values
@@ -123,22 +122,33 @@ class ExplainaboardBuilder:
         # Get names of bucketing features
         bucket_feature_funcs = {}
         for bucket_feature in sys_info.features.get_bucket_features():
-            if (bucket_feature in sys_info.features.keys() and
-                (statistics is not None or not sys_info.features[bucket_feature].require_training_set)):
-                bucket_feature_funcs[bucket_feature] = self._get_feature_func(bucket_feature)
-        for _id, dict_sysout in tqdm(
-            enumerate(sys_output), desc="featurizing"
-        ):
+            if bucket_feature in sys_info.features.keys() and (
+                statistics is not None
+                or not sys_info.features[bucket_feature].require_training_set
+            ):
+                bucket_feature_funcs[bucket_feature] = (
+                    self._get_feature_func(bucket_feature),
+                    sys_info.features[bucket_feature].require_training_set,
+                )
+        for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
-            for bucket_key, bucket_func in bucket_feature_funcs.items():
-                dict_sysout[bucket_key] = bucket_func(dict_sysout)
+            for bucket_key, (
+                bucket_func,
+                training_dependent,
+            ) in bucket_feature_funcs.items():
+                dict_sysout[bucket_key] = (
+                    bucket_func(dict_sysout, statistics)
+                    if training_dependent
+                    else bucket_func(dict_sysout)
+                )
         return list(bucket_feature_funcs.keys())
 
-    def _bucketing_samples(self,
-                           sys_info: SysOutputInfo,
-                           sys_output: List[dict],
-                           active_features: List[str],
-                           ) -> Tuple[dict, dict]:
+    def _bucketing_samples(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        active_features: List[str],
+    ) -> Tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
         :param sys_info: Information about the system output
@@ -160,24 +170,32 @@ class ExplainaboardBuilder:
             #       f"bucket_setting: {sys_info.features[feature_name].bucket_info.setting}\n")
 
             # Preparation for bucketing
-            bucket_func = getattr(explainaboard.utils.bucketing, sys_info.features[feature_name].bucket_info.method)
+            bucket_func = getattr(
+                explainaboard.utils.bucketing,
+                sys_info.features[feature_name].bucket_info.method,
+            )
             # TODO(gneubig): make dict_obj more elegant so it doesn't have to copy memory
             samples_over_bucket[feature_name] = bucket_func(
-                dict_obj={x: sys_output[x][feature_name] for x in range(len(sys_output))},
+                dict_obj={
+                    x: sys_output[x][feature_name] for x in range(len(sys_output))
+                },
                 bucket_number=sys_info.features[feature_name].bucket_info.number,
                 bucket_setting=sys_info.features[feature_name].bucket_info.setting,
             )
 
             # evaluating bucket: get bucket performance
-            performances_over_bucket[feature_name] = self.get_bucket_performance(sys_info, sys_output, samples_over_bucket[feature_name])
+            performances_over_bucket[feature_name] = self.get_bucket_performance(
+                sys_info, sys_output, samples_over_bucket[feature_name]
+            )
 
         return samples_over_bucket, performances_over_bucket
 
-    def get_bucket_performance(self,
-                               sys_info: SysOutputInfo,
-                               sys_output: List[dict],
-                               samples_over_bucket: Dict[str, List[int]]
-                               ) -> Dict[str, List[BucketPerformance]]:
+    def get_bucket_performance(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        samples_over_bucket: Dict[str, List[int]],
+    ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
@@ -204,7 +222,7 @@ class ExplainaboardBuilder:
                 bucket_true_labels.append(true_label)
                 bucket_predicted_labels.append(predicted_label)
                 # get a bucket of cases (e.g., errors)
-                if sys_info.results.is_print_case:
+                if sys_info.is_print_case:
                     if true_label != predicted_label:
                         bucket_case = str(s_id)
                         bucket_cases.append(bucket_case)
@@ -215,7 +233,7 @@ class ExplainaboardBuilder:
                 one_metric = metric_func(
                     true_labels=bucket_true_labels,
                     predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=sys_info.results.is_print_confidence_interval,
+                    is_print_confidence_interval=sys_info.is_print_confidence_interval,
                 )
                 metric_result = one_metric.evaluate()
 
@@ -233,10 +251,11 @@ class ExplainaboardBuilder:
 
         return sort_dict(bucket_name_to_performance)
 
-    def get_overall_performance(self,
-                                sys_info: SysOutputInfo,
-                                sys_output: List[dict],
-                                ) -> Dict[str, Performance]:
+    def get_overall_performance(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+    ) -> Dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
@@ -256,7 +275,7 @@ class ExplainaboardBuilder:
             one_metric = metric_func(
                 true_labels=true_labels,
                 predicted_labels=predicted_labels,
-                is_print_confidence_interval=sys_info.results.is_print_confidence_interval,
+                is_print_confidence_interval=sys_info.is_print_confidence_interval,
             )
             metric_result = one_metric.evaluate()
 
@@ -269,9 +288,12 @@ class ExplainaboardBuilder:
             overall_results[metric_name] = overall_performance
         return overall_results
 
-    def _print_bucket_info(self,
-                           performances_over_bucket: Dict[str, Dict[str, List[BucketPerformance]]]
-                           ):
+    def get_statistics(self):
+        raise NotImplementedError
+
+    def _print_bucket_info(
+        self, performances_over_bucket: Dict[str, Dict[str, List[BucketPerformance]]]
+    ):
         """
         Print out performance bucket by bucket
         :param performances_over_bucket: dictionary of features -> buckets -> performance for different metrics
@@ -279,14 +301,19 @@ class ExplainaboardBuilder:
         for feature_name, feature_value in performances_over_bucket.items():
             print_dict(feature_value, feature_name)
 
-    def run(self,
+    def run(
+        self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
     ) -> Result:
         statistics = self._init_statistics(sys_info, self.get_statistics)
-        active_features = self._complete_features(sys_info, sys_output, statistics=statistics)
-        samples_over_bucket, performance_over_bucket = self._bucketing_samples(sys_info, sys_output, active_features)
+        active_features = self._complete_features(
+            sys_info, sys_output, statistics=statistics
+        )
+        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
+            sys_info, sys_output, active_features
+        )
         overall_results = self.get_overall_performance(sys_info, sys_output)
         self._print_bucket_info(performance_over_bucket)
-        result = Result(overall = overall_results, fine_grained=performance_over_bucket)
+        result = Result(overall=overall_results, fine_grained=performance_over_bucket)
         return result

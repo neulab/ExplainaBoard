@@ -1,4 +1,5 @@
-from typing import Iterable
+from typing import List
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
@@ -82,16 +83,21 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         }
     )
 
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
+    def __init__(self) -> None:
+        super().__init__()
+
+    def process(self,
+                metadata: dict,
+                sys_output: List[dict]) -> Result:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = TaskType.aspect_based_sentiment_classification.value
         if "metric_names" not in metadata.keys() or metadata["metric_names"] is None:
             metadata["metric_names"] = ["Accuracy"]
-        # print(metadata)
-        super().__init__(metadata, system_output_data)
-        self._builder = ABSCExplainaboardBuilder()
-        self._builder.run(self._system_output_info, system_output_data)
+        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info.features = self._features
+        builder = ABSCExplainaboardBuilder()
+        return builder.run(sys_info, sys_output)
 
         # explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv
