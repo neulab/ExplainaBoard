@@ -2,6 +2,7 @@ from typing import Any
 from typing import Iterator, Dict, List
 
 import numpy
+
 # TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
@@ -153,8 +154,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
         oracle_position_fre = 0
         if (
             statistics is not None
-            and str(int(oracle_position))
-            in statistics['oracle_position_fre'].keys()
+            and str(int(oracle_position)) in statistics['oracle_position_fre'].keys()
         ):
             oracle_position_fre = statistics['oracle_position_fre'][
                 str(int(oracle_position))
@@ -168,7 +168,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): can this be de-duplicated or is it specialized?
     def _complete_features(
-            self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
     ) -> List[str]:
         """
         This function is used to calculate features used for bucketing, such as sentence_length
@@ -206,7 +206,10 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
                 statistics is not None
                 or not sys_info.features[bucket_feature].require_training_set
             ):
-                if bucket_feature in oracle_feat_names or bucket_feature in advanced_feat_names:
+                if (
+                    bucket_feature in oracle_feat_names
+                    or bucket_feature in advanced_feat_names
+                ):
                     bucket_feature_funcs[bucket_feature] = (None, False)
                 else:
                     bucket_feature_funcs[bucket_feature] = (
@@ -218,9 +221,9 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
             dict_advanced_features = None
             oracle_feats = self.get_oracle(dict_sysout, statistics)
             # Get values of bucketing features
-            for bucket_key, (
-                    bucket_func,
-                    training_dependent,
+            for (
+                bucket_key,
+                (bucket_func, training_dependent,),
             ) in bucket_feature_funcs.items():
 
                 # TODO(gneubig): this logic seems complicated, can it be simplified?
@@ -240,9 +243,7 @@ class CondGenExplainaboardBuilder(ExplainaboardBuilder):
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-            self,
-            sys_info: SysOutputInfo,
-            sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
 
         inputs = []  # noqa

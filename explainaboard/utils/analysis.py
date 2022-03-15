@@ -95,6 +95,3 @@ def reverse_dict_discrete(dict_a2b):
             dict_b2a[v].append(k)
 
     return dict_b2a
-
-
-

@@ -213,9 +213,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         super().__init__()
         samples_over_bucket_pred = {}
 
-    def _init_statistics(self,
-                         sys_info: SysOutputInfo,
-                         get_statistics: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -231,9 +229,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         if None != sys_info.dataset_name:
             try:
 
-                dataset = load_dataset(
-                    sys_info.dataset_name, sys_info.sub_dataset_name
-                )
+                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
                 if (
                     len(dataset['train']._stat) == 0 or sys_info.reload_stat == False
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
@@ -365,9 +361,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         This function is used to calculate features used for bucketing, such as sentence_length
         :return:
         """
-        for _id, dict_sysout in tqdm(
-            enumerate(sys_output), desc="featurizing"
-        ):
+        for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
 
@@ -381,16 +375,18 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
             dict_sysout[
                 "true_entity_info"
-            ] = self._complete_feature_advanced_span_features(tokens, dict_sysout["true_tags"], statistics=statistics)
+            ] = self._complete_feature_advanced_span_features(
+                tokens, dict_sysout["true_tags"], statistics=statistics
+            )
             dict_sysout[
                 "pred_entity_info"
-            ] = self._complete_feature_advanced_span_features(tokens, dict_sysout["pred_tags"], statistics=statistics)
+            ] = self._complete_feature_advanced_span_features(
+                tokens, dict_sysout["pred_tags"], statistics=statistics
+            )
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-            self,
-            sys_info: SysOutputInfo,
-            sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []  # noqa
 
@@ -517,10 +513,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             ):
                 continue
 
-            bucket_func = getattr(
-                explainaboard.utils.bucketing,
-                _bucket_info.method,
-            )
+            bucket_func = getattr(explainaboard.utils.bucketing, _bucket_info.method,)
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
                 bucket_number=_bucket_info.number,
@@ -540,7 +533,10 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
             # evaluating bucket: get bucket performance
             performances_over_bucket[feature_name] = self.get_bucket_performance_ner(
-                sys_info, sys_output, samples_over_bucket[feature_name], samples_over_bucket_pred[feature_name]
+                sys_info,
+                sys_output,
+                samples_over_bucket[feature_name],
+                samples_over_bucket_pred[feature_name],
             )
         return samples_over_bucket, performances_over_bucket
 
@@ -548,12 +544,14 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
     Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
     """
 
-    def get_bucket_cases_ner(self, bucket_interval,
-                             sys_info: SysOutputInfo,
-                             sys_output: List[dict],
-                             samples_over_bucket: Dict[str, List[int]],
-                             samples_over_bucket_pred: Dict[str, List[int]],
-        ) -> list:
+    def get_bucket_cases_ner(
+        self,
+        bucket_interval,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        samples_over_bucket: Dict[str, List[int]],
+        samples_over_bucket_pred: Dict[str, List[int]],
+    ) -> list:
         # predict:  2_3 -> NER
         dict_pos2tag_pred = {}
         for k_bucket_eval, spans_pred in samples_over_bucket_pred.items():
@@ -647,10 +645,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         for bucket_interval, spans_true in samples_over_bucket.items():
 
             spans_pred = []
-            if (
-                bucket_interval
-                not in samples_over_bucket_pred.keys()
-            ):
+            if bucket_interval not in samples_over_bucket_pred.keys():
                 raise ValueError("Predict Label Bucketing Errors")
             else:
                 spans_pred = samples_over_bucket_pred[bucket_interval]
@@ -658,7 +653,13 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             """
             Get bucket samples for ner task
             """
-            bucket_samples = self.get_bucket_cases_ner(bucket_interval, sys_info, sys_output, samples_over_bucket, samples_over_bucket_pred)
+            bucket_samples = self.get_bucket_cases_ner(
+                bucket_interval,
+                sys_info,
+                sys_output,
+                samples_over_bucket,
+                samples_over_bucket_pred,
+            )
 
             for metric_name in sys_info.metric_names:
                 """

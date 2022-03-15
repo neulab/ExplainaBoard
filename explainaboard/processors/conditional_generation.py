@@ -142,9 +142,7 @@ class ConditionalGenerationProcessor(Processor):
     def __init__(self) -> None:
         super().__init__()
 
-    def process(self,
-                metadata: dict,
-                sys_output: List[dict]) -> Result:
+    def process(self, metadata: dict, sys_output: List[dict]) -> Result:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
@@ -156,6 +154,7 @@ class ConditionalGenerationProcessor(Processor):
         sys_info.features = self._features
         builder = CondGenExplainaboardBuilder()
         return builder.run(sys_info, sys_output)
+
 
 @register_processor(TaskType.summarization)
 class SummarizationProcessor(ConditionalGenerationProcessor):

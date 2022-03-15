@@ -63,6 +63,7 @@ class Result:
     calibration: List[Performance] = None
     fine_grained: Any = None
 
+
 @dataclass
 class SysOutputInfo:
     """Information about a system output

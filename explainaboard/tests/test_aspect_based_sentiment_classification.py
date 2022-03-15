@@ -21,9 +21,7 @@ class TestAspectBasedSentimentClassification(unittest.TestCase):
             load_file_as_str(f"{artifacts_path}test-aspect.tsv"),
         )
         data = loader.load()
-        processor = get_processor(
-            TaskType.aspect_based_sentiment_classification
-        )
+        processor = get_processor(TaskType.aspect_based_sentiment_classification)
         self.assertEqual(len(processor._features), 10)
 
         results = processor.process(metadata, data)
