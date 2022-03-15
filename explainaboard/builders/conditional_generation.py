@@ -13,7 +13,6 @@ from tqdm import tqdm
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
-from explainaboard.utils.analysis import *
 
 # to calculate advanced features
 summary_attribute = SUMAttribute()

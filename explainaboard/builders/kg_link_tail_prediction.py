@@ -1,4 +1,5 @@
 import os
+import json
 from typing import Callable
 from typing import Dict, List
 
@@ -10,7 +11,7 @@ from tqdm import tqdm
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
-from explainaboard.utils.analysis import *
+from explainaboard.utils.analysis import eprint
 import explainaboard.metric
 
 

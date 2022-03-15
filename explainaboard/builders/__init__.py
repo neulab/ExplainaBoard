@@ -1,6 +1,7 @@
 from typing import Callable, List, Tuple, Dict, Iterator, Any
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Result
 import explainaboard.metric
+import json
 from tqdm import tqdm
 from eaas import Config, Client
 from datalabs import load_dataset
@@ -10,7 +11,7 @@ from explainaboard.utils.analysis import (
     print_dict,
     sort_dict,
 )
-from explainaboard.utils.db_api import *
+from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
 
 
 class ExplainaboardBuilder:
@@ -64,7 +65,7 @@ class ExplainaboardBuilder:
                         # self.statistics = dataset['train']._stat
                         # write statistics to db
                         eprint("saving to database")
-                        response = write_statistics_from_db(
+                        response = write_statistics_to_db(
                             dataset_name, sub_dataset, content=statistics
                         )
                         eprint(response.content)

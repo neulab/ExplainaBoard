@@ -3,7 +3,6 @@ from typing import Iterator, Any
 from tqdm import tqdm
 
 from explainaboard.builders import ExplainaboardBuilder
-from explainaboard.utils.feature_funcs import *
 from explainaboard.utils.spacy_loader import spacy_loader
 from datalabs.operations.aggregate.text_classification import (
     text_classification_aggregating,

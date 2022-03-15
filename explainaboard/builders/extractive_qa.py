@@ -6,7 +6,7 @@ from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregatin
 
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
-from explainaboard.utils.analysis import *
+from explainaboard.utils.analysis import eprint
 import explainaboard.utils.eval_basic_qa
 
 

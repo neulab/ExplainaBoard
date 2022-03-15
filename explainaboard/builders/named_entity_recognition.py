@@ -12,7 +12,6 @@ from tqdm import tqdm
 import explainaboard.utils.bucketing
 from explainaboard.builders import ExplainaboardBuilder
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
-from explainaboard.utils.analysis import *
 from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.eval_basic import get_chunks, f1_score_seqeval
 
