@@ -26,7 +26,7 @@ def save_json(obj_json, path):
 
 def beautify_interval(interval):
 
-    if type(interval[0]) == type("string"):  # pay attention to it
+    if isinstance(interval[0], str):
         return interval[0]
     else:
         if len(interval) == 1:

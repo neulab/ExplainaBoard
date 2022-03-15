@@ -395,7 +395,6 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
     ) -> Dict[str, Performance]:
-        predicted_labels, true_labels = [], []
 
         true_tags_list = []
         pred_tags_list = []

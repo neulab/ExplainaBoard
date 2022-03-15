@@ -64,7 +64,7 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                     statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."
                     "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
         return statistics
@@ -165,7 +165,6 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 predicted_label = sys_output[int(sample_id)]["predicted_answers"][
                     "text"
                 ]
-                sent = sys_output[int(sample_id)]["question"]
                 s_id = sys_output[int(sample_id)]["id"]
 
                 # get a bucket of true/predicted labels
