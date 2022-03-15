@@ -1,6 +1,7 @@
-from typing import Iterable
+from typing import Iterable, List
 from explainaboard import feature
 from explainaboard.tasks import TaskType
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.builders.kg_link_tail_prediction import KGLTPExplainaboardBuilder
@@ -20,9 +21,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="number of words in the tail entity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "head_entity_length": feature.Value(
@@ -30,9 +31,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="number of words in the head entity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "tail_fre": feature.Value(
@@ -40,9 +41,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="the frequency of tail entity in the training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -51,9 +52,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="the frequency of link relation in the training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -62,9 +63,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="the frequency of head relation in the training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -73,7 +74,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="boolean feature: 'symmetric' or 'asymmetric'; more granularity to be added",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=2, _setting=1
+                    method="bucket_attribute_discrete_value", number=2, setting=1
                 ),
             ),
             "entity_type_level": feature.Value(
@@ -81,24 +82,17 @@ class KGLinkTailPredictionProcessor(Processor):
                 description="most specific (highest) entity type level of true tail entity",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_discrete_value", _number=8, _setting=1
+                    method="bucket_attribute_discrete_value", number=8, setting=1
                 ),
             ),
         }
     )
+    _default_metrics = ["Hits", "MeanReciprocalRank"]
 
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.kg_link_tail_prediction.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["Hits", "MeanReciprocalRank"]
-        super().__init__(metadata, system_output_data)
+    def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
         self._builder = KGLTPExplainaboardBuilder(
-            self._system_output_info,
-            system_output_data,
             user_defined_feature_config=metadata.get(
                 "user_defined_features_configs", None
-            ),
+            )
         )
+        return super().process(metadata, sys_output)

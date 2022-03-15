@@ -17,7 +17,7 @@ class TestQAMultipleChoice(unittest.TestCase):
             FileType.json,
             path_data,
         )
-        data = loader.load()
+        data = list(loader.load())
 
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
@@ -25,15 +25,14 @@ class TestQAMultipleChoice(unittest.TestCase):
             "metric_names": ["Accuracy"],
         }
 
-        processor = get_processor(TaskType.qa_multiple_choice.value, metadata, data)
+        processor = get_processor(TaskType.qa_multiple_choice.value)
         # self.assertEqual(len(processor._features), 4)
 
-        analysis = processor.process()
+        sys_info = processor.process(metadata, data)
+
         # analysis.write_to_directory("./")
-        # print(analysis)
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        self.assertIsNotNone(analysis.results.fine_grained)
-        # self.assertGreater(len(analysis.results.overall), 1)
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
 
 
 if __name__ == '__main__':

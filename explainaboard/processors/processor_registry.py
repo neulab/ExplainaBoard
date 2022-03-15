@@ -6,14 +6,12 @@ from explainaboard.processors.processor import Processor
 _processor_registry: dict = {}
 
 
-def get_processor(
-    task: TaskType, metadata: dict = None, data: Iterable[dict] = None
-) -> Processor:
+def get_processor(task: TaskType) -> Processor:
     """
     return a processor based on the task type
     TODO: error handling
     """
-    return _processor_registry[task](metadata, data)
+    return _processor_registry[task]()
 
 
 def register_processor(task_type: TaskType):

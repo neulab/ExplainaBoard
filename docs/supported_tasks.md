@@ -159,7 +159,7 @@ Extractive QA tasks, such as SQuAD.
 
 **CLI Example**
 ```shell
-explainaboard --task question_answering_extractive --system_outputs ./data/system_outputs/squad/test-qa-extractive.json > report.json
+explainaboard --task question-answering-extractive --system_outputs ./data/system_outputs/squad/test-qa-extractive.json > report.json
 ```
 
 **Class**

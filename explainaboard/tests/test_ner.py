@@ -26,15 +26,14 @@ class TestNER(unittest.TestCase):
             "metric_names": ["f1_score_seqeval"],
         }
 
-        processor = get_processor(TaskType.named_entity_recognition, metadata, data)
+        processor = get_processor(TaskType.named_entity_recognition)
         # self.assertEqual(len(processor._features), 4)
 
-        analysis = processor.process()
-        analysis.write_to_directory("./")
+        sys_info = processor.process(metadata, data)
 
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
 
 
 if __name__ == '__main__':

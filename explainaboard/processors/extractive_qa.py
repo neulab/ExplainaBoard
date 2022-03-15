@@ -1,4 +1,5 @@
-from typing import Iterable
+from typing import List
+from explainaboard.info import Result, SysOutputInfo
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
@@ -7,7 +8,7 @@ from explainaboard.builders.extractive_qa import QAExtractiveExplainaboardBuilde
 
 
 @register_processor(TaskType.question_answering_extractive)
-class QASqudProcessor(Processor):
+class QASquadProcessor(Processor):
     _task_type = TaskType.question_answering_extractive
     _features = feature.Features(
         {
@@ -22,9 +23,9 @@ class QASqudProcessor(Processor):
                 description="context length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "question_length": feature.Value(
@@ -32,9 +33,9 @@ class QASqudProcessor(Processor):
                 description="question length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "answer_length": feature.Value(
@@ -42,9 +43,9 @@ class QASqudProcessor(Processor):
                 description="answer length",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
             ),
             "num_oov": feature.Value(
@@ -52,9 +53,9 @@ class QASqudProcessor(Processor):
                 description="the number of out-of-vocabulary words",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
@@ -63,29 +64,19 @@ class QASqudProcessor(Processor):
                 description="the average rank of each work based on its frequency in training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
-                    _method="bucket_attribute_specified_bucket_value",
-                    _number=4,
-                    _setting=(),
+                    method="bucket_attribute_specified_bucket_value",
+                    number=4,
+                    setting=(),
                 ),
                 require_training_set=True,
             ),
             # "sim_context_question": feature.Value(dtype="float",
             #                                is_bucket=True,
             #                                bucket_info=feature.BucketInfo(
-            #                                    _method="bucket_attribute_specified_bucket_value",
-            #                                    _number=4,
-            #                                    _setting=()))
+            #                                    method="bucket_attribute_specified_bucket_value",
+            #                                    number=4,
+            #                                    setting=()))
         }
     )
-
-    def __init__(self, metadata: dict, system_output_data: Iterable[dict]) -> None:
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = TaskType.question_answering_extractive.value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = ["f1_score_qa", "exact_match_qa"]
-        super().__init__(metadata, system_output_data)
-        self._builder = QAExtractiveExplainaboardBuilder(
-            self._system_output_info, system_output_data
-        )
+    _builder = QAExtractiveExplainaboardBuilder()
+    _default_metrics = ["f1_score_qa", "exact_match_qa"]

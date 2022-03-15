@@ -14,7 +14,7 @@ class TestSummarization(unittest.TestCase):
         loader = get_loader(
             TaskType.summarization, Source.local_filesystem, FileType.tsv, path_data
         )
-        data = loader.load()
+        data = list(loader.load())
 
         metadata = {
             "task_name": TaskType.summarization.value,
@@ -22,15 +22,14 @@ class TestSummarization(unittest.TestCase):
             "metric_names": ["bleu"],
         }
 
-        processor = get_processor(TaskType.summarization.value, metadata, data)
+        processor = get_processor(TaskType.summarization.value)
         # self.assertEqual(len(processor._features), 4)
 
-        analysis = processor.process()
+        sys_info = processor.process(metadata, data)
+
         # analysis.write_to_directory("./")
-        # print(analysis)
-        self.assertListEqual(analysis.metric_names, metadata["metric_names"])
-        self.assertIsNotNone(analysis.results.fine_grained)
-        self.assertGreater(len(analysis.results.overall), 0)
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
 
 
 if __name__ == '__main__':
