@@ -79,6 +79,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
     def __init__(self, user_defined_feature_config=None):
         super().__init__()
         self._user_defined_feature_config = user_defined_feature_config
+        self._statistics_func = get_statistics
         self.entity_type_level_map = None
 
     def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):

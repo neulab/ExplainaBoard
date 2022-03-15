@@ -60,8 +60,10 @@ def get_statistics(samples: Iterator):
 
 
 class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
+
     def __init__(self):
         super().__init__()
+        self._statistics_func = get_statistics
 
     # TODO(gneubig) to be deduplicated
     def _init_statistics(self, sys_info: SysOutputInfo, get_statistics: Callable):
@@ -180,7 +182,9 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param feature_name: the name of a feature, e.g., sentence length
+        :param sys_info: Information about the system output
+        :param sys_output: The system output itself
+        :param samples_over_bucket: a dictionary mapping bucket interval names to lists of sample IDs for that bucket
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
