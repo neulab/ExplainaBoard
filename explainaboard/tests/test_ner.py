@@ -30,7 +30,6 @@ class TestNER(unittest.TestCase):
         # self.assertEqual(len(processor._features), 4)
 
         results = processor.process(metadata, data)
-        analysis.write_to_directory("./")
 
         self.assertIsNotNone(results.fine_grained)
         self.assertGreater(len(results.overall), 0)

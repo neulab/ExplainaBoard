@@ -211,6 +211,7 @@ class ExplainaboardBuilder:
             bucket_predicted_labels = []
             bucket_cases = []
 
+            eprint(f'sample_ids: {sample_ids}')
             for sample_id in sample_ids:
 
                 data_point = sys_output[sample_id]
