@@ -1,6 +1,7 @@
 from dataclasses import dataclass, asdict, field
 from typing import Any, List, Optional
 from explainaboard.feature import Features
+import sys
 import json
 import os
 from explainaboard import config
@@ -109,8 +110,29 @@ class SysOutputInfo:
     def to_dict(self) -> dict:
         return asdict(self)
 
+    def replace_bad_keys(self, data):
+        if isinstance(data, list):
+            for value in data:
+                if isinstance(value, dict):
+                    self.replace_bad_keys(value)
+        else:
+            replace_keys = []
+            for key, value in data.items():
+                if not isinstance(key, str):
+                    replace_keys.append(key)
+                if isinstance(value, dict) or isinstance(value, list):
+                    self.replace_bad_keys(value)
+            for key in replace_keys:
+                data[str(key)] = data[key]
+                del data[key]
+
     def print_as_json(self):
-        print(json.dumps(self.to_dict(), indent=4))
+        data_dict = self.to_dict()
+        self.replace_bad_keys(data_dict)
+        try:
+            print(json.dumps(data_dict, indent=4))
+        except TypeError as e:
+            raise e
 
     def _dump_info(self, file):
         """SystemOutputInfo => JSON"""
