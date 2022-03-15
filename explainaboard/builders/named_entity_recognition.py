@@ -395,7 +395,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         true_tags_list = []
         pred_tags_list = []
 
-        for _id, feature_table in sys_output.items():
+        for _id, feature_table in enumerate(sys_output):
 
             true_tags_list.append(feature_table["true_tags"])
             pred_tags_list.append(feature_table["pred_tags"])
@@ -520,7 +520,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
             bucket_func = getattr(
                 explainaboard.utils.bucketing,
-                sys_info.features[feature_name].bucket_info.method,
+                _bucket_info.method,
             )
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
@@ -540,8 +540,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             # print(f"samples_over_bucket.keys():\n{samples_over_bucket_true.keys()}")
 
             # evaluating bucket: get bucket performance
-            performances_over_bucket[feature_name] = self.get_bucket_performance(
-                sys_info, sys_output, samples_over_bucket[feature_name]
+            performances_over_bucket[feature_name] = self.get_bucket_performance_ner(
+                sys_info, sys_output, samples_over_bucket[feature_name], samples_over_bucket_pred[feature_name]
             )
         return samples_over_bucket, performances_over_bucket
 
@@ -549,12 +549,15 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
     Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
     """
 
-    def get_bucket_cases_ner(self, feature_name: str, bucket_interval) -> list:
+    def get_bucket_cases_ner(self, bucket_interval,
+                             sys_info: SysOutputInfo,
+                             sys_output: List[dict],
+                             samples_over_bucket: Dict[str, List[int]],
+                             samples_over_bucket_pred: Dict[str, List[int]],
+        ) -> list:
         # predict:  2_3 -> NER
         dict_pos2tag_pred = {}
-        for k_bucket_eval, spans_pred in samples_over_bucket_pred[
-            feature_name
-        ].items():
+        for k_bucket_eval, spans_pred in samples_over_bucket_pred.items():
             if k_bucket_eval != bucket_interval:
                 continue
             for span_pred in spans_pred:
@@ -565,7 +568,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
 
         # true:  2_3 -> NER
         dict_pos2tag = {}
-        for k_bucket_eval, spans in samples_over_bucket[feature_name].items():
+        for k_bucket_eval, spans in samples_over_bucket.items():
             if k_bucket_eval != bucket_interval:
                 continue
             for span in spans:
@@ -656,7 +659,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             """
             Get bucket samples for ner task
             """
-            bucket_samples = self.get_bucket_cases_ner(feature_name, bucket_interval)
+            bucket_samples = self.get_bucket_cases_ner(bucket_interval, sys_info, sys_output, samples_over_bucket, samples_over_bucket_pred)
 
             for metric_name in sys_info.metric_names:
                 """

@@ -136,9 +136,7 @@ def bucket_attribute_specified_bucket_interval(
 
     # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
 
-    if type(list(intervals)[0][0]) == type(  # noqa
-        "string"
-    ):  # discrete value, such as entity tags
+    if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
         dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
         dict_att_val2span = sort_dict(dict_att_val2span, flag="value")  # noqa
         for att_val, entity in dict_att_val2span.items():
