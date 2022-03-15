@@ -123,13 +123,11 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
             overall_value = metric_func(true_answers, predicted_answers)
 
             overall_value = overall_value
-            confidence_score_low = 0
-            confidence_score_up = 0
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
-                confidence_score_low=confidence_score_low,
-                confidence_score_up=confidence_score_up,
+                confidence_score_low=None,
+                confidence_score_high=None,
             )
             overall[metric_name] = overall_performance
         return overall
@@ -187,22 +185,12 @@ class QAExtractiveExplainaboardBuilder(ExplainaboardBuilder):
                 metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
                 bucket_value = metric_func(bucket_true_labels, bucket_predicted_labels)
 
-                bucket_value = bucket_value
-                confidence_score_low = 0
-                confidence_score_up = 0
-
-                # print(
-                #       f"value:\t {bucket_value}\n"
-                #       f"confidence low\t {confidence_score_low}\n"
-                #       f"confidence up \t {confidence_score_up}\n"
-                #       f"---------------------------------")
-
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
                     value=bucket_value,
-                    confidence_score_low=confidence_score_low,
-                    confidence_score_up=confidence_score_up,
+                    confidence_score_low=None,
+                    confidence_score_high=None,
                     n_samples=len(bucket_true_labels),
                     bucket_samples=bucket_cases,
                 )
