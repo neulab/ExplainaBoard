@@ -67,7 +67,7 @@ def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
             entity_len = len(entity_span.split())
 
             for sid in entity_sids:
-                label_candi_list = tag_sequences_train[sid:sid + entity_len]
+                label_candi_list = tag_sequences_train[sid : sid + entity_len]
                 for label in label_candi_list:
                     klab = 'o'
                     if len(label.split('-')) > 1:
@@ -240,8 +240,8 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                     statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
         return statistics
 
@@ -386,7 +386,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
                 tokens, dict_sysout["pred_tags"], statistics=statistics
             )
         # This should return a list, but this list isn't used in the overridden function so ignore for now
-        return None # noqa
+        return None  # noqa
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
@@ -438,9 +438,7 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
             span_pos = span_info["span_pos"]
             span_label = span_info["span_tag"]
 
-            span_address = (
-                f'{sample_id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
-            )
+            span_address = f'{sample_id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
 
             for feature_name in bucket_features:
                 if feature_name not in feature_to_sample_address_to_value.keys():
@@ -572,7 +570,9 @@ class NERExplainaboardBuilder(ExplainaboardBuilder):
         samples_over_bucket_pred: Dict[str, List[str]],
     ) -> list:
         # predict:  2_3 -> NER
-        dict_pos2tag_pred = self._create_sample_dict(samples_over_bucket_pred, bucket_interval)
+        dict_pos2tag_pred = self._create_sample_dict(
+            samples_over_bucket_pred, bucket_interval
+        )
         dict_pos2tag = self._create_sample_dict(samples_over_bucket, bucket_interval)
 
         error_case_list = []

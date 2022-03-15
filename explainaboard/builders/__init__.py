@@ -71,13 +71,13 @@ class ExplainaboardBuilder:
                         eprint(response.content)
                 else:  # dataset does not exist
                     eprint(
-                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                     )
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
         return statistics
 
@@ -337,7 +337,9 @@ class ExplainaboardBuilder:
         }
 
     @staticmethod
-    def feat_freq_rank(existing_features: dict, statistics: Any, text_from_sample: Callable):
+    def feat_freq_rank(
+        existing_features: dict, statistics: Any, text_from_sample: Callable
+    ):
         fre_rank = 0
 
         tokens = text_from_sample(existing_features).split(" ")
@@ -351,7 +353,9 @@ class ExplainaboardBuilder:
         return fre_rank
 
     @staticmethod
-    def feat_num_oov(existing_features: dict, statistics: Any, text_from_sample: Callable):
+    def feat_num_oov(
+        existing_features: dict, statistics: Any, text_from_sample: Callable
+    ):
         num_oov = 0
         for w in text_from_sample(existing_features).split(" "):
             if w not in statistics['vocab'].keys():

@@ -91,11 +91,15 @@ class TCExplainaboardBuilder(ExplainaboardBuilder):
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_num_oov(existing_features, statistics, lambda x: x['text'])
+        return ExplainaboardBuilder.feat_num_oov(
+            existing_features, statistics, lambda x: x['text']
+        )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
-        return ExplainaboardBuilder.feat_freq_rank(existing_features, statistics, lambda x: x['text'])
+        return ExplainaboardBuilder.feat_freq_rank(
+            existing_features, statistics, lambda x: x['text']
+        )
 
     # training set dependent features
     def _get_length_fre(self, existing_features: dict, statistics: Any):
