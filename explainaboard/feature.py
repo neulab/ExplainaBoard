@@ -527,7 +527,13 @@ class Value:
 
 
 FeatureType = Union[
-    dict, list, tuple, ClassLabel, Value, Sequence, Span,
+    dict,
+    list,
+    tuple,
+    ClassLabel,
+    Value,
+    Sequence,
+    Span,
 ]
 
 

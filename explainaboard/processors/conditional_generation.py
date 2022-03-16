@@ -277,7 +277,10 @@ class ConditionalGenerationProcessor(Processor):
             # Get values of bucketing features
             for (
                 bucket_key,
-                (bucket_func, training_dependent,),
+                (
+                    bucket_func,
+                    training_dependent,
+                ),
             ) in bucket_feature_funcs.items():
 
                 # TODO(gneubig): this logic seems complicated, can it be simplified?
@@ -297,20 +300,20 @@ class ConditionalGenerationProcessor(Processor):
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-        self, sys_info: SysOutputInfo, sys_output: List[dict],
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
     ) -> Dict[str, Performance]:
 
         overall = {}
         for metric_name in sys_info.metric_names:
 
             overall_value = self.score_dic["corpus_level"]["corpus_" + metric_name]
-            confidence_score_low = None
-            confidence_score_high = None
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
-                confidence_score_low=confidence_score_low,
-                confidence_score_high=confidence_score_high,
+                confidence_score_low=None,
+                confidence_score_high=None,
             )
 
             overall[metric_name] = overall_performance
