@@ -44,7 +44,7 @@ where
 
 After declaring the new feature `token_number`, we need to define a corresponding
 feature function `_get_token_number(self, text)` and apply it to each sample
-of the dataset in the module: `explainaboard/builders/text_classification.py`
+of the dataset in the module: `explainaboard/processors/text_classification.py`
 
 There are a couple of flexible ways to achieve this but remember the final goal is:
 

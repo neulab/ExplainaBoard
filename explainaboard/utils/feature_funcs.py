@@ -1,5 +1,7 @@
 import sacrebleu
 from lexicalrichness import LexicalRichness
+from tqdm import tqdm
+from typing import Iterator, Callable, Any
 
 
 BASIC_WORDS = (
@@ -49,3 +51,44 @@ def get_lexical_richness(sentence: str):
         )
     finally:
         return results
+
+
+def accumulate_vocab_from_samples(samples: Iterator, text_from_sample: Callable):
+    vocab = {}
+    for sample in tqdm(samples):
+        for w in text_from_sample(sample).split(" "):
+            vocab[w] = vocab.get(w, 0) + 1
+    # the rank of each word based on its frequency
+    sorted_dict = {
+        key: rank
+        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+    }
+    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+    return {
+        "vocab": vocab,
+        "vocab_rank": vocab_rank,
+    }
+
+
+def feat_freq_rank(
+    existing_features: dict, statistics: Any, text_from_sample: Callable
+):
+    fre_rank = 0
+
+    tokens = text_from_sample(existing_features).split(" ")
+    for w in tokens:
+        if w not in statistics['vocab_rank']:
+            fre_rank += len(statistics['vocab_rank'])
+        else:
+            fre_rank += statistics['vocab_rank'][w]
+
+    fre_rank = fre_rank * 1.0 / len(tokens)
+    return fre_rank
+
+
+def feat_num_oov(existing_features: dict, statistics: Any, text_from_sample: Callable):
+    num_oov = 0
+    for w in text_from_sample(existing_features).split(" "):
+        if w not in statistics['vocab'].keys():
+            num_oov += 1
+    return num_oov

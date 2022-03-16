@@ -81,7 +81,7 @@ def main():
         )
 
     # Read in data and check validity
-    system_datasets = [get_loader(task, data=x).load() for x in system_outputs]
+    system_datasets = [list(get_loader(task, data=x).load()) for x in system_outputs]
 
     # Get user_defined_features_configs (this should be generalized later
     loader = get_loader(task, data=system_outputs[0])
