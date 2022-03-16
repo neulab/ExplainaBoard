@@ -9,7 +9,6 @@ from datalabs.operations.aggregate.sequence_labeling import (
 from tqdm import tqdm
 
 import explainaboard.utils.bucketing
-import explainaboard.utils.bucketing
 from explainaboard import feature
 from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
 from explainaboard.processors.processor import Processor
@@ -117,8 +116,8 @@ class NERProcessor(Processor):
                         "span_capitalness": feature.Value(
                             dtype="string",
                             description="The capitalness of an entity. For example, first_caps represents only the "
-                                        "first character of the entity is capital. full_caps denotes all characters "
-                                        "of the entity are capital",
+                            "first character of the entity is capital. full_caps denotes all characters "
+                            "of the entity are capital",
                             is_bucket=True,
                             bucket_info=feature.BucketInfo(
                                 method="bucket_attribute_discrete_value",
@@ -149,7 +148,7 @@ class NERProcessor(Processor):
                         "span_density": feature.Value(
                             dtype="float",
                             description="Entity density. Given a sentence (or a sample), entity density tallies the "
-                                        "ratio between the number of all entity tokens and tokens in this sentence",
+                            "ratio between the number of all entity tokens and tokens in this sentence",
                             is_bucket=True,
                             bucket_info=feature.BucketInfo(
                                 method="bucket_attribute_specified_bucket_value",
@@ -375,9 +374,7 @@ class NERProcessor(Processor):
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
 
         true_tags_list = []
@@ -500,10 +497,7 @@ class NERProcessor(Processor):
             ):
                 continue
 
-            bucket_func = getattr(
-                explainaboard.utils.bucketing,
-                _bucket_info.method,
-            )
+            bucket_func = getattr(explainaboard.utils.bucketing, _bucket_info.method,)
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feature_to_sample_address_to_value_true[feature_name],
                 bucket_number=_bucket_info.number,
@@ -717,7 +711,7 @@ def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
             entity_len = len(entity_span.split())
 
             for sid in entity_sids:
-                label_candi_list = tag_sequences_train[sid:sid + entity_len]
+                label_candi_list = tag_sequences_train[sid : sid + entity_len]
                 for label in label_candi_list:
                     klab = 'o'
                     if len(label.split('-')) > 1:

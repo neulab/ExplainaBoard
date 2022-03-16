@@ -121,7 +121,9 @@ class KGLinkTailPredictionProcessor(Processor):
         self._user_defined_feature_config = None
 
     def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
-        self._user_defined_feature_config = metadata.get("user_defined_features_configs", None)
+        self._user_defined_feature_config = metadata.get(
+            "user_defined_features_configs", None
+        )
         return super().process(metadata, sys_output)
 
     def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
@@ -153,8 +155,8 @@ class KGLinkTailPredictionProcessor(Processor):
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard." # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md" # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
+                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                 )
 
         # print(self.entity_type_level_map)
@@ -225,9 +227,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
     # TODO(gneubig): this can probably be generalized to single-metric
     def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []
 

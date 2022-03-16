@@ -52,6 +52,7 @@ def get_lexical_richness(sentence: str):
     finally:
         return results
 
+
 def accumulate_vocab_from_samples(samples: Iterator, text_from_sample: Callable):
     vocab = {}
     for sample in tqdm(samples):
@@ -68,6 +69,7 @@ def accumulate_vocab_from_samples(samples: Iterator, text_from_sample: Callable)
         "vocab_rank": vocab_rank,
     }
 
+
 def feat_freq_rank(
     existing_features: dict, statistics: Any, text_from_sample: Callable
 ):
@@ -83,9 +85,8 @@ def feat_freq_rank(
     fre_rank = fre_rank * 1.0 / len(tokens)
     return fre_rank
 
-def feat_num_oov(
-    existing_features: dict, statistics: Any, text_from_sample: Callable
-):
+
+def feat_num_oov(existing_features: dict, statistics: Any, text_from_sample: Callable):
     num_oov = 0
     for w in text_from_sample(existing_features).split(" "):
         if w not in statistics['vocab'].keys():

@@ -147,10 +147,7 @@ class Processor:
             # Get values of bucketing features
             for (
                 bucket_key,
-                (
-                    bucket_func,
-                    training_dependent,
-                ),
+                (bucket_func, training_dependent,),
             ) in bucket_feature_funcs.items():
                 dict_sysout[bucket_key] = (
                     bucket_func(dict_sysout, statistics)
@@ -266,9 +263,7 @@ class Processor:
         return sort_dict(bucket_name_to_performance)
 
     def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
         """
         Get the overall performance according to metrics
@@ -330,5 +325,7 @@ class Processor:
         )
         overall_results = self.get_overall_performance(sys_info, sys_output)
         self._print_bucket_info(performance_over_bucket)
-        sys_info.results = Result(overall=overall_results, fine_grained=performance_over_bucket)
+        sys_info.results = Result(
+            overall=overall_results, fine_grained=performance_over_bucket
+        )
         return sys_info

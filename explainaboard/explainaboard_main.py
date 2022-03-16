@@ -29,11 +29,7 @@ def main():
     )
 
     parser.add_argument(
-        '--dataset',
-        type=str,
-        required=False,
-        default=None,
-        help="the name of dataset",
+        '--dataset', type=str, required=False, default=None, help="the name of dataset",
     )
 
     parser.add_argument(
