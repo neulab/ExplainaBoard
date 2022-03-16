@@ -52,16 +52,13 @@ class Metric:
 
         self._results = {"value": self._eval_function(*args, **kwargs)}
 
-        if not self._is_print_confidence_interval:
-            self._results["confidence_score_low"] = None
-            self._results["confidence_score_high"] = None
-        else:
-            (
-                confidence_interval_low,
-                confidence_interval_up,
-            ) = self.get_confidence_interval(*args, **kwargs)
-            self._results["confidence_score_low"] = confidence_interval_low
-            self._results["confidence_score_high"] = confidence_interval_up
+        (confidence_interval_low, confidence_interval_high,) = (
+            self.get_confidence_interval(*args, **kwargs)
+            if self._is_print_confidence_interval
+            else (None, None)
+        )
+        self._results["confidence_score_low"] = confidence_interval_low
+        self._results["confidence_score_high"] = confidence_interval_high
 
         return self._results
 
