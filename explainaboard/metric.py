@@ -31,7 +31,6 @@ class Metric:
         #       f"self._n_samples {self._n_samples}\n")
 
         performance_list = []
-        confidence_low, confidence_up = 0, 0
         for i in range(self._n_times):
             sample_index_list = choices(range(self._n_samples), k=n_sampling)
             performance = self._eval_function(
@@ -51,19 +50,15 @@ class Metric:
 
     def _evaluate(self, *args, **kwargs):
 
-        self._results = {}
-        self._results["value"] = self._eval_function(*args, **kwargs)
+        self._results = {"value": self._eval_function(*args, **kwargs)}
 
-        if not self._is_print_confidence_interval:
-            self._results["confidence_score_low"] = 0
-            self._results["confidence_score_up"] = 0
-        else:
-            (
-                confidence_interval_low,
-                confidence_interval_up,
-            ) = self.get_confidence_interval(*args, **kwargs)
-            self._results["confidence_score_low"] = confidence_interval_low
-            self._results["confidence_score_up"] = confidence_interval_up
+        (confidence_interval_low, confidence_interval_high,) = (
+            self.get_confidence_interval(*args, **kwargs)
+            if self._is_print_confidence_interval
+            else (None, None)
+        )
+        self._results["confidence_score_low"] = confidence_interval_low
+        self._results["confidence_score_high"] = confidence_interval_high
 
         return self._results
 

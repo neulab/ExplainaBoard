@@ -4,8 +4,8 @@ def get_pairwise_performance_gap(sys1, sys2):
         sys1["results"]["overall"][metric_name]["value"] = float(
             sys1["results"]["overall"][metric_name]["value"]
         ) - float(sys2["results"]["overall"][metric_name]["value"])
-        sys1["results"]["overall"][metric_name]["confidence_score_low"] = 0
-        sys1["results"]["overall"][metric_name]["confidence_score_up"] = 0
+        sys1["results"]["overall"][metric_name]["confidence_score_low"] = None
+        sys1["results"]["overall"][metric_name]["confidence_score_high"] = None
 
     for attr, performance_list in sys1["results"]["fine_grained"].items():
         for idx, performances in enumerate(performance_list):
@@ -17,9 +17,9 @@ def get_pairwise_performance_gap(sys1, sys2):
                 ) - float(sys2["results"]["fine_grained"][attr][idx][idy]["value"])
                 sys1["results"]["fine_grained"][attr][idx][idy][
                     "confidence_score_low"
-                ] = 0
+                ] = None
                 sys1["results"]["fine_grained"][attr][idx][idy][
-                    "confidence_score_up"
-                ] = 0
+                    "confidence_score_high"
+                ] = None
 
     return sys1
