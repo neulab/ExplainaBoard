@@ -2,6 +2,7 @@ from typing import Any
 from typing import Iterator, Dict, List
 
 import numpy
+
 # TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
@@ -276,10 +277,7 @@ class ConditionalGenerationProcessor(Processor):
             # Get values of bucketing features
             for (
                 bucket_key,
-                (
-                    bucket_func,
-                    training_dependent,
-                ),
+                (bucket_func, training_dependent,),
             ) in bucket_feature_funcs.items():
 
                 # TODO(gneubig): this logic seems complicated, can it be simplified?
@@ -299,9 +297,7 @@ class ConditionalGenerationProcessor(Processor):
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        self, sys_info: SysOutputInfo, sys_output: List[dict],
     ) -> Dict[str, Performance]:
 
         overall = {}
