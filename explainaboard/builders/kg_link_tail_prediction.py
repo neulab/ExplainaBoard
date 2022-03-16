@@ -209,7 +209,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                 metric_name=metric_name,
                 value=metric_result["value"],
                 confidence_score_low=metric_result["confidence_score_low"],
-                confidence_score_up=metric_result["confidence_score_up"],
+                confidence_score_high=metric_result["confidence_score_high"],
             )
             overall[metric_name] = overall_performance
         return overall
@@ -268,7 +268,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                     metric_name=metric_name,
                     value=metric_result["value"],
                     confidence_score_low=metric_result["confidence_score_low"],
-                    confidence_score_up=metric_result["confidence_score_up"],
+                    confidence_score_high=metric_result["confidence_score_high"],
                     n_samples=len(bucket_true_labels),
                     bucket_samples=bucket_cases,
                 )
@@ -282,12 +282,12 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
 
                 # bucket_value = bucket_value_json["value"]
                 # confidence_score_low = bucket_value_json["confidence_score_low"]
-                # confidence_score_up = bucket_value_json["confidence_score_up"]
+                # confidence_score_high = bucket_value_json["confidence_score_high"]
 
                 # # print(f"name:\t {one_metric._name} \n"
                 # #       f"value:\t {bucket_value}\n"
                 # #       f"confidence low\t {confidence_score_low}\n"
-                # #       f"confidence up \t {confidence_score_up}\n"
+                # #       f"confidence up \t {confidence_score_high}\n"
                 # #       f"---------------------------------")
 
                 # bucket_performance = BucketPerformance(
@@ -295,7 +295,7 @@ class KGLTPExplainaboardBuilder(ExplainaboardBuilder):
                 #     metric_name=metric_name,
                 #     value=bucket_value,
                 #     confidence_score_low=confidence_score_low,
-                #     confidence_score_up=confidence_score_up,
+                #     confidence_score_high=confidence_score_high,
                 #     n_samples=len(bucket_true_labels),
                 #     bucket_samples=bucket_cases,
                 # )
