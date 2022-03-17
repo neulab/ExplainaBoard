@@ -26,7 +26,7 @@ class KgLinkTailPredictionLoader(Loader):
         self._source = source
         self._file_type = file_type
         self._data = data
-        self.user_defined_features_configs = None
+        self.user_defined_features_configs = self.load_user_defined_features_configs()
 
     def load_user_defined_features_configs(self):
 
