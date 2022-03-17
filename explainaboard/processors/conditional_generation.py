@@ -239,14 +239,13 @@ class ConditionalGenerationProcessor(Processor):
             )
             sys_output[_id] = feature_table
 
-        self.score_dic = self._get_eaas_client().score(
+        request_id = self._get_eaas_client().async_score(
             inputs,
             task="sum",
             metrics=sys_info.metric_names.copy(),
             lang="en",
             cal_attributes=False,
         )
-        # print(self.score_dic["sample_level"][0].keys())
 
         # Get names of bucketing features
         # print(f"sys_info.features.get_bucket_features()\n {sys_info.features.get_bucket_features()}")
@@ -296,6 +295,8 @@ class ConditionalGenerationProcessor(Processor):
                     dict_sysout[bucket_key] = bucket_func(dict_sysout, statistics)
                 else:
                     dict_sysout[bucket_key] = bucket_func(dict_sysout)
+
+        self.score_dict = self._eaas_client.wait_and_get_result(request_id)
         return list(bucket_feature_funcs.keys())
 
     # TODO(gneubig): should this be generalized or is it task specific?
@@ -308,7 +309,7 @@ class ConditionalGenerationProcessor(Processor):
         overall = {}
         for metric_name in sys_info.metric_names:
 
-            overall_value = self.score_dic["corpus_level"]["corpus_" + metric_name]
+            overall_value = self.score_dict["corpus_level"]["corpus_" + metric_name]
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
@@ -361,7 +362,7 @@ class ConditionalGenerationProcessor(Processor):
                     bucket_cases.append(bucket_case)
 
                 for metric_name in sys_info.metric_names:
-                    metric_value = self.score_dic["sample_level"][int(sample_id)][
+                    metric_value = self.score_dict["sample_level"][int(sample_id)][
                         metric_name
                     ]  # This would be modified later
                     if metric_name not in dict_metric_to_values.keys():
