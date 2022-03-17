@@ -2,7 +2,8 @@ import json
 from typing import Callable, List, Tuple, Dict
 
 from datalabs import load_dataset
-from eaas import Config, Client
+from explainaboard.utils.async_eaas import AsyncEaaSClient
+from eaas.config import Config
 from tqdm import tqdm
 
 import explainaboard.metric
@@ -98,7 +99,7 @@ class Processor:
     def _get_eaas_client(self):
         if not self._eaas_client:
             self._eaas_config = Config()
-            self._eaas_client = Client()
+            self._eaas_client = AsyncEaaSClient()
             self._eaas_client.load_config(
                 self._eaas_config
             )  # The config you have created above

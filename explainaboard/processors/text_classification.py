@@ -11,7 +11,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
-from explainaboard.utils.spacy_loader import spacy_loader
+from explainaboard.utils.spacy_loader import get_named_entities
 
 
 @register_processor(TaskType.text_classification)
@@ -129,9 +129,7 @@ class TextClassificationProcessor(Processor):
         return len(existing_feature["text"])
 
     def _get_entity_number(self, existing_feature: dict):
-        return len(
-            spacy_loader.get_model("en_core_web_sm")(existing_feature["text"]).ents
-        )
+        return len(get_named_entities(existing_feature["text"]))
 
     def _get_label(self, existing_feature: dict):
         return existing_feature["true_label"]
