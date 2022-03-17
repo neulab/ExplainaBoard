@@ -1,0 +1,638 @@
+Boot time 	"[[ Boot time ]] is super fast , around anywhere from 35 seconds to 1 minute ."	positive	positive	0.996909559
+tech support 	[[ tech support ]] would not fix the problem unless I bought your plan for $ 150 plus .	negative	negative	0.996316552
+Set up 	[[ Set up ]] was easy .	positive	positive	0.995904863
+Windows 8 	Did not enjoy the new [[ Windows 8 ]] and touchscreen functions .	negative	negative	0.995963454
+touchscreen functions 	Did not enjoy the new Windows 8 and [[ touchscreen functions ]] .	negative	negative	0.996244192
+internal speakers 	"Other than not being a fan of click pads ( industry standard these days ) and the lousy [[ internal speakers ]] , it 's hard for me to find things about this notebook I do n't like , especially considering the $ 350 price tag ."	negative	negative	0.997026145
+price tag 	"Other than not being a fan of click pads ( industry standard these days ) and the lousy internal speakers , it 's hard for me to find things about this notebook I do n't like , especially considering the $ 350 [[ price tag ]] ."	positive	negative	0.996519685
+click pads 	"Other than not being a fan of [[ click pads ]] ( industry standard these days ) and the lousy internal speakers , it 's hard for me to find things about this notebook I do n't like , especially considering the $ 350 price tag ."	negative	negative	0.996594965
+installation disk ( DVD ) 	No [[ installation disk ( DVD ) ]] is included .	neutral	negative	0.979612529
+use 	"It 's fast , light , and simple to [[ use ]] ."	positive	positive	0.997098088
+Works 	"[[ Works ]] well , and I am extremely happy to be back to an apple OS ."	positive	positive	0.997299135
+apple OS 	"Works well , and I am extremely happy to be back to an [[ apple OS ]] ."	positive	positive	0.99012357
+features 	Sure it 's not light and slim but the [[ features ]] make up for it 100 % .	positive	positive	0.995667577
+log on 	"I am pleased with the fast [[ log on ]] , speedy WiFi connection and the long battery life ( > 6 hrs ) ."	positive	positive	0.997683644
+WiFi connection 	"I am pleased with the fast log on , speedy [[ WiFi connection ]] and the long battery life ( > 6 hrs ) ."	positive	positive	0.997645438
+battery life 	"I am pleased with the fast log on , speedy WiFi connection and the long [[ battery life ]] ( > 6 hrs ) ."	positive	positive	0.997564197
+delete key 	The Apple engineers have not yet discovered the [[ delete key ]] .	negative	negative	0.98519069
+interneting 	Made [[ interneting ]] ( part of my business ) very difficult to maintain .	negative	negative	0.996532559
+priced 	"Luckily , for all of us contemplating the decision , the Mac Mini is [[ priced ]] just right ."	positive	positive	0.997191966
+works 	"Super light , super sexy and everything just [[ works ]] ."	positive	positive	0.996537566
+track pad 	"Only problem that I had was that the [[ track pad ]] was not very good for me , I only had a problem once or twice with it , But probably my computer was a bit defective ."	negative	negative	0.997126877
+graphics 	It is super fast and has outstanding [[ graphics ]] .	positive	positive	0.997346401
+mountain lion 	But the [[ mountain lion ]] is just too slow .	negative	negative	0.996205151
+durability 	Strong build though which really adds to its [[ durability ]] .	positive	positive	0.996858835
+build 	Strong [[ build ]] though which really adds to its durability .	positive	positive	0.997361958
+battery life 	The [[ battery life ]] is excellent- 6 - 7 hours without charging .	positive	positive	0.996951342
+works 	I 've had my computer for 2 weeks already and it [[ works ]] perfectly .	positive	positive	0.996583164
+Windows 8 	And I may be the only one but I am really liking [[ Windows 8 ]] .	positive	positive	0.995834947
+baterry 	The [[ baterry ]] is very longer .	positive	negative	0.996899128
+size 	Its [[ size ]] is ideal and the weight is acceptable .	positive	positive	0.997194171
+weight 	Its size is ideal and the [[ weight ]] is acceptable .	positive	positive	0.997010827
+performance 	I can say that I am fully satisfied with the [[ performance ]] that the computer has supplied .	positive	positive	0.997172713
+USB ports 	"This laptop has only 2 [[ USB ports ]] , and they are both on the same side ."	negative	negative	0.989950716
+speed 	It has so much more [[ speed ]] and the screen is very sharp .	positive	positive	0.996387362
+screen 	It has so much more speed and the [[ screen ]] is very sharp .	positive	positive	0.997116208
+price 	Everything I wanted and everything I needed and the [[ price ]] was great !	positive	positive	0.997435033
+Hardware performance 	It 's not inexpensive but the [[ Hardware performance ]] is impressive for a computer this small .	positive	positive	0.995964885
+works 	"This thing is awesome , everything always [[ works ]] , everything is always easy to set up , everything is compatible , its literally everything I could ask for ."	positive	positive	0.997448087
+set up 	"This thing is awesome , everything always works , everything is always easy to [[ set up ]] , everything is compatible , its literally everything I could ask for ."	positive	positive	0.997425854
+Keyboard 	[[ Keyboard ]] responds well to presses .	positive	positive	0.997370958
+Windows 8 	"Lastly , [[ Windows 8 ]] is annoying ."	negative	negative	0.997084439
+setup 	Everything is so easy and intuitive to [[ setup ]] or configure .	positive	positive	0.996802568
+configure 	Everything is so easy and intuitive to setup or [[ configure ]] .	positive	positive	0.996600926
+Windows 8 	Biggest complaint is [[ Windows 8 ]] .	negative	negative	0.996691942
+usb ports 	Only 2 [[ usb ports ]] ... seems kind of ... limited .	negative	negative	0.99641031
+features 	It has all the expected [[ features ]] and more + plus a wide screen and more than roomy keyboard .	positive	positive	0.996128321
+screen 	It has all the expected features and more + plus a wide [[ screen ]] and more than roomy keyboard .	positive	positive	0.997467518
+keyboard 	It has all the expected features and more + plus a wide screen and more than roomy [[ keyboard ]] .	positive	positive	0.997255266
+Performance 	Amazing [[ Performance ]] for anything I throw at it .	positive	positive	0.99692142
+quality 	The receiver was full of superlatives for the [[ quality ]] and performance .	positive	positive	0.994394422
+performance 	The receiver was full of superlatives for the quality and [[ performance ]] .	positive	positive	0.994404912
+OS 	I was extremely happy with the [[ OS ]] itself .	positive	positive	0.996923029
+portability 	The new MBP offers great [[ portability ]] and gives us confidence that we are not going to need to purchase a new laptop in 18 months .	positive	positive	0.997291863
+portable computing 	"The criticism has waned , and now I 'd be the first to recommend an Air for truly [[ portable computing ]] ."	positive	positive	0.994516909
+Windows 8 	I would have given it 5 starts was it not for the fact that it had [[ Windows 8 ]]	negative	negative	0.775453687
+MS Office 2011 for Mac 	"[[ MS Office 2011 for Mac ]] is wonderful , well worth it ."	positive	positive	0.99735415
+performance 	But the [[ performance ]] of Mac Mini is a huge disappointment .	negative	negative	0.997236192
+look 	They do n't just [[ look ]] good ; they deliver excellent performance .	positive	positive	0.996812165
+performance 	They do n't just look good ; they deliver excellent [[ performance ]] .	positive	positive	0.997150004
+lit up keys 	I have had it over a year now with out a Glitch of any kind .. I love the [[ lit up keys ]] and screen display ... this thing is Fast and clear as can be .	positive	positive	0.997527897
+screen display 	I have had it over a year now with out a Glitch of any kind .. I love the lit up keys and [[ screen display ]] ... this thing is Fast and clear as can be .	positive	positive	0.997531772
+Mountain Lion OS 	The [[ Mountain Lion OS ]] is not hard to figure out if you are familiar with Microsoft Windows .	positive	positive	0.991448939
+Microsoft Windows 	The Mountain Lion OS is not hard to figure out if you are familiar with [[ Microsoft Windows ]] .	neutral	neutral	0.992379069
+OSX 	"However , I can refute that [[ OSX ]] is "" FAST "" ."	negative	negative	0.524194539
+Microsoft Office 	Enjoy using [[ Microsoft Office ]] !	positive	positive	0.99346292
+graphics 	Incredible [[ graphics ]] and brilliant colors .	positive	positive	0.997492194
+colors 	Incredible graphics and brilliant [[ colors ]] .	positive	positive	0.997495949
+Built - in apps 	[[ Built - in apps ]] are purely amazing .	positive	positive	0.996381104
+Screen resolution 	Cons : [[ Screen resolution ]] .	negative	negative	0.996421218
+operating system 	From the speed to the multi touch gestures this [[ operating system ]] beats Windows easily .	positive	positive	0.997334599
+Windows 	From the speed to the multi touch gestures this operating system beats [[ Windows ]] easily .	negative	positive	0.382040501
+speed 	From the [[ speed ]] to the multi touch gestures this operating system beats Windows easily .	positive	positive	0.997297227
+multi touch gestures 	From the speed to the [[ multi touch gestures ]] this operating system beats Windows easily .	positive	positive	0.997341335
+size 	I really like the [[ size ]] and I 'm a fan of the ACERS .	positive	positive	0.997487664
+SquareTrade 3-Year Computer Accidental Protection Warranty 	"I opted for the [[ SquareTrade 3-Year Computer Accidental Protection Warranty ]] ( $ 1500 - 2000 ) which also support "" accidents "" like drops and spills that are NOT covered by AppleCare ."	positive	neutral	0.981821239
+AppleCare 	"I opted for the SquareTrade 3-Year Computer Accidental Protection Warranty ( $ 1500 - 2000 ) which also support "" accidents "" like drops and spills that are NOT covered by [[ AppleCare ]] ."	negative	negative	0.990493476
+transport 	It 's light and easy to [[ transport ]] .	positive	positive	0.997321904
+Windows 8 Set - Up 	Once you get past learning how to use the poorly designed [[ Windows 8 Set - Up ]] you may feel frustrated .	negative	negative	0.995822787
+size 	"It 's been time for a new laptop , and the only debate was which [[ size ]] of the Mac laptops , and whether to spring for the retina display ."	neutral	neutral	0.986908853
+retina display 	"It 's been time for a new laptop , and the only debate was which size of the Mac laptops , and whether to spring for the [[ retina display ]] ."	neutral	neutral	0.995636284
+design 	The reason why I choose apple MacBook because of their [[ design ]] and the aluminum casing .	positive	positive	0.997234881
+aluminum casing 	The reason why I choose apple MacBook because of their design and the [[ aluminum casing ]] .	positive	positive	0.997328639
+aluminum body 	The [[ aluminum body ]] sure makes it stand out .	positive	positive	0.99723345
+integrate bluetooth devices 	"It is very easy to [[ integrate bluetooth devices ]] , and USB devices are recognized almost instantly ."	positive	positive	0.996366024
+USB devices 	"It is very easy to integrate bluetooth devices , and [[ USB devices ]] are recognized almost instantly ."	positive	positive	0.993395507
+Intel4000 graphic chip 	"And the fact that Apple is driving the 13 "" RMBP with the [[ Intel4000 graphic chip ]] seems underpowered ( to me ."	negative	negative	0.990885437
+DVD drive Firewire port 	Apple removed the [[ DVD drive Firewire port ]] ( will work with adapter ) and put the SDXC slot in a silly position on the back .	neutral	neutral	0.952949643
+adapter 	Apple removed the DVD drive Firewire port ( will work with [[ adapter ]] ) and put the SDXC slot in a silly position on the back .	neutral	neutral	0.974896848
+SDXC slot 	Apple removed the DVD drive Firewire port ( will work with adapter ) and put the [[ SDXC slot ]] in a silly position on the back .	negative	negative	0.988447964
+durability 	The [[ durability ]] of the laptop will make it worth the money .	positive	positive	0.996305823
+designed 	Well [[ designed ]] and fast .	positive	positive	0.99733597
+use 	"But I was completely wrong , this computer is UNBELIEVABLE amazing and easy to [[ use ]] ."	positive	positive	0.996890724
+value 	Exactly as posted plus a great [[ value ]] .	positive	positive	0.997488976
+specs 	The [[ specs ]] are pretty good too .	positive	positive	0.997343957
+product quality 	"Apple is unmatched in [[ product quality ]] , aesthetics , craftmanship , and customer service ."	positive	positive	0.997266173
+aesthetics 	"Apple is unmatched in product quality , [[ aesthetics ]] , craftmanship , and customer service ."	positive	positive	0.997195363
+craftmanship 	"Apple is unmatched in product quality , aesthetics , [[ craftmanship ]] , and customer service ."	positive	positive	0.997265577
+customer service 	"Apple is unmatched in product quality , aesthetics , craftmanship , and [[ customer service ]] ."	positive	positive	0.997260332
+size 	It is a great [[ size ]] and amazing windows 8 included !	positive	positive	0.997474611
+windows 8 	It is a great size and amazing [[ windows 8 ]] included !	positive	positive	0.997447848
+Windows 8 	I do not like too much [[ Windows 8 ]] .	negative	negative	0.993393123
+Startup times 	[[ Startup times ]] are incredibly long : over two minutes .	negative	negative	0.99300319
+colors 	Also stunning [[ colors ]] and speedy	positive	positive	0.997439623
+price 	great [[ price ]] free shipping what else can i ask for ! !	positive	positive	0.997444749
+shipping 	great price free [[ shipping ]] what else can i ask for ! !	positive	positive	0.997499287
+mouse 	This [[ mouse ]] is terrific .	positive	positive	0.997300684
+battery 	It is really thick around the [[ battery ]] .	neutral	positive	0.995985925
+windows 7 	And [[ windows 7 ]] works like a charm .	positive	positive	0.997279227
+price 	":) Great product , great [[ price ]] , great delivery , and great service ."	positive	positive	0.99779737
+delivery 	":) Great product , great price , great [[ delivery ]] , and great service ."	positive	positive	0.997847438
+service 	":) Great product , great price , great delivery , and great [[ service ]] ."	positive	positive	0.997705638
+customer service 	:] It arrived so fast and [[ customer service ]] was great .	positive	positive	0.997577369
+windows 8 	tried [[ windows 8 ]] and hated it ! ! !	negative	neutral	0.868739784
+Set up 	[[ Set up ]] was a breeze .	positive	positive	0.994409621
+Win8 	But I do NOT like [[ Win8 ]] .	negative	negative	0.995458364
+features 	I am still in the process of learning about its [[ features ]] .	neutral	neutral	0.994059563
+price 	"I had the same reasons as most PC users : the [[ price ]] , the overbearing restrictions of OSX and lack of support for games ."	negative	negative	0.996848524
+OSX 	"I had the same reasons as most PC users : the price , the overbearing restrictions of [[ OSX ]] and lack of support for games ."	negative	negative	0.996813238
+support for games 	"I had the same reasons as most PC users : the price , the overbearing restrictions of OSX and lack of [[ support for games ]] ."	negative	negative	0.996920228
+mobility 	"I wanted it for it 's [[ mobility ]] and man , this little bad boy is very nice ."	positive	neutral	0.991518438
+set up 	I found the mini to be : Exceptionally easy to [[ set up ]]	positive	positive	0.997286677
+USB3 	Having [[ USB3 ]] is why I bought this Mini .	positive	positive	0.86935246
+sound 	The [[ sound ]] is nice and loud ; I do n't have any problems with hearing anything .	positive	positive	0.997306228
+track pad 	"It is very slim , the [[ track pad ]] is very much impressed with me ."	positive	positive	0.996472895
+settings 	The [[ settings ]] are not user - friendly either .	negative	negative	0.997130215
+OpenOffice 	Thank goodness for [[ OpenOffice ]] !	positive	positive	0.993754447
+form factor 	"Awesome [[ form factor ]] , great battery life , wonderful UX ."	positive	positive	0.997892916
+battery life 	"Awesome form factor , great [[ battery life ]] , wonderful UX ."	positive	positive	0.997912109
+UX 	"Awesome form factor , great battery life , wonderful [[ UX ]] ."	positive	positive	0.997790813
+keyboard 	i love the [[ keyboard ]] and the screen .	positive	positive	0.997190058
+screen 	i love the keyboard and the [[ screen ]] .	positive	positive	0.997295916
+touchpad 	"However , there are MAJOR issues with the [[ touchpad ]] which render the device nearly useless ."	negative	negative	0.996275902
+Mavericks 	I 've already upgraded o [[ Mavericks ]] and I am impressed with everything about this computer .	positive	positive	0.931610346
+i5 	Not as fast as I would have expect for an [[ i5 ]] .	negative	negative	0.972938538
+service 	thanks for great [[ service ]] and shipping !	positive	positive	0.99665463
+shipping 	thanks for great service and [[ shipping ]] !	positive	positive	0.996703446
+performance 	"The [[ performance ]] seems quite good , and built - in applications like iPhoto work great with my phone and camera ."	positive	positive	0.997378111
+built - in applications 	"The performance seems quite good , and [[ built - in applications ]] like iPhoto work great with my phone and camera ."	positive	positive	0.997620046
+iPhoto 	"The performance seems quite good , and built - in applications like [[ iPhoto ]] work great with my phone and camera ."	positive	positive	0.997660518
+hard drive 	I did swap out the [[ hard drive ]] for a Samsung 830 SSD which I highly recommend .	neutral	neutral	0.974587977
+Samsung 830 SSD 	I did swap out the hard drive for a [[ Samsung 830 SSD ]] which I highly recommend .	positive	positive	0.993331134
+Starts up 	[[ Starts up ]] in a hurry and everything is ready to go .	positive	positive	0.872707009
+aluminum 	"Yes , that 's a good thing , but it 's made from [[ aluminum ]] that scratches easily ."	negative	negative	0.925212443
+built in virus control 	Quick and has [[ built in virus control ]] .	positive	positive	0.997400761
+retina display 	Took a long time trying to decide between one with [[ retina display ]] and one without .	neutral	neutral	0.918767989
+components 	I was also informed that the [[ components ]] of the Mac Book were dirty .	negative	negative	0.996613562
+hardware 	"the [[ hardware ]] problems have been so bad , i ca n't wait till it completely dies in 3 years , TOPS !"	negative	negative	0.997318447
+battery 	It 's so nice that the [[ battery ]] last so long and that this machine has the snow lion !	positive	positive	0.993076444
+snow lion 	It 's so nice that the battery last so long and that this machine has the [[ snow lion ]] !	positive	positive	0.99616611
+shipping 	HOWEVER I chose two day [[ shipping ]] and it took over a week to arrive .	negative	negative	0.942731619
+features 	"it 's exactly what i wanted , and it has all the new [[ features ]] and whatnot ."	positive	positive	0.997149169
+quality 	Can you buy any laptop that matches the [[ quality ]] of a MacBook ?	positive	positive	0.555987775
+keyboard 	"It feels cheap , the [[ keyboard ]] is not very sensitive ."	negative	negative	0.996260464
+sound quality 	"Though please note that sometimes it crashes , and the [[ sound quality ]] is nt superb ."	negative	negative	0.997088492
+navigate 	It is very easy to [[ navigate ]] even for a novice .	positive	positive	0.996585488
+battery life 	"Does everything I need it to , has a wonderful [[ battery life ]] and I could n't be happier ."	positive	positive	0.99759382
+Performance 	Great [[ Performance ]] and Quality .	positive	positive	0.997722447
+Quality 	Great Performance and [[ Quality ]] .	positive	positive	0.997712255
+windows XP 	"I used [[ windows XP ]] , windows Vista , and Windows 7 extensively ."	neutral	neutral	0.99656266
+windows Vista 	"I used windows XP , [[ windows Vista ]] , and Windows 7 extensively ."	neutral	neutral	0.996277392
+Windows 7 	"I used windows XP , windows Vista , and [[ Windows 7 ]] extensively ."	neutral	neutral	0.996497691
+SSD drive 	I did add a [[ SSD drive ]] and memory	neutral	neutral	0.995738268
+memory 	I did add a SSD drive and [[ memory ]]	neutral	neutral	0.995821595
+start up 	On [[ start up ]] it asks endless questions just so itune can sell you more of their products .	negative	negative	0.892789185
+itune 	On start up it asks endless questions just so [[ itune ]] can sell you more of their products .	negative	negative	0.755573273
+OS 	I Have been a Pc user for a very long time now but I will get used to this new [[ OS ]] .	neutral	neutral	0.759070158
+restore disks 	"One more thing , this mac does NOT come with [[ restore disks ]] and I am not sure if you can make them direct from the mac like you can with newer PC 's , also the charging cables are made of the same cheap material as the iPhone / iPod touch cables ."	negative	negative	0.995438516
+charging cables 	"One more thing , this mac does NOT come with restore disks and I am not sure if you can make them direct from the mac like you can with newer PC 's , also the [[ charging cables ]] are made of the same cheap material as the iPhone / iPod touch cables ."	negative	negative	0.996097267
+material 	"One more thing , this mac does NOT come with restore disks and I am not sure if you can make them direct from the mac like you can with newer PC 's , also the charging cables are made of the same cheap [[ material ]] as the iPhone / iPod touch cables ."	negative	negative	0.982589126
+graphic design 	I bought it to my son who uses it for [[ graphic design ]] .	neutral	neutral	0.993533134
+external mics 	I never tried any [[ external mics ]] with that iMac .	neutral	neutral	0.759209156
+os 	The new [[ os ]] is great on my macbook pro !	positive	positive	0.997375131
+works 	"I have experienced no problems , [[ works ]] as anticipated ."	positive	positive	0.996801734
+System 	[[ System ]] is running great .	positive	positive	0.996962249
+customize setting 	Easy to [[ customize setting ]] and even create your own bookmarks .	positive	positive	0.989232659
+create your own bookmarks 	Easy to customize setting and even [[ create your own bookmarks ]] .	positive	positive	0.930393577
+wireless keyboard / mouse 	"The MAC Mini , [[ wireless keyboard / mouse ]] and a HDMI cable is all I need to get some real work done ."	neutral	neutral	0.995443821
+HDMI cable 	"The MAC Mini , wireless keyboard / mouse and a [[ HDMI cable ]] is all I need to get some real work done ."	neutral	neutral	0.991397738
+features 	"it has all the [[ features ]] that we expected and the price was good , working well so far ."	positive	positive	0.996380389
+price 	"it has all the features that we expected and the [[ price ]] was good , working well so far ."	positive	positive	0.997433841
+working 	"it has all the features that we expected and the price was good , [[ working ]] well so far ."	positive	positive	0.996925771
+gaming 	"I work as a designer and coder and I needed a new buddy to work with , not [[ gaming ]] ."	neutral	neutral	0.995661199
+operating system 	The new [[ operating system ]] makes this computer into a super iPad .	positive	positive	0.995777249
+set up 	Easy to [[ set up ]] and go !	positive	positive	0.994869471
+hard drive 	I ca n't believe how quiet the [[ hard drive ]] is and how quick this thing boots up .	positive	positive	0.997611165
+boots up 	I ca n't believe how quiet the hard drive is and how quick this thing [[ boots up ]] .	positive	positive	0.997636318
+scanning 	The only issue came when I tried [[ scanning ]] to the mac .	negative	negative	0.91039747
+price point 	I think this is about as good as it gets at anything close to this [[ price point ]] .	neutral	positive	0.61619854
+works 	It 's just what we were looking for and it [[ works ]] great .	positive	positive	0.99730128
+working 	It 's so quick and responsive that it makes [[ working ]] / surfing on a computer so much more pleasurable !	positive	positive	0.997326374
+surfing 	It 's so quick and responsive that it makes working / [[ surfing ]] on a computer so much more pleasurable !	positive	positive	0.997455537
+works 	"It [[ works ]] fine , and all the software seems to run pretty well ."	positive	positive	0.996348977
+software 	"It works fine , and all the [[ software ]] seems to run pretty well ."	positive	positive	0.996335864
+word processing 	"I 'm using this computer for [[ word processing ]] , web browsing , some gaming , and I 'm learning programming ."	neutral	neutral	0.996105194
+web browsing 	"I 'm using this computer for word processing , [[ web browsing ]] , some gaming , and I 'm learning programming ."	neutral	neutral	0.996226549
+gaming 	"I 'm using this computer for word processing , web browsing , some [[ gaming ]] , and I 'm learning programming ."	neutral	neutral	0.996161342
+programming 	"I 'm using this computer for word processing , web browsing , some gaming , and I 'm learning [[ programming ]] ."	neutral	neutral	0.99554646
+function 	"My wife was so excited to open the box , but quickly came to see that it did not [[ function ]] as it should ."	negative	negative	0.996288419
+performance 	"I wanted a computer that was quite , fast , and that had overall great [[ performance ]] ."	neutral	positive	0.996622443
+"Apple "" Help "" "	"[[ Apple "" Help "" ]] is a mixed bag ."	negative	negative	0.990288138
+work 	It suddenly can not [[ work ]] .	negative	negative	0.994873345
+Harddrive 	"[[ Harddrive ]] was in poor condition , had to replace it ."	negative	negative	0.995944202
+on / off switch 	The [[ on / off switch ]] is a bit obscure in the rear corner .	negative	negative	0.996837258
+instructions 	My only complaint is the total lack of [[ instructions ]] that come with the mac mini .	negative	negative	0.997349143
+gaming 	"The only task that this computer would not be good enough for would be [[ gaming ]] , otherwise the integrated Intel 4000 graphics work well for other tasks ."	negative	negative	0.994633913
+content creation 	"I use it mostly for [[ content creation ]] ( Audio , video , photo editing ) and its reliable ."	positive	neutral	0.983511567
+Audio 	"I use it mostly for content creation ( [[ Audio ]] , video , photo editing ) and its reliable ."	positive	neutral	0.993345261
+video 	"I use it mostly for content creation ( Audio , [[ video ]] , photo editing ) and its reliable ."	positive	neutral	0.99509418
+photo editing 	"I use it mostly for content creation ( Audio , video , [[ photo editing ]] ) and its reliable ."	positive	neutral	0.994796693
+Screen 	[[ Screen ]] is bright and gorgeous .	positive	positive	0.996863365
+brightness 	"The only solution is to turn the [[ brightness ]] down , etc ."	neutral	neutral	0.805983663
+applications 	If you want more information on macs I suggest going to apple.com and heading towards the macbook page for more information on the [[ applications ]] .	neutral	neutral	0.996515512
+use 	"It is robust , with a friendly [[ use ]] as all Apple products ."	positive	positive	0.997604191
+use 	It is fast and easy to [[ use ]] .	positive	positive	0.9970029
+i5 processor 	And the fact that it comes with an [[ i5 processor ]] definitely speeds things up	positive	positive	0.996784449
+built in features 	I have been PC for years but this computer is intuitive and its [[ built in features ]] are a great help	positive	positive	0.997327447
+screen 	"Nice [[ screen ]] , keyboard works great !"	positive	positive	0.997537732
+keyboard 	"Nice screen , [[ keyboard ]] works great !"	positive	positive	0.997510672
+delivery 	I was amazed at how fast the [[ delivery ]] was .	positive	positive	0.997331977
+SSD 	I 've installed to it additional [[ SSD ]] and 16Gb RAM .	neutral	neutral	0.995887697
+16Gb RAM 	I 've installed to it additional SSD and [[ 16Gb RAM ]] .	neutral	neutral	0.994937181
+memory 	The [[ memory ]] was gone and it was not able to be used .	negative	negative	0.995699167
+works 	It [[ works ]] great and I am so happy I bought it .	positive	positive	0.997522175
+design 	"I like the [[ design ]] and ease of use with the keyboard , plenty of ports ."	positive	positive	0.997641563
+keyboard 	"I like the design and ease of use with the [[ keyboard ]] , plenty of ports ."	positive	positive	0.997537017
+ports 	"I like the design and ease of use with the keyboard , plenty of [[ ports ]] ."	positive	positive	0.997533798
+service 	it definitely beats my old mac and the [[ service ]] was great .	positive	positive	0.997784078
+Web browsing 	[[ Web browsing ]] is very quick with Safari browser .	positive	positive	0.997506917
+Safari browser 	Web browsing is very quick with [[ Safari browser ]] .	positive	positive	0.997465372
+lighted screen 	I like the [[ lighted screen ]] at night .	positive	positive	0.993586361
+use 	It is really easy to [[ use ]] and it is quick to start up .	positive	positive	0.997174382
+start up 	It is really easy to use and it is quick to [[ start up ]] .	positive	positive	0.997225702
+operation 	I 've lived with the crashes and slow [[ operation ]] and restarts .	negative	negative	0.99483335
+USB3 Peripherals 	[[ USB3 Peripherals ]] are noticably less expensive than the ThunderBolt ones .	positive	positive	0.950865865
+ThunderBolt 	USB3 Peripherals are noticably less expensive than the [[ ThunderBolt ]] ones .	negative	negative	0.960436702
+warranty 	And mine had broke but I sent it in under [[ warranty ]] -no problems .	positive	neutral	0.754785836
+media editing 	"It 's fast , light , and is perfect for [[ media editing ]] , which is mostly why I bought it in the first place ."	positive	positive	0.995755434
+battery 	"The [[ battery ]] lasts as advertised ( give or take 15 - 20 minutes ) , and the entire user experience is very elegant ."	positive	positive	0.996597946
+user experience 	"The battery lasts as advertised ( give or take 15 - 20 minutes ) , and the entire [[ user experience ]] is very elegant ."	positive	positive	0.997575343
+shipment 	Thanks for the fast [[ shipment ]] and great price .	positive	positive	0.997488022
+price 	Thanks for the fast shipment and great [[ price ]] .	positive	positive	0.997544825
+performance 	"! Excelent [[ performance ]] , usability , presentation and time response ."	positive	positive	0.997583985
+usability 	"! Excelent performance , [[ usability ]] , presentation and time response ."	positive	positive	0.997620523
+presentation 	"! Excelent performance , usability , [[ presentation ]] and time response ."	positive	positive	0.997485042
+time response 	"! Excelent performance , usability , presentation and [[ time response ]] ."	positive	positive	0.997485518
+size 	The smaller [[ size ]] was a bonus because of space restrictions .	positive	positive	0.996285439
+Mac OS 	I blame the [[ Mac OS ]] .	negative	negative	0.994948149
+Legacy programs 	"In fact I still use many [[ Legacy programs ]] ( Appleworks , FileMaker Pro , Quicken , Photoshop etc ) !"	neutral	neutral	0.995804489
+Appleworks 	"In fact I still use many Legacy programs ( [[ Appleworks ]] , FileMaker Pro , Quicken , Photoshop etc ) !"	neutral	neutral	0.996424139
+FileMaker Pro 	"In fact I still use many Legacy programs ( Appleworks , [[ FileMaker Pro ]] , Quicken , Photoshop etc ) !"	neutral	neutral	0.996492088
+Quicken 	"In fact I still use many Legacy programs ( Appleworks , FileMaker Pro , [[ Quicken ]] , Photoshop etc ) !"	neutral	neutral	0.99620688
+Photoshop 	"In fact I still use many Legacy programs ( Appleworks , FileMaker Pro , Quicken , [[ Photoshop ]] etc ) !"	neutral	neutral	0.996101022
+operating system 	I like the [[ operating system ]] .	positive	positive	0.994726837
+form factor 	I love the [[ form factor ]] .	positive	positive	0.997518063
+loading the internet 	It 's fast at [[ loading the internet ]] .	positive	positive	0.997159362
+looking 	So much faster and sleeker [[ looking ]] .	positive	positive	0.996876836
+XP 	"Unfortunately , it runs [[ XP ]] and Microsoft is dropping support next April ."	neutral	negative	0.989492416
+support 	"Unfortunately , it runs XP and Microsoft is dropping [[ support ]] next April ."	negative	negative	0.988785863
+OS 	"First off , I really do like my MBP ... once used to the [[ OS ]] it is pretty easy to get around , and the overall build is great ... eg the keyboard is one of the best to type on ."	positive	positive	0.581557453
+overall build 	"First off , I really do like my MBP ... once used to the OS it is pretty easy to get around , and the [[ overall build ]] is great ... eg the keyboard is one of the best to type on ."	positive	positive	0.997562051
+keyboard 	"First off , I really do like my MBP ... once used to the OS it is pretty easy to get around , and the overall build is great ... eg the [[ keyboard ]] is one of the best to type on ."	positive	positive	0.997208297
+construction 	It is made of such solid [[ construction ]] and since I have never had a Mac using my iPhone helped me get used to the system a bit .	positive	positive	0.997373343
+system 	It is made of such solid construction and since I have never had a Mac using my iPhone helped me get used to the [[ system ]] a bit .	neutral	positive	0.911245108
+unibody construction 	Very nice [[ unibody construction ]] .	positive	positive	0.997332573
+runs 	"This Macbook Pro is fast , powerful , and [[ runs ]] super quiet and cool ."	positive	positive	0.996976614
+disk drive 	It 's ok but does n't have a [[ disk drive ]] which I did n't know until after I bought it .	neutral	negative	0.996304512
+HDMI receptacle 	"There is no [[ HDMI receptacle ]] , nor is there an SD card slot located anywhere on the device ."	neutral	negative	0.992543221
+SD card slot 	"There is no HDMI receptacle , nor is there an [[ SD card slot ]] located anywhere on the device ."	neutral	negative	0.990733862
+works 	It came in brand new and [[ works ]] perfectly .	positive	positive	0.997234643
+design app 	"It should n't happen like that , I do n't have any [[ design app ]] open or anything ."	neutral	negative	0.991958976
+TRACKPAD 	MY [[ TRACKPAD ]] IS NOT WORKING .	negative	negative	0.99557364
+finish 	"It looks and feels solid , with a flawless [[ finish ]] ."	positive	positive	0.997487664
+looks 	"It [[ looks ]] and feels solid , with a flawless finish ."	positive	positive	0.997442842
+feels 	"It looks and [[ feels ]] solid , with a flawless finish ."	positive	positive	0.997483969
+Price 	[[ Price ]] was higher when purchased on MAC when compared to price showing on PC when I bought this product .	negative	negative	0.906849861
+price 	Price was higher when purchased on MAC when compared to [[ price ]] showing on PC when I bought this product .	positive	negative	0.986332178
+system 	Then the [[ system ]] would many times not power down without a forced power - off .	negative	negative	0.997262955
+power down 	Then the system would many times not [[ power down ]] without a forced power - off .	negative	negative	0.980991006
+configuration 	The [[ configuration ]] is perfect for my needs .	positive	positive	0.996875286
+speakers 	and the [[ speakers ]] is the worst ever .	negative	negative	0.99722904
+looks 	"Its the best , its got the [[ looks ]] , super easy to use and love all you can do with the trackpad ! .."	positive	positive	0.997762918
+use 	"Its the best , its got the looks , super easy to [[ use ]] and love all you can do with the trackpad ! .."	positive	positive	0.997624934
+trackpad 	"Its the best , its got the looks , super easy to use and love all you can do with the [[ trackpad ]] ! .."	positive	positive	0.997534156
+Web surfuring 	[[ Web surfuring ]] is smooth and seamless .	positive	positive	0.997334361
+interface 	I 'm overall pleased with the [[ interface ]] and the portability of this product .	positive	positive	0.997387111
+portability 	I 'm overall pleased with the interface and the [[ portability ]] of this product .	positive	positive	0.997318089
+works 	"This item is a beautiful piece , it [[ works ]] well , it is easy to carry and handle ."	positive	positive	0.997071981
+carry 	"This item is a beautiful piece , it works well , it is easy to [[ carry ]] and handle ."	positive	positive	0.996983588
+handle 	"This item is a beautiful piece , it works well , it is easy to carry and [[ handle ]] ."	positive	positive	0.996917248
+performance 	"It was also suffering from hardware ( keyboard ) issues , relatively slow [[ performance ]] and shortening battery lifetime ."	negative	negative	0.996981442
+battery lifetime 	"It was also suffering from hardware ( keyboard ) issues , relatively slow performance and shortening [[ battery lifetime ]] ."	negative	negative	0.996584177
+hardware ( keyboard ) 	"It was also suffering from [[ hardware ( keyboard ) ]] issues , relatively slow performance and shortening battery lifetime ."	negative	negative	0.996254921
+Runs 	"[[ Runs ]] good and does the job , ca n't complain about that !"	positive	positive	0.996927679
+footprint 	It 's silent and has a very small [[ footprint ]] on my desk .	positive	negative	0.987928927
+exterior 	The [[ exterior ]] is absolutely gorgeous .	positive	positive	0.997102916
+performance 	"It has a very high [[ performance ]] , just for what I needed for ."	positive	positive	0.997573435
+intel 4000 graphics chipset 	Apple is aware of this issue and this is either old stock or a defective design involving the [[ intel 4000 graphics chipset ]] .	neutral	negative	0.986152768
+design 	Apple is aware of this issue and this is either old stock or a defective [[ design ]] involving the intel 4000 graphics chipset .	neutral	negative	0.997398734
+OSX Mountain Lion 	[[ OSX Mountain Lion ]] soon to upgrade to Mavericks .	neutral	neutral	0.983444214
+Mavericks 	OSX Mountain Lion soon to upgrade to [[ Mavericks ]] .	neutral	neutral	0.993450642
+USB ports 	"I just bought the new MacBook Pro , the 13 "" model , and I ca n't believe Apple keeps making the same mistake with regard to [[ USB ports ]] ."	negative	negative	0.995919406
+lid 	It wakes in less than a second when I open the [[ lid ]] .	neutral	neutral	0.994961858
+wakes 	It [[ wakes ]] in less than a second when I open the lid .	positive	positive	0.960960209
+size 	It is the perfect [[ size ]] and speed for me .	positive	positive	0.996005714
+speed 	It is the perfect size and [[ speed ]] for me .	positive	positive	0.996039629
+CUSTOMER SERVICE 	THE [[ CUSTOMER SERVICE ]] IS TERRIFIC ! !	positive	positive	0.986281931
+performed 	"My last laptop was a 17 "" ASUS gaming machine , which [[ performed ]] admirably , but having since built my own desktop and really settling into the college life , I found myself wanting something smaller and less cumbersome , not to mention that the ASUS had been slowly developing problems ever since I bought it about 4 years ago ."	positive	positive	0.996095836
+battery cycle count 	"However , it did not have any scratches , ZERO [[ battery cycle count ]] ( pretty surprised ) , and all the hardware seemed to be working perfectly ."	positive	positive	0.955543101
+hardware 	"However , it did not have any scratches , ZERO battery cycle count ( pretty surprised ) , and all the [[ hardware ]] seemed to be working perfectly ."	positive	positive	0.99503231
+OS 	After fumbling around with the [[ OS ]] I started searching the internet for a fix and found a number of forums on fixing the issue .	negative	neutral	0.954551816
+finger swipes 	And as for all the fancy [[ finger swipes ]] -- I just gave up and attached a mouse .	negative	negative	0.994564533
+mouse 	And as for all the fancy finger swipes -- I just gave up and attached a [[ mouse ]] .	neutral	neutral	0.994241476
+storage 	"I needed a laptop with big [[ storage ]] , a nice screen and fast so I can photoshop without any problem ."	neutral	neutral	0.688309848
+screen 	"I needed a laptop with big storage , a nice [[ screen ]] and fast so I can photoshop without any problem ."	neutral	positive	0.96707201
+photoshop 	"I needed a laptop with big storage , a nice screen and fast so I can [[ photoshop ]] without any problem ."	neutral	positive	0.506400883
+Mac OS 	I like coming back to [[ Mac OS ]] but this laptop is lacking in speaker quality compared to my $ 400 old HP laptop .	positive	positive	0.99049437
+speaker quality 	I like coming back to Mac OS but this laptop is lacking in [[ speaker quality ]] compared to my $ 400 old HP laptop .	negative	negative	0.996024251
+Shipped 	[[ Shipped ]] very quickly and safely .	positive	positive	0.996850789
+thunderbolt port 	The [[ thunderbolt port ]] is awesome !	positive	positive	0.997295201
+performance 	The [[ performance ]] is definitely superior to any computer I 've ever put my hands on .	positive	positive	0.99445504
+streaming video 	It 's great for [[ streaming video ]] and other entertainment uses .	positive	positive	0.996604443
+entertainment uses 	It 's great for streaming video and other [[ entertainment uses ]] .	positive	positive	0.994449496
+design 	I like the [[ design ]] and its features but there are somethings I think needs to be improved .	positive	positive	0.996453166
+features 	I like the design and its [[ features ]] but there are somethings I think needs to be improved .	positive	positive	0.99673599
+Mac office 	There were small problems with [[ Mac office ]] .	negative	negative	0.996058345
+Apple Tech Support 	I understand I should call [[ Apple Tech Support ]] about any variables(which is my purpose of writing this con ) as variables could be a bigger future problem .	neutral	neutral	0.624052167
+spec 	"I ordered my 2012 mac mini after being disappointed with [[ spec ]] of the new 27 "" Imacs ."	negative	negative	0.991815269
+works 	"It still [[ works ]] and it 's extremely user friendly , so I would recommend it for new computer user and also for those who are just looking for a more efficient way to do things"	positive	positive	0.997234881
+use 	"Its fast , easy to [[ use ]] and it looks great ."	positive	positive	0.997319281
+looks 	"Its fast , easy to use and it [[ looks ]] great ."	positive	positive	0.997432768
+Office 	( but [[ Office ]] can be purchased ) IF I ever need a laptop again I am for sure purchasing another Toshiba ! !	neutral	neutral	0.813885689
+retina display 	I have n't tried the one with [[ retina display ]] ... Maybe in the future .	neutral	neutral	0.98199755
+Performance 	"[[ Performance ]] is much much better on the Pro , especially if you install an SSD on it ."	positive	positive	0.95072794
+SSD 	"Performance is much much better on the Pro , especially if you install an [[ SSD ]] on it ."	positive	neutral	0.995736599
+MagSafe accessories 	"Note , however , that any existing [[ MagSafe accessories ]] you have will not work with the MagSafe 2 connection ."	neutral	negative	0.995326757
+MagSafe 2 connection 	"Note , however , that any existing MagSafe accessories you have will not work with the [[ MagSafe 2 connection ]] ."	negative	negative	0.99429965
+touchpad 	"The only thing I dislike is the [[ touchpad ]] , alot of the times its unresponsive and does things I do nt want it too , I would recommend using a mouse with it ."	negative	negative	0.996694207
+mouse 	"The only thing I dislike is the touchpad , alot of the times its unresponsive and does things I do nt want it too , I would recommend using a [[ mouse ]] with it ."	neutral	neutral	0.992025793
+runs 	"The Mac mini is about 8x smaller than my old computer which is a huge bonus and [[ runs ]] very quiet , actually the fans are n't audible unlike my old pc"	positive	positive	0.997513771
+fans 	"The Mac mini is about 8x smaller than my old computer which is a huge bonus and runs very quiet , actually the [[ fans ]] are n't audible unlike my old pc"	positive	negative	0.989816308
+Mac OS 	MAYBE The [[ Mac OS ]] improvement were not The product they Want to offer .	negative	negative	0.997262239
+Mac ecosystem 	I thought the transition would be difficult at best and would take some time to fully familiarize myself with the new [[ Mac ecosystem ]] .	neutral	neutral	0.988658726
+price 	It 's absolutely wonderful and worth the [[ price ]] !	positive	positive	0.996335745
+use 	I am please with the products ease of [[ use ]] ; out of the box ready ; appearance and functionality .	positive	positive	0.997654796
+appearance 	I am please with the products ease of use ; out of the box ready ; [[ appearance ]] and functionality .	positive	positive	0.997688055
+functionality 	I am please with the products ease of use ; out of the box ready ; appearance and [[ functionality ]] .	positive	positive	0.997682691
+graphic design 	Perfect for all my [[ graphic design ]] classes I 'm taking this year in college :-)	positive	positive	0.994997859
+slot 	I will not be using that [[ slot ]] again .	negative	negative	0.989399076
+OS 	"The [[ OS ]] is fast and fluid , everything is organized and it 's just beautiful ."	positive	positive	0.99744451
+use 	They are simpler to [[ use ]] .	positive	positive	0.997117758
+SSD 	! so nice .. stable .. fast .. now i got my [[ SSD ]] !	positive	positive	0.970927954
+built - in camera 	"Also , in using the [[ built - in camera ]] , my voice recording for my vlog sounds like the interplanetary transmissions in the "" Star Wars "" saga ."	neutral	neutral	0.912347853
+voice recording 	"Also , in using the built - in camera , my [[ voice recording ]] for my vlog sounds like the interplanetary transmissions in the "" Star Wars "" saga ."	negative	negative	0.985266447
+start up 	I love the quick [[ start up ]] .	positive	positive	0.997475684
+functionality 	You just can not beat the [[ functionality ]] of an Apple device .	positive	positive	0.996277511
+function 	Yet my mac continues to [[ function ]] properly .	positive	positive	0.981906056
+Graphics 	[[ Graphics ]] are much improved .	positive	positive	0.979941487
+Build Quality 	"Here are the things that made me confident with my purchase : [[ Build Quality ]] - Seriously , you ca n't beat a unibody construction ."	positive	positive	0.997229517
+unibody construction 	"Here are the things that made me confident with my purchase : Build Quality - Seriously , you ca n't beat a [[ unibody construction ]] ."	positive	positive	0.997012019
+flexibility for connectivity 	It provides much more [[ flexibility for connectivity ]] .	positive	positive	0.996247947
+portability 	"I want the [[ portability ]] of a tablet , without the limitations of a tablet and that 's where this laptop comes into play ."	positive	positive	0.67487514
+Mac tutorials 	[[ Mac tutorials ]] do help .	positive	positive	0.974891305
+technical support 	The [[ technical support ]] was not helpful as well .	negative	negative	0.997294843
+adapter 	I got the new [[ adapter ]] and there was no change .	neutral	neutral	0.740830481
+technical support 	so i called [[ technical support ]] .	neutral	neutral	0.992370725
+iPhoto 	Came with [[ iPhoto ]] and garage band already loaded .	neutral	positive	0.932338774
+garage band 	Came with iPhoto and [[ garage band ]] already loaded .	neutral	positive	0.959770262
+Logic board 	"[[ Logic board ]] utterly fried , cried , and laid down and died ."	positive	negative	0.995380998
+sound 	The [[ sound ]] was crappy even when you turn up the volume still the same results .	negative	negative	0.997237682
+volume 	The sound was crappy even when you turn up the [[ volume ]] still the same results .	negative	neutral	0.944371343
+OSX Lion 	[[ OSX Lion ]] is a great performer .. extremely fast and reliable .	positive	positive	0.997092485
+application 	"Having heard from friends and family about how reliable a Mac product is , I never expected to have an [[ application ]] crash within the first month , but I did ."	negative	negative	0.980749786
+physical form 	The Macbook pro 's [[ physical form ]] is wonderful .	positive	positive	0.997152448
+body 	The Mini 's [[ body ]] has n't changed since late 2010- and for a good reason .	positive	positive	0.944852054
+unibody construction 	The [[ unibody construction ]] really does feel lot more solid than Apple 's previous laptops .	positive	positive	0.996436
+3D rendering 	[[ 3D rendering ]] slows it down considerably .	negative	negative	0.997055173
+OS X Mountain Lion 	Got this Mac Mini with [[ OS X Mountain Lion ]] for my wife .	neutral	neutral	0.992523372
+screen 	"fast , great [[ screen ]] , beautiful apps for a laptop ; priced at 1100 on the apple website;amazon had it for 1098 + tax - plus i had a 10 % off coupon from amazon- cost me 998 plus tax- 1070- OTD !"	positive	positive	0.997356653
+apps 	"fast , great screen , beautiful [[ apps ]] for a laptop ; priced at 1100 on the apple website;amazon had it for 1098 + tax - plus i had a 10 % off coupon from amazon- cost me 998 plus tax- 1070- OTD !"	positive	positive	0.997033715
+priced 	"fast , great screen , beautiful apps for a laptop ; [[ priced ]] at 1100 on the apple website;amazon had it for 1098 + tax - plus i had a 10 % off coupon from amazon- cost me 998 plus tax- 1070- OTD !"	neutral	positive	0.988584518
+cost 	"fast , great screen , beautiful apps for a laptop ; priced at 1100 on the apple website;amazon had it for 1098 + tax - plus i had a 10 % off coupon from amazon- [[ cost ]] me 998 plus tax- 1070- OTD !"	neutral	positive	0.994409263
+boot 	12.44 seconds to [[ boot ]] .	neutral	neutral	0.879926264
+ports 	All the [[ ports ]] are much needed since this is my main computer .	neutral	negative	0.996423662
+Quad - Core 2.5 GHz CPU 	"The Like New condition of the iMac MC309LL / A on Amazon is at $ 900 + level only , and it is a [[ Quad - Core 2.5 GHz CPU ]] ( similar to the $ 799 Mini ) , with Radeon HD 6750 M 512 MB graphic card ( this mini is integrated Intel 4000 card ) , and it even comes with wireless Apple Keyboard and Mouse , all put together in neat and nice package ."	neutral	neutral	0.991852701
+Radeon HD 6750 M 512 MB graphic card 	"The Like New condition of the iMac MC309LL / A on Amazon is at $ 900 + level only , and it is a Quad - Core 2.5 GHz CPU ( similar to the $ 799 Mini ) , with [[ Radeon HD 6750 M 512 MB graphic card ]] ( this mini is integrated Intel 4000 card ) , and it even comes with wireless Apple Keyboard and Mouse , all put together in neat and nice package ."	neutral	neutral	0.981990993
+integrated Intel 4000 card 	"The Like New condition of the iMac MC309LL / A on Amazon is at $ 900 + level only , and it is a Quad - Core 2.5 GHz CPU ( similar to the $ 799 Mini ) , with Radeon HD 6750 M 512 MB graphic card ( this mini is [[ integrated Intel 4000 card ]] ) , and it even comes with wireless Apple Keyboard and Mouse , all put together in neat and nice package ."	neutral	neutral	0.994889498
+wireless Apple Keyboard and Mouse 	"The Like New condition of the iMac MC309LL / A on Amazon is at $ 900 + level only , and it is a Quad - Core 2.5 GHz CPU ( similar to the $ 799 Mini ) , with Radeon HD 6750 M 512 MB graphic card ( this mini is integrated Intel 4000 card ) , and it even comes with [[ wireless Apple Keyboard and Mouse ]] , all put together in neat and nice package ."	neutral	positive	0.98122865
+package 	"The Like New condition of the iMac MC309LL / A on Amazon is at $ 900 + level only , and it is a Quad - Core 2.5 GHz CPU ( similar to the $ 799 Mini ) , with Radeon HD 6750 M 512 MB graphic card ( this mini is integrated Intel 4000 card ) , and it even comes with wireless Apple Keyboard and Mouse , all put together in neat and nice [[ package ]] ."	positive	positive	0.997238994
+cover 	Put a [[ cover ]] on it and is a little better but that is my only complaint .	neutral	positive	0.723276436
+gestures 	Within a few hours I was using the [[ gestures ]] unconsciously .	positive	neutral	0.980766058
+extender cable 	This mac does come with an [[ extender cable ]] and I 'm using mine right now hoping the cable will stay nice for the many years I plan on using this mac .	neutral	neutral	0.992719293
+cable 	This mac does come with an extender cable and I 'm using mine right now hoping the [[ cable ]] will stay nice for the many years I plan on using this mac .	positive	positive	0.972895324
+2.9ghz dual - core i7 chip 	The [[ 2.9ghz dual - core i7 chip ]] really out does itself .	positive	positive	0.996125638
+starts up 	It is pretty snappy and [[ starts up ]] in about 30 seconds which is good enough for me .	positive	positive	0.996803164
+Windows 8 	Not sure on [[ Windows 8 ]] .	neutral	neutral	0.948576987
+internal CD drive 	My one complaint is that there was no [[ internal CD drive ]] .	negative	negative	0.996119976
+hard drive 	This newer netbook has no [[ hard drive ]] or network lights .	neutral	negative	0.99286747
+network lights 	This newer netbook has no hard drive or [[ network lights ]] .	neutral	negative	0.992078602
+priced 	"I was having a though time deciding between the 13 "" MacBook Air or the MacBook Pro 13 "" ( Both baseline models , [[ priced ]] at 1,200 $ retail )"	neutral	neutral	0.980221272
+storage 	Not too expense and has enough [[ storage ]] for most users and many ports .	positive	positive	0.996717155
+ports 	Not too expense and has enough storage for most users and many [[ ports ]] .	positive	neutral	0.794114053
+audio volume 	The [[ audio volume ]] is quite low and virtually unusable in a room with any background activity .	negative	negative	0.996860981
+size 	It is lightweight and the perfect [[ size ]] to carry to class .	positive	positive	0.996492207
+Windows 8 	I was given a demonstration of [[ Windows 8 ]] .	neutral	neutral	0.994160473
+capabilities 	The MBP is beautiful has many wonderful [[ capabilities ]] .	positive	positive	0.997305751
+settings 	"I thought that it will be fine , if i do some [[ settings ]] ."	neutral	neutral	0.804246306
+Runs 	[[ Runs ]] very smoothly .	positive	positive	0.995227814
+Boot - up 	[[ Boot - up ]] slowed significantly after all Windows updates were installed .	negative	negative	0.995580614
+Windows updates 	Boot - up slowed significantly after all [[ Windows updates ]] were installed .	negative	neutral	0.9905352
+logic board 	More likely it will require replacing the [[ logic board ]] once they admit they have a problem and come up with a solution .	negative	neutral	0.920680881
+internet 	"It was important that it was powerful enough to do all of the tasks he needed on the [[ internet ]] , word processing , graphic design and gaming ."	positive	neutral	0.986438394
+word processing 	"It was important that it was powerful enough to do all of the tasks he needed on the internet , [[ word processing ]] , graphic design and gaming ."	positive	neutral	0.969448507
+graphic design 	"It was important that it was powerful enough to do all of the tasks he needed on the internet , word processing , [[ graphic design ]] and gaming ."	positive	neutral	0.983730435
+gaming 	"It was important that it was powerful enough to do all of the tasks he needed on the internet , word processing , graphic design and [[ gaming ]] ."	positive	neutral	0.991805911
+setup 	"I like the Mini Mac it was easy to [[ setup ]] and install , but I am learning as I go and could use a tutorial to learn how to use some of the features I was use to on the PC especially the right mouse click menu ."	positive	positive	0.997211158
+install 	"I like the Mini Mac it was easy to setup and [[ install ]] , but I am learning as I go and could use a tutorial to learn how to use some of the features I was use to on the PC especially the right mouse click menu ."	positive	positive	0.997181892
+tutorial 	"I like the Mini Mac it was easy to setup and install , but I am learning as I go and could use a [[ tutorial ]] to learn how to use some of the features I was use to on the PC especially the right mouse click menu ."	neutral	neutral	0.957538068
+features 	"I like the Mini Mac it was easy to setup and install , but I am learning as I go and could use a tutorial to learn how to use some of the [[ features ]] I was use to on the PC especially the right mouse click menu ."	neutral	neutral	0.853889763
+right mouse click menu 	"I like the Mini Mac it was easy to setup and install , but I am learning as I go and could use a tutorial to learn how to use some of the features I was use to on the PC especially the [[ right mouse click menu ]] ."	neutral	neutral	0.96054703
+Runs 	[[ Runs ]] real quick .	positive	positive	0.996473014
+RAM memory 	Buy the separate [[ RAM memory ]] and you will have a rocket !	positive	positive	0.723733723
+profile 	"Since the machine 's slim [[ profile ]] is critical to me , that was a problem ."	negative	negative	0.996845305
+disk drive 	"WiFi capability , [[ disk drive ]] and multiple USB ports to connect scale and printers was all that was required ."	positive	neutral	0.952156782
+USB ports 	"WiFi capability , disk drive and multiple [[ USB ports ]] to connect scale and printers was all that was required ."	positive	neutral	0.908348858
+WiFi capability 	"[[ WiFi capability ]] , disk drive and multiple USB ports to connect scale and printers was all that was required ."	positive	neutral	0.931157708
+SD card reader 	"The [[ SD card reader ]] is slightly recessed and upside down ( the nail slot on the card can not be accessed ) , if this was a self ejecting slot this would not be an issue , but its not ."	negative	negative	0.965042055
+nail slot on the card 	"The SD card reader is slightly recessed and upside down ( the [[ nail slot on the card ]] can not be accessed ) , if this was a self ejecting slot this would not be an issue , but its not ."	negative	negative	0.987727761
+slot 	"The SD card reader is slightly recessed and upside down ( the nail slot on the card can not be accessed ) , if this was a self ejecting [[ slot ]] this would not be an issue , but its not ."	negative	negative	0.97530365
+touch 	"Soft [[ touch ]] , anodized aluminum with laser cut precision and no flaws ."	positive	positive	0.997485161
+anodized aluminum 	"Soft touch , [[ anodized aluminum ]] with laser cut precision and no flaws ."	positive	positive	0.997213185
+aluminium 	"Simple details , crafted [[ aluminium ]] and real glass make this laptop blow away the other plastic ridden , bulky sticker filled laptops ."	positive	positive	0.996843696
+glass 	"Simple details , crafted aluminium and real [[ glass ]] make this laptop blow away the other plastic ridden , bulky sticker filled laptops ."	positive	positive	0.996773779
+aluminum 	First of all yes this is a mac and it has that nice brushed [[ aluminum ]] .	positive	positive	0.997436821
+16 GB of RAM 	"After all was said and done , I essentially used that $ 450 savings to buy [[ 16 GB of RAM ]] , TWO Seagate Momentus XT hybrid drives and an OWC upgrade kit to install the second hard drive ."	neutral	neutral	0.9963606
+Seagate Momentus XT hybrid drives 	"After all was said and done , I essentially used that $ 450 savings to buy 16 GB of RAM , TWO [[ Seagate Momentus XT hybrid drives ]] and an OWC upgrade kit to install the second hard drive ."	neutral	neutral	0.994986296
+OWC upgrade kit 	"After all was said and done , I essentially used that $ 450 savings to buy 16 GB of RAM , TWO Seagate Momentus XT hybrid drives and an [[ OWC upgrade kit ]] to install the second hard drive ."	neutral	neutral	0.996133566
+hard drive 	"After all was said and done , I essentially used that $ 450 savings to buy 16 GB of RAM , TWO Seagate Momentus XT hybrid drives and an OWC upgrade kit to install the second [[ hard drive ]] ."	neutral	neutral	0.996406853
+number pad on the keyboard 	"The Dell Inspiron is fast and has a [[ number pad on the keyboard ]] , which I miss on my Apple laptops ."	positive	positive	0.997132301
+regular hard drive 	I was concerned that the downgrade to the [[ regular hard drive ]] would make it unacceptably slow but I need not have worried - this machine is the fastest I have ever owned ...	positive	neutral	0.99036938
+CD slot 	This one still has the [[ CD slot ]] .	neutral	neutral	0.965431452
+HDMI port 	No [[ HDMI port ]] .	neutral	negative	0.992645979
+install Mountain Lion 	I had to [[ install Mountain Lion ]] and it took a good two hours .	negative	neutral	0.966650307
+Customization 	[[ Customization ]] on mac is impossible .	negative	negative	0.995651186
+HD 	I am replacing the [[ HD ]] with a Micron SSD soon .	neutral	neutral	0.996116281
+Micron SSD 	I am replacing the HD with a [[ Micron SSD ]] soon .	neutral	neutral	0.995588899
+two finger clicking 	Plus [[ two finger clicking ]] as a replacement for the right click button is surprisingly intuitive .	positive	positive	0.997310996
+right click button 	Plus two finger clicking as a replacement for the [[ right click button ]] is surprisingly intuitive .	neutral	negative	0.915984273
+SuperDrive 	The [[ SuperDrive ]] is quiet .	positive	positive	0.683651626
+power plug 	The [[ power plug ]] has to be connected to the power adaptor to charge the battery but wo n't stay connected .	negative	negative	0.913829625
+power adaptor 	The power plug has to be connected to the [[ power adaptor ]] to charge the battery but wo n't stay connected .	neutral	neutral	0.982349455
+battery 	The power plug has to be connected to the power adaptor to charge the [[ battery ]] but wo n't stay connected .	neutral	neutral	0.596748114
+battery 	"The [[ battery ]] was completely dead , in fact it had grown about a quarter inch thick lump on the underside ."	negative	negative	0.995337605
+practicality 	if yo like [[ practicality ]] this is the laptop for you .	positive	positive	0.949335039
+OS 	The [[ OS ]] is great .	positive	positive	0.997499168
+monitors 	I tried several [[ monitors ]] and several HDMI cables and this was the case each time .	neutral	neutral	0.996200025
+HDMI cables 	I tried several monitors and several [[ HDMI cables ]] and this was the case each time .	neutral	neutral	0.995482445
+Price 	"CONS : [[ Price ]] is a bit ridiculous , kinda heavy ."	negative	negative	0.996834934
+AC adaptor 	The troubleshooting said it was the [[ AC adaptor ]] so we ordered a new one .	neutral	negative	0.917128146
+Fan 	[[ Fan ]] only comes on when you are playing a game .	neutral	negative	0.988107264
+playing a game 	Fan only comes on when you are [[ playing a game ]] .	neutral	neutral	0.992254376
+USB 2 ports 	"Which it did not have , only 3 [[ USB 2 ports ]] ."	neutral	negative	0.98851043
+startup disk 	No [[ startup disk ]] was not included but that may be my fault .	neutral	negative	0.996428549
+ tools  menu 	"There is no [[ "" tools "" menu ]] ."	neutral	negative	0.979910851
+word program 	It is very fast and has everything that I need except for a [[ word program ]] .	negative	positive	0.569001615
+CD / DVD drive 	Needs a [[ CD / DVD drive ]] and a bigger power switch .	neutral	neutral	0.989369035
+power switch 	Needs a CD / DVD drive and a bigger [[ power switch ]] .	negative	neutral	0.857611001
+Windows 7 	My laptop with [[ Windows 7 ]] crashed and I did not want Windows 8 .	negative	negative	0.994362831
+Windows 8 	My laptop with Windows 7 crashed and I did not want [[ Windows 8 ]] .	negative	negative	0.990265787
+install 	Easy to [[ install ]] also small to leave anywhere at your bedroom also very easy to configure for ADSl cable or wifi .	positive	positive	0.996864378
+configure for ADSl cable or wifi 	Easy to install also small to leave anywhere at your bedroom also very easy to [[ configure for ADSl cable or wifi ]] .	positive	positive	0.560600221
+packing 	Nice [[ packing ]] .	positive	positive	0.997380078
+windows 	"I switched to this because I wanted something different , even though I miss [[ windows ]] ."	positive	negative	0.986372054
+iDVD 	"Apple no longer includes [[ iDVD ]] with the computer and furthermore , Apple does n't even offer it anymore !"	negative	negative	0.995111287
+Windows 7 	"I also wanted [[ Windows 7 ]] , which this one has ."	positive	neutral	0.992208719
+Mac system 	"At first , I feel a little bit uncomfortable in using the [[ Mac system ]] ."	negative	negative	0.99418807
+windows 	I am used to computers with [[ windows ]] so I am having a little difficulty finding my way around .	neutral	neutral	0.881310701
+works 	It just [[ works ]] out of the box and you have a lot of cool software included with the OS .	positive	positive	0.997330546
+software 	It just works out of the box and you have a lot of cool [[ software ]] included with the OS .	positive	positive	0.997506797
+OS 	It just works out of the box and you have a lot of cool software included with the [[ OS ]] .	neutral	positive	0.977809131
+works 	its as advertised on here ..... it [[ works ]] great and is not a waste of money !	positive	positive	0.997546852
+Runs 	[[ Runs ]] like a champ .....	positive	positive	0.99427551
+price 	Premium [[ price ]] for the OS more than anything else .	positive	positive	0.996678948
+OS 	Premium price for the [[ OS ]] more than anything else .	neutral	positive	0.996778071
+touch pad 	"I was a little concerned about the [[ touch pad ]] based on reviews , but I 've found it fine to work with ."	positive	negative	0.959459841
+headphones 	"The sound as mentioned earlier is n't the best , but it can be solved with [[ headphones ]] ."	neutral	positive	0.674394906
+OS 	"However , the experience was great since the [[ OS ]] does not become unstable and the application will simply shutdown and reopen ."	positive	positive	0.992943823
+application 	"However , the experience was great since the OS does not become unstable and the [[ application ]] will simply shutdown and reopen ."	positive	positive	0.988283753
+price 	"If you ask me , for this [[ price ]] it should be included ."	negative	neutral	0.628285527
+battery 	The [[ battery ]] is not as shown in the product photos .	negative	negative	0.996984422
+Shipping 	[[ Shipping ]] was quick and product described was the product sent and so much more ...	positive	positive	0.997365892
+retina display display 	the [[ retina display display ]] make pictures i took years ago jaw dropping .	positive	positive	0.873731315
+compact computing 	The Mac Mini is probably the simplest example of [[ compact computing ]] out there .	positive	positive	0.997287631
+performance and feature set of the hardware 	"Instead , I 'll focus more on the actual [[ performance and feature set of the hardware ]] itself so you can make an educated decision on which Mac to buy ."	neutral	neutral	0.721626043
+ports 	"Other [[ ports ]] include FireWire 800 , Gigabit Ethernet , MagSafe port , Microphone jack ."	neutral	neutral	0.995987356
+FireWire 800 	"Other ports include [[ FireWire 800 ]] , Gigabit Ethernet , MagSafe port , Microphone jack ."	neutral	neutral	0.995764732
+Gigabit Ethernet 	"Other ports include FireWire 800 , [[ Gigabit Ethernet ]] , MagSafe port , Microphone jack ."	neutral	neutral	0.994329512
+MagSafe port 	"Other ports include FireWire 800 , Gigabit Ethernet , [[ MagSafe port ]] , Microphone jack ."	neutral	neutral	0.996463954
+Microphone jack 	"Other ports include FireWire 800 , Gigabit Ethernet , MagSafe port , [[ Microphone jack ]] ."	neutral	neutral	0.996342719
+ventilation system 	"Additionally , there is barely a [[ ventilation system ]] in the computer , and even the simple activity of watching videos let alone playing steam games causes the laptop to get very very hot , and in fact impossible to keep on lap ."	negative	negative	0.993961513
+watching videos 	"Additionally , there is barely a ventilation system in the computer , and even the simple activity of [[ watching videos ]] let alone playing steam games causes the laptop to get very very hot , and in fact impossible to keep on lap ."	neutral	neutral	0.991882265
+playing steam games 	"Additionally , there is barely a ventilation system in the computer , and even the simple activity of watching videos let alone [[ playing steam games ]] causes the laptop to get very very hot , and in fact impossible to keep on lap ."	neutral	neutral	0.986160874
+Acer support 	"Chatting with [[ Acer support ]] , I was advised the problem was corrupted operating system files ."	neutral	neutral	0.991698146
+operating system files 	"Chatting with Acer support , I was advised the problem was corrupted [[ operating system files ]] ."	neutral	negative	0.996267021
+keys 	It 's been a couple weeks since the purchase and I 'm struggle with finding the correct [[ keys ]] ( but that was expected ) .	neutral	negative	0.994823575
+OS 	"Many people complain about the new [[ OS ]] , and it 's urgent for Apple to fix it asap !"	negative	negative	0.996240497
+Lion 	Now that I have upgraded to [[ Lion ]] I am much happier about MAC OS and have just bought an iMac for office .	positive	neutral	0.824168086
+MAC OS 	Now that I have upgraded to Lion I am much happier about [[ MAC OS ]] and have just bought an iMac for office .	positive	positive	0.99443841
+RAM 	User upgradeable [[ RAM ]] and HDD .	positive	positive	0.916271269
+HDD 	User upgradeable RAM and [[ HDD ]] .	positive	positive	0.89378792
+CD / DVD player 	But I wanted the Pro for the [[ CD / DVD player ]] .	positive	neutral	0.996611059
+os.x 	I was a little worry at first because I do n't have a lot of experience with [[ os.x ]] and windows has always been second nature to me after many years of using windows .	neutral	neutral	0.927481472
+windows 	I was a little worry at first because I do n't have a lot of experience with os.x and [[ windows ]] has always been second nature to me after many years of using windows .	positive	positive	0.8929649
+windows 	I was a little worry at first because I do n't have a lot of experience with os.x and windows has always been second nature to me after many years of using [[ windows ]] .	neutral	neutral	0.878303766
+OS 	With the softwares supporting the use of other [[ OS ]] makes it much better .	neutral	neutral	0.878954232
+softwares 	With the [[ softwares ]] supporting the use of other OS makes it much better .	neutral	positive	0.995905161
+"Mac OS X 10.8 "" Mountain Lion "" "	"I then upgraded to [[ Mac OS X 10.8 "" Mountain Lion "" ]] ."	neutral	neutral	0.996578515
+performance 	"I was considering buying the Air , but in reality , this one has a more powerful [[ performance ]] and seems much more convenient , even though it 's about .20 inch thicker and 2 lbs heavier ."	positive	positive	0.996929705
+built in screen size 	"At home and the office it gets plugged into an external 24 "" LCD screen , so [[ built in screen size ]] is not terribly important ."	neutral	neutral	0.947070181
+"external 24 "" LCD screen "	"At home and the office it gets plugged into an [[ external 24 "" LCD screen ]] , so built in screen size is not terribly important ."	neutral	neutral	0.995606244
+install software 	Just beware no DVD slot so when I went to [[ install software ]] I had on CD I could n't .	negative	negative	0.915823698
+DVD slot 	Just beware no [[ DVD slot ]] so when I went to install software I had on CD I could n't .	neutral	negative	0.993160605
+word processing program 	"I bought it to be able to dedicate a small , portable laptop to my writing and was surprised to learn that I needed to buy a [[ word processing program ]] to do so ."	neutral	neutral	0.986036956
+"third - generation CPU ( "" Ivy Bridge "" ) "	"This version of MacBook Pro runs on a [[ third - generation CPU ( "" Ivy Bridge "" ) ]] , not the latest fourth - generation Haswell CPU the 2013 version has ."	neutral	neutral	0.996106803
+fourth - generation Haswell CPU 	"This version of MacBook Pro runs on a third - generation CPU ( "" Ivy Bridge "" ) , not the latest [[ fourth - generation Haswell CPU ]] the 2013 version has ."	neutral	neutral	0.992479801
+Cd Rom 	No [[ Cd Rom ]] in the new version there 's no way I 'm spending that kind of money on something has less features than the older version .	neutral	negative	0.987772226
+features 	No Cd Rom in the new version there 's no way I 'm spending that kind of money on something has less [[ features ]] than the older version .	negative	negative	0.9939031
+volume 	the [[ volume ]] is really low to low for a laptopwas not expectin t volume to be so lowan i hate that about this computer	negative	negative	0.996720254
+volume 	the volume is really low to low for a laptopwas not expectin t [[ volume ]] to be so lowan i hate that about this computer	negative	negative	0.997095704
+case 	and its not hard to accidentally bang it against something so i recommend getting a [[ case ]] to protect it .	neutral	neutral	0.951845765
+price 	I got this at an amazing [[ price ]] from Amazon and it arrived just in time .	positive	positive	0.997538924
+log into the system 	"Every time I [[ log into the system ]] after a few hours , there is this endlessly frustrating process that I have to go through ."	negative	negative	0.997119665
+"21 "" LED screen "	"Put a SSD and use a [[ 21 "" LED screen ]] , this set up is silky smooth !"	neutral	positive	0.996943414
+SSD 	"Put a [[ SSD ]] and use a 21 "" LED screen , this set up is silky smooth !"	neutral	neutral	0.992526293
+set up 	"Put a SSD and use a 21 "" LED screen , this [[ set up ]] is silky smooth !"	positive	positive	0.99749583
+case 	"The [[ case ]] is now slightly larger than the previous generation , but the lack of an external power supply justifies the small increase in size ."	negative	negative	0.984070539
+external power supply 	"The case is now slightly larger than the previous generation , but the lack of an [[ external power supply ]] justifies the small increase in size ."	neutral	negative	0.993384421
+wireless mouse 	"I had to buy a [[ wireless mouse ]] to go with it , as I am old school and hate the pad , but knew that before I bought it , now it works great , need to get adjusted to the key board , as I am used to a bigger one and pounding ."	neutral	neutral	0.990325332
+pad 	"I had to buy a wireless mouse to go with it , as I am old school and hate the [[ pad ]] , but knew that before I bought it , now it works great , need to get adjusted to the key board , as I am used to a bigger one and pounding ."	negative	negative	0.995083869
+works 	"I had to buy a wireless mouse to go with it , as I am old school and hate the pad , but knew that before I bought it , now it [[ works ]] great , need to get adjusted to the key board , as I am used to a bigger one and pounding ."	positive	positive	0.996898413
+key board 	"I had to buy a wireless mouse to go with it , as I am old school and hate the pad , but knew that before I bought it , now it works great , need to get adjusted to the [[ key board ]] , as I am used to a bigger one and pounding ."	neutral	neutral	0.992129207
+cost of ownership 	"When considering a Mac , look at the total [[ cost of ownership ]] and not just the initial price tag ."	neutral	neutral	0.969364524
+price tag 	"When considering a Mac , look at the total cost of ownership and not just the initial [[ price tag ]] ."	neutral	negative	0.529081225
+features 	"Has all the other [[ features ]] I wanted including a VGA port , HDMI , ethernet and 3 USB ports ."	positive	positive	0.560902059
+VGA port 	"Has all the other features I wanted including a [[ VGA port ]] , HDMI , ethernet and 3 USB ports ."	neutral	neutral	0.995391726
+HDMI 	"Has all the other features I wanted including a VGA port , [[ HDMI ]] , ethernet and 3 USB ports ."	neutral	neutral	0.994737923
+ethernet 	"Has all the other features I wanted including a VGA port , HDMI , [[ ethernet ]] and 3 USB ports ."	neutral	neutral	0.995681167
+USB ports 	"Has all the other features I wanted including a VGA port , HDMI , ethernet and 3 [[ USB ports ]] ."	neutral	neutral	0.993552685
+rubber pads 	The only thing I dislike about this laptop are the [[ rubber pads ]] found on the bottom of the computer for grip .	negative	negative	0.996803284
+price 	It 's a decent computer for the [[ price ]] and hopefully it will last a long time .	neutral	positive	0.99703455
+heat output 	The nicest part is the low [[ heat output ]] and ultra quiet operation .	positive	positive	0.997641802
+operation 	The nicest part is the low heat output and ultra quiet [[ operation ]] .	positive	positive	0.997509003
+upgrade the ram 	I will [[ upgrade the ram ]] myself ( because with this model you can you can do it ) later on .	positive	neutral	0.9856264
+price 	The [[ price ]] is 200 dollars down .	positive	negative	0.997131705
+built - in mic 	"this Mac Mini does not have a [[ built - in mic ]] , and it would seem that its Mac OS 10.9 does not handle external microphones properly ."	neutral	negative	0.994879603
+Mac OS 10.9 	"this Mac Mini does not have a built - in mic , and it would seem that its [[ Mac OS 10.9 ]] does not handle external microphones properly ."	negative	negative	0.994667649
+external microphones 	"this Mac Mini does not have a built - in mic , and it would seem that its Mac OS 10.9 does not handle [[ external microphones ]] properly ."	neutral	negative	0.995777965
+features 	A lot of [[ features ]] and shortcuts on the MBP that I was never exposed to on a normal PC .	neutral	positive	0.99530679
+shortcuts 	A lot of features and [[ shortcuts ]] on the MBP that I was never exposed to on a normal PC .	neutral	positive	0.995710373
+IOS system 	Was n't sure if I was going to like it much less love it so I went to a local best buy and played around with the [[ IOS system ]] on a Mac Pro and it was totally unique and different .	positive	neutral	0.964287162
+resolution 	air has higher [[ resolution ]] but the fonts are small .	positive	positive	0.946120203
+fonts 	air has higher resolution but the [[ fonts ]] are small .	negative	negative	0.995418668
+working 	"[[ working ]] with Mac is so much easier , so many cool features ."	positive	positive	0.997531772
+features 	"working with Mac is so much easier , so many cool [[ features ]] ."	positive	positive	0.997546971
+brightness 	I like the [[ brightness ]] and adjustments .	positive	positive	0.997363985
+adjustments 	I like the brightness and [[ adjustments ]] .	positive	positive	0.997330546
+CD / DVD player 	I only wish this mac had a [[ CD / DVD player ]] built in .	neutral	negative	0.988148272
+backlit keys 	The only thing I miss is that my old Alienware laptop had [[ backlit keys ]] .	negative	negative	0.957149327
+ Home / End  type keys 	"The only thing I miss are the [[ "" Home / End "" type keys ]] and other things that I grew accustomed to after so long ."	neutral	negative	0.941997886
+Microsoft Word 	"So happy with this purchase , I just wish it came with [[ Microsoft Word ]] ."	neutral	negative	0.94229418
+memory 	It has enough [[ memory ]] and speed to run my business with all the flexibility that comes with a laptop .	positive	positive	0.996313632
+speed 	It has enough memory and [[ speed ]] to run my business with all the flexibility that comes with a laptop .	positive	positive	0.996216595
+flexibility 	It has enough memory and speed to run my business with all the [[ flexibility ]] that comes with a laptop .	positive	positive	0.992235005
+speed 	"The [[ speed ]] , the simplicity , the design .. it is lightyears ahead of any PC I have ever owned ."	positive	positive	0.996860385
+simplicity 	"The speed , the [[ simplicity ]] , the design .. it is lightyears ahead of any PC I have ever owned ."	positive	positive	0.996984422
+design 	"The speed , the simplicity , the [[ design ]] .. it is lightyears ahead of any PC I have ever owned ."	positive	positive	0.996565044
+battery life 	"The [[ battery life ]] is excellent , the display is excellent , and downloading apps is a breeze ."	positive	positive	0.997641325
+display 	"The battery life is excellent , the [[ display ]] is excellent , and downloading apps is a breeze ."	positive	positive	0.99760443
+downloading apps 	"The battery life is excellent , the display is excellent , and [[ downloading apps ]] is a breeze ."	positive	positive	0.99687922
+screen 	"The [[ screen ]] , the software and the smoothness of the operating system ."	positive	positive	0.995678246
+software 	"The screen , the [[ software ]] and the smoothness of the operating system ."	positive	positive	0.996075094
+operating system 	"The screen , the software and the smoothness of the [[ operating system ]] ."	positive	positive	0.996369362
+slim plastic case 	i have dropped mine a couple times with only a [[ slim plastic case ]] covering it .	neutral	negative	0.993437707
+recovery USB stick 	I also made a [[ recovery USB stick ]] .	neutral	neutral	0.976319253
+bass 	"But with this laptop , the [[ bass ]] is very weak and the sound comes out sounding tinny ."	negative	negative	0.996966183
+sound 	"But with this laptop , the bass is very weak and the [[ sound ]] comes out sounding tinny ."	negative	negative	0.997259021
+built quality 	"The [[ built quality ]] is really good , I was so Happy and excited about this Product ."	positive	positive	0.997464418
+performance 	I am loving the fast [[ performance ]] also .	positive	positive	0.997556925
+Bluetooth interface 	"Further , this Mac Mini has a sloppy [[ Bluetooth interface ]] ( courtesy of the Mac OS ) and the range is poor ."	negative	negative	0.997401118
+Mac OS 	"Further , this Mac Mini has a sloppy Bluetooth interface ( courtesy of the [[ Mac OS ]] ) and the range is poor ."	negative	negative	0.925608575
+range 	"Further , this Mac Mini has a sloppy Bluetooth interface ( courtesy of the Mac OS ) and the [[ range ]] is poor ."	negative	negative	0.997342527
+start menu 	If you start on the far right side and scroll to your left the [[ start menu ]] will automatically come up .	neutral	neutral	0.926059783
+RAM 	My only gripe would be the need to add more [[ RAM ]] .	negative	negative	0.996768355
+touch screen 	Fine if you have a [[ touch screen ]] .	neutral	neutral	0.995746911
+games 	"As far as user type - I dabble in everything from [[ games ]] ( WoW ) to Photoshop , but nothing professionally ."	neutral	neutral	0.995958269
+Photoshop 	"As far as user type - I dabble in everything from games ( WoW ) to [[ Photoshop ]] , but nothing professionally ."	neutral	neutral	0.995095491
+ WLAN  card 	"I re - seated the [[ "" WLAN "" card ]] inside and re - installed the LAN device drivers ."	neutral	neutral	0.996583402
+LAN device drivers 	"I re - seated the "" WLAN "" card inside and re - installed the [[ LAN device drivers ]] ."	neutral	neutral	0.996721208
+built 	"This by far beats any computer out on the market today [[ built ]] well , battery life AMAZING ."	positive	positive	0.997188032
+battery life 	"This by far beats any computer out on the market today built well , [[ battery life ]] AMAZING ."	positive	positive	0.996899009
+OS 	"The [[ OS ]] is easy , and offers all kinds of surprises ."	positive	positive	0.996716797
+Apple Customer Support 	I had to get [[ Apple Customer Support ]] to correct the problem .	neutral	neutral	0.568601787
+Firewire 800 	A veryimportant feature is [[ Firewire 800 ]] which in my experience works better then USB3 ( in PC enabled with USB3 ) I was not originally sold on the MAC OS I felt it was inferior in many ways To Windows 7 .	positive	positive	0.996481657
+USB3 	A veryimportant feature is Firewire 800 which in my experience works better then [[ USB3 ]] ( in PC enabled with USB3 ) I was not originally sold on the MAC OS I felt it was inferior in many ways To Windows 7 .	negative	neutral	0.367684454
+USB3 	A veryimportant feature is Firewire 800 which in my experience works better then USB3 ( in PC enabled with [[ USB3 ]] ) I was not originally sold on the MAC OS I felt it was inferior in many ways To Windows 7 .	neutral	neutral	0.978999138
+MAC OS 	A veryimportant feature is Firewire 800 which in my experience works better then USB3 ( in PC enabled with USB3 ) I was not originally sold on the [[ MAC OS ]] I felt it was inferior in many ways To Windows 7 .	negative	negative	0.994408786
+Windows 7 	A veryimportant feature is Firewire 800 which in my experience works better then USB3 ( in PC enabled with USB3 ) I was not originally sold on the MAC OS I felt it was inferior in many ways To [[ Windows 7 ]] .	positive	positive	0.97786957
+iTunes 	"I like [[ iTunes ]] , the apparent security , the Mini form factor , all the nice graphics stuff ."	positive	positive	0.997340024
+security 	"I like iTunes , the apparent [[ security ]] , the Mini form factor , all the nice graphics stuff ."	positive	positive	0.997513652
+Mini form factor 	"I like iTunes , the apparent security , the [[ Mini form factor ]] , all the nice graphics stuff ."	positive	positive	0.997514367
+graphics stuff 	"I like iTunes , the apparent security , the Mini form factor , all the nice [[ graphics stuff ]] ."	positive	positive	0.997596443
+card reader 	The first time I used the [[ card reader ]] it took half an hour and a pair of tweezers to remove the card .	negative	neutral	0.496004641
+remove the card 	The first time I used the card reader it took half an hour and a pair of tweezers to [[ remove the card ]] .	negative	negative	0.977627635
+spinning hard disk 	"After replacing the [[ spinning hard disk ]] with an ssd drive , my mac is just flying ."	neutral	neutral	0.995649755
+ssd drive 	"After replacing the spinning hard disk with an [[ ssd drive ]] , my mac is just flying ."	positive	neutral	0.996523321
+HDMI 	I know some people complained about [[ HDMI ]] issues but they released a firmware patch to address that issue .	neutral	negative	0.996470928
+firmware patch 	I know some people complained about HDMI issues but they released a [[ firmware patch ]] to address that issue .	neutral	positive	0.934165716
+specs 	With the needs of a professional photographer I generally need to keep up with the best [[ specs ]] .	neutral	positive	0.474722475
+packing 	[[ packing ]] and everything was perfect	positive	positive	0.99489814
+mother boards 	I called Toshiba where I gave them the serial number and they informed me that they were having issues with the [[ mother boards ]] .	neutral	negative	0.996385574
+Mother Board 	"I seem to be having repeat problems as the [[ Mother Board ]] in this one is diagnosed as faulty , related to the graphics card ."	negative	negative	0.99719584
+graphics card 	"I seem to be having repeat problems as the Mother Board in this one is diagnosed as faulty , related to the [[ graphics card ]] ."	negative	negative	0.997173905
+4 G of RAM 	It also comes with [[ 4 G of RAM ]] but if you 're like me you want to max that out so I immediately put 8 G of RAM in her and I 've never used a computer that performs better .	neutral	neutral	0.860282898
+8 G of RAM 	It also comes with 4 G of RAM but if you 're like me you want to max that out so I immediately put [[ 8 G of RAM ]] in her and I 've never used a computer that performs better .	neutral	neutral	0.987836778
+performs 	It also comes with 4 G of RAM but if you 're like me you want to max that out so I immediately put 8 G of RAM in her and I 've never used a computer that [[ performs ]] better .	positive	positive	0.989919424
+virtual home schooling 	This computer is also awesome for my sons [[ virtual home schooling ]] .	positive	positive	0.970779002
+Cost 	[[ Cost ]] is more as compared to other brands .	negative	negative	0.676541865
+operating system 	also ... - excellent [[ operating system ]] - size and weight for optimal mobility - excellent durability of the battery - the functions provided by the trackpad is unmatched by any other brand-	positive	positive	0.997731626
+size 	also ... - excellent operating system - [[ size ]] and weight for optimal mobility - excellent durability of the battery - the functions provided by the trackpad is unmatched by any other brand-	positive	positive	0.997567296
+weight 	also ... - excellent operating system - size and [[ weight ]] for optimal mobility - excellent durability of the battery - the functions provided by the trackpad is unmatched by any other brand-	positive	positive	0.997523963
+mobility 	also ... - excellent operating system - size and weight for optimal [[ mobility ]] - excellent durability of the battery - the functions provided by the trackpad is unmatched by any other brand-	positive	positive	0.997615933
+durability of the battery 	also ... - excellent operating system - size and weight for optimal mobility - excellent [[ durability of the battery ]] - the functions provided by the trackpad is unmatched by any other brand-	positive	positive	0.997130215
+functions provided by the trackpad 	also ... - excellent operating system - size and weight for optimal mobility - excellent durability of the battery - the [[ functions provided by the trackpad ]] is unmatched by any other brand-	positive	positive	0.996201098
+hardware 	This [[ hardware ]] seems to be better than the iMac in that it is n't $ 1400 and smaller .	positive	positive	0.994159102
+software 	I 've had it for about 2 months now and found no issues with [[ software ]] or updates .	neutral	neutral	0.756649733
+updates 	I 've had it for about 2 months now and found no issues with software or [[ updates ]] .	neutral	neutral	0.839004338
+disc drive 	the latest version does not have a [[ disc drive ]] .	neutral	negative	0.996205389
+Screen 	[[ Screen ]] - although some people might complain about low res which I think is ridiculous .	positive	positive	0.985947967
+res 	Screen - although some people might complain about low [[ res ]] which I think is ridiculous .	positive	negative	0.995177388
