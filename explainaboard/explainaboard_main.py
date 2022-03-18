@@ -81,18 +81,24 @@ def main():
         )
 
     # Read in data and check validity
-    system_datasets = [list(get_loader(task, data=x).load()) for x in system_outputs]
+    loaders = [get_loader(task, data=x) for x in system_outputs]
+    system_datasets = [list(loader.load()) for loader in loaders]
 
-    # Get user_defined_features_configs (this should be generalized later
-    loader = get_loader(task, data=system_outputs[0])
-    user_defined_features_configs = loader.load_user_defined_features_configs()
-
-    if len(system_datasets) == 2 and len(system_datasets[0]) != len(system_datasets[1]):
-        num0 = len(system_datasets[0])
-        num1 = len(system_datasets[1])
-        raise ValueError(
-            f'Data must be identical for pairwise analysis, but length of files {system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
-        )
+    # validation
+    if len(system_datasets) == 2:
+        if len(system_datasets[0]) != len(system_datasets[1]):
+            num0 = len(system_datasets[0])
+            num1 = len(system_datasets[1])
+            raise ValueError(
+                f'Data must be identical for pairwise analysis, but length of files {system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
+            )
+        if (
+            loaders[0].user_defined_features_configs
+            != loaders[1].user_defined_features_configs
+        ):
+            raise ValueError(
+                "User defined features must be the same for pairwise analysis."
+            )
 
     # Setup metadata
     metadata = {
@@ -100,7 +106,7 @@ def main():
         "sub_dataset_name": sub_dataset,
         "task_name": task,
         "reload_stat": reload_stat,
-        "user_defined_features_configs": user_defined_features_configs,
+        "user_defined_features_configs": loaders[0].user_defined_features_configs,
     }
     if metric_names is not None:
         metadata["metric_names"] = metric_names

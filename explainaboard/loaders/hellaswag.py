@@ -1,6 +1,5 @@
 from typing import Dict, Iterable, List
 from explainaboard.constants import Source, FileType
-from enum import Enum
 from .loader import register_loader
 from .loader import Loader
 from datasets import load_dataset
@@ -11,7 +10,7 @@ from explainaboard.tasks import TaskType
 class HellaswagLoader(Loader):
     """ """
 
-    def __init__(self, source: Source, file_type: Enum, data: str = None):
+    def __init__(self, source: Source, file_type: FileType, data: str = None):
 
         if source is None:
             source = Source.local_filesystem
@@ -28,12 +27,12 @@ class HellaswagLoader(Loader):
         text \t label \t predicted_label
         :return: class object
         """
+        super().load()
         dataset = load_dataset('hellaswag')['validation']
 
-        raw_data = self._load_raw_data_points()
         data: List[Dict] = []
         if self._file_type == FileType.tsv:
-            for id, dp in enumerate(raw_data):
+            for id, dp in enumerate(self._raw_data):
                 sample_id, predicted_label = dp[:2]
                 data.append(
                     {
