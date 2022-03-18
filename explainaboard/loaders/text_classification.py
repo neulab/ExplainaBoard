@@ -1,6 +1,5 @@
 from typing import Dict, Iterable, List
 from explainaboard.constants import Source, FileType
-from enum import Enum
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
@@ -16,7 +15,7 @@ class TextClassificationLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: Enum, data: str = None):
+    def __init__(self, source: Source, file_type: FileType, data: str = None):
 
         if source is None:
             source = Source.local_filesystem
@@ -33,10 +32,10 @@ class TextClassificationLoader(Loader):
         text \t label \t predicted_label
         :return: class object
         """
-        raw_data = self._load_raw_data_points()
+        super().load()
         data: List[Dict] = []
         if self._file_type == FileType.tsv:
-            for id, dp in enumerate(raw_data):
+            for id, dp in enumerate(self._raw_data):
                 text, true_label, predicted_label = dp[:3]
                 data.append(
                     {
@@ -47,7 +46,7 @@ class TextClassificationLoader(Loader):
                     }
                 )
         elif self._file_type == FileType.json:
-            for id, info in enumerate(raw_data):
+            for id, info in enumerate(self._raw_data):
                 text, true_label, predicted_label = (
                     info["text"],
                     info["true_label"],
@@ -62,7 +61,7 @@ class TextClassificationLoader(Loader):
                     }
                 )
         elif self._file_type == FileType.datalab:
-            for id, info in enumerate(raw_data):
+            for id, info in enumerate(self._raw_data):
                 text, true_label, predicted_label = (
                     info["text"],
                     info["label"],

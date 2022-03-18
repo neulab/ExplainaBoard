@@ -4,7 +4,6 @@ from .loader import register_loader
 from .loader import Loader
 from explainaboard.constants import FileType, Source
 from explainaboard.tasks import TaskType
-from enum import Enum
 
 
 @register_loader(TaskType.named_entity_recognition)
@@ -17,7 +16,7 @@ class NERLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: Enum, data: str = None):
+    def __init__(self, source: Source, file_type: FileType, data: str = None):
 
         if source is None:
             source = Source.local_filesystem
@@ -34,14 +33,14 @@ class NERLoader(Loader):
         token \t true_tag \t predicted_tag
         :return: class object
         """
-        raw_data = self._load_raw_data_points()
+        super().load()
         data: List[Dict] = []
         guid = 0
         tokens = []
         ner_true_tags = []
         ner_pred_tags = []
 
-        for id, line in enumerate(raw_data):
+        for id, line in enumerate(self._raw_data):
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
                 if tokens:
                     data.append(
