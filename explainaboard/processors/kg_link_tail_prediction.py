@@ -122,7 +122,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
         self._user_defined_feature_config = metadata.get(
-            "user_defined_features_configs", None
+            "user_defined_features_configs"
         )
         return super().process(metadata, sys_output)
 
