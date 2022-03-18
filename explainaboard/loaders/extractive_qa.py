@@ -1,6 +1,5 @@
 from typing import Dict, Iterable, List
 from explainaboard.constants import Source, FileType
-from enum import Enum
 from .loader import register_loader
 from .loader import Loader
 from explainaboard.tasks import TaskType
@@ -10,7 +9,7 @@ from explainaboard.tasks import TaskType
 class QAExtractiveLoader(Loader):
     """ """
 
-    def __init__(self, source: Source, file_type: Enum, data: str = None):
+    def __init__(self, source: Source, file_type: FileType, data: str = None):
 
         if source is None:
             source = Source.local_filesystem
@@ -27,7 +26,7 @@ class QAExtractiveLoader(Loader):
         text \t label \t predicted_label
         :return: class object
         """
-        raw_data = self._load_raw_data_points()
+        super().load()
 
         # if self._file_type == FileType.json:
         #     pred_json = raw_data
@@ -39,10 +38,9 @@ class QAExtractiveLoader(Loader):
         #     os.path.join(os.path.dirname(__file__), "../datasets/squad/testset-en.json")
         # )
 
-        raw_data = self._load_raw_data_points()  # for json files: loads the entire json
         data: List[Dict] = []
         if self._file_type == FileType.json:
-            for id, data_info in enumerate(raw_data):
+            for id, data_info in enumerate(self._raw_data):
                 data.append(
                     {
                         "id": str(id),  # should be string type
@@ -53,7 +51,7 @@ class QAExtractiveLoader(Loader):
                     }
                 )
         elif self._file_type == FileType.datalab:
-            for id, data_info in enumerate(raw_data):
+            for id, data_info in enumerate(self._raw_data):
                 data.append(
                     {
                         "id": str(id),  # should be string type
@@ -105,4 +103,3 @@ class QAExtractiveLoader(Loader):
         #                     }
         #                 )
         #                 key += 1
-        return data
