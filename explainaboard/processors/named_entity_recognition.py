@@ -3,9 +3,7 @@ from typing import Callable, Tuple
 from typing import Iterator, Dict, List
 
 from datalabs import load_dataset
-from datalabs.operations.aggregate.sequence_labeling import (
-    sequence_labeling_aggregating,
-)
+from datalabs import aggregating
 from tqdm import tqdm
 
 import explainaboard.utils.bucketing
@@ -795,7 +793,7 @@ def get_efre_dic(train_word_sequences, tag_sequences_train):
     return efre_dic_keep
 
 
-@sequence_labeling_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="sequence-labeling, named-entity-recognition, structure-prediction",

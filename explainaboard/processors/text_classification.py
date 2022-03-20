@@ -1,8 +1,4 @@
 from typing import Iterator, Any
-
-from datalabs.operations.aggregate.text_classification import (
-    text_classification_aggregating,
-)
 from tqdm import tqdm
 
 import explainaboard.utils.feature_funcs
@@ -12,6 +8,8 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.spacy_loader import get_named_entities
+
+from datalabs import aggregating
 
 
 @register_processor(TaskType.text_classification)
@@ -165,7 +163,7 @@ class TextClassificationProcessor(Processor):
     # --- End feature functions
 
 
-@text_classification_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="text-classification",
