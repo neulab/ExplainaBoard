@@ -14,6 +14,7 @@ class TaskType(str, Enum):
     aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
     kg_link_tail_prediction = "kg-link-tail-prediction"
     qa_multiple_choice = "qa-multiple-choice"
+    conditional_generation = "conditional-generation"
 
     @staticmethod
     def list():
@@ -68,6 +69,29 @@ _task_categories: List[TaskCategory] = [
             Task(
                 name=TaskType.summarization,
                 description="Summarize long documents into short texts. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_summarization.md",
+                supported=True,
+                supported_metrics=[
+                    "bleu",
+                    "bart_score_summ",
+                    "bart_score_mt",
+                    "bart_score_cnn_hypo_ref",
+                    "rouge1",
+                    "rouge2",
+                    "rougeL",
+                    "bert_score_f",
+                    "bert_score_p",
+                    "bert_score_r",
+                    "chrf",
+                    "comet",
+                    "mover_score",
+                    "prism",
+                ],
+                supported_formats=["tsv"],
+                supported_datasets=[],
+            ),
+            Task(
+                name=TaskType.conditional_generation,
+                description="Generic conditional text generation tasks, e.g., machine translation, text summarization",
                 supported=True,
                 supported_metrics=[
                     "bleu",
