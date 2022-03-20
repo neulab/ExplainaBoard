@@ -1,15 +1,6 @@
-from typing import Any
-from typing import Iterator, Dict, List
-import numpy
-from tqdm import tqdm
-
-import explainaboard.utils.feature_funcs
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
-from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import sort_dict
 from .conditional_generation import ConditionalGenerationProcessor
 
 
@@ -21,7 +12,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
     def __init__(self):
         super().__init__()
         # Inherit features from parent class and add new child-specific features
-        _features = super()._features.update(
+        _features = super()._features.update(  # noqa
             feature.Features(
                 {
                     # declaim task-specific features

@@ -147,7 +147,7 @@ class ConditionalGenerationProcessor(Processor):
                 )
 
         for _id, dict_sysout in enumerate(sys_output):
-            dict_advanced_features = None
+
             # oracle_feats = self.get_oracle(dict_sysout, statistics)
             # Get values of bucketing features
             for (
@@ -293,7 +293,7 @@ def get_statistics(samples: Iterator):
 
     vocab = {}
     vocab_pruning = {}
-    oracle_position_fre = {}
+
     for sample in tqdm(samples):
 
         text, summary = sample["text"], sample["summary"]
