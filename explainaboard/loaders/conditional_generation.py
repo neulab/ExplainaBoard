@@ -5,6 +5,7 @@ from .loader import Loader
 from explainaboard.tasks import TaskType
 
 
+@register_loader(TaskType.conditional_generation)
 @register_loader(TaskType.summarization)
 @register_loader(TaskType.machine_translation)
 class ConditionalGenerationLoader(Loader):
