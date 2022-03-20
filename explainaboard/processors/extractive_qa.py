@@ -2,7 +2,7 @@ from typing import Callable, Any
 from typing import Iterator, Dict, List
 
 from datalabs import load_dataset
-from datalabs.operations.aggregate.qa_extractive import qa_extractive_aggregating
+from datalabs import aggregating
 
 import explainaboard.utils.eval_basic_qa
 import explainaboard.utils.feature_funcs
@@ -253,7 +253,7 @@ class QAExtractiveProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
 
-@qa_extractive_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="qa-extractive",
