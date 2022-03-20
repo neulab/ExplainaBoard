@@ -1,13 +1,11 @@
-from typing import Any
-from typing import Iterator, Dict, List
-
 import numpy
-
+from tqdm import tqdm
+from typing import Iterator, Dict, List, Any
+from functools import lru_cache
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
 from datalabs.operations.featurize.summarization import get_oracle_summary
-from tqdm import tqdm
 
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
@@ -15,13 +13,15 @@ from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.py_utils import sort_dict, hash_dict
 from .conditional_generation import ConditionalGenerationProcessor
 
 # to calculate advanced features
 summary_attribute = SUMAttribute()
 
 
+@hash_dict
+@lru_cache(maxsize=10)
 def get_oracle(existing_features: dict):
     """
     oracle_info =
