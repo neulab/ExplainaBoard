@@ -3,6 +3,7 @@ from typing import Iterator, Dict, List
 
 import numpy
 from tqdm import tqdm
+
 # TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
 import explainaboard.utils.feature_funcs
@@ -12,6 +13,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import sort_dict
+
 
 @register_processor(TaskType.conditional_generation)
 class ConditionalGenerationProcessor(Processor):
@@ -78,7 +80,6 @@ class ConditionalGenerationProcessor(Processor):
         }
     )
 
-
     def __init__(self):
         super().__init__()
         self._statistics_func = get_statistics
@@ -93,7 +94,6 @@ class ConditionalGenerationProcessor(Processor):
     def _get_hypothesis_length(self, existing_features: dict):
         return len(existing_features["hypothesis"].split(" "))
 
-
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
@@ -104,8 +104,6 @@ class ConditionalGenerationProcessor(Processor):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features, statistics, lambda x: x['source']
         )
-
-
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
@@ -127,7 +125,7 @@ class ConditionalGenerationProcessor(Processor):
 
         request_id = self._get_eaas_client().async_score(
             inputs,
-            task="sum", # TODO(pengfei): this should be generalized
+            task="sum",  # TODO(pengfei): this should be generalized
             metrics=sys_info.metric_names.copy(),
             lang="en",
             cal_attributes=False,
@@ -168,7 +166,6 @@ class ConditionalGenerationProcessor(Processor):
 
         self.score_dict = self._eaas_client.wait_and_get_result(request_id)
         return list(bucket_feature_funcs.keys())
-
 
     # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
@@ -272,9 +269,6 @@ class ConditionalGenerationProcessor(Processor):
 # class SummarizationProcessor(ConditionalGenerationProcessor):
 #     _task_type = TaskType.summarization
 #     _default_metrics = ["rouge1", "rouge2", "rougeL"]
-
-
-
 
 
 # TODO(gneubig) this should be a member function
