@@ -21,7 +21,7 @@ class ConditionalGenerationLoader(Loader):
 
         if source is None:
             source = Source.local_filesystem
-        if file_type is None:
+        if file_type is None:  # default format
             file_type = FileType.tsv
 
         self._source = source
