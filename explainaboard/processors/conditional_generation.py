@@ -182,8 +182,6 @@ class ConditionalGenerationProcessor(Processor):
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
-                confidence_score_low=None,
-                confidence_score_high=None,
             )
 
             overall[metric_name] = overall_performance
@@ -255,8 +253,6 @@ class ConditionalGenerationProcessor(Processor):
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
                     value=bucket_value,
-                    confidence_score_low=None,
-                    confidence_score_high=None,
                     n_samples=len(dict_metric_to_values[metric_name]),
                     bucket_samples=bucket_cases,
                 )
