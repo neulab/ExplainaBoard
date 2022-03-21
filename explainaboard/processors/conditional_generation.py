@@ -13,6 +13,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 @register_processor(TaskType.conditional_generation)
@@ -86,13 +87,13 @@ class ConditionalGenerationProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
-        return len(existing_features["source"].split(" "))
+        return len(self._tokenizer(existing_features["source"]))
 
     def _get_reference_length(self, existing_features: dict):
-        return len(existing_features["reference"].split(" "))
+        return len(self._tokenizer(existing_features["reference"]))
 
     def _get_hypothesis_length(self, existing_features: dict):
-        return len(existing_features["hypothesis"].split(" "))
+        return len(self._tokenizer(existing_features["hypothesis"]))
 
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
@@ -271,8 +272,6 @@ class ConditionalGenerationProcessor(Processor):
 #     _default_metrics = ["rouge1", "rouge2", "rougeL"]
 
 
-# TODO(gneubig) this should be a member function
-# TODO(gneubig) we should try to git rid of this task-specific decorator
 # TODO(gneubig) should be conditional generation, not summarization
 # Aggregate training set statistics
 @aggregating(
@@ -290,6 +289,9 @@ def get_statistics(samples: Iterator):
     }]
     Output:dict:
     """
+
+    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+    tokenizer = SingleSpaceTokenizer()
 
     vocab = {}
     vocab_pruning = {}
@@ -311,7 +313,7 @@ def get_statistics(samples: Iterator):
         #     oracle_position_fre[oracle_position] += 1
 
         # Vocabulary info
-        for w in (text + summary).split(" "):
+        for w in tokenizer(text + summary):
             if w in vocab.keys():
                 vocab[w] += 1
             else:
