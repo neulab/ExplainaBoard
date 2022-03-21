@@ -31,6 +31,6 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         )
 
     def _get_attr_compression(self, existing_features: dict):
-        return len(existing_features["source"].split(" ")) / len(
-            existing_features["reference"].split(" ")
+        return len(self._tokenizer(existing_features["source"])) / len(
+            self._tokenizer(existing_features["reference"])
         )

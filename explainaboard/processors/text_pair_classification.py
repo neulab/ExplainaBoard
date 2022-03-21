@@ -131,13 +131,17 @@ class TextPairClassificationProcessor(Processor):
         )
 
     def _get_text1_length(self, existing_features: dict):
-        return len(existing_features["text1"].split(" "))
+        return len(self._tokenizer(existing_features["text1"]))
 
     def _get_text2_length(self, existing_feature: dict):
-        return len(existing_feature["text2"])
+        return len(self._tokenizer(existing_feature["text2"]))
 
     def _get_text1_divided_text2(self, existing_feature: dict):
-        return len(existing_feature["text1"]) * 1.0 / len(existing_feature["text2"])
+        return (
+            len(self._tokenizer(existing_feature["text1"]))
+            * 1.0
+            / len(self._tokenizer(existing_feature["text2"]))
+        )
 
     def _get_label(self, existing_feature: dict):
         # print(f"print_existing_feature: \t {existing_feature}")
