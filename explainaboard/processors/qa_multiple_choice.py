@@ -2,9 +2,7 @@ from typing import Callable, Any
 from typing import Iterator
 
 from datalabs import load_dataset
-from datalabs.operations.aggregate.qa_multiple_choice import (
-    qa_multiple_choice_aggregating,
-)
+from datalabs import aggregating
 
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
@@ -157,7 +155,7 @@ class QAMultipleChoiceProcessor(Processor):
         return data_point["predicted_answers"]["option_index"]
 
 
-@qa_multiple_choice_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="qa-multiple-choice",
