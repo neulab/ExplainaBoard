@@ -11,6 +11,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 @register_processor(TaskType.qa_multiple_choice)
@@ -116,24 +117,24 @@ class QAMultipleChoiceProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, existing_features: dict):
-        return len(existing_features["context"].split(" "))
+        return len(self._tokenizer(existing_features["context"]))
 
     def _get_question_length(self, existing_features: dict):
-        return len(existing_features["question"].split(" "))
+        return len(self._tokenizer(existing_features["question"]))
 
     def _get_answer_length(self, existing_features: dict):
-        return len(existing_features["answers"]["text"].split(" "))
+        return len(self._tokenizer(existing_features["answers"]["text"]))
 
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['context']
+            existing_features, statistics, lambda x: x['context'], self._tokenizer
         )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['context']
+            existing_features, statistics, lambda x: x['context'], self._tokenizer
         )
 
     # --- End feature functions
@@ -173,6 +174,10 @@ def get_statistics(samples: Iterator):
      "options"
     }]
     """
+
+    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+    tokenizer = SingleSpaceTokenizer()
+
     return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-        samples, lambda x: x['context']
+        samples, lambda x: x['context'], tokenizer
     )

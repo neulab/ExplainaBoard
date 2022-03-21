@@ -11,6 +11,8 @@ from explainaboard.utils.spacy_loader import get_named_entities
 
 from datalabs import aggregating
 
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+
 
 @register_processor(TaskType.text_classification)
 class TextClassificationProcessor(Processor):
@@ -121,7 +123,7 @@ class TextClassificationProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
-        return len(existing_features["text"].split(" "))
+        return len(self._tokenizer(existing_features["text"]))
 
     def _get_token_number(self, existing_feature: dict):
         return len(existing_feature["text"])
@@ -153,7 +155,7 @@ class TextClassificationProcessor(Processor):
     # training set dependent features
     def _get_length_fre(self, existing_features: dict, statistics: Any):
         length_fre = 0
-        length = len(existing_features["text"].split(" "))
+        length = len(self._tokenizer(existing_features["text"]))
 
         if length in statistics['length_fre'].keys():
             length_fre = statistics['length_fre'][length]
@@ -178,12 +180,16 @@ def get_statistics(samples: Iterator):
     }]
     """
 
+    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+    tokenizer = SingleSpaceTokenizer()
+
     vocab = {}
     length_fre = {}
     total_samps = 0
     for sample in tqdm(samples):
         text = sample["text"]
-        length = len(text.split(" "))
+        tokens = tokenizer(text)
+        length = len(tokens)
 
         if length in length_fre.keys():
             length_fre[length] += 1
@@ -191,7 +197,7 @@ def get_statistics(samples: Iterator):
             length_fre[length] = 1
 
         # update vocabulary
-        for w in text.split(" "):
+        for w in tokens:
             if w in vocab.keys():
                 vocab[w] += 1
             else:

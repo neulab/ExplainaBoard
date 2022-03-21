@@ -85,7 +85,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
-        return len(existing_features["text"].split(" "))
+        return len(self._tokenizer(existing_features["text"]))
 
     def _get_token_number(self, existing_feature: dict):
         return len(existing_feature["text"])
@@ -97,7 +97,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         return existing_feature["true_label"]
 
     def _get_aspect_length(self, existing_features: dict):
-        return len(existing_features["aspect"].split(" "))
+        return len(self._tokenizer(existing_features["aspect"]))
 
     def _get_aspect_index(self, existing_features: dict):
         return existing_features["text"].find(existing_features["aspect"])
