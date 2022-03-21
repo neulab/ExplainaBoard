@@ -12,6 +12,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import eprint, sort_dict
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 @register_processor(TaskType.question_answering_extractive)
@@ -271,6 +272,10 @@ def get_statistics(samples: Iterator):
      "options"
     }]
     """
+
+    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+    tokenizer = SingleSpaceTokenizer()
+
     return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-        samples, lambda x: x['context']
+        samples, lambda x: x['context'], tokenizer
     )
