@@ -136,19 +136,7 @@ class Processor:
         # Get names of bucketing features
         bucket_feature_funcs = {}
         for bucket_feature in sys_info.features.get_bucket_features():
-
-            # handles user-defined features
-            if self._user_defined_feature_config is not None and bucket_feature in self._user_defined_feature_config.keys() and (
-                statistics is not None
-                or not sys_info.features[bucket_feature].require_training_set
-            ):
-                bucket_feature_funcs[bucket_feature] = (
-                    None,  # no need to call a function for user-defined features; they are already in the data point itself
-                    sys_info.features[bucket_feature].require_training_set,
-                )
-
-            # handles all other features
-            elif bucket_feature in sys_info.features.keys() and (
+            if bucket_feature in sys_info.features.keys() and (
                 statistics is not None
                 or not sys_info.features[bucket_feature].require_training_set
             ):
@@ -165,21 +153,11 @@ class Processor:
                     training_dependent,
                 ),
             ) in bucket_feature_funcs.items():
-
-                # handles user-defined features
-                if self._user_defined_feature_config is not None and bucket_key in self._user_defined_feature_config.keys():
-                    feature_value = dict_sysout[bucket_key]
-                    dict_sysout[bucket_key] = (
-                        feature_value
-                    )
-                    
-                # all other features
-                else:
-                    dict_sysout[bucket_key] = (
-                        bucket_func(dict_sysout, statistics)
-                        if training_dependent
-                        else bucket_func(dict_sysout)
-                    )
+                dict_sysout[bucket_key] = (
+                    bucket_func(dict_sysout, statistics)
+                    if training_dependent
+                    else bucket_func(dict_sysout)
+                )
         return list(bucket_feature_funcs.keys())
 
     def _bucketing_samples(
