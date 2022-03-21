@@ -3,6 +3,7 @@ import nltk
 from nltk import word_tokenize, sent_tokenize
 from collections import namedtuple, Counter
 from nltk.util import ngrams
+from functools import lru_cache
 
 try:
     nltk.data.find('tokenizers/punkt')
@@ -47,6 +48,7 @@ class SUMAttribute:
             "attr_hypothesis_len": 0.0,
         }
 
+    @lru_cache(maxsize=10)
     def cal_attributes_each(self, text, summary):
 
         # Normalize text

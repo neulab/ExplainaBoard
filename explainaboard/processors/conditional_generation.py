@@ -2,15 +2,10 @@ from typing import Any
 from typing import Iterator, Dict, List
 
 import numpy
+from tqdm import tqdm
 
 # TODO(gneubig) we should try to remove this task-specific dependency with Datalab
 from datalabs.operations.aggregate.summarization import summarization_aggregating
-from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
-    SUMAttribute,
-)
-from datalabs.operations.featurize.summarization import get_oracle_summary
-from tqdm import tqdm
-
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
@@ -19,11 +14,12 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import sort_dict
 
-# to calculate advanced features
-summary_attribute = SUMAttribute()
 
-
+@register_processor(TaskType.conditional_generation)
 class ConditionalGenerationProcessor(Processor):
+    _task_type = TaskType.conditional_generation
+    _default_metrics = ["rouge1", "rouge2", "rougeL", "bleu"]
+
     _features = feature.Features(
         {
             "source": feature.Value("string"),
@@ -59,46 +55,6 @@ class ConditionalGenerationProcessor(Processor):
                     setting=(),
                 ),
             ),
-            "attr_compression": feature.Value(
-                dtype="float",
-                description="compression",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "attr_copy_len": feature.Value(
-                dtype="float",
-                description="copy length",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "attr_coverage": feature.Value(
-                dtype="float",
-                description="coverage",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "attr_novelty": feature.Value(
-                dtype="float",
-                description="novelty",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
             "num_oov": feature.Value(
                 dtype="float",
                 description="the number of out-of-vocabulary words",
@@ -113,37 +69,6 @@ class ConditionalGenerationProcessor(Processor):
             "fre_rank": feature.Value(
                 dtype="float",
                 description="the average rank of each work based on its frequency in training set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-                require_training_set=True,
-            ),
-            "oracle_score": feature.Value(
-                dtype="float",
-                description="the sample-level oracle score",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "oracle_position": feature.Value(
-                dtype="float",
-                description="the sample-level oracle position",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "oracle_position_fre": feature.Value(
-                dtype="float",
-                description="the frequency of oracle sentence's position in training set",
                 is_bucket=True,
                 bucket_info=feature.BucketInfo(
                     method="bucket_attribute_specified_bucket_value",
@@ -169,8 +94,6 @@ class ConditionalGenerationProcessor(Processor):
     def _get_hypothesis_length(self, existing_features: dict):
         return len(existing_features["hypothesis"].split(" "))
 
-    # --- End feature functions
-
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
@@ -182,45 +105,6 @@ class ConditionalGenerationProcessor(Processor):
             existing_features, statistics, lambda x: x['source']
         )
 
-    def get_oracle(self, existing_features: dict, statistics: Any):
-        """
-        oracle_info =
-            {
-            "source":src,
-            "reference":ref,
-            "oracle_summary":oracle,
-            "oracle_labels":labels,
-            "oracle_score":max_score
-            }
-        """
-
-        sample = {
-            "text": existing_features["source"],
-            "summary": existing_features["reference"],
-        }
-        oracle_info = get_oracle_summary.func(sample)
-
-        index_of_oracles = [
-            i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0
-        ]
-        oracle_position = numpy.mean(index_of_oracles)
-
-        oracle_position_fre = 0
-        if (
-            statistics is not None
-            and str(int(oracle_position)) in statistics['oracle_position_fre'].keys()
-        ):
-            oracle_position_fre = statistics['oracle_position_fre'][
-                str(int(oracle_position))
-            ]
-
-        return {
-            "oracle_position": oracle_position,
-            "oracle_score": oracle_info["oracle_score"],
-            "oracle_position_fre": oracle_position_fre,
-        }
-
-    # TODO(gneubig): can this be de-duplicated or is it specialized?
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
     ) -> List[str]:
@@ -241,7 +125,7 @@ class ConditionalGenerationProcessor(Processor):
 
         request_id = self._get_eaas_client().async_score(
             inputs,
-            task="sum",
+            task="sum",  # TODO(pengfei): this should be generalized
             metrics=sys_info.metric_names.copy(),
             lang="en",
             cal_attributes=False,
@@ -251,28 +135,20 @@ class ConditionalGenerationProcessor(Processor):
         # print(f"sys_info.features.get_bucket_features()\n {sys_info.features.get_bucket_features()}")
 
         # Get names of bucketing features
-        oracle_feat_names = {"oracle_position", "oracle_score", "oracle_position_fre"}
-        advanced_feat_names = set(summary_attribute.get_schema().keys())
         bucket_feature_funcs = {}
         for bucket_feature in sys_info.features.get_bucket_features():
             if bucket_feature in sys_info.features.keys() and (
                 statistics is not None
                 or not sys_info.features[bucket_feature].require_training_set
             ):
-                if (
-                    bucket_feature in oracle_feat_names
-                    or bucket_feature in advanced_feat_names
-                ):
-                    bucket_feature_funcs[bucket_feature] = (None, False)
-                else:
-                    bucket_feature_funcs[bucket_feature] = (
-                        self._get_feature_func(bucket_feature),
-                        sys_info.features[bucket_feature].require_training_set,
-                    )
+                bucket_feature_funcs[bucket_feature] = (
+                    self._get_feature_func(bucket_feature),
+                    sys_info.features[bucket_feature].require_training_set,
+                )
 
         for _id, dict_sysout in enumerate(sys_output):
-            dict_advanced_features = None
-            oracle_feats = self.get_oracle(dict_sysout, statistics)
+
+            # oracle_feats = self.get_oracle(dict_sysout, statistics)
             # Get values of bucketing features
             for (
                 bucket_key,
@@ -281,20 +157,12 @@ class ConditionalGenerationProcessor(Processor):
                     training_dependent,
                 ),
             ) in bucket_feature_funcs.items():
-
-                # TODO(gneubig): this logic seems complicated, can it be simplified?
-                if bucket_key in advanced_feat_names:
-                    if dict_advanced_features is None:
-                        dict_advanced_features = summary_attribute.cal_attributes_each(
-                            dict_sysout["source"], dict_sysout["reference"]
-                        )
-                    dict_sysout[bucket_key] = dict_advanced_features[bucket_key]
-                elif bucket_key in oracle_feat_names:
-                    dict_sysout[bucket_key] = oracle_feats[bucket_key]
-                elif training_dependent:
+                # TODO(pengfei): should check the feature value type
+                if training_dependent:
                     dict_sysout[bucket_key] = bucket_func(dict_sysout, statistics)
                 else:
                     dict_sysout[bucket_key] = bucket_func(dict_sysout)
+                    # print(dict_sysout[bucket_key])
 
         self.score_dict = self._eaas_client.wait_and_get_result(request_id)
         return list(bucket_feature_funcs.keys())
@@ -397,16 +265,10 @@ class ConditionalGenerationProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
 
-@register_processor(TaskType.summarization)
-class SummarizationProcessor(ConditionalGenerationProcessor):
-    _task_type = TaskType.summarization
-    _default_metrics = ["rouge1", "rouge2", "rougeL"]
-
-
-@register_processor(TaskType.machine_translation)
-class MachineTranslationProcessor(ConditionalGenerationProcessor):
-    _task_type = TaskType.machine_translation
-    _default_metrics = ["bleu"]
+# @register_processor(TaskType.summarization)
+# class SummarizationProcessor(ConditionalGenerationProcessor):
+#     _task_type = TaskType.summarization
+#     _default_metrics = ["rouge1", "rouge2", "rougeL"]
 
 
 # TODO(gneubig) this should be a member function
@@ -431,22 +293,22 @@ def get_statistics(samples: Iterator):
 
     vocab = {}
     vocab_pruning = {}
-    oracle_position_fre = {}
+
     for sample in tqdm(samples):
 
         text, summary = sample["text"], sample["summary"]
 
-        # oracle_position_fre
-        oracle_info = get_oracle_summary.func(sample)
-        index_of_oracles = [
-            i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0
-        ]
-        oracle_position = str(int(numpy.mean(index_of_oracles)))
-
-        if oracle_position not in oracle_position_fre.keys():
-            oracle_position_fre[oracle_position] = 1
-        else:
-            oracle_position_fre[oracle_position] += 1
+        # # oracle_position_fre
+        # oracle_info = get_oracle_summary.func(sample)
+        # index_of_oracles = [
+        #     i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0
+        # ]
+        # oracle_position = str(int(numpy.mean(index_of_oracles)))
+        #
+        # if oracle_position not in oracle_position_fre.keys():
+        #     oracle_position_fre[oracle_position] = 1
+        # else:
+        #     oracle_position_fre[oracle_position] += 1
 
         # Vocabulary info
         for w in (text + summary).split(" "):
@@ -471,5 +333,5 @@ def get_statistics(samples: Iterator):
     return {
         "vocab": vocab_pruning,
         "vocab_rank": vocab_rank,
-        "oracle_position_fre": oracle_position_fre,
+        # "oracle_position_fre": oracle_position_fre,
     }

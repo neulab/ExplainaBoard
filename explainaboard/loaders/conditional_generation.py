@@ -5,6 +5,7 @@ from .loader import Loader
 from explainaboard.tasks import TaskType
 
 
+@register_loader(TaskType.conditional_generation)
 @register_loader(TaskType.summarization)
 @register_loader(TaskType.machine_translation)
 class ConditionalGenerationLoader(Loader):
@@ -20,7 +21,7 @@ class ConditionalGenerationLoader(Loader):
 
         if source is None:
             source = Source.local_filesystem
-        if file_type is None:
+        if file_type is None:  # default format
             file_type = FileType.tsv
 
         self._source = source
