@@ -136,7 +136,7 @@ _task_categories: List[TaskCategory] = [
                 name=TaskType.named_entity_recognition,
                 description="Recognize named entities from a given text. See one example of the uploaded file: https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/conll2003.elmo",
                 supported=True,
-                supported_metrics=["f1_score_seqeval"],
+                supported_metrics=["f1_seqeval"],
                 supported_formats=["conll"],
                 supported_datasets=[],
             )

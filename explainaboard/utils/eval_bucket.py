@@ -1,4 +1,4 @@
-def f1_score_seqeval_bucket(pred_chunks, true_chunks):
+def f1_seqeval_bucket(pred_chunks, true_chunks):
 
     correct_preds = len(set(true_chunks) & set(pred_chunks))
     total_preds = len(pred_chunks)
