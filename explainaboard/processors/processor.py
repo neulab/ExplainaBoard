@@ -1,7 +1,8 @@
 import json
-from typing import Callable, List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional, Mapping, Any
 
-from datalabs import load_dataset
+from datalabs import load_dataset, aggregating, Dataset
+
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 from eaas.config import Config
 from tqdm import tqdm
@@ -36,7 +37,15 @@ class Processor:
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
+    def _get_statistics_resources(
+        self, dataset_split: Dataset
+    ) -> Optional[Mapping[str, Any]]:
+        """
+        From a DataLab dataset split, get resources necessary to calculate statistics
+        """
+        return None
+
+    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: aggregating):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -46,7 +55,6 @@ class Processor:
         """
         statistics = None
         if sys_info.dataset_name is not None:
-            dataset_name = sys_info.dataset_name
             split_name = "train"
             sub_dataset = (
                 None
@@ -55,44 +63,37 @@ class Processor:
             )
             try:
                 # read statistics from db
-                response = read_statistics_from_db(dataset_name, sub_dataset)
-                message = json.loads(response.text.replace("null", ""))["message"]
-                eprint(message)
-                if message == "success" and sys_info.reload_stat:
-                    statistics = json.loads(response.content)['content']
-                elif (
-                    message == "success"
-                    and not sys_info.reload_stat
+                message = None
+                if sys_info.reload_stat:
+                    response = read_statistics_from_db(
+                        sys_info.dataset_name, sub_dataset
+                    )
+                    message = json.loads(response.text.replace("null", ""))["message"]
+                    if message == "success":
+                        return json.loads(response.content)['content']
+                # calculate statistics if not reloading or not found
+                if (
+                    not sys_info.reload_stat
                     or message
                     == "the dataset does not include the information of _stat"
                 ):
-                    dataset = load_dataset(
-                        sys_info.dataset_name, sys_info.sub_dataset_name
+                    dataset = load_dataset(sys_info.dataset_name, sub_dataset)
+                    statistics_func.resources = self._get_statistics_resources(dataset)
+                    new_train = dataset[split_name].apply(statistics_func, mode="local")
+                    statistics = new_train._stat
+                    eprint("saving to database")
+                    response = write_statistics_to_db(
+                        sys_info.dataset_name, sub_dataset, content=statistics
                     )
-                    if (
-                        len(dataset[split_name]._stat) == 0 or not sys_info.reload_stat
-                    ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                        new_train = dataset[split_name].apply(
-                            statistics_func, mode="local"
-                        )
-
-                        statistics = new_train._stat
-                        # self.statistics = dataset['train']._stat
-                        # write statistics to db
-                        eprint("saving to database")
-                        response = write_statistics_to_db(
-                            dataset_name, sub_dataset, content=statistics
-                        )
-                        eprint(response.content)
-                else:  # dataset does not exist
-                    eprint(
-                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
-                    )
+                    eprint(response.content)
+                # dataset does not exist
+                else:
+                    raise FileNotFoundError
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be "
+                    "supported by ExplainaBoard. You can add the dataset by: "
+                    "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
         return statistics
 
