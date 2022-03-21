@@ -1,5 +1,5 @@
 import json
-from typing import Callable, List, Tuple, Dict
+from typing import Callable, List, Tuple, Dict, Optional
 
 from datalabs import load_dataset
 from explainaboard.utils.async_eaas import AsyncEaaSClient
@@ -36,7 +36,7 @@ class Processor:
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
+    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable) -> Optional[Dict]:
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -343,7 +343,7 @@ class Processor:
         for feature_name, feature_value in performances_over_bucket.items():
             print_dict(feature_value, feature_name)
 
-    def process(self, metadata: dict, sys_output: List[dict]):
+    def get_statistics(self, metadata: dict, sys_output: List[dict]) -> Tuple[SysOutputInfo, dict, List[str]]:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
@@ -356,11 +356,7 @@ class Processor:
         active_features = self._complete_features(
             sys_info, sys_output, statistics=statistics
         )
-        print("SYS_INFO", sys_info)
-        print("STATS", statistics)
-        print("FEATS", active_features)
         return sys_info, statistics, active_features
-
 
     def get_result(self, sys_info: SysOutputInfo, sys_output: List[dict], active_features: List[str]) -> Result:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
@@ -372,3 +368,7 @@ class Processor:
             overall=overall_results, fine_grained=performance_over_bucket
         )
         return sys_info
+
+    def process(self, metadata: dict, sys_output: List[dict]):
+        sys_info, _, active_features = self.get_statistics(metadata, sys_output)
+        return self.get_result(sys_info, sys_output, active_features)
