@@ -639,23 +639,7 @@ class Features(dict):
             if feature_info.is_bucket:
                 bucket_features.append(feature_name)
 
-        # print("--++----- bucket features ---++------")
-        # for feature_name in bucket_features:
-        #     print(feature_name)
-
         return bucket_features
-
-    # def get_pre_computed_features(self) -> List:
-    #     """
-    #     Get features that reply on pre-computed models
-    #     :return:
-    #     a list of features
-    #     """
-    #     pre_computed_features = []
-    #     for feature_name in self.keys():
-    #         if self[feature_name].is_pre_computed:
-    #             pre_computed_features.append(feature_name)
-    #     return pre_computed_features
 
     def get_pre_computed_features(self) -> List:
         """
