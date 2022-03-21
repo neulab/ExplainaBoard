@@ -17,6 +17,7 @@ from explainaboard.utils.py_utils import (
     print_dict,
     sort_dict,
 )
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 class Processor:
@@ -32,6 +33,7 @@ class Processor:
         self._eaas_config = None
         self._eaas_client = None
         self._statistics_func = None
+        self._tokenizer = SingleSpaceTokenizer()
 
     def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary

@@ -183,10 +183,10 @@ class KGLinkTailPredictionProcessor(Processor):
         return str(most_specific_level)
 
     def _get_tail_entity_length(self, existing_features: dict):
-        return len(existing_features["true_tail"].split(" "))
+        return len(self._tokenizer(existing_features["true_tail"]))
 
     def _get_head_entity_length(self, existing_features: dict):
-        return len(existing_features["true_head"].split(" "))
+        return len(self._tokenizer(existing_features["true_head"]))
 
     def _get_tail_fre(self, existing_features: dict):
         if (

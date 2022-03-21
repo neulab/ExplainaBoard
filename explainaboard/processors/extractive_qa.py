@@ -124,16 +124,16 @@ class QAExtractiveProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, existing_features: dict):
-        return len(existing_features["context"].split(" "))
+        return len(self._tokenizer(existing_features["context"]))
 
     def _get_question_length(self, existing_features: dict):
-        return len(existing_features["question"].split(" "))
+        return len(self._tokenizer(existing_features["question"]))
 
     def _get_answer_length(self, existing_features: dict):
         if isinstance(existing_features["answers"]["text"], list):
-            return len(existing_features["answers"]["text"][0].split(" "))
+            return len(self._tokenizer(existing_features["answers"]["text"][0]))
         else:
-            return len(existing_features["answers"]["text"].split(" "))
+            return len(self._tokenizer(existing_features["answers"]["text"]))
 
     def _get_sim_context_question(self, existing_features: dict):
 
@@ -146,12 +146,12 @@ class QAExtractiveProcessor(Processor):
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['context']
+            existing_features, statistics, lambda x: x['context'], self._tokenizer
         )
 
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['context']
+            existing_features, statistics, lambda x: x['context'], self._tokenizer
         )
 
     # --- End feature functions

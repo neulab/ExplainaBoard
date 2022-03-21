@@ -86,20 +86,20 @@ class HellaswagProcessor(Processor):
 
     # define function for incomplete features
     def _get_ctx_length(self, existing_features: dict):
-        return len(existing_features["ctx"].split(" "))
+        return len(self._tokenizer(existing_features["ctx"]))
 
     # define function for incomplete features
     def _get_ctx_a_length_divided_b(self, existing_features: dict):
         return (
-            len(existing_features["ctx_a"].split(" "))
+            len(self._tokenizer(existing_features["ctx_a"]))
             * 1.0
-            / len(existing_features["ctx_b"].split(" "))
+            / len(self._tokenizer(existing_features["ctx_b"]))
         )
 
     def _get_true_answer_length(self, existing_features: dict):
         true_label = int(existing_features["true_label"])
         true_answer = existing_features["endings"][true_label]
-        return len(true_answer.split(" "))
+        return len(self._tokenizer(true_answer))
 
     def _get_activity_label(self, existing_feature: dict):
         return str(existing_feature["activity_label"])
