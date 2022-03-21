@@ -4,9 +4,7 @@ from typing import Callable
 from typing import Dict, List
 
 from datalabs import load_dataset
-from datalabs.operations.aggregate.kg_link_prediction import (
-    kg_link_prediction_aggregating,
-)
+from datalabs import aggregating
 from tqdm import tqdm
 
 import explainaboard.metric
@@ -348,7 +346,7 @@ class KGLinkTailPredictionProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
 
-@kg_link_prediction_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="kg-link-prediction",

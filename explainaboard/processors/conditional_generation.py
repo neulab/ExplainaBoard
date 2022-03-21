@@ -4,8 +4,8 @@ from typing import Iterator, Dict, List
 import numpy
 from tqdm import tqdm
 
-# TODO(gneubig) we should try to remove this task-specific dependency with Datalab
-from datalabs.operations.aggregate.summarization import summarization_aggregating
+
+from datalabs import aggregating
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
@@ -275,7 +275,7 @@ class ConditionalGenerationProcessor(Processor):
 # TODO(gneubig) we should try to git rid of this task-specific decorator
 # TODO(gneubig) should be conditional generation, not summarization
 # Aggregate training set statistics
-@summarization_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="summarization",

@@ -1,7 +1,7 @@
 from typing import Callable, Iterator, Any
 
 from datalabs import load_dataset
-from datalabs.operations.aggregate.text_matching import text_matching_aggregating
+from datalabs import aggregating
 
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
@@ -158,7 +158,7 @@ class TextPairClassificationProcessor(Processor):
     # --- End feature functions
 
 
-@text_matching_aggregating(
+@aggregating(
     name="get_statistics",
     contributor="datalab",
     task="text-matching, natural-language-inference",
