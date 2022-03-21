@@ -343,7 +343,7 @@ class Processor:
         for feature_name, feature_value in performances_over_bucket.items():
             print_dict(feature_value, feature_name)
 
-    def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
+    def process(self, metadata: dict, sys_output: List[dict]):
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
@@ -356,6 +356,13 @@ class Processor:
         active_features = self._complete_features(
             sys_info, sys_output, statistics=statistics
         )
+        print("SYS_INFO", sys_info)
+        print("STATS", statistics)
+        print("FEATS", active_features)
+        return sys_info, statistics, active_features
+
+
+    def get_result(self, sys_info: SysOutputInfo, sys_output: List[dict], active_features: List[str]) -> Result:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features
         )
