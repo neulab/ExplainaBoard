@@ -268,7 +268,7 @@ class NERProcessor(Processor):
         return span_dics
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
     ) -> List[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
@@ -276,7 +276,7 @@ class NERProcessor(Processor):
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param statistics: Training set statistics that are used to calculate training set specific features
+        :param external_stats: Training set statistics that are used to calculate training set specific features
         :return: The features that are active (e.g. skipping training set features when no training set available)
         """
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
@@ -287,16 +287,16 @@ class NERProcessor(Processor):
             dict_sysout["sentence_length"] = len(tokens)
 
             # sentence-level training set dependent features
-            if statistics is not None:
-                dict_sysout["num_oov"] = self._get_num_oov(tokens, statistics)
-                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, statistics)
+            if external_stats is not None:
+                dict_sysout["num_oov"] = self._get_num_oov(tokens, external_stats)
+                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, external_stats)
 
             # span features for true and predicted spans
             dict_sysout["true_entity_info"] = self._complete_span_features(
-                tokens, dict_sysout["true_tags"], statistics=statistics
+                tokens, dict_sysout["true_tags"], statistics=external_stats
             )
             dict_sysout["pred_entity_info"] = self._complete_span_features(
-                tokens, dict_sysout["pred_tags"], statistics=statistics
+                tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
         # This should return a list, but this list isn't used in the overridden function so ignore for now
         return None  # noqa
@@ -305,6 +305,7 @@ class NERProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
         """
         Get the overall performance according to metrics
@@ -365,6 +366,7 @@ class NERProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         active_features: List[str],
+        scoring_stats: Any = None,
     ) -> Tuple[dict, dict]:
 
         features = sys_info.features
