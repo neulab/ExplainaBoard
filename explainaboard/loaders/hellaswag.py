@@ -1,5 +1,5 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import Source, FileType
+from explainaboard.constants import FileType
 from .loader import register_loader
 from .loader import Loader
 from datasets import load_dataset
@@ -8,18 +8,8 @@ from explainaboard.tasks import TaskType
 
 @register_loader(TaskType.hellaswag)
 class HellaswagLoader(Loader):
-    """ """
 
-    def __init__(self, source: Source, file_type: FileType, data: str = None):
-
-        if source is None:
-            source = Source.local_filesystem
-        if file_type is None:
-            file_type = FileType.tsv  # easy to make mistake
-
-        self._source = source
-        self._file_type = file_type
-        self._data = data
+    _default_file_type = FileType.tsv
 
     def load(self) -> Iterable[Dict]:
         """

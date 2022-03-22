@@ -1,5 +1,5 @@
 from typing import Dict, Iterable, List
-from explainaboard.constants import Source, FileType
+from explainaboard.constants import FileType
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
@@ -15,16 +15,7 @@ class QAMultipleChoiceLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: FileType, data: str = None):
-
-        if source is None:
-            source = Source.local_filesystem
-        if file_type is None:
-            file_type = FileType.json
-
-        self._source = source
-        self._file_type = file_type
-        self._data = data
+    _default_file_type = FileType.json
 
     def load(self) -> Iterable[Dict]:
         """
