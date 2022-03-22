@@ -419,9 +419,6 @@ class Processor:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, scoring_stats=scoring_stats
         )
-        overall_results = self.get_overall_performance(
-            sys_info, sys_output, scoring_stats=scoring_stats
-        )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket
