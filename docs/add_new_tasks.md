@@ -2,8 +2,8 @@
 
 Let's take `text_classification` as an example to show how to add a new task for ExplainaBoard.
 
-To do so, you would first need to add your task to the modules `tasks.py` and `table_schema.py`. 
-After doing so, you would also need to create a loader, builder, processor and unittest for the
+To do so, you would first need to add your task to the modules `tasks.py`. 
+After doing so, you would also need to create a `Loader`, `Processor`, and unit tests for the
 new task, placed under the relevant directories.
 
 
@@ -12,8 +12,9 @@ new task, placed under the relevant directories.
 please add your task to `TaskType` (enum) and the task list `_task_categories`. Task names can not 
 contain `space` and different words should be connected using `-`.
 
-(2) If the format of your task's dataset is not covered by `FileType` in the file:
-`explainaboard/constants.py`, please manually add the new format.
+(2) If the format of your task's dataset is not covered by `FileType` in the file
+`explainaboard/constants.py`, please manually add the new format (in the case that your
+task uses a standard format such as tsv, it is not necessary to add a new type).
 
 For example:
 ```python
@@ -26,44 +27,7 @@ _task_categories: List[TaskCategory] = [
                  [Task(TaskType.text_classification, True, ["F1score", "Accuracy"])]),
 ]
 ```
-where the parameters in `TaskCategory` refers to the task's name, description and the list of tasks
-
-
-## Table Schema Declaration
-(1) Add a new table schema for your task in **table_schema.py**. 
-Each schema is a list of dictionary, which is used to instruct how to print bucket-level cases 
-in the frontend table (the number of list denotes the number of table columns)
-Currently, the table schema is characterized by:
-* field_key:str:  this is used to retrieve data from system output file
-* sort:bool: whether this column is sortable
-* filter:bool: whether this column is filterable
-* label:str: the text to be printed of this column in the table head
-
-The blocks you add should match the table columns in the system output file,
-for example:
-```python
-table_schemas[TaskType.text_classification] = [
-    {
-        "field_key": "text",
-        "sort": False,
-        "filter": False,
-        "label": "Text"
-    },
-    {
-        "field_key": "true_label",
-        "sort": True,
-        "filter": True,
-        "label": "True Label"
-    },
-    {
-        "field_key": "predicted_label",
-        "sort": True,
-        "filter": True,
-        "label": "Prediction"
-    },
-]
-```
-
+where the parameters in `TaskCategory` refers to the task's name, description, and the list of tasks
 
 ## Create a Loader module for your task
 
@@ -71,9 +35,9 @@ table_schemas[TaskType.text_classification] = [
 
 (2) In this file, we need to:
 * create a data loader for text classification task inheriting from the class `Loader`
-* re-implement the member function `def load(self)`
+* implement the member function `def load(self)`
 
-Specifically:
+Here is the example for text classification:
   
 ```python
 from typing import Dict, Iterable, List
@@ -97,32 +61,32 @@ class TextClassificationLoader(Loader):
         text \t label \t predicted_label
         :return: class object
         """
-        raw_data = self._load_raw_data_points()
+        super().load()
         data: List[Dict] = []
         if self._file_type == FileType.tsv:
-            for id, dp in enumerate(raw_data):
+            for id, dp in enumerate(self._raw_data):
                 text, true_label, predicted_label = dp[:3]
-                data.append({"id": id,
-                             "text": text.strip(),
-                             "true_label": true_label.strip(),
-                             "predicted_label": predicted_label.strip()})
+                data.append(
+                    {
+                        "id": str(id),
+                        "text": text.strip(),
+                        "true_label": true_label.strip(),
+                        "predicted_label": predicted_label.strip(),
+                    }
+                )
         else:
             raise NotImplementedError
         return data
 ```
 
-(3) Import this module (text_classification.py) in `__init__.py`
+In general, it is a good idea to look at the loader for the most similar variety of
+task to the one you're trying to implement to get hints.
+
+(3) Import this module (`text_classification.py`) in `__init__.py`
 For example, in this file `explainaboard/loaders/__init__.py`, we have:
 ```python
 from . import text_classification
 ```
-
-
-## Create a Builder module for your task
-(1) Create a new python file, `text_classification.py` in the folder: `explainaboard/builders/`:
-Implement it
-
-
 
 ## Create a Processor module for your task
 
@@ -130,8 +94,13 @@ Implement it
 
 (2) In this file, we need to:
 * create a processor for text classification task inheriting from the class `Processor`
-* define features that you aim to use for this task
-* re-implement constructor function
+* define features that you aim to use for this task in the `_features` variable
+* [implement the features](add_new_features.md) that you want to use to perform analysis
+
+Note that for simpler tests, this is mostly all that you need to do. For more complex tasks,
+you may want to override some of the functions in the base `Processor` class implemented in
+`processors/processor.py`. `processors/text_classification.py` gives a good example of a simpler
+task, and `processors/named_entity_recognition.py` gives a good example of a more complicated task.
 
 (3) Import this module (text_classification.py) in `__init__.py`
 For example, in this file `explainaboard/processors/__init__.py`, we have: 
@@ -143,5 +112,5 @@ from . import text_classification
 
 (1) Create a new python file `test_text_classification.py` in the folder `explainaboard/tests/`
 
-(2) Implement a unittest for this task
+(2) Implement a unittest for this task referencing that of other similar tasks
 
