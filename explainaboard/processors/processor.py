@@ -36,7 +36,9 @@ class Processor:
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable) -> Optional[Dict]:
+    def _init_statistics(
+        self, sys_info: SysOutputInfo, statistics_func: Callable
+    ) -> Optional[Dict]:
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -343,7 +345,12 @@ class Processor:
         for feature_name, feature_value in performances_over_bucket.items():
             print_dict(feature_value, feature_name)
 
-    def get_statistics(self, metadata: dict, sys_output: List[dict]) -> Tuple[SysOutputInfo, dict, List[str]]:
+    def get_overall_statistics(self, metadata: dict, sys_output: List[dict]) -> dict:
+        """
+        Get the overall statistics information of the system output
+        :param metadata: The metadata of the system
+        :param sys_output: The system output itself
+        """
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
@@ -356,19 +363,36 @@ class Processor:
         active_features = self._complete_features(
             sys_info, sys_output, statistics=statistics
         )
-        return sys_info, statistics, active_features
+        overall_results = self.get_overall_performance(sys_info, sys_output)
+        return {
+            "sys_info": sys_info,
+            "statistics": statistics,
+            "active_features": active_features,
+            "overall_results": overall_results,
+        }
 
-    def get_result(self, sys_info: SysOutputInfo, sys_output: List[dict], active_features: List[str]) -> Result:
+    # TODO(chihhao) this function is just a wrapper, expose _bucketing_samples properly
+    def get_fine_grained_statistics(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        active_features: List[str],
+    ) -> Tuple[dict, dict]:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features
         )
-        overall_results = self.get_overall_performance(sys_info, sys_output)
+        return samples_over_bucket, performance_over_bucket
+
+    def process(self, metadata: dict, sys_output: List[dict]):
+        overall_statistics = self.get_overall_statistics(metadata, sys_output)
+        sys_info = overall_statistics["sys_info"]
+        active_features = overall_statistics["active_features"]
+        overall_results = overall_statistics["overall_results"]
+        samples_over_bucket, performance_over_bucket = self.get_fine_grained_statistics(
+            sys_info, sys_output, active_features
+        )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket
         )
         return sys_info
-
-    def process(self, metadata: dict, sys_output: List[dict]):
-        sys_info, _, active_features = self.get_statistics(metadata, sys_output)
-        return self.get_result(sys_info, sys_output, active_features)
