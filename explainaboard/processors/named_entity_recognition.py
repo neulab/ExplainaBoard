@@ -1,9 +1,8 @@
 import re
-from typing import Callable, Tuple
-from typing import Iterator, Dict, List
+from typing import Iterator, Dict, List, Tuple, Optional, Mapping, Any, Callable
+from collections import defaultdict
 
-from datalabs import load_dataset
-from datalabs import aggregating
+from datalabs import aggregating, Dataset
 from tqdm import tqdm
 
 import explainaboard.utils.bucketing
@@ -13,9 +12,9 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.analysis import cap_feature
-from explainaboard.utils.eval_basic_ner import get_chunks, f1_score_seqeval
-from explainaboard.utils.eval_bucket import f1_score_seqeval_bucket
-from explainaboard.utils.py_utils import eprint, sort_dict
+from explainaboard.utils import eval_basic_ner
+from explainaboard.utils.eval_bucket import f1_seqeval_bucket
+from explainaboard.utils.py_utils import sort_dict
 
 
 @register_processor(TaskType.named_entity_recognition)
@@ -54,6 +53,7 @@ class NERProcessor(Processor):
                     ]
                 )
             ),
+            # --- the following are features of the sentences ---
             "sentence_length": feature.Value(
                 dtype="float",
                 description="sentence length",
@@ -86,6 +86,7 @@ class NERProcessor(Processor):
                 ),
                 require_training_set=True,
             ),
+            # --- the following are features of each entity ---
             "true_entity_info": feature.Sequence(
                 feature.Set(
                     {
@@ -188,153 +189,86 @@ class NERProcessor(Processor):
             ),
         }
     )
-    _default_metrics = ["f1_score_seqeval"]
+    _default_metrics = ["f1_seqeval", "recall_seqeval", "precision_seqeval"]
 
     def __init__(self):
         super().__init__()
         self._statistics_func = get_statistics
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
-        """Take in information about the system outputs and a statistic calculating function and return a dictionary
-        of statistics.
-
-        :param sys_info: Information about the system outputs
-        :param statistics_func: The function used to get the statistics
-        :return: Statistics from, usually, the training set that are used to calculate other features
-        """
-
-        # TODO(gneubig): this is a bit different than others, and probably should override the parent class
-        # Calculate statistics of training set
-        eprint(sys_info.dataset_name, sys_info.sub_dataset_name)
-        statistics = None
-        if sys_info.dataset_name is not None:
-            try:
-
-                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
-                if (
-                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
-                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    tag_id2str = dataset['train']._info.task_templates[0].labels
-                    statistics_func.resources = {"tag_id2str": tag_id2str}
-                    new_train = dataset['train'].apply(statistics_func, mode="local")
-                    statistics = new_train._stat
-                else:
-                    statistics = dataset["train"]._stat
-            except FileNotFoundError:
-                eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
-                )
-        return statistics
-
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
         return len(existing_features["tokens"])
 
-    def _get_econ_value(self, span_dic: dict, span_text: str, span_tag: str):
+    def _get_stat_values(
+        self, econ_dic: dict, efre_dic: dict, span_text: str, span_tag: str
+    ):
         """
-        Since keys and values of span_dic have been lower-cased, we also need to lowercase span_tag and span_text
-
+        Get entity consistency and frequency values
         """
         span_tag = span_tag.lower()
         span_text = span_text.lower()
-
-        econ_value = 0.0
-        if span_text in span_dic.keys():
-            if span_tag in span_dic[span_text]:
-                econ_value = float(span_dic[span_text][span_tag])
-        return econ_value
-
-    def _get_efre_value(self, span_dic, span_text):
-        efre_value = 0.0
-        span_text = span_text.lower()
-        if span_text in span_dic.keys():
-            efre_value = float(span_dic[span_text])
-        return efre_value
+        econ_val = 0.0
+        if span_text in econ_dic and span_tag in econ_dic[span_text]:
+            econ_val = float(econ_dic[span_text][span_tag])
+        efre_val = efre_dic.get(span_text, 0.0)
+        return econ_val, efre_val
 
     # training set dependent features
     def _get_num_oov(self, tokens, statistics):
         num_oov = 0
-
         for w in tokens:
-            if w not in statistics['vocab'].keys():
+            if w not in statistics['vocab']:
                 num_oov += 1
-        # print(num_oov)
         return num_oov
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, tokens, statistics):
-        fre_rank = 0
-
+        vocab_stats = statistics['vocab_rank']
+        fre_rank = 0.0
         for w in tokens:
-            if w not in statistics['vocab_rank'].keys():
-                fre_rank += len(statistics['vocab_rank'])
-            else:
-                fre_rank += statistics['vocab_rank'][w]
-
-        fre_rank = 0 if len(tokens) == 0 else fre_rank * 1.0 / len(tokens)
+            fre_rank += vocab_stats.get(w, len(vocab_stats))
+        fre_rank = 0 if len(tokens) == 0 else fre_rank / len(tokens)
         return fre_rank
 
     # --- End feature functions
 
-    def _complete_feature_raw_span_features(self, sentence, tags):
-        # span_text, span_len, span_pos, span_tag
-        chunks = get_chunks(tags)
+    def _complete_span_features(self, sentence, tags, statistics=None):
+
+        # Get training set stats if they exist
+        has_stats = statistics is not None and len(statistics) > 0
+        econ_dic = statistics["econ_dic"] if has_stats else None
+        efre_dic = statistics["efre_dic"] if has_stats else None
+
         span_dics = []
-        for chunk in chunks:
-            tag, sid, eid = chunk
-            # span_text = ' '.join(sentence[sid:eid]).lower()
+        chunks = eval_basic_ner.get_chunks(tags)
+        for tag, sid, eid in chunks:
             span_text = ' '.join(sentence[sid:eid])
-            span_len = eid - sid
-            span_pos = (sid, eid)
+            # Basic features
             span_dic = {
                 'span_text': span_text,
-                'span_len': span_len,
-                'span_pos': span_pos,
+                'span_len': eid - sid,
+                'span_pos': (sid, eid),
                 'span_tag': tag,
                 'span_capitalness': cap_feature(span_text),
                 'span_position': eid * 1.0 / len(sentence),
                 'span_chars': len(span_text),
                 'span_density': len(chunks) * 1.0 / len(sentence),
             }
-            # print('span_dic: ',span_dic)
+            # Training set dependent features
+            if has_stats:
+                lower_tag = tag.lower()
+                lower_text = tag.lower()
+                span_dic['econ'] = 0
+                if span_text in econ_dic and lower_tag in econ_dic[lower_text]:
+                    span_dic['econ'] = float(econ_dic[lower_text][lower_tag])
+                span_dic['efre'] = efre_dic.get(lower_text, 0.0)
+            # Save the features
             span_dics.append(span_dic)
-        # self.span_dics = span_dics
-        return span_dics
-
-    def _complete_feature_advanced_span_features(self, sentence, tags, statistics=None):
-        span_dics = self._complete_feature_raw_span_features(sentence, tags)
-        # if not self.dict_pre_computed_models:
-        #     return span_dics
-
-        if (
-            statistics is None or len(statistics) == 0
-        ):  # there is no training set dependent features
-            return span_dics
-
-        # econ_dic = self.dict_pre_computed_models['econ']
-        # econ_dic = statistics["econ_dic"]
-        econ_dic = statistics["econ_dic"]
-        # efre_dic = self.dict_pre_computed_models['efre']
-        efre_dic = statistics["efre_dic"]
-
-        for span_dic in span_dics:
-            span_text = span_dic['span_text']
-            span_tag = span_dic['span_tag']
-
-            # compute the entity-level label consistency
-
-            if 'econ' not in span_dic:
-                span_dic['econ'] = self._get_econ_value(econ_dic, span_text, span_tag)
-            # compute the entity-level frequency
-            if 'efre' not in span_dic:
-                span_dic['efre'] = self._get_efre_value(efre_dic, span_text)
 
         return span_dics
 
-    # TODO(gneubig): can this be generalized or is it specialized?
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
     ) -> List[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
@@ -342,7 +276,7 @@ class NERProcessor(Processor):
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param statistics: Training set statistics that are used to calculate training set specific features
+        :param external_stats: Training set statistics that are used to calculate training set specific features
         :return: The features that are active (e.g. skipping training set features when no training set available)
         """
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
@@ -353,252 +287,195 @@ class NERProcessor(Processor):
             dict_sysout["sentence_length"] = len(tokens)
 
             # sentence-level training set dependent features
-            if statistics is not None:
-                dict_sysout["num_oov"] = self._get_num_oov(tokens, statistics)
-                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, statistics)
+            if external_stats is not None:
+                dict_sysout["num_oov"] = self._get_num_oov(tokens, external_stats)
+                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, external_stats)
 
-            dict_sysout[
-                "true_entity_info"
-            ] = self._complete_feature_advanced_span_features(
-                tokens, dict_sysout["true_tags"], statistics=statistics
+            # span features for true and predicted spans
+            dict_sysout["true_entity_info"] = self._complete_span_features(
+                tokens, dict_sysout["true_tags"], statistics=external_stats
             )
-            dict_sysout[
-                "pred_entity_info"
-            ] = self._complete_feature_advanced_span_features(
-                tokens, dict_sysout["pred_tags"], statistics=statistics
+            dict_sysout["pred_entity_info"] = self._complete_span_features(
+                tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
         # This should return a list, but this list isn't used in the overridden function so ignore for now
         return None  # noqa
 
-    # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
+        """
+        Get the overall performance according to metrics
+        :param sys_info: Information about the system output
+        :param sys_output: The system output itself
+        :return: a dictionary of metrics to overall performance numbers
+        """
 
-        true_tags_list = []
-        pred_tags_list = []
-
-        for _id, feature_table in enumerate(sys_output):
-
-            true_tags_list.append(feature_table["true_tags"])
-            pred_tags_list.append(feature_table["pred_tags"])
+        true_tags_list = [x['true_tags'] for x in sys_output]
+        pred_tags_list = [x['pred_tags'] for x in sys_output]
 
         overall = {}
         for metric_name in sys_info.metric_names:
-            if metric_name != 'f1_score_seqeval':
+            if not metric_name.endswith('_seqeval'):
                 raise NotImplementedError(f'Unsupported metric {metric_name}')
-            res_json = f1_score_seqeval(true_tags_list, pred_tags_list)
-
-            overall_value = res_json["f1"]
-            # overall_value = f1_score_seqeval(true_tags_list, pred_tags_list)["f1"]
-
-            # metric_name = "F1score_seqeval"
-            overall_performance = Performance(
+            # This gets the appropriate metric from the eval_basic_ner package
+            score_func = getattr(eval_basic_ner, metric_name)
+            overall[metric_name] = Performance(
                 metric_name=metric_name,
-                value=overall_value,
-                confidence_score_low=None,
-                confidence_score_high=None,
+                value=score_func(true_tags_list, pred_tags_list),
             )
-            overall[metric_name] = overall_performance
         return overall
 
-    def _bucketing_samples_add_feats(
+    def _get_span_ids(
         self,
-        sample_id,
-        bucket_features,
-        pcf_set,
-        feature_table,
-        entity_info_list,
-        feature_to_sample_address_to_value,
-    ):
+        sys_output: List[Dict],
+        output_to_spans: Callable,
+    ) -> Iterator[str]:
+        for sample_id, my_output in enumerate(sys_output):
+            for span_info in output_to_spans(my_output):
+                span_text = span_info["span_text"]
+                sid, eid = span_info["span_pos"]
+                span_label = span_info["span_tag"]
+                yield f'{sample_id}|||{sid}|||{eid}|||{span_text}|||{span_label}'
 
-        for span_info in entity_info_list:
-            span_text = span_info["span_text"]
-            span_pos = span_info["span_pos"]
-            span_label = span_info["span_tag"]
+    def _get_span_sample_features(
+        self,
+        feature_name: str,
+        sys_output: List[Dict],
+        output_to_spans: Callable,
+    ) -> Iterator[str]:
+        for sample_id, my_output in enumerate(sys_output):
+            for _ in output_to_spans(my_output):
+                yield my_output[feature_name]
 
-            span_address = f'{sample_id}|||{span_pos[0]}|||{span_pos[1]}|||{span_text}|||{span_label}'
-
-            for feature_name in bucket_features:
-                if feature_name not in feature_to_sample_address_to_value.keys():
-                    feature_to_sample_address_to_value[feature_name] = {}
-                elif feature_name in feature_table:  # first-level features
-                    feature_to_sample_address_to_value[feature_name][
-                        span_address
-                    ] = feature_table[feature_name]
-                elif feature_name in span_info:  # second-level features
-                    feature_to_sample_address_to_value[feature_name][
-                        span_address
-                    ] = span_info[feature_name]
-                elif feature_name not in pcf_set:
-                    raise ValueError(
-                        f'Missing feature {feature_name} not found and not pre-computed'
-                    )
+    def _get_span_span_features(
+        self,
+        feature_name: str,
+        sys_output: List[Dict],
+        output_to_spans: Callable,
+    ) -> Iterator[str]:
+        for sample_id, my_output in enumerate(sys_output):
+            for span_info in output_to_spans(my_output):
+                yield span_info[feature_name]
 
     def _bucketing_samples(
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         active_features: List[str],
+        scoring_stats: Any = None,
     ) -> Tuple[dict, dict]:
 
-        feature_to_sample_address_to_value_true = {}
-        feature_to_sample_address_to_value_pred = {}
+        features = sys_info.features
 
-        bucket_features = sys_info.features.get_bucket_features()
-        pcf_set = set(sys_info.features.get_pre_computed_features())
+        bucket_features = features.get_bucket_features()
+        pcf_set = set(features.get_pre_computed_features())
 
-        # Preparation for bucketing
-        for _id, feature_table in enumerate(sys_output):
-
-            self._bucketing_samples_add_feats(
-                _id,
-                bucket_features,
-                pcf_set,
-                feature_table,
-                feature_table["true_entity_info"],
-                feature_to_sample_address_to_value_true,
-            )
-            self._bucketing_samples_add_feats(
-                _id,
-                bucket_features,
-                pcf_set,
-                feature_table,
-                feature_table["pred_entity_info"],
-                feature_to_sample_address_to_value_pred,
-            )
+        span_ids_true = list(
+            self._get_span_ids(sys_output, lambda x: x["true_entity_info"])
+        )
+        span_ids_pred = list(
+            self._get_span_ids(sys_output, lambda x: x["pred_entity_info"])
+        )
 
         # Bucketing
-        samples_over_bucket = {}
+        samples_over_bucket_true = {}
         samples_over_bucket_pred = {}
         performances_over_bucket = {}
-        for feature_name in tqdm(
-            sys_info.features.get_bucket_features(), desc="bucketing"
-        ):
+        for feature_name in tqdm(bucket_features, desc="bucketing"):
 
-            _bucket_info = ""
-            if feature_name in sys_info.features.keys():
-                _bucket_info = sys_info.features[feature_name].bucket_info
-            else:
-                # print(sys_info.features)
-                _bucket_info = (
-                    sys_info.features["true_entity_info"]
-                    .feature.feature[feature_name]
-                    .bucket_info
-                )
-
-            # The following indicates that there are no examples, probably because necessary data for bucketing
-            # was not available.
-            if (
-                len(feature_to_sample_address_to_value_true[feature_name]) == 0
-                or len(feature_to_sample_address_to_value_pred[feature_name]) == 0
-            ):
+            # Choose behavior based on whether this is a feature of samples or spans
+            if feature_name in pcf_set:
                 continue
+            if feature_name in features:
+                my_feature = features[feature_name]
+                my_feature_func = self._get_span_sample_features
+            else:
+                my_feature = features["true_entity_info"].feature.feature[feature_name]
+                my_feature_func = self._get_span_span_features
+            bucket_info = my_feature.bucket_info
 
-            bucket_func = getattr(
-                explainaboard.utils.bucketing,
-                _bucket_info.method,
+            # Get buckets for true spans
+            bucket_func = getattr(explainaboard.utils.bucketing, bucket_info.method)
+            feat_vals = my_feature_func(
+                feature_name, sys_output, lambda x: x["true_entity_info"]
             )
-            samples_over_bucket[feature_name] = bucket_func(
-                dict_obj=feature_to_sample_address_to_value_true[feature_name],
-                bucket_number=_bucket_info.number,
-                bucket_setting=_bucket_info.setting,
+            feat_dict = {x: y for x, y in zip(span_ids_true, feat_vals)}
+            samples_over_bucket_true[feature_name] = bucket_func(
+                dict_obj=feat_dict,
+                bucket_number=bucket_info.number,
+                bucket_setting=bucket_info.setting,
             )
 
-            # print(f"debug-1: {samples_over_bucket_true[feature_name]}")
+            # Get buckets for predicted spans
+            feat_vals = my_feature_func(
+                feature_name, sys_output, lambda x: x["pred_entity_info"]
+            )
+            feat_dict = {x: y for x, y in zip(span_ids_pred, feat_vals)}
             samples_over_bucket_pred[
                 feature_name
             ] = explainaboard.utils.bucketing.bucket_attribute_specified_bucket_interval(
-                dict_obj=feature_to_sample_address_to_value_pred[feature_name],
-                bucket_number=_bucket_info.number,
-                bucket_setting=samples_over_bucket[feature_name].keys(),
+                dict_obj=feat_dict,
+                bucket_number=bucket_info.number,
+                bucket_setting=samples_over_bucket_true[feature_name].keys(),
             )
-
-            # print(f"samples_over_bucket.keys():\n{samples_over_bucket_true.keys()}")
 
             # evaluating bucket: get bucket performance
             performances_over_bucket[feature_name] = self.get_bucket_performance_ner(
                 sys_info,
                 sys_output,
-                samples_over_bucket[feature_name],
+                samples_over_bucket_true[feature_name],
                 samples_over_bucket_pred[feature_name],
             )
-        return samples_over_bucket, performances_over_bucket
+        return samples_over_bucket_true, performances_over_bucket
 
-    """
-    Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
-    """
-
-    def _create_sample_dict(self, samp_bucket, interval):
-        dict_pos2tag = {}
-        for k_bucket_eval, spans in samp_bucket.items():
-            if k_bucket_eval != interval:
-                continue
-            for span in spans:
-                pos = "|||".join(span.split("|||")[0:4])
-                tag = span.split("|||")[-1]
-                dict_pos2tag[pos] = tag
-        return dict_pos2tag
+    def _add_to_sample_dict(
+        self, spans: List[str], type_id: str, sample_dict: defaultdict
+    ):
+        """
+        Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
+        """
+        for span in spans:
+            split_span = span.split("|||")
+            pos = "|||".join(split_span[0:4])
+            tag = split_span[-1]
+            sample_dict[pos][type_id] = tag
 
     def get_bucket_cases_ner(
         self,
-        bucket_interval,
+        bucket_interval: str,
         sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[str]],
+        samples_over_bucket_true: Dict[str, List[str]],
         samples_over_bucket_pred: Dict[str, List[str]],
     ) -> list:
-        # predict:  2_3 -> NER
-        dict_pos2tag_pred = self._create_sample_dict(
-            samples_over_bucket_pred, bucket_interval
+        # Index samples for easy comparison
+        sample_dict = defaultdict(lambda: dict())
+        self._add_to_sample_dict(
+            samples_over_bucket_pred[bucket_interval], 'pred', sample_dict
         )
-        dict_pos2tag = self._create_sample_dict(samples_over_bucket, bucket_interval)
+        self._add_to_sample_dict(
+            samples_over_bucket_true[bucket_interval], 'true', sample_dict
+        )
 
         error_case_list = []
-        for pos, tag in dict_pos2tag.items():
-
-            true_label = tag
-            sent_id = int(pos.split("|||")[0])
-            span = pos.split("|||")[-1]
-            system_output_id = sys_output[int(sent_id)]["id"]
-
-            if pos in dict_pos2tag_pred.keys():
-                pred_label = dict_pos2tag_pred[pos]
-                if true_label == pred_label:
-                    continue
-            else:
-                pred_label = "O"
-            error_case = {
-                "span": span,
-                "text": str(system_output_id),
-                "true_label": true_label,
-                "predicted_label": pred_label,
-            }
-            error_case_list.append(error_case)
-
-        for pos, tag in dict_pos2tag_pred.items():
-
-            pred_label = tag
-
-            sent_id = int(pos.split("|||")[0])
-            span = pos.split("|||")[-1]
-            system_output_id = sys_output[int(sent_id)]["id"]
-
-            if pos in dict_pos2tag.keys():
-                true_label = dict_pos2tag[pos]
-                if true_label == pred_label:
-                    continue
-            else:
-                true_label = "O"
-            # error_case = span + "|||" + span_sentence + "|||" + true_label + "|||" + pred_label
-            error_case = {
-                "span": span,
-                "text": system_output_id,
-                "true_label": true_label,
-                "predicted_label": pred_label,
-            }
-            error_case_list.append(error_case)
+        for pos, tags in sample_dict.items():
+            true_label = tags.get('true', 'O')
+            pred_label = tags.get('pred', 'O')
+            if true_label != pred_label:
+                split_pos = pos.split("|||")
+                sent_id = int(split_pos[0])
+                span = split_pos[-1]
+                system_output_id = sys_output[int(sent_id)]["id"]
+                error_case = {
+                    "span": span,
+                    "text": str(system_output_id),
+                    "true_label": true_label,
+                    "predicted_label": pred_label,
+                }
+                error_case_list.append(error_case)
 
         return error_case_list
 
@@ -640,35 +517,46 @@ class NERProcessor(Processor):
                 """
                 # Note that: for NER task, the bucket-wise evaluation function is a little different from overall
                 #            evaluation function
-                # for overall: f1_score_seqeval
-                # for bucket:  f1_score_seqeval_bucket
+                # for overall: f1_seqeval
+                # for bucket:  f1_seqeval_bucket
                 """
-                if metric_name != 'f1_score_seqeval':
+                f1, p, r = f1_seqeval_bucket(spans_pred, spans_true)
+                if metric_name == 'f1_seqeval':
+                    my_score = f1
+                elif metric_name == 'precision_seqeval':
+                    my_score = p
+                elif metric_name == 'recall_seqeval':
+                    my_score = r
+                else:
                     raise NotImplementedError(f'Unsupported metric {metric_name}')
-                f1, p, r = f1_score_seqeval_bucket(spans_pred, spans_true)
-
-                bucket_name_to_performance[bucket_interval] = []
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
-                    value=f1,
-                    confidence_score_low=None,
-                    confidence_score_high=None,
+                    value=my_score,
                     n_samples=len(spans_pred),
                     bucket_samples=bucket_samples,
                 )
 
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
+                bucket_name_to_performance[bucket_interval] = [bucket_performance]
 
         return sort_dict(bucket_name_to_performance)
 
+    def _get_statistics_resources(
+        self, dataset_split: Dataset
+    ) -> Optional[Mapping[str, Any]]:
+        """
+        From a DataLab dataset split, get resources necessary to calculate statistics
+        """
+        return {'tag_id2str': dataset_split._info.task_templates[0].labels}
 
+
+# TODO(gneubig): below is not done with refactoring
 def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
     """
     Note: when matching, the text span and tag have been lowercased.
     """
     econ_dic = dict()
-    chunks_train = set(get_chunks(tag_sequences_train))
+    chunks_train = set(eval_basic_ner.get_chunks(tag_sequences_train))
 
     print('tags: ', tags)
     count_idx = 0
@@ -743,7 +631,7 @@ def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
 # Global functions for training set dependent features
 def get_efre_dic(train_word_sequences, tag_sequences_train):
     efre_dic = dict()
-    chunks_train = set(get_chunks(tag_sequences_train))
+    chunks_train = set(eval_basic_ner.get_chunks(tag_sequences_train))
     count_idx = 0
     word_sequences_train_str = ' '.join(train_word_sequences).lower()
     for true_chunk in tqdm(chunks_train):
