@@ -305,6 +305,7 @@ class NERProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
         """
         Get the overall performance according to metrics
@@ -365,6 +366,7 @@ class NERProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         active_features: List[str],
+        scoring_stats: Any = None,
     ) -> Tuple[dict, dict]:
 
         features = sys_info.features

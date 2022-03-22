@@ -10,6 +10,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 @register_processor(TaskType.text_pair_classification)
@@ -150,13 +151,19 @@ class TextPairClassificationProcessor(Processor):
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['text1'] + x['text2']
+            existing_features,
+            statistics,
+            lambda x: x['text1'] + x['text2'],
+            self._tokenizer,
         )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['text1'] + x['text2']
+            existing_features,
+            statistics,
+            lambda x: x['text1'] + x['text2'],
+            self._tokenizer,
         )
 
     # --- End feature functions
@@ -178,6 +185,10 @@ def get_statistics(samples: Iterator):
      "label":
     }]
     """
+
+    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+    tokenizer = SingleSpaceTokenizer()
+
     return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-        samples, lambda x: x['text1'] + x['text2']
+        samples, lambda x: x['text1'] + x['text2'], tokenizer
     )
