@@ -1,7 +1,7 @@
 import json
-from typing import List, Tuple, Dict, Optional, Mapping, Any
+from typing import List, Tuple, Dict, Any
 
-from datalabs import load_dataset, aggregating, Dataset
+from datalabs import load_dataset, aggregating
 
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 from eaas.config import Config
@@ -36,12 +36,6 @@ class Processor:
         self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
-
-    def _get_urces(self, dataset_split: Dataset) -> Optional[Mapping[str, Any]]:
-        """
-        From a DataLab dataset split, get resources necessary to calculate statistics
-        """
-        return None
 
     def _gen_external_stats(
         self, sys_info: SysOutputInfo, statistics_func: aggregating
