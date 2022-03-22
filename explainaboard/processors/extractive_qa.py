@@ -93,7 +93,7 @@ class QAExtractiveProcessor(Processor):
         self._statistics_func = get_statistics
 
     # TODO(gneubig) to be deduplicated
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
+    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 
@@ -162,6 +162,7 @@ class QAExtractiveProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
         predicted_answers, true_answers = [], []
 
@@ -190,6 +191,7 @@ class QAExtractiveProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         samples_over_bucket: Dict[str, List[int]],
+        scoring_stats: Any = None,
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
