@@ -365,7 +365,12 @@ class Processor:
         for feature_name, feature_value in performances_over_bucket.items():
             print_dict(feature_value, feature_name)
 
-    def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
+    def get_overall_statistics(self, metadata: dict, sys_output: List[dict]) -> dict:
+        """
+        Get the overall statistics information, including performance, of the system output
+        :param metadata: The metadata of the system
+        :param sys_output: The system output itself
+        """
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
@@ -379,11 +384,42 @@ class Processor:
         active_features = self._complete_features(
             sys_info, sys_output, external_stats=external_stats
         )
-        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features, scoring_stats=scoring_stats
-        )
         overall_results = self.get_overall_performance(
             sys_info, sys_output, scoring_stats=scoring_stats
+        )
+        return {
+            "sys_info": sys_info,
+            "scoring_stats": scoring_stats,
+            "active_features": active_features,
+            "overall_results": overall_results,
+        }
+
+    def get_fine_grained_statistics(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: List[dict],
+        active_features: List[str],
+        scoring_stats=None,
+    ) -> Tuple[dict, dict]:
+        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
+            sys_info, sys_output, active_features, scoring_stats
+        )
+        """
+        A wrapper function to expose _bucketing_samples for the web interface
+        """
+        return {
+            "samples_over_bucket": samples_over_bucket,
+            "performance_over_bucket": performance_over_bucket,
+        }
+
+    def process(self, metadata: dict, sys_output: List[dict]):
+        overall_statistics = self.get_overall_statistics(metadata, sys_output)
+        sys_info = overall_statistics["sys_info"]
+        scoring_stats = overall_statistics["scoring_stats"]
+        active_features = overall_statistics["active_features"]
+        overall_results = overall_statistics["overall_results"]
+        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
+            sys_info, sys_output, active_features, scoring_stats=scoring_stats
         )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
