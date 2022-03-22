@@ -384,7 +384,9 @@ class Processor:
         active_features = self._complete_features(
             sys_info, sys_output, external_stats=external_stats
         )
-        overall_results = self.get_overall_performance(sys_info, sys_output)
+        overall_results = self.get_overall_performance(
+            sys_info, sys_output, scoring_stats=scoring_stats
+        )
         return {
             "sys_info": sys_info,
             "scoring_stats": scoring_stats,
