@@ -107,7 +107,7 @@ class ConditionalGenerationProcessor(Processor):
         )
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
     ) -> List[str]:
         """
         This function is used to calculate features used for bucketing, such as sentence_length
@@ -139,7 +139,7 @@ class ConditionalGenerationProcessor(Processor):
         bucket_feature_funcs = {}
         for bucket_feature in sys_info.features.get_bucket_features():
             if bucket_feature in sys_info.features.keys() and (
-                statistics is not None
+                external_stats is not None
                 or not sys_info.features[bucket_feature].require_training_set
             ):
                 bucket_feature_funcs[bucket_feature] = (
@@ -160,7 +160,7 @@ class ConditionalGenerationProcessor(Processor):
             ) in bucket_feature_funcs.items():
                 # TODO(pengfei): should check the feature value type
                 if training_dependent:
-                    dict_sysout[bucket_key] = bucket_func(dict_sysout, statistics)
+                    dict_sysout[bucket_key] = bucket_func(dict_sysout, external_stats)
                 else:
                     dict_sysout[bucket_key] = bucket_func(dict_sysout)
                     # print(dict_sysout[bucket_key])

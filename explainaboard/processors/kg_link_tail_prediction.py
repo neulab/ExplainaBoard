@@ -156,7 +156,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
         return super().process(metadata, sys_output)
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
+    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
 
         # TODO(gneubig): this will be reloaded for every dataset, maybe should be fixed for multiple analysis
         if sys_info.dataset_name != "fb15k_237":  # to be generalized
