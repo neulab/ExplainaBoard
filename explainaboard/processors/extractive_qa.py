@@ -93,7 +93,7 @@ class QAExtractiveProcessor(Processor):
         self._statistics_func = get_statistics
 
     # TODO(gneubig) to be deduplicated
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
+    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 

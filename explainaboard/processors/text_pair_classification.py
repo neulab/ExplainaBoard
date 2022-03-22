@@ -97,7 +97,7 @@ class TextPairClassificationProcessor(Processor):
         super().__init__()
         self._statistics_func = get_statistics
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: Callable):
+    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
         of statistics.
 

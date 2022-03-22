@@ -45,9 +45,11 @@ class Processor:
         """
         return None
 
-    def _init_statistics(self, sys_info: SysOutputInfo, statistics_func: aggregating):
-        """Take in information about the system outputs and a statistic calculating function and return a dictionary
-        of statistics.
+    def _gen_external_stats(
+        self, sys_info: SysOutputInfo, statistics_func: aggregating
+    ):
+        """Generate external statistics that are gathered from a relatively costly source, such as the training
+        set. These are gathered once and then cached for future use.
 
         :param sys_info: Information about the system outputs
         :param statistics_func: The function used to get the statistics
@@ -126,7 +128,7 @@ class Processor:
         return data_point["predicted_label"]
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
     ) -> List[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
@@ -134,7 +136,7 @@ class Processor:
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param statistics: Training set statistics that are used to calculate training set specific features
+        :param external_stats: Extenral statistics that are used to calculate training set specific features
         :return: The features that are active (e.g. skipping training set features when no training set available)
         """
         # Get names of bucketing features
@@ -146,7 +148,7 @@ class Processor:
                 self._user_defined_feature_config is not None
                 and bucket_feature in self._user_defined_feature_config.keys()
                 and (
-                    statistics is not None
+                    external_stats is not None
                     or not sys_info.features[bucket_feature].require_training_set
                 )
             ):
@@ -157,7 +159,7 @@ class Processor:
 
             # handles all other features
             elif bucket_feature in sys_info.features.keys() and (
-                statistics is not None
+                external_stats is not None
                 or not sys_info.features[bucket_feature].require_training_set
             ):
                 bucket_feature_funcs[bucket_feature] = (
@@ -185,7 +187,7 @@ class Processor:
                 # handles all other features
                 else:
                     dict_sysout[bucket_key] = (
-                        bucket_func(dict_sysout, statistics)
+                        bucket_func(dict_sysout, external_stats)
                         if training_dependent
                         else bucket_func(dict_sysout)
                     )
@@ -353,9 +355,9 @@ class Processor:
             metadata["metric_names"] = self._default_metrics
         sys_info = SysOutputInfo.from_dict(metadata)
         sys_info.features = self._features
-        statistics = self._init_statistics(sys_info, self._statistics_func)
+        external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
-            sys_info, sys_output, statistics=statistics
+            sys_info, sys_output, external_stats=external_stats
         )
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features
