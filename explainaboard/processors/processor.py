@@ -347,7 +347,7 @@ class Processor:
 
     def get_overall_statistics(self, metadata: dict, sys_output: List[dict]) -> dict:
         """
-        Get the overall statistics information of the system output
+        Get the overall statistics information, including performance, of the system output
         :param metadata: The metadata of the system
         :param sys_output: The system output itself
         """
@@ -371,7 +371,6 @@ class Processor:
             "overall_results": overall_results,
         }
 
-    # TODO(chihhao) this function is just a wrapper, expose _bucketing_samples properly
     def get_fine_grained_statistics(
         self,
         sys_info: SysOutputInfo,
@@ -381,14 +380,20 @@ class Processor:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features
         )
-        return samples_over_bucket, performance_over_bucket
+        """
+        A wrapper function to expose _bucketing_samples for the web interface
+        """
+        return {
+            "samples_over_bucket": samples_over_bucket,
+            "performance_over_bucket": performance_over_bucket,
+        }
 
     def process(self, metadata: dict, sys_output: List[dict]):
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = overall_statistics["sys_info"]
         active_features = overall_statistics["active_features"]
         overall_results = overall_statistics["overall_results"]
-        samples_over_bucket, performance_over_bucket = self.get_fine_grained_statistics(
+        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features
         )
         self._print_bucket_info(performance_over_bucket)
