@@ -12,9 +12,9 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         path_data = artifacts_path + "test-kg-link-tail-prediction.json"
         loader = get_loader(
             TaskType.kg_link_tail_prediction,
+            path_data,
             Source.local_filesystem,
             FileType.json,
-            path_data,
         )
         data = loader.load()
         self.assertEqual(loader.user_defined_features_configs, {})
@@ -36,9 +36,9 @@ class TestKgLinkTailPrediction(unittest.TestCase):
     def test_with_user_defined_features(self):
         loader = get_loader(
             TaskType.kg_link_tail_prediction,
+            artifacts_path + "test-kg-link-tail-prediction-user-defined-features.json",
             Source.local_filesystem,
             FileType.json,
-            artifacts_path + "test-kg-link-tail-prediction-user-defined-features.json",
         )
         data = loader.load()
         self.assertEqual(len(loader.user_defined_features_configs), 2)

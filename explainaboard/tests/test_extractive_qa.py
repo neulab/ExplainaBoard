@@ -13,9 +13,9 @@ class TestExtractiveQA(unittest.TestCase):
         path_data = artifacts_path + "test-qa-squad.json"
         loader = get_loader(
             TaskType.question_answering_extractive,
+            path_data,
             Source.local_filesystem,
             FileType.json,
-            path_data,
         )
         data = loader.load()
 

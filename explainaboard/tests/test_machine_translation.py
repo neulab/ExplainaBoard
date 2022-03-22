@@ -13,9 +13,9 @@ class TestMachineTranslation(unittest.TestCase):
         path_data = artifacts_path + "test-mt.tsv"
         loader = get_loader(
             TaskType.machine_translation,
+            path_data,
             Source.local_filesystem,
             FileType.tsv,
-            path_data,
         )
         data = loader.load()
 

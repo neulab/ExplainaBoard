@@ -28,9 +28,9 @@ def explainaboard(samples: Iterator, dataset_info=None):
 
     loader = get_loader(
         dataset_info.task_templates[0].task_category,
+        samples,
         Source.in_memory,
         FileType.datalab,
-        samples,
     )
 
     data = loader.load()

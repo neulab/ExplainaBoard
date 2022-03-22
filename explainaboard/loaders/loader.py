@@ -12,9 +12,21 @@ JSON = t.Union[str, int, float, bool, None, t.Mapping[str, 'JSON'], t.List['JSON
 class Loader:
     """base class of loader"""
 
-    def __init__(self, source: Source, file_type: FileType, data: str):
-        self._source = source
-        self._file_type = file_type
+    _default_source = Source.local_filesystem
+    _default_file_type: Optional[FileType] = None
+
+    def __init__(
+        self,
+        data: str,
+        source: Optional[Source] = None,
+        file_type: Optional[FileType] = None,
+    ):
+        if not source and not self._default_source:
+            raise Exception("no source is provided for the loader")
+        if not file_type and not self._file_type:
+            raise Exception("no file_type is provided for the loader")
+        self._source = source or self._default_source
+        self._file_type = file_type or self._default_file_type
         self._data = data  # base64 or filepath
         self._raw_data: Optional[Iterable] = None  # loaded data
 
@@ -88,10 +100,13 @@ _loader_registry: Dict = {}
 
 
 def get_loader(
-    task: TaskType, source: Source = None, file_type: FileType = None, data: str = None
+    task: TaskType,
+    data: str,
+    source: Optional[Source] = None,
+    file_type: Optional[FileType] = None,
 ) -> Loader:
 
-    return _loader_registry[task](source, file_type, data)
+    return _loader_registry[task](data, source, file_type)
 
 
 def register_loader(task_type: TaskType):
