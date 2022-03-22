@@ -1,7 +1,8 @@
 import json
-from typing import Callable, List, Tuple, Dict, Optional
+from typing import List, Tuple, Dict, Any, Mapping, Optional
 
-from datalabs import load_dataset
+from datalabs import load_dataset, aggregating, Dataset
+
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 from eaas.config import Config
 from tqdm import tqdm
@@ -36,11 +37,19 @@ class Processor:
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
 
-    def _init_statistics(
-        self, sys_info: SysOutputInfo, statistics_func: Callable
-    ) -> Optional[Dict]:
-        """Take in information about the system outputs and a statistic calculating function and return a dictionary
-        of statistics.
+    def _get_statistics_resources(
+        self, dataset_split: Dataset
+    ) -> Optional[Mapping[str, Any]]:
+        """
+        From a DataLab dataset split, get resources necessary to calculate statistics
+        """
+        return None
+
+    def _gen_external_stats(
+        self, sys_info: SysOutputInfo, statistics_func: aggregating
+    ):
+        """Generate external statistics that are gathered from a relatively costly source, such as the training
+        set. These are gathered once and then cached for future use.
 
         :param sys_info: Information about the system outputs
         :param statistics_func: The function used to get the statistics
@@ -48,7 +57,6 @@ class Processor:
         """
         statistics = None
         if sys_info.dataset_name is not None:
-            dataset_name = sys_info.dataset_name
             split_name = "train"
             sub_dataset = (
                 None
@@ -57,46 +65,50 @@ class Processor:
             )
             try:
                 # read statistics from db
-                response = read_statistics_from_db(dataset_name, sub_dataset)
-                message = json.loads(response.text.replace("null", ""))["message"]
-                eprint(message)
-                if message == "success" and sys_info.reload_stat:
-                    statistics = json.loads(response.content)['content']
-                elif (
-                    message == "success"
-                    and not sys_info.reload_stat
+                message = None
+                if sys_info.reload_stat:
+                    response = read_statistics_from_db(
+                        sys_info.dataset_name, sub_dataset
+                    )
+                    message = json.loads(response.text.replace("null", ""))["message"]
+                    if message == "success":
+                        return json.loads(response.content)['content']
+                # calculate statistics if not reloading or not found
+                if (
+                    not sys_info.reload_stat
                     or message
                     == "the dataset does not include the information of _stat"
                 ):
-                    dataset = load_dataset(
-                        sys_info.dataset_name, sys_info.sub_dataset_name
+                    dataset = load_dataset(sys_info.dataset_name, sub_dataset)
+                    statistics_func.resources = self._get_statistics_resources(dataset)
+                    new_train = dataset[split_name].apply(statistics_func, mode="local")
+                    statistics = new_train._stat
+                    eprint("saving to database")
+                    response = write_statistics_to_db(
+                        sys_info.dataset_name, sub_dataset, content=statistics
                     )
-                    if (
-                        len(dataset[split_name]._stat) == 0 or not sys_info.reload_stat
-                    ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                        new_train = dataset[split_name].apply(
-                            statistics_func, mode="local"
-                        )
-
-                        statistics = new_train._stat
-                        # self.statistics = dataset['train']._stat
-                        # write statistics to db
-                        eprint("saving to database")
-                        response = write_statistics_to_db(
-                            dataset_name, sub_dataset, content=statistics
-                        )
-                        eprint(response.content)
-                else:  # dataset does not exist
-                    eprint(
-                        "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                        "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
-                    )
+                    eprint(response.content)
+                # dataset does not exist
+                else:
+                    raise FileNotFoundError
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                    "The dataset hasn't been supported by DataLab so no training set dependent features will be "
+                    "supported by ExplainaBoard. You can add the dataset by: "
+                    "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
         return statistics
+
+    def _gen_scoring_stats(
+        self, sys_info: SysOutputInfo, sys_output: List[dict]
+    ) -> Any:
+        """Generate sufficient statistics for scoring.
+
+        :param sys_info: Information about the system outputs
+        :param sys_output: The system output itself
+        :return: Statistics sufficient for scoring
+        """
+        return None
 
     def _get_feature_func(self, func_name: str):
         return getattr(self, f'_get_{func_name}')
@@ -127,7 +139,7 @@ class Processor:
         return data_point["predicted_label"]
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], statistics=None
+        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
     ) -> List[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
@@ -135,7 +147,7 @@ class Processor:
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param statistics: Training set statistics that are used to calculate training set specific features
+        :param external_stats: Extenral statistics that are used to calculate training set specific features
         :return: The features that are active (e.g. skipping training set features when no training set available)
         """
         # Get names of bucketing features
@@ -147,7 +159,7 @@ class Processor:
                 self._user_defined_feature_config is not None
                 and bucket_feature in self._user_defined_feature_config.keys()
                 and (
-                    statistics is not None
+                    external_stats is not None
                     or not sys_info.features[bucket_feature].require_training_set
                 )
             ):
@@ -158,7 +170,7 @@ class Processor:
 
             # handles all other features
             elif bucket_feature in sys_info.features.keys() and (
-                statistics is not None
+                external_stats is not None
                 or not sys_info.features[bucket_feature].require_training_set
             ):
                 bucket_feature_funcs[bucket_feature] = (
@@ -186,7 +198,7 @@ class Processor:
                 # handles all other features
                 else:
                     dict_sysout[bucket_key] = (
-                        bucket_func(dict_sysout, statistics)
+                        bucket_func(dict_sysout, external_stats)
                         if training_dependent
                         else bucket_func(dict_sysout)
                     )
@@ -197,6 +209,7 @@ class Processor:
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         active_features: List[str],
+        scoring_stats=None,
     ) -> Tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
@@ -232,7 +245,10 @@ class Processor:
 
             # evaluating bucket: get bucket performance
             performances_over_bucket[feature_name] = self.get_bucket_performance(
-                sys_info, sys_output, samples_over_bucket[feature_name]
+                sys_info,
+                sys_output,
+                samples_over_bucket[feature_name],
+                scoring_stats=scoring_stats,
             )
 
         return samples_over_bucket, performances_over_bucket
@@ -242,12 +258,14 @@ class Processor:
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         samples_over_bucket: Dict[str, List[int]],
+        scoring_stats: Any = None,
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
         :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
+        :param scoring_stats: any statistics useful to performing scoring
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
@@ -302,11 +320,13 @@ class Processor:
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
+        :param scoring_stats: any statistics useful to performing scoring
         :return: a dictionary of metrics to overall performance numbers
         """
         predicted_labels, true_labels = [], []
@@ -359,14 +379,15 @@ class Processor:
             metadata["metric_names"] = self._default_metrics
         sys_info = SysOutputInfo.from_dict(metadata)
         sys_info.features = self._features
-        statistics = self._init_statistics(sys_info, self._statistics_func)
+        scoring_stats = self._gen_scoring_stats(sys_info, sys_output)
+        external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
-            sys_info, sys_output, statistics=statistics
+            sys_info, sys_output, external_stats=external_stats
         )
         overall_results = self.get_overall_performance(sys_info, sys_output)
         return {
             "sys_info": sys_info,
-            "statistics": statistics,
+            "scoring_stats": scoring_stats,
             "active_features": active_features,
             "overall_results": overall_results,
         }
@@ -376,9 +397,10 @@ class Processor:
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         active_features: List[str],
+        scoring_stats=None,
     ) -> Tuple[dict, dict]:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features
+            sys_info, sys_output, active_features, scoring_stats
         )
         """
         A wrapper function to expose _bucketing_samples for the web interface
@@ -391,10 +413,14 @@ class Processor:
     def process(self, metadata: dict, sys_output: List[dict]):
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = overall_statistics["sys_info"]
+        scoring_stats = overall_statistics["scoring_stats"]
         active_features = overall_statistics["active_features"]
         overall_results = overall_statistics["overall_results"]
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features
+            sys_info, sys_output, active_features, scoring_stats=scoring_stats
+        )
+        overall_results = self.get_overall_performance(
+            sys_info, sys_output, scoring_stats=scoring_stats
         )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(

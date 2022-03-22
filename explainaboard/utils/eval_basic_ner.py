@@ -10,7 +10,19 @@ Sequence Labeling
 '''
 
 
-def f1_score_seqeval(labels, predictions, language=None):
+def f1_seqeval(labels, predictions, language=None):
+    return f1_score(labels, predictions) * 100.0
+
+
+def precision_seqeval(labels, predictions, language=None):
+    return precision_score(labels, predictions) * 100.0
+
+
+def recall_seqeval(labels, predictions, language=None):
+    return recall_score(labels, predictions) * 100.0
+
+
+def all_scores_seqeval(labels, predictions, language=None):
     f1 = f1_score(labels, predictions)
     precision = precision_score(labels, predictions)
     recall = recall_score(labels, predictions)
