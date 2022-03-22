@@ -1,7 +1,6 @@
 import json
 import os
-from typing import Callable
-from typing import Dict, List
+from typing import Callable, Dict, List, Any
 
 from datalabs import load_dataset
 from datalabs import aggregating
@@ -260,6 +259,7 @@ class KGLinkTailPredictionProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
         predicted_labels, true_labels = [], []
 
@@ -293,6 +293,7 @@ class KGLinkTailPredictionProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         samples_over_bucket: Dict[str, List[int]],
+        scoring_stats: Any = None,
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)

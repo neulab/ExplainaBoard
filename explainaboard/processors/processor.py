@@ -37,9 +37,7 @@ class Processor:
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
 
-    def _get_statistics_resources(
-        self, dataset_split: Dataset
-    ) -> Optional[Mapping[str, Any]]:
+    def _get_urces(self, dataset_split: Dataset) -> Optional[Mapping[str, Any]]:
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
@@ -80,7 +78,7 @@ class Processor:
                     == "the dataset does not include the information of _stat"
                 ):
                     dataset = load_dataset(sys_info.dataset_name, sub_dataset)
-                    statistics_func.resources = self._get_statistics_resources(dataset)
+                    statistics_func.resources = self._get_urces(dataset)
                     new_train = dataset[split_name].apply(statistics_func, mode="local")
                     statistics = new_train._stat
                     eprint("saving to database")
@@ -98,6 +96,17 @@ class Processor:
                     "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
         return statistics
+
+    def _gen_scoring_stats(
+        self, sys_info: SysOutputInfo, sys_output: List[dict]
+    ) -> Any:
+        """Generate sufficient statistics for scoring.
+
+        :param sys_info: Information about the system outputs
+        :param sys_output: The system output itself
+        :return: Statistics sufficient for scoring
+        """
+        return None
 
     def _get_feature_func(self, func_name: str):
         return getattr(self, f'_get_{func_name}')
@@ -198,6 +207,7 @@ class Processor:
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         active_features: List[str],
+        scoring_stats=None,
     ) -> Tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
@@ -233,7 +243,10 @@ class Processor:
 
             # evaluating bucket: get bucket performance
             performances_over_bucket[feature_name] = self.get_bucket_performance(
-                sys_info, sys_output, samples_over_bucket[feature_name]
+                sys_info,
+                sys_output,
+                samples_over_bucket[feature_name],
+                scoring_stats=scoring_stats,
             )
 
         return samples_over_bucket, performances_over_bucket
@@ -243,12 +256,14 @@ class Processor:
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         samples_over_bucket: Dict[str, List[int]],
+        scoring_stats: Any = None,
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
         :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
+        :param scoring_stats: any statistics useful to performing scoring
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
@@ -303,11 +318,13 @@ class Processor:
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
+        :param scoring_stats: any statistics useful to performing scoring
         :return: a dictionary of metrics to overall performance numbers
         """
         predicted_labels, true_labels = [], []
@@ -355,14 +372,17 @@ class Processor:
             metadata["metric_names"] = self._default_metrics
         sys_info = SysOutputInfo.from_dict(metadata)
         sys_info.features = self._features
+        scoring_stats = self._gen_scoring_stats(sys_info, sys_output)
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
             sys_info, sys_output, external_stats=external_stats
         )
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features
+            sys_info, sys_output, active_features, scoring_stats=scoring_stats
         )
-        overall_results = self.get_overall_performance(sys_info, sys_output)
+        overall_results = self.get_overall_performance(
+            sys_info, sys_output, scoring_stats=scoring_stats
+        )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket

@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 
 import explainaboard.metric
 from explainaboard import feature
@@ -115,6 +115,7 @@ class HellaswagProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         samples_over_bucket: Dict[str, List[int]],
+        scoring_stats: Any = None,
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)

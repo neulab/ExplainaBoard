@@ -106,12 +106,14 @@ class ConditionalGenerationProcessor(Processor):
             existing_features, statistics, lambda x: x['source']
         )
 
-    def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> List[str]:
-        """
-        This function is used to calculate features used for bucketing, such as sentence_length
-        :return:
+    def _gen_scoring_stats(
+        self, sys_info: SysOutputInfo, sys_output: List[dict]
+    ) -> Any:
+        """Generate sufficient statistics for scoring.
+
+        :param sys_info: Information about the system outputs
+        :param sys_output: The system output itself
+        :return: Statistics sufficient for scoring
         """
         inputs = []
         for _id, feature_table in enumerate(sys_output):
@@ -131,6 +133,30 @@ class ConditionalGenerationProcessor(Processor):
             lang="en",
             cal_attributes=False,
         )
+
+        # Note that this returns an asynchronous request ID so the EaaS call can continue while other
+        # faeturizing, etc. is going on
+        return {'request_id': request_id}
+
+    def _fetch_scoring_stats(self, scoring_stats: Any):
+        """
+        A utility function used to lazily fetch the actual scoring dict when it's necessary.
+        """
+        if 'request_id' in scoring_stats:
+            eaas_stats = self._eaas_client.wait_and_get_result(
+                scoring_stats['request_id']
+            )
+            scoring_stats.clear()
+            for k, v in eaas_stats.items():
+                scoring_stats[k] = v
+
+    def _complete_features(
+        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
+    ) -> List[str]:
+        """
+        This function is used to calculate features used for bucketing, such as sentence_length
+        :return:
+        """
 
         # Get names of bucketing features
         # print(f"sys_info.features.get_bucket_features()\n {sys_info.features.get_bucket_features()}")
@@ -165,20 +191,22 @@ class ConditionalGenerationProcessor(Processor):
                     dict_sysout[bucket_key] = bucket_func(dict_sysout)
                     # print(dict_sysout[bucket_key])
 
-        self.score_dict = self._eaas_client.wait_and_get_result(request_id)
         return list(bucket_feature_funcs.keys())
 
-    # TODO(gneubig): should this be generalized or is it task specific?
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
+        scoring_stats: Any = None,
     ) -> Dict[str, Performance]:
+
+        # Fetch asynchronously calculated stats
+        self._fetch_scoring_stats(scoring_stats)
 
         overall = {}
         for metric_name in sys_info.metric_names:
 
-            overall_value = self.score_dict["corpus_level"]["corpus_" + metric_name]
+            overall_value = scoring_stats["corpus_level"]["corpus_" + metric_name]
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
@@ -187,12 +215,12 @@ class ConditionalGenerationProcessor(Processor):
             overall[metric_name] = overall_performance
         return overall
 
-    # TODO(gneubig): this should be generalized
     def get_bucket_performance(
         self,
         sys_info: SysOutputInfo,
         sys_output: List[dict],
         samples_over_bucket: Dict[str, List[int]],
+        scoring_stats: Any = None,
     ) -> Dict[str, List[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
@@ -201,6 +229,9 @@ class ConditionalGenerationProcessor(Processor):
         :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
+
+        # Fetch asynchronously calculated stats
+        self._fetch_scoring_stats(scoring_stats)
 
         bucket_name_to_performance = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
@@ -221,15 +252,12 @@ class ConditionalGenerationProcessor(Processor):
                 )
 
                 if sys_info.is_print_case:
-                    # #bucket_case =  reference + "|||" + hypothesis
-                    # bucket_case = {"source": (sample_id, ["source"]),
-                    #                "references": (sample_id, ["references"]),
-                    #                "hypothesis": (sample_id, ["hypothesis"])}
                     bucket_case = str(sample_id)
                     bucket_cases.append(bucket_case)
 
+                # TODO(gneubig): This needs to be fixed because many metrics are not linearly decomposable
                 for metric_name in sys_info.metric_names:
-                    metric_value = self.score_dict["sample_level"][int(sample_id)][
+                    metric_value = scoring_stats["sample_level"][int(sample_id)][
                         metric_name
                     ]  # This would be modified later
                     if metric_name not in dict_metric_to_values.keys():
