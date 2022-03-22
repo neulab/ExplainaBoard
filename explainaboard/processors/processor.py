@@ -1,7 +1,7 @@
 import json
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Mapping, Optional
 
-from datalabs import load_dataset, aggregating
+from datalabs import load_dataset, aggregating, Dataset
 
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 from eaas.config import Config
@@ -36,6 +36,14 @@ class Processor:
         self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
+
+    def _get_statistics_resources(
+        self, dataset_split: Dataset
+    ) -> Optional[Mapping[str, Any]]:
+        """
+        From a DataLab dataset split, get resources necessary to calculate statistics
+        """
+        return None
 
     def _gen_external_stats(
         self, sys_info: SysOutputInfo, statistics_func: aggregating
@@ -72,7 +80,7 @@ class Processor:
                     == "the dataset does not include the information of _stat"
                 ):
                     dataset = load_dataset(sys_info.dataset_name, sub_dataset)
-                    statistics_func.resources = self._get_urces(dataset)
+                    statistics_func.resources = self._get_statistics_resources(dataset)
                     new_train = dataset[split_name].apply(statistics_func, mode="local")
                     statistics = new_train._stat
                     eprint("saving to database")
