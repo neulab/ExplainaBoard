@@ -44,7 +44,9 @@ class QAMultipleChoiceLoader(Loader):
                     "answers": data_info["answers"],
                     "predicted_answers": data_info["predicted_answers"],
                 }
-                if self.user_defined_features_configs:  # user defined features are present
+                if (
+                    self.user_defined_features_configs
+                ):  # user defined features are present
                     # additional user-defined features
                     data_base.update(
                         {
