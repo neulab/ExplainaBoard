@@ -190,3 +190,9 @@ class OverallStatistics:
     scoring_stats: Any = None
     active_features: List[str] = None
     overall_results: Dict[str, Performance] = None
+
+
+@dataclass
+class FineGrainedStatistics:
+    samples_over_bucket: dict = None
+    performance_over_bucket: dict = None

@@ -16,6 +16,7 @@ from explainaboard.info import (
     BucketPerformance,
     Result,
     OverallStatistics,
+    FineGrainedStatistics,
 )
 from explainaboard.tasks import TaskType
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
@@ -412,10 +413,7 @@ class Processor:
         """
         A wrapper function to expose _bucketing_samples for the web interface
         """
-        return {
-            "samples_over_bucket": samples_over_bucket,
-            "performance_over_bucket": performance_over_bucket,
-        }
+        return FineGrainedStatistics(samples_over_bucket, performance_over_bucket)
 
     def process(self, metadata: dict, sys_output: List[dict]):
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
