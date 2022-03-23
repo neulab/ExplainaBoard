@@ -96,7 +96,16 @@ class TextPairClassificationProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
+
+    @aggregating()
+    def _statistics_func(self, samples):
+        # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+        tokenizer = self._tokenizer
+
+        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+            samples, lambda x: x['text1'] + x['text2'], tokenizer
+        )
 
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
         """Take in information about the system outputs and a statistic calculating function and return a dictionary
@@ -115,7 +124,7 @@ class TextPairClassificationProcessor(Processor):
                 if (
                     len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(statistics_func, mode="local")
+                    new_train = dataset['train'].apply(self._statistics_func, mode="local")
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat
@@ -169,26 +178,26 @@ class TextPairClassificationProcessor(Processor):
     # --- End feature functions
 
 
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="text-matching, natural-language-inference",
-    description="Calculate the overall statistics (e.g., average length) of a given "
-    "text pair classification datasets. e,g. natural language inference",
-)
-def get_statistics(samples: Iterator):
-    """
-    Input:
-    samples: [{
-     "text1":
-     "text2":
-     "label":
-    }]
-    """
-
-    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-    tokenizer = SingleSpaceTokenizer()
-
-    return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-        samples, lambda x: x['text1'] + x['text2'], tokenizer
-    )
+# @aggregating(
+#     name="get_statistics",
+#     contributor="datalab",
+#     task="text-matching, natural-language-inference",
+#     description="Calculate the overall statistics (e.g., average length) of a given "
+#     "text pair classification datasets. e,g. natural language inference",
+# )
+# def get_statistics(samples: Iterator):
+#     """
+#     Input:
+#     samples: [{
+#      "text1":
+#      "text2":
+#      "label":
+#     }]
+#     """
+#
+#     # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+#     tokenizer = SingleSpaceTokenizer()
+#
+#     return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+#         samples, lambda x: x['text1'] + x['text2'], tokenizer
+#     )
