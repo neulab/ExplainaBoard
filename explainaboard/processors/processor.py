@@ -10,7 +10,13 @@ from tqdm import tqdm
 import explainaboard.metric
 import explainaboard.utils.bucketing
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, Performance, BucketPerformance, Result
+from explainaboard.info import (
+    SysOutputInfo,
+    Performance,
+    BucketPerformance,
+    Result,
+    OverallStatistics,
+)
 from explainaboard.tasks import TaskType
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
 from explainaboard.utils.py_utils import (
@@ -365,7 +371,9 @@ class Processor:
         for feature_name, feature_value in performances_over_bucket.items():
             print_dict(feature_value, feature_name)
 
-    def get_overall_statistics(self, metadata: dict, sys_output: List[dict]) -> dict:
+    def get_overall_statistics(
+        self, metadata: dict, sys_output: List[dict]
+    ) -> OverallStatistics:
         """
         Get the overall statistics information, including performance, of the system output
         :param metadata: The metadata of the system
@@ -387,12 +395,9 @@ class Processor:
         overall_results = self.get_overall_performance(
             sys_info, sys_output, scoring_stats=scoring_stats
         )
-        return {
-            "sys_info": sys_info,
-            "scoring_stats": scoring_stats,
-            "active_features": active_features,
-            "overall_results": overall_results,
-        }
+        return OverallStatistics(
+            sys_info, scoring_stats, active_features, overall_results
+        )
 
     def get_fine_grained_statistics(
         self,
@@ -414,10 +419,10 @@ class Processor:
 
     def process(self, metadata: dict, sys_output: List[dict]):
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
-        sys_info = overall_statistics["sys_info"]
-        scoring_stats = overall_statistics["scoring_stats"]
-        active_features = overall_statistics["active_features"]
-        overall_results = overall_statistics["overall_results"]
+        sys_info = overall_statistics.sys_info
+        scoring_stats = overall_statistics.scoring_stats
+        active_features = overall_statistics.active_features
+        overall_results = overall_statistics.overall_results
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, scoring_stats=scoring_stats
         )
