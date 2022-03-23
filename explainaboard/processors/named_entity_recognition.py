@@ -202,7 +202,9 @@ class NERProcessor(Processor):
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
         base_resources = super()._get_statistics_resources(dataset_split)
-        task_specific_resources = {'tag_id2str': dataset_split._info.task_templates[0].labels}
+        task_specific_resources = {
+            'tag_id2str': dataset_split._info.task_templates[0].labels
+        }
         # print(f"super()._get_statistics_resources(dataset_split):{super()._get_statistics_resources(dataset_split)}")
         # print({'tag_id2str': dataset_split._info.task_templates[0].labels}.update(super()._get_statistics_resources(dataset_split)))
         return {**base_resources, **task_specific_resources}
@@ -607,8 +609,6 @@ class NERProcessor(Processor):
                 bucket_name_to_performance[bucket_interval] = [bucket_performance]
 
         return sort_dict(bucket_name_to_performance)
-
-
 
 
 # TODO(gneubig): below is not done with refactoring
