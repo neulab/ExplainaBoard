@@ -1,5 +1,10 @@
-from typing import Dict, Iterable, List
 from explainaboard.constants import FileType
+from explainaboard.loaders.file_loader import (
+    FileLoaderDType,
+    FileLoaderField,
+    JSONFileLoader,
+    TSVFileLoader,
+)
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
@@ -16,43 +21,30 @@ class AspectBasedSentimentClassificationLoader(Loader):
     """
 
     _default_file_type = FileType.tsv
-
-    def load(self) -> Iterable[Dict]:
-        """
-        aspect \t text \t label \t predicted_label
-        :return: class object
-        """
-        super().load()
-        data: List[Dict] = []
-        if self._file_type == FileType.tsv:
-            for id, dp in enumerate(self._raw_data):
-                aspect, text, true_label, predicted_label = dp[:4]
-                data.append(
-                    {
-                        "id": str(id),
-                        "aspect": aspect.strip(),
-                        "text": text.strip(),
-                        "true_label": true_label.strip(),
-                        "predicted_label": predicted_label.strip(),
-                    }
-                )
-        elif self._file_type == FileType.json:
-            for id, info in enumerate(self._raw_data):
-                aspect, text, true_label, predicted_label = (
-                    info["aspect"],
-                    info["text"],
-                    info["true_label"],
-                    info["predicted_label"],
-                )
-                data.append(
-                    {
-                        "id": str(id),
-                        "aspect": aspect.strip,
-                        "text": text.strip(),
-                        "true_label": true_label.strip(),
-                        "predicted_label": predicted_label.strip(),
-                    }
-                )
-        else:
-            raise NotImplementedError
-        return data
+    field_names = ["aspect", "text", "true_label", "predicted_label"]
+    _default_file_loaders = {
+        FileType.tsv: TSVFileLoader(
+            [
+                FileLoaderField(0, field_names[0], FileLoaderDType.str, True),
+                FileLoaderField(1, field_names[1], FileLoaderDType.str, True),
+                FileLoaderField(2, field_names[2], FileLoaderDType.str, True),
+                FileLoaderField(3, field_names[3], FileLoaderDType.str, True),
+            ],
+        ),
+        FileType.json: JSONFileLoader(
+            [
+                FileLoaderField(
+                    field_names[0], field_names[0], FileLoaderDType.str, True
+                ),
+                FileLoaderField(
+                    field_names[1], field_names[1], FileLoaderDType.str, True
+                ),
+                FileLoaderField(
+                    field_names[2], field_names[2], FileLoaderDType.str, True
+                ),
+                FileLoaderField(
+                    field_names[3], field_names[3], FileLoaderDType.str, True
+                ),
+            ]
+        ),
+    }

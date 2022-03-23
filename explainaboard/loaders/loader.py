@@ -1,25 +1,35 @@
-from typing import Dict, Iterable, List, Optional
+from __future__ import annotations
+from typing import Dict, Iterable, Optional
 import typing as t
 import json
-from io import StringIO
-import csv
 from explainaboard.constants import FileType, Source
+from explainaboard.loaders.file_loader import FileLoader
 from explainaboard.tasks import TaskType
 
 JSON = t.Union[str, int, float, bool, None, t.Mapping[str, 'JSON'], t.List['JSON']]  # type: ignore
 
 
 class Loader:
-    """base class of loader"""
+    """Base class of Loaders
+
+    Args:
+        data: base64 encoded system output content or a path for the system output file
+        source: source of data
+        file type: tsv, json, conll, etc.
+        file_loaders: a dict of file loaders. To customize the loading process, either implement
+            a custome FileLoader or override `load()`
+    """
 
     _default_source = Source.local_filesystem
     _default_file_type: Optional[FileType] = None
+    _default_file_loaders: Dict[FileType, FileLoader] = {}
 
     def __init__(
         self,
         data: str,
         source: Optional[Source] = None,
         file_type: Optional[FileType] = None,
+        file_loaders: Dict[FileType, FileLoader] = {},
     ):
         if not source and not self._default_source:
             raise Exception("no source is provided for the loader")
@@ -27,11 +37,17 @@ class Loader:
             raise Exception("no file_type is provided for the loader")
         self._source = source or self._default_source
         self._file_type = file_type or self._default_file_type
+        self.file_loaders = file_loaders or self._default_file_loaders
         self._data = data  # base64 or filepath
-        self._raw_data: Optional[Iterable] = None  # loaded data
 
-        # None: uninitialized; {}: no custom features defined
-        self._user_defined_features_configs: Optional[dict] = None
+        if self._file_type not in self.file_loaders:
+            raise NotImplementedError(
+                f"file type: {self._file_type} is not configured. please add it to loader config or override the load method."
+            )
+
+        self._user_defined_features_configs: dict = (
+            self._parse_user_defined_features_configs()
+        )
 
     @property
     def user_defined_features_configs(self) -> dict:
@@ -41,58 +57,22 @@ class Loader:
             )
         return self._user_defined_features_configs
 
-    def _load_raw_data_points(self) -> Iterable:
-        """
-        loads data and return an iterable of data points. element type depends on file_type
-        """
-        raw_data: Optional[Iterable] = None
-        if self._source == Source.in_memory:
-            if self._file_type == FileType.tsv:
-                file = StringIO(self._data)
-                raw_data = csv.reader(file, delimiter='\t')
-            elif self._file_type == FileType.conll:
-                raw_data = self._data.splitlines()
-            elif self._file_type == FileType.json:
-                raw_data = json.loads(self._data)
-            elif self._file_type == FileType.datalab:
-                raw_data = self._data
-            else:
-                raise NotImplementedError
-
-        elif self._source == Source.local_filesystem:
-            if self._file_type == FileType.tsv:
-                content: List[str] = []
-                with open(self._data, "r", encoding="utf8") as fin:
-                    for record in csv.reader(fin, delimiter='\t'):
-                        content.append(record)
-                raw_data = content
-            elif self._file_type == FileType.conll:
-                content = []
-                with open(self._data, "r", encoding="utf8") as fin:
-                    for record in fin:
-                        content.append(record)
-                raw_data = content
-            elif self._file_type == FileType.json:
-                with open(self._data, 'r', encoding="utf8") as json_file:
-                    data = json_file.read()
-                raw_data = json.loads(data)
-            else:
-                raise NotImplementedError
-
-        # load user defined features if exists
-        if isinstance(raw_data, dict) and raw_data.get("user_defined_features_configs"):
-            self._user_defined_features_configs = raw_data[
+    def _parse_user_defined_features_configs(self) -> dict:
+        if self._file_type == FileType.json:
+            raw_data = self.file_loaders[FileType.json].load_raw(
+                self._data, self._source
+            )
+            if isinstance(raw_data, dict) and raw_data.get(
                 "user_defined_features_configs"
-            ]
-            raw_data = raw_data["predictions"]
-
-        else:
-            self._user_defined_features_configs = {}
-        self._raw_data = raw_data
-        return raw_data
+            ):
+                self._data = json.dumps(raw_data["predictions"])
+                self._source = Source.in_memory
+                return raw_data["user_defined_features_configs"]
+        return {}
 
     def load(self) -> Iterable[dict]:
-        return self._load_raw_data_points()
+        file_loader = self.file_loaders[self._file_type]
+        return file_loader.load(self._data, self._source)
 
 
 # loader_registry is a global variable, storing all basic loading functions

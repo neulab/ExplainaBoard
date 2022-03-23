@@ -21,6 +21,9 @@ class TestTextClassification(unittest.TestCase):
             FileType.tsv,
         )
         data = list(loader.load())
+        self.assertEqual(
+            set(data[0].keys()), {"text", "true_label", "predicted_label", "id"}
+        )
         processor = get_processor(TaskType.text_classification)
 
         sys_info = processor.process(metadata, data)
