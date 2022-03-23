@@ -1,6 +1,5 @@
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
-    FileLoaderDType,
     FileLoaderField,
     JSONFileLoader,
     TSVFileLoader,
@@ -25,26 +24,18 @@ class AspectBasedSentimentClassificationLoader(Loader):
     _default_file_loaders = {
         FileType.tsv: TSVFileLoader(
             [
-                FileLoaderField(0, field_names[0], FileLoaderDType.str, True),
-                FileLoaderField(1, field_names[1], FileLoaderDType.str, True),
-                FileLoaderField(2, field_names[2], FileLoaderDType.str, True),
-                FileLoaderField(3, field_names[3], FileLoaderDType.str, True),
+                FileLoaderField(0, field_names[0], str),
+                FileLoaderField(1, field_names[1], str),
+                FileLoaderField(2, field_names[2], str),
+                FileLoaderField(3, field_names[3], str),
             ],
         ),
         FileType.json: JSONFileLoader(
             [
-                FileLoaderField(
-                    field_names[0], field_names[0], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    field_names[1], field_names[1], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    field_names[2], field_names[2], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    field_names[3], field_names[3], FileLoaderDType.str, True
-                ),
+                FileLoaderField(field_names[0], field_names[0], str),
+                FileLoaderField(field_names[1], field_names[1], str),
+                FileLoaderField(field_names[2], field_names[2], str),
+                FileLoaderField(field_names[3], field_names[3], str),
             ]
         ),
     }

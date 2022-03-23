@@ -43,7 +43,7 @@ setup(
         "wheel",
         "tqdm",
         "sacrebleu",
-        "datasets",
+        "datasets>=2.0.0",
         "lexicalrichness",
         "spacy",
         "datalabs>=0.3.6",

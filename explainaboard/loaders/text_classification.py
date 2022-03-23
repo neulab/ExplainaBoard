@@ -1,7 +1,6 @@
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
-    FileLoaderDType,
     FileLoaderField,
     JSONFileLoader,
     TSVFileLoader,
@@ -26,35 +25,23 @@ class TextClassificationLoader(Loader):
     _default_file_loaders = {
         FileType.tsv: TSVFileLoader(
             [
-                FileLoaderField(0, _target_field_names[0], FileLoaderDType.str, True),
-                FileLoaderField(1, _target_field_names[1], FileLoaderDType.str, True),
-                FileLoaderField(2, _target_field_names[2], FileLoaderDType.str, True),
+                FileLoaderField(0, _target_field_names[0], str),
+                FileLoaderField(1, _target_field_names[1], str),
+                FileLoaderField(2, _target_field_names[2], str),
             ],
         ),
         FileType.json: JSONFileLoader(
             [
-                FileLoaderField(
-                    "text", _target_field_names[0], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    "true_label", _target_field_names[1], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    "predicted_label", _target_field_names[2], FileLoaderDType.str, True
-                ),
+                FileLoaderField("text", _target_field_names[0], str),
+                FileLoaderField("true_label", _target_field_names[1], str),
+                FileLoaderField("predicted_label", _target_field_names[2], str),
             ]
         ),
         FileType.datalab: DatalabFileLoader(
             [
-                FileLoaderField(
-                    "text", _target_field_names[0], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    "label", _target_field_names[1], FileLoaderDType.str, True
-                ),
-                FileLoaderField(
-                    "prediction", _target_field_names[2], FileLoaderDType.str, True
-                ),
+                FileLoaderField("text", _target_field_names[0], str),
+                FileLoaderField("label", _target_field_names[1], str),
+                FileLoaderField("prediction", _target_field_names[2], str),
             ]
         ),
     }
