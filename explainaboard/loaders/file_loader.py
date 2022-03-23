@@ -157,7 +157,7 @@ class TSVFileLoader(FileLoader):
         raise NotImplementedError
 
 
-class CoNLLFilerLoader(FileLoader):
+class CoNLLFileLoader(FileLoader):
     def __init__(self) -> None:
         super().__init__(fields=[], use_idx_as_id=False, id_field_name=False)
 

@@ -1,4 +1,4 @@
-from explainaboard.loaders.file_loader import CoNLLFilerLoader
+from explainaboard.loaders.file_loader import CoNLLFileLoader
 
 from .loader import register_loader
 from .loader import Loader
@@ -17,4 +17,4 @@ class NERLoader(Loader):
     """
 
     _default_file_type = FileType.conll
-    _default_file_loaders = {FileType.conll: CoNLLFilerLoader()}
+    _default_file_loaders = {FileType.conll: CoNLLFileLoader()}
