@@ -78,7 +78,6 @@ class QAMultipleChoiceProcessor(Processor):
                 ),
                 require_training_set=True,
             ),
-
         }
     )
     _default_metrics = ["Accuracy"]

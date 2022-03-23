@@ -117,7 +117,6 @@ class KGLinkTailPredictionProcessor(Processor):
         self.entity_type_level_map = None
         self._user_defined_feature_config = None
 
-
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
 
         # TODO(gneubig): this will be reloaded for every dataset, maybe should be fixed for multiple analysis

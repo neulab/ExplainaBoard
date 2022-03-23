@@ -34,8 +34,6 @@ class TestQAMultipleChoice(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-
-
     def test_multiple_qa_customized_feature(self):
         """TODO: should add harder tests"""
 
@@ -53,7 +51,7 @@ class TestQAMultipleChoice(unittest.TestCase):
             "task_name": TaskType.qa_multiple_choice.value,
             "dataset_name": "metaphor_qa",
             "metric_names": ["Accuracy"],
-            "user_defined_features_configs":loader.user_defined_features_configs # don't forget this, otherwise the user-defined features will be ignored
+            "user_defined_features_configs": loader.user_defined_features_configs,  # don't forget this, otherwise the user-defined features will be ignored
         }
 
         processor = get_processor(TaskType.qa_multiple_choice.value)
@@ -64,7 +62,6 @@ class TestQAMultipleChoice(unittest.TestCase):
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
-
 
 
 if __name__ == '__main__':

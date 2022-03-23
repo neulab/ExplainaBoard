@@ -138,8 +138,6 @@ class Processor:
         """
         return data_point["predicted_label"]
 
-
-
     def _init_customized_features(self, metadata: dict):
         """
         declare the customized features and add them into self._features
@@ -242,7 +240,11 @@ class Processor:
                     and bucket_key in self._user_defined_feature_config.keys()
                 ):
                     # TODO(Pengfei): this should be generalized
-                    feature_value = "_".join(dict_sysout[bucket_key]) if isinstance(dict_sysout[bucket_key], list) else dict_sysout[bucket_key]
+                    feature_value = (
+                        "_".join(dict_sysout[bucket_key])
+                        if isinstance(dict_sysout[bucket_key], list)
+                        else dict_sysout[bucket_key]
+                    )
                     dict_sysout[bucket_key] = feature_value
 
                 # handles all other features
