@@ -1,5 +1,5 @@
 import json
-from typing import List, Tuple, Dict, Any, Mapping, Optional
+from typing import List, Tuple, Dict, Any, Mapping, Optional, Iterator
 
 from datalabs import load_dataset, aggregating, Dataset
 
@@ -33,7 +33,7 @@ class Processor:
         # Things to use only if necessary
         self._eaas_config = None
         self._eaas_client = None
-        self._statistics_func = None
+        # self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
 
@@ -43,7 +43,15 @@ class Processor:
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        return None
+        return {"cls":self}
+
+
+
+    @aggregating
+    def _statistics_func(self):
+        return {}
+
+
 
     def _gen_external_stats(
         self, sys_info: SysOutputInfo, statistics_func: aggregating
@@ -80,8 +88,9 @@ class Processor:
                     == "the dataset does not include the information of _stat"
                 ):
                     dataset = load_dataset(sys_info.dataset_name, sub_dataset)
-                    statistics_func.resources = self._get_statistics_resources(dataset)
-                    new_train = dataset[split_name].apply(statistics_func, mode="local")
+                    self._statistics_func.resources = self._get_statistics_resources(dataset[split_name])
+                    # print(f"self._statistics_func.resources:f\t{self._statistics_func.resources}")
+                    new_train = dataset[split_name].apply(self._statistics_func, mode="local")
                     statistics = new_train._stat
                     eprint("saving to database")
                     response = write_statistics_to_db(
