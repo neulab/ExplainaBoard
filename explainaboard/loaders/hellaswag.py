@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, List
 from explainaboard.constants import FileType
+from explainaboard.loaders.file_loader import TSVFileLoader
 from .loader import register_loader
 from .loader import Loader
 from datasets import load_dataset
@@ -10,6 +11,7 @@ from explainaboard.tasks import TaskType
 class HellaswagLoader(Loader):
 
     _default_file_type = FileType.tsv
+    _default_file_loaders = {FileType.tsv: TSVFileLoader(None, False)}
 
     def load(self) -> Iterable[Dict]:
         """
@@ -17,12 +19,14 @@ class HellaswagLoader(Loader):
         text \t label \t predicted_label
         :return: class object
         """
-        super().load()
         dataset = load_dataset('hellaswag')['validation']
 
         data: List[Dict] = []
         if self._file_type == FileType.tsv:
-            for id, dp in enumerate(self._raw_data):
+            raw_data = self._default_file_loaders[FileType.tsv].load_raw(
+                self._data, self._source
+            )
+            for id, dp in enumerate(raw_data):
                 sample_id, predicted_label = dp[:2]
                 data.append(
                     {
