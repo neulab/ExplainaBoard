@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict, field
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Dict
 from explainaboard.feature import Features
 import json
 import os
@@ -182,3 +182,17 @@ class SysOutputInfo:
 
     def copy(self) -> "SysOutputInfo":
         return self.__class__(**{k: copy.deepcopy(v) for k, v in self.__dict__.items()})
+
+
+@dataclass
+class OverallStatistics:
+    sys_info: SysOutputInfo = None
+    scoring_stats: Any = None
+    active_features: List[str] = None
+    overall_results: Dict[str, Performance] = None
+
+
+@dataclass
+class FineGrainedStatistics:
+    samples_over_bucket: dict = None
+    performance_over_bucket: dict = None
