@@ -37,15 +37,22 @@ class QAMultipleChoiceLoader(Loader):
         data: List[Dict] = []
         if self._file_type == FileType.json:
             for id, data_info in enumerate(self._raw_data):
-                data.append(
-                    {
-                        "id": str(id),  # should be string type
-                        "context": data_info["context"],
-                        "question": data_info["question"],
-                        "answers": data_info["answers"],
-                        "predicted_answers": data_info["predicted_answers"],
-                    }
-                )
+                data_base = {
+                    "id": str(id),  # should be string type
+                    "context": data_info["context"],
+                    "question": data_info["question"],
+                    "answers": data_info["answers"],
+                    "predicted_answers": data_info["predicted_answers"],
+                }
+                if self.user_defined_features_configs:  # user defined features are present
+                    # additional user-defined features
+                    data_base.update(
+                        {
+                            feature_name: data_info[feature_name]
+                            for feature_name in self.user_defined_features_configs
+                        }
+                    )
+                data.append(data_base)
         else:
             raise NotImplementedError
         return data

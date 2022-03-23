@@ -117,43 +117,6 @@ class KGLinkTailPredictionProcessor(Processor):
         self.entity_type_level_map = None
         self._user_defined_feature_config = None
 
-    def process(self, metadata: dict, sys_output: List[dict]) -> SysOutputInfo:
-        self._user_defined_feature_config = metadata.get(
-            "user_defined_features_configs"
-        )
-
-        # add user-defined features into features list
-        if self._user_defined_feature_config is not None:
-            for (
-                feature_name,
-                feature_config,
-            ) in self._user_defined_feature_config.items():
-                if feature_config["dtype"] == "string":
-                    self._features[feature_name] = feature.Value(
-                        dtype="string",
-                        description=feature_config["description"],
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_discrete_value",
-                            number=feature_config["num_buckets"],
-                            setting=1,
-                        ),
-                    )
-                elif feature_config['dtype'] == 'float':
-                    self._features[feature_name] = feature.Value(
-                        dtype="float",
-                        description=feature_config["description"],
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=feature_config["num_buckets"],
-                            setting=(),
-                        ),
-                    )
-                else:
-                    raise NotImplementedError
-
-        return super().process(metadata, sys_output)
 
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
 

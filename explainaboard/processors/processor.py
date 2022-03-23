@@ -138,6 +138,55 @@ class Processor:
         """
         return data_point["predicted_label"]
 
+
+
+    def _init_customized_features(self, metadata: dict):
+        """
+        declare the customized features and add them into self._features
+        Args:
+            metadata: the metadata information of system output
+
+        Returns:
+
+        """
+
+        self._user_defined_feature_config = metadata.get(
+            "user_defined_features_configs"
+        )
+
+        # print(f"self._user_defined_feature_config:\t{self._user_defined_feature_config}")
+
+        # add user-defined features into features list
+        if self._user_defined_feature_config is not None:
+            for (
+                feature_name,
+                feature_config,
+            ) in self._user_defined_feature_config.items():
+                if feature_config["dtype"] == "string":
+                    self._features[feature_name] = feature.Value(
+                        dtype="string",
+                        description=feature_config["description"],
+                        is_bucket=True,
+                        bucket_info=feature.BucketInfo(
+                            method="bucket_attribute_discrete_value",
+                            number=feature_config["num_buckets"],
+                            setting=1,
+                        ),
+                    )
+                elif feature_config['dtype'] == 'float':
+                    self._features[feature_name] = feature.Value(
+                        dtype="float",
+                        description=feature_config["description"],
+                        is_bucket=True,
+                        bucket_info=feature.BucketInfo(
+                            method="bucket_attribute_specified_bucket_value",
+                            number=feature_config["num_buckets"],
+                            setting=(),
+                        ),
+                    )
+                else:
+                    raise NotImplementedError
+
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
     ) -> List[str]:
@@ -192,7 +241,8 @@ class Processor:
                     self._user_defined_feature_config is not None
                     and bucket_key in self._user_defined_feature_config.keys()
                 ):
-                    feature_value = dict_sysout[bucket_key]
+                    # TODO(Pengfei): this should be generalized
+                    feature_value = "_".join(dict_sysout[bucket_key]) if isinstance(dict_sysout[bucket_key], list) else dict_sysout[bucket_key]
                     dict_sysout[bucket_key] = feature_value
 
                 # handles all other features
@@ -379,6 +429,9 @@ class Processor:
             metadata["metric_names"] = self._default_metrics
         sys_info = SysOutputInfo.from_dict(metadata)
         sys_info.features = self._features
+        # declare customized features
+        self._init_customized_features(metadata)
+        # get scoring statistics
         scoring_stats = self._gen_scoring_stats(sys_info, sys_output)
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
@@ -413,6 +466,7 @@ class Processor:
         }
 
     def process(self, metadata: dict, sys_output: List[dict]):
+        # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = overall_statistics["sys_info"]
         scoring_stats = overall_statistics["scoring_stats"]
