@@ -4,10 +4,7 @@ from ctypes import Union
 from dataclasses import dataclass
 from io import StringIO
 import json
-from typing import Any, Callable, Iterable, List, Optional
-
-from enum import Enum
-
+from typing import Any, Callable, Iterable, List, Optional, Type
 from explainaboard.constants import Source
 
 
@@ -39,14 +36,15 @@ class FileLoader:
         if field.strip_before_parsing:
             data = data.strip()
         dtype = field.dtype
-        if dtype == FileLoaderDType.int:
+        if dtype == int:
             return int(data)
-        if dtype == FileLoaderDType.float:
+        elif dtype == float:
             return float(data)
-        if dtype == FileLoaderDType.str:
+        elif dtype == str:
             return str(data)
-        if dtype == FileLoaderDType.other:
+        elif dtype is None:
             return data
+        raise NotImplementedError(f"dtype {dtype} is not supported")
 
     def generate_id(self, parsed_data_point: dict, sample_idx: int):
         """generates an id attribute for each data point in place"""
@@ -93,25 +91,44 @@ class FileLoader:
 
 @dataclass
 class FileLoaderField:
-    src_name: Union[int, str]  # int for tsv column indices and string for dict keys
+    """
+    Args:
+        src_name: field name in the source file. use int for tsv column indices and use str for dict keys
+        target_name: field name expected in the loaded data
+        dtype: data type of the field in the loaded data. It is only intended for simple type conversion so
+        it only supports int, float and str. Pass in None to turn off type conversion.
+        strip_before_parsing: call strip() on strings before casting to either str, int or float. It is
+            only intended to be used with these three data types. It defaults to True for str. For all other
+            types, it defaults to False
+        parser: a custom parser for the field. When called, `data_points[idx][src_name]` is passed in as input,
+            it is expected to return the parsed result. If parser is not None, `strip_before_parsing` and dtype
+            will not have any effect
+    """
+
+    src_name: Union[int, str]
     target_name: str
-    dtype: FileLoaderDType
-    strip_before_parsing: bool = False
+    dtype: Union[Type[int], Type[float], Type[str]] = None
+    strip_before_parsing: bool = None
     parser: Callable = None
 
     def __post_init__(self):
+        if self.strip_before_parsing is None:
+            if self.dtype == str:
+                self.strip_before_parsing = True
+            else:
+                self.strip_before_parsing = False
+
+        # validation
         for name in (self.src_name, self.target_name):
             if not isinstance(name, str) and not isinstance(name, int):
                 raise ValueError("src_name and target_name must be str or int")
-        if self.dtype == FileLoaderDType.other and self.strip_before_parsing:
-            raise ValueError("dict type field does not support strip_before_parsing")
 
-
-class FileLoaderDType(str, Enum):
-    int = "int"
-    float = "float"
-    str = "str"
-    other = "other"
+        if self.dtype is None and self.strip_before_parsing:
+            raise ValueError(
+                "strip_before_parsing only works with int, float and str types"
+            )
+        if self.dtype not in (str, int, float, None):
+            raise ValueError("dtype must be one of str, int, float and None")
 
 
 class TSVFileLoader(FileLoader):
@@ -125,15 +142,13 @@ class TSVFileLoader(FileLoader):
         for field in self._fields:
             if not isinstance(field.src_name, int):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
-            if field.dtype == FileLoaderDType.other:
-                raise ValueError("TSVFilerLoader doesn't support 'other' field type")
 
     @classmethod
     def load_raw(self, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             file = StringIO(data)
             return csv.reader(file, delimiter='\t')
-        if source == Source.local_filesystem:
+        elif source == Source.local_filesystem:
             content: List[str] = []
             with open(data, "r", encoding="utf8") as fin:
                 for record in csv.reader(fin, delimiter='\t'):
@@ -150,7 +165,7 @@ class CoNLLFilerLoader(FileLoader):
     def load_raw(self, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             return data.splitlines()
-        if source == Source.local_filesystem:
+        elif source == Source.local_filesystem:
             content = []
             with open(data, "r", encoding="utf8") as fin:
                 for record in fin:
@@ -206,7 +221,7 @@ class JSONFileLoader(FileLoader):
     def load_raw(self, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             return json.loads(data)
-        if source == Source.local_filesystem:
+        elif source == Source.local_filesystem:
             with open(data, 'r', encoding="utf8") as json_file:
                 data = json_file.read()
                 return json.loads(data)

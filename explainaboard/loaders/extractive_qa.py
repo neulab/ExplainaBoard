@@ -1,7 +1,6 @@
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
-    FileLoaderDType,
     FileLoaderField,
     JSONFileLoader,
 )
@@ -18,37 +17,38 @@ class QAExtractiveLoader(Loader):
         FileType.json: JSONFileLoader(
             [
                 FileLoaderField(
-                    _target_field_names[0], _target_field_names[0], FileLoaderDType.str
+                    _target_field_names[0],
+                    _target_field_names[0],
+                    str,
+                    strip_before_parsing=False,
                 ),
                 FileLoaderField(
-                    _target_field_names[1], _target_field_names[1], FileLoaderDType.str
+                    _target_field_names[1],
+                    _target_field_names[1],
+                    str,
+                    strip_before_parsing=False,
                 ),
-                FileLoaderField(
-                    _target_field_names[2],
-                    _target_field_names[2],
-                    FileLoaderDType.other,
-                ),
-                FileLoaderField(
-                    _target_field_names[3],
-                    _target_field_names[3],
-                    FileLoaderDType.other,
-                ),
+                FileLoaderField(_target_field_names[2], _target_field_names[2]),
+                FileLoaderField(_target_field_names[3], _target_field_names[3]),
             ]
         ),
         FileType.datalab: DatalabFileLoader(
             [
-                FileLoaderField("context", _target_field_names[0], FileLoaderDType.str),
                 FileLoaderField(
-                    "question", _target_field_names[1], FileLoaderDType.str
+                    "context",
+                    _target_field_names[0],
+                    str,
+                    strip_before_parsing=False,
                 ),
                 FileLoaderField(
-                    "answers", _target_field_names[2], FileLoaderDType.other
+                    "question",
+                    _target_field_names[1],
+                    str,
+                    strip_before_parsing=False,
                 ),
+                FileLoaderField("answers", _target_field_names[2]),
                 FileLoaderField(
-                    "prediction",
-                    _target_field_names[3],
-                    FileLoaderDType.other,
-                    parser=lambda x: {"text": x},
+                    "prediction", _target_field_names[3], parser=lambda x: {"text": x}
                 ),
             ]
         ),

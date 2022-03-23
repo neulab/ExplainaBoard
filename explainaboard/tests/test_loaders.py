@@ -15,7 +15,11 @@ class BaseLoaderTests(TestCase):
             load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
             Source.in_memory,
             FileType.tsv,
-            {FileType.tsv: TSVFileLoader([FileLoaderField(0, "field0", "str")], True)},
+            {
+                FileType.tsv: TSVFileLoader(
+                    [FileLoaderField(0, "field0", str)], use_idx_as_id=True
+                )
+            },
         )
         samples = [sample for sample in loader.load()]
         self.assertEqual(len(samples), 10)
@@ -26,7 +30,9 @@ class FileLoaderTests(TestCase):
     def test_tsv_validation(self):
         self.assertRaises(
             ValueError,
-            lambda: TSVFileLoader([FileLoaderField("0", "field0", "str")], True),
+            lambda: TSVFileLoader(
+                [FileLoaderField("0", "field0", str)], use_idx_as_id=True
+            ),
         )
 
 
