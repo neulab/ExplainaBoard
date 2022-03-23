@@ -1,7 +1,5 @@
-from typing import Callable, Any
-from typing import Iterator, Dict, List, Iterator
-
-from datalabs import load_dataset
+from typing import Any
+from typing import Iterator, Dict, List
 from datalabs import aggregating
 
 import explainaboard.utils.eval_basic_qa
@@ -11,8 +9,7 @@ from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import eprint, sort_dict
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.utils.py_utils import sort_dict
 
 
 @register_processor(TaskType.question_answering_extractive)
@@ -93,7 +90,7 @@ class QAExtractiveProcessor(Processor):
         # self._statistics_func = get_statistics
 
     @aggregating()
-    def _statistics_func(self, samples:Iterator):
+    def _statistics_func(self, samples: Iterator):
         """
         Input:
         samples: [{

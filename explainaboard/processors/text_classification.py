@@ -1,4 +1,4 @@
-from typing import Iterator, Any
+from typing import Any
 from tqdm import tqdm
 
 import explainaboard.utils.feature_funcs
@@ -8,10 +8,7 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.spacy_loader import get_named_entities
-
 from datalabs import aggregating
-
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 @register_processor(TaskType.text_classification)
@@ -218,4 +215,3 @@ class TextClassificationProcessor(Processor):
 #     task="text-classification",
 #     description="Calculate the overall statistics (e.g., density) of a given text classification dataset",
 # )
-

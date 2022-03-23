@@ -118,7 +118,7 @@ class KGLinkTailPredictionProcessor(Processor):
         self._user_defined_feature_config = None
 
     @aggregating()
-    def _statistics_func(self, samples:Iterator):
+    def _statistics_func(self, samples: Iterator):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
@@ -175,7 +175,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 if (
                     len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(_statistics_func, mode="local")
+                    new_train = dataset['train'].apply(
+                        self._statistics_func, mode="local"
+                    )
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat

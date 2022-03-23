@@ -1,17 +1,11 @@
-from typing import Callable, Any, Iterator
-from typing import Iterator
-
-from datalabs import load_dataset
+from typing import Any, Iterator
 from datalabs import aggregating
-
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.tasks import TaskType
 
 
 @register_processor(TaskType.qa_multiple_choice)
