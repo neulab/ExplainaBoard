@@ -43,7 +43,7 @@ class Processor:
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        return {"cls":self}
+        return {"cls":self} #
 
 
 
