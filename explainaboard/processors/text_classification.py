@@ -119,7 +119,7 @@ class TextClassificationProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
@@ -143,13 +143,13 @@ class TextClassificationProcessor(Processor):
     # training set dependent features
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['text']
+            existing_features, statistics, lambda x: x['text'], self._tokenizer
         )
 
     # training set dependent features (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['text']
+            existing_features, statistics, lambda x: x['text'], self._tokenizer
         )
 
     # training set dependent features
@@ -164,55 +164,58 @@ class TextClassificationProcessor(Processor):
 
     # --- End feature functions
 
+    @aggregating()
+    def _statistics_func(self, samples):
+        """
+        Input:
+        samples: [{
+         "text":
+         "label":
+        }]
+        """
 
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="text-classification",
-    description="Calculate the overall statistics (e.g., density) of a given text classification dataset",
-)
-def get_statistics(samples: Iterator):
-    """
-    Input:
-    samples: [{
-     "text":
-     "label":
-    }]
-    """
+        # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+        # tokenizer = SingleSpaceTokenizer()
 
-    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-    tokenizer = SingleSpaceTokenizer()
+        vocab = {}
+        length_fre = {}
+        total_samps = 0
+        for sample in tqdm(samples):
+            text = sample["text"]
+            tokens = self._tokenizer(text)
+            length = len(tokens)
 
-    vocab = {}
-    length_fre = {}
-    total_samps = 0
-    for sample in tqdm(samples):
-        text = sample["text"]
-        tokens = tokenizer(text)
-        length = len(tokens)
-
-        if length in length_fre.keys():
-            length_fre[length] += 1
-        else:
-            length_fre[length] = 1
-
-        # update vocabulary
-        for w in tokens:
-            if w in vocab.keys():
-                vocab[w] += 1
+            if length in length_fre.keys():
+                length_fre[length] += 1
             else:
-                vocab[w] = 1
+                length_fre[length] = 1
 
-        total_samps += 1
+            # update vocabulary
+            for w in tokens:
+                if w in vocab.keys():
+                    vocab[w] += 1
+                else:
+                    vocab[w] = 1
 
-    # the rank of each word based on its frequency
-    sorted_dict = {
-        key: rank
-        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-    }
-    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+            total_samps += 1
 
-    for k, v in length_fre.items():
-        length_fre[k] = v * 1.0 / total_samps
+        # the rank of each word based on its frequency
+        sorted_dict = {
+            key: rank
+            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+        }
+        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
 
-    return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
+        for k, v in length_fre.items():
+            length_fre[k] = v * 1.0 / total_samps
+
+        return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
+
+
+# @aggregating(
+#     name="get_statistics",
+#     contributor="datalab",
+#     task="text-classification",
+#     description="Calculate the overall statistics (e.g., density) of a given text classification dataset",
+# )
+
