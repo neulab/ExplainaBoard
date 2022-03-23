@@ -13,7 +13,6 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 * [Conditional Text Generation](#conditional-generation)
 * [Named Entity Recognition](#named-entity-recognition)
 * [Extractive QA](#extractive-qa-extractive)
-* [Hellaswag](#hellaswag)
 * [KG-Link-Tail-Prediction](#kg-link-tail-prediction)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [QA-Multiple-Choice](#qa-multiple-choice)
@@ -172,13 +171,6 @@ explainaboard --task question-answering-extractive --system_outputs ./data/syste
 * `f1_score_qa`
 * `exact_match_qa`
  
-
-## [Hellaswag](task_hellaswag.md)
-
-**CLI Example**
-```shell
-explainaboard --task hellaswag --system_outputs ./data/system_outputs/hellaswag/hellaswag.random
-```
 
 ## [Aspect-based Sentiment Classification](task_aspect_based_sentiment_classification.md)
 Predict the sentiment of a text based on a specific aspect.
