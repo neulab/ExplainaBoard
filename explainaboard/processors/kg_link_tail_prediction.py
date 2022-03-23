@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Callable, Dict, List, Any
+from typing import Callable, Dict, List, Any, Iterator
 
 from datalabs import load_dataset
 from datalabs import aggregating
