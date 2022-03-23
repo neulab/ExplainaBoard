@@ -84,7 +84,7 @@ class QAMultipleChoiceProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
 
     # TODO(gneubig): this should be deduplicated
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
@@ -104,7 +104,7 @@ class QAMultipleChoiceProcessor(Processor):
                 if (
                     len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(statistics_func, mode="local")
+                    new_train = dataset['train'].apply(self._statistics_func, mode="local")
                     statistics = new_train._stat
                 else:
                     statistics = dataset["train"]._stat
