@@ -1,5 +1,6 @@
 from unittest import TestCase
 from explainaboard import TaskType, FileType, Source, get_loader
+from explainaboard.loaders.file_loader import FileLoaderField, TSVFileLoader
 from explainaboard.tests.utils import load_file_as_str
 from explainaboard.loaders.loader import Loader
 import pathlib
@@ -14,10 +15,19 @@ class BaseLoaderTests(TestCase):
             load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
             Source.in_memory,
             FileType.tsv,
+            {FileType.tsv: TSVFileLoader([FileLoaderField(0, "field0", "str")], True)},
         )
-        samples = [sample for sample in loader._load_raw_data_points()]
+        samples = [sample for sample in loader.load()]
         self.assertEqual(len(samples), 10)
-        self.assertEqual(len(samples[0]), 3)
+        self.assertEqual(set(samples[0].keys()), {"id", "field0"})
+
+
+class FileLoaderTests(TestCase):
+    def test_tsv_validation(self):
+        self.assertRaises(
+            ValueError,
+            lambda: TSVFileLoader([FileLoaderField("0", "field0", "str")], True),
+        )
 
 
 class TextClassificationLoader(TestCase):
@@ -30,8 +40,8 @@ class TextClassificationLoader(TestCase):
         )
         data = loader.load()
         self.assertEqual(len(data), 10)
-        self.assertListEqual(
-            list(data[0].keys()), ["id", "text", "true_label", "predicted_label"]
+        self.assertEqual(
+            set(data[0].keys()), {"id", "text", "true_label", "predicted_label"}
         )
 
 
@@ -44,8 +54,6 @@ class QASquadLoader(TestCase):
             FileType.json,
         )
         data = loader.load()
-        # print(data[0].keys())
-        # print(len(data))
         self.assertEqual(len(data), 5)
 
 
@@ -58,6 +66,4 @@ class SummSquadLoader(TestCase):
             FileType.tsv,
         )
         data = loader.load()
-        # print(data[0].keys())
-        # print(len(data))
         self.assertEqual(len(data), 70)

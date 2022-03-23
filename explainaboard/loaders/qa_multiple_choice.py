@@ -1,5 +1,6 @@
-from typing import Dict, Iterable, List
+from typing import Iterable, List
 from explainaboard.constants import FileType
+from explainaboard.loaders.file_loader import JSONFileLoader
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
@@ -16,18 +17,24 @@ class QAMultipleChoiceLoader(Loader):
     """
 
     _default_file_type = FileType.json
+    _default_file_loaders = {
+        FileType.json: JSONFileLoader(None, False),
+    }
 
-    def load(self) -> Iterable[Dict]:
+    def load(self) -> Iterable[dict]:
         """
         :param path_system_output: the path of system output file with following format:
         "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
 
         :return: class object
         """
-        super().load()
-        data: List[Dict] = []
+        data: List[dict] = []
         if self._file_type == FileType.json:
-            for id, data_info in enumerate(self._raw_data):
+            raw_data = self._default_file_loaders[FileType.json].load_raw(
+                self._data, self._source
+            )
+
+            for id, data_info in enumerate(raw_data):
                 data_base = {
                     "id": str(id),  # should be string type
                     "context": data_info["context"],

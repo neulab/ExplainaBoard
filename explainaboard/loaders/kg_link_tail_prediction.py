@@ -1,5 +1,6 @@
 from typing import Dict, Iterable, List
 from explainaboard.constants import FileType
+from explainaboard.loaders.file_loader import JSONFileLoader
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
@@ -16,6 +17,7 @@ class KgLinkTailPredictionLoader(Loader):
     """
 
     _default_file_type = FileType.json
+    _default_file_loaders = {FileType.json: JSONFileLoader(None, False)}
 
     def load(self) -> Iterable[Dict]:
         """
@@ -24,11 +26,13 @@ class KgLinkTailPredictionLoader(Loader):
 
         :return: class object
         """
-        super().load()
         data: List[Dict] = []
         if self._file_type == FileType.json:
+            raw_data = self._default_file_loaders[FileType.json].load_raw(
+                self._data, self._source
+            )
             if self.user_defined_features_configs:  # user defined features are present
-                for id, (link, features_dict) in enumerate(self._raw_data.items()):
+                for id, (link, features_dict) in enumerate(raw_data.items()):
 
                     data_i = {
                         "id": str(id),  # should be string type
@@ -49,7 +53,7 @@ class KgLinkTailPredictionLoader(Loader):
 
                     data.append(data_i)
             else:
-                for id, (link, predictions) in enumerate(self._raw_data.items()):
+                for id, (link, predictions) in enumerate(raw_data.items()):
                     data.append(
                         {
                             "id": str(id),  # should be string type
