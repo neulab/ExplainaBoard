@@ -41,9 +41,9 @@ class TestTextClassification(unittest.TestCase):
         }
         loader = get_loader(
             TaskType.text_classification,
+            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
             Source.in_memory,
             FileType.tsv,
-            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
         )
         data = list(loader.load())
         processor = get_processor(TaskType.text_classification)
