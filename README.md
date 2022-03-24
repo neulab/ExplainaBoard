@@ -49,14 +49,14 @@ We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.a
 
 ### Quick Installation
 
-**Method 1:** Simple installation from PyPI (Python 3 only)
+**Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
 ```
 pip install explainaboard
 python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
 ```
 
-**Method 2:** Install from the source and develop locally (Python 3 only)
+**Method 2 - Development:** Install from the source and develop locally (Python 3 only)
 
 ```bash
 # Clone current repo
@@ -67,7 +67,9 @@ cd ExplainaBoard
 pip install .[dev]
 pre-commit install
 ```
-- This project uses flake8 (linter) and black (formatter). They are enforced in the pre-commit hook and in the CI pipeline.
+
+- **Testing:** To run tests, you can run `python -m unittest`. 
+- **Linting and Code Style:** This project uses flake8 (linter) and black (formatter). They are enforced in the pre-commit hook and in the CI pipeline.
     - run `python -m black .` to format code
     - run `flake8` to lint code
     - You can also configure your IDE to automatically format and lint the files as you are writing code.
