@@ -17,9 +17,9 @@ class TestTextPairClassification(unittest.TestCase):
         path_data = artifacts_path + "test-snli.tsv"
         loader = get_loader(
             TaskType.text_pair_classification,
+            path_data,
             Source.local_filesystem,
             FileType.tsv,
-            path_data,
         )
         data = list(loader.load())
         processor = get_processor(TaskType.text_pair_classification)

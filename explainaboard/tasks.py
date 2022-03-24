@@ -10,7 +10,6 @@ class TaskType(str, Enum):
     summarization = "summarization"
     machine_translation = "machine-translation"
     text_pair_classification = "text-pair-classification"
-    hellaswag = "hellaswag"
     aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
     kg_link_tail_prediction = "kg-link-tail-prediction"
     qa_multiple_choice = "qa-multiple-choice"

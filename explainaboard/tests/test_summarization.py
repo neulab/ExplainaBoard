@@ -12,7 +12,7 @@ class TestSummarization(unittest.TestCase):
 
         path_data = artifacts_path + "test-summ.tsv"
         loader = get_loader(
-            TaskType.summarization, Source.local_filesystem, FileType.tsv, path_data
+            TaskType.summarization, path_data, Source.local_filesystem, FileType.tsv
         )
         data = list(loader.load())
 
