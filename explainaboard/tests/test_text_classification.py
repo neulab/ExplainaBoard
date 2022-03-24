@@ -16,11 +16,14 @@ class TestTextClassification(unittest.TestCase):
         }
         loader = get_loader(
             TaskType.text_classification,
+            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
             Source.in_memory,
             FileType.tsv,
-            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
         )
         data = list(loader.load())
+        self.assertEqual(
+            set(data[0].keys()), {"text", "true_label", "predicted_label", "id"}
+        )
         processor = get_processor(TaskType.text_classification)
 
         sys_info = processor.process(metadata, data)

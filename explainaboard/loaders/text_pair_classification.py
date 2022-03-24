@@ -1,5 +1,9 @@
-from typing import Dict, Iterable, List
-from explainaboard.constants import Source, FileType
+from explainaboard.constants import FileType
+from explainaboard.loaders.file_loader import (
+    FileLoaderField,
+    JSONFileLoader,
+    TSVFileLoader,
+)
 from explainaboard.tasks import TaskType
 from .loader import register_loader
 from .loader import Loader
@@ -15,37 +19,23 @@ class TextPairClassificationLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    def __init__(self, source: Source, file_type: FileType, data: str = None):
-
-        if source is None:
-            source = Source.local_filesystem
-        if file_type is None:
-            file_type = FileType.tsv
-
-        self._source = source
-        self._file_type = file_type
-        self._data = data
-
-    def load(self) -> Iterable[Dict]:
-        """
-        :param path_system_output: the path of system output file with following format:
-        text \t label \t predicted_label
-        :return: class object
-        """
-        super().load()
-        data: List[Dict] = []
-        if self._file_type == FileType.tsv:
-            for id, dp in enumerate(self._raw_data):
-                text1, text2, true_label, predicted_label = dp[:4]
-                data.append(
-                    {
-                        "id": str(id),
-                        "text1": text1.strip(),
-                        "text2": text2.strip(),
-                        "true_label": true_label.strip(),
-                        "predicted_label": predicted_label.strip(),
-                    }
-                )
-        else:
-            raise NotImplementedError
-        return data
+    _default_file_type = FileType.tsv
+    _target_names = ["text1", "text2", "true_label", "predicted_label"]
+    _default_file_loaders = {
+        FileType.tsv: TSVFileLoader(
+            [
+                FileLoaderField(0, _target_names[0], str),
+                FileLoaderField(1, _target_names[1], str),
+                FileLoaderField(2, _target_names[2], str),
+                FileLoaderField(3, _target_names[3], str),
+            ],
+        ),
+        FileType.json: JSONFileLoader(
+            [
+                FileLoaderField("text1", _target_names[0], str),
+                FileLoaderField("text2", _target_names[1], str),
+                FileLoaderField("true_label", _target_names[2], str),
+                FileLoaderField("predicted_label", _target_names[3], str),
+            ]
+        ),
+    }

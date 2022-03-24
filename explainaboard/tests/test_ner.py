@@ -13,9 +13,9 @@ class TestNER(unittest.TestCase):
         path_data = artifacts_path + "test-ner.tsv"
         loader = get_loader(
             TaskType.named_entity_recognition,
+            path_data,
             Source.local_filesystem,
             FileType.conll,
-            path_data,
         )
         data = loader.load()
 

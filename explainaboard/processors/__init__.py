@@ -8,7 +8,6 @@ from . import summarization
 from . import machine_translation
 
 from . import text_pair_classification
-from . import hellaswag
 
 from . import aspect_based_sentiment_classification
 
