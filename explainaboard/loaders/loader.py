@@ -42,7 +42,7 @@ class Loader:
 
         if self._file_type not in self.file_loaders:
             raise NotImplementedError(
-                f"file type: {self._file_type} is not configured. please add it to loader config or override the load method."
+                f"A file loader for {self._file_type} is not provided. please add it to the file_loaders."
             )
 
         self._user_defined_features_configs: dict = (
