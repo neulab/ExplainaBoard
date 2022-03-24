@@ -46,7 +46,7 @@ setup(
         "datasets>=2.0.0",
         "lexicalrichness",
         "spacy",
-        "datalabs>=0.3.6",
+        "datalabs>=0.3.7",
     ],
     extras_require={"dev": ["black", "flake8", "pre-commit"]},
     include_package_data=True,

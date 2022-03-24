@@ -83,7 +83,7 @@ class ConditionalGenerationProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
@@ -98,12 +98,12 @@ class ConditionalGenerationProcessor(Processor):
     # training set dependent features (could be merged for optimization?)
     def _get_num_oov(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['source']
+            existing_features, statistics, lambda x: x['source'], self._tokenizer
         )
 
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['source']
+            existing_features, statistics, lambda x: x['source'], self._tokenizer
         )
 
     def _gen_scoring_stats(

@@ -1,17 +1,11 @@
-from typing import Callable, Any
-from typing import Iterator
-
-from datalabs import load_dataset
+from typing import Any, Iterator
 from datalabs import aggregating
-
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.tasks import TaskType
 
 
 @register_processor(TaskType.qa_multiple_choice)
@@ -84,36 +78,7 @@ class QAMultipleChoiceProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
-
-    # TODO(gneubig): this should be deduplicated
-    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
-        """Take in information about the system outputs and a statistic calculating function and return a dictionary
-        of statistics.
-
-        :param sys_info: Information about the system outputs
-        :param statistics_func: The function used to get the statistics
-        :return: Statistics from, usually, the training set that are used to calculate other features
-        """
-
-        # Calculate statistics of training set
-        statistics = None
-        if sys_info.dataset_name is not None:
-            try:
-                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
-                if (
-                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
-                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(statistics_func, mode="local")
-                    statistics = new_train._stat
-                else:
-                    statistics = dataset["train"]._stat
-            except FileNotFoundError:
-                eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
-                )
-        return statistics
+        # self._statistics_func = get_statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, existing_features: dict):
