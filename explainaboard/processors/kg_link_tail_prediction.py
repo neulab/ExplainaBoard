@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Callable, Dict, List, Any
+from typing import Callable, Dict, List, Any, Iterator
 
 from datalabs import load_dataset
 from datalabs import aggregating
@@ -113,9 +113,44 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
         self.entity_type_level_map = None
         self._user_defined_feature_config = None
+
+    @aggregating()
+    def _statistics_func(self, samples: Iterator):
+        """
+        `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
+        # pip install datalabs
+        dataset = load_dataset("fb15k_237", 'readable')
+        print(dataset['train'])
+        """
+        dict_head = {}
+        dict_link = {}
+        dict_tail = {}
+
+        for sample in tqdm(samples):
+
+            if sample['tail'] not in dict_tail.keys():
+                dict_tail[sample['tail']] = 1
+            else:
+                dict_tail[sample['tail']] += 1
+
+            if sample['head'] not in dict_head.keys():
+                dict_head[sample['head']] = 1
+            else:
+                dict_head[sample['head']] += 1
+
+            if sample['link'] not in dict_link.keys():
+                dict_link[sample['link']] = 1
+            else:
+                dict_link[sample['link']] += 1
+
+        return {
+            "head_fre": dict_head,
+            "link_fre": dict_link,
+            "tail_fre": dict_tail,
+        }
 
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
 
@@ -140,7 +175,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 if (
                     len(dataset['train']._stat) == 0 or not sys_info.reload_stat
                 ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(statistics_func, mode="local")
+                    new_train = dataset['train'].apply(
+                        self._statistics_func, mode="local"
+                    )
                     self.statistics = new_train._stat
                 else:
                     self.statistics = dataset["train"]._stat
@@ -341,42 +378,42 @@ class KGLinkTailPredictionProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
 
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="kg-link-prediction",
-    description="aggregation function",
-)
-def get_statistics(samples: List[Dict]):
-    """
-    `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
-    # pip install datalabs
-    dataset = load_dataset("fb15k_237", 'readable')
-    print(dataset['train'])
-    """
-    dict_head = {}
-    dict_link = {}
-    dict_tail = {}
-
-    for sample in tqdm(samples):
-
-        if sample['tail'] not in dict_tail.keys():
-            dict_tail[sample['tail']] = 1
-        else:
-            dict_tail[sample['tail']] += 1
-
-        if sample['head'] not in dict_head.keys():
-            dict_head[sample['head']] = 1
-        else:
-            dict_head[sample['head']] += 1
-
-        if sample['link'] not in dict_link.keys():
-            dict_link[sample['link']] = 1
-        else:
-            dict_link[sample['link']] += 1
-
-    return {
-        "head_fre": dict_head,
-        "link_fre": dict_link,
-        "tail_fre": dict_tail,
-    }
+# @aggregating(
+#     name="get_statistics",
+#     contributor="datalab",
+#     task="kg-link-prediction",
+#     description="aggregation function",
+# )
+# def get_statistics(samples: List[Dict]):
+#     """
+#     `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
+#     # pip install datalabs
+#     dataset = load_dataset("fb15k_237", 'readable')
+#     print(dataset['train'])
+#     """
+#     dict_head = {}
+#     dict_link = {}
+#     dict_tail = {}
+#
+#     for sample in tqdm(samples):
+#
+#         if sample['tail'] not in dict_tail.keys():
+#             dict_tail[sample['tail']] = 1
+#         else:
+#             dict_tail[sample['tail']] += 1
+#
+#         if sample['head'] not in dict_head.keys():
+#             dict_head[sample['head']] = 1
+#         else:
+#             dict_head[sample['head']] += 1
+#
+#         if sample['link'] not in dict_link.keys():
+#             dict_link[sample['link']] = 1
+#         else:
+#             dict_link[sample['link']] += 1
+#
+#     return {
+#         "head_fre": dict_head,
+#         "link_fre": dict_link,
+#         "tail_fre": dict_tail,
+#     }

@@ -193,7 +193,76 @@ class NERProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
+
+    def _get_statistics_resources(
+        self, dataset_split: Dataset
+    ) -> Optional[Mapping[str, Any]]:
+        """
+        From a DataLab dataset split, get resources necessary to calculate statistics
+        """
+        base_resources = super()._get_statistics_resources(dataset_split)
+        task_specific_resources = {
+            'tag_id2str': dataset_split._info.task_templates[0].labels
+        }
+        # print(f"super()._get_statistics_resources(dataset_split):{super()._get_statistics_resources(dataset_split)}")
+        # print({'tag_id2str': dataset_split._info.task_templates[0].labels}.update(super()._get_statistics_resources(dataset_split)))
+        return {**base_resources, **task_specific_resources}
+
+    @aggregating()
+    def _statistics_func(self, samples: Iterator, tag_id2str=None):
+        """
+        Input:
+        samples: [{
+         "tokens":
+         "tags":
+        }]
+        Output:dict:
+        """
+
+        # tag_id2str = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
+
+        if tag_id2str is None:
+            tag_id2str = []
+        tokens_sequences = []
+        tags_sequences = []
+        tags_without_bio = list(
+            set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
+        )
+
+        vocab = {}
+        for sample in tqdm(samples):
+            tokens, tag_ids = sample["tokens"], sample["tags"]
+            tags = [tag_id2str[tag_id] for tag_id in tag_ids]
+
+            # update vocabulary
+            for w in tokens:
+                if w in vocab.keys():
+                    vocab[w] += 1
+                else:
+                    vocab[w] = 1
+
+            tokens_sequences += tokens
+            tags_sequences += tags
+
+        # efre_dic
+        econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)
+        # econ_dic = {"a":1} # for debugging purpose
+        # econ_dic
+        efre_dic = get_efre_dic(tokens_sequences, tags_sequences)
+        # vocab_rank: the rank of each word based on its frequency
+        sorted_dict = {
+            key: rank
+            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+        }
+        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+
+        return {
+            "efre_dic": efre_dic,
+            "econ_dic": econ_dic,
+            "vocab": vocab,
+            "vocab_rank": vocab_rank,
+        }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):
@@ -257,7 +326,7 @@ class NERProcessor(Processor):
             # Training set dependent features
             if has_stats:
                 lower_tag = tag.lower()
-                lower_text = tag.lower()
+                lower_text = span_text.lower()
                 span_dic['econ'] = 0
                 if span_text in econ_dic and lower_tag in econ_dic[lower_text]:
                     span_dic['econ'] = float(econ_dic[lower_text][lower_tag])
@@ -541,14 +610,6 @@ class NERProcessor(Processor):
 
         return sort_dict(bucket_name_to_performance)
 
-    def _get_statistics_resources(
-        self, dataset_split: Dataset
-    ) -> Optional[Mapping[str, Any]]:
-        """
-        From a DataLab dataset split, get resources necessary to calculate statistics
-        """
-        return {'tag_id2str': dataset_split._info.task_templates[0].labels}
-
 
 # TODO(gneubig): below is not done with refactoring
 def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
@@ -558,9 +619,9 @@ def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
     econ_dic = dict()
     chunks_train = set(eval_basic_ner.get_chunks(tag_sequences_train))
 
-    print('tags: ', tags)
+    # print('tags: ', tags)
     count_idx = 0
-    print('num of computed chunks:', len(chunks_train))
+    # print('num of computed chunks:', len(chunks_train))
     word_sequences_train_str = ' '.join(train_word_sequences).lower()
     for true_chunk in tqdm(chunks_train):
         # print('true_chunk',true_chunk)
@@ -681,63 +742,63 @@ def get_efre_dic(train_word_sequences, tag_sequences_train):
     return efre_dic_keep
 
 
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="sequence-labeling, named-entity-recognition, structure-prediction",
-    description="Calculate the overall statistics (e.g., average length) of "
-    "a given sequence labeling datasets (e.g., named entity recognition)",
-)
-def get_statistics(samples: Iterator, tag_id2str=None):
-    """
-    Input:
-    samples: [{
-     "tokens":
-     "tags":
-    }]
-    Output:dict:
-    """
-
-    # tag_id2str = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
-
-    if tag_id2str is None:
-        tag_id2str = []
-    tokens_sequences = []
-    tags_sequences = []
-    tags_without_bio = list(
-        set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
-    )
-
-    vocab = {}
-    for sample in tqdm(samples):
-        tokens, tag_ids = sample["tokens"], sample["tags"]
-        tags = [tag_id2str[tag_id] for tag_id in tag_ids]
-
-        # update vocabulary
-        for w in tokens:
-            if w in vocab.keys():
-                vocab[w] += 1
-            else:
-                vocab[w] = 1
-
-        tokens_sequences += tokens
-        tags_sequences += tags
-
-    # efre_dic
-    econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)
-    # econ_dic = {"a":1} # for debugging purpose
-    # econ_dic
-    efre_dic = get_efre_dic(tokens_sequences, tags_sequences)
-    # vocab_rank: the rank of each word based on its frequency
-    sorted_dict = {
-        key: rank
-        for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-    }
-    vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
-    return {
-        "efre_dic": efre_dic,
-        "econ_dic": econ_dic,
-        "vocab": vocab,
-        "vocab_rank": vocab_rank,
-    }
+# @aggregating(
+#     name="get_statistics",
+#     contributor="datalab",
+#     task="sequence-labeling, named-entity-recognition, structure-prediction",
+#     description="Calculate the overall statistics (e.g., average length) of "
+#     "a given sequence labeling datasets (e.g., named entity recognition)",
+# )
+# def get_statistics(samples: Iterator, tag_id2str=None):
+#     """
+#     Input:
+#     samples: [{
+#      "tokens":
+#      "tags":
+#     }]
+#     Output:dict:
+#     """
+#
+#     # tag_id2str = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
+#
+#     if tag_id2str is None:
+#         tag_id2str = []
+#     tokens_sequences = []
+#     tags_sequences = []
+#     tags_without_bio = list(
+#         set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
+#     )
+#
+#     vocab = {}
+#     for sample in tqdm(samples):
+#         tokens, tag_ids = sample["tokens"], sample["tags"]
+#         tags = [tag_id2str[tag_id] for tag_id in tag_ids]
+#
+#         # update vocabulary
+#         for w in tokens:
+#             if w in vocab.keys():
+#                 vocab[w] += 1
+#             else:
+#                 vocab[w] = 1
+#
+#         tokens_sequences += tokens
+#         tags_sequences += tags
+#
+#     # efre_dic
+#     econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)
+#     # econ_dic = {"a":1} # for debugging purpose
+#     # econ_dic
+#     efre_dic = get_efre_dic(tokens_sequences, tags_sequences)
+#     # vocab_rank: the rank of each word based on its frequency
+#     sorted_dict = {
+#         key: rank
+#         for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+#     }
+#     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+#
+#     return {
+#         "efre_dic": efre_dic,
+#         "econ_dic": econ_dic,
+#         "vocab": vocab,
+#         "vocab_rank": vocab_rank,
+#     }

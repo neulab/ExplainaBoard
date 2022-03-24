@@ -1,7 +1,5 @@
-from typing import Callable, Any
+from typing import Any
 from typing import Iterator, Dict, List
-
-from datalabs import load_dataset
 from datalabs import aggregating
 
 import explainaboard.utils.eval_basic_qa
@@ -11,8 +9,7 @@ from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import eprint, sort_dict
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.utils.py_utils import sort_dict
 
 
 @register_processor(TaskType.question_answering_extractive)
@@ -90,38 +87,27 @@ class QAExtractiveProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._statistics_func = get_statistics
+        # self._statistics_func = get_statistics
 
-    # TODO(gneubig) to be deduplicated
-    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
-        """Take in information about the system outputs and a statistic calculating function and return a dictionary
-        of statistics.
-
-        :param sys_info: Information about the system outputs
-        :param statistics_func: The function used to get the statistics
-        :return: Statistics from, usually, the training set that are used to calculate other features
+    @aggregating()
+    def _statistics_func(self, samples: Iterator):
+        """
+        Input:
+        samples: [{
+         "id":str
+         "context":str
+         "question":str
+         "answers":Dict
+         "options"
+        }]
         """
 
-        # Calculate statistics of training set
-        statistics = None
-        if sys_info.dataset_name is not None:
-            try:
-                dataset = load_dataset(sys_info.dataset_name, sys_info.sub_dataset_name)
-                if "train" not in dataset.keys():
-                    statistics = None
-                elif (
-                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
-                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
-                    new_train = dataset['train'].apply(statistics_func, mode="local")
-                    statistics = new_train._stat
-                else:
-                    statistics = dataset["train"]._stat
-            except FileNotFoundError:
-                eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
-                )
-        return statistics
+        # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+        # tokenizer = SingleSpaceTokenizer()
+
+        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+            samples, lambda x: x['context'], self._tokenizer
+        )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, existing_features: dict):
@@ -252,28 +238,28 @@ class QAExtractiveProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
 
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="qa-extractive",
-    description="Calculate the overall statistics (e.g., average length) of "
-    "a given text classification dataset",
-)
-def get_statistics(samples: Iterator):
-    """
-    Input:
-    samples: [{
-     "id":str
-     "context":str
-     "question":str
-     "answers":Dict
-     "options"
-    }]
-    """
-
-    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-    tokenizer = SingleSpaceTokenizer()
-
-    return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-        samples, lambda x: x['context'], tokenizer
-    )
+# @aggregating(
+#     name="get_statistics",
+#     contributor="datalab",
+#     task="qa-extractive",
+#     description="Calculate the overall statistics (e.g., average length) of "
+#     "a given text classification dataset",
+# )
+# def get_statistics(samples: Iterator):
+#     """
+#     Input:
+#     samples: [{
+#      "id":str
+#      "context":str
+#      "question":str
+#      "answers":Dict
+#      "options"
+#     }]
+#     """
+#
+#     # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+#     tokenizer = SingleSpaceTokenizer()
+#
+#     return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+#         samples, lambda x: x['context'], tokenizer
+#     )
