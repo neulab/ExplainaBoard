@@ -29,30 +29,25 @@ class QAMultipleChoiceLoader(Loader):
         :return: class object
         """
         data: List[dict] = []
-        if self._file_type == FileType.json:
-            raw_data = self._default_file_loaders[FileType.json].load_raw(
-                self._data, self._source
-            )
+        raw_data = self._default_file_loaders[self._file_type].load_raw(
+            self._data, self._source
+        )
 
-            for id, data_info in enumerate(raw_data):
-                data_base = {
-                    "id": str(id),  # should be string type
-                    "context": data_info["context"],
-                    "question": data_info["question"],
-                    "answers": data_info["answers"],
-                    "predicted_answers": data_info["predicted_answers"],
-                }
-                if (
-                    self.user_defined_features_configs
-                ):  # user defined features are present
-                    # additional user-defined features
-                    data_base.update(
-                        {
-                            feature_name: data_info[feature_name]
-                            for feature_name in self.user_defined_features_configs
-                        }
-                    )
-                data.append(data_base)
-        else:
-            raise NotImplementedError
+        for id, data_info in enumerate(raw_data):
+            data_base = {
+                "id": str(id),  # should be string type
+                "context": data_info["context"],
+                "question": data_info["question"],
+                "answers": data_info["answers"],
+                "predicted_answers": data_info["predicted_answers"],
+            }
+            if self.user_defined_features_configs:  # user defined features are present
+                # additional user-defined features
+                data_base.update(
+                    {
+                        feature_name: data_info[feature_name]
+                        for feature_name in self.user_defined_features_configs
+                    }
+                )
+            data.append(data_base)
         return data
