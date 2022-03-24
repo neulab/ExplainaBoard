@@ -47,7 +47,7 @@ We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.a
 40 datasets and 300 systems. Detailed information is as follows.
 <img src="./fig/demo.gif" width="800" class="center">
 
-### Quick Installation
+### Installation
 
 **Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
