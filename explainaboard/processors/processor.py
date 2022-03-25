@@ -203,7 +203,7 @@ class Processor:
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> List[str]:
+    ) -> Optional[List[str]]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
         information, then calculates feature functions and modifies `sys_output` to add these feature values
