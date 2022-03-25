@@ -17,85 +17,93 @@ from explainaboard.utils.py_utils import eprint, sort_dict
 
 @register_processor(TaskType.kg_link_tail_prediction)
 class KGLinkTailPredictionProcessor(Processor):
-    _task_type = TaskType.kg_link_tail_prediction
-    _features = feature.Features(
-        {
-            "true_head": feature.Value("string"),
-            "link": feature.Value("string"),
-            "true_tail": feature.Value("string"),
-            "predicted_tails": feature.Sequence(feature.Value("string")),
-            "tail_entity_length": feature.Value(
-                dtype="float",
-                description="number of words in the tail entity",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+    @classmethod
+    def task_type(cls) -> TaskType:
+        return TaskType.kg_link_tail_prediction
+
+    @classmethod
+    def default_features(cls) -> feature.Features:
+        return feature.Features(
+            {
+                "true_head": feature.Value("string"),
+                "link": feature.Value("string"),
+                "true_tail": feature.Value("string"),
+                "predicted_tails": feature.Sequence(feature.Value("string")),
+                "tail_entity_length": feature.Value(
+                    dtype="float",
+                    description="number of words in the tail entity",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "head_entity_length": feature.Value(
-                dtype="float",
-                description="number of words in the head entity",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "head_entity_length": feature.Value(
+                    dtype="float",
+                    description="number of words in the head entity",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "tail_fre": feature.Value(
-                dtype="float",
-                description="the frequency of tail entity in the training set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "tail_fre": feature.Value(
+                    dtype="float",
+                    description="the frequency of tail entity in the training set",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            "link_fre": feature.Value(
-                dtype="float",
-                description="the frequency of link relation in the training set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "link_fre": feature.Value(
+                    dtype="float",
+                    description="the frequency of link relation in the training set",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            "head_fre": feature.Value(
-                dtype="float",
-                description="the frequency of head relation in the training set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "head_fre": feature.Value(
+                    dtype="float",
+                    description="the frequency of head relation in the training set",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            "symmetry": feature.Value(
-                dtype="string",
-                description="boolean feature: 'symmetric' or 'asymmetric'; more granularity to be added",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_discrete_value", number=2, setting=1
+                "symmetry": feature.Value(
+                    dtype="string",
+                    description="boolean feature: 'symmetric' or 'asymmetric'; more granularity to be added",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_discrete_value", number=2, setting=1
+                    ),
                 ),
-            ),
-            "entity_type_level": feature.Value(
-                dtype="string",
-                description="most specific (highest) entity type level of true tail entity",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_discrete_value", number=8, setting=1
+                "entity_type_level": feature.Value(
+                    dtype="string",
+                    description="most specific (highest) entity type level of true tail entity",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_discrete_value", number=8, setting=1
+                    ),
                 ),
-            ),
-        }
-    )
-    _default_metrics = ["Hits", "MeanReciprocalRank"]
+            }
+        )
+
+    @classmethod
+    def default_metrics(cls) -> List[str]:
+        return ["Hits", "MeanReciprocalRank"]
 
     # TODO: is this the best place to put this?
     _symmetric_relations = [
@@ -113,7 +121,6 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        # self._statistics_func = get_statistics
         self.entity_type_level_map = None
         self._user_defined_feature_config = None
 

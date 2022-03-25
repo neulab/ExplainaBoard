@@ -1,3 +1,5 @@
+from typing import List
+
 from explainaboard import feature
 from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
@@ -7,81 +9,86 @@ from explainaboard.utils.spacy_loader import get_named_entities
 
 @register_processor(TaskType.aspect_based_sentiment_classification)
 class AspectBasedSentimentClassificationProcessor(Processor):
-    _task_type = TaskType.aspect_based_sentiment_classification
-    _features = feature.Features(
-        {
-            "aspect": feature.Value("string"),
-            "text": feature.Value("string"),
-            "true_label": feature.ClassLabel(
-                names=["positive", "negative"], is_bucket=False
-            ),
-            "predicted_label": feature.ClassLabel(
-                names=["positive", "negative"], is_bucket=False
-            ),
-            "label": feature.Value(
-                dtype="string",
-                description="category",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_discrete_value", number=4, setting=1
-                ),
-            ),
-            "sentence_length": feature.Value(
-                dtype="float",
-                description="sentence length",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "token_number": feature.Value(
-                dtype="float",
-                description="the number of chars",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "entity_number": feature.Value(
-                dtype="float",
-                description="entity numbers",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "aspect_length": feature.Value(
-                dtype="float",
-                description="aspect length",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-            "aspect_index": feature.Value(
-                dtype="float",
-                description="aspect position",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
-                ),
-            ),
-        }
-    )
-    _default_metrics = ["Accuracy"]
+    @classmethod
+    def task_type(cls) -> TaskType:
+        return TaskType.aspect_based_sentiment_classification
 
-    def __init__(self):
-        super().__init__()
+    @classmethod
+    def default_features(cls) -> feature.Features:
+        return feature.Features(
+            {
+                "aspect": feature.Value("string"),
+                "text": feature.Value("string"),
+                "true_label": feature.ClassLabel(
+                    names=["positive", "negative"], is_bucket=False
+                ),
+                "predicted_label": feature.ClassLabel(
+                    names=["positive", "negative"], is_bucket=False
+                ),
+                "label": feature.Value(
+                    dtype="string",
+                    description="category",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_discrete_value", number=4, setting=1
+                    ),
+                ),
+                "sentence_length": feature.Value(
+                    dtype="float",
+                    description="sentence length",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "token_number": feature.Value(
+                    dtype="float",
+                    description="the number of chars",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "entity_number": feature.Value(
+                    dtype="float",
+                    description="entity numbers",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "aspect_length": feature.Value(
+                    dtype="float",
+                    description="aspect length",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "aspect_index": feature.Value(
+                    dtype="float",
+                    description="aspect position",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+            }
+        )
+
+    @classmethod
+    def default_metrics(cls) -> List[str]:
+        return ["Accuracy"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, existing_features: dict):

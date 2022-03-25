@@ -18,72 +18,75 @@ from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 @register_processor(TaskType.conditional_generation)
 class ConditionalGenerationProcessor(Processor):
-    _task_type = TaskType.conditional_generation
-    _default_metrics = ["rouge1", "rouge2", "rougeL", "bleu"]
+    @classmethod
+    def task_type(cls) -> TaskType:
+        return TaskType.conditional_generation
 
-    _features = feature.Features(
-        {
-            "source": feature.Value("string"),
-            "reference": feature.Value("string"),
-            "hypothesis": feature.Value("string"),
-            "source_length": feature.Value(
-                dtype="float",
-                description="the length of source document",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+    @classmethod
+    def default_features(cls) -> feature.Features:
+        return feature.Features(
+            {
+                "source": feature.Value("string"),
+                "reference": feature.Value("string"),
+                "hypothesis": feature.Value("string"),
+                "source_length": feature.Value(
+                    dtype="float",
+                    description="the length of source document",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "reference_length": feature.Value(
-                dtype="float",
-                description="the length of gold summary",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "reference_length": feature.Value(
+                    dtype="float",
+                    description="the length of gold summary",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "hypothesis_length": feature.Value(
-                dtype="float",
-                description="the length of gold summary",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "hypothesis_length": feature.Value(
+                    dtype="float",
+                    description="the length of gold summary",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "num_oov": feature.Value(
-                dtype="float",
-                description="the number of out-of-vocabulary words",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "num_oov": feature.Value(
+                    dtype="float",
+                    description="the number of out-of-vocabulary words",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            "fre_rank": feature.Value(
-                dtype="float",
-                description="the average rank of each work based on its frequency in training set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "fre_rank": feature.Value(
+                    dtype="float",
+                    description="the average rank of each work based on its frequency in training set",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-        }
-    )
+            }
+        )
 
-    def __init__(self):
-        super().__init__()
-        # self._statistics_func = get_statistics
+    @classmethod
+    def default_metrics(cls) -> List[str]:
+        return ["rouge1", "rouge2", "rougeL", "bleu"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):
@@ -288,12 +291,6 @@ class ConditionalGenerationProcessor(Processor):
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
         return sort_dict(bucket_name_to_performance)
-
-
-# @register_processor(TaskType.summarization)
-# class SummarizationProcessor(ConditionalGenerationProcessor):
-#     _task_type = TaskType.summarization
-#     _default_metrics = ["rouge1", "rouge2", "rougeL"]
 
 
 # TODO(gneubig) should be conditional generation, not summarization

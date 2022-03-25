@@ -23,7 +23,6 @@ class TestSummarization(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.summarization.value)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 
