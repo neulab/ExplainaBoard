@@ -1,11 +1,10 @@
 from typing import Any, Optional, Tuple, Callable
-from typing import Iterator, Dict, List
+from typing import Dict, List
 
 import numpy
 from tqdm import tqdm
 
 
-from datalabs import aggregating
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.analysis import cap_feature
 from explainaboard import feature
@@ -14,7 +13,6 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import sort_dict
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 import explainaboard.utils.bucketing
 
 
@@ -525,12 +523,6 @@ class ConditionalGenerationProcessor(Processor):
 
                 bucket_value = numpy.average(dict_metric_to_values[metric_name])
 
-                # print(
-                #       f"value:\t {bucket_value}\n"
-                #       f"confidence low\t {confidence_score_low}\n"
-                #       f"confidence up \t {confidence_score_high}\n"
-                #       f"---------------------------------")
-
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
@@ -542,76 +534,3 @@ class ConditionalGenerationProcessor(Processor):
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
         return sort_dict(bucket_name_to_performance)
-
-
-# @register_processor(TaskType.summarization)
-# class SummarizationProcessor(ConditionalGenerationProcessor):
-#     _task_type = TaskType.summarization
-#     _default_metrics = ["rouge1", "rouge2", "rougeL"]
-
-
-# TODO(gneubig) should be conditional generation, not summarization
-# Aggregate training set statistics
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="summarization",
-    description="Calculate the overall statistics (e.g., density) of a given summarization dataset",
-)
-def get_statistics(samples: Iterator):
-    """
-    Input:
-    samples: [{
-     "text":
-     "summary":
-    }]
-    Output:dict:
-    """
-
-    # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-    tokenizer = SingleSpaceTokenizer()
-
-    vocab = {}
-    vocab_pruning = {}
-
-    for sample in tqdm(samples):
-
-        text, summary = sample["text"], sample["summary"]
-
-        # # oracle_position_fre
-        # oracle_info = get_oracle_summary.func(sample)
-        # index_of_oracles = [
-        #     i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0
-        # ]
-        # oracle_position = str(int(numpy.mean(index_of_oracles)))
-        #
-        # if oracle_position not in oracle_position_fre.keys():
-        #     oracle_position_fre[oracle_position] = 1
-        # else:
-        #     oracle_position_fre[oracle_position] += 1
-
-        # Vocabulary info
-        for w in tokenizer(text + summary):
-            if w in vocab.keys():
-                vocab[w] += 1
-            else:
-                vocab[w] = 1
-
-    for k, v in vocab.items():  # pruning for the availability of database storage
-        if v > 20:
-            vocab_pruning[k] = v
-        if len(vocab_pruning) > 100:
-            break
-
-    # the rank of each word based on its frequency
-    sorted_dict = {
-        key: rank
-        for rank, key in enumerate(sorted(set(vocab_pruning.values()), reverse=True), 1)
-    }
-    vocab_rank = {k: sorted_dict[v] for k, v in vocab_pruning.items()}
-
-    return {
-        "vocab": vocab_pruning,
-        "vocab_rank": vocab_rank,
-        # "oracle_position_fre": oracle_position_fre,
-    }
