@@ -93,7 +93,7 @@ class NERProcessor(Processor):
                         "span_text": feature.Value("string"),
                         "span_len": feature.Value(
                             dtype="float",
-                            description="entity length",
+                            description="entity length in tokens",
                             is_bucket=True,
                             bucket_info=feature.BucketInfo(
                                 method="bucket_attribute_specified_bucket_value",
@@ -338,7 +338,7 @@ class NERProcessor(Processor):
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> List[str]:
+    ) -> Optional[List[str]]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
         information, then calculates feature functions and modifies `sys_output` to add these feature values
@@ -367,8 +367,7 @@ class NERProcessor(Processor):
             dict_sysout["pred_entity_info"] = self._complete_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
-        # This should return a list, but this list isn't used in the overridden function so ignore for now
-        return None  # noqa
+        return None
 
     def get_overall_performance(
         self,

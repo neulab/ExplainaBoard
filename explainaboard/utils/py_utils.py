@@ -29,7 +29,7 @@ def sort_dict(dict_obj, flag="key"):
 def print_dict(dict_obj, print_infomation="dict"):
     # print("-----------------------------------------------")
     eprint("the information of #" + print_infomation + "#")
-    eprint("Bucket_interval\tF1\tEntity-Number")
+    eprint("bucket_interval\tscore\t#samples")
     for k, v in dict_obj.items():
         if len(k) == 1:
             eprint(
