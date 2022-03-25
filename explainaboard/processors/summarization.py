@@ -1,4 +1,5 @@
 import numpy
+import copy
 from functools import lru_cache
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
@@ -47,76 +48,82 @@ def get_oracle(existing_features: dict):
 class SummarizationProcessor(ConditionalGenerationProcessor):
     _task_type = TaskType.summarization
     _default_metrics = ["rouge1", "rouge2", "rougeL"]
+    # Inherit features from parent class and add new child-specific feature
+    _features = None
 
     def __init__(self):
-        super().__init__()
-        # Inherit features from parent class and add new child-specific features
-        _features = super()._features.update(  # noqa
-            feature.Features(
-                {
-                    "attr_compression": feature.Value(
-                        dtype="float",
-                        description="compression",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "attr_copy_len": feature.Value(
-                        dtype="float",
-                        description="copy length",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "attr_coverage": feature.Value(
-                        dtype="float",
-                        description="coverage",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "attr_novelty": feature.Value(
-                        dtype="float",
-                        description="novelty",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "oracle_score": feature.Value(
-                        dtype="float",
-                        description="the sample-level oracle score",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "oracle_position": feature.Value(
-                        dtype="float",
-                        description="the sample-level oracle position",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                }
+        # First initialization of a SummarizationProcessor should initialize features
+        if SummarizationProcessor._features is None:
+            SummarizationProcessor._features = copy.deepcopy(
+                ConditionalGenerationProcessor._features
             )
-        )
+            SummarizationProcessor._features.update(
+                feature.Features(
+                    {
+                        "attr_compression": feature.Value(
+                            dtype="float",
+                            description="compression",
+                            is_bucket=True,
+                            bucket_info=feature.BucketInfo(
+                                method="bucket_attribute_specified_bucket_value",
+                                number=4,
+                                setting=(),
+                            ),
+                        ),
+                        "attr_copy_len": feature.Value(
+                            dtype="float",
+                            description="copy length",
+                            is_bucket=True,
+                            bucket_info=feature.BucketInfo(
+                                method="bucket_attribute_specified_bucket_value",
+                                number=4,
+                                setting=(),
+                            ),
+                        ),
+                        "attr_coverage": feature.Value(
+                            dtype="float",
+                            description="coverage",
+                            is_bucket=True,
+                            bucket_info=feature.BucketInfo(
+                                method="bucket_attribute_specified_bucket_value",
+                                number=4,
+                                setting=(),
+                            ),
+                        ),
+                        "attr_novelty": feature.Value(
+                            dtype="float",
+                            description="novelty",
+                            is_bucket=True,
+                            bucket_info=feature.BucketInfo(
+                                method="bucket_attribute_specified_bucket_value",
+                                number=4,
+                                setting=(),
+                            ),
+                        ),
+                        "oracle_score": feature.Value(
+                            dtype="float",
+                            description="the sample-level oracle score",
+                            is_bucket=True,
+                            bucket_info=feature.BucketInfo(
+                                method="bucket_attribute_specified_bucket_value",
+                                number=4,
+                                setting=(),
+                            ),
+                        ),
+                        "oracle_position": feature.Value(
+                            dtype="float",
+                            description="the sample-level oracle position",
+                            is_bucket=True,
+                            bucket_info=feature.BucketInfo(
+                                method="bucket_attribute_specified_bucket_value",
+                                number=4,
+                                setting=(),
+                            ),
+                        ),
+                    }
+                )
+            )
+        super().__init__()
 
     def _get_oracle_position(self, existing_features: dict):
         return get_oracle(existing_features)["oracle_position"]

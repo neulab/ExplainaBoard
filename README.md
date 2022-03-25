@@ -96,10 +96,10 @@ more [supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/su
 from explainaboard import TaskType, get_loader, get_processor
 
 path_data = "./explainaboard/tests/artifacts/test-summ.tsv"
-loader = get_loader(TaskType.summarization, data = path_data)
-data = loader.load()
-processor = get_processor(TaskType.summarization, data = data)
-analysis = processor.process()
+loader = get_loader(TaskType.summarization, data=path_data)
+data = list(loader.load())
+processor = get_processor(TaskType.summarization)
+analysis = processor.process(metadata={}, sys_output=data)
 analysis.write_to_directory("./")
 ```
 

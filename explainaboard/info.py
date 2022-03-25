@@ -99,13 +99,6 @@ class SysOutputInfo:
     features: Features = None
     results: Result = field(default_factory=lambda: Result())
 
-    def write_to_directory(self, dataset_info_dir):
-        """Write `SysOutputInfo` as JSON to `dataset_info_dir`."""
-        with open(
-            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "wb"
-        ) as f:
-            self._dump_info(f)
-
     def to_dict(self) -> dict:
         return asdict(self)
 
@@ -125,6 +118,13 @@ class SysOutputInfo:
                 data[str(key)] = data[key]
                 del data[key]
 
+    def write_to_directory(self, dataset_info_dir):
+        """Write `SysOutputInfo` as JSON to `dataset_info_dir`."""
+        with open(
+            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "wb"
+        ) as f:
+            self._dump_info(f)
+
     def print_as_json(self):
         data_dict = self.to_dict()
         self.replace_bad_keys(data_dict)
@@ -135,7 +135,9 @@ class SysOutputInfo:
 
     def _dump_info(self, file):
         """SystemOutputInfo => JSON"""
-        file.write(json.dumps(self.to_dict(), indent=4).encode("utf-8"))
+        data_dict = self.to_dict()
+        self.replace_bad_keys(data_dict)
+        file.write(json.dumps(data_dict, indent=4).encode("utf-8"))
 
     @classmethod
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
