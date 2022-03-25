@@ -27,7 +27,6 @@ class TestNER(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.named_entity_recognition)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 

@@ -23,7 +23,6 @@ class TestTextPairClassification(unittest.TestCase):
         )
         data = list(loader.load())
         processor = get_processor(TaskType.text_pair_classification)
-        # self.assertEqual(len(processor._features), 8)
 
         sys_info = processor.process(metadata, data)
 
