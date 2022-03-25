@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 from datalabs import aggregating
 import explainaboard.utils.feature_funcs
-from build.lib.explainaboard.utils.analysis import cap_feature
+from explainaboard.utils.analysis import cap_feature
 from explainaboard import feature
 from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
 from explainaboard.processors.processor import Processor
