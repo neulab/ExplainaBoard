@@ -1,7 +1,8 @@
-from typing import Any, Dict, List
-from eaas import Client
 from threading import Thread
+from typing import Any, Dict, List
 import uuid
+
+from eaas import Client
 
 
 class AsyncEaaSClient(Client):

@@ -1,2 +1,3 @@
-# flake8: noqa
-from .performance_gap import get_pairwise_performance_gap
+from explainaboard.analyzers import performance_gap
+
+get_pairwise_performance_gap = performance_gap.get_pairwise_performance_gap

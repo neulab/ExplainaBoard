@@ -1,18 +1,18 @@
-import re
-from typing import Iterator, Dict, List, Tuple, Optional, Mapping, Any, Callable
 from collections import defaultdict
+import re
+from typing import Any, Callable, Dict, Iterator, List, Mapping, Optional, Tuple
 
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
 
-import explainaboard.utils.bucketing
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
+from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.analysis import cap_feature
 from explainaboard.utils import eval_basic_ner
+from explainaboard.utils.analysis import cap_feature
+import explainaboard.utils.bucketing
 from explainaboard.utils.eval_bucket import f1_seqeval_bucket
 from explainaboard.utils.py_utils import sort_dict
 

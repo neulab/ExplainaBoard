@@ -1,8 +1,8 @@
 from typing import Iterator
-from explainaboard import get_processor
-from explainaboard import get_loader
-from explainaboard import FileType, Source
+
 from datalabs.operations.aggregate.auto_eval import auto_eval
+
+from explainaboard import FileType, get_loader, get_processor, Source
 
 
 @auto_eval(name="explainaboard")

@@ -1,10 +1,11 @@
-from unittest import TestCase
-from explainaboard import TaskType, FileType, Source, get_loader
-from explainaboard.loaders.file_loader import FileLoaderField, TSVFileLoader
-from explainaboard.tests.utils import load_file_as_str
-from explainaboard.loaders.loader import Loader
-import pathlib
 import os
+import pathlib
+from unittest import TestCase
+
+from explainaboard import FileType, get_loader, Source, TaskType
+from explainaboard.loaders.file_loader import FileLoaderField, TSVFileLoader
+from explainaboard.loaders.loader import Loader
+from explainaboard.tests.utils import load_file_as_str
 
 artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 

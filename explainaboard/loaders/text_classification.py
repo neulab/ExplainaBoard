@@ -5,9 +5,8 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
     TSVFileLoader,
 )
+from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
-from .loader import register_loader
-from .loader import Loader
 
 
 @register_loader(TaskType.text_classification)

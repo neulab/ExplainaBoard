@@ -1,7 +1,8 @@
-import unittest
 import os
 import pathlib
-from explainaboard import TaskType, get_loader, get_processor
+import unittest
+
+from explainaboard import get_loader, get_processor, TaskType
 
 
 class TestExampleCode(unittest.TestCase):

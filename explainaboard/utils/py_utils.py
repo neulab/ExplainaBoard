@@ -1,6 +1,6 @@
+import functools
 import itertools
 import sys
-import functools
 
 
 def eprint(*args, **kwargs):

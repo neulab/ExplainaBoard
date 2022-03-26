@@ -1,5 +1,5 @@
-from typing import List
 from functools import lru_cache
+from typing import List
 
 
 class Tokenizer:

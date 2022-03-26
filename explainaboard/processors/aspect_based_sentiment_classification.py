@@ -1,9 +1,9 @@
 from typing import List
 
 from explainaboard import feature
-from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
+from explainaboard.tasks import TaskType
 from explainaboard.utils.spacy_loader import get_named_entities
 
 

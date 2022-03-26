@@ -1,5 +1,5 @@
-from explainaboard.tasks import TaskType
 from explainaboard.processors.processor import Processor
+from explainaboard.tasks import TaskType
 
 
 _processor_registry: dict = {}

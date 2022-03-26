@@ -1,16 +1,19 @@
 from functools import lru_cache
 from typing import List
 
-import numpy
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
 from datalabs.operations.featurize.summarization import get_oracle_summary
+import numpy
+
 from explainaboard import feature
+from explainaboard.processors.conditional_generation import (
+    ConditionalGenerationProcessor,
+)
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import hash_dict
-from .conditional_generation import ConditionalGenerationProcessor
 
 # to calculate advanced features
 summary_attribute = SUMAttribute()
