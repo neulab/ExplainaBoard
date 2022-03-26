@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List
 
 
 class TaskType(str, Enum):
@@ -25,19 +26,19 @@ class Task:
     name: str
     description: str = "task description"
     supported: bool = field(default=False)
-    supported_metrics: List[str] = field(default_factory=list)
-    supported_formats: List[str] = field(default_factory=list)
-    supported_datasets: List[str] = field(default_factory=list)
+    supported_metrics: list[str] = field(default_factory=list)
+    supported_formats: list[str] = field(default_factory=list)
+    supported_datasets: list[str] = field(default_factory=list)
 
 
 @dataclass
 class TaskCategory:
     name: str
     description: str
-    tasks: List[Task]
+    tasks: list[Task]
 
 
-_task_categories: List[TaskCategory] = [
+_task_categories: list[TaskCategory] = [
     TaskCategory(
         "conditional-text-generation",
         "data-to-text and text transduction tasks such as translation or summarization",
