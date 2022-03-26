@@ -1,4 +1,6 @@
-from typing import Iterator
+from __future__ import annotations
+
+from collections.abc import Iterator
 
 from datalabs.operations.aggregate.auto_eval import auto_eval
 

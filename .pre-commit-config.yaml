@@ -12,3 +12,7 @@ repos:
           - flake8-black>=0.1.1
           - flake8-import-order
         entry: flake8
+  - repo: https://github.com/sondrelg/pep585-upgrade
+    rev: v1.0.1
+    hooks:
+      - id: upgrade-type-hints

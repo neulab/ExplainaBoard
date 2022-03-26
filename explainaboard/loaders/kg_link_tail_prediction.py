@@ -1,4 +1,6 @@
-from typing import Dict, Iterable, List
+from __future__ import annotations
+
+from collections.abc import Iterable
 
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import JSONFileLoader
@@ -19,14 +21,14 @@ class KgLinkTailPredictionLoader(Loader):
     _default_file_type = FileType.json
     _default_file_loaders = {FileType.json: JSONFileLoader(None, False)}
 
-    def load(self) -> Iterable[Dict]:
+    def load(self) -> Iterable[dict]:
         """
         :param path_system_output: the path of system output file with following format:
         "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
 
         :return: class object
         """
-        data: List[Dict] = []
+        data: list[dict] = []
         raw_data = self.file_loaders[self._file_type].load_raw(self._data, self._source)
         if self.user_defined_features_configs:  # user defined features are present
             for id, (link, features_dict) in enumerate(raw_data.items()):

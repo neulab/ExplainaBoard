@@ -1,4 +1,5 @@
-from typing import List
+from __future__ import annotations
+
 
 from explainaboard import feature
 from explainaboard.processors.conditional_generation import (
@@ -37,7 +38,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["bleu"]
 
     def _get_attr_compression(self, existing_features: dict):
