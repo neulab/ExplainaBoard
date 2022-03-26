@@ -48,3 +48,9 @@ jobs:
         uses: pre-commit/action@v2.0.3
         with:
           extra_args: flake8 --all-files
+      # TODO(odashi): Replace upgrade-type-hints with an appropriate flake8 plugin
+      # (e.g., flake8-pep585) if the one got the audience enough.
+      - name: lint-pep585-compliant
+        uses: pre-commit/action@v2.0.3
+        with:
+          extra_args: upgrade-type-hints --all-files
