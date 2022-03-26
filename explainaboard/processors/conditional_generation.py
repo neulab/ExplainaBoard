@@ -1,19 +1,17 @@
-from typing import Any, Optional, Tuple, Callable
-from typing import Dict, List
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy
 from tqdm import tqdm
 
-
-import explainaboard.utils.feature_funcs
-from explainaboard.utils.analysis import cap_feature
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, Performance, BucketPerformance
+from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.bucketing
+import explainaboard.utils.feature_funcs
+from explainaboard.utils.py_utils import sort_dict
 
 
 @register_processor(TaskType.conditional_generation)

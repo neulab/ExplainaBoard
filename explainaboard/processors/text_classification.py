@@ -1,14 +1,15 @@
 from typing import Any, List
+
+from datalabs import aggregating
 from tqdm import tqdm
 
-import explainaboard.utils.feature_funcs
 from explainaboard import feature
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
+import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.spacy_loader import get_named_entities
-from datalabs import aggregating
 
 
 @register_processor(TaskType.text_classification)

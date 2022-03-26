@@ -1,7 +1,9 @@
-from setuptools import setup, find_packages
 import codecs
-from version import __version__
 import os
+
+from setuptools import find_packages, setup
+from version import __version__
+
 
 setup(
     name="explainaboard",
@@ -31,24 +33,35 @@ setup(
         ],
     },
     install_requires=[
+        "datalabs>=0.3.7",
+        "datasets>=2.0.0",
+        "eaas",
+        "lexicalrichness",
+        "matplotlib",
         "nltk>=3.2",
         "numpy",
-        "scipy",
-        "matplotlib",
-        "scikit-learn",
-        "seqeval",
         "pandas",
         "pyarrow",
-        "eaas",
-        "wheel",
-        "tqdm",
         "sacrebleu",
-        "datasets>=2.0.0",
-        "lexicalrichness",
+        "scikit-learn",
+        "scipy",
+        "seqeval",
         "spacy",
-        "datalabs>=0.3.7",
+        "tqdm",
+        "wheel",
     ],
-    extras_require={"dev": ["black", "flake8", "pre-commit"]},
+    extras_require={
+        "dev": [
+            "black",
+            "flake8",
+            "flake8-absolute-import",
+            "flake8-black>=0.1.1",
+            "flake8-import-order",
+            "pre-commit",
+        ]
+    },
     include_package_data=True,
 )
+
+# TODO(odashi): Consider avoiding external invocation to install required models.
 os.system("python -m spacy download en_core_web_sm")

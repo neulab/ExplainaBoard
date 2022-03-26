@@ -1,12 +1,11 @@
-from __future__ import annotations
-from typing import Dict, Iterable, Optional
-import typing as t
 import json
+from typing import Dict, Iterable, List, Mapping, Optional, Union
+
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import FileLoader
 from explainaboard.tasks import TaskType
 
-JSON = t.Union[str, int, float, bool, None, t.Mapping[str, 'JSON'], t.List['JSON']]  # type: ignore
+JSON = Union[str, int, float, bool, None, Mapping[str, 'JSON'], List['JSON']]
 
 
 class Loader:

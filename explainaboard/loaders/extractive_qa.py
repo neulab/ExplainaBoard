@@ -4,8 +4,7 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
     JSONFileLoader,
 )
-from .loader import register_loader
-from .loader import Loader
+from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
 
 

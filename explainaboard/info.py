@@ -1,12 +1,13 @@
-from dataclasses import dataclass, asdict, field
-from typing import Any, List, Optional, Dict
-from explainaboard.feature import Features
+import copy
+import dataclasses
+from dataclasses import asdict, dataclass, field
 import json
 import os
+from typing import Any, Dict, List, Optional
+
 from explainaboard import config
+from explainaboard.feature import Features
 from explainaboard.utils.logging import get_logger
-import dataclasses
-import copy
 
 logger = get_logger(__name__)
 
