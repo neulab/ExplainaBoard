@@ -1,14 +1,14 @@
-from typing import Any
-from typing import Iterator, Dict, List
+from typing import Any, Dict, Iterator, List
+
 from datalabs import aggregating
 
-import explainaboard.utils.eval_basic_qa
-import explainaboard.utils.feature_funcs
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
+from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
+import explainaboard.utils.eval_basic_qa
+import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
 
 

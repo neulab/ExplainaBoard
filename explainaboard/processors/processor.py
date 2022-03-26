@@ -1,31 +1,26 @@
 import abc
 import json
-from typing import List, Tuple, Dict, Any, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
-from datalabs import load_dataset, aggregating, Dataset
-
-from explainaboard.utils.async_eaas import AsyncEaaSClient
+from datalabs import aggregating, Dataset, load_dataset
 from eaas.config import Config
 from tqdm import tqdm
 
-import explainaboard.metric
-import explainaboard.utils.bucketing
 from explainaboard import feature
 from explainaboard.info import (
-    SysOutputInfo,
-    Performance,
     BucketPerformance,
-    Result,
-    OverallStatistics,
     FineGrainedStatistics,
+    OverallStatistics,
+    Performance,
+    Result,
+    SysOutputInfo,
 )
+import explainaboard.metric
 from explainaboard.tasks import TaskType
+from explainaboard.utils.async_eaas import AsyncEaaSClient
+import explainaboard.utils.bucketing
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
-from explainaboard.utils.py_utils import (
-    eprint,
-    print_dict,
-    sort_dict,
-)
+from explainaboard.utils.py_utils import eprint, print_dict, sort_dict
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 

@@ -1,4 +1,5 @@
 import json
+
 import requests
 
 if __name__ == "__main__":
@@ -22,9 +23,7 @@ if __name__ == "__main__":
         'dataset_name': 'sst2',
         'subset_name': None,
         'version': 'Hugging Face',
-        'transformation': {
-            'type': 'origin'
-        },
+        'transformation': {'type': 'origin'},
     }
     response = requests.post(end_point_upload_dataset, json=data_info)
 
