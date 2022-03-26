@@ -120,7 +120,7 @@ def bucket_attribute_discrete_value(
 
 
 def bucket_attribute_specified_bucket_interval(
-    dict_obj=None, bucket_number=None, bucket_setting=None  # noqa
+    dict_obj=None, bucket_number=None, bucket_setting=None
 ):
     # Bucketing different Attributes
 
