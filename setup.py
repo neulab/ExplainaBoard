@@ -19,7 +19,9 @@ setup(
         "Topic :: Text Processing",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3 :: Only",
     ],
     packages=find_packages(),
     # packages=find_packages("explainaboard"),
@@ -52,13 +54,8 @@ setup(
     ],
     extras_require={
         "dev": [
-            "black",
-            "flake8",
-            "flake8-absolute-import",
-            "flake8-black>=0.1.1",
-            "flake8-import-order",
             "pre-commit",
-        ]
+        ],
     },
     include_package_data=True,
 )
