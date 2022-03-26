@@ -26,13 +26,26 @@ class TestMachineTranslation(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.machine_translation.value)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
+
+    def test_default_features_dont_modify_condgen(self):
+
+        condgen_processor = get_processor(TaskType.conditional_generation.value)
+        mt_processor = get_processor(TaskType.machine_translation.value)
+
+        condgen_features_1 = condgen_processor.default_features()
+        mt_features = mt_processor.default_features()
+        condgen_features_2 = condgen_processor.default_features()
+
+        # MT features didn't change condgen features
+        self.assertDictEqual(condgen_features_1, condgen_features_2)
+        # condgen features are a subset of MT features
+        self.assertDictEqual(mt_features, {**mt_features, **condgen_features_1})
 
 
 if __name__ == '__main__':

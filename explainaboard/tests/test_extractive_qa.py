@@ -26,7 +26,6 @@ class TestExtractiveQA(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.question_answering_extractive)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 

@@ -18,141 +18,144 @@ import explainaboard.utils.bucketing
 
 @register_processor(TaskType.conditional_generation)
 class ConditionalGenerationProcessor(Processor):
-    _task_type = TaskType.conditional_generation
-    _default_metrics = ["rouge1", "rouge2", "rougeL", "bleu"]
+    @classmethod
+    def task_type(cls) -> TaskType:
+        return TaskType.conditional_generation
 
-    _features = feature.Features(
-        {
-            "source": feature.Value("string"),
-            "reference": feature.Value("string"),
-            "hypothesis": feature.Value("string"),
-            "source_length": feature.Value(
-                dtype="float",
-                description="the length of source document",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+    @classmethod
+    def default_features(cls) -> feature.Features:
+        return feature.Features(
+            {
+                "source": feature.Value("string"),
+                "reference": feature.Value("string"),
+                "hypothesis": feature.Value("string"),
+                "source_length": feature.Value(
+                    dtype="float",
+                    description="the length of source document",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "reference_length": feature.Value(
-                dtype="float",
-                description="the length of gold summary",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "reference_length": feature.Value(
+                    dtype="float",
+                    description="the length of gold summary",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "hypothesis_length": feature.Value(
-                dtype="float",
-                description="the length of gold summary",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "hypothesis_length": feature.Value(
+                    dtype="float",
+                    description="the length of gold summary",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "num_oov": feature.Value(
-                dtype="float",
-                description="the number of out-of-vocabulary words",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "num_oov": feature.Value(
+                    dtype="float",
+                    description="the number of out-of-vocabulary words",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            "src_fre_rank": feature.Value(
-                dtype="float",
-                description="the average rank of each word in the source sentence based on its frequency in training "
-                "set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "src_fre_rank": feature.Value(
+                    dtype="float",
+                    description="the average rank of each word in the source sentence based on its frequency in training "
+                    "set",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            # --- the following are features of each token ---
-            "ref_tok_info": feature.Sequence(
-                feature.Set(
-                    {
-                        "tok_text": feature.Value("string"),
-                        "tok_pos": feature.Position(positions=[0, 0]),
-                        "tok_matched": feature.Value(
-                            dtype="bool",
-                            description="whether the ref/hyp token matches with a hyp/ref token",
-                            is_bucket=False,
-                        ),
-                        "tok_capitalness": feature.Value(
-                            dtype="string",
-                            description="The capitalness of an token. For example, first_caps represents only the "
-                            "first character of the token is capital. full_caps denotes all characters "
-                            "of the token are capital",
-                            is_bucket=True,
-                            bucket_info=feature.BucketInfo(
-                                method="bucket_attribute_discrete_value",
-                                number=4,
-                                setting=1,
+                # --- the following are features of each token ---
+                "ref_tok_info": feature.Sequence(
+                    feature.Set(
+                        {
+                            "tok_text": feature.Value("string"),
+                            "tok_pos": feature.Position(positions=[0, 0]),
+                            "tok_matched": feature.Value(
+                                dtype="bool",
+                                description="whether the ref/hyp token matches with a hyp/ref token",
+                                is_bucket=False,
                             ),
-                        ),
-                        "tok_position": feature.Value(
-                            dtype="float",
-                            description="The relative position of a token in a sentence",
-                            is_bucket=True,
-                            bucket_info=feature.BucketInfo(
-                                method="bucket_attribute_specified_bucket_value",
-                                number=4,
-                                setting=(),
+                            "tok_capitalness": feature.Value(
+                                dtype="string",
+                                description="The capitalness of an token. For example, first_caps represents only the "
+                                "first character of the token is capital. full_caps denotes all characters "
+                                "of the token are capital",
+                                is_bucket=True,
+                                bucket_info=feature.BucketInfo(
+                                    method="bucket_attribute_discrete_value",
+                                    number=4,
+                                    setting=1,
+                                ),
                             ),
-                        ),
-                        "tok_chars": feature.Value(
-                            dtype="float",
-                            description="The number of characters in a token",
-                            is_bucket=True,
-                            bucket_info=feature.BucketInfo(
-                                method="bucket_attribute_specified_bucket_value",
-                                number=4,
-                                setting=(),
+                            "tok_position": feature.Value(
+                                dtype="float",
+                                description="The relative position of a token in a sentence",
+                                is_bucket=True,
+                                bucket_info=feature.BucketInfo(
+                                    method="bucket_attribute_specified_bucket_value",
+                                    number=4,
+                                    setting=(),
+                                ),
                             ),
-                        ),
-                        "tok_test_freq": feature.Value(
-                            dtype="float",
-                            description="tok test frequency in the training set",
-                            is_bucket=True,
-                            require_training_set=False,
-                            bucket_info=feature.BucketInfo(
-                                method="bucket_attribute_specified_bucket_value",
-                                number=4,
-                                setting=(),
+                            "tok_chars": feature.Value(
+                                dtype="float",
+                                description="The number of characters in a token",
+                                is_bucket=True,
+                                bucket_info=feature.BucketInfo(
+                                    method="bucket_attribute_specified_bucket_value",
+                                    number=4,
+                                    setting=(),
+                                ),
                             ),
-                        ),
-                        "tok_train_freq": feature.Value(
-                            dtype="float",
-                            description="tok test frequency in the training set",
-                            is_bucket=True,
-                            require_training_set=True,
-                            bucket_info=feature.BucketInfo(
-                                method="bucket_attribute_specified_bucket_value",
-                                number=4,
-                                setting=(),
+                            "tok_test_freq": feature.Value(
+                                dtype="float",
+                                description="tok frequency in the test set",
+                                is_bucket=True,
+                                require_training_set=False,
+                                bucket_info=feature.BucketInfo(
+                                    method="bucket_attribute_specified_bucket_value",
+                                    number=4,
+                                    setting=(),
+                                ),
                             ),
-                        ),
-                    }
-                )
-            ),
-        }
-    )
+                            "tok_train_freq": feature.Value(
+                                dtype="float",
+                                description="tok frequency in the training set",
+                                is_bucket=True,
+                                require_training_set=True,
+                                bucket_info=feature.BucketInfo(
+                                    method="bucket_attribute_specified_bucket_value",
+                                    number=4,
+                                    setting=(),
+                                ),
+                            ),
+                        }
+                    )
+                ),
+            }
+        )
 
-    def __init__(self):
-        super().__init__()
-        # self._statistics_func = get_statistics
+    @classmethod
+    def default_metrics(cls) -> List[str]:
+        return ["rouge1", "rouge2", "rougeL", "bleu"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, existing_features: dict):

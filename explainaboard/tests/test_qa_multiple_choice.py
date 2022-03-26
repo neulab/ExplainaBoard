@@ -26,7 +26,6 @@ class TestQAMultipleChoice(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.qa_multiple_choice.value)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 
@@ -55,7 +54,6 @@ class TestQAMultipleChoice(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.qa_multiple_choice.value)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 

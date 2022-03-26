@@ -23,13 +23,26 @@ class TestSummarization(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.summarization.value)
-        # self.assertEqual(len(processor._features), 4)
 
         sys_info = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
+
+    def test_default_features_dont_modify_condgen(self):
+
+        condgen_processor = get_processor(TaskType.conditional_generation.value)
+        sum_processor = get_processor(TaskType.summarization.value)
+
+        condgen_features_1 = condgen_processor.default_features()
+        sum_features = sum_processor.default_features()
+        condgen_features_2 = condgen_processor.default_features()
+
+        # MT features didn't change condgen features
+        self.assertDictEqual(condgen_features_1, condgen_features_2)
+        # condgen features are a subset of sum features
+        self.assertDictEqual(sum_features, {**sum_features, **condgen_features_1})
 
 
 if __name__ == '__main__':

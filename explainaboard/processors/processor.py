@@ -1,3 +1,4 @@
+import abc
 import json
 from typing import List, Tuple, Dict, Any, Mapping, Optional
 
@@ -28,13 +29,27 @@ from explainaboard.utils.py_utils import (
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
-class Processor:
+class Processor(metaclass=abc.ABCMeta):
     """Base case for task-based processor"""
 
-    _features: feature.Features
-    _task_type: TaskType
+    @classmethod
+    @abc.abstractmethod
+    def task_type(cls) -> TaskType:
+        """Returns the task type of this processor."""
+        ...
+
+    @classmethod
+    @abc.abstractmethod
+    def default_features(cls) -> feature.Features:
+        """Returns default features for this processor."""
+        ...
+
     # TODO(gneubig): this could potentially be moved directly into the task definition
-    _default_metrics: List[str]
+    @classmethod
+    @abc.abstractmethod
+    def default_metrics(cls) -> List[str]:
+        """Returns the default metrics of this processor."""
+        ...
 
     def __init__(self) -> None:
         # Things to use only if necessary
@@ -43,6 +58,7 @@ class Processor:
         # self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
+        self._features = self.default_features()
 
     def _get_statistics_resources(
         self, dataset_split: Dataset
@@ -156,7 +172,7 @@ class Processor:
 
     def _init_customized_features(self, metadata: dict):
         """
-        declare the customized features and add them into self._features
+        declare the customized features for this processor.
         Args:
             metadata: the metadata information of system output
 
@@ -444,13 +460,16 @@ class Processor:
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
-            metadata["task_name"] = self._task_type.value
+            metadata["task_name"] = self.task_type().value
         if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = self._default_metrics
+            metadata["metric_names"] = self.default_metrics()
         sys_info = SysOutputInfo.from_dict(metadata)
-        sys_info.features = self._features
-        # declare customized features
+
+        # declare customized features: _features will be updated
         self._init_customized_features(metadata)
+
+        sys_info.features = self._features
+
         # get scoring statistics
         scoring_stats = self._gen_scoring_stats(sys_info, sys_output)
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
