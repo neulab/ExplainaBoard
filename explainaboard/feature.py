@@ -599,9 +599,10 @@ class Features(dict):
     #     for k, v in dictionary.items():
     #         setattr(self,k,v)
 
-    def get_bucket_features(self) -> List:
+    def get_bucket_features(self, include_training_dependent=True) -> List:
         """
         Get features that would be used for bucketing
+        :param include_training_dependent: Include training-set dependent features
         :return:
         a list of features
         """
@@ -637,7 +638,8 @@ class Features(dict):
         for feature_name, feature_info in dict_res.items():
             # print(k,v)
             if feature_info.is_bucket:
-                bucket_features.append(feature_name)
+                if include_training_dependent or not feature_info.require_training_set:
+                    bucket_features.append(feature_name)
 
         return bucket_features
 

@@ -342,7 +342,7 @@ class NERProcessor(Processor):
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> List[str]:
+    ) -> Optional[List[str]]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
         information, then calculates feature functions and modifies `sys_output` to add these feature values
@@ -371,8 +371,7 @@ class NERProcessor(Processor):
             dict_sysout["pred_entity_info"] = self._complete_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
-        # This should return a list, but this list isn't used in the overridden function so ignore for now
-        return None  # noqa
+        return None
 
     def get_overall_performance(
         self,
@@ -736,73 +735,5 @@ def get_efre_dic(train_word_sequences, tag_sequences_train):
             efre_dic_keep[span] = '%.3f' % (float(freq) / max_freq)
         else:
             count_bigger_than_max_freq += 1
-    # print('The number of words whose word frequency exceeds the threshold: %d is %d' % (
-    #     max_freq, count_bigger_than_max_freq))
-
-    # fwrite = open(path_write, 'wb')
-    # pickle.dump(efre_dic_keep, fwrite)
-    # fwrite.close()
 
     return efre_dic_keep
-
-
-# @aggregating(
-#     name="get_statistics",
-#     contributor="datalab",
-#     task="sequence-labeling, named-entity-recognition, structure-prediction",
-#     description="Calculate the overall statistics (e.g., average length) of "
-#     "a given sequence labeling datasets (e.g., named entity recognition)",
-# )
-# def get_statistics(samples: Iterator, tag_id2str=None):
-#     """
-#     Input:
-#     samples: [{
-#      "tokens":
-#      "tags":
-#     }]
-#     Output:dict:
-#     """
-#
-#     # tag_id2str = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
-#
-#     if tag_id2str is None:
-#         tag_id2str = []
-#     tokens_sequences = []
-#     tags_sequences = []
-#     tags_without_bio = list(
-#         set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
-#     )
-#
-#     vocab = {}
-#     for sample in tqdm(samples):
-#         tokens, tag_ids = sample["tokens"], sample["tags"]
-#         tags = [tag_id2str[tag_id] for tag_id in tag_ids]
-#
-#         # update vocabulary
-#         for w in tokens:
-#             if w in vocab.keys():
-#                 vocab[w] += 1
-#             else:
-#                 vocab[w] = 1
-#
-#         tokens_sequences += tokens
-#         tags_sequences += tags
-#
-#     # efre_dic
-#     econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)
-#     # econ_dic = {"a":1} # for debugging purpose
-#     # econ_dic
-#     efre_dic = get_efre_dic(tokens_sequences, tags_sequences)
-#     # vocab_rank: the rank of each word based on its frequency
-#     sorted_dict = {
-#         key: rank
-#         for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-#     }
-#     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-#
-#     return {
-#         "efre_dic": efre_dic,
-#         "econ_dic": econ_dic,
-#         "vocab": vocab,
-#         "vocab_rank": vocab_rank,
-#     }
