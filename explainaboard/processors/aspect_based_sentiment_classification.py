@@ -1,4 +1,5 @@
-from typing import List
+from __future__ import annotations
+
 
 from explainaboard import feature
 from explainaboard.processors.processor import Processor
@@ -87,7 +88,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["Accuracy"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()

@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from random import choices
-from typing import List
 
 import numpy as np
 import scipy
@@ -86,7 +87,7 @@ def get_chunk_type(tok):
     return tok_split[0], tok_split[-1]
 
 
-def accuracy(labels: List[str], predictions: List[str], language=None):
+def accuracy(labels: list[str], predictions: list[str], language=None):
     correct = sum([int(p == l) for p, l in zip(predictions, labels)])
     accuracy_value = float(correct) / len(predictions)
     return accuracy_value * 100

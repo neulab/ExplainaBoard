@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from threading import Thread
-from typing import Any, Dict, List
+from typing import Any
 import uuid
 
 from eaas import Client
@@ -15,8 +17,8 @@ class AsyncEaaSClient(Client):
 
     def __init__(self):
         super().__init__()
-        self._threads: Dict[int, Thread] = {}
-        self._results: Dict[int, Any] = {}
+        self._threads: dict[int, Thread] = {}
+        self._results: dict[int, Any] = {}
 
     def _run_thread(self, original_fn) -> str:
         request_id = str(uuid.uuid1())
@@ -30,7 +32,7 @@ class AsyncEaaSClient(Client):
 
     def async_score(
         self,
-        inputs: List[Dict],
+        inputs: list[dict],
         task="sum",
         metrics=None,
         lang="en",
