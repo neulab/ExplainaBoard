@@ -59,7 +59,7 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task question_answering_extractive --system_outputs ./data/system_outputs/squad/test-qa-extractive.json > report.json
+    explainaboard --task question-answering-extractive --system_outputs ./data/system_outputs/squad/test-qa-extractive.json > report.json
 ```
 where
 * `--task`: denotes the task name. 
