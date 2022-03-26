@@ -190,8 +190,10 @@ class KGLinkTailPredictionProcessor(Processor):
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be supported by ExplainaBoard."  # noqa
-                    "You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                    "The dataset hasn't been supported by DataLab so no "
+                    "training set dependent features will be supported by "
+                    "ExplainaBoard. You can add the dataset by: "
+                    "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
 
         # print(self.entity_type_level_map)
