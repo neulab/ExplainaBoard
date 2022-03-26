@@ -46,4 +46,4 @@ jobs:
       - name: lint
         uses: pre-commit/action@v2.0.3
         with:
-          extra_args: frake8 --all-files
+          extra_args: flake8 --all-files
