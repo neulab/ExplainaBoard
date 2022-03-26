@@ -1,7 +1,8 @@
 name: Continuous Integration
 on:
   push:
-    branches: ["*"]
+    branches:
+      - main
   pull_request:
     branches: ["*"]
 
@@ -9,9 +10,9 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: Install dependencies
@@ -25,9 +26,9 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: format
@@ -38,12 +39,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: lint
-        run: |
-          pip install flake8
-          flake8
+        uses: pre-commit/action@v2.0.3
+        with:
+          extra_args: flake8 --all-files
