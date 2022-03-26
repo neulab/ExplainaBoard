@@ -1,4 +1,5 @@
 from typing import Dict, Tuple
+
 import spacy
 from spacy.language import Language
 

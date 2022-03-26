@@ -1,8 +1,8 @@
-import pathlib
 import os
+import pathlib
 import unittest
-from explainaboard import FileType, Source, TaskType, get_loader, get_processor
 
+from explainaboard import FileType, get_loader, get_processor, Source, TaskType
 
 artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 

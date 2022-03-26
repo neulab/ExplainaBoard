@@ -1,14 +1,14 @@
 import json
 import os
-from typing import Callable, Dict, List, Any, Iterator
+from typing import Any, Callable, Dict, Iterator, List
 
-from datalabs import load_dataset
-from datalabs import aggregating
+from datalabs import aggregating, load_dataset
 from tqdm import tqdm
 
-import explainaboard.metric
+# TODO(odashi): Add a function to obtain metric class instead of using getattr.
 from explainaboard import feature
-from explainaboard.info import SysOutputInfo, BucketPerformance, Performance
+from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+import explainaboard.metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType

@@ -1,8 +1,9 @@
+from random import choices
+from typing import List
+
 import numpy as np
 import scipy
-from random import choices
-from seqeval.metrics import precision_score, recall_score, f1_score
-from typing import List
+from seqeval.metrics import f1_score, precision_score, recall_score
 
 
 '''

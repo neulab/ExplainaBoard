@@ -1,11 +1,52 @@
-from __future__ import annotations
 import csv
-from ctypes import Union
 from dataclasses import dataclass
 from io import StringIO
 import json
-from typing import Any, Callable, Iterable, List, Optional, Type
+from typing import Any, Callable, Iterable, List, Optional, Type, Union
+
 from explainaboard.constants import Source
+
+
+@dataclass
+class FileLoaderField:
+    """
+    Args:
+        src_name: field name in the source file. use int for tsv column indices and use str for dict keys
+        target_name: field name expected in the loaded data
+        dtype: data type of the field in the loaded data. It is only intended for simple type conversion so
+        it only supports int, float and str. Pass in None to turn off type conversion.
+        strip_before_parsing: call strip() on strings before casting to either str, int or float. It is
+            only intended to be used with these three data types. It defaults to True for str. For all other
+            types, it defaults to False
+        parser: a custom parser for the field. When called, `data_points[idx][src_name]` is passed in as input,
+            it is expected to return the parsed result. If parser is not None, `strip_before_parsing` and dtype
+            will not have any effect
+    """
+
+    src_name: Union[int, str]
+    target_name: str
+    dtype: Union[Type[int], Type[float], Type[str]] = None
+    strip_before_parsing: bool = None
+    parser: Callable = None
+
+    def __post_init__(self):
+        if self.strip_before_parsing is None:
+            if self.dtype == str:
+                self.strip_before_parsing = True
+            else:
+                self.strip_before_parsing = False
+
+        # validation
+        for name in (self.src_name, self.target_name):
+            if not isinstance(name, str) and not isinstance(name, int):
+                raise ValueError("src_name and target_name must be str or int")
+
+        if self.dtype is None and self.strip_before_parsing:
+            raise ValueError(
+                "strip_before_parsing only works with int, float and str types"
+            )
+        if self.dtype not in (str, int, float, None):
+            raise ValueError("dtype must be one of str, int, float and None")
 
 
 class FileLoader:
@@ -87,48 +128,6 @@ class FileLoader:
             self.generate_id(parsed_data_point, idx)
             parsed_data_points.append(parsed_data_point)
         return parsed_data_points
-
-
-@dataclass
-class FileLoaderField:
-    """
-    Args:
-        src_name: field name in the source file. use int for tsv column indices and use str for dict keys
-        target_name: field name expected in the loaded data
-        dtype: data type of the field in the loaded data. It is only intended for simple type conversion so
-        it only supports int, float and str. Pass in None to turn off type conversion.
-        strip_before_parsing: call strip() on strings before casting to either str, int or float. It is
-            only intended to be used with these three data types. It defaults to True for str. For all other
-            types, it defaults to False
-        parser: a custom parser for the field. When called, `data_points[idx][src_name]` is passed in as input,
-            it is expected to return the parsed result. If parser is not None, `strip_before_parsing` and dtype
-            will not have any effect
-    """
-
-    src_name: Union[int, str]
-    target_name: str
-    dtype: Union[Type[int], Type[float], Type[str]] = None
-    strip_before_parsing: bool = None
-    parser: Callable = None
-
-    def __post_init__(self):
-        if self.strip_before_parsing is None:
-            if self.dtype == str:
-                self.strip_before_parsing = True
-            else:
-                self.strip_before_parsing = False
-
-        # validation
-        for name in (self.src_name, self.target_name):
-            if not isinstance(name, str) and not isinstance(name, int):
-                raise ValueError("src_name and target_name must be str or int")
-
-        if self.dtype is None and self.strip_before_parsing:
-            raise ValueError(
-                "strip_before_parsing only works with int, float and str types"
-            )
-        if self.dtype not in (str, int, float, None):
-            raise ValueError("dtype must be one of str, int, float and None")
 
 
 class TSVFileLoader(FileLoader):

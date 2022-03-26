@@ -1,11 +1,13 @@
-from typing import Any, List, Iterator
+from typing import Any, Iterator, List
+
 from datalabs import aggregating
-import explainaboard.utils.feature_funcs
+
 from explainaboard import feature
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 from explainaboard.tasks import TaskType
+import explainaboard.utils.feature_funcs
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
 @register_processor(TaskType.qa_multiple_choice)

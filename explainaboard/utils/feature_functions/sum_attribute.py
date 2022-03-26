@@ -1,13 +1,16 @@
-# %%
-import nltk
-from nltk import word_tokenize, sent_tokenize
-from collections import namedtuple, Counter
-from nltk.util import ngrams
+from collections import Counter, namedtuple
 from functools import lru_cache
+
+import nltk
+from nltk import sent_tokenize, word_tokenize
+from nltk.util import ngrams
+
 
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
+    # TODO(odashi): Avoid programatic download: it requires unnecessary outbound
+    # connection and won't work in offline systems.
     nltk.download('punkt')
 
 
@@ -24,6 +27,7 @@ class SUMAttribute:
     * copy_len
     """
 
+    # TODO(odashi): Use dataclass instead.
     Match = namedtuple("Match", ("summary", "text", "length"))
 
     def __call__(self, texts, summaries):

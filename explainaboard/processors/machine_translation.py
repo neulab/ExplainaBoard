@@ -1,9 +1,11 @@
 from typing import List
 
 from explainaboard import feature
+from explainaboard.processors.conditional_generation import (
+    ConditionalGenerationProcessor,
+)
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from .conditional_generation import ConditionalGenerationProcessor
 
 
 @register_processor(TaskType.machine_translation)

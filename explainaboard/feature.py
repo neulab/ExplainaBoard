@@ -1,15 +1,16 @@
-from dataclasses import dataclass, field
-from typing import Any, ClassVar, Dict, List, Optional
 from collections.abc import Iterable
-from typing import Tuple, Union
-from explainaboard import config
+import copy
+from dataclasses import dataclass, field
+import re
+import sys
+from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
-from explainaboard.utils.py_utils import zip_dict
 import pyarrow as pa
-import re
-import copy
-import sys
+
+from explainaboard import config
+from explainaboard.utils.py_utils import zip_dict
 
 
 def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
