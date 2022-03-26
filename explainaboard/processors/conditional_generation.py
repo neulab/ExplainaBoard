@@ -127,7 +127,7 @@ class ConditionalGenerationProcessor(Processor):
                             ),
                             "tok_test_freq": feature.Value(
                                 dtype="float",
-                                description="tok test frequency in the training set",
+                                description="tok frequency in the test set",
                                 is_bucket=True,
                                 require_training_set=False,
                                 bucket_info=feature.BucketInfo(
@@ -138,7 +138,7 @@ class ConditionalGenerationProcessor(Processor):
                             ),
                             "tok_train_freq": feature.Value(
                                 dtype="float",
-                                description="tok test frequency in the training set",
+                                description="tok frequency in the training set",
                                 is_bucket=True,
                                 require_training_set=True,
                                 bucket_info=feature.BucketInfo(
