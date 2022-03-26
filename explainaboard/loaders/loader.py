@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+from collections.abc import Iterable
 import json
-from typing import Dict, Iterable, List, Mapping, Optional, Union
+from typing import List, Mapping, Optional, Union
 
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import FileLoader
@@ -21,7 +24,7 @@ class Loader:
 
     _default_source = Source.local_filesystem
     _default_file_type: Optional[FileType] = None
-    _default_file_loaders: Dict[FileType, FileLoader] = {}
+    _default_file_loaders: dict[FileType, FileLoader] = {}
 
     def __init__(
         self,
@@ -77,7 +80,7 @@ class Loader:
 
 
 # loader_registry is a global variable, storing all basic loading functions
-_loader_registry: Dict = {}
+_loader_registry: dict = {}
 
 
 def get_loader(

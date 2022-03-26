@@ -1,4 +1,6 @@
-from typing import Any, List
+from __future__ import annotations
+
+from typing import Any
 
 from datalabs import aggregating
 from tqdm import tqdm
@@ -122,7 +124,7 @@ class TextClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["Accuracy"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()

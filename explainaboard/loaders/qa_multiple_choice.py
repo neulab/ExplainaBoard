@@ -1,4 +1,6 @@
-from typing import Iterable, List
+from __future__ import annotations
+
+from collections.abc import Iterable
 
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import JSONFileLoader
@@ -28,7 +30,7 @@ class QAMultipleChoiceLoader(Loader):
 
         :return: class object
         """
-        data: List[dict] = []
+        data: list[dict] = []
         raw_data = self._default_file_loaders[self._file_type].load_raw(
             self._data, self._source
         )

@@ -1,4 +1,7 @@
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any, Optional
 
 import numpy
 from tqdm import tqdm
@@ -152,7 +155,7 @@ class ConditionalGenerationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["rouge1", "rouge2", "rougeL", "bleu"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
@@ -177,7 +180,7 @@ class ConditionalGenerationProcessor(Processor):
         )
 
     def _gen_scoring_stats(
-        self, sys_info: SysOutputInfo, sys_output: List[dict]
+        self, sys_info: SysOutputInfo, sys_output: list[dict]
     ) -> Any:
         """Generate sufficient statistics for scoring.
 
@@ -227,8 +230,8 @@ class ConditionalGenerationProcessor(Processor):
             return self._features['ref_tok_info'][name]
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> Optional[List[str]]:
+        self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
+    ) -> Optional[list[str]]:
         """
         This function is used to calculate features used for bucketing, such as sentence_length
         :return:
@@ -323,9 +326,9 @@ class ConditionalGenerationProcessor(Processor):
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        sys_output: list[dict],
         scoring_stats: Any = None,
-    ) -> Dict[str, Performance]:
+    ) -> dict[str, Performance]:
 
         # Fetch asynchronously calculated stats
         self._fetch_scoring_stats(scoring_stats)
@@ -343,7 +346,7 @@ class ConditionalGenerationProcessor(Processor):
         return overall
 
     def _get_feature_dict(
-        self, sys_output: List[dict], feature_name: str, output_to_toks: Callable
+        self, sys_output: list[dict], feature_name: str, output_to_toks: Callable
     ):
         feat_dict = {}
         for samp_id, my_output in enumerate(sys_output):
@@ -354,10 +357,10 @@ class ConditionalGenerationProcessor(Processor):
     def _bucketing_samples(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        active_features: List[str],
+        sys_output: list[dict],
+        active_features: list[str],
         scoring_stats: Any = None,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
 
         features = sys_info.features
         sent_feats, tok_feats = [], []
@@ -413,10 +416,10 @@ class ConditionalGenerationProcessor(Processor):
     def get_bucket_performance_tok(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket_true: Dict[str, List[str]],
-        samples_over_bucket_pred: Dict[str, List[str]],
-    ) -> Dict[str, List[BucketPerformance]]:
+        sys_output: list[dict],
+        samples_over_bucket_true: dict[str, list[str]],
+        samples_over_bucket_pred: dict[str, list[str]],
+    ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
@@ -471,10 +474,10 @@ class ConditionalGenerationProcessor(Processor):
     def get_bucket_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[int]],
+        sys_output: list[dict],
+        samples_over_bucket: dict[str, list[int]],
         scoring_stats: Any = None,
-    ) -> Dict[str, List[BucketPerformance]]:
+    ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output

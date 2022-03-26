@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from collections import defaultdict
+from collections.abc import Callable, Iterator, Mapping
 import re
-from typing import Any, Callable, Dict, Iterator, List, Mapping, Optional, Tuple
+from typing import Any, Optional
 
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
@@ -196,7 +199,7 @@ class NERProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["f1_seqeval", "recall_seqeval", "precision_seqeval"]
 
     def _get_statistics_resources(
@@ -341,8 +344,8 @@ class NERProcessor(Processor):
         return span_dics
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> Optional[List[str]]:
+        self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
+    ) -> Optional[list[str]]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
         information, then calculates feature functions and modifies `sys_output` to add these feature values
@@ -376,9 +379,9 @@ class NERProcessor(Processor):
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        sys_output: list[dict],
         scoring_stats: Any = None,
-    ) -> Dict[str, Performance]:
+    ) -> dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
@@ -403,7 +406,7 @@ class NERProcessor(Processor):
 
     def _get_span_ids(
         self,
-        sys_output: List[Dict],
+        sys_output: list[dict],
         output_to_spans: Callable,
     ) -> Iterator[str]:
         for sample_id, my_output in enumerate(sys_output):
@@ -416,7 +419,7 @@ class NERProcessor(Processor):
     def _get_span_sample_features(
         self,
         feature_name: str,
-        sys_output: List[Dict],
+        sys_output: list[dict],
         output_to_spans: Callable,
     ) -> Iterator[str]:
         for sample_id, my_output in enumerate(sys_output):
@@ -426,7 +429,7 @@ class NERProcessor(Processor):
     def _get_span_span_features(
         self,
         feature_name: str,
-        sys_output: List[Dict],
+        sys_output: list[dict],
         output_to_spans: Callable,
     ) -> Iterator[str]:
         for sample_id, my_output in enumerate(sys_output):
@@ -436,10 +439,10 @@ class NERProcessor(Processor):
     def _bucketing_samples(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        active_features: List[str],
+        sys_output: list[dict],
+        active_features: list[str],
         scoring_stats: Any = None,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
 
         features = sys_info.features
 
@@ -505,7 +508,7 @@ class NERProcessor(Processor):
         return samples_over_bucket_true, performances_over_bucket
 
     def _add_to_sample_dict(
-        self, spans: List[str], type_id: str, sample_dict: defaultdict
+        self, spans: list[str], type_id: str, sample_dict: defaultdict
     ):
         """
         Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
@@ -519,9 +522,9 @@ class NERProcessor(Processor):
     def get_bucket_cases_ner(
         self,
         bucket_interval: str,
-        sys_output: List[dict],
-        samples_over_bucket_true: Dict[str, List[str]],
-        samples_over_bucket_pred: Dict[str, List[str]],
+        sys_output: list[dict],
+        samples_over_bucket_true: dict[str, list[str]],
+        samples_over_bucket_pred: dict[str, list[str]],
     ) -> list:
         # Index samples for easy comparison
         sample_dict = defaultdict(lambda: dict())
@@ -554,10 +557,10 @@ class NERProcessor(Processor):
     def get_bucket_performance_ner(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket_true: Dict[str, List[str]],
-        samples_over_bucket_pred: Dict[str, List[str]],
-    ) -> Dict[str, List[BucketPerformance]]:
+        sys_output: list[dict],
+        samples_over_bucket_true: dict[str, list[str]],
+        samples_over_bucket_pred: dict[str, list[str]],
+    ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
