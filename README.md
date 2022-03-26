@@ -52,6 +52,7 @@ We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.a
 **Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
 ```
+pip install --upgrade pip  # recommending the newest version of pip.
 pip install explainaboard
 python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
 ```
@@ -64,7 +65,7 @@ git clone https://github.com/neulab/ExplainaBoard.git
 cd ExplainaBoard
 
 # Install the required dependencies and dev dependencies
-pip install .[dev]
+pip install ."[dev]"
 pre-commit install
 ```
 
