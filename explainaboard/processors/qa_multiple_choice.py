@@ -1,4 +1,4 @@
-from typing import Any, Iterator
+from typing import Any, List, Iterator
 from datalabs import aggregating
 import explainaboard.utils.feature_funcs
 from explainaboard import feature
@@ -10,71 +10,79 @@ from explainaboard.tasks import TaskType
 
 @register_processor(TaskType.qa_multiple_choice)
 class QAMultipleChoiceProcessor(Processor):
-    _task_type = TaskType.qa_multiple_choice
-    _features = feature.Features(
-        {
-            "context": feature.Value("string"),
-            "question": feature.Value("string"),
-            "options": feature.Sequence(feature.Value("string")),
-            "answers": {
-                "text": feature.Value("string"),
-                "option_index": feature.Value("int32"),
-            },
-            "context_length": feature.Value(
-                dtype="float",
-                description="the length of context",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+    @classmethod
+    def task_type(cls) -> TaskType:
+        return TaskType.qa_multiple_choice
+
+    @classmethod
+    def default_features(cls) -> feature.Features:
+        return feature.Features(
+            {
+                "context": feature.Value("string"),
+                "question": feature.Value("string"),
+                "options": feature.Sequence(feature.Value("string")),
+                "answers": {
+                    "text": feature.Value("string"),
+                    "option_index": feature.Value("int32"),
+                },
+                "context_length": feature.Value(
+                    dtype="float",
+                    description="the length of context",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "question_length": feature.Value(
-                dtype="float",
-                description="the length of question",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "question_length": feature.Value(
+                    dtype="float",
+                    description="the length of question",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "answer_length": feature.Value(
-                dtype="float",
-                description="the length of answer",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "answer_length": feature.Value(
+                    dtype="float",
+                    description="the length of answer",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
                 ),
-            ),
-            "num_oov": feature.Value(
-                dtype="float",
-                description="the number of out-of-vocabulary words",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "num_oov": feature.Value(
+                    dtype="float",
+                    description="the number of out-of-vocabulary words",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-            "fre_rank": feature.Value(
-                dtype="float",
-                description="the average rank of each work based on its frequency in training set",
-                is_bucket=True,
-                bucket_info=feature.BucketInfo(
-                    method="bucket_attribute_specified_bucket_value",
-                    number=4,
-                    setting=(),
+                "fre_rank": feature.Value(
+                    dtype="float",
+                    description="the average rank of each work based on its frequency in training set",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
                 ),
-                require_training_set=True,
-            ),
-        }
-    )
-    _default_metrics = ["Accuracy"]
+            }
+        )
+
+    @classmethod
+    def default_metrics(cls) -> List[str]:
+        return ["Accuracy"]
 
     def __init__(self):
         super().__init__()

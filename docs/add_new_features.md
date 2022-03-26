@@ -14,18 +14,27 @@ corresponding to its task, in this case: `explainaboard/processors/text_classifi
 
 ```python
 class TextClassificationProcessor(Processor):
-    _task_type = TaskType.text_classification
-    _features = feature.Features({
-        ...
-        ...
-        "token_number": feature.Value(dtype="float",
-                                      is_bucket=True,
-                                      bucket_info=feature.BucketInfo(
-                                          _method="bucket_attribute_specified_bucket_value",
-                                          _number=4,
-                                          _setting=())),
+    @classmethod
+    def task_type(cls) -> TaskType:
+        return TaskType.text_classification
 
-    })
+    @classmethod
+    def features(cls) -> feature.Features:
+        return feature.Features({
+            ...
+            ...
+            "token_number": feature.Value(dtype="float",
+                                        is_bucket=True,
+                                        bucket_info=feature.BucketInfo(
+                                            _method="bucket_attribute_specified_bucket_value",
+                                            _number=4,
+                                            _setting=())),
+
+        })
+
+    @classmethod
+    def default_metrics(cls) -> List[str]:
+        return ["Accuracy"]
 ```
 where
 * `dtype` represents the data type of the feature

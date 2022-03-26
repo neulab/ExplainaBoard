@@ -21,7 +21,6 @@ class TestAspectBasedSentimentClassification(unittest.TestCase):
         )
         data = loader.load()
         processor = get_processor(TaskType.aspect_based_sentiment_classification)
-        self.assertEqual(len(processor._features), 10)
 
         sys_info = processor.process(metadata, data)
 
