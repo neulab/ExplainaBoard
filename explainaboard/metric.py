@@ -77,21 +77,21 @@ class Metric:
         """
         ...
 
-    def aggregate_stats(self, stats: MetricStats) -> MetricStats:
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
         Aggregate sufficient statistics from multiple examples into a single example
         :param stats: stats for every example
         :return: aggregated stats
         """
-        return MetricStats(np.mean(stats.data, axis=0))
+        return np.mean(stats.data, axis=0)
 
-    def calc_metric_from_stats(self, stats: MetricStats) -> float:
+    def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
         """From aggregated sufficient statistics, calculate the metric value
-        :param stats: aggregated statistics
+        :param agg_stats: aggregated statistics
         :return: a single scalar metric value
         """
-        if stats.data.size == 1:
-            return float(stats.data)
+        if agg_stats.size == 1:
+            return float(agg_stats)
         else:
             raise NotImplementedError
 
@@ -115,8 +115,8 @@ class Metric:
         all_indices = np.array(range(len(stats)))
         for i in range(n_samples):
             indices = np.random.choice(all_indices, size=n_elems, replace=True)
-            samp_stats = self.aggregate_stats(stats.filter(indices))
-            samp_results[i] = self.calc_metric_from_stats(samp_stats)
+            agg_stats = self.aggregate_stats(stats.filter(indices))
+            samp_results[i] = self.calc_metric_from_aggregate(agg_stats)
         np.sort(samp_results)
         low = int(n_samples * conf_value / 2.0)
         high = int(n_samples * (1.0 - conf_value / 2.0))
@@ -132,8 +132,8 @@ class Metric:
         intervals
         :return: a resulting metric value
         """
-        stats = self.aggregate_stats(stats)
-        value = self.calc_metric_from_stats(stats)
+        agg_stats = self.aggregate_stats(stats)
+        value = self.calc_metric_from_aggregate(agg_stats)
         conf_interval = (
             self.bootstrap_interval(stats, conf_value) if conf_value else None
         )
@@ -161,9 +161,9 @@ class Accuracy(Metric):
     def default_name(cls) -> str:
         return 'Accuracy'
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
-        return np.array(
-            [(1.0 if x == y else 0.0) for x, y in zip(true_data, pred_data)]
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        return MetricStats(
+            np.array([(1.0 if x == y else 0.0) for x, y in zip(true_data, pred_data)])
         )
 
 
@@ -178,7 +178,7 @@ class F1Score(Metric):
             raise ValueError(f'only {supported_averages} supported for now')
         super().__init__(name=self.default_name() + average)
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         id_map = {}
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
@@ -192,24 +192,24 @@ class F1Score(Metric):
             stats[i, id_map[p] * 3 + 1] += 1
             if t == p:
                 stats[i, id_map[t] * 3 + 2] += 1
-        return stats
+        return MetricStats(stats)
 
-    def calc_metric_from_stats(self, stats: np.ndarray) -> float:
-        assert len(stats) % 3 == 0
-        n_classes = int(len(stats) / 3)
+    def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
+        assert len(agg_stats) % 3 == 0
+        n_classes = int(len(agg_stats) / 3)
         if self.average == 'micro':
             match, true, pred = 0.0, 0.0, 0.0
             for i in range(n_classes):
-                true += stats[i * 3]
-                pred += stats[i * 3 + 1]
-                match += stats[i * 3 + 1]
+                true += agg_stats[i * 3]
+                pred += agg_stats[i * 3 + 1]
+                match += agg_stats[i * 3 + 1]
             p = match / pred if pred else 0.0
             r = match / true if true else 0.0
             f1_total = 2 * p * r / (p + r)
         elif self.average == 'macro':
             f1_total = 0.0
             for i in range(n_classes):
-                true, pred, match = stats[i * 3 : i * 3 + 3]
+                true, pred, match = agg_stats[i * 3 : i * 3 + 3]
                 p = match / pred if pred else 0.0
                 r = match / true if true else 0.0
                 f1 = 2 * p * r / (p + r)
@@ -229,9 +229,9 @@ class Hits(Metric):
     def default_name(cls) -> str:
         return 'Hits'
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
-        return np.array(
-            [(1.0 if t in p else 0.0) for t, p in zip(true_data, pred_data)]
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        return MetricStats(
+            np.array([(1.0 if t in p else 0.0) for t, p in zip(true_data, pred_data)])
         )
 
 
@@ -243,5 +243,7 @@ class MeanReciprocalRank(Metric):
         true_rank = list(preds).index(true) + 1  # 1-indexed
         return 1.0 / true_rank
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
-        return np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        return MetricStats(
+            np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
+        )
