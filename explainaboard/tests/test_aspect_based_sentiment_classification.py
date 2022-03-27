@@ -12,7 +12,7 @@ class TestAspectBasedSentimentClassification(unittest.TestCase):
     def test_e2e(self):
         metadata = {
             "task_name": TaskType.aspect_based_sentiment_classification.value,
-            "metric_names": ["Accuracy", "F1score"],
+            "metric_names": ["Accuracy", "F1Score"],
         }
         loader = get_loader(
             TaskType.aspect_based_sentiment_classification,

@@ -377,19 +377,23 @@ class Processor(metaclass=abc.ABCMeta):
             bucket_name_to_performance[bucket_interval] = []
             for metric_name in sys_info.metric_names:
                 metric_func = getattr(explainaboard.metric, metric_name)
-                one_metric = metric_func(
-                    true_labels=bucket_true_labels,
-                    predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=sys_info.is_print_confidence_interval,
+                one_metric = metric_func()
+                metric_result = one_metric.evaluate(
+                    true_data=bucket_true_labels,
+                    pred_data=bucket_predicted_labels,
+                    conf_value=0.05 if sys_info.is_print_confidence_interval else None,
                 )
-                metric_result = one_metric.evaluate()
 
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
-                    value=metric_result["value"],
-                    confidence_score_low=metric_result["confidence_score_low"],
-                    confidence_score_high=metric_result["confidence_score_high"],
+                    value=metric_result.value,
+                    confidence_score_low=metric_result.conf_interval[0]
+                    if metric_result.conf_interval
+                    else None,
+                    confidence_score_high=metric_result.conf_interval[1]
+                    if metric_result.conf_interval
+                    else None,
                     n_samples=len(bucket_true_labels),
                     bucket_samples=bucket_cases,
                 )
@@ -421,18 +425,22 @@ class Processor(metaclass=abc.ABCMeta):
         overall_results = {}
         for metric_name in sys_info.metric_names:
             metric_func = getattr(explainaboard.metric, metric_name)
-            one_metric = metric_func(
-                true_labels=true_labels,
-                predicted_labels=predicted_labels,
-                is_print_confidence_interval=sys_info.is_print_confidence_interval,
+            one_metric = metric_func()
+            metric_result = one_metric.evaluate(
+                true_data=true_labels,
+                pred_data=predicted_labels,
+                conf_value=0.05 if sys_info.is_print_confidence_interval else None,
             )
-            metric_result = one_metric.evaluate()
 
             overall_performance = Performance(
                 metric_name=metric_name,
-                value=metric_result["value"],
-                confidence_score_low=metric_result["confidence_score_low"],
-                confidence_score_high=metric_result["confidence_score_high"],
+                value=metric_result.value,
+                confidence_score_low=metric_result.conf_interval[0]
+                if metric_result.conf_interval
+                else None,
+                confidence_score_high=metric_result.conf_interval[1]
+                if metric_result.conf_interval
+                else None,
             )
             overall_results[metric_name] = overall_performance
         return overall_results
