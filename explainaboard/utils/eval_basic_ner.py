@@ -5,7 +5,6 @@ import numpy as np
 import scipy
 from seqeval.metrics import f1_score, precision_score, recall_score
 
-
 '''
 Sequence Labeling
 '''

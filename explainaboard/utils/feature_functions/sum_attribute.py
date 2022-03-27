@@ -5,7 +5,6 @@ import nltk
 from nltk import sent_tokenize, word_tokenize
 from nltk.util import ngrams
 
-
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:
