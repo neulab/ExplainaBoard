@@ -18,7 +18,7 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
-import explainaboard.metric
+from explainaboard.metric import MetricStats
 from explainaboard.tasks import TaskType
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 import explainaboard.utils.bucketing
@@ -129,16 +129,25 @@ class Processor(metaclass=abc.ABCMeta):
                 )
         return statistics
 
-    def _gen_scoring_stats(
+    def _get_metrics(self, sys_info: SysOutputInfo):
+        return [getattr(explainaboard.metric, name)() for name in sys_info.metric_names]
+
+    def _gen_metric_stats(
         self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> Any:
-        """Generate sufficient statistics for scoring.
+    ) -> list[MetricStats]:
+        """Generate sufficient statistics for scoring different metrics.
 
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
         :return: Statistics sufficient for scoring
         """
-        return None
+        metrics = self._get_metrics(sys_info)
+        true_data = [self._get_true_label(x) for x in sys_output]
+        pred_data = [self._get_predicted_label(x) for x in sys_output]
+        metric_stats = []
+        for metric in metrics:
+            metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+        return metric_stats
 
     def _get_feature_func(self, func_name: str):
         return getattr(self, f'_get_{func_name}')
@@ -291,7 +300,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats=None,
+        metric_stats=None,
     ) -> tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
@@ -330,7 +339,7 @@ class Processor(metaclass=abc.ABCMeta):
                 sys_info,
                 sys_output,
                 samples_over_bucket[feature_name],
-                scoring_stats=scoring_stats,
+                metric_stats=metric_stats,
             )
 
         return samples_over_bucket, performances_over_bucket
@@ -340,22 +349,23 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         samples_over_bucket: dict[str, list[int]],
-        scoring_stats: Any = None,
+        metric_stats: list[MetricStats] = None,
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
         :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
-        :param scoring_stats: any statistics useful to performing scoring
+        :param metric_stats: any statistics useful to performing scoring
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
+
+        # Get the functions to calculate metrics
+        metric_funcs = self._get_metrics(sys_info)
 
         bucket_name_to_performance = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
-            bucket_true_labels = []
-            bucket_predicted_labels = []
             bucket_cases = []
 
             for sample_id in sample_ids:
@@ -365,9 +375,6 @@ class Processor(metaclass=abc.ABCMeta):
                 predicted_label = self._get_predicted_label(data_point)
                 s_id = data_point["id"]
 
-                # get a bucket of true/predicted labels
-                bucket_true_labels.append(true_label)
-                bucket_predicted_labels.append(predicted_label)
                 # get a bucket of cases (e.g., errors)
                 if sys_info.is_print_case:
                     if true_label != predicted_label:
@@ -375,26 +382,28 @@ class Processor(metaclass=abc.ABCMeta):
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in sys_info.metric_names:
-                metric_func = getattr(explainaboard.metric, metric_name)
-                one_metric = metric_func()
-                metric_result = one_metric.evaluate(
-                    true_data=bucket_true_labels,
-                    pred_data=bucket_predicted_labels,
+            for metric_name, metric_func, metric_stat in zip(
+                sys_info.metric_names, metric_funcs, metric_stats
+            ):
+                bucket_stats = metric_stat.filter(sample_ids)
+                metric_result = metric_func.evaluate_from_stats(
+                    bucket_stats,
                     conf_value=0.05 if sys_info.is_print_confidence_interval else None,
+                )
+
+                conf_low, conf_high = (
+                    metric_result.conf_interval
+                    if metric_result.conf_interval
+                    else (None, None)
                 )
 
                 bucket_performance = BucketPerformance(
                     bucket_name=bucket_interval,
                     metric_name=metric_name,
                     value=metric_result.value,
-                    confidence_score_low=metric_result.conf_interval[0]
-                    if metric_result.conf_interval
-                    else None,
-                    confidence_score_high=metric_result.conf_interval[1]
-                    if metric_result.conf_interval
-                    else None,
-                    n_samples=len(bucket_true_labels),
+                    confidence_score_low=conf_low,
+                    confidence_score_high=conf_high,
+                    n_samples=len(bucket_stats),
                     bucket_samples=bucket_cases,
                 )
 
@@ -406,41 +415,43 @@ class Processor(metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        scoring_stats: Any = None,
+        metric_stats: list[MetricStats],
     ) -> dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param scoring_stats: any statistics useful to performing scoring
+        :param metric_stats: any statistics useful to performing scoring
         :return: a dictionary of metrics to overall performance numbers
         """
         predicted_labels, true_labels = [], []
 
         for _id, feature_table in enumerate(sys_output):
-
             predicted_labels.append(self._get_predicted_label(feature_table))
             true_labels.append(self._get_true_label(feature_table))
 
+        metric_funcs = self._get_metrics(sys_info)
+
         overall_results = {}
-        for metric_name in sys_info.metric_names:
-            metric_func = getattr(explainaboard.metric, metric_name)
-            one_metric = metric_func()
-            metric_result = one_metric.evaluate(
-                true_data=true_labels,
-                pred_data=predicted_labels,
+        for metric_name, metric_func, metric_stat in zip(
+            sys_info.metric_names, metric_funcs, metric_stats
+        ):
+            metric_result = metric_func.evaluate_from_stats(
+                metric_stat,
                 conf_value=0.05 if sys_info.is_print_confidence_interval else None,
+            )
+
+            conf_low, conf_high = (
+                metric_result.conf_interval
+                if metric_result.conf_interval
+                else (None, None)
             )
 
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=metric_result.value,
-                confidence_score_low=metric_result.conf_interval[0]
-                if metric_result.conf_interval
-                else None,
-                confidence_score_high=metric_result.conf_interval[1]
-                if metric_result.conf_interval
-                else None,
+                confidence_score_low=conf_low,
+                confidence_score_high=conf_high,
             )
             overall_results[metric_name] = overall_performance
         return overall_results
@@ -477,16 +488,16 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info.features = self._features
 
         # get scoring statistics
-        scoring_stats = self._gen_scoring_stats(sys_info, sys_output)
+        metric_stats = self._gen_metric_stats(sys_info, sys_output)
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
             sys_info, sys_output, external_stats=external_stats
         )
         overall_results = self.get_overall_performance(
-            sys_info, sys_output, scoring_stats=scoring_stats
+            sys_info, sys_output, metric_stats=metric_stats
         )
         return OverallStatistics(
-            sys_info, scoring_stats, active_features, overall_results
+            sys_info, metric_stats, active_features, overall_results
         )
 
     def get_fine_grained_statistics(
@@ -494,10 +505,10 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats=None,
+        metric_stats=None,
     ) -> tuple[dict, dict]:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features, scoring_stats
+            sys_info, sys_output, active_features, metric_stats
         )
         """
         A wrapper function to expose _bucketing_samples for the web interface
@@ -508,11 +519,11 @@ class Processor(metaclass=abc.ABCMeta):
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = overall_statistics.sys_info
-        scoring_stats = overall_statistics.scoring_stats
+        metric_stats = overall_statistics.metric_stats
         active_features = overall_statistics.active_features
         overall_results = overall_statistics.overall_results
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features, scoring_stats=scoring_stats
+            sys_info, sys_output, active_features, metric_stats=metric_stats
         )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
