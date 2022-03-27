@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import itertools
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import numpy as np
 
@@ -39,6 +39,23 @@ class MetricResult:
         return ret
 
 
+class MetricStats:
+    def __init__(self, data: np.ndarray):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def filter(self, indices: Union[list[int], np.ndarray]):
+        """
+        Return a view of these stats filtered down to the indicated indices
+        """
+        sdata = self.data
+        if type(indices) != np.ndarray:
+            indices = np.array(indices)
+        return MetricStats(sdata[indices])
+
+
 class Metric:
     @classmethod
     @abc.abstractmethod
@@ -50,7 +67,7 @@ class Metric:
         self.name = name if name else self.default_name()
 
     @abc.abstractmethod
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """From a list of true data and predicted data, calculate the sufficient statistics for each data example so
         that the evaluation metric can be calculated later. In the simplest form, this is just the evaluation metric
         value for each example.
@@ -60,27 +77,27 @@ class Metric:
         """
         ...
 
-    def aggregate_stats(self, stats: np.ndarray) -> np.ndarray:
+    def aggregate_stats(self, stats: MetricStats) -> MetricStats:
         """
         Aggregate sufficient statistics from multiple examples into a single example
         :param stats: stats for every example
         :return: aggregated stats
         """
-        return np.mean(stats, axis=0)
+        return MetricStats(np.mean(stats.data, axis=0))
 
-    def calc_metric_from_stats(self, stats: np.ndarray) -> float:
+    def calc_metric_from_stats(self, stats: MetricStats) -> float:
         """From aggregated sufficient statistics, calculate the metric value
         :param stats: aggregated statistics
         :return: a single scalar metric value
         """
-        if stats.size == 1:
-            return float(stats)
+        if stats.data.size == 1:
+            return float(stats.data)
         else:
             raise NotImplementedError
 
     def bootstrap_interval(
         self,
-        stats: np.ndarray,
+        stats: MetricStats,
         conf_value: float,
         n_samples: int = 2000,
         prop_samples: float = 0.5,
@@ -95,14 +112,32 @@ class Metric:
             raise ValueError(f'Bad confidence value {conf_value}')
         n_elems = int(prop_samples * len(stats))
         samp_results = np.zeros(shape=(n_samples,))
+        all_indices = np.array(range(len(stats)))
         for i in range(n_samples):
-            samp_stats = np.random.Generator.choice(stats, size=n_elems, replace=True)
-            samp_stats = self.aggregate_stats(samp_stats)
+            indices = np.random.choice(all_indices, size=n_elems, replace=True)
+            samp_stats = self.aggregate_stats(stats.filter(indices))
             samp_results[i] = self.calc_metric_from_stats(samp_stats)
         np.sort(samp_results)
         low = int(n_samples * conf_value / 2.0)
         high = int(n_samples * (1.0 - conf_value / 2.0))
         return samp_results[low], samp_results[high]
+
+    def evaluate_from_stats(
+        self, stats: MetricStats, conf_value: Optional[float] = None
+    ):
+        """Return an evaluation result over stats.
+        :param stats: pre-computed metric stats
+        :param indices: optionally, the indices to be included in the calculation
+        :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
+        intervals
+        :return: a resulting metric value
+        """
+        stats = self.aggregate_stats(stats)
+        value = self.calc_metric_from_stats(stats)
+        conf_interval = (
+            self.bootstrap_interval(stats, conf_value) if conf_value else None
+        )
+        return MetricResult(self.name, value, conf_interval, conf_value)
 
     def evaluate(
         self, true_data: list, pred_data: list, conf_value: Optional[float] = None
@@ -115,12 +150,7 @@ class Metric:
         :return: a resulting metric value
         """
         stats = self.calc_stats_from_data(true_data, pred_data)
-        stats = self.aggregate_stats(stats)
-        value = self.calc_metric_from_stats(stats)
-        conf_interval = (
-            self.bootstrap_interval(stats, conf_value) if conf_value else None
-        )
-        return MetricResult(self.name, value, conf_interval, conf_value)
+        return self.evaluate_from_stats(stats, conf_value)
 
     def get_metadata(self) -> dict:
         """Return metadata describing the metric in a reproducible way"""
@@ -190,7 +220,7 @@ class F1Score(Metric):
         return f1_total
 
     def get_metadata(self) -> dict:
-        meta = dict(super.get_metadata())
+        meta = dict(super().get_metadata())
         meta['average'] = self.average
         return meta
 
