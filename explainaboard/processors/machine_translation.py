@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from explainaboard import feature
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,

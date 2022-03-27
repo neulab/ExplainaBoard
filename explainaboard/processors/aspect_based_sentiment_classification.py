@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from explainaboard import feature
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
