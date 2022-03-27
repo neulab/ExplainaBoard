@@ -1,8 +1,4 @@
-from explainaboard.utils.analysis import (
-    find_key,
-    reverse_dict,
-    reverse_dict_discrete,
-)
+from explainaboard.utils.analysis import find_key, reverse_dict, reverse_dict_discrete
 from explainaboard.utils.py_utils import sort_dict
 
 
