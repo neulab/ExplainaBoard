@@ -36,6 +36,18 @@ jobs:
         with:
           options: "--check --verbose"
           version: "22.1.0"
+  isort:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Python 3
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+      - name: isort
+        uses: pre-commit/action@v2.0.3
+        with:
+          extra_args: isort --all-files
   lint:
     runs-on: ubuntu-latest
     steps:

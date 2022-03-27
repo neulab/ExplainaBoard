@@ -11,7 +11,6 @@ repos:
         additional_dependencies:
           - flake8-absolute-import
           - flake8-black>=0.1.1
-          - flake8-import-order
         entry: flake8
         files: '\.py$'
   - repo: https://github.com/pycqa/isort.git
