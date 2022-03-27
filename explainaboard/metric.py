@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import itertools
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -195,64 +195,23 @@ class F1Score(Metric):
         return meta
 
 
-def hits(true_labels, pred_labels):
-    num_hits = 0
-    for i in range(len(true_labels)):
-        i_true = true_labels[i]
-        i_preds = pred_labels[i]
-        if i_true in i_preds:
-            num_hits += 1
-    return num_hits / len(true_labels)
-
-
 class Hits(Metric):
-    def __init__(self, true_labels, pred_labels, is_print_confidence_interval=False):
-        super(Hits, self).__init__()
-        # Metric.__init__(self)
-        self._name = self.__class__.__name__
-        self._true_labels = true_labels
-        self._pred_labels = pred_labels
-        self._eval_function = self.hits
-        self._is_print_confidence_interval = is_print_confidence_interval
-        self._n_samples = len(self._true_labels)
+    def default_name(cls) -> str:
+        return 'Hits'
 
-    @staticmethod
-    def hits(true_labels, pred_labels):
-        num_hits = 0
-        for i in range(len(true_labels)):
-            i_true = true_labels[i]
-            i_preds = pred_labels[i]
-            if i_true in i_preds:
-                num_hits += 1
-        return num_hits / len(true_labels)
-
-    def evaluate(self):
-
-        return self._evaluate(self._true_labels, self._pred_labels)
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
+        return np.array(
+            [(1.0 if t in p else 0.0) for t, p in zip(true_data, pred_data)]
+        )
 
 
 class MeanReciprocalRank(Metric):
-    def __init__(self, true_labels, pred_labels, is_print_confidence_interval=False):
-        super(MeanReciprocalRank, self).__init__()
-        # Metric.__init__(self)
-        self._name = self.__class__.__name__
-        self._true_labels = true_labels
-        self._pred_labels = pred_labels
-        self._eval_function = self.mean_reciprocal_rank
-        self._is_print_confidence_interval = is_print_confidence_interval
-        self._n_samples = len(self._true_labels)
+    def default_name(cls) -> str:
+        return 'MRR'
 
-    @staticmethod
-    def mean_reciprocal_rank(true_labels, pred_labels):
-        total_reciprocal_rank = 0
-        for i in range(len(true_labels)):
-            i_true = true_labels[i]
-            i_preds = pred_labels[i]
-            if i_true in i_preds:
-                true_rank = list(i_preds).index(i_true) + 1  # 1-indexed
-                total_reciprocal_rank += 1 / true_rank
-        return total_reciprocal_rank / len(true_labels)
+    def mrr_val(self, true: Any, preds: list):
+        true_rank = list(preds).index(true) + 1  # 1-indexed
+        return 1.0 / true_rank
 
-    def evaluate(self):
-
-        return self._evaluate(self._true_labels, self._pred_labels)
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> np.ndarray:
+        return np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
