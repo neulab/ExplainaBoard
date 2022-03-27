@@ -1,4 +1,7 @@
-from typing import Any, Iterator, List
+from __future__ import annotations
+
+from collections.abc import Iterator
+from typing import Any
 
 from datalabs import aggregating
 
@@ -83,7 +86,7 @@ class QAMultipleChoiceProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["Accuracy"]
 
     def __init__(self):

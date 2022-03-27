@@ -1,8 +1,11 @@
+from __future__ import annotations
+
+from collections.abc import Callable, Iterable
 import csv
 from dataclasses import dataclass
 from io import StringIO
 import json
-from typing import Any, Callable, Iterable, List, Optional, Type, Union
+from typing import Any, Optional, Union
 
 from explainaboard.constants import Source
 
@@ -25,7 +28,7 @@ class FileLoaderField:
 
     src_name: Union[int, str]
     target_name: str
-    dtype: Union[Type[int], Type[float], Type[str]] = None
+    dtype: Union[type[int], type[float], type[str]] = None
     strip_before_parsing: bool = None
     parser: Callable = None
 
@@ -52,7 +55,7 @@ class FileLoaderField:
 class FileLoader:
     def __init__(
         self,
-        fields: List[FileLoaderField] = None,
+        fields: list[FileLoaderField] = None,
         use_idx_as_id: bool = True,
         id_field_name: Optional[str] = None,
     ) -> None:
@@ -116,7 +119,7 @@ class FileLoader:
         iterable of data points.
         """
         raw_data = self.load_raw(data, source)
-        parsed_data_points: List[dict] = []
+        parsed_data_points: list[dict] = []
         for idx, data_point in enumerate(raw_data):
             parsed_data_point = {}
 
@@ -133,7 +136,7 @@ class FileLoader:
 class TSVFileLoader(FileLoader):
     def __init__(
         self,
-        fields: List[FileLoaderField] = None,
+        fields: list[FileLoaderField] = None,
         use_idx_as_id: bool = True,
         id_field_name: Optional[str] = None,
     ) -> None:
@@ -148,7 +151,7 @@ class TSVFileLoader(FileLoader):
             file = StringIO(data)
             return csv.reader(file, delimiter='\t')
         elif source == Source.local_filesystem:
-            content: List[str] = []
+            content: list[str] = []
             with open(data, "r", encoding="utf8") as fin:
                 for record in csv.reader(fin, delimiter='\t'):
                     content.append(record)
@@ -174,7 +177,7 @@ class CoNLLFileLoader(FileLoader):
 
     def load(self, data: str, source: Source) -> Iterable[dict]:
         raw_data = self.load_raw(data, source)
-        parsed_data_points: List[dict] = []
+        parsed_data_points: list[dict] = []
         guid = 0
         tokens = []
         ner_true_tags = []

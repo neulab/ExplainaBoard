@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import List
 
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
@@ -126,7 +127,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["rouge1", "rouge2", "rougeL"]
 
     def _get_oracle_position(self, existing_features: dict):

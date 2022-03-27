@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 from functools import lru_cache
-from typing import List
 
 
 class Tokenizer:
-    def __call__(self, text: str) -> List[str]:
+    def __call__(self, text: str) -> list[str]:
         """
         Tokenize a string into a list of tokens
         :param text: The string to tokenize
@@ -11,7 +12,7 @@ class Tokenizer:
         """
         raise NotImplementedError
 
-    def detokenize(self, tokens: List[str]) -> str:
+    def detokenize(self, tokens: list[str]) -> str:
         """
         Detokenize a list of tokens into a string
         :param tokens: A list of tokens
@@ -26,8 +27,8 @@ class SingleSpaceTokenizer(Tokenizer):
     """
 
     @lru_cache(maxsize=20)
-    def __call__(self, text: str) -> List[str]:
+    def __call__(self, text: str) -> list[str]:
         return text.split(' ')
 
-    def detokenize(self, tokens: List[str]) -> str:
+    def detokenize(self, tokens: list[str]) -> str:
         return ' '.join(tokens)

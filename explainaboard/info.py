@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 import copy
 import dataclasses
 from dataclasses import asdict, dataclass, field
 import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from explainaboard import config
 from explainaboard.feature import Features
@@ -61,7 +63,7 @@ class BucketPerformance(Performance):
 @dataclass
 class Result:
     overall: Any = None
-    calibration: List[Performance] = None
+    calibration: list[Performance] = None
     fine_grained: Any = None
 
 
@@ -87,7 +89,7 @@ class SysOutputInfo:
     model_name: Optional[str] = None
     dataset_name: Optional[str] = None
     sub_dataset_name: Optional[str] = None
-    metric_names: Optional[List[str]] = None
+    metric_names: Optional[list[str]] = None
     reload_stat: bool = True
     is_print_case: bool = True
     is_print_confidence_interval: bool = False
@@ -191,8 +193,8 @@ class SysOutputInfo:
 class OverallStatistics:
     sys_info: SysOutputInfo = None
     scoring_stats: Any = None
-    active_features: List[str] = None
-    overall_results: Dict[str, Performance] = None
+    active_features: list[str] = None
+    overall_results: dict[str, Performance] = None
 
 
 @dataclass

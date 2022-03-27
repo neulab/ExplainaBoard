@@ -1,4 +1,7 @@
-from typing import Any, Dict, Iterator, List
+from __future__ import annotations
+
+from collections.abc import Iterator
+from typing import Any
 
 from datalabs import aggregating
 
@@ -90,7 +93,7 @@ class QAExtractiveProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["f1_score_qa", "exact_match_qa"]
 
     @aggregating()
@@ -151,9 +154,9 @@ class QAExtractiveProcessor(Processor):
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        sys_output: list[dict],
         scoring_stats: Any = None,
-    ) -> Dict[str, Performance]:
+    ) -> dict[str, Performance]:
         predicted_answers, true_answers = [], []
 
         for _id, feature_table in enumerate(sys_output):
@@ -179,10 +182,10 @@ class QAExtractiveProcessor(Processor):
     def get_bucket_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[int]],
+        sys_output: list[dict],
+        samples_over_bucket: dict[str, list[int]],
         scoring_stats: Any = None,
-    ) -> Dict[str, List[BucketPerformance]]:
+    ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output

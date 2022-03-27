@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from collections.abc import Iterable
 import copy
 from dataclasses import dataclass, field
 import re
 import sys
-from typing import Any, ClassVar, Dict, List, Optional, Tuple, Union
+from typing import Any, ClassVar, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -112,7 +114,7 @@ def string_to_arrow(datasets_dtype: str) -> pa.DataType:
     return pa.__dict__[arrow_data_factory_function_name]()
 
 
-def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> Tuple[Any, bool]:
+def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> tuple[Any, bool]:
     """
     Cast pytorch/tensorflow/pandas objects to python numpy array/lists.
     It works recursively.
@@ -285,7 +287,7 @@ class ClassLabel:
     """
 
     num_classes: int = None
-    names: List[str] = None
+    names: list[str] = None
     description: str = None
     names_file: Optional[str] = None
     id: Optional[str] = None
@@ -295,8 +297,8 @@ class ClassLabel:
     bucket_info: BucketInfo = None
     # Class Variables
     dtype: ClassVar[str] = "int64"
-    _str2int: ClassVar[Dict[str, int]] = None
-    _int2str: ClassVar[Dict[int, int]] = None
+    _str2int: ClassVar[dict[str, int]] = None
+    _int2str: ClassVar[dict[int, int]] = None
     _type: str = field(default="ClassLabel", init=False, repr=False)
 
     def __post_init__(self):
@@ -600,7 +602,7 @@ class Features(dict):
     #     for k, v in dictionary.items():
     #         setattr(self,k,v)
 
-    def get_bucket_features(self, include_training_dependent=True) -> List:
+    def get_bucket_features(self, include_training_dependent=True) -> list:
         """
         Get features that would be used for bucketing
         :param include_training_dependent: Include training-set dependent features
@@ -644,7 +646,7 @@ class Features(dict):
 
         return bucket_features
 
-    def get_pre_computed_features(self) -> List:
+    def get_pre_computed_features(self) -> list:
         """
         Get features that would be used for bucketing
         :return:
