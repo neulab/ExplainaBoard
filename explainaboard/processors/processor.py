@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import abc
+from collections.abc import Mapping
 import json
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, load_dataset
 from eaas.config import Config
@@ -42,7 +45,7 @@ class Processor(metaclass=abc.ABCMeta):
     # TODO(gneubig): this could potentially be moved directly into the task definition
     @classmethod
     @abc.abstractmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         """Returns the default metrics of this processor."""
         ...
 
@@ -127,7 +130,7 @@ class Processor(metaclass=abc.ABCMeta):
         return statistics
 
     def _gen_scoring_stats(
-        self, sys_info: SysOutputInfo, sys_output: List[dict]
+        self, sys_info: SysOutputInfo, sys_output: list[dict]
     ) -> Any:
         """Generate sufficient statistics for scoring.
 
@@ -213,8 +216,8 @@ class Processor(metaclass=abc.ABCMeta):
                     raise NotImplementedError
 
     def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: List[dict], external_stats=None
-    ) -> Optional[List[str]]:
+        self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
+    ) -> Optional[list[str]]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
         information, then calculates feature functions and modifies `sys_output` to add these feature values
@@ -286,10 +289,10 @@ class Processor(metaclass=abc.ABCMeta):
     def _bucketing_samples(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        active_features: List[str],
+        sys_output: list[dict],
+        active_features: list[str],
         scoring_stats=None,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
         :param sys_info: Information about the system output
@@ -335,10 +338,10 @@ class Processor(metaclass=abc.ABCMeta):
     def get_bucket_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[int]],
+        sys_output: list[dict],
+        samples_over_bucket: dict[str, list[int]],
         scoring_stats: Any = None,
-    ) -> Dict[str, List[BucketPerformance]]:
+    ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
@@ -398,9 +401,9 @@ class Processor(metaclass=abc.ABCMeta):
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        sys_output: list[dict],
         scoring_stats: Any = None,
-    ) -> Dict[str, Performance]:
+    ) -> dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
@@ -435,7 +438,7 @@ class Processor(metaclass=abc.ABCMeta):
         return overall_results
 
     def _print_bucket_info(
-        self, performances_over_bucket: Dict[str, Dict[str, List[BucketPerformance]]]
+        self, performances_over_bucket: dict[str, dict[str, list[BucketPerformance]]]
     ):
         """
         Print out performance bucket by bucket
@@ -445,7 +448,7 @@ class Processor(metaclass=abc.ABCMeta):
             print_dict(feature_value, feature_name)
 
     def get_overall_statistics(
-        self, metadata: dict, sys_output: List[dict]
+        self, metadata: dict, sys_output: list[dict]
     ) -> OverallStatistics:
         """
         Get the overall statistics information, including performance, of the system output
@@ -481,10 +484,10 @@ class Processor(metaclass=abc.ABCMeta):
     def get_fine_grained_statistics(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        active_features: List[str],
+        sys_output: list[dict],
+        active_features: list[str],
         scoring_stats=None,
-    ) -> Tuple[dict, dict]:
+    ) -> tuple[dict, dict]:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, scoring_stats
         )
@@ -493,7 +496,7 @@ class Processor(metaclass=abc.ABCMeta):
         """
         return FineGrainedStatistics(samples_over_bucket, performance_over_bucket)
 
-    def process(self, metadata: dict, sys_output: List[dict]):
+    def process(self, metadata: dict, sys_output: list[dict]):
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = overall_statistics.sys_info

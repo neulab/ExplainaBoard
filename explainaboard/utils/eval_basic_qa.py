@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from collections import Counter
 import re
 import string
-from typing import List
 
 '''
 QA
@@ -61,7 +62,7 @@ def metric_max_over_ground_truths(metric_fn, prediction: str, ground_truths: lis
     return max(scores_for_ground_truths)
 
 
-def exact_match_qa(true_answers: List[list], predicted_answer: List[str]):
+def exact_match_qa(true_answers: list[list], predicted_answer: list[str]):
     exact_match = 0
     total = 0
     # for k1,k2 in zip(true_Anss,pred_Anss):
@@ -79,7 +80,7 @@ def exact_match_qa(true_answers: List[list], predicted_answer: List[str]):
     return exact_match
 
 
-def f1_score_qa(true_answers: List[list], predicted_answer: List[str]):
+def f1_score_qa(true_answers: list[list], predicted_answer: list[str]):
     f1_dataset_level = 0
     total = 0
 

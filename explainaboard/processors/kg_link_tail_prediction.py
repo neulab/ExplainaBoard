@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from collections.abc import Callable, Iterator
 import json
 import os
-from typing import Any, Callable, Dict, Iterator, List
+from typing import Any
 
 from datalabs import aggregating, load_dataset
 from tqdm import tqdm
@@ -102,7 +105,7 @@ class KGLinkTailPredictionProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> List[str]:
+    def default_metrics(cls) -> list[str]:
         return ["Hits", "MeanReciprocalRank"]
 
     # TODO: is this the best place to put this?
@@ -266,9 +269,9 @@ class KGLinkTailPredictionProcessor(Processor):
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
+        sys_output: list[dict],
         scoring_stats: Any = None,
-    ) -> Dict[str, Performance]:
+    ) -> dict[str, Performance]:
         predicted_labels, true_labels = [], []
 
         for _id, feature_table in enumerate(sys_output):
@@ -299,10 +302,10 @@ class KGLinkTailPredictionProcessor(Processor):
     def get_bucket_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: List[dict],
-        samples_over_bucket: Dict[str, List[int]],
+        sys_output: list[dict],
+        samples_over_bucket: dict[str, list[int]],
         scoring_stats: Any = None,
-    ) -> Dict[str, List[BucketPerformance]]:
+    ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance

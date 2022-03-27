@@ -19,3 +19,8 @@ repos:
     hooks:
       - id: isort
         files: '\.py$'
+  - repo: https://github.com/sondrelg/pep585-upgrade
+    rev: v1.0.1
+    hooks:
+      - id: upgrade-type-hints
+        files: '\.py$'

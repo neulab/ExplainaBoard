@@ -1,4 +1,7 @@
-from typing import Any, Callable, Iterator
+from __future__ import annotations
+
+from collections.abc import Callable, Iterator
+from typing import Any
 
 from lexicalrichness import LexicalRichness
 import sacrebleu

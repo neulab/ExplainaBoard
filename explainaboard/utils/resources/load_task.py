@@ -1,17 +1,18 @@
+from __future__ import annotations
+
 import enum
 import json
-from typing import Dict, List
 
 PATH_OF_TASKS_JSON = "./tasks.json"
 
 
-def get_task_mapping() -> Dict:
+def get_task_mapping() -> dict:
     with open(PATH_OF_TASKS_JSON, "r") as fin:
         task_infos = json.load(fin)
     return task_infos
 
 
-def get_all_tasks() -> List[str]:
+def get_all_tasks() -> list[str]:
     task_infos = get_task_mapping()
     all_tasks = []
     for task_category, description in task_infos.items():

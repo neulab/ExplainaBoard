@@ -1,4 +1,5 @@
-from typing import Dict, Tuple
+from __future__ import annotations
+
 
 import spacy
 from spacy.language import Language
@@ -10,7 +11,7 @@ class SpacyLoader:
     encapsulates `spacy.load()` so we don't load big spacy models unless it's
     necessary."""
 
-    _models: Dict[str, Language] = {}
+    _models: dict[str, Language] = {}
 
     def get_model(self, name: str) -> Language:
         """
@@ -30,7 +31,7 @@ class SpacyLoader:
 spacy_loader = SpacyLoader()
 
 
-def get_named_entities(text: str, model_name="en_core_web_sm") -> Tuple[str]:
+def get_named_entities(text: str, model_name="en_core_web_sm") -> tuple[str]:
     """Use spacy to extract named entities from `text`. All other spacy components are disabled to improve speed."""
     return spacy_loader.get_model(model_name)(
         text, disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"]
