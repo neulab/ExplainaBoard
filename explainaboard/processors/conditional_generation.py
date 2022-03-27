@@ -3,11 +3,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any, Optional
 
-import numpy
 from tqdm import tqdm
 
 from explainaboard import feature
-from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.info import BucketPerformance, SysOutputInfo
+import explainaboard.metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -179,15 +179,26 @@ class ConditionalGenerationProcessor(Processor):
             existing_features, statistics, lambda x: x['source'], self._tokenizer
         )
 
-    def _gen_scoring_stats(
-        self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> Any:
+    def _get_metrics(self, sys_info: SysOutputInfo):
+        return [
+            explainaboard.metric.EaaSMetric(name=name) for name in sys_info.metric_names
+        ]
+
+    def _get_true_label(self, data_point: dict):
+        return data_point["reference"]
+
+    def _get_predicted_label(self, data_point: dict):
+        return data_point["hypothesis"]
+
+    def _gen_metric_stats(self, sys_info: SysOutputInfo, sys_output: list[dict]) -> Any:
         """Generate sufficient statistics for scoring.
 
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
         :return: Statistics sufficient for scoring
         """
+
+        # Queue up EaaS client request for all metrics
         inputs = []
         for _id, feature_table in enumerate(sys_output):
             inputs.append(
@@ -197,9 +208,7 @@ class ConditionalGenerationProcessor(Processor):
                     "hypothesis": feature_table["hypothesis"],
                 }
             )
-            sys_output[_id] = feature_table
-
-        request_id = self._get_eaas_client().async_score(
+        async_result = self._get_eaas_client().async_score(
             inputs,
             task="sum",  # TODO(pengfei): this should be generalized
             metrics=sys_info.metric_names.copy(),
@@ -207,21 +216,23 @@ class ConditionalGenerationProcessor(Processor):
             cal_attributes=False,
         )
 
-        # Note that this returns an asynchronous request ID so the EaaS call can continue while other
-        # faeturizing, etc. is going on
-        return {'request_id': request_id}
+        # Share the request result with all stats functions
+        return [
+            explainaboard.metric.EaaSMetricStats(name=name, eaas_result=async_result)
+            for name in sys_info.metric_names
+        ]
 
-    def _fetch_scoring_stats(self, scoring_stats: Any):
+    def _fetch_metric_stats(self, metric_stats: Any):
         """
         A utility function used to lazily fetch the actual scoring dict when it's necessary.
         """
-        if 'request_id' in scoring_stats:
+        if 'request_id' in metric_stats:
             eaas_stats = self._eaas_client.wait_and_get_result(
-                scoring_stats['request_id']
+                metric_stats['request_id']
             )
-            scoring_stats.clear()
+            metric_stats.clear()
             for k, v in eaas_stats.items():
-                scoring_stats[k] = v
+                metric_stats[k] = v
 
     def _get_feature_info(self, name: str):
         if name in self._features:
@@ -323,28 +334,6 @@ class ConditionalGenerationProcessor(Processor):
 
         return tok_dics
 
-    def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        scoring_stats: Any = None,
-    ) -> dict[str, Performance]:
-
-        # Fetch asynchronously calculated stats
-        self._fetch_scoring_stats(scoring_stats)
-
-        overall = {}
-        for metric_name in sys_info.metric_names:
-
-            overall_value = scoring_stats["corpus_level"]["corpus_" + metric_name]
-            overall_performance = Performance(
-                metric_name=metric_name,
-                value=overall_value,
-            )
-
-            overall[metric_name] = overall_performance
-        return overall
-
     def _get_feature_dict(
         self, sys_output: list[dict], feature_name: str, output_to_toks: Callable
     ):
@@ -359,7 +348,7 @@ class ConditionalGenerationProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats: Any = None,
+        metric_stats: Any = None,
     ) -> tuple[dict, dict]:
 
         features = sys_info.features
@@ -369,7 +358,7 @@ class ConditionalGenerationProcessor(Processor):
 
         # First, get the buckets for sentences using the standard protocol
         samples_over_bucket, performances_over_bucket = super()._bucketing_samples(
-            sys_info, sys_output, sent_feats, scoring_stats
+            sys_info, sys_output, sent_feats, metric_stats
         )
         samples_over_bucket_pred = {}
 
@@ -467,74 +456,6 @@ class ConditionalGenerationProcessor(Processor):
                     n_samples=len(toks_true),
                     bucket_samples=toks_true,
                 )
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
-
-        return sort_dict(bucket_name_to_performance)
-
-    def get_bucket_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        samples_over_bucket: dict[str, list[int]],
-        scoring_stats: Any = None,
-    ) -> dict[str, list[BucketPerformance]]:
-        """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
-        """
-
-        # Fetch asynchronously calculated stats
-        self._fetch_scoring_stats(scoring_stats)
-
-        bucket_name_to_performance = {}
-        for bucket_interval, sample_ids in samples_over_bucket.items():
-
-            bucket_cases = []
-
-            bucket_inputs = []
-            dict_metric_to_values = {}
-
-            for sample_id in sample_ids:
-                sys_out = sys_output[sample_id]
-                bucket_inputs.append(
-                    {
-                        "source": sys_out["source"],
-                        "references": [sys_out["reference"]],
-                        "hypothesis": sys_out["hypothesis"],
-                    }
-                )
-
-                if sys_info.is_print_case:
-                    bucket_case = str(sample_id)
-                    bucket_cases.append(bucket_case)
-
-                # TODO(gneubig): This needs to be fixed because many metrics are not linearly decomposable
-                for metric_name in sys_info.metric_names:
-                    metric_value = scoring_stats["sample_level"][int(sample_id)][
-                        metric_name
-                    ]  # This would be modified later
-                    if metric_name not in dict_metric_to_values.keys():
-                        dict_metric_to_values[metric_name] = [metric_value]
-                    else:
-                        dict_metric_to_values[metric_name].append(metric_value)
-
-            bucket_name_to_performance[bucket_interval] = []
-
-            for metric_name in sys_info.metric_names:
-
-                bucket_value = numpy.average(dict_metric_to_values[metric_name])
-
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=bucket_value,
-                    n_samples=len(dict_metric_to_values[metric_name]),
-                    bucket_samples=bucket_cases,
-                )
-
                 bucket_name_to_performance[bucket_interval].append(bucket_performance)
 
         return sort_dict(bucket_name_to_performance)
