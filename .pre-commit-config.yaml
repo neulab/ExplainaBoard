@@ -3,6 +3,7 @@ repos:
     rev: 22.1.0
     hooks:
       - id: black
+        files: '\.py$'
   - repo: https://gitlab.com/pycqa/flake8.git
     rev: 4.0.1
     hooks:
@@ -10,9 +11,15 @@ repos:
         additional_dependencies:
           - flake8-absolute-import
           - flake8-black>=0.1.1
-          - flake8-import-order
         entry: flake8
+        files: '\.py$'
+  - repo: https://github.com/pycqa/isort.git
+    rev: 5.6.4
+    hooks:
+      - id: isort
+        files: '\.py$'
   - repo: https://github.com/sondrelg/pep585-upgrade
     rev: v1.0.1
     hooks:
       - id: upgrade-type-hints
+        files: '\.py$'
