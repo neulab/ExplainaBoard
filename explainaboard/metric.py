@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import abc
 import itertools
+import sys
 from typing import Any, Optional, Union
 
 import numpy as np
+
+from explainaboard.utils.async_eaas import AsyncEaaSResult
 
 
 class MetricResult:
@@ -20,7 +23,7 @@ class MetricResult:
         :param name: name of the metric
         :param value: value of the metric
         :param conf_interval: the confidence interval of the metric
-        :param conv_value: the p-value of the confidence interval
+        :param conf_value: the p-value of the confidence interval
         """
         self.name = name
         self.value = value
@@ -40,17 +43,20 @@ class MetricResult:
 
 
 class MetricStats:
-    def __init__(self, data: np.ndarray):
-        self.data = data
+    def __init__(self, data: Optional[np.ndarray]):
+        self._data = data
 
     def __len__(self):
-        return len(self.data)
+        return len(self._data)
+
+    def get_data(self):
+        return self._data
 
     def filter(self, indices: Union[list[int], np.ndarray]):
         """
         Return a view of these stats filtered down to the indicated indices
         """
-        sdata = self.data
+        sdata = self.get_data()
         if type(indices) != np.ndarray:
             indices = np.array(indices)
         return MetricStats(sdata[indices])
@@ -83,7 +89,7 @@ class Metric:
         :param stats: stats for every example
         :return: aggregated stats
         """
-        return np.mean(stats.data, axis=0)
+        return np.mean(stats.get_data(), axis=0)
 
     def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
         """From aggregated sufficient statistics, calculate the metric value
@@ -105,7 +111,7 @@ class Metric:
         """
         :param stats: sufficient statistics as calculated by calc_stats_from_data
         :param conf_value: the p-value of the interval
-        :param n_times: the number of bootstrapping samples
+        :param n_samples: the number of bootstrapping samples
         :param prop_samples: the proportion of samples to sample each time
         """
         if conf_value <= 0.0 or conf_value >= 1.0:
@@ -127,7 +133,6 @@ class Metric:
     ):
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
-        :param indices: optionally, the indices to be included in the calculation
         :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
         intervals
         :return: a resulting metric value
@@ -158,6 +163,7 @@ class Metric:
 
 
 class Accuracy(Metric):
+    @classmethod
     def default_name(cls) -> str:
         return 'Accuracy'
 
@@ -168,6 +174,7 @@ class Accuracy(Metric):
 
 
 class F1Score(Metric):
+    @classmethod
     def default_name(cls) -> str:
         return 'F1'
 
@@ -226,6 +233,7 @@ class F1Score(Metric):
 
 
 class Hits(Metric):
+    @classmethod
     def default_name(cls) -> str:
         return 'Hits'
 
@@ -236,6 +244,7 @@ class Hits(Metric):
 
 
 class MeanReciprocalRank(Metric):
+    @classmethod
     def default_name(cls) -> str:
         return 'MRR'
 
@@ -247,3 +256,56 @@ class MeanReciprocalRank(Metric):
         return MetricStats(
             np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
+
+
+class EaaSMetricStats(MetricStats):
+    def __init__(self, name: str, eaas_result: AsyncEaaSResult):
+        super().__init__(data=None)
+        self.name = name
+        self.eaas_result = eaas_result
+        self._corpus_value = None
+
+    def __len__(self):
+        return len(self.get_data())
+
+    def _fetch_results(self):
+        if not self._data:
+            result = self.eaas_result.get_result()
+            self._corpus_value = result['corpus_level'][f'corpus_{self.name}']
+            samps = result['sample_level']
+            self._data = np.array([x[self.name] for x in samps])
+
+    def get_corpus_value(self) -> float:
+        self._fetch_results()
+        return self._corpus_value
+
+    def get_data(self) -> np.ndarray:
+        self._fetch_results()
+        return self._data
+
+    def filter(self, indices: Union[list[int], np.ndarray]):
+        """
+        Return a view of these stats filtered down to the indicated indices
+        """
+        sdata = self._data
+        if type(indices) != np.ndarray:
+            indices = np.array(indices)
+        return MetricStats(sdata[indices])
+
+
+class EaaSMetric(Metric):
+    @classmethod
+    def default_name(cls) -> str:
+        raise NotImplementedError
+
+    def __init__(self, name: str):
+        super().__init__(name)
+        # !!! Temporary warning
+        non_decomposable_metrics = ['bleu']
+        if name in non_decomposable_metrics:
+            print(
+                f'WARNING: corpus-level {name} is currently calculated as the average of sentence-level {name}, which is not technically correct. This is a known issue that we are working on: https://github.com/neulab/ExplainaBoard/issues/161',
+                file=sys.stderr,
+            )
+        # !!! End temporary warning
+        self.name = name
