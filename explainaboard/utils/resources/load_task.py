@@ -2,7 +2,6 @@ import enum
 import json
 from typing import Dict, List
 
-
 PATH_OF_TASKS_JSON = "./tasks.json"
 
 
