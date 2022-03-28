@@ -11,7 +11,7 @@ from typing import Any, Optional, Union
 
 import numpy as np
 
-from explainaboard.utils.async_eaas import AsyncEaaSResult
+from explainaboard.utils.async_eaas import AsyncEaaSRequest
 
 
 @dataclass
@@ -313,18 +313,18 @@ class EaaSMetricStats(MetricStats):
     Stats from EaaS for calculation of any of the metrics. These are calculated lazily, so that a request is dispatched to the EaaS server and the results are retrieved when they're needed.
     """
 
-    def __init__(self, name: str, eaas_result: AsyncEaaSResult):
+    def __init__(self, name: str, eaas_request: AsyncEaaSRequest):
         super().__init__(data=None)
         self.name = name
-        self.eaas_result = eaas_result
+        self.eaas_request = eaas_request
         self._corpus_value = None
 
     def __len__(self):
         return len(self.get_data())
 
     def _fetch_results(self):
-        if not self._data:
-            result = self.eaas_result.get_result()
+        if self._data is None:
+            result = self.eaas_request.get_result()
             self._corpus_value = result['corpus_level'][f'corpus_{self.name}']
             samps = result['sample_level']
             self._data = np.array([x[self.name] for x in samps])
@@ -340,15 +340,6 @@ class EaaSMetricStats(MetricStats):
         self._fetch_results()
         return self._data
 
-    def filter(self, indices: Union[list[int], np.ndarray]):
-        """
-        Return a view of these stats filtered down to the indicated indices
-        """
-        sdata = self._data
-        if type(indices) != np.ndarray:
-            indices = np.array(indices)
-        return MetricStats(sdata[indices])
-
 
 class EaaSMetric(Metric):
     """
@@ -362,7 +353,7 @@ class EaaSMetric(Metric):
     def __init__(self, name: str):
         super().__init__(name)
         # !!! Temporary warning
-        non_decomposable_metrics = ['bleu']
+        non_decomposable_metrics = ['bleu', 'chrf']
         if name in non_decomposable_metrics:
             print(
                 f'WARNING: corpus-level {name} is currently calculated as the average of sentence-level {name}, which is not technically correct. This is a known issue that we are working on: https://github.com/neulab/ExplainaBoard/issues/161',
