@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections import Counter
+from dataclasses import dataclass
 import itertools
 import re
 import string
@@ -13,25 +14,20 @@ import numpy as np
 from explainaboard.utils.async_eaas import AsyncEaaSResult
 
 
+@dataclass
 class MetricResult:
-    def __init__(
-        self,
-        name: str,
-        value: float,
-        conf_interval: Optional[tuple[float, float]] = None,
-        conf_value: Optional[float] = None,
-    ):
-        """Initialize a result of an evaluation metric
+    """
+    A result of computing a metric over some data
+    """
 
-        :param name: name of the metric
-        :param value: value of the metric
-        :param conf_interval: the confidence interval of the metric
-        :param conf_value: the p-value of the confidence interval
-        """
-        self.name = name
-        self.value = value
-        self.conf_interval = conf_interval
-        self.conf_value = conf_value
+    # Name of the metric that was computed
+    name: str
+    # Metric value
+    value: float
+    # Confidence interval of the metric values
+    conf_interval: Optional[tuple[float, float]] = (None,)
+    # The p-value of the confidence interval
+    conf_value: Optional[float] = (None,)
 
     def to_dict(self):
         ret = {
@@ -46,18 +42,33 @@ class MetricResult:
 
 
 class MetricStats:
+    """
+    A class holding the sufficient statistics necessary to calculate a metric
+    """
+
     def __init__(self, data: Optional[np.ndarray]):
+        """
+        :param data: A numpy array of dimensions [x,y], where x in the length of the dataset, and y is the size of the sufficient statistics necessary to calculate the metric.
+        """
         self._data = data
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """
+        Returns the number of samples in the dataset
+        """
         return len(self._data)
 
-    def get_data(self):
+    def get_data(self) -> np.ndarray:
+        """
+        Get the sufficient statistics in ndarray format
+        """
         return self._data
 
-    def filter(self, indices: Union[list[int], np.ndarray]):
+    def filter(self, indices: Union[list[int], np.ndarray]) -> MetricStats:
         """
-        Return a view of these stats filtered down to the indicated indices
+        Return a view of these stats filtered down to the indicated indices.
+        :param indices: The indices over which the stats should be calculated
+        :return: The filtered stats
         """
         sdata = self.get_data()
         if type(indices) != np.ndarray:
@@ -66,6 +77,10 @@ class MetricStats:
 
 
 class Metric:
+    """
+    A class representing an evaluation metric
+    """
+
     @classmethod
     @abc.abstractmethod
     def default_name(cls) -> str:
@@ -73,6 +88,10 @@ class Metric:
         ...
 
     def __init__(self, name: str = None):
+        """
+        Initialize the metric
+        :param name: the name of the metric for reference later
+        """
         self.name = name if name else self.default_name()
 
     @abc.abstractmethod
@@ -133,7 +152,7 @@ class Metric:
 
     def evaluate_from_stats(
         self, stats: MetricStats, conf_value: Optional[float] = None
-    ):
+    ) -> MetricResult:
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
         :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
@@ -166,6 +185,10 @@ class Metric:
 
 
 class Accuracy(Metric):
+    """
+    Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground truth
+    """
+
     @classmethod
     def default_name(cls) -> str:
         return 'Accuracy'
@@ -177,6 +200,10 @@ class Accuracy(Metric):
 
 
 class F1Score(Metric):
+    """
+    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's implementation.
+    """
+
     @classmethod
     def default_name(cls) -> str:
         return 'F1'
@@ -189,6 +216,15 @@ class F1Score(Metric):
         super().__init__(name=self.default_name() + average)
 
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        """
+        Return sufficient statistics necessary to compute f-score.
+        :param true_data: True outputs
+        :param pred_data: Predicted outputs
+        :return: Returns stats for each class (integer id c) in the following columns of MetricStats
+          * c*3 + 0: occurrences in the true output
+          * c*3 + 1: occurrences in the predicted output
+          * c*3 + 2: number of matches between true and predicted output
+        """
         id_map = {}
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
@@ -236,6 +272,10 @@ class F1Score(Metric):
 
 
 class Hits(Metric):
+    """
+    Calculates the hits metric, telling whether the predicted output is in a set of true outputs.
+    """
+
     @classmethod
     def default_name(cls) -> str:
         return 'Hits'
@@ -247,6 +287,10 @@ class Hits(Metric):
 
 
 class MeanReciprocalRank(Metric):
+    """
+    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is the rank of the true output in the predicted n-best list.
+    """
+
     @classmethod
     def default_name(cls) -> str:
         return 'MRR'
@@ -265,6 +309,10 @@ class MeanReciprocalRank(Metric):
 
 
 class EaaSMetricStats(MetricStats):
+    """
+    Stats from EaaS for calculation of any of the metrics. These are calculated lazily, so that a request is dispatched to the EaaS server and the results are retrieved when they're needed.
+    """
+
     def __init__(self, name: str, eaas_result: AsyncEaaSResult):
         super().__init__(data=None)
         self.name = name
@@ -282,6 +330,9 @@ class EaaSMetricStats(MetricStats):
             self._data = np.array([x[self.name] for x in samps])
 
     def get_corpus_value(self) -> float:
+        """
+        Return the evaluation metric value over all examples in the corpus.
+        """
         self._fetch_results()
         return self._corpus_value
 
@@ -300,6 +351,10 @@ class EaaSMetricStats(MetricStats):
 
 
 class EaaSMetric(Metric):
+    """
+    A metric that calculates evaluation scores using EaaS.
+    """
+
     @classmethod
     def default_name(cls) -> str:
         raise NotImplementedError
@@ -318,7 +373,11 @@ class EaaSMetric(Metric):
 
 
 class QAMetric(Metric):
-    def normalize_answer(self, s: str):
+    """
+    An abstract class for extractive QA tasks that measures scores after normalization. The actual metric must inherit this class and implement the sample_level_metric() function.
+    """
+
+    def normalize_answer(self, s: str) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
         s = re.sub(r'\b(a|an|the)\b', ' ', s)
         s = ' '.join(s.split())
@@ -339,10 +398,17 @@ class QAMetric(Metric):
 
     @abc.abstractmethod
     def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
+        """
+        Calculate a score given a ground truth answer string and a prediction.
+        """
         ...
 
 
 class ExactMatchQA(QAMetric):
+    """
+    Calculate a score for extractive QA based on exact match.
+    """
+
     @classmethod
     def default_name(cls) -> str:
         return 'ExactMatchQA'
@@ -356,6 +422,10 @@ class ExactMatchQA(QAMetric):
 
 
 class F1ScoreQA(QAMetric):
+    """
+    Calculate a score for extractive QA based on F1 score.
+    """
+
     @classmethod
     def default_name(cls) -> str:
         return 'F1ScoreQA'
