@@ -1,5 +1,7 @@
 """Generic functions to manipulate type hints."""
 
+from __future__ import annotations
+
 from collections.abc import Generator, Iterable
 from typing import Optional, TypeVar
 
