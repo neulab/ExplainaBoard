@@ -13,7 +13,7 @@ class TestTextClassification(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.text_classification.value,
-            "metric_names": ["Accuracy", "F1score"],
+            "metric_names": ["Accuracy", "F1Score"],
         }
         loader = get_loader(
             TaskType.text_classification,
@@ -36,7 +36,7 @@ class TestTextClassification(unittest.TestCase):
     def test_training_set_dependent_features(self):
         metadata = {
             "task_name": TaskType.text_classification.value,
-            "metric_names": ["Accuracy", "F1score"],
+            "metric_names": ["Accuracy", "F1Score"],
             "dataset_name": "ag_news",
             "reload_stat": False,
         }

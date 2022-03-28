@@ -3,20 +3,17 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 import json
 import os
-from typing import Any
 
 from datalabs import aggregating, load_dataset
 from tqdm import tqdm
 
 # TODO(odashi): Add a function to obtain metric class instead of using getattr.
 from explainaboard import feature
-from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
-import explainaboard.metric
+from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils.py_utils import eprint, sort_dict
-from explainaboard.utils.typing_utils import unwrap_generator
+from explainaboard.utils.py_utils import eprint
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -200,13 +197,6 @@ class KGLinkTailPredictionProcessor(Processor):
                     "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
                 )
 
-        # print(self.entity_type_level_map)
-        # exit()
-
-        # f = open('entity_type_level_map.json')
-        # self.entity_type_level_map = json.load(f)
-        # print(self.entity_type_level_map.keys())
-
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
 
@@ -266,167 +256,8 @@ class KGLinkTailPredictionProcessor(Processor):
 
     # --- End feature functions
 
-    # TODO(gneubig): this can probably be generalized to single-metric
-    def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        scoring_stats: Any = None,
-    ) -> dict[str, Performance]:
-        predicted_labels, true_labels = [], []
+    def _get_true_label(self, data_point: dict):
+        return data_point["true_tail"]
 
-        for _id, feature_table in enumerate(sys_output):
-
-            predicted_labels.append(feature_table["predicted_tails"])
-            true_labels.append(feature_table["true_tail"])
-
-        overall = {}
-        for metric_name in unwrap_generator(sys_info.metric_names):
-            metric_func = getattr(explainaboard.metric, metric_name)
-            one_metric = metric_func(
-                true_labels=true_labels,
-                predicted_labels=predicted_labels,
-                is_print_confidence_interval=sys_info.is_print_confidence_interval,
-            )
-            metric_result = one_metric.evaluate()
-
-            overall_performance = Performance(
-                metric_name=metric_name,
-                value=metric_result["value"],
-                confidence_score_low=metric_result["confidence_score_low"],
-                confidence_score_high=metric_result["confidence_score_high"],
-            )
-            overall[metric_name] = overall_performance
-        return overall
-
-    # TODO(gneubig): the only difficult part in generalizing this is specifing "in" instead of "=="
-    def get_bucket_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        samples_over_bucket: dict[str, list[int]],
-        scoring_stats: Any = None,
-    ) -> dict[str, list[BucketPerformance]]:
-        """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
-        """
-
-        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
-        for bucket_interval, sample_ids in samples_over_bucket.items():
-
-            bucket_true_labels = []
-            bucket_predicted_labels = []  # list of (lists of top-k ranked tails)
-            bucket_cases = []
-
-            for sample_id in sample_ids:
-
-                true_label = sys_output[int(sample_id)]["true_tail"]
-                predicted_label = sys_output[int(sample_id)]["predicted_tails"]
-                s_id = sys_output[int(sample_id)]["id"]
-
-                # get a bucket of true/predicted labels
-                bucket_true_labels.append(true_label)
-                bucket_predicted_labels.append(predicted_label)
-                # get a bucket of cases (e.g., errors)
-                if sys_info.is_print_case:
-                    if true_label not in predicted_label:
-                        # bucket_case = true_label + "|||" + predicted_label + "|||" + sent
-                        # bucket_case = {"true_label":(s_id,["true_label"]),
-                        #                "predicted_label":(s_id,["predicted_label"]),
-                        #                "text":(s_id,["text"])}
-                        bucket_case = str(s_id)
-                        bucket_cases.append(bucket_case)
-
-            bucket_name_to_performance[bucket_interval] = []
-            for metric_name in unwrap_generator(sys_info.metric_names):
-
-                metric_func = getattr(explainaboard.metric, metric_name)
-                one_metric = metric_func(
-                    true_labels=bucket_true_labels,
-                    predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=sys_info.is_print_confidence_interval,
-                )
-                metric_result = one_metric.evaluate()
-
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=metric_result["value"],
-                    confidence_score_low=metric_result["confidence_score_low"],
-                    confidence_score_high=metric_result["confidence_score_high"],
-                    n_samples=len(bucket_true_labels),
-                    bucket_samples=bucket_cases,
-                )
-
-                # one_metric = eval(metric_name)(
-                #     true_labels=bucket_true_labels,
-                #     predicted_labels=bucket_predicted_labels,
-                #     is_print_confidence_interval=sys_info.is_print_confidence_interval,
-                # )
-                # bucket_value_json = one_metric.evaluate()
-
-                # bucket_value = bucket_value_json["value"]
-                # confidence_score_low = bucket_value_json["confidence_score_low"]
-                # confidence_score_high = bucket_value_json["confidence_score_high"]
-
-                # # print(f"name:\t {one_metric._name} \n"
-                # #       f"value:\t {bucket_value}\n"
-                # #       f"confidence low\t {confidence_score_low}\n"
-                # #       f"confidence up \t {confidence_score_high}\n"
-                # #       f"---------------------------------")
-
-                # bucket_performance = BucketPerformance(
-                #     bucket_name=bucket_interval,
-                #     metric_name=metric_name,
-                #     value=bucket_value,
-                #     confidence_score_low=confidence_score_low,
-                #     confidence_score_high=confidence_score_high,
-                #     n_samples=len(bucket_true_labels),
-                #     bucket_samples=bucket_cases,
-                # )
-
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
-
-        return sort_dict(bucket_name_to_performance)
-
-
-# @aggregating(
-#     name="get_statistics",
-#     contributor="datalab",
-#     task="kg-link-prediction",
-#     description="aggregation function",
-# )
-# def get_statistics(samples: List[Dict]):
-#     """
-#     `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
-#     # pip install datalabs
-#     dataset = load_dataset("fb15k_237", 'readable')
-#     print(dataset['train'])
-#     """
-#     dict_head = {}
-#     dict_link = {}
-#     dict_tail = {}
-#
-#     for sample in tqdm(samples):
-#
-#         if sample['tail'] not in dict_tail.keys():
-#             dict_tail[sample['tail']] = 1
-#         else:
-#             dict_tail[sample['tail']] += 1
-#
-#         if sample['head'] not in dict_head.keys():
-#             dict_head[sample['head']] = 1
-#         else:
-#             dict_head[sample['head']] += 1
-#
-#         if sample['link'] not in dict_link.keys():
-#             dict_link[sample['link']] = 1
-#         else:
-#             dict_link[sample['link']] += 1
-#
-#     return {
-#         "head_fre": dict_head,
-#         "link_fre": dict_link,
-#         "tail_fre": dict_tail,
-#     }
+    def _get_predicted_label(self, data_point: dict):
+        return data_point["predicted_tails"]
