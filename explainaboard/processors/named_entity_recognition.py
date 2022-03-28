@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -307,6 +308,15 @@ class NERProcessor(Processor):
 
     # --- End feature functions
 
+    # These return none because NER is not yet in the main metric interface
+    def _get_metrics(self, sys_info: SysOutputInfo):
+        return None
+
+    def _gen_metric_stats(
+        self, sys_info: SysOutputInfo, sys_output: list[dict]
+    ) -> Optional[list[MetricStats]]:
+        return None
+
     def _complete_span_features(self, sentence, tags, statistics=None):
 
         # Get training set stats if they exist
@@ -379,7 +389,7 @@ class NERProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        scoring_stats: Any = None,
+        metric_stats: Any = None,
     ) -> dict[str, Performance]:
         """
         Get the overall performance according to metrics
@@ -440,7 +450,7 @@ class NERProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats: Any = None,
+        metric_stats: Any = None,
     ) -> tuple[dict, dict]:
 
         features = unwrap(sys_info.features)

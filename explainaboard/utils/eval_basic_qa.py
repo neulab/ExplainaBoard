@@ -4,7 +4,6 @@ from collections import Counter
 import re
 import string
 
-
 '''
 QA
 '''

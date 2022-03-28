@@ -3,7 +3,6 @@ from __future__ import annotations
 import enum
 import json
 
-
 PATH_OF_TASKS_JSON = "./tasks.json"
 
 
