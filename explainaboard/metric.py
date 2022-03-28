@@ -126,7 +126,7 @@ class Metric:
             indices = np.random.choice(all_indices, size=n_elems, replace=True)
             agg_stats = self.aggregate_stats(stats.filter(indices))
             samp_results[i] = self.calc_metric_from_aggregate(agg_stats)
-        np.sort(samp_results)
+        samp_results = np.sort(samp_results)
         low = int(n_samples * conf_value / 2.0)
         high = int(n_samples * (1.0 - conf_value / 2.0))
         return samp_results[low], samp_results[high]
@@ -183,7 +183,7 @@ class F1Score(Metric):
 
     def __init__(self, average: str = 'micro'):
         self.average = average
-        supported_averages = ['micro', 'macro']
+        supported_averages = {'micro', 'macro'}
         if average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
         super().__init__(name=self.default_name() + average)
@@ -194,35 +194,35 @@ class F1Score(Metric):
             if word not in id_map:
                 id_map[word] = len(id_map)
         n_data = len(true_data)
-        n_classes = 3 * len(id_map)
+        n_classes = len(id_map)
         # This is a bit memory inefficient if there's a large number of classes
         stats = np.zeros((n_data, n_classes * 3))
         for i, (t, p) in enumerate(zip(true_data, pred_data)):
-            stats[i, id_map[t] * 3] += 1
-            stats[i, id_map[p] * 3 + 1] += 1
-            if t == p:
-                stats[i, id_map[t] * 3 + 2] += 1
+            tid, pid = id_map[t], id_map[p]
+            stats[i, tid * 3] += 1
+            stats[i, pid * 3 + 1] += 1
+            if tid == pid:
+                stats[i, tid * 3 + 2] += 1
         return MetricStats(stats)
 
     def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
-        assert len(agg_stats) % 3 == 0
         n_classes = int(len(agg_stats) / 3)
         if self.average == 'micro':
             match, true, pred = 0.0, 0.0, 0.0
             for i in range(n_classes):
                 true += agg_stats[i * 3]
                 pred += agg_stats[i * 3 + 1]
-                match += agg_stats[i * 3 + 1]
+                match += agg_stats[i * 3 + 2]
             p = match / pred if pred else 0.0
             r = match / true if true else 0.0
-            f1_total = 2 * p * r / (p + r)
+            f1_total = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
         elif self.average == 'macro':
             f1_total = 0.0
             for i in range(n_classes):
                 true, pred, match = agg_stats[i * 3 : i * 3 + 3]
                 p = match / pred if pred else 0.0
                 r = match / true if true else 0.0
-                f1 = 2 * p * r / (p + r)
+                f1 = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
                 f1_total += f1
             f1_total /= n_classes
         else:
@@ -252,8 +252,11 @@ class MeanReciprocalRank(Metric):
         return 'MRR'
 
     def mrr_val(self, true: Any, preds: list):
-        true_rank = list(preds).index(true) + 1  # 1-indexed
-        return 1.0 / true_rank
+        if true not in preds:
+            return 0.0
+        else:
+            true_rank = list(preds).index(true) + 1  # 1-indexed
+            return 1.0 / true_rank
 
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         return MetricStats(
