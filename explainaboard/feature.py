@@ -13,6 +13,7 @@ import pyarrow as pa
 
 from explainaboard import config
 from explainaboard.utils.py_utils import zip_dict
+from explainaboard.utils.typing_utils import unwrap
 
 
 def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
@@ -288,7 +289,7 @@ class ClassLabel:
         names_file:str, path to a file with names, one per line
     """
 
-    num_classes: int = None  # type: ignore
+    num_classes: Optional[int] = None
     names: Optional[list[str]] = None
     description: Optional[str] = None
     names_file: Optional[str] = None
@@ -343,7 +344,7 @@ class ClassLabel:
             else:
                 # No names provided, try to integerize
                 output = int(value)
-                if 0 <= output < self.num_classes:
+                if 0 <= output < unwrap(self.num_classes):
                     raise ValueError(f'{value} is out of range.')
                 return output
         except Exception as ex:
@@ -363,7 +364,7 @@ class ClassLabel:
 
     def int2str_scalar(self, value: int) -> str:
         """Convert a class ID into the corresponding name."""
-        if not 0 <= value < self.num_classes:
+        if not 0 <= value < unwrap(self.num_classes):
             raise ValueError(f'{value} is out of range.')
 
         if self._int2str is not None:
