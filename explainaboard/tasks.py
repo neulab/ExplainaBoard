@@ -150,7 +150,7 @@ _task_categories: list[TaskCategory] = [
                 name=TaskType.question_answering_extractive,
                 description="A task of extracting an answer from a text given a question. See more details about the format of upload files: https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.md",
                 supported=True,
-                supported_metrics=["f1_score_qa", "exact_match_qa"],
+                supported_metrics=["F1ScoreQA", "ExactMatchQA"],
                 supported_formats=["json"],
                 supported_datasets=[],
             ),
