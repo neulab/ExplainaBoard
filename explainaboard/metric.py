@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import abc
+from collections import Counter
 import itertools
+import re
+import string
 import sys
 from typing import Any, Optional, Union
 
@@ -309,3 +312,59 @@ class EaaSMetric(Metric):
             )
         # !!! End temporary warning
         self.name = name
+
+
+class QAMetric(Metric):
+    def normalize_answer(self, s: str):
+        """Lower text and remove punctuation, articles and extra whitespace."""
+        s = re.sub(r'\b(a|an|the)\b', ' ', s)
+        s = ' '.join(s.split())
+        exclude_punc = set(string.punctuation)
+        s = ''.join(ch for ch in s if ch not in exclude_punc)
+        s = s.lower()
+        return s
+
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        return MetricStats(
+            np.array(
+                [
+                    max([self.sample_level_metric(t, p) for t in ts])
+                    for ts, p in zip(true_data, pred_data)
+                ]
+            )
+        )
+
+    @abc.abstractmethod
+    def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
+        ...
+
+
+class ExactMatchQA(QAMetric):
+    @classmethod
+    def default_name(cls) -> str:
+        return 'ExactMatchQA'
+
+    def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
+        return (
+            1.0
+            if self.normalize_answer(prediction) == self.normalize_answer(ground_truth)
+            else 0.0
+        )
+
+
+class F1ScoreQA(QAMetric):
+    @classmethod
+    def default_name(cls) -> str:
+        return 'F1ScoreQA'
+
+    def sample_level_metric(self, ground_truth: str, prediction: str):
+        prediction_tokens = self.normalize_answer(prediction).split()
+        ground_truth_tokens = self.normalize_answer(ground_truth).split()
+        common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
+        num_same = sum(common.values())
+        if num_same == 0:
+            return 0
+        precision = 1.0 * num_same / len(prediction_tokens)
+        recall = 1.0 * num_same / len(ground_truth_tokens)
+        f1 = (2 * precision * recall) / (precision + recall)
+        return f1
