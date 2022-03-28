@@ -7,6 +7,18 @@ import uuid
 from eaas import Client
 
 
+class AsyncEaaSResult:
+    def __init__(self, eaas_client: AsyncEaaSClient, request_id: str):
+        self._eaas_client = eaas_client
+        self._request_id = request_id
+        self._result = None
+
+    def get_result(self):
+        if self._result is None:
+            self._result = self._eaas_client.wait_and_get_result(self._request_id)
+        return self._result
+
+
 class AsyncEaaSClient(Client):
     """
     A wrapper class to support async requests for EaaS. It uses threads so there is a limit to the maximum number of parallel requests it can make.
@@ -17,10 +29,10 @@ class AsyncEaaSClient(Client):
 
     def __init__(self):
         super().__init__()
-        self._threads: dict[int, Thread] = {}
-        self._results: dict[int, Any] = {}
+        self._threads: dict[str, Thread] = {}
+        self._results: dict[str, Any] = {}
 
-    def _run_thread(self, original_fn) -> str:
+    def _run_thread(self, original_fn) -> AsyncEaaSResult:
         request_id = str(uuid.uuid1())
 
         def fn():
@@ -28,7 +40,7 @@ class AsyncEaaSClient(Client):
 
         self._threads[request_id] = Thread(target=fn)
         self._threads[request_id].start()
-        return request_id
+        return AsyncEaaSResult(self, request_id)
 
     def async_score(
         self,
