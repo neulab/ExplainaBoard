@@ -192,7 +192,7 @@ class SysOutputInfo:
 @dataclass
 class OverallStatistics:
     sys_info: SysOutputInfo = None
-    scoring_stats: Any = None
+    metric_stats: Any = None
     active_features: list[str] = None
     overall_results: dict[str, Performance] = None
 

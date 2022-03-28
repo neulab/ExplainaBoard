@@ -23,7 +23,7 @@ class TestExtractiveQA(unittest.TestCase):
         metadata = {
             "task_name": TaskType.question_answering_extractive.value,
             "dataset_name": "squad",
-            "metric_names": ["f1_score_qa", "exact_match_qa"],
+            "metric_names": ["F1ScoreQA", "ExactMatchQA"],
         }
 
         processor = get_processor(TaskType.question_answering_extractive)
