@@ -319,8 +319,7 @@ class Processor(metaclass=abc.ABCMeta):
             samples_over_bucket: a dictionary of feature name -> list of buckets and samples
             performances_over_bucket: a dictionary of feature name -> list of performances by bucket
         """
-        if sys_info.features is None:
-            return {}, {}
+        sys_features = unwrap(sys_info.features)
 
         # Bucketing
         samples_over_bucket = {}
@@ -334,15 +333,15 @@ class Processor(metaclass=abc.ABCMeta):
             # Preparation for bucketing
             bucket_func = getattr(
                 explainaboard.utils.bucketing,
-                sys_info.features[feature_name].bucket_info.method,
+                sys_features[feature_name].bucket_info.method,
             )
             # TODO(gneubig): make dict_obj more elegant so it doesn't have to copy memory
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj={
                     x: sys_output[x][feature_name] for x in range(len(sys_output))
                 },
-                bucket_number=sys_info.features[feature_name].bucket_info.number,
-                bucket_setting=sys_info.features[feature_name].bucket_info.setting,
+                bucket_number=sys_features[feature_name].bucket_info.number,
+                bucket_setting=sys_features[feature_name].bucket_info.setting,
             )
 
             # evaluating bucket: get bucket performance
