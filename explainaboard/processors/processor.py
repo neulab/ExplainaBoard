@@ -18,7 +18,7 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
-from explainaboard.metric import MetricStats
+from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 import explainaboard.utils.bucketing
@@ -129,7 +129,7 @@ class Processor(metaclass=abc.ABCMeta):
                 )
         return statistics
 
-    def _get_metrics(self, sys_info: SysOutputInfo):
+    def _get_metrics(self, sys_info: SysOutputInfo) -> Optional[list[Metric]]:
         return [getattr(explainaboard.metric, name)() for name in sys_info.metric_names]
 
     def _gen_metric_stats(
