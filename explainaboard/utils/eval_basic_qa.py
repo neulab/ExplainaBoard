@@ -32,7 +32,7 @@ def normalize_answer(s):
 def f1_score_qa_sample_level(prediction: str, ground_truth: str):
     prediction_tokens = normalize_answer(prediction).split()
     ground_truth_tokens = normalize_answer(ground_truth).split()
-    common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
+    common: Counter = Counter(prediction_tokens) & Counter(ground_truth_tokens)
     num_same = sum(common.values())
     if num_same == 0:
         return 0
@@ -76,9 +76,7 @@ def exact_match_qa(true_answers: list[list], predicted_answer: list[str]):
 
         exact_match += exact_match1
 
-    exact_match = 100.0 * exact_match / total
-
-    return exact_match
+    return 100.0 * exact_match / total
 
 
 def f1_score_qa(true_answers: list[list], predicted_answer: list[str]):
@@ -93,6 +91,4 @@ def f1_score_qa(true_answers: list[list], predicted_answer: list[str]):
         )
         f1_dataset_level += f1_sample
 
-    f1_dataset_level = 100.0 * f1_dataset_level / total
-
-    return f1_dataset_level
+    return 100.0 * f1_dataset_level / total

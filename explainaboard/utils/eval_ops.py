@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-
 from datalabs.operations.aggregate.auto_eval import auto_eval
 
 from explainaboard import FileType, get_loader, get_processor, Source
 
 
 @auto_eval(name="explainaboard")
-def explainaboard(samples: Iterator, dataset_info=None):
+def explainaboard(samples: str, dataset_info=None):
+    # TODO(odashi): I didn't understand what this docstring mean.
+    # This function seems to be not used anywhere, so I guessed the file can be removed.
     """
     Package: python
     Input:
@@ -37,6 +37,7 @@ def explainaboard(samples: Iterator, dataset_info=None):
 
     data = loader.load()
 
+    # TODO(odashi): Mismatching the function signature, resulting in runtime panic.
     # Run analysis
     report = get_processor(
         dataset_info.task_templates[0].task_category, metadata=metadata, data=data

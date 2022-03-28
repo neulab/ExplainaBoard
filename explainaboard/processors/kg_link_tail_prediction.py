@@ -16,6 +16,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import eprint, sort_dict
+from explainaboard.utils.typing_utils import unwrap_generator
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -128,16 +129,16 @@ class KGLinkTailPredictionProcessor(Processor):
         self._user_defined_feature_config = None
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator):
+    def _statistics_func(self, samples: Iterator[dict[str, str]]):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
         dataset = load_dataset("fb15k_237", 'readable')
         print(dataset['train'])
         """
-        dict_head = {}
-        dict_link = {}
-        dict_tail = {}
+        dict_head: dict[str, int] = {}
+        dict_link: dict[str, int] = {}
+        dict_tail: dict[str, int] = {}
 
         for sample in tqdm(samples):
 
@@ -280,7 +281,7 @@ class KGLinkTailPredictionProcessor(Processor):
             true_labels.append(feature_table["true_tail"])
 
         overall = {}
-        for metric_name in sys_info.metric_names:
+        for metric_name in unwrap_generator(sys_info.metric_names):
             metric_func = getattr(explainaboard.metric, metric_name)
             one_metric = metric_func(
                 true_labels=true_labels,
@@ -311,7 +312,7 @@ class KGLinkTailPredictionProcessor(Processor):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
-        bucket_name_to_performance = {}
+        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
             bucket_true_labels = []
@@ -338,7 +339,7 @@ class KGLinkTailPredictionProcessor(Processor):
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in sys_info.metric_names:
+            for metric_name in unwrap_generator(sys_info.metric_names):
 
                 metric_func = getattr(explainaboard.metric, metric_name)
                 one_metric = metric_func(

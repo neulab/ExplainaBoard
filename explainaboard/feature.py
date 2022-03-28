@@ -5,7 +5,7 @@ import copy
 from dataclasses import dataclass, field
 import re
 import sys
-from typing import Any, ClassVar, Optional, Union
+from typing import Any, ClassVar, Optional, overload, Union
 
 import numpy as np
 import pandas as pd
@@ -265,6 +265,8 @@ class BucketInfo:
     setting: Any = 1  # For different bucket_methods, the settings are diverse
 
 
+# TODO(odashi): Make this class non-dataclass because __post_init__ does lots of
+# type-insensitive processes.
 @dataclass
 class ClassLabel:
     """
@@ -286,19 +288,19 @@ class ClassLabel:
         names_file:str, path to a file with names, one per line
     """
 
-    num_classes: int = None
-    names: list[str] = None
-    description: str = None
+    num_classes: int = None  # type: ignore
+    names: Optional[list[str]] = None
+    description: Optional[str] = None
     names_file: Optional[str] = None
     id: Optional[str] = None
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     # Class Variables
     dtype: ClassVar[str] = "int64"
-    _str2int: ClassVar[dict[str, int]] = None
-    _int2str: ClassVar[dict[int, int]] = None
+    _str2int: ClassVar[Optional[dict[str, int]]] = None
+    _int2str: ClassVar[Optional[dict[int, str]]] = None
     _type: str = field(default="ClassLabel", init=False, repr=False)
 
     def __post_init__(self):
@@ -333,54 +335,61 @@ class ClassLabel:
                 "Some label names are duplicated. Each label name should be unique."
             )
 
-    def str2int(self, values: Union[str, Iterable]):
-        """Conversion class name string => integer."""
-        assert isinstance(values, str) or isinstance(
-            values, Iterable
-        ), f"Values {values} should be a string or an Iterable (list, numpy array, pytorch, tensorflow tensors)"
-        return_list = True
-        if isinstance(values, str):
-            values = [values]
-            return_list = False
-
-        output = []
-        for value in values:
-            if self._str2int:
-                # strip key if not in dict
-                if value not in self._str2int:
-                    value = str(value).strip()
-                output.append(self._str2int[str(value)])
+    def str2int_scalar(self, value: str) -> int:
+        """Convert a class name into the corresponding ID."""
+        try:
+            if self._str2int is not None:
+                return self._str2int.get(value) or self._str2int[value.strip()]
             else:
                 # No names provided, try to integerize
-                failed_parse = False
-                try:
-                    output.append(int(value))
-                except ValueError:
-                    failed_parse = True
-                if failed_parse or not 0 <= value < self.num_classes:
-                    raise ValueError("Invalid string class label %s" % value)
-        return output if return_list else output[0]
+                output = int(value)
+                if 0 <= output < self.num_classes:
+                    raise ValueError(f'{value} is out of range.')
+                return output
+        except Exception as ex:
+            raise ValueError(f'Invalid string class label: {value}.') from ex
 
-    def int2str(self, values: Union[int, Iterable]):
-        """Conversion integer => class name string."""
-        assert isinstance(values, int) or isinstance(
-            values, Iterable
-        ), f"Values {values} should be an integer or an Iterable (list, numpy array, pytorch, tensorflow tensors)"
-        return_list = True
-        if isinstance(values, int):
-            values = [values]
-            return_list = False
+    def str2int_vector(self, values: Iterable[str]) -> list[int]:
+        """Convert a list of class names into corresponding IDs."""
+        return [self.str2int_scalar(v) for v in values]
 
-        for v in values:
-            if not 0 <= v < self.num_classes:
-                raise ValueError("Invalid integer class label %d" % v)
-
-        if self._int2str:
-            output = [self._int2str[int(v)] for v in values]
+    def str2int(self, values: Iterable[str]) -> Union[int, list[int]]:
+        """Convert class names into corresponding IDs: generic version."""
+        # NOTE(odashi): str is also Iterable[str].
+        if isinstance(values, str):
+            return self.str2int_scalar(values)
         else:
-            # No names provided, return str(values)
-            output = [str(v) for v in values]
-        return output if return_list else output[0]
+            return self.str2int_vector(values)
+
+    def int2str_scalar(self, value: int) -> str:
+        """Convert a class ID into the corresponding name."""
+        if not 0 <= value < self.num_classes:
+            raise ValueError(f'{value} is out of range.')
+
+        if self._int2str is not None:
+            return self._int2str[value]
+        else:
+            # No names provided, assuming the string representation is the name.
+            return str(value)
+
+    def int2str_vector(self, values: Iterable[int]) -> list[str]:
+        """Convert a list of class IDs into corresponding names."""
+        return [self.int2str_scalar(v) for v in values]
+
+    @overload
+    def int2str(self, values: int) -> str:
+        ...
+
+    @overload
+    def int2str(self, values: Iterable[int]) -> list[str]:
+        ...
+
+    def int2str(self, values):
+        """Convert class IDs into corresponding names: generic version."""
+        if isinstance(values, int):
+            return self.int2str_scalar(values)
+        else:
+            return self.int2str_vector(values)
 
     def encode_example(self, example_data):
         if self.num_classes is None:
@@ -434,7 +443,7 @@ class Set:
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     _type: str = field(default="Set", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
@@ -442,12 +451,12 @@ class Set:
 
 @dataclass
 class Position:
-    positions: list = None
-    dtype: ClassVar[str] = Any
+    positions: Optional[list] = None
+    dtype: ClassVar[Union[str, object]] = Any  # TODO(odashi): avoid using Any here.
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     _type: str = field(default="Position", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
@@ -455,11 +464,11 @@ class Position:
 
 @dataclass
 class Span:
-    dtype: ClassVar[str] = Any
+    dtype: ClassVar[Union[str, object]] = Any  # TODO(odashi): avoid using Any here.
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     _type: str = field(default="Span", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
@@ -491,11 +500,11 @@ class Value:
     """
 
     dtype: str  # must be initialized when created
-    description: str = None
+    description: Optional[str] = None
     is_bucket: bool = False  # don't need to be initialized
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     id: Optional[str] = None
     # Automatically constructed
     pa_type: ClassVar[Any] = None
@@ -596,13 +605,7 @@ def encode_nested_example(schema, obj):
 
 
 class Features(dict):
-
-    # def __init__(self, dictionary):
-    #     print(dictionary)
-    #     for k, v in dictionary.items():
-    #         setattr(self,k,v)
-
-    def get_bucket_features(self, include_training_dependent=True) -> list:
+    def get_bucket_features(self, include_training_dependent=True) -> list[str]:
         """
         Get features that would be used for bucketing
         :param include_training_dependent: Include training-set dependent features

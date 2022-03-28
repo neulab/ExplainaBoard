@@ -1,13 +1,14 @@
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
 class BuilderConfig:
-    path_output_file: str = None
-    path_report: str = None
-    data_file: str = None
-    description: str = None
-    path_test_set: str = None  # for question answering task
+    path_output_file: Optional[str] = None
+    path_report: Optional[str] = None
+    data_file: Optional[str] = None
+    description: Optional[str] = None
+    path_test_set: Optional[str] = None  # for question answering task
 
 
 TORCH_VERSION = "N/A"

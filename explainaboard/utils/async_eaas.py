@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from threading import Thread
 from typing import Any
 import uuid
@@ -7,6 +8,7 @@ import uuid
 from eaas import Client
 
 
+# TODO(odashi): Use async concurrency to implement this functionaliry.
 class AsyncEaaSClient(Client):
     """
     A wrapper class to support async requests for EaaS. It uses threads so there is a limit to the maximum number of parallel requests it can make.
@@ -17,10 +19,10 @@ class AsyncEaaSClient(Client):
 
     def __init__(self):
         super().__init__()
-        self._threads: dict[int, Thread] = {}
-        self._results: dict[int, Any] = {}
+        self._threads: dict[str, Thread] = {}
+        self._results: dict[str, Any] = {}
 
-    def _run_thread(self, original_fn) -> str:
+    def _run_thread(self, original_fn: Callable[[], Any]) -> str:
         request_id = str(uuid.uuid1())
 
         def fn():

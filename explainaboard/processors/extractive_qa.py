@@ -13,6 +13,7 @@ from explainaboard.tasks import TaskType
 import explainaboard.utils.eval_basic_qa
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.question_answering_extractive)
@@ -164,7 +165,7 @@ class QAExtractiveProcessor(Processor):
             true_answers.append(feature_table["answers"]["text"])
 
         overall = {}
-        for metric_name in sys_info.metric_names:
+        for metric_name in unwrap(sys_info.metric_names):
             # TODO(gneubig): is it necessary to have this as a separate interface than the other metrics?
             #                probably not. it'd be good to unify these.
             metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
@@ -194,7 +195,7 @@ class QAExtractiveProcessor(Processor):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
-        bucket_name_to_performance = {}
+        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
             bucket_true_labels = []
@@ -226,7 +227,7 @@ class QAExtractiveProcessor(Processor):
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in sys_info.metric_names:
+            for metric_name in unwrap(sys_info.metric_names):
                 # TODO(gneubig): is it necessary to have this as a separate interface than the other metrics?
                 #                probably not. it'd be good to unify these.
                 metric_func = getattr(explainaboard.utils.eval_basic_qa, metric_name)
