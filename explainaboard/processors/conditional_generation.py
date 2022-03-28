@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any, cast, Optional
 
 import numpy
 from tqdm import tqdm
@@ -15,6 +15,7 @@ from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.bucketing
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 @register_processor(TaskType.conditional_generation)
@@ -181,7 +182,7 @@ class ConditionalGenerationProcessor(Processor):
 
     def _gen_scoring_stats(
         self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> Any:
+    ) -> dict[str, str]:
         """Generate sufficient statistics for scoring.
 
         :param sys_info: Information about the system outputs
@@ -202,7 +203,7 @@ class ConditionalGenerationProcessor(Processor):
         request_id = self._get_eaas_client().async_score(
             inputs,
             task="sum",  # TODO(pengfei): this should be generalized
-            metrics=sys_info.metric_names.copy(),
+            metrics=unwrap(sys_info.metric_names).copy(),
             lang="en",
             cal_attributes=False,
         )
@@ -211,12 +212,13 @@ class ConditionalGenerationProcessor(Processor):
         # faeturizing, etc. is going on
         return {'request_id': request_id}
 
-    def _fetch_scoring_stats(self, scoring_stats: Any):
+    # TODO(odashi): Restructure this function (and EaaS client) to be type-safe.
+    def _fetch_scoring_stats(self, scoring_stats: dict[str, Any]):
         """
         A utility function used to lazily fetch the actual scoring dict when it's necessary.
         """
         if 'request_id' in scoring_stats:
-            eaas_stats = self._eaas_client.wait_and_get_result(
+            eaas_stats: dict[str, Any] = unwrap(self._eaas_client).wait_and_get_result(
                 scoring_stats['request_id']
             )
             scoring_stats.clear()
@@ -238,25 +240,28 @@ class ConditionalGenerationProcessor(Processor):
         """
 
         # One pass over the test set to find token test frequency
-        ref_test_freq, src_test_freq = {}, {}
+        ref_test_freq: dict[str, int] = {}
+        src_test_freq: dict[str, int] = {}
         for dict_sysout in sys_output:
             for ref_tok in self._tokenizer(dict_sysout['reference']):
                 ref_test_freq[ref_tok] = ref_test_freq.get(ref_tok, 0) + 1
             for src_tok in self._tokenizer(dict_sysout['source']):
                 src_test_freq[src_tok] = src_test_freq.get(src_tok, 0) + 1
 
+        sys_features = unwrap(sys_info.features)
+
         # Get names of bucketing features
         bucket_feature_funcs = {}
         active_features = list(
-            sys_info.features.get_bucket_features(
+            sys_features.get_bucket_features(
                 include_training_dependent=external_stats is not None
             )
         )
         for bucket_feature in active_features:
-            if bucket_feature in sys_info.features:
+            if bucket_feature in sys_features:
                 bucket_feature_funcs[bucket_feature] = (
                     self._get_feature_func(bucket_feature),
-                    sys_info.features[bucket_feature].require_training_set,
+                    sys_features[bucket_feature].require_training_set,
                 )
 
         for _id, dict_sysout in enumerate(sys_output):
@@ -331,12 +336,13 @@ class ConditionalGenerationProcessor(Processor):
     ) -> dict[str, Performance]:
 
         # Fetch asynchronously calculated stats
-        self._fetch_scoring_stats(scoring_stats)
+        self._fetch_scoring_stats(cast('dict[str, Any]', scoring_stats))
 
         overall = {}
-        for metric_name in sys_info.metric_names:
+        for metric_name in unwrap_generator(sys_info.metric_names):
 
-            overall_value = scoring_stats["corpus_level"]["corpus_" + metric_name]
+            scoring_stats_typed = cast('dict[str, dict[str, float]]', scoring_stats)
+            overall_value = scoring_stats_typed["corpus_level"]["corpus_" + metric_name]
             overall_performance = Performance(
                 metric_name=metric_name,
                 value=overall_value,
@@ -362,8 +368,9 @@ class ConditionalGenerationProcessor(Processor):
         scoring_stats: Any = None,
     ) -> tuple[dict, dict]:
 
-        features = sys_info.features
-        sent_feats, tok_feats = [], []
+        features = unwrap(sys_info.features)
+        sent_feats: list[str] = []
+        tok_feats: list[str] = []
         for x in active_features:
             (sent_feats if (x in features) else tok_feats).append(x)
 
@@ -429,7 +436,7 @@ class ConditionalGenerationProcessor(Processor):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
-        bucket_name_to_performance = {}
+        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
             if bucket_interval not in samples_over_bucket_pred.keys():
@@ -438,6 +445,10 @@ class ConditionalGenerationProcessor(Processor):
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
             p_denom, r_denom = len(toks_pred), len(toks_true)
+
+            # TODO(odashi): I didn't understand what these lines are doing.
+            # These lines clearly violate type hints as far as I believed those in
+            # the argument list, but I couldn't figure out the correct typing.
             p_num = sum(
                 map(
                     lambda x: sys_output[x[0]]['hyp_tok_info'][x[1]]['tok_matched'],
@@ -450,6 +461,7 @@ class ConditionalGenerationProcessor(Processor):
                     toks_true,
                 )
             )
+
             p = p_num / float(p_denom) if p_denom else 0.0
             r = r_num / float(r_denom) if r_denom else 0.0
             f1 = 2 * p * r / (p + r) if p + r else 0.0
@@ -487,15 +499,13 @@ class ConditionalGenerationProcessor(Processor):
         """
 
         # Fetch asynchronously calculated stats
-        self._fetch_scoring_stats(scoring_stats)
+        self._fetch_scoring_stats(cast('dict[str, Any]', scoring_stats))
 
-        bucket_name_to_performance = {}
+        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
-
             bucket_cases = []
-
             bucket_inputs = []
-            dict_metric_to_values = {}
+            dict_metric_to_values: dict[str, list[float]] = {}
 
             for sample_id in sample_ids:
                 sys_out = sys_output[sample_id]
@@ -512,8 +522,11 @@ class ConditionalGenerationProcessor(Processor):
                     bucket_cases.append(bucket_case)
 
                 # TODO(gneubig): This needs to be fixed because many metrics are not linearly decomposable
-                for metric_name in sys_info.metric_names:
-                    metric_value = scoring_stats["sample_level"][int(sample_id)][
+                for metric_name in unwrap(sys_info.metric_names):
+                    scoring_stats_typed = cast(
+                        'dict[str, dict[int, dict[str, float]]]', scoring_stats
+                    )
+                    metric_value = scoring_stats_typed["sample_level"][int(sample_id)][
                         metric_name
                     ]  # This would be modified later
                     if metric_name not in dict_metric_to_values.keys():
@@ -523,7 +536,7 @@ class ConditionalGenerationProcessor(Processor):
 
             bucket_name_to_performance[bucket_interval] = []
 
-            for metric_name in sys_info.metric_names:
+            for metric_name in unwrap_generator(sys_info.metric_names):
 
                 bucket_value = numpy.average(dict_metric_to_values[metric_name])
 

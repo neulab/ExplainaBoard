@@ -25,6 +25,7 @@ import explainaboard.utils.bucketing
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
 from explainaboard.utils.py_utils import eprint, print_dict, sort_dict
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 class Processor(metaclass=abc.ABCMeta):
@@ -51,8 +52,8 @@ class Processor(metaclass=abc.ABCMeta):
 
     def __init__(self) -> None:
         # Things to use only if necessary
-        self._eaas_config = None
-        self._eaas_client = None
+        self._eaas_config: Optional[Config] = None
+        self._eaas_client: Optional[AsyncEaaSClient] = None
         # self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
@@ -227,9 +228,10 @@ class Processor(metaclass=abc.ABCMeta):
         :param external_stats: Extenral statistics that are used to calculate training set specific features
         :return: The features that are active (e.g. skipping training set features when no training set available)
         """
-        # Get names of bucketing features
         bucket_feature_funcs = {}
-        for bucket_feature in sys_info.features.get_bucket_features():
+        sys_features = unwrap(sys_info.features)
+
+        for bucket_feature in sys_features.get_bucket_features():
 
             # handles user-defined features
             if (
@@ -237,23 +239,26 @@ class Processor(metaclass=abc.ABCMeta):
                 and bucket_feature in self._user_defined_feature_config.keys()
                 and (
                     external_stats is not None
-                    or not sys_info.features[bucket_feature].require_training_set
+                    or not sys_features[bucket_feature].require_training_set
                 )
             ):
                 bucket_feature_funcs[bucket_feature] = (
-                    None,  # no need to call a function for user-defined features; they are already in the data point itself
-                    sys_info.features[bucket_feature].require_training_set,
+                    # no need to call a function for user-defined features;
+                    # they are already in the data point itself
+                    None,
+                    sys_features[bucket_feature].require_training_set,
                 )
 
             # handles all other features
-            elif bucket_feature in sys_info.features.keys() and (
+            elif bucket_feature in sys_features.keys() and (
                 external_stats is not None
-                or not sys_info.features[bucket_feature].require_training_set
+                or not sys_features[bucket_feature].require_training_set
             ):
                 bucket_feature_funcs[bucket_feature] = (
                     self._get_feature_func(bucket_feature),
-                    sys_info.features[bucket_feature].require_training_set,
+                    sys_features[bucket_feature].require_training_set,
                 )
+
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             for (
@@ -284,6 +289,7 @@ class Processor(metaclass=abc.ABCMeta):
                         if training_dependent
                         else bucket_func(dict_sysout)
                     )
+
         return list(bucket_feature_funcs.keys())
 
     def _bucketing_samples(
@@ -301,6 +307,8 @@ class Processor(metaclass=abc.ABCMeta):
             samples_over_bucket: a dictionary of feature name -> list of buckets and samples
             performances_over_bucket: a dictionary of feature name -> list of performances by bucket
         """
+        if sys_info.features is None:
+            return {}, {}
 
         # Bucketing
         samples_over_bucket = {}
@@ -351,7 +359,8 @@ class Processor(metaclass=abc.ABCMeta):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
-        bucket_name_to_performance = {}
+        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
+
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
             bucket_true_labels = []
@@ -375,7 +384,7 @@ class Processor(metaclass=abc.ABCMeta):
                         bucket_cases.append(bucket_case)
 
             bucket_name_to_performance[bucket_interval] = []
-            for metric_name in sys_info.metric_names:
+            for metric_name in unwrap_generator(sys_info.metric_names):
                 metric_func = getattr(explainaboard.metric, metric_name)
                 one_metric = metric_func(
                     true_labels=bucket_true_labels,
@@ -419,22 +428,25 @@ class Processor(metaclass=abc.ABCMeta):
             true_labels.append(self._get_true_label(feature_table))
 
         overall_results = {}
-        for metric_name in sys_info.metric_names:
-            metric_func = getattr(explainaboard.metric, metric_name)
-            one_metric = metric_func(
-                true_labels=true_labels,
-                predicted_labels=predicted_labels,
-                is_print_confidence_interval=sys_info.is_print_confidence_interval,
-            )
-            metric_result = one_metric.evaluate()
 
-            overall_performance = Performance(
-                metric_name=metric_name,
-                value=metric_result["value"],
-                confidence_score_low=metric_result["confidence_score_low"],
-                confidence_score_high=metric_result["confidence_score_high"],
-            )
-            overall_results[metric_name] = overall_performance
+        if sys_info.metric_names is not None:
+            for metric_name in sys_info.metric_names:
+                metric_func = getattr(explainaboard.metric, metric_name)
+                one_metric = metric_func(
+                    true_labels=true_labels,
+                    predicted_labels=predicted_labels,
+                    is_print_confidence_interval=sys_info.is_print_confidence_interval,
+                )
+                metric_result = one_metric.evaluate()
+
+                overall_performance = Performance(
+                    metric_name=metric_name,
+                    value=metric_result["value"],
+                    confidence_score_low=metric_result["confidence_score_low"],
+                    confidence_score_high=metric_result["confidence_score_high"],
+                )
+                overall_results[metric_name] = overall_performance
+
         return overall_results
 
     def _print_bucket_info(
@@ -487,7 +499,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_output: list[dict],
         active_features: list[str],
         scoring_stats=None,
-    ) -> tuple[dict, dict]:
+    ) -> FineGrainedStatistics:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, scoring_stats
         )
@@ -499,11 +511,12 @@ class Processor(metaclass=abc.ABCMeta):
     def process(self, metadata: dict, sys_output: list[dict]):
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
-        sys_info = overall_statistics.sys_info
+        sys_info = unwrap(overall_statistics.sys_info)
         scoring_stats = overall_statistics.scoring_stats
-        active_features = overall_statistics.active_features
+        active_features = unwrap(overall_statistics.active_features)
         overall_results = overall_statistics.overall_results
-        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
+
+        _samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, scoring_stats=scoring_stats
         )
         self._print_bucket_info(performance_over_bucket)
