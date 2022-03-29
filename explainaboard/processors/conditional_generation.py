@@ -208,7 +208,7 @@ class ConditionalGenerationProcessor(Processor):
                     "hypothesis": feature_table["hypothesis"],
                 }
             )
-        async_result = self._get_eaas_client().async_score(
+        async_request = self._get_eaas_client().async_score(
             inputs,
             task="sum",  # TODO(pengfei): this should be generalized
             metrics=sys_info.metric_names.copy(),
@@ -218,7 +218,7 @@ class ConditionalGenerationProcessor(Processor):
 
         # Share the request result with all stats functions
         return [
-            explainaboard.metric.EaaSMetricStats(name=name, eaas_result=async_result)
+            explainaboard.metric.EaaSMetricStats(name=name, eaas_request=async_request)
             for name in sys_info.metric_names
         ]
 
