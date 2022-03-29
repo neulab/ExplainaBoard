@@ -53,6 +53,11 @@ class Loader:
             self._parse_user_defined_features_configs()
         )
 
+        self._user_defined_metadata_configs: dict = (
+            self._parse_user_defined_metadata_configs()
+        )
+
+
     @property
     def user_defined_features_configs(self) -> dict:
         if self._user_defined_features_configs is None:
@@ -60,6 +65,17 @@ class Loader:
                 "User defined features configs are not available (data has not been loaded))"
             )
         return self._user_defined_features_configs
+
+
+    @property
+    def user_defined_metadata_configs(self) -> dict:
+        if self._user_defined_metadata_configs is None:
+            raise Exception(
+                "User defined metadata configs are not available (data has not been loaded))"
+            )
+        return self._user_defined_metadata_configs
+
+
 
     def _parse_user_defined_features_configs(self) -> dict:
         if self._file_type == FileType.json:
@@ -74,9 +90,24 @@ class Loader:
                 return raw_data["user_defined_features_configs"]
         return {}
 
+
+    def _parse_user_defined_metadata_configs(self) -> dict:
+        if self._file_type == FileType.json:
+            raw_data = self.file_loaders[FileType.json].load_raw(
+                self._data, self._source
+            )
+            if isinstance(raw_data, dict) and raw_data.get(
+                "user_defined_metadata_configs"
+            ):
+                self._data = json.dumps(raw_data["predictions"])
+                self._source = Source.in_memory
+                return raw_data["user_defined_metadata_configs"]
+        return {}
+
+
     def load(self) -> Iterable[dict]:
         file_loader = self.file_loaders[self._file_type]
-        return file_loader.load(self._data, self._source)
+        return file_loader.load(self._data, self._source, self.user_defined_features_configs)
 
 
 # loader_registry is a global variable, storing all basic loading functions

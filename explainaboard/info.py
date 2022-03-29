@@ -93,7 +93,7 @@ class SysOutputInfo:
     reload_stat: bool = True
     is_print_case: bool = True
     is_print_confidence_interval: bool = False
-    # language : str = "English"
+    language : str = "en"
 
     # set later
     # code: str = None
