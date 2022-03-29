@@ -40,8 +40,8 @@ class PaperInfo:
 
 @dataclass
 class Performance:
-    metric_name: Optional[str] = None
-    value: Optional[float] = None
+    metric_name: str
+    value: float
     confidence_score_low: Optional[float] = None
     confidence_score_high: Optional[float] = None
 
