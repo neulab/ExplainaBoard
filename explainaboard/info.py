@@ -192,5 +192,5 @@ class OverallStatistics:
 
 @dataclass
 class FineGrainedStatistics:
-    samples_over_bucket: Optional[dict] = None
-    performance_over_bucket: Optional[dict] = None
+    samples_over_bucket: dict
+    performance_over_bucket: dict
