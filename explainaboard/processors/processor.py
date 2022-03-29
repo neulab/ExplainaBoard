@@ -15,6 +15,7 @@ from explainaboard.info import (
     FineGrainedStatistics,
     OverallStatistics,
     Performance,
+    print_bucket_dict,
     Result,
     SysOutputInfo,
 )
@@ -23,7 +24,7 @@ from explainaboard.tasks import TaskType
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 import explainaboard.utils.bucketing
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
-from explainaboard.utils.py_utils import eprint, print_dict, sort_dict
+from explainaboard.utils.py_utils import eprint, sort_dict
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
 
 
@@ -367,9 +368,7 @@ class Processor(metaclass=abc.ABCMeta):
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
             bucket_cases = []
-
             for sample_id in sample_ids:
-
                 data_point = sys_output[sample_id]
                 true_label = self._get_true_label(data_point)
                 predicted_label = self._get_predicted_label(data_point)
@@ -381,7 +380,12 @@ class Processor(metaclass=abc.ABCMeta):
                         bucket_case = str(s_id)
                         bucket_cases.append(bucket_case)
 
-            bucket_name_to_performance[bucket_interval] = []
+            bucket_performance = BucketPerformance(
+                bucket_name=bucket_interval,
+                n_samples=len(sample_ids),
+                bucket_samples=bucket_cases,
+            )
+
             for metric_name, metric_func, metric_stat in zip(
                 sys_info.metric_names, metric_funcs, metric_stats
             ):
@@ -397,17 +401,16 @@ class Processor(metaclass=abc.ABCMeta):
                     else (None, None)
                 )
 
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
+                performance = Performance(
                     metric_name=metric_name,
                     value=metric_result.value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
-                    n_samples=len(bucket_stats),
-                    bucket_samples=bucket_cases,
                 )
 
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
+                bucket_performance.performances.append(performance)
+
+            bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
 
@@ -457,14 +460,14 @@ class Processor(metaclass=abc.ABCMeta):
         return overall_results
 
     def _print_bucket_info(
-        self, performances_over_bucket: dict[str, dict[str, list[BucketPerformance]]]
+        self, performances_over_bucket: dict[str, dict[str, BucketPerformance]]
     ):
         """
         Print out performance bucket by bucket
         :param performances_over_bucket: dictionary of features -> buckets -> performance for different metrics
         """
         for feature_name, feature_value in performances_over_bucket.items():
-            print_dict(feature_value, feature_name)
+            print_bucket_dict(feature_value, feature_name)
 
     def get_overall_statistics(
         self, metadata: dict, sys_output: list[dict]
