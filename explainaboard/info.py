@@ -184,7 +184,7 @@ class SysOutputInfo:
 
 @dataclass
 class OverallStatistics:
-    sys_info: Optional[SysOutputInfo] = None
+    sys_info: SysOutputInfo
     metric_stats: Any = None
     active_features: Optional[list[str]] = None
     overall_results: Optional[dict[str, Performance]] = None
