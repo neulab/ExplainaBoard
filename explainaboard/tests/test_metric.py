@@ -100,7 +100,7 @@ class TestMetric(unittest.TestCase):
         metrics = [explainaboard.metric.EaaSMetric(name=name) for name in metric_names]
 
         # Get results for full data and half data
-        half_bound = int(len(sys_output))
+        half_bound = int(len(sys_output) / 2)
         full_request = self._get_eaas_request(sys_output, metric_names, eaas_client)
         half_request = self._get_eaas_request(
             sys_output[:half_bound], metric_names, eaas_client
