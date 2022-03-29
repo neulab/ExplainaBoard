@@ -598,6 +598,11 @@ class NERProcessor(Processor):
                 samples_over_bucket_pred,
             )
 
+            bucket_performance = BucketPerformance(
+                bucket_name=bucket_interval,
+                n_samples=len(spans_pred),
+                bucket_samples=bucket_samples,
+            )
             for metric_name in sys_info.metric_names:
                 """
                 # Note that: for NER task, the bucket-wise evaluation function is a little different from overall
@@ -614,15 +619,11 @@ class NERProcessor(Processor):
                     my_score = r
                 else:
                     raise NotImplementedError(f'Unsupported metric {metric_name}')
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=my_score,
-                    n_samples=len(spans_pred),
-                    bucket_samples=bucket_samples,
-                )
+                # TODO(gneubig): It'd be better to have significance tests here
+                performance = Performance(metric_name=metric_name, value=my_score)
+                bucket_performance.performances.append(performance)
 
-                bucket_name_to_performance[bucket_interval] = [bucket_performance]
+            bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
 

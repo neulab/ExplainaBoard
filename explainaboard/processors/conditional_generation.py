@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from collections.abc import Callable
 from typing import Any, Optional
 
+import numpy as np
 from tqdm import tqdm
 
 from explainaboard import feature
-from explainaboard.info import BucketPerformance, SysOutputInfo
+from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 import explainaboard.metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -90,8 +92,8 @@ class ConditionalGenerationProcessor(Processor):
                             "tok_text": feature.Value("string"),
                             "tok_pos": feature.Position(positions=[0, 0]),
                             "tok_matched": feature.Value(
-                                dtype="bool",
-                                description="whether the ref/hyp token matches with a hyp/ref token",
+                                dtype="float",  # this is actually "int" but int is not supported
+                                description="which token the ref/hyp token matches in the hyp/ref sentence, or -1 if none",
                                 is_bucket=False,
                             ),
                             "tok_capitalness": feature.Value(
@@ -208,7 +210,7 @@ class ConditionalGenerationProcessor(Processor):
                     "hypothesis": feature_table["hypothesis"],
                 }
             )
-        async_result = self._get_eaas_client().async_score(
+        async_request = self._get_eaas_client().async_score(
             inputs,
             task="sum",  # TODO(pengfei): this should be generalized
             metrics=sys_info.metric_names.copy(),
@@ -218,7 +220,7 @@ class ConditionalGenerationProcessor(Processor):
 
         # Share the request result with all stats functions
         return [
-            explainaboard.metric.EaaSMetricStats(name=name, eaas_result=async_result)
+            explainaboard.metric.EaaSMetricStats(name=name, eaas_request=async_request)
             for name in sys_info.metric_names
         ]
 
@@ -307,16 +309,15 @@ class ConditionalGenerationProcessor(Processor):
         fre_dic = statistics["vocab"] if has_stats else None
 
         # Find tokens in other set
-        other_tok_count = {}
-        for tok in other_toks:
-            other_tok_count[tok] = other_tok_count.get(tok, 0) + 1
+        other_tok_list = defaultdict(list)
+        for i, tok in enumerate(other_toks):
+            other_tok_list[tok].append(i)
 
         tok_dics = []
         for i, tok in enumerate(toks):
             # Basic features
-            matched = other_tok_count.get(tok, 0) > 0
-            if matched:
-                other_tok_count[tok] -= 1
+            my_other = other_tok_list.get(tok, list())
+            matched = my_other.pop(0) if len(my_other) > 1 else -1
             tok_dic = {
                 'tok_text': tok,
                 'tok_pos': (i, i + 1),
@@ -419,6 +420,7 @@ class ConditionalGenerationProcessor(Processor):
         """
 
         bucket_name_to_performance = {}
+        f1_score = explainaboard.metric.F1Score(separate_match=True)
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
             if bucket_interval not in samples_over_bucket_pred.keys():
@@ -426,36 +428,36 @@ class ConditionalGenerationProcessor(Processor):
             else:
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
-            p_denom, r_denom = len(toks_pred), len(toks_true)
-            p_num = sum(
-                map(
-                    lambda x: sys_output[x[0]]['hyp_tok_info'][x[1]]['tok_matched'],
-                    toks_pred,
+            stats_list = []
+            for sid, tid in toks_true:
+                matched = (
+                    1.0
+                    if sys_output[sid]['ref_tok_info'][tid]['tok_matched'] >= 0
+                    else 0.0
                 )
-            )
-            r_num = sum(
-                map(
-                    lambda x: sys_output[x[0]]['ref_tok_info'][x[1]]['tok_matched'],
-                    toks_true,
+                stats_list.append([1.0, 0.0, matched, 0.0])
+            for sid, tid in toks_pred:
+                matched = (
+                    1.0
+                    if sys_output[sid]['hyp_tok_info'][tid]['tok_matched'] >= 0
+                    else 0.0
                 )
-            )
-            p = p_num / float(p_denom) if p_denom else 0.0
-            r = r_num / float(r_denom) if r_denom else 0.0
-            f1 = 2 * p * r / (p + r) if p + r else 0.0
+                stats_list.append([0.0, 1.0, 0.0, matched])
 
-            bucket_name_to_performance[bucket_interval] = []
-            for metric_name, metric_value in [
-                ('f1', f1),
-                ('precision', p),
-                ('recall', r),
-            ]:
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=metric_value,
-                    n_samples=len(toks_true),
-                    bucket_samples=toks_true,
-                )
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
+            stats = explainaboard.metric.MetricStats(np.array(stats_list))
+            result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
+            performance = Performance(
+                metric_name='F1',
+                value=result.value,
+                confidence_score_low=result.conf_interval[0],
+                confidence_score_high=result.conf_interval[1],
+            )
+            bucket_performance = BucketPerformance(
+                bucket_name=bucket_interval,
+                n_samples=len(toks_true),
+                bucket_samples=toks_true,
+                performances=[performance],
+            )
+            bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)

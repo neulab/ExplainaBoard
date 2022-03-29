@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 import itertools
 import sys
@@ -24,37 +26,6 @@ def sort_dict(dict_obj, flag="key"):
             dict_obj.items(), key=lambda item: len(item[1]), reverse=True
         )
     return dict(sorted_dict_obj)
-
-
-def print_dict(dict_obj, print_infomation="dict"):
-    # print("-----------------------------------------------")
-    eprint("the information of #" + print_infomation + "#")
-    eprint("bucket_interval\tscore\t#samples")
-    for k, v in dict_obj.items():
-        if len(k) == 1:
-            eprint(
-                "["
-                + str(k[0])
-                + ",]"
-                + "\t"
-                + str(v[0].value)
-                + "\t"
-                + str(v[0].n_samples)
-            )
-        else:
-            eprint(
-                "["
-                + str(k[0])
-                + ", "
-                + str(k[1])
-                + "]"
-                + "\t"
-                + str(v[0].value)
-                + "\t"
-                + str(v[0].n_samples)
-            )
-
-    eprint("")
 
 
 def hash_dict(func):
