@@ -54,3 +54,22 @@ class TestTextClassification(unittest.TestCase):
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
+
+
+    def test_user_defined_metadata(self):
+
+        loader = get_loader(
+            TaskType.text_classification,
+            load_file_as_str(f"{artifacts_path}tc_user_specified_metadata.json"),
+            Source.in_memory,
+            FileType.json,
+        )
+        metadata = loader.user_defined_metadata_configs
+        data = list(loader.load())
+        processor = get_processor(TaskType.text_classification)
+
+        sys_info = processor.process(metadata, data)
+
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)

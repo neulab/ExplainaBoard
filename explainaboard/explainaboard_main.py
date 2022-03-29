@@ -6,6 +6,7 @@ from explainaboard import (
     get_pairwise_performance_gap,
     get_processor,
     TaskType,
+    FileType,
 )
 
 
@@ -13,7 +14,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
 
-    parser.add_argument('--task', type=str, required=True, help="the task name")
+    parser.add_argument('--task', type=str, required=False, help="the task name")
 
     parser.add_argument(
         '--system_outputs',
@@ -47,6 +48,15 @@ def main():
         help="the name of sub-dataset",
     )
 
+
+    parser.add_argument(
+        '--language',
+        type=str,
+        required=False,
+        default="en",
+        help="the language of system output",
+    )
+
     parser.add_argument(
         '--reload_stat',
         type=str,
@@ -63,17 +73,43 @@ def main():
         help="multiple metrics should be separated by space",
     )
 
+    parser.add_argument(
+        '--file_type',
+        type=str,
+        required=False,
+        default=None,
+        help="the file type: json, tsv, conll",
+    )
+
+
     args = parser.parse_args()
 
     dataset = args.dataset
     sub_dataset = args.sub_dataset
+    language = args.language
     task = args.task
     reload_stat = False if args.reload_stat == "0" else True
     system_outputs = args.system_outputs
     num_outputs = len(system_outputs)
     metric_names = args.metrics
+    file_type = args.file_type
 
-    # Checks on inputs
+
+
+
+    # check for benchmark submission: explainaboard  --system_outputs ./data/system_outputs/sst2/user_specified_metadata.json
+    if task is None:
+        file_type = "json"
+        task = TaskType.text_classification
+        # TaskType.text_classification is set for temporal use, and this need to be generalized
+        for x in system_outputs:
+            loader = get_loader(task, data=x, file_type=file_type)
+            if loader.user_defined_metadata_configs is None or len(loader.user_defined_metadata_configs) == 0:
+                raise ValueError(f"user_defined_metadata_configs in system output {x} has n't been specified or task name should be specified")
+
+
+
+    # Checks on other inputs
     if num_outputs > 2:
         raise ValueError(
             f'ExplainaBoard currently only supports 1 or 2 system outputs, but received {num_outputs}'
@@ -83,8 +119,19 @@ def main():
             f'Task name {task} was not recognized. ExplainaBoard currently supports: {TaskType.list()}'
         )
 
+    if file_type not in FileType.list():
+        raise ValueError(
+            f'File type {file_type} was not recognized. ExplainaBoard currently supports: {FileType.list()}'
+        )
+
+
+
     # Read in data and check validity
-    loaders = [get_loader(task, data=x) for x in system_outputs]
+    loads = []
+    if file_type is not None:
+        loaders = [get_loader(task, data=x, file_type = file_type) for x in system_outputs]
+    else:
+        loaders = [get_loader(task, data=x) for x in system_outputs] # use the default loaders that has been pre-defiend for each task
     system_datasets = [list(loader.load()) for loader in loaders]
 
     # validation
@@ -107,10 +154,13 @@ def main():
     metadata = {
         "dataset_name": dataset,
         "sub_dataset_name": sub_dataset,
+        "language": language,
         "task_name": task,
         "reload_stat": reload_stat,
         "user_defined_features_configs": loaders[0].user_defined_features_configs,
     }
+    metadata.update(loaders[0].user_defined_metadata_configs)
+
     if metric_names is not None:
         metadata["metric_names"] = metric_names
 
