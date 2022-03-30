@@ -8,7 +8,7 @@ import uuid
 from eaas import Client
 
 
-class AsyncEaaSResult:
+class AsyncEaaSRequest:
     def __init__(self, eaas_client: AsyncEaaSClient, request_id: str):
         self._eaas_client = eaas_client
         self._request_id = request_id
@@ -34,7 +34,7 @@ class AsyncEaaSClient(Client):
         self._threads: dict[str, Thread] = {}
         self._results: dict[str, Any] = {}
 
-    def _run_thread(self, original_fn: Callable[[], Any]) -> AsyncEaaSResult:
+    def _run_thread(self, original_fn: Callable[[], Any]) -> AsyncEaaSRequest:
         request_id = str(uuid.uuid1())
 
         def fn():
@@ -42,7 +42,7 @@ class AsyncEaaSClient(Client):
 
         self._threads[request_id] = Thread(target=fn)
         self._threads[request_id].start()
-        return AsyncEaaSResult(self, request_id)
+        return AsyncEaaSRequest(self, request_id)
 
     def async_score(
         self,
