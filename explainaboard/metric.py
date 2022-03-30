@@ -12,6 +12,7 @@ from typing import Any, Optional, Union
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
+from explainaboard.utils.typing_utils import unwrap
 
 
 @dataclass
@@ -25,18 +26,18 @@ class MetricResult:
     # Metric value
     value: float
     # Confidence interval of the metric values
-    conf_interval: Optional[tuple[float, float]] = (None,)
+    conf_interval: Optional[tuple[float, float]] = None
     # The p-value of the confidence interval
-    conf_value: Optional[float] = (None,)
+    conf_value: Optional[float] = None
 
     def to_dict(self):
         ret = {
             'name': self.name,
             'value': self.value,
         }
-        if self.conf_interval:
+        if self.conf_interval is not None:
             ret['conf_interval'] = self.conf_interval
-        if self.conf_value:
+        if self.conf_value is not None:
             ret['conf_value'] = self.conf_value
         return ret
 
@@ -56,13 +57,13 @@ class MetricStats:
         """
         Returns the number of samples in the dataset
         """
-        return len(self._data)
+        return len(unwrap(self._data))
 
     def get_data(self) -> np.ndarray:
         """
         Get the sufficient statistics in ndarray format
         """
-        return self._data
+        return unwrap(self._data)
 
     def filter(self, indices: Union[list[int], np.ndarray]) -> MetricStats:
         """
@@ -225,7 +226,7 @@ class F1Score(Metric):
           * c*3 + 1: occurrences in the predicted output
           * c*3 + 2: number of matches between true and predicted output
         """
-        id_map = {}
+        id_map: dict[str, int] = {}
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
                 id_map[word] = len(id_map)
@@ -317,6 +318,9 @@ class EaaSMetricStats(MetricStats):
         super().__init__(data=None)
         self.name = name
         self.eaas_request = eaas_request
+        self._data: Optional[np.ndarray] = None
+
+        # TODO(odashi): remove this field: this is private but unused.
         self._corpus_value = None
 
     def __len__(self):
@@ -334,11 +338,20 @@ class EaaSMetricStats(MetricStats):
         Return the evaluation metric value over all examples in the corpus.
         """
         self._fetch_results()
-        return self._corpus_value
+        return unwrap(self._corpus_value)
 
     def get_data(self) -> np.ndarray:
         self._fetch_results()
         return self._data
+
+    def filter(self, indices: Union[list[int], np.ndarray]) -> MetricStats:
+        """
+        Return a view of these stats filtered down to the indicated indices
+        """
+        sdata: np.ndarray = unwrap(self._data)
+        if not isinstance(indices, np.ndarray):
+            indices = np.array(indices)
+        return MetricStats(sdata[indices])
 
 
 class EaaSMetric(Metric):
@@ -361,6 +374,9 @@ class EaaSMetric(Metric):
             )
         # !!! End temporary warning
         self.name = name
+
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        raise NotImplementedError
 
 
 class QAMetric(Metric):

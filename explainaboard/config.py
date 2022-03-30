@@ -1,14 +1,4 @@
-from dataclasses import dataclass
-
-
-@dataclass
-class BuilderConfig:
-    path_output_file: str = None
-    path_report: str = None
-    data_file: str = None
-    description: str = None
-    path_test_set: str = None  # for question answering task
-
+"""Global configs of the library."""
 
 TORCH_VERSION = "N/A"
 TORCH_AVAILABLE = False

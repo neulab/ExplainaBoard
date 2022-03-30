@@ -6,6 +6,7 @@ from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import JSONFileLoader
 from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_loader(TaskType.qa_multiple_choice)
@@ -31,7 +32,7 @@ class QAMultipleChoiceLoader(Loader):
         :return: class object
         """
         data: list[dict] = []
-        raw_data = self._default_file_loaders[self._file_type].load_raw(
+        raw_data = self._default_file_loaders[unwrap(self._file_type)].load_raw(
             self._data, self._source
         )
 
