@@ -16,14 +16,7 @@ logger = get_logger(__name__)
 
 @dataclass
 class Table:
-    # def __init__(self,
-    #              table_iterator):
-    #     self.table = []
-    #     for _id, dict_features in table_iterator:
-    #         self.table.append(dict_features)
-    table: dict = None
-
-    # def __post_init__(self):
+    table: Optional[dict] = None
 
 
 @dataclass
@@ -47,23 +40,23 @@ class PaperInfo:
 
 @dataclass
 class Performance:
-    metric_name: str = None
-    value: float = None
+    metric_name: str
+    value: float
     confidence_score_low: Optional[float] = None
     confidence_score_high: Optional[float] = None
 
 
 @dataclass
 class BucketPerformance(Performance):
-    bucket_name: str = None
-    n_samples: float = None
+    bucket_name: Optional[str] = None
+    n_samples: Optional[float] = None
     bucket_samples: Any = None
 
 
 @dataclass
 class Result:
     overall: Any = None
-    calibration: list[Performance] = None
+    calibration: Optional[list[Performance]] = None
     fine_grained: Any = None
 
 
@@ -99,7 +92,7 @@ class SysOutputInfo:
     # code: str = None
     # download_link: str = None
     # paper_info: PaperInfo = PaperInfo()
-    features: Features = None
+    features: Optional[Features] = None
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
@@ -191,13 +184,13 @@ class SysOutputInfo:
 
 @dataclass
 class OverallStatistics:
-    sys_info: SysOutputInfo = None
+    sys_info: SysOutputInfo
     metric_stats: Any = None
-    active_features: list[str] = None
-    overall_results: dict[str, Performance] = None
+    active_features: Optional[list[str]] = None
+    overall_results: Optional[dict[str, Performance]] = None
 
 
 @dataclass
 class FineGrainedStatistics:
-    samples_over_bucket: dict = None
-    performance_over_bucket: dict = None
+    samples_over_bucket: dict
+    performance_over_bucket: dict
