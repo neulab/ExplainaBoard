@@ -63,6 +63,14 @@ def main():
         help="multiple metrics should be separated by space",
     )
 
+    parser.add_argument(
+        '--conf_value',
+        type=float,
+        required=False,
+        default=0.05,
+        help="the p-value with which to calculate the confidence interval",
+    )
+
     args = parser.parse_args()
 
     dataset = args.dataset
@@ -110,6 +118,7 @@ def main():
         "task_name": task,
         "reload_stat": reload_stat,
         "user_defined_features_configs": loaders[0].user_defined_features_configs,
+        "conf_value": args.conf_value,
     }
     if metric_names is not None:
         metadata["metric_names"] = metric_names
