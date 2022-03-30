@@ -28,16 +28,13 @@ class FileLoaderField:
 
     src_name: Union[int, str]
     target_name: str
-    dtype: Union[type[int], type[float], type[str]] = None
-    strip_before_parsing: bool = None
-    parser: Callable = None
+    dtype: Union[type[int], type[float], type[str], None] = None
+    strip_before_parsing: Optional[bool] = None
+    parser: Optional[Callable] = None
 
     def __post_init__(self):
         if self.strip_before_parsing is None:
-            if self.dtype == str:
-                self.strip_before_parsing = True
-            else:
-                self.strip_before_parsing = False
+            self.strip_before_parsing = self.dtype == str
 
         # validation
         for name in (self.src_name, self.target_name):
@@ -102,7 +99,7 @@ class FileLoader:
             parsed_data_point["id"] = str(parsed_data_point[self._id_field_name])
 
     @classmethod
-    def load_raw(self, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str, source: Source) -> Iterable:
         """Load data from source and return an iterable of data points. It does not use
         fields information to parse the data points.
 
@@ -146,12 +143,12 @@ class TSVFileLoader(FileLoader):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
 
     @classmethod
-    def load_raw(self, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             file = StringIO(data)
             return csv.reader(file, delimiter='\t')
         elif source == Source.local_filesystem:
-            content: list[str] = []
+            content: list[list[str]] = []
             with open(data, "r", encoding="utf8") as fin:
                 for record in csv.reader(fin, delimiter='\t'):
                     content.append(record)
@@ -161,10 +158,10 @@ class TSVFileLoader(FileLoader):
 
 class CoNLLFileLoader(FileLoader):
     def __init__(self) -> None:
-        super().__init__(fields=[], use_idx_as_id=False, id_field_name=False)
+        super().__init__(fields=[], use_idx_as_id=False, id_field_name=None)
 
     @classmethod
-    def load_raw(self, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             return data.splitlines()
         elif source == Source.local_filesystem:
@@ -179,9 +176,9 @@ class CoNLLFileLoader(FileLoader):
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
         guid = 0
-        tokens = []
-        ner_true_tags = []
-        ner_pred_tags = []
+        tokens: list[str] = []
+        ner_true_tags: list[str] = []
+        ner_pred_tags: list[str] = []
 
         for id, line in enumerate(raw_data):
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
@@ -220,7 +217,7 @@ class CoNLLFileLoader(FileLoader):
 
 class JSONFileLoader(FileLoader):
     @classmethod
-    def load_raw(self, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             return json.loads(data)
         elif source == Source.local_filesystem:
@@ -232,7 +229,7 @@ class JSONFileLoader(FileLoader):
 
 class DatalabFileLoader(FileLoader):
     @classmethod
-    def load_raw(self, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             return data
         raise NotImplementedError

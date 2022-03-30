@@ -15,6 +15,7 @@ from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.bucketing
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 @register_processor(TaskType.conditional_generation)
@@ -181,7 +182,8 @@ class ConditionalGenerationProcessor(Processor):
 
     def _get_metrics(self, sys_info: SysOutputInfo):
         return [
-            explainaboard.metric.EaaSMetric(name=name) for name in sys_info.metric_names
+            explainaboard.metric.EaaSMetric(name=name)
+            for name in unwrap_generator(sys_info.metric_names)
         ]
 
     def _get_true_label(self, data_point: dict):
@@ -211,7 +213,7 @@ class ConditionalGenerationProcessor(Processor):
         async_result = self._get_eaas_client().async_score(
             inputs,
             task="sum",  # TODO(pengfei): this should be generalized
-            metrics=sys_info.metric_names.copy(),
+            metrics=unwrap(sys_info.metric_names).copy(),
             lang="en",
             cal_attributes=False,
         )
@@ -219,15 +221,16 @@ class ConditionalGenerationProcessor(Processor):
         # Share the request result with all stats functions
         return [
             explainaboard.metric.EaaSMetricStats(name=name, eaas_result=async_result)
-            for name in sys_info.metric_names
+            for name in unwrap_generator(sys_info.metric_names)
         ]
 
-    def _fetch_metric_stats(self, metric_stats: Any):
+    # TODO(odashi): Restructure this function (and EaaS client) to be type-safe.
+    def _fetch_metric_stats(self, metric_stats: dict[str, Any]):
         """
         A utility function used to lazily fetch the actual scoring dict when it's necessary.
         """
         if 'request_id' in metric_stats:
-            eaas_stats = self._eaas_client.wait_and_get_result(
+            eaas_stats: dict[str, Any] = unwrap(self._eaas_client).wait_and_get_result(
                 metric_stats['request_id']
             )
             metric_stats.clear()
@@ -249,25 +252,28 @@ class ConditionalGenerationProcessor(Processor):
         """
 
         # One pass over the test set to find token test frequency
-        ref_test_freq, src_test_freq = {}, {}
+        ref_test_freq: dict[str, int] = {}
+        src_test_freq: dict[str, int] = {}
         for dict_sysout in sys_output:
             for ref_tok in self._tokenizer(dict_sysout['reference']):
                 ref_test_freq[ref_tok] = ref_test_freq.get(ref_tok, 0) + 1
             for src_tok in self._tokenizer(dict_sysout['source']):
                 src_test_freq[src_tok] = src_test_freq.get(src_tok, 0) + 1
 
+        sys_features = unwrap(sys_info.features)
+
         # Get names of bucketing features
         bucket_feature_funcs = {}
         active_features = list(
-            sys_info.features.get_bucket_features(
+            sys_features.get_bucket_features(
                 include_training_dependent=external_stats is not None
             )
         )
         for bucket_feature in active_features:
-            if bucket_feature in sys_info.features:
+            if bucket_feature in sys_features:
                 bucket_feature_funcs[bucket_feature] = (
                     self._get_feature_func(bucket_feature),
-                    sys_info.features[bucket_feature].require_training_set,
+                    sys_features[bucket_feature].require_training_set,
                 )
 
         for _id, dict_sysout in enumerate(sys_output):
@@ -351,8 +357,9 @@ class ConditionalGenerationProcessor(Processor):
         metric_stats: Any = None,
     ) -> tuple[dict, dict]:
 
-        features = sys_info.features
-        sent_feats, tok_feats = [], []
+        features = unwrap(sys_info.features)
+        sent_feats: list[str] = []
+        tok_feats: list[str] = []
         for x in active_features:
             (sent_feats if (x in features) else tok_feats).append(x)
 
@@ -418,7 +425,7 @@ class ConditionalGenerationProcessor(Processor):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
-        bucket_name_to_performance = {}
+        bucket_name_to_performance: dict[str, list[BucketPerformance]] = {}
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
             if bucket_interval not in samples_over_bucket_pred.keys():
@@ -427,6 +434,10 @@ class ConditionalGenerationProcessor(Processor):
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
             p_denom, r_denom = len(toks_pred), len(toks_true)
+
+            # TODO(odashi): I didn't understand what these lines are doing.
+            # These lines clearly violate type hints as far as I believed those in
+            # the argument list, but I couldn't figure out the correct typing.
             p_num = sum(
                 map(
                     lambda x: sys_output[x[0]]['hyp_tok_info'][x[1]]['tok_matched'],
@@ -439,6 +450,7 @@ class ConditionalGenerationProcessor(Processor):
                     toks_true,
                 )
             )
+
             p = p_num / float(p_denom) if p_denom else 0.0
             r = r_num / float(r_denom) if r_denom else 0.0
             f1 = 2 * p * r / (p + r) if p + r else 0.0

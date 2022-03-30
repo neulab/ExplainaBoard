@@ -19,6 +19,7 @@ from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.bucketing
 from explainaboard.utils.eval_bucket import f1_seqeval_bucket
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.named_entity_recognition)
@@ -209,12 +210,10 @@ class NERProcessor(Processor):
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        base_resources = super()._get_statistics_resources(dataset_split)
+        base_resources = unwrap(super()._get_statistics_resources(dataset_split))
         task_specific_resources = {
             'tag_id2str': dataset_split._info.task_templates[0].labels
         }
-        # print(f"super()._get_statistics_resources(dataset_split):{super()._get_statistics_resources(dataset_split)}")
-        # print({'tag_id2str': dataset_split._info.task_templates[0].labels}.update(super()._get_statistics_resources(dataset_split)))
         return {**base_resources, **task_specific_resources}
 
     @aggregating()
@@ -238,7 +237,7 @@ class NERProcessor(Processor):
             set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
         )
 
-        vocab = {}
+        vocab: dict[str, int] = {}
         for sample in tqdm(samples):
             tokens, tag_ids = sample["tokens"], sample["tags"]
             tags = [tag_id2str[tag_id] for tag_id in tag_ids]
@@ -402,8 +401,8 @@ class NERProcessor(Processor):
         true_tags_list = [x['true_tags'] for x in sys_output]
         pred_tags_list = [x['pred_tags'] for x in sys_output]
 
-        overall = {}
-        for metric_name in sys_info.metric_names:
+        overall: dict[str, Performance] = {}
+        for metric_name in unwrap(sys_info.metric_names):
             if not metric_name.endswith('_seqeval'):
                 raise NotImplementedError(f'Unsupported metric {metric_name}')
             # This gets the appropriate metric from the eval_basic_ner package
@@ -454,7 +453,7 @@ class NERProcessor(Processor):
         metric_stats: Any = None,
     ) -> tuple[dict, dict]:
 
-        features = sys_info.features
+        features = unwrap(sys_info.features)
 
         bucket_features = features.get_bucket_features()
         pcf_set = set(features.get_pre_computed_features())
@@ -518,7 +517,10 @@ class NERProcessor(Processor):
         return samples_over_bucket_true, performances_over_bucket
 
     def _add_to_sample_dict(
-        self, spans: list[str], type_id: str, sample_dict: defaultdict
+        self,
+        spans: list[str],
+        type_id: str,
+        sample_dict: defaultdict[str, dict[str, str]],
     ):
         """
         Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
@@ -537,7 +539,7 @@ class NERProcessor(Processor):
         samples_over_bucket_pred: dict[str, list[str]],
     ) -> list:
         # Index samples for easy comparison
-        sample_dict = defaultdict(lambda: dict())
+        sample_dict: defaultdict[str, dict[str, str]] = defaultdict(lambda: dict())
         self._add_to_sample_dict(
             samples_over_bucket_pred[bucket_interval], 'pred', sample_dict
         )
@@ -598,7 +600,7 @@ class NERProcessor(Processor):
                 samples_over_bucket_pred,
             )
 
-            for metric_name in sys_info.metric_names:
+            for metric_name in unwrap(sys_info.metric_names):
                 """
                 # Note that: for NER task, the bucket-wise evaluation function is a little different from overall
                 #            evaluation function
