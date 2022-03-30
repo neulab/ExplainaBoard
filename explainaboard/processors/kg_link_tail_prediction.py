@@ -126,16 +126,16 @@ class KGLinkTailPredictionProcessor(Processor):
         self._user_defined_feature_config = None
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator):
+    def _statistics_func(self, samples: Iterator[dict[str, str]]):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
         dataset = load_dataset("fb15k_237", 'readable')
         print(dataset['train'])
         """
-        dict_head = {}
-        dict_link = {}
-        dict_tail = {}
+        dict_head: dict[str, int] = {}
+        dict_link: dict[str, int] = {}
+        dict_tail: dict[str, int] = {}
 
         for sample in tqdm(samples):
 
