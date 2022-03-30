@@ -404,7 +404,7 @@ class Processor(metaclass=abc.ABCMeta):
                 bucket_stats = metric_stat.filter(sample_ids)
                 metric_result = metric_func.evaluate_from_stats(
                     bucket_stats,
-                    conf_value=0.05 if sys_info.is_print_confidence_interval else None,
+                    conf_value=sys_info.conf_value,
                 )
 
                 conf_low, conf_high = (
@@ -455,7 +455,7 @@ class Processor(metaclass=abc.ABCMeta):
         ):
             metric_result = metric_func.evaluate_from_stats(
                 metric_stat,
-                conf_value=0.05 if sys_info.is_print_confidence_interval else None,
+                conf_value=sys_info.conf_value,
             )
 
             conf_low, conf_high = (
