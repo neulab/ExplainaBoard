@@ -209,8 +209,15 @@ class F1Score(Metric):
     def default_name(cls) -> str:
         return 'F1'
 
-    def __init__(self, average: str = 'micro'):
-        self.average = average
+    def __init__(self, average: str = 'micro', separate_match: bool = False):
+        """Constructor for f-measure
+        :param average: What variety of average to measure
+        :param separate_match: Whether to count matches separately for true and pred. This is useful in, for example bucketing, when ref and pred are not aligned
+        """
+        self.average: str = average
+        self.separate_match: bool = separate_match
+        self._stat_mult: int = 4 if separate_match else 3
+        self._pred_match_offfset: int = 3 if separate_match else 2
         supported_averages = {'micro', 'macro'}
         if average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
@@ -222,9 +229,10 @@ class F1Score(Metric):
         :param true_data: True outputs
         :param pred_data: Predicted outputs
         :return: Returns stats for each class (integer id c) in the following columns of MetricStats
-          * c*3 + 0: occurrences in the true output
-          * c*3 + 1: occurrences in the predicted output
-          * c*3 + 2: number of matches between true and predicted output
+          * c*self._stat_mult + 0: occurrences in the true output
+          * c*self._stat_mult + 1: occurrences in the predicted output
+          * c*self._stat_mult + 2: number of matches with the true output
+          * c*self._stat_mult + 3: number of matches with the predicted output (when self.separate_match=True only)
         """
         id_map: dict[str, int] = {}
         for word in itertools.chain(true_data, pred_data):
@@ -233,32 +241,38 @@ class F1Score(Metric):
         n_data = len(true_data)
         n_classes = len(id_map)
         # This is a bit memory inefficient if there's a large number of classes
-        stats = np.zeros((n_data, n_classes * 3))
+        stats = np.zeros((n_data, n_classes * self._stat_mult))
         for i, (t, p) in enumerate(zip(true_data, pred_data)):
             tid, pid = id_map[t], id_map[p]
-            stats[i, tid * 3] += 1
-            stats[i, pid * 3 + 1] += 1
+            stats[i, tid * self._stat_mult + 0] += 1
+            stats[i, pid * self._stat_mult + 1] += 1
             if tid == pid:
-                stats[i, tid * 3 + 2] += 1
+                stats[i, tid * self._stat_mult + 2] += 1
+                if self.separate_match:
+                    stats[i, tid * self._stat_mult + 3] += 1
         return MetricStats(stats)
 
     def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
-        n_classes = int(len(agg_stats) / 3)
+        n_classes = int(len(agg_stats) / self._stat_mult)
         if self.average == 'micro':
-            match, true, pred = 0.0, 0.0, 0.0
+            true, pred, true_match, pred_match = 0.0, 0.0, 0.0, 0.0
             for i in range(n_classes):
-                true += agg_stats[i * 3]
-                pred += agg_stats[i * 3 + 1]
-                match += agg_stats[i * 3 + 2]
-            p = match / pred if pred else 0.0
-            r = match / true if true else 0.0
+                true += agg_stats[i * self._stat_mult + 0]
+                pred += agg_stats[i * self._stat_mult + 1]
+                true_match += agg_stats[i * self._stat_mult + 2]
+                pred_match += agg_stats[i * self._stat_mult + self._pred_match_offfset]
+            p = pred_match / pred if pred else 0.0
+            r = true_match / true if true else 0.0
             f1_total = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
         elif self.average == 'macro':
             f1_total = 0.0
             for i in range(n_classes):
-                true, pred, match = agg_stats[i * 3 : i * 3 + 3]
-                p = match / pred if pred else 0.0
-                r = match / true if true else 0.0
+                true, pred, true_match = agg_stats[
+                    i * self._stat_mult : i * self._stat_mult + 3
+                ]
+                pred_match = agg_stats[i * self._stat_mult + self._pred_match_offfset]
+                p = pred_match / pred if pred else 0.0
+                r = true_match / true if true else 0.0
                 f1 = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
                 f1_total += f1
             f1_total /= n_classes
