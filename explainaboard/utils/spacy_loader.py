@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import spacy
 from spacy.language import Language
 

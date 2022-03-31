@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -18,6 +19,7 @@ from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.bucketing
 from explainaboard.utils.eval_bucket import f1_seqeval_bucket
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.named_entity_recognition)
@@ -208,12 +210,10 @@ class NERProcessor(Processor):
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        base_resources = super()._get_statistics_resources(dataset_split)
+        base_resources = unwrap(super()._get_statistics_resources(dataset_split))
         task_specific_resources = {
             'tag_id2str': dataset_split._info.task_templates[0].labels
         }
-        # print(f"super()._get_statistics_resources(dataset_split):{super()._get_statistics_resources(dataset_split)}")
-        # print({'tag_id2str': dataset_split._info.task_templates[0].labels}.update(super()._get_statistics_resources(dataset_split)))
         return {**base_resources, **task_specific_resources}
 
     @aggregating()
@@ -237,7 +237,7 @@ class NERProcessor(Processor):
             set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
         )
 
-        vocab = {}
+        vocab: dict[str, int] = {}
         for sample in tqdm(samples):
             tokens, tag_ids = sample["tokens"], sample["tags"]
             tags = [tag_id2str[tag_id] for tag_id in tag_ids]
@@ -307,6 +307,15 @@ class NERProcessor(Processor):
         return fre_rank
 
     # --- End feature functions
+
+    # These return none because NER is not yet in the main metric interface
+    def _get_metrics(self, sys_info: SysOutputInfo):
+        return None
+
+    def _gen_metric_stats(
+        self, sys_info: SysOutputInfo, sys_output: list[dict]
+    ) -> Optional[list[MetricStats]]:
+        return None
 
     def _complete_span_features(self, sentence, tags, statistics=None):
 
@@ -380,7 +389,7 @@ class NERProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        scoring_stats: Any = None,
+        metric_stats: Any = None,
     ) -> dict[str, Performance]:
         """
         Get the overall performance according to metrics
@@ -392,8 +401,8 @@ class NERProcessor(Processor):
         true_tags_list = [x['true_tags'] for x in sys_output]
         pred_tags_list = [x['pred_tags'] for x in sys_output]
 
-        overall = {}
-        for metric_name in sys_info.metric_names:
+        overall: dict[str, Performance] = {}
+        for metric_name in unwrap(sys_info.metric_names):
             if not metric_name.endswith('_seqeval'):
                 raise NotImplementedError(f'Unsupported metric {metric_name}')
             # This gets the appropriate metric from the eval_basic_ner package
@@ -441,10 +450,10 @@ class NERProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats: Any = None,
+        metric_stats: Any = None,
     ) -> tuple[dict, dict]:
 
-        features = sys_info.features
+        features = unwrap(sys_info.features)
 
         bucket_features = features.get_bucket_features()
         pcf_set = set(features.get_pre_computed_features())
@@ -508,7 +517,10 @@ class NERProcessor(Processor):
         return samples_over_bucket_true, performances_over_bucket
 
     def _add_to_sample_dict(
-        self, spans: list[str], type_id: str, sample_dict: defaultdict
+        self,
+        spans: list[str],
+        type_id: str,
+        sample_dict: defaultdict[str, dict[str, str]],
     ):
         """
         Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
@@ -527,7 +539,7 @@ class NERProcessor(Processor):
         samples_over_bucket_pred: dict[str, list[str]],
     ) -> list:
         # Index samples for easy comparison
-        sample_dict = defaultdict(lambda: dict())
+        sample_dict: defaultdict[str, dict[str, str]] = defaultdict(lambda: dict())
         self._add_to_sample_dict(
             samples_over_bucket_pred[bucket_interval], 'pred', sample_dict
         )
@@ -588,7 +600,12 @@ class NERProcessor(Processor):
                 samples_over_bucket_pred,
             )
 
-            for metric_name in sys_info.metric_names:
+            bucket_performance = BucketPerformance(
+                bucket_name=bucket_interval,
+                n_samples=len(spans_pred),
+                bucket_samples=bucket_samples,
+            )
+            for metric_name in unwrap(sys_info.metric_names):
                 """
                 # Note that: for NER task, the bucket-wise evaluation function is a little different from overall
                 #            evaluation function
@@ -604,15 +621,11 @@ class NERProcessor(Processor):
                     my_score = r
                 else:
                     raise NotImplementedError(f'Unsupported metric {metric_name}')
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
-                    metric_name=metric_name,
-                    value=my_score,
-                    n_samples=len(spans_pred),
-                    bucket_samples=bucket_samples,
-                )
+                # TODO(gneubig): It'd be better to have significance tests here
+                performance = Performance(metric_name=metric_name, value=my_score)
+                bucket_performance.performances.append(performance)
 
-                bucket_name_to_performance[bucket_interval] = [bucket_performance]
+            bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
 

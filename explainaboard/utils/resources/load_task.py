@@ -3,7 +3,6 @@ from __future__ import annotations
 import enum
 import json
 
-
 PATH_OF_TASKS_JSON = "./tasks.json"
 
 
@@ -27,4 +26,6 @@ all_tasks_dict = {}
 for task_name in all_tasks:
     all_tasks_dict[task_name.replace("-", "_")] = task_name
 
-TaskType = enum.Enum('TaskType', all_tasks_dict)
+# TODO(odashi): avoid storing list of tasks into enum as num should be considered
+# as a static type.
+TaskType = enum.Enum('TaskType', all_tasks_dict)  # type: ignore
