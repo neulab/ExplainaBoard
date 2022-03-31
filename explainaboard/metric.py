@@ -7,12 +7,47 @@ import itertools
 import re
 import string
 import sys
-from typing import Any, Optional, Union
+import unicodedata
+from typing import List, Any, Optional, Union
 
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
 from explainaboard.utils.typing_utils import unwrap
+
+# TODO(Pengfei): the following code is extracted from mlqa evaluation script,
+#  what would be a good place to put them
+PUNCT = {
+    chr(i)
+    for i in range(sys.maxunicode)
+    if unicodedata.category(chr(i)).startswith('P')
+}.union(string.punctuation)
+WHITESPACE_LANGS = ['en', 'es', 'hi', 'vi', 'de', 'ar']
+MIXED_SEGMENTATION_LANGS = ['zh']
+
+
+def whitespace_tokenize(text: str) -> List[str]:
+    return text.split()
+
+
+def mixed_segmentation(text: str) -> List[str]:
+    segs_out = []
+    temp_str = ""
+    for char in text:
+        if re.search(r'[\u4e00-\u9fa5]', char) or char in PUNCT:
+            if temp_str != "":
+                ss = whitespace_tokenize(temp_str)
+                segs_out.extend(ss)
+                temp_str = ""
+            segs_out.append(char)
+        else:
+            temp_str += char
+
+    if temp_str != "":
+        ss = whitespace_tokenize(temp_str)
+        segs_out.extend(ss)
+
+    return segs_out
 
 
 @dataclass
@@ -90,12 +125,13 @@ class Metric:
         """Returns the default name of the metric."""
         ...
 
-    def __init__(self, name: str = None):
+    def __init__(self, name: str = None, language: str = 'en'):
         """
         Initialize the metric
         :param name: the name of the metric for reference later
         """
         self.name = name if name else self.default_name()
+        self.language = language
 
     @abc.abstractmethod
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
@@ -419,20 +455,48 @@ class QAMetric(Metric):
     def normalize_answer(self, s: str) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
 
-        def remove_articles(text):
-            return re.sub(r'\b(a|an|the)\b', ' ', text)
+        def remove_articles(text, lang):
+            if lang == 'en':
+                return re.sub(r'\b(a|an|the)\b', ' ', text)
+            elif lang == 'es':
+                return re.sub(r'\b(un|una|unos|unas|el|la|los|las)\b', ' ', text)
+            elif lang == 'hi':
+                return text  # Hindi does not have formal articles
+            elif lang == 'vi':
+                return re.sub(r'\b(của|là|cái|chiếc|những)\b', ' ', text)
+            elif lang == 'de':
+                return re.sub(
+                    r'\b(ein|eine|einen|einem|eines|einer|der|die|das|den|dem|'
+                    r'des)\b',
+                    ' ',
+                    text,
+                )
+            elif lang == 'ar':
+                # TODO(Pengfei): W605 invalid escape sequence '\s'
+                return re.sub('\sال^|ال', ' ', text)  # noqa
+            elif lang == 'zh':
+                return text  # Chinese does not have formal articles
+            else:  # TODO(Pengfei): is this too strong?
+                raise Exception('Unknown Language {}'.format(lang))
 
-        def white_space_fix(text):
-            return ' '.join(text.split())
+        def white_space_fix(text, lang):
+            if lang in WHITESPACE_LANGS:
+                tokens = whitespace_tokenize(text)
+            elif lang in MIXED_SEGMENTATION_LANGS:
+                tokens = mixed_segmentation(text)
+            else:
+                raise Exception('Unknown Language {}'.format(lang))
+            return ' '.join([t for t in tokens if t.strip() != ''])
 
         def remove_punc(text):
-            exclude = set(string.punctuation)
-            return ''.join(ch for ch in text if ch not in exclude)
+            return ''.join(ch for ch in text if ch not in PUNCT)
 
         def lower(text):
             return text.lower()
 
-        return white_space_fix(remove_articles(remove_punc(lower(s))))
+        return white_space_fix(
+            remove_articles(remove_punc(lower(s)), self.language), self.language
+        )
 
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         return MetricStats(
