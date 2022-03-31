@@ -31,7 +31,9 @@ spacy_loader = SpacyLoader()
 
 
 def get_named_entities(text: str, model_name="en_core_web_sm") -> tuple[str]:
-    """Use spacy to extract named entities from `text`. All other spacy components are disabled to improve speed."""
+    """Use spacy to extract named entities from `text`. All other spacy components are
+    disabled to improve speed.
+    """
     return spacy_loader.get_model(model_name)(
         text, disable=["tok2vec", "tagger", "parser", "attribute_ruler", "lemmatizer"]
     ).ents

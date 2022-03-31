@@ -14,9 +14,8 @@ from explainaboard.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils import eval_basic_ner
+from explainaboard.utils import bucketing, eval_basic_ner
 from explainaboard.utils.analysis import cap_feature
-import explainaboard.utils.bucketing
 from explainaboard.utils.eval_bucket import f1_seqeval_bucket
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.typing_utils import unwrap
@@ -87,7 +86,10 @@ class NERProcessor(Processor):
                 ),
                 "fre_rank": feature.Value(
                     dtype="float",
-                    description="the average rank of each work based on its frequency in training set",
+                    description=(
+                        "the average rank of each work based on its frequency in "
+                        "training set"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -124,9 +126,12 @@ class NERProcessor(Processor):
                             ),
                             "span_capitalness": feature.Value(
                                 dtype="string",
-                                description="The capitalness of an entity. For example, first_caps represents only the "
-                                "first character of the entity is capital. full_caps denotes all characters "
-                                "of the entity are capital",
+                                description=(
+                                    "The capitalness of an entity. For example, "
+                                    "first_caps represents only the first character of "
+                                    "the entity is capital. full_caps denotes all "
+                                    "characters of the entity are capital"
+                                ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_discrete_value",
@@ -136,7 +141,9 @@ class NERProcessor(Processor):
                             ),
                             "span_position": feature.Value(
                                 dtype="float",
-                                description="The relative position of an entity in a sentence",
+                                description=(
+                                    "The relative position of an entity in a sentence"
+                                ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -156,8 +163,12 @@ class NERProcessor(Processor):
                             ),
                             "span_density": feature.Value(
                                 dtype="float",
-                                description="Entity density. Given a sentence (or a sample), entity density tallies the "
-                                "ratio between the number of all entity tokens and tokens in this sentence",
+                                description=(
+                                    "Entity density. Given a sentence (or a sample), "
+                                    "entity density tallies the ratio between the "
+                                    "number of all entity tokens and tokens in this "
+                                    "sentence"
+                                ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -165,13 +176,6 @@ class NERProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            # "basic_words": feature.Value(dtype="float",
-                            #                              description="the ratio of basic words",
-                            #                              is_bucket=True,
-                            #                              bucket_info=feature.BucketInfo(
-                            #                                  method="bucket_attribute_specified_bucket_value",
-                            #                                  number=4,
-                            #                                  setting=())),
                             "econ": feature.Value(
                                 dtype="float",
                                 description="entity label consistency",
@@ -226,8 +230,6 @@ class NERProcessor(Processor):
         }]
         Output:dict:
         """
-
-        # tag_id2str = ['O', 'B-PER', 'I-PER', 'B-ORG', 'I-ORG', 'B-LOC', 'I-LOC', 'B-MISC', 'I-MISC']
 
         if tag_id2str is None:
             tag_id2str = []
@@ -297,7 +299,8 @@ class NERProcessor(Processor):
                 num_oov += 1
         return num_oov
 
-    # training set dependent features (this could be merged into the above one for further optimization)
+    # training set dependent features
+    # (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, tokens, statistics):
         vocab_stats = statistics['vocab_rank']
         fre_rank = 0.0
@@ -356,13 +359,16 @@ class NERProcessor(Processor):
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
     ) -> Optional[list[str]]:
         """
-        This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
-        information, then calculates feature functions and modifies `sys_output` to add these feature values
+        This function takes in meta-data about system outputs, system outputs, and a few
+        other optional pieces of information, then calculates feature functions and
+        modifies `sys_output` to add these feature values
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param external_stats: Training set statistics that are used to calculate training set specific features
-        :return: The features that are active (e.g. skipping training set features when no training set available)
+        :param external_stats: Training set statistics that are used to calculate
+            training set specific features
+        :return: The features that are active (e.g. skipping training set features when
+            no training set available)
         """
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
@@ -483,7 +489,7 @@ class NERProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func = getattr(explainaboard.utils.bucketing, bucket_info.method)
+            bucket_func = getattr(bucketing, bucket_info.method)
             feat_vals = my_feature_func(
                 feature_name, sys_output, lambda x: x["true_entity_info"]
             )
@@ -501,7 +507,7 @@ class NERProcessor(Processor):
             feat_dict = {x: y for x, y in zip(span_ids_pred, feat_vals)}
             samples_over_bucket_pred[
                 feature_name
-            ] = explainaboard.utils.bucketing.bucket_attribute_specified_bucket_interval(
+            ] = bucketing.bucket_attribute_specified_bucket_interval(
                 dict_obj=feat_dict,
                 bucket_number=bucket_info.number,
                 bucket_setting=samples_over_bucket_true[feature_name].keys(),
@@ -523,7 +529,8 @@ class NERProcessor(Processor):
         sample_dict: defaultdict[str, dict[str, str]],
     ):
         """
-        Get bucket samples (with mis-predicted entities) for each bucket given a feature (e.g., length)
+        Get bucket samples (with mis-predicted entities) for each bucket given a feature
+        (e.g., length)
         """
         for span in spans:
             split_span = span.split("|||")
@@ -574,12 +581,16 @@ class NERProcessor(Processor):
         samples_over_bucket_pred: dict[str, list[str]],
     ) -> dict[str, list[BucketPerformance]]:
         """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
+        This function defines how to get bucket-level performance w.r.t a given feature
+        (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket_true: a dictionary mapping bucket interval names to true sample IDs
-        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to predicted sample IDs
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
+        :param samples_over_bucket_true: a dictionary mapping bucket interval names to
+            true sample IDs
+        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to
+            predicted sample IDs
+        :return: bucket_name_to_performance: a dictionary that maps bucket names to
+            bucket performance
         """
 
         bucket_name_to_performance = {}
@@ -607,8 +618,8 @@ class NERProcessor(Processor):
             )
             for metric_name in unwrap(sys_info.metric_names):
                 """
-                # Note that: for NER task, the bucket-wise evaluation function is a little different from overall
-                #            evaluation function
+                # Note that: for NER task, the bucket-wise evaluation function is a
+                # little different from overall evaluation function
                 # for overall: f1_seqeval
                 # for bucket:  f1_seqeval_bucket
                 """
