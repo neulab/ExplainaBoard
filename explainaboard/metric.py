@@ -8,7 +8,7 @@ import re
 import string
 import sys
 import unicodedata
-from typing import List, Any, Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 
@@ -26,11 +26,11 @@ WHITESPACE_LANGS = ['en', 'es', 'hi', 'vi', 'de', 'ar']
 MIXED_SEGMENTATION_LANGS = ['zh']
 
 
-def whitespace_tokenize(text: str) -> List[str]:
+def whitespace_tokenize(text: str) -> list[str]:
     return text.split()
 
 
-def mixed_segmentation(text: str) -> List[str]:
+def mixed_segmentation(text: str) -> list[str]:
     segs_out = []
     temp_str = ""
     for char in text:
