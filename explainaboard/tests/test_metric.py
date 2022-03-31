@@ -8,7 +8,7 @@ from eaas import Config
 import numpy as np
 import sklearn.metrics
 
-from explainaboard import FileType, Source, TaskType, get_processor
+from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.loader import get_loader
 import explainaboard.metric
 from explainaboard.utils.async_eaas import AsyncEaaSClient
