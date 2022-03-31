@@ -15,16 +15,18 @@ from explainaboard.info import (
     FineGrainedStatistics,
     OverallStatistics,
     Performance,
+    print_bucket_dict,
     Result,
     SysOutputInfo,
 )
-import explainaboard.metric
+from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 import explainaboard.utils.bucketing
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
-from explainaboard.utils.py_utils import eprint, print_dict, sort_dict
+from explainaboard.utils.py_utils import eprint, sort_dict
 from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 class Processor(metaclass=abc.ABCMeta):
@@ -51,8 +53,8 @@ class Processor(metaclass=abc.ABCMeta):
 
     def __init__(self) -> None:
         # Things to use only if necessary
-        self._eaas_config = None
-        self._eaas_client = None
+        self._eaas_config: Optional[Config] = None
+        self._eaas_client: Optional[AsyncEaaSClient] = None
         # self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._user_defined_feature_config = None
@@ -129,16 +131,28 @@ class Processor(metaclass=abc.ABCMeta):
                 )
         return statistics
 
-    def _gen_scoring_stats(
+    def _get_metrics(self, sys_info: SysOutputInfo) -> Optional[list[Metric]]:
+        return [
+            getattr(explainaboard.metric, name)()
+            for name in unwrap(sys_info.metric_names)
+        ]
+
+    def _gen_metric_stats(
         self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> Any:
-        """Generate sufficient statistics for scoring.
+    ) -> Optional[list[MetricStats]]:
+        """Generate sufficient statistics for scoring different metrics.
 
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
         :return: Statistics sufficient for scoring
         """
-        return None
+        metrics = unwrap(self._get_metrics(sys_info))
+        true_data = [self._get_true_label(x) for x in sys_output]
+        pred_data = [self._get_predicted_label(x) for x in sys_output]
+        metric_stats = []
+        for metric in metrics:
+            metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+        return metric_stats
 
     def _get_feature_func(self, func_name: str):
         return getattr(self, f'_get_{func_name}')
@@ -227,9 +241,10 @@ class Processor(metaclass=abc.ABCMeta):
         :param external_stats: Extenral statistics that are used to calculate training set specific features
         :return: The features that are active (e.g. skipping training set features when no training set available)
         """
-        # Get names of bucketing features
         bucket_feature_funcs = {}
-        for bucket_feature in sys_info.features.get_bucket_features():
+        sys_features = unwrap(sys_info.features)
+
+        for bucket_feature in sys_features.get_bucket_features():
 
             # handles user-defined features
             if (
@@ -237,23 +252,26 @@ class Processor(metaclass=abc.ABCMeta):
                 and bucket_feature in self._user_defined_feature_config.keys()
                 and (
                     external_stats is not None
-                    or not sys_info.features[bucket_feature].require_training_set
+                    or not sys_features[bucket_feature].require_training_set
                 )
             ):
                 bucket_feature_funcs[bucket_feature] = (
-                    None,  # no need to call a function for user-defined features; they are already in the data point itself
-                    sys_info.features[bucket_feature].require_training_set,
+                    # no need to call a function for user-defined features;
+                    # they are already in the data point itself
+                    None,
+                    sys_features[bucket_feature].require_training_set,
                 )
 
             # handles all other features
-            elif bucket_feature in sys_info.features.keys() and (
+            elif bucket_feature in sys_features.keys() and (
                 external_stats is not None
-                or not sys_info.features[bucket_feature].require_training_set
+                or not sys_features[bucket_feature].require_training_set
             ):
                 bucket_feature_funcs[bucket_feature] = (
                     self._get_feature_func(bucket_feature),
-                    sys_info.features[bucket_feature].require_training_set,
+                    sys_features[bucket_feature].require_training_set,
                 )
+
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             for (
@@ -284,6 +302,7 @@ class Processor(metaclass=abc.ABCMeta):
                         if training_dependent
                         else bucket_func(dict_sysout)
                     )
+
         return list(bucket_feature_funcs.keys())
 
     def _bucketing_samples(
@@ -291,7 +310,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats=None,
+        metric_stats=None,
     ) -> tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
@@ -301,6 +320,7 @@ class Processor(metaclass=abc.ABCMeta):
             samples_over_bucket: a dictionary of feature name -> list of buckets and samples
             performances_over_bucket: a dictionary of feature name -> list of performances by bucket
         """
+        sys_features = unwrap(sys_info.features)
 
         # Bucketing
         samples_over_bucket = {}
@@ -314,15 +334,15 @@ class Processor(metaclass=abc.ABCMeta):
             # Preparation for bucketing
             bucket_func = getattr(
                 explainaboard.utils.bucketing,
-                sys_info.features[feature_name].bucket_info.method,
+                sys_features[feature_name].bucket_info.method,
             )
             # TODO(gneubig): make dict_obj more elegant so it doesn't have to copy memory
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj={
                     x: sys_output[x][feature_name] for x in range(len(sys_output))
                 },
-                bucket_number=sys_info.features[feature_name].bucket_info.number,
-                bucket_setting=sys_info.features[feature_name].bucket_info.setting,
+                bucket_number=sys_features[feature_name].bucket_info.number,
+                bucket_setting=sys_features[feature_name].bucket_info.setting,
             )
 
             # evaluating bucket: get bucket performance
@@ -330,7 +350,7 @@ class Processor(metaclass=abc.ABCMeta):
                 sys_info,
                 sys_output,
                 samples_over_bucket[feature_name],
-                scoring_stats=scoring_stats,
+                metric_stats=metric_stats,
             )
 
         return samples_over_bucket, performances_over_bucket
@@ -340,61 +360,69 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         samples_over_bucket: dict[str, list[int]],
-        scoring_stats: Any = None,
+        metric_stats: Optional[list[MetricStats]] = None,
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
         :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
-        :param scoring_stats: any statistics useful to performing scoring
+        :param metric_stats: any statistics useful to performing scoring
         :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
         """
 
-        bucket_name_to_performance = {}
+        # Get the functions to calculate metrics
+        metric_funcs = self._get_metrics(sys_info)
+
+        bucket_name_to_performance: dict[str, BucketPerformance] = {}
         for bucket_interval, sample_ids in samples_over_bucket.items():
 
-            bucket_true_labels = []
-            bucket_predicted_labels = []
             bucket_cases = []
-
             for sample_id in sample_ids:
-
                 data_point = sys_output[sample_id]
                 true_label = self._get_true_label(data_point)
                 predicted_label = self._get_predicted_label(data_point)
                 s_id = data_point["id"]
 
-                # get a bucket of true/predicted labels
-                bucket_true_labels.append(true_label)
-                bucket_predicted_labels.append(predicted_label)
                 # get a bucket of cases (e.g., errors)
                 if sys_info.is_print_case:
                     if true_label != predicted_label:
                         bucket_case = str(s_id)
                         bucket_cases.append(bucket_case)
 
-            bucket_name_to_performance[bucket_interval] = []
-            for metric_name in sys_info.metric_names:
-                metric_func = getattr(explainaboard.metric, metric_name)
-                one_metric = metric_func(
-                    true_labels=bucket_true_labels,
-                    predicted_labels=bucket_predicted_labels,
-                    is_print_confidence_interval=sys_info.is_print_confidence_interval,
-                )
-                metric_result = one_metric.evaluate()
+            bucket_performance = BucketPerformance(
+                bucket_name=bucket_interval,
+                n_samples=len(sample_ids),
+                bucket_samples=bucket_cases,
+            )
 
-                bucket_performance = BucketPerformance(
-                    bucket_name=bucket_interval,
+            for metric_name, metric_func, metric_stat in zip(
+                unwrap_generator(sys_info.metric_names),
+                unwrap_generator(metric_funcs),
+                unwrap_generator(metric_stats),
+            ):
+                bucket_stats = metric_stat.filter(sample_ids)
+                metric_result = metric_func.evaluate_from_stats(
+                    bucket_stats,
+                    conf_value=sys_info.conf_value,
+                )
+
+                conf_low, conf_high = (
+                    metric_result.conf_interval
+                    if metric_result.conf_interval
+                    else (None, None)
+                )
+
+                performance = Performance(
                     metric_name=metric_name,
-                    value=metric_result["value"],
-                    confidence_score_low=metric_result["confidence_score_low"],
-                    confidence_score_high=metric_result["confidence_score_high"],
-                    n_samples=len(bucket_true_labels),
-                    bucket_samples=bucket_cases,
+                    value=metric_result.value,
+                    confidence_score_low=conf_low,
+                    confidence_score_high=conf_high,
                 )
 
-                bucket_name_to_performance[bucket_interval].append(bucket_performance)
+                bucket_performance.performances.append(performance)
+
+            bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
 
@@ -402,50 +430,58 @@ class Processor(metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        scoring_stats: Any = None,
+        metric_stats: list[MetricStats],
     ) -> dict[str, Performance]:
         """
         Get the overall performance according to metrics
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param scoring_stats: any statistics useful to performing scoring
+        :param metric_stats: any statistics useful to performing scoring
         :return: a dictionary of metrics to overall performance numbers
         """
         predicted_labels, true_labels = [], []
 
         for _id, feature_table in enumerate(sys_output):
-
             predicted_labels.append(self._get_predicted_label(feature_table))
             true_labels.append(self._get_true_label(feature_table))
 
+        metric_funcs = self._get_metrics(sys_info)
+
         overall_results = {}
-        for metric_name in sys_info.metric_names:
-            metric_func = getattr(explainaboard.metric, metric_name)
-            one_metric = metric_func(
-                true_labels=true_labels,
-                predicted_labels=predicted_labels,
-                is_print_confidence_interval=sys_info.is_print_confidence_interval,
+        for metric_name, metric_func, metric_stat in zip(
+            unwrap_generator(sys_info.metric_names),
+            unwrap_generator(metric_funcs),
+            metric_stats,
+        ):
+            metric_result = metric_func.evaluate_from_stats(
+                metric_stat,
+                conf_value=sys_info.conf_value,
             )
-            metric_result = one_metric.evaluate()
+
+            conf_low, conf_high = (
+                metric_result.conf_interval
+                if metric_result.conf_interval
+                else (None, None)
+            )
 
             overall_performance = Performance(
                 metric_name=metric_name,
-                value=metric_result["value"],
-                confidence_score_low=metric_result["confidence_score_low"],
-                confidence_score_high=metric_result["confidence_score_high"],
+                value=metric_result.value,
+                confidence_score_low=conf_low,
+                confidence_score_high=conf_high,
             )
             overall_results[metric_name] = overall_performance
         return overall_results
 
     def _print_bucket_info(
-        self, performances_over_bucket: dict[str, dict[str, list[BucketPerformance]]]
+        self, performances_over_bucket: dict[str, dict[str, BucketPerformance]]
     ):
         """
         Print out performance bucket by bucket
         :param performances_over_bucket: dictionary of features -> buckets -> performance for different metrics
         """
         for feature_name, feature_value in performances_over_bucket.items():
-            print_dict(feature_value, feature_name)
+            print_bucket_dict(feature_value, feature_name)
 
     def get_overall_statistics(
         self, metadata: dict, sys_output: list[dict]
@@ -469,16 +505,16 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info.features = self._features
 
         # get scoring statistics
-        scoring_stats = self._gen_scoring_stats(sys_info, sys_output)
+        metric_stats = unwrap(self._gen_metric_stats(sys_info, sys_output))
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
             sys_info, sys_output, external_stats=external_stats
         )
         overall_results = self.get_overall_performance(
-            sys_info, sys_output, scoring_stats=scoring_stats
+            sys_info, sys_output, metric_stats=metric_stats
         )
         return OverallStatistics(
-            sys_info, scoring_stats, active_features, overall_results
+            sys_info, metric_stats, active_features, overall_results
         )
 
     def get_fine_grained_statistics(
@@ -486,10 +522,10 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        scoring_stats=None,
-    ) -> tuple[dict, dict]:
+        metric_stats=None,
+    ) -> FineGrainedStatistics:
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features, scoring_stats
+            sys_info, sys_output, active_features, metric_stats
         )
         """
         A wrapper function to expose _bucketing_samples for the web interface
@@ -499,12 +535,12 @@ class Processor(metaclass=abc.ABCMeta):
     def process(self, metadata: dict, sys_output: list[dict]):
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
-        sys_info = overall_statistics.sys_info
-        scoring_stats = overall_statistics.scoring_stats
-        active_features = overall_statistics.active_features
+        sys_info = unwrap(overall_statistics.sys_info)
+        metric_stats = overall_statistics.metric_stats
+        active_features = unwrap(overall_statistics.active_features)
         overall_results = overall_statistics.overall_results
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features, scoring_stats=scoring_stats
+            sys_info, sys_output, active_features, metric_stats=metric_stats
         )
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(

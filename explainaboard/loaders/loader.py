@@ -7,8 +7,11 @@ from typing import List, Mapping, Optional, Union
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import FileLoader
 from explainaboard.tasks import TaskType
+from explainaboard.utils.typing_utils import unwrap
 
-JSON = Union[str, int, float, bool, None, Mapping[str, 'JSON'], List['JSON']]
+JSON = Union[  # type: ignore
+    str, int, float, bool, None, Mapping[str, 'JSON'], List['JSON']  # type: ignore
+]
 
 
 class Loader:
@@ -31,7 +34,7 @@ class Loader:
         data: str,
         source: Optional[Source] = None,
         file_type: Optional[FileType] = None,
-        file_loaders=None,
+        file_loaders: dict[FileType, FileLoader] = None,
     ):
         if file_loaders is None:
             file_loaders = {}
@@ -110,8 +113,10 @@ class Loader:
         return file_loader.load(self._data, self._source, self.user_defined_features_configs)
 
 
+
+
 # loader_registry is a global variable, storing all basic loading functions
-_loader_registry: dict = {}
+_loader_registry: dict[TaskType, type[Loader]] = {}
 
 
 def get_loader(
