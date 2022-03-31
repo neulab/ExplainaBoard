@@ -8,7 +8,7 @@ from eaas import Config
 import numpy as np
 import sklearn.metrics
 
-from explainaboard import FileType, Source, TaskType
+from explainaboard import FileType, Source, TaskType, get_processor
 from explainaboard.loaders.loader import get_loader
 import explainaboard.metric
 from explainaboard.utils.async_eaas import AsyncEaaSClient
@@ -134,3 +134,32 @@ class TestMetric(unittest.TestCase):
                     metric.evaluate_from_stats(half_stats).value,
                     metric.evaluate_from_stats(split_stats).value,
                 )
+
+    def test_qa_metrics(self):
+
+        path_data = artifacts_path + "test-xquad-en.json"
+        loader = get_loader(
+            TaskType.question_answering_extractive,
+            path_data,
+            Source.local_filesystem,
+            FileType.json,
+        )
+        data = loader.load()
+
+        metadata = {
+            "task_name": TaskType.question_answering_extractive.value,
+            "dataset_name": "squad",
+            "metric_names": ["F1ScoreQA", "ExactMatchQA"],
+        }
+
+        processor = get_processor(TaskType.question_answering_extractive)
+
+        sys_info = processor.process(metadata, data)
+
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
+        # should be 0.6974789915966386
+        self.assertGreater(sys_info.results.overall["ExactMatchQA"].value, 0.69)
+        # should be 0.8235975260931867
+        self.assertGreater(sys_info.results.overall["F1ScoreQA"].value, 0.82)
