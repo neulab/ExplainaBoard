@@ -7,7 +7,6 @@ from typing import List, Mapping, Optional, Union
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import FileLoader
 from explainaboard.tasks import TaskType
-from explainaboard.utils.typing_utils import unwrap
 
 JSON = Union[  # type: ignore
     str, int, float, bool, None, Mapping[str, 'JSON'], List['JSON']  # type: ignore
@@ -60,7 +59,6 @@ class Loader:
             self._parse_user_defined_metadata_configs()
         )
 
-
     @property
     def user_defined_features_configs(self) -> dict:
         if self._user_defined_features_configs is None:
@@ -69,7 +67,6 @@ class Loader:
             )
         return self._user_defined_features_configs
 
-
     @property
     def user_defined_metadata_configs(self) -> dict:
         if self._user_defined_metadata_configs is None:
@@ -77,8 +74,6 @@ class Loader:
                 "User defined metadata configs are not available (data has not been loaded))"
             )
         return self._user_defined_metadata_configs
-
-
 
     def _parse_user_defined_features_configs(self) -> dict:
         if self._file_type == FileType.json:
@@ -93,7 +88,6 @@ class Loader:
                 return raw_data["user_defined_features_configs"]
         return {}
 
-
     def _parse_user_defined_metadata_configs(self) -> dict:
         if self._file_type == FileType.json:
             raw_data = self.file_loaders[FileType.json].load_raw(
@@ -107,12 +101,11 @@ class Loader:
                 return raw_data["user_defined_metadata_configs"]
         return {}
 
-
     def load(self) -> Iterable[dict]:
         file_loader = self.file_loaders[self._file_type]
-        return file_loader.load(self._data, self._source, self.user_defined_features_configs)
-
-
+        return file_loader.load(
+            self._data, self._source, self.user_defined_features_configs
+        )
 
 
 # loader_registry is a global variable, storing all basic loading functions
