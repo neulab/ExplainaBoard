@@ -1,8 +1,8 @@
 from explainaboard.tasks import TaskType
 
 """
-Each schema is a list of dictionary, which is used to instruct how to print bucket-level cases
-in the frontend table (the number of list denotes the number of table columns)
+Each schema is a list of dictionary, which is used to instruct how to print bucket-level
+cases in the frontend table (the number of list denotes the number of table columns)
 Currently, the table schema is characterized by:
 (1) field_key:str:  this is used to retrieve data from system output file
 (2) sort:bool: whether this column is sortable
@@ -10,7 +10,8 @@ Currently, the table schema is characterized by:
 (4) label:str: the text to be printed of this column in the table head
 
 
-For some tasks (e.g., extractive_qa_squad), whose system output format involves nested dict, for example, extractive QA tasks
+For some tasks (e.g., extractive_qa_squad), whose system output format involves nested
+dict, for example, extractive QA tasks
 {
     "title": title,
     "context": context,
@@ -24,8 +25,9 @@ For some tasks (e.g., extractive_qa_squad), whose system output format involves 
 }
 
 
-For this case,  the field_key will be with the format "answer = A.B", suggesting a nested dict, for example
-supposing we have `system_output` file and `sample_id`, then we can get "answer"
+For this case,  the field_key will be with the format "answer = A.B", suggesting a
+nested dict, for example supposing we have `system_output` file and `sample_id`, then we
+can get "answer"
 answer = system_output[A][B]
 """
 

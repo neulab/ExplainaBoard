@@ -13,8 +13,8 @@ import explainaboard.metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
+from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
-import explainaboard.utils.bucketing
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
@@ -76,8 +76,10 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 "src_fre_rank": feature.Value(
                     dtype="float",
-                    description="the average rank of each word in the source sentence based on its frequency in training "
-                    "set",
+                    description=(
+                        "the average rank of each word in the source sentence based on "
+                        "its frequency in training set"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -93,15 +95,22 @@ class ConditionalGenerationProcessor(Processor):
                             "tok_text": feature.Value("string"),
                             "tok_pos": feature.Position(positions=[0, 0]),
                             "tok_matched": feature.Value(
-                                dtype="float",  # this is actually "int" but int is not supported
-                                description="which token the ref/hyp token matches in the hyp/ref sentence, or -1 if none",
+                                # this is actually "int" but int is not supported
+                                dtype="float",
+                                description=(
+                                    "which token the ref/hyp token matches in the "
+                                    "hyp/ref sentence, or -1 if none"
+                                ),
                                 is_bucket=False,
                             ),
                             "tok_capitalness": feature.Value(
                                 dtype="string",
-                                description="The capitalness of an token. For example, first_caps represents only the "
-                                "first character of the token is capital. full_caps denotes all characters "
-                                "of the token are capital",
+                                description=(
+                                    "The capitalness of an token. For example, "
+                                    "first_caps represents only the first character of "
+                                    "the token is capital. full_caps denotes all "
+                                    "characters of the token are capital"
+                                ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_discrete_value",
@@ -111,7 +120,9 @@ class ConditionalGenerationProcessor(Processor):
                             ),
                             "tok_position": feature.Value(
                                 dtype="float",
-                                description="The relative position of a token in a sentence",
+                                description=(
+                                    "The relative position of a token in a sentence"
+                                ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -229,7 +240,8 @@ class ConditionalGenerationProcessor(Processor):
     # TODO(odashi): Restructure this function (and EaaS client) to be type-safe.
     def _fetch_metric_stats(self, metric_stats: dict[str, Any]):
         """
-        A utility function used to lazily fetch the actual scoring dict when it's necessary.
+        A utility function used to lazily fetch the actual scoring dict when it's
+        necessary.
         """
         if 'request_id' in metric_stats:
             eaas_stats: dict[str, Any] = unwrap(self._eaas_client).wait_and_get_result(
@@ -249,7 +261,8 @@ class ConditionalGenerationProcessor(Processor):
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
     ) -> Optional[list[str]]:
         """
-        This function is used to calculate features used for bucketing, such as sentence_length
+        This function is used to calculate features used for bucketing, such as
+        sentence_length
         :return:
         """
 
@@ -378,7 +391,7 @@ class ConditionalGenerationProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func = getattr(explainaboard.utils.bucketing, bucket_info.method)
+            bucket_func = getattr(bucketing, bucket_info.method)
 
             feat_dict = self._get_feature_dict(
                 sys_output, feature_name, lambda x: x['ref_tok_info']
@@ -395,7 +408,7 @@ class ConditionalGenerationProcessor(Processor):
             )
             samples_over_bucket_pred[
                 feature_name
-            ] = explainaboard.utils.bucketing.bucket_attribute_specified_bucket_interval(
+            ] = bucketing.bucket_attribute_specified_bucket_interval(
                 dict_obj=feat_dict,
                 bucket_number=bucket_info.number,
                 bucket_setting=samples_over_bucket[feature_name].keys(),
@@ -418,12 +431,16 @@ class ConditionalGenerationProcessor(Processor):
         samples_over_bucket_pred: dict[str, list[tuple[int, int]]],
     ) -> dict[str, list[BucketPerformance]]:
         """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
+        This function defines how to get bucket-level performance w.r.t a given feature
+        (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket_true: a dictionary mapping bucket interval names to true sample IDs
-        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to predicted sample IDs
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
+        :param samples_over_bucket_true: a dictionary mapping bucket interval names to
+            true sample IDs
+        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to
+            predicted sample IDs
+        :return: bucket_name_to_performance: a dictionary that maps bucket names to
+            bucket performance
         """
 
         bucket_name_to_performance: dict[str, BucketPerformance] = {}
