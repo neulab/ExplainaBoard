@@ -20,7 +20,10 @@ def main():
         type=str,
         required=True,
         nargs="+",
-        help="the directories of system outputs. Multiple one should be separated by space, for example: system1 system2",
+        help=(
+            "the directories of system outputs. Multiple one should be separated by "
+            "space, for example: system1 system2"
+        ),
     )
 
     parser.add_argument(
@@ -84,11 +87,13 @@ def main():
     # Checks on inputs
     if num_outputs > 2:
         raise ValueError(
-            f'ExplainaBoard currently only supports 1 or 2 system outputs, but received {num_outputs}'
+            f'ExplainaBoard currently only supports 1 or 2 system outputs, but '
+            f'received {num_outputs}'
         )
     if task not in TaskType.list():
         raise ValueError(
-            f'Task name {task} was not recognized. ExplainaBoard currently supports: {TaskType.list()}'
+            f'Task name {task} was not recognized. ExplainaBoard currently supports: '
+            f'{TaskType.list()}'
         )
 
     # Read in data and check validity
@@ -101,7 +106,8 @@ def main():
             num0 = len(system_datasets[0])
             num1 = len(system_datasets[1])
             raise ValueError(
-                f'Data must be identical for pairwise analysis, but length of files {system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
+                f'Data must be identical for pairwise analysis, but length of files '
+                f'{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
             )
         if (
             loaders[0].user_defined_features_configs

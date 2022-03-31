@@ -18,8 +18,8 @@ from explainaboard.utils.typing_utils import unwrap
 
 def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
     """
-    _arrow_to_datasets_dtype takes a pyarrow.DataType and converts it to a datasets string dtype.
-    In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
+    _arrow_to_datasets_dtype takes a pyarrow.DataType and converts it to a datasets
+    string dtype. In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
     """
 
     if pa.types.is_null(arrow_type):
@@ -74,11 +74,11 @@ def string_to_arrow(datasets_dtype: str) -> pa.DataType:
     """
     string_to_arrow takes a datasets string dtype and converts it to a pyarrow.DataType.
     In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
-    This is necessary because the datasets.Value() primitive type is constructed using a string dtype
-    Value(dtype=str)
-    But Features.type (via `get_nested_type()` expects to resolve Features into a pyarrow Schema,
-        which means that each Value() must be able to resolve into a corresponding pyarrow.DataType, which is the
-        purpose of this function.
+    This is necessary because the datasets.Value() primitive type is constructed using a
+    string dtype Value(dtype=str)
+    But Features.type (via `get_nested_type()` expects to resolve Features into a
+    pyarrow Schema, which means that each Value() must be able to resolve into a
+    corresponding pyarrow.DataType, which is the purpose of this function.
     """
     timestamp_regex = re.compile(r"^timestamp\[(.*)\]$")
     timestamp_matches = timestamp_regex.search(datasets_dtype)
@@ -97,16 +97,21 @@ def string_to_arrow(datasets_dtype: str) -> pa.DataType:
             return pa.timestamp(internals_matches.group(1), internals_matches.group(2))
         else:
             raise ValueError(
-                f"{datasets_dtype} is not a validly formatted string representation of a pyarrow timestamp."
-                f"Examples include timestamp[us] or timestamp[us, tz=America/New_York]"
-                f"See: https://arrow.apache.org/docs/python/generated/pyarrow.timestamp.html#pyarrow.timestamp"
+                f"""
+{datasets_dtype} is not a validly formatted string representation of a pyarrow
+timestamp. Examples include timestamp[us] or timestamp[us, tz=America/New_York]
+See:
+https://arrow.apache.org/docs/python/generated/pyarrow.timestamp.html#pyarrow.timestamp
+"""
             )
     elif datasets_dtype not in pa.__dict__:
         if str(datasets_dtype + "_") not in pa.__dict__:
             raise ValueError(
-                f"Neither {datasets_dtype} nor {datasets_dtype + '_'} seems to be a pyarrow data type. "
-                f"Please make sure to use a correct data type, see: "
-                f"https://arrow.apache.org/docs/python/api/datatypes.html#factory-functions"
+                f"""
+Neither {datasets_dtype} nor {datasets_dtype + '_'} seems to be a pyarrow data type.
+Please make sure to use a correct data type, see:
+https://arrow.apache.org/docs/python/api/datatypes.html#factory-functions
+"""
             )
         arrow_data_factory_function_name = str(datasets_dtype + "_")
     else:
@@ -119,17 +124,23 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> tuple[Any, boo
     """
     Cast pytorch/tensorflow/pandas objects to python numpy array/lists.
     It works recursively.
-    To avoid iterating over possibly long lists, it first checks if the first element that is not None has to be casted.
-    If the first element needs to be casted, then all the elements of the list will be casted, otherwise they'll stay the same.
-    This trick allows to cast objects that contain tokenizers outputs without iterating over every single token for example.
+    To avoid iterating over possibly long lists, it first checks if the first element
+    that is not None has to be casted.
+    If the first element needs to be casted, then all the elements of the list will be
+    casted, otherwise they'll stay the same.
+    This trick allows to cast objects that contain tokenizers outputs without iterating
+    over every single token for example.
     Args:
         obj: the object (nested struct) to cast
-        only_1d_for_numpy (bool): whether to keep the full multi-dim tensors as multi-dim numpy arrays, or convert them to
-            nested lists of 1-dimensional numpy arrays. This can be useful to keep only 1-d arrays to instantiate Arrow arrays.
-            Indeed Arrow only support converting 1-dimensional array values.
+        only_1d_for_numpy (bool): whether to keep the full multi-dim tensors as
+            multi-dim numpy arrays, or convert them to nested lists of 1-dimensional
+            numpy arrays. This can be useful to keep only 1-d arrays to instantiate
+            Arrow arrays. Indeed Arrow only support converting 1-dimensional array
+            values.
     Returns:
         casted_obj: the casted object
-        has_changed (bool): True if the object has been changed, False if it is identical
+        has_changed (bool): True if the object has been changed, False if it is
+            identical
     """
 
     if config.TF_AVAILABLE and "tensorflow" in sys.modules:
@@ -240,9 +251,12 @@ def cast_to_python_objects(obj: Any, only_1d_for_numpy=False) -> Any:
     """
     Cast numpy/pytorch/tensorflow/pandas objects to python lists.
     It works recursively.
-    To avoid iterating over possibly long lists, it first checks if the first element that is not None has to be casted.
-    If the first element needs to be casted, then all the elements of the list will be casted, otherwise they'll stay the same.
-    This trick allows to cast objects that contain tokenizers outputs without iterating over every single token for example.
+    To avoid iterating over possibly long lists, it first checks if the first element
+    that is not None has to be casted.
+    If the first element needs to be casted, then all the elements of the list will be
+    casted, otherwise they'll stay the same.
+    This trick allows to cast objects that contain tokenizers outputs without iterating
+    over every single token for example.
     Args:
         obj: the object (nested struct) to cast
     Returns:
@@ -552,7 +566,8 @@ FeatureType = Union[
 
 def encode_nested_example(schema, obj):
     """Encode a nested example.
-    This is used since some features (in particular ClassLabel) have some logic during encoding.
+    This is used since some features (in particular ClassLabel) have some logic during
+    encoding.
     """
     # Nested structures: we allow dict, list/tuples, sequences
     if isinstance(schema, dict):
@@ -598,10 +613,12 @@ def encode_nested_example(schema, obj):
             else None
         )
     # Object with special encoding:
-    # ClassLabel will convert from string to int, TranslationVariableLanguages does some checks
+    # ClassLabel will convert from string to int,
+    # TranslationVariableLanguages does some checks
     elif isinstance(schema, (ClassLabel, Value)):
         return schema.encode_example(obj)
-    # Other object should be directly convertible to a native Arrow type (like Translation and Translation)
+    # Other object should be directly convertible to a native Arrow type
+    # (like Translation and Translation)
     return obj
 
 
