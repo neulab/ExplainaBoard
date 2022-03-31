@@ -75,12 +75,14 @@ class Processor(metaclass=abc.ABCMeta):
     def _gen_external_stats(
         self, sys_info: SysOutputInfo, statistics_func: aggregating
     ):
-        """Generate external statistics that are gathered from a relatively costly source, such as the training
-        set. These are gathered once and then cached for future use.
+        """Generate external statistics that are gathered from a relatively costly
+        source, such as the training set.
+        These are gathered once and then cached for future use.
 
         :param sys_info: Information about the system outputs
         :param statistics_func: The function used to get the statistics
-        :return: Statistics from, usually, the training set that are used to calculate other features
+        :return: Statistics from, usually, the training set that are used to calculate
+            other features
         """
         statistics = None
         if sys_info.dataset_name is not None:
@@ -125,9 +127,11 @@ class Processor(metaclass=abc.ABCMeta):
                     raise FileNotFoundError
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no training set dependent features will be "
-                    "supported by ExplainaBoard. You can add the dataset by: "
-                    "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                    """
+The dataset hasn't been supported by DataLab so no training set dependent features will
+be supported by ExplainaBoard. You can add the dataset by:
+https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md
+"""
                 )
         return statistics
 
@@ -168,7 +172,8 @@ class Processor(metaclass=abc.ABCMeta):
 
     def _get_true_label(self, data_point: dict):
         """
-        Get the true label from a data point. Returns "true_label" by default, but can be overloaded.
+        Get the true label from a data point. Returns "true_label" by default, but can
+        be overloaded.
         :param data_point: the data point under consideration
         :return: the true label for the output
         """
@@ -176,7 +181,8 @@ class Processor(metaclass=abc.ABCMeta):
 
     def _get_predicted_label(self, data_point: dict):
         """
-        Get the predicted label from a data point. Returns "predicted_label" by default, but can be overloaded.
+        Get the predicted label from a data point. Returns "predicted_label" by default,
+        but can be overloaded.
         :param data_point: the data point under consideration
         :return: the predicted label for the output
         """
@@ -195,8 +201,6 @@ class Processor(metaclass=abc.ABCMeta):
         self._user_defined_feature_config = metadata.get(
             "user_defined_features_configs"
         )
-
-        # print(f"self._user_defined_feature_config:\t{self._user_defined_feature_config}")
 
         # add user-defined features into features list
         if self._user_defined_feature_config is not None:
@@ -233,13 +237,16 @@ class Processor(metaclass=abc.ABCMeta):
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
     ) -> Optional[list[str]]:
         """
-        This function takes in meta-data about system outputs, system outputs, and a few other optional pieces of
-        information, then calculates feature functions and modifies `sys_output` to add these feature values
+        This function takes in meta-data about system outputs, system outputs, and a few
+        other optional pieces of information, then calculates feature functions and
+        modifies `sys_output` to add these feature values
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param external_stats: Extenral statistics that are used to calculate training set specific features
-        :return: The features that are active (e.g. skipping training set features when no training set available)
+        :param external_stats: Extenral statistics that are used to calculate training
+            set specific features
+        :return: The features that are active (e.g. skipping training set features when
+            no training set available)
         """
         bucket_feature_funcs = {}
         sys_features = unwrap(sys_info.features)
@@ -317,8 +324,10 @@ class Processor(metaclass=abc.ABCMeta):
         :param sys_info: Information about the system output
         :param sys_output: The system output itself, already annotated with features
         :return:
-            samples_over_bucket: a dictionary of feature name -> list of buckets and samples
-            performances_over_bucket: a dictionary of feature name -> list of performances by bucket
+            samples_over_bucket:
+                a dictionary of feature name -> list of buckets and samples
+            performances_over_bucket:
+                a dictionary of feature name -> list of performances by bucket
         """
         sys_features = unwrap(sys_info.features)
 
@@ -326,17 +335,13 @@ class Processor(metaclass=abc.ABCMeta):
         samples_over_bucket = {}
         performances_over_bucket = {}
         for feature_name in tqdm(active_features, desc="bucketing"):
-            # print(f"Feature Name: {feature_name}\n"
-            #       f"Bucket Hyper:\n function_name: {sys_info.features[feature_name].bucket_info.method} \n"
-            #       f"bucket_number: {sys_info.features[feature_name].bucket_info.number}\n"
-            #       f"bucket_setting: {sys_info.features[feature_name].bucket_info.setting}\n")
-
             # Preparation for bucketing
             bucket_func = getattr(
                 explainaboard.utils.bucketing,
                 sys_features[feature_name].bucket_info.method,
             )
-            # TODO(gneubig): make dict_obj more elegant so it doesn't have to copy memory
+            # TODO(gneubig):
+            # make dict_obj more elegant so it doesn't have to copy memory
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj={
                     x: sys_output[x][feature_name] for x in range(len(sys_output))
@@ -363,12 +368,15 @@ class Processor(metaclass=abc.ABCMeta):
         metric_stats: Optional[list[MetricStats]] = None,
     ) -> dict[str, list[BucketPerformance]]:
         """
-        This function defines how to get bucket-level performance w.r.t a given feature (e.g., sentence length)
+        This function defines how to get bucket-level performance w.r.t a given feature
+        (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to sample IDs for that bucket
+        :param samples_over_bucket: a dictionary mapping bucket interval names to sample
+            IDs for that bucket
         :param metric_stats: any statistics useful to performing scoring
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to bucket performance
+        :return: bucket_name_to_performance: a dictionary that maps bucket names to
+            bucket performance
         """
 
         # Get the functions to calculate metrics
@@ -478,7 +486,8 @@ class Processor(metaclass=abc.ABCMeta):
     ):
         """
         Print out performance bucket by bucket
-        :param performances_over_bucket: dictionary of features -> buckets -> performance for different metrics
+        :param performances_over_bucket:
+            dictionary of features -> buckets -> performance for different metrics
         """
         for feature_name, feature_value in performances_over_bucket.items():
             print_bucket_dict(feature_value, feature_name)
@@ -487,7 +496,8 @@ class Processor(metaclass=abc.ABCMeta):
         self, metadata: dict, sys_output: list[dict]
     ) -> OverallStatistics:
         """
-        Get the overall statistics information, including performance, of the system output
+        Get the overall statistics information, including performance, of the system
+        output
         :param metadata: The metadata of the system
         :param sys_output: The system output itself
         """

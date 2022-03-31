@@ -73,14 +73,6 @@ def bucket_attribute_specified_bucket_value(
                 dict_bucket2span[key_bucket] = entity_list
             else:
                 dict_bucket2span[(val_list[0], p_infinity)] = entity_list  # fix bugs
-    #
-    #
-    #
-    # [(0,), (0.1, 0.2), (0.3,0.4), (0.5, 0.6)] --> [(0,), (0,0.2), (0.2, 0.4), (0.4, 0.6)]
-    # dict_old2new = interval_transformer(dict_bucket2span.keys())
-    # dict_bucket2span_new = {}
-    # for inter_list, span_list in dict_bucket2span.items():
-    # 	dict_bucket2span_new[dict_old2new[inter_list]] = span_list
 
     return dict_bucket2span
 

@@ -3,21 +3,6 @@ import json
 import requests
 
 if __name__ == "__main__":
-    # end_point_upload_dataset = "https://datalab.nlpedia.ai/api/normal_dataset/update_stat"
-    # data_info = {
-    #     'dataset_name': 'allocine',
-    #     'subset_name': None,
-    #     'version': 'Hugging Face',
-    #     'transformation': {
-    #         'type': 'origin'
-    #     },
-    #     'content': {
-    #         'ration': {'test0': 0.1, 'test1': 0.9}
-    #     }
-    # }
-    # response = requests.post(end_point_upload_dataset, json=data_info)
-    # print(response.content)
-
     end_point_upload_dataset = "https://datalab.nlpedia.ai/api/normal_dataset/read_stat"
     data_info = {
         'dataset_name': 'sst2',

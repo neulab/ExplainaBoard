@@ -85,7 +85,10 @@ class KGLinkTailPredictionProcessor(Processor):
                 ),
                 "symmetry": feature.Value(
                     dtype="string",
-                    description="boolean feature: 'symmetric' or 'asymmetric'; more granularity to be added",
+                    description=(
+                        "boolean feature: 'symmetric' or 'asymmetric'; more "
+                        "granularity to be added"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_discrete_value", number=2, setting=1
@@ -93,7 +96,9 @@ class KGLinkTailPredictionProcessor(Processor):
                 ),
                 "entity_type_level": feature.Value(
                     dtype="string",
-                    description="most specific (highest) entity type level of true tail entity",
+                    description=(
+                        "most specific (highest) entity type level of true tail entity"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_discrete_value", number=8, setting=1
@@ -113,7 +118,7 @@ class KGLinkTailPredictionProcessor(Processor):
         '/base/popstra/celebrity/dated./base/popstra/dated/participant',
         '/base/popstra/celebrity/friendship./base/popstra/friendship/participant',
         '/celebrities/celebrity/celebrity_friends./celebrities/friendship/friend',
-        '/celebrities/celebrity/sexual_relationships./celebrities/romantic_relationship/celebrity',
+        '/celebrities/celebrity/sexual_relationships./celebrities/romantic_relationship/celebrity',  # noqa: E501
         '/influence/influence_node/peers./influence/peer_relationship/peers',
         '/location/location/adjoin_s./location/adjoining_relationship/adjoins',
         '/people/person/spouse_s./people/marriage/spouse',
@@ -162,7 +167,9 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
 
-        # TODO(gneubig): this will be reloaded for every dataset, maybe should be fixed for multiple analysis
+        # TODO(gneubig):
+        # this will be reloaded for every dataset, maybe should be fixed for multiple
+        # analysis
         if sys_info.dataset_name != "fb15k_237":  # to be generalized
             self.entity_type_level_map = {}
         else:
@@ -180,9 +187,9 @@ class KGLinkTailPredictionProcessor(Processor):
         if sys_info.dataset_name is not None:
             try:
                 dataset = load_dataset(sys_info.dataset_name, "readable")
-                if (
-                    len(dataset['train']._stat) == 0 or not sys_info.reload_stat
-                ):  # calculate the statistics (_stat) when _stat is {} or `reload_stat` is False
+                # calculate the statistics (_stat) when _stat is {} or
+                # `reload_stat` is False
+                if len(dataset['train']._stat) == 0 or not sys_info.reload_stat:
                     new_train = dataset['train'].apply(
                         self._statistics_func, mode="local"
                     )
@@ -191,16 +198,18 @@ class KGLinkTailPredictionProcessor(Processor):
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError:
                 eprint(
-                    "The dataset hasn't been supported by DataLab so no "
-                    "training set dependent features will be supported by "
-                    "ExplainaBoard. You can add the dataset by: "
-                    "https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"
+                    """
+The dataset hasn't been supported by DataLab so no training set dependent features will
+be supported by ExplainaBoard. You can add the dataset by:
+https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md
+"""
                 )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
 
-        # list of entity types at each level: [type_level_0, type_level_1, ... type_level_6]
+        # list of entity types at each level:
+        # [type_level_0, type_level_1, ... type_level_6]
         # e.g. ["Thing", "Agent", "Person", None, None, None, None]
         tail_entity_type_levels = self.entity_type_level_map.get(
             existing_features['true_tail'], None

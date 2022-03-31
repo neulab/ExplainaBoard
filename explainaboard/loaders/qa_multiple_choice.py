@@ -13,7 +13,7 @@ from explainaboard.utils.typing_utils import unwrap
 class QAMultipleChoiceLoader(Loader):
     """
     Validate and Reformat system output file with json format:
-    "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
+    "head \t relation \t trueTail": [predTail1, predTail2, ..., predTail5],
 
     usage:
         please refer to `test_loaders.py`
@@ -26,8 +26,9 @@ class QAMultipleChoiceLoader(Loader):
 
     def load(self) -> Iterable[dict]:
         """
-        :param path_system_output: the path of system output file with following format:
-        "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
+        :param path_system_output:
+            the path of system output file with following format:
+            "head \t relation \t trueTail": [predTail1, predTail2, ..., predTail5],
 
         :return: class object
         """

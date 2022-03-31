@@ -100,7 +100,10 @@ class TextClassificationProcessor(Processor):
                 ),
                 "fre_rank": feature.Value(
                     dtype="float",
-                    description="the average rank of each work based on its frequency in training set",
+                    description=(
+                        "the average rank of each work based on its frequency in "
+                        "training set"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -152,7 +155,8 @@ class TextClassificationProcessor(Processor):
             existing_features, statistics, lambda x: x['text'], self._tokenizer
         )
 
-    # training set dependent features (this could be merged into the above one for further optimization)
+    # training set dependent features
+    # (this could be merged into the above one for further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features, statistics, lambda x: x['text'], self._tokenizer
@@ -180,7 +184,8 @@ class TextClassificationProcessor(Processor):
         }]
         """
 
-        # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+        # TODO(gneubig):
+        # BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
         # tokenizer = SingleSpaceTokenizer()
 
         vocab = {}
@@ -216,11 +221,3 @@ class TextClassificationProcessor(Processor):
             length_fre[k] = v * 1.0 / total_samps
 
         return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
-
-
-# @aggregating(
-#     name="get_statistics",
-#     contributor="datalab",
-#     task="text-classification",
-#     description="Calculate the overall statistics (e.g., density) of a given text classification dataset",
-# )

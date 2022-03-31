@@ -71,7 +71,10 @@ class QAExtractiveProcessor(Processor):
                 ),
                 "fre_rank": feature.Value(
                     dtype="float",
-                    description="the average rank of each work based on its frequency in training set",
+                    description=(
+                        "the average rank of each work based on its frequency in "
+                        "training set"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -80,12 +83,6 @@ class QAExtractiveProcessor(Processor):
                     ),
                     require_training_set=True,
                 ),
-                # "sim_context_question": feature.Value(dtype="float",
-                #                                is_bucket=True,
-                #                                bucket_info=feature.BucketInfo(
-                #                                    method="bucket_attribute_specified_bucket_value",
-                #                                    number=4,
-                #                                    setting=()))
             }
         )
 
@@ -106,7 +103,8 @@ class QAExtractiveProcessor(Processor):
         }]
         """
 
-        # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+        # TODO(gneubig):
+        # BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
         # tokenizer = SingleSpaceTokenizer()
 
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(

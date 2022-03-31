@@ -51,7 +51,8 @@ class TestQAMultipleChoice(unittest.TestCase):
             "task_name": TaskType.qa_multiple_choice.value,
             "dataset_name": "metaphor_qa",
             "metric_names": ["Accuracy"],
-            "user_defined_features_configs": loader.user_defined_features_configs,  # don't forget this, otherwise the user-defined features will be ignored
+            # don't forget this, otherwise the user-defined features will be ignored
+            "user_defined_features_configs": loader.user_defined_features_configs,
         }
 
         processor = get_processor(TaskType.qa_multiple_choice.value)

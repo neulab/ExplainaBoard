@@ -95,7 +95,8 @@ class TestMetric(unittest.TestCase):
         eaas_client = AsyncEaaSClient()
         eaas_client.load_config(Config())
         metric_names = ['rouge1', 'bleu', 'chrf']
-        # Uncomment the following line to test all metrics, but beware that it will be very slow
+        # Uncomment the following line to test all metrics,
+        # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics
         metrics = [explainaboard.metric.EaaSMetric(name=name) for name in metric_names]
 
@@ -127,7 +128,8 @@ class TestMetric(unittest.TestCase):
                     half_result['corpus_level'][f'corpus_{name}'],
                     metric.evaluate_from_stats(half_stats).value,
                 )
-                # Stats calculated over half corpus should be the same as the stats split away from the full corpus
+                # Stats calculated over half corpus should be the same as the stats
+                # split away from the full corpus
                 self.assertAlmostEqual(
                     metric.evaluate_from_stats(half_stats).value,
                     metric.evaluate_from_stats(split_stats).value,
