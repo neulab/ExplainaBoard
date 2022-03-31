@@ -49,7 +49,9 @@ class MetricStats:
 
     def __init__(self, data: Optional[np.ndarray]):
         """
-        :param data: A numpy array of dimensions [x,y], where x in the length of the dataset, and y is the size of the sufficient statistics necessary to calculate the metric.
+        :param data: A numpy array of dimensions [x,y], where x in the length of the
+            dataset, and y is the size of the sufficient statistics necessary to
+            calculate the metric.
         """
         self._data = data
 
@@ -97,12 +99,14 @@ class Metric:
 
     @abc.abstractmethod
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
-        """From a list of true data and predicted data, calculate the sufficient statistics for each data example so
-        that the evaluation metric can be calculated later. In the simplest form, this is just the evaluation metric
-        value for each example.
+        """From a list of true data and predicted data, calculate the sufficient
+        statistics for each data example so that the evaluation metric can be calculated
+        later. In the simplest form, this is just the evaluation metric value for each
+        example.
         :param true_data: gold-standard data
         :param pred_data: predicted data
-        :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest case of decomposable eval metrics
+        :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest
+            case of decomposable eval metrics
         """
         ...
 
@@ -156,8 +160,8 @@ class Metric:
     ) -> MetricResult:
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
-        :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
-        intervals
+        :param conf_value: if set to not None, must be a number between 0 and 1,
+            indicating the p-value of confidence intervals
         :return: a resulting metric value
         """
         agg_stats = self.aggregate_stats(stats)
@@ -173,8 +177,8 @@ class Metric:
         """Return an evaluation result over true data and predicted data.
         :param true_data: gold-standard data
         :param pred_data: predicted data
-        :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
-        intervals
+        :param conf_value: if set to not None, must be a number between 0 and 1,
+            indicating the p-value of confidence intervals
         :return: a resulting metric value
         """
         stats = self.calc_stats_from_data(true_data, pred_data)
@@ -187,7 +191,8 @@ class Metric:
 
 class Accuracy(Metric):
     """
-    Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground truth
+    Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground
+    truth
     """
 
     @classmethod
@@ -202,7 +207,8 @@ class Accuracy(Metric):
 
 class F1Score(Metric):
     """
-    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's implementation.
+    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's
+    implementation.
     """
 
     @classmethod
@@ -212,7 +218,8 @@ class F1Score(Metric):
     def __init__(self, average: str = 'micro', separate_match: bool = False):
         """Constructor for f-measure
         :param average: What variety of average to measure
-        :param separate_match: Whether to count matches separately for true and pred. This is useful in, for example bucketing, when ref and pred are not aligned
+        :param separate_match: Whether to count matches separately for true and pred.
+            This is useful in, for example bucketing, when ref and pred are not aligned
         """
         self.average: str = average
         self.separate_match: bool = separate_match
@@ -228,11 +235,13 @@ class F1Score(Metric):
         Return sufficient statistics necessary to compute f-score.
         :param true_data: True outputs
         :param pred_data: Predicted outputs
-        :return: Returns stats for each class (integer id c) in the following columns of MetricStats
-          * c*self._stat_mult + 0: occurrences in the true output
-          * c*self._stat_mult + 1: occurrences in the predicted output
-          * c*self._stat_mult + 2: number of matches with the true output
-          * c*self._stat_mult + 3: number of matches with the predicted output (when self.separate_match=True only)
+        :return: Returns stats for each class (integer id c) in the following columns of
+            MetricStats
+            * c*self._stat_mult + 0: occurrences in the true output
+            * c*self._stat_mult + 1: occurrences in the predicted output
+            * c*self._stat_mult + 2: number of matches with the true output
+            * c*self._stat_mult + 3: number of matches with the predicted output
+                (when self.separate_match=True only)
         """
         id_map: dict[str, int] = {}
         for word in itertools.chain(true_data, pred_data):
@@ -288,7 +297,8 @@ class F1Score(Metric):
 
 class Hits(Metric):
     """
-    Calculates the hits metric, telling whether the predicted output is in a set of true outputs.
+    Calculates the hits metric, telling whether the predicted output is in a set of true
+    outputs.
     """
 
     @classmethod
@@ -303,7 +313,8 @@ class Hits(Metric):
 
 class MeanReciprocalRank(Metric):
     """
-    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is the rank of the true output in the predicted n-best list.
+    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is
+    the rank of the true output in the predicted n-best list.
     """
 
     @classmethod
@@ -325,7 +336,9 @@ class MeanReciprocalRank(Metric):
 
 class EaaSMetricStats(MetricStats):
     """
-    Stats from EaaS for calculation of any of the metrics. These are calculated lazily, so that a request is dispatched to the EaaS server and the results are retrieved when they're needed.
+    Stats from EaaS for calculation of any of the metrics. These are calculated lazily,
+    so that a request is dispatched to the EaaS server and the results are retrieved
+    when they're needed.
     """
 
     def __init__(self, name: str, eaas_request: AsyncEaaSRequest):
@@ -383,7 +396,10 @@ class EaaSMetric(Metric):
         non_decomposable_metrics = ['bleu', 'chrf']
         if name in non_decomposable_metrics:
             print(
-                f'WARNING: corpus-level {name} is currently calculated as the average of sentence-level {name}, which is not technically correct. This is a known issue that we are working on: https://github.com/neulab/ExplainaBoard/issues/161',
+                f'WARNING: corpus-level {name} is currently calculated as the average '
+                f'of sentence-level {name}, which is not technically correct. '
+                'This is a known issue that we are working on: '
+                'https://github.com/neulab/ExplainaBoard/issues/161',
                 file=sys.stderr,
             )
         # !!! End temporary warning
@@ -395,7 +411,9 @@ class EaaSMetric(Metric):
 
 class QAMetric(Metric):
     """
-    An abstract class for extractive QA tasks that measures scores after normalization. The actual metric must inherit this class and implement the sample_level_metric() function.
+    An abstract class for extractive QA tasks that measures scores after normalization.
+    The actual metric must inherit this class and implement the sample_level_metric()
+    function.
     """
 
     def normalize_answer(self, s: str) -> str:
