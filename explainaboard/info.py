@@ -88,7 +88,7 @@ class SysOutputInfo:
     reload_stat: bool = True
     is_print_case: bool = True
     is_print_confidence_interval: bool = False
-    language : str = "en"
+    language: str = "en"
     conf_value: float = 0.05
     # language : str = "English"
 
@@ -118,11 +118,14 @@ class SysOutputInfo:
                 data[str(key)] = data[key]
                 del data[key]
 
-    def write_to_directory(self, dataset_info_dir):
+    def write_to_directory(self, dataset_info_dir, file_name=""):
         """Write `SysOutputInfo` as JSON to `dataset_info_dir`."""
-        with open(
-            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "wb"
-        ) as f:
+        file_path = (
+            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME)
+            if file_name == ""
+            else os.path.join(dataset_info_dir, file_name)
+        )
+        with open(file_path, "wb") as f:
             self._dump_info(f)
 
     def print_as_json(self):

@@ -55,7 +55,6 @@ class TestTextClassification(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-
     def test_user_defined_metadata(self):
 
         loader = get_loader(

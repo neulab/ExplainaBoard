@@ -1,11 +1,11 @@
 import argparse
 import json
 import os
-from tqdm import tqdm
 from typing import Optional
 import numpy as np
 from explainaboard.analyzers.draw_hist import draw_bar_chart_from_report
 import copy
+
 
 from explainaboard import (
     get_loader,
@@ -16,8 +16,12 @@ from explainaboard import (
 )
 
 
-
-def aggregate_score_tensor(score_tensor:dict, models_aggregation:Optional[str] = None, datasets_aggregation:Optional[str] = None, languages_aggregation:Optional[str]= None):
+def aggregate_score_tensor(
+    score_tensor: dict,
+    models_aggregation: Optional[str] = None,
+    datasets_aggregation: Optional[str] = None,
+    languages_aggregation: Optional[str] = None,
+):
     """
     This function aggregate score tensor based on specified parameters along three dimensions: model, dataset and language
     TODO(Pengfei):
@@ -31,7 +35,6 @@ def aggregate_score_tensor(score_tensor:dict, models_aggregation:Optional[str] =
     :return:
     """
 
-
     if datasets_aggregation is not None and languages_aggregation is None:
         languages_aggregation = datasets_aggregation
 
@@ -42,14 +45,22 @@ def aggregate_score_tensor(score_tensor:dict, models_aggregation:Optional[str] =
         for model_name, m_value in score_tensor.items():
             score_tensor_aggregated_language[model_name] = {}
             for dataset_name, d_value in score_tensor[model_name].items():
-                score_info_template = copy.deepcopy(list(score_tensor[model_name][dataset_name].values())[0])
+                score_info_template = copy.deepcopy(
+                    list(score_tensor[model_name][dataset_name].values())[0]
+                )
 
                 # print(score_info_template)
                 score_tensor_aggregated_language[model_name][dataset_name] = {}
-                aggregated_score = np.average([score["value"] for score in score_tensor[model_name][dataset_name].values()])
+                aggregated_score = np.average(
+                    [
+                        score["value"]
+                        for score in score_tensor[model_name][dataset_name].values()
+                    ]
+                )
                 score_info_template["value"] = aggregated_score
-                score_tensor_aggregated_language[model_name][dataset_name]["all_languages"] = score_info_template
-
+                score_tensor_aggregated_language[model_name][dataset_name][
+                    "all_languages"
+                ] = score_info_template
 
     # Regarding dataset aggregation
     score_tensor_aggregated_dataset = {}
@@ -59,26 +70,28 @@ def aggregate_score_tensor(score_tensor:dict, models_aggregation:Optional[str] =
             aggregated_score = 0.0
             score_info_template = {}
             for dataset_name, d_value in score_tensor[model_name].items():
-                score_info_template = copy.deepcopy(list(score_tensor[model_name][dataset_name].values())[0])
-                aggregated_score += score_tensor_aggregated_language[model_name][dataset_name]["all_languages"]["value"]
+                score_info_template = copy.deepcopy(
+                    list(score_tensor[model_name][dataset_name].values())[0]
+                )
+                aggregated_score += score_tensor_aggregated_language[model_name][
+                    dataset_name
+                ]["all_languages"]["value"]
             aggregated_score /= len(score_tensor[model_name].items())
             score_info_template["value"] = aggregated_score
             score_tensor_aggregated_dataset[model_name]["all_datasets"] = {}
-            score_tensor_aggregated_dataset[model_name]["all_datasets"]["all_languages"] = score_info_template
-
-
+            score_tensor_aggregated_dataset[model_name]["all_datasets"][
+                "all_languages"
+            ] = score_info_template
 
     # Regarding model aggregation
     if datasets_aggregation is not None:
         score_tensor = score_tensor_aggregated_dataset
-    elif languages_aggregation  is not None:
+    elif languages_aggregation is not None:
         score_tensor = score_tensor_aggregated_language
-
-
 
     score_tensor_aggregated_model = {}
     if models_aggregation == "minus":
-        if len(score_tensor)!=2:
+        if len(score_tensor) != 2:
             raise ValueError("the number of systems should two")
         sys1_name, sys2_name = list(score_tensor.keys())
         score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"] = {}
@@ -89,15 +102,23 @@ def aggregate_score_tensor(score_tensor:dict, models_aggregation:Optional[str] =
             sys1_languages = score_tensor[sys1_name][common_dataset]
             sys2_languages = score_tensor[sys2_name][common_dataset]
             common_languages = list(set(sys1_languages) & set(sys2_languages))
-            score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"][common_dataset] = {}
+            score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"][
+                common_dataset
+            ] = {}
 
             for common_language in common_languages:
-                score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"][common_dataset][common_language] = score_tensor[sys1_name][common_dataset][common_language]
-                aggregated_score = score_tensor[sys1_name][common_dataset][common_language]["value"] - score_tensor[sys2_name][common_dataset][common_language]["value"]
-                score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"][common_dataset][common_language]["value"] = aggregated_score
-
-
-
+                score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"][
+                    common_dataset
+                ][common_language] = score_tensor[sys1_name][common_dataset][
+                    common_language
+                ]
+                aggregated_score = (
+                    score_tensor[sys1_name][common_dataset][common_language]["value"]
+                    - score_tensor[sys2_name][common_dataset][common_language]["value"]
+                )
+                score_tensor_aggregated_model[f"{sys1_name} V.S {sys2_name}"][
+                    common_dataset
+                ][common_language]["value"] = aggregated_score
 
     if models_aggregation is not None:
         return score_tensor_aggregated_model
@@ -109,10 +130,12 @@ def aggregate_score_tensor(score_tensor:dict, models_aggregation:Optional[str] =
         return score_tensor
 
 
-
-
-
-def filter_score_tensor(score_tensor: dict, models:Optional[list], datasets:Optional[list], languages:Optional[list]):
+def filter_score_tensor(
+    score_tensor: dict,
+    models: Optional[list],
+    datasets: Optional[list],
+    languages: Optional[list],
+):
     """
     filter score tensor based on given models, datasets and languages
     """
@@ -127,15 +150,18 @@ def filter_score_tensor(score_tensor: dict, models:Optional[list], datasets:Opti
             if datasets is not None and dataset_name not in datasets:
                 continue
             score_tensor_filter[model_name][dataset_name] = {}
-            for language_name, l_value in score_tensor[model_name][dataset_name].items():
+            for language_name, l_value in score_tensor[model_name][
+                dataset_name
+            ].items():
                 if languages is not None and language_name not in languages:
                     continue
-                score_tensor_filter[model_name][dataset_name][language_name] = score_tensor_copy[model_name][dataset_name][
-                    language_name]
+                score_tensor_filter[model_name][dataset_name][
+                    language_name
+                ] = score_tensor_copy[model_name][dataset_name][language_name]
     return score_tensor_filter
 
 
-def print_score_tensor(score_tensor:dict):
+def print_score_tensor(score_tensor: dict):
     """
     print the score_tensor, for example,
      ----------------------------------------
@@ -157,11 +183,25 @@ def print_score_tensor(score_tensor:dict):
     for model_name, m_value in score_tensor.items():
         for dataset_name, d_value in score_tensor[model_name].items():
             info_printed = f"----------------------------------------\nModel: {model_name}, Dataset: {dataset_name} \n"
-            info_printed += f"Language:\t" + "\t".join(score_tensor[model_name][dataset_name].keys()) + "\n"
-            metric_name = list(score_tensor[model_name][dataset_name].values())[0]["metric_name"]
-            info_printed += f"{metric_name}:\t" + "\t".join(['{:.3f}'.format(score["value"]) for score in score_tensor[model_name][dataset_name].values()]) + "\n"
+            info_printed += (
+                "Language:\t"
+                + "\t".join(score_tensor[model_name][dataset_name].keys())
+                + "\n"
+            )
+            metric_name = list(score_tensor[model_name][dataset_name].values())[0][
+                "metric_name"
+            ]
+            info_printed += (
+                f"{metric_name}:\t"
+                + "\t".join(
+                    [
+                        '{:.3f}'.format(score["value"])
+                        for score in score_tensor[model_name][dataset_name].values()
+                    ]
+                )
+                + "\n"
+            )
             print(info_printed)
-
 
 
 def main():
@@ -173,20 +213,18 @@ def main():
     parser.add_argument(
         '--system_outputs',
         type=str,
-        required=True,
+        required=False,
         nargs="+",
         help="the directories of system outputs. Multiple one should be separated by space, for example: system1 system2",
     )
 
-
-	parser.add_argument(
+    parser.add_argument(
         '--reports',
         type=str,
         required=False,
         nargs="+",
         help="the directories of analysis reports. Multiple one should be separated by space, for example: report1 report2",
     )
-
 
     parser.add_argument(
         '--models',
@@ -233,7 +271,6 @@ def main():
         help="None|average|",
     )
 
-
     parser.add_argument(
         '--type',
         type=str,
@@ -257,7 +294,6 @@ def main():
         default=None,
         help="the name of sub-dataset",
     )
-
 
     parser.add_argument(
         '--language',
@@ -291,15 +327,13 @@ def main():
         help="the file type: json, tsv, conll",
     )
 
-
-	parser.add_argument(
+    parser.add_argument(
         '--conf_value',
         type=float,
         required=False,
         default=0.05,
         help="the p-value with which to calculate the confidence interval",
     )
-
 
     parser.add_argument(
         '--output_dir',
@@ -309,8 +343,6 @@ def main():
         help="the directory of output files",
     )
 
-
-
     args = parser.parse_args()
 
     dataset = args.dataset
@@ -319,11 +351,12 @@ def main():
     task = args.task
     reload_stat = False if args.reload_stat == "0" else True
     system_outputs = args.system_outputs
-    #num_outputs = len(system_outputs)
-    metric_names = args.metrics
-    file_type = args.file_type
+
+    # num_outputs = len(system_outputs)
 
     reports = args.reports
+    metric_names = args.metrics
+    file_type = args.file_type
     output_dir = args.output_dir
     models = args.models
     datasets = args.datasets
@@ -332,8 +365,8 @@ def main():
     datasets_aggregation = args.datasets_aggregation
     languages_aggregation = args.languages_aggregation
 
-
-
+    #  explainaboard --system_outputs ./data/system_outputs/multilingual/json/CL-mlpp15out1sum/marc/*
+    #  explainaboard --reports ./output/reports/*
 
     # If reports have been specified, ExplainaBoard cli will performan analysis over report files.
     if reports is not None:
@@ -357,29 +390,30 @@ def main():
                     score_tensor[model_name] = {}
                 if dataset_name not in score_tensor[model_name].keys():
                     score_tensor[model_name][dataset_name] = {}
-                if language not in  score_tensor[model_name][dataset_name].keys():
+                if language not in score_tensor[model_name][dataset_name].keys():
                     score_tensor[model_name][dataset_name][language] = {}
                 score_tensor[model_name][dataset_name][language] = score_info
 
-
         # print(json.dumps(score_tensor))
 
-
-        score_tensor_filter = filter_score_tensor(score_tensor, models, datasets, languages)
+        score_tensor_filter = filter_score_tensor(
+            score_tensor, models, datasets, languages
+        )
         # print_score_tensor(score_tensor_filter)
 
-
-        score_tensor_aggregated = aggregate_score_tensor(score_tensor_filter, models_aggregation, datasets_aggregation, languages_aggregation)
+        score_tensor_aggregated = aggregate_score_tensor(
+            score_tensor_filter,
+            models_aggregation,
+            datasets_aggregation,
+            languages_aggregation,
+        )
         print_score_tensor(score_tensor_aggregated)
 
         return True
 
-
     # Setup for generated reports and figures
     output_dir_figures = output_dir + "/" + "figures"
     output_dir_reports = output_dir + "/" + "reports"
-
-
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -388,9 +422,6 @@ def main():
     if not os.path.exists(output_dir_reports):
         os.makedirs(output_dir_reports)
 
-
-
-
     # check for benchmark submission: explainaboard  --system_outputs ./data/system_outputs/sst2/user_specified_metadata.json
     if task is None:
         file_type = "json"
@@ -398,11 +429,14 @@ def main():
         # TaskType.text_classification is set for temporal use, and this need to be generalized
         for x in system_outputs:
             loader = get_loader(task, data=x, file_type=file_type)
-            if loader.user_defined_metadata_configs is None or len(loader.user_defined_metadata_configs) == 0:
-                raise ValueError(f"user_defined_metadata_configs in system output {x} has n't been specified or task name should be specified")
+            if (
+                loader.user_defined_metadata_configs is None
+                or len(loader.user_defined_metadata_configs) == 0
+            ):
+                raise ValueError(
+                    f"user_defined_metadata_configs in system output {x} has n't been specified or task name should be specified"
+                )
             task = loader.user_defined_metadata_configs['task_name']
-
-
 
     # Checks on other inputs
     # if num_outputs > 2:
@@ -419,14 +453,15 @@ def main():
             f'File type {file_type} was not recognized. ExplainaBoard currently supports: {FileType.list()}'
         )
 
-
-
     # Read in data and check validity
-    loads = []
     if file_type is not None:
-        loaders = [get_loader(task, data=x, file_type = file_type) for x in system_outputs]
+        loaders = [
+            get_loader(task, data=x, file_type=file_type) for x in system_outputs
+        ]
     else:
-        loaders = [get_loader(task, data=x) for x in system_outputs] # use the default loaders that has been pre-defiend for each task
+        loaders = [
+            get_loader(task, data=x) for x in system_outputs
+        ]  # use the default loaders that has been pre-defiend for each task
     system_datasets = [list(loader.load()) for loader in loaders]
 
     # validation
@@ -454,18 +489,21 @@ def main():
         "reload_stat": reload_stat,
         "conf_value": args.conf_value,
     }
-    metadata.update(loaders[0].user_defined_metadata_configs)
 
     if metric_names is not None:
         metadata["metric_names"] = metric_names
 
     # Run analysis
     reports = []
-    for loader, system_dataset, system_full_path in zip(loaders, system_datasets, system_outputs):
+    for loader, system_dataset, system_full_path in zip(
+        loaders, system_datasets, system_outputs
+    ):
 
         metadata.update(loader.user_defined_metadata_configs)
 
-        report = get_processor(task).process(metadata=metadata, sys_output=system_dataset)
+        report = get_processor(task).process(
+            metadata=metadata, sys_output=system_dataset
+        )
         reports.append(report)
 
         # save report to `output_dir_reports`
@@ -475,12 +513,15 @@ def main():
         # generate figures and save them into  `output_dir_figures`
         if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
             os.makedirs(f"{output_dir_figures}/{x_file_name}")
-        draw_bar_chart_from_report(f"{output_dir_reports}/{x_file_name}.json", f"{output_dir_figures}/{x_file_name}")
+        draw_bar_chart_from_report(
+            f"{output_dir_reports}/{x_file_name}.json",
+            f"{output_dir_figures}/{x_file_name}",
+        )
 
-    
     if len(system_outputs) == 1:  # individual system analysis
-        reports[0].print_as_json()
-    else:  # pairwise analysis
+        # reports[0].print_as_json()
+        print("hello")
+    elif len(system_outputs) == 2:  # pairwise analysis
         compare_analysis = get_pairwise_performance_gap(
             reports[0].to_dict(), reports[1].to_dict()
         )

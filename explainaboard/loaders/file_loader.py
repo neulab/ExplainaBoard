@@ -75,7 +75,9 @@ class FileLoader:
         if field.parser:
             return field.parser(data)
         if field.strip_before_parsing:
-            data = data.strip() if isinstance(data, str) else data # some time data could be a nested json object
+            data = (
+                data.strip() if isinstance(data, str) else data
+            )  # some time data could be a nested json object
         dtype = field.dtype
         if dtype == int:
             return int(data)
@@ -84,7 +86,7 @@ class FileLoader:
         elif dtype == str:
             return str(data)
         elif dtype == dict:
-            return data # TODO(Pengfei): I add the `dict` type for temporal use, but wonder if we need to generalize the current type mechanism,
+            return data  # TODO(Pengfei): I add the `dict` type for temporal use, but wonder if we need to generalize the current type mechanism,
         elif dtype is None:
             return data
         raise NotImplementedError(f"dtype {dtype} is not supported")
@@ -113,7 +115,9 @@ class FileLoader:
             "load_raw() is not implemented for the base FileLoader"
         )
 
-    def load(self, data: str, source: Source, user_defined_features_configs:dict) -> Iterable[dict]:
+    def load(
+        self, data: str, source: Source, user_defined_features_configs: dict
+    ) -> Iterable[dict]:
         """Load data from source, parse data points with fields information and return an
         iterable of data points.
         """
@@ -174,7 +178,9 @@ class CoNLLFileLoader(FileLoader):
             return content
         raise NotImplementedError
 
-    def load(self, data: str, source: Source, user_defined_features_configs:dict) -> Iterable[dict]:
+    def load(
+        self, data: str, source: Source, user_defined_features_configs: dict
+    ) -> Iterable[dict]:
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
         guid = 0
@@ -228,11 +234,11 @@ class JSONFileLoader(FileLoader):
                 return json.loads(data)
         raise NotImplementedError
 
-
-    def load(self, data: str, source: Source, user_defined_features_configs:dict) -> Iterable[dict]:
+    def load(
+        self, data: str, source: Source, user_defined_features_configs: dict
+    ) -> Iterable[dict]:
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
-
 
         for idx, data_point in enumerate(raw_data):
             parsed_data_point = {}
@@ -245,7 +251,10 @@ class JSONFileLoader(FileLoader):
             # add idx as the sample id
             self.generate_id(parsed_data_point, idx)
 
-            if user_defined_features_configs is not None and len(user_defined_features_configs) !=0:
+            if (
+                user_defined_features_configs is not None
+                and len(user_defined_features_configs) != 0
+            ):
                 # additional user-defined features
                 parsed_data_point.update(
                     {

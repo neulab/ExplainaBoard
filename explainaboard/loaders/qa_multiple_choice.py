@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 from explainaboard.constants import FileType
-from explainaboard.loaders.file_loader import JSONFileLoader,FileLoaderField
+from explainaboard.loaders.file_loader import JSONFileLoader, FileLoaderField
 from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_loader(TaskType.qa_multiple_choice)
 class QAMultipleChoiceLoader(Loader):
-
 
     _default_file_type = FileType.json
     _target_field_names = ["context", "question", "answers", "predicted_answers"]
