@@ -440,7 +440,7 @@ class EaaSMetricStats(MetricStats):
         """
         Return a view of these stats filtered down to the indicated indices
         """
-        sdata: np.ndarray = unwrap(self._data)
+        sdata: np.ndarray = self.get_data()
         if not isinstance(indices, np.ndarray):
             indices = np.array(indices)
         return MetricStats(sdata[indices])
