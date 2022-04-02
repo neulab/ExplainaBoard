@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import re
 import string
 import sys
@@ -8,14 +9,16 @@ import unicodedata
 from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
 
 
+@abc.abstractmethod
 class Preprocessor:
+    @abc.abstractmethod
     def __call__(self, text: str) -> str:
         """
         preprocess text
         :param text: text to be preprocessed
         :return: preprocessed text
         """
-        raise NotImplementedError
+        ...
 
 
 class MLQAPreprocessor(Preprocessor):
