@@ -32,10 +32,9 @@ jobs:
         with:
           python-version: 3.9
       - name: format
-        uses: psf/black@stable
+        uses: pre-commit/action@v2.0.3
         with:
-          options: "--check --verbose"
-          version: "22.1.0"
+          extra_args: black --all-files
   isort:
     runs-on: ubuntu-latest
     steps:

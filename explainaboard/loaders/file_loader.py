@@ -14,16 +14,19 @@ from explainaboard.constants import Source
 class FileLoaderField:
     """
     Args:
-        src_name: field name in the source file. use int for tsv column indices and use str for dict keys
+        src_name: field name in the source file. use int for tsv column indices and use
+            str for dict keys
         target_name: field name expected in the loaded data
-        dtype: data type of the field in the loaded data. It is only intended for simple type conversion so
-        it only supports int, float and str. Pass in None to turn off type conversion.
-        strip_before_parsing: call strip() on strings before casting to either str, int or float. It is
-            only intended to be used with these three data types. It defaults to True for str. For all other
-            types, it defaults to False
-        parser: a custom parser for the field. When called, `data_points[idx][src_name]` is passed in as input,
-            it is expected to return the parsed result. If parser is not None, `strip_before_parsing` and dtype
-            will not have any effect
+        dtype: data type of the field in the loaded data. It is only intended for simple
+            type conversion so it only supports int, float and str. Pass in None to turn
+            off type conversion.
+        strip_before_parsing: call strip() on strings before casting to either str, int
+            or float. It is only intended to be used with these three data types.
+            It defaults to True for str. For all other types, it defaults to False
+        parser: a custom parser for the field. When called, `data_points[idx][src_name]`
+            is passed in as input, it is expected to return the parsed result.
+            If parser is not None, `strip_before_parsing` and dtype will not have any
+            effect.
     """
 
     src_name: Union[int, str]
@@ -98,7 +101,8 @@ class FileLoader:
         elif self._id_field_name:
             if self._id_field_name not in parsed_data_point:
                 raise ValueError(
-                    f"The {sample_idx} data point in system outputs file does not have field {self._id_field_name}"
+                    f"The {sample_idx} data point in system outputs file does not have "
+                    f"field {self._id_field_name}"
                 )
             parsed_data_point["id"] = str(parsed_data_point[self._id_field_name])
 
@@ -108,8 +112,9 @@ class FileLoader:
         fields information to parse the data points.
 
         Args:
-            data (str): base64 encoded system output content or a path for the system output file
-                source: source of data
+            data (str): base64 encoded system output content or a path for the system
+                output file
+            source: source of data
         """
         raise NotImplementedError(
             "load_raw() is not implemented for the base FileLoader"
