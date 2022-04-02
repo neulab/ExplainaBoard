@@ -8,9 +8,9 @@ from datalabs import aggregating
 from explainaboard import feature
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.preprocessor import MLQAPreprocessor
 from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.preprocessor import MLQAPreprocessor
 
 
 @register_processor(TaskType.question_answering_extractive)
