@@ -4,50 +4,14 @@ import abc
 from collections import Counter
 from dataclasses import dataclass
 import itertools
-import re
-import string
 import sys
-import unicodedata
 from typing import Any, Optional, Union
 
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
+from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import unwrap
-
-# TODO(Pengfei): the following code is extracted from mlqa evaluation script,
-#  what would be a good place to put them
-PUNCT = {
-    chr(i)
-    for i in range(sys.maxunicode)
-    if unicodedata.category(chr(i)).startswith('P')
-}.union(string.punctuation)
-WHITESPACE_LANGS = ['en', 'es', 'hi', 'vi', 'de', 'ar']
-MIXED_SEGMENTATION_LANGS = ['zh']
-
-
-def whitespace_tokenize(text: str) -> list[str]:
-    return text.split()
-
-
-def mixed_segmentation(text: str) -> list[str]:
-    segs_out = []
-    temp_str = ""
-    for char in text:
-        if re.search(r'[\u4e00-\u9fa5]', char) or char in PUNCT:
-            if temp_str != "":
-                ss = whitespace_tokenize(temp_str)
-                segs_out.extend(ss)
-                temp_str = ""
-            segs_out.append(char)
-        else:
-            temp_str += char
-
-    if temp_str != "":
-        ss = whitespace_tokenize(temp_str)
-        segs_out.extend(ss)
-
-    return segs_out
 
 
 @dataclass
@@ -125,13 +89,16 @@ class Metric:
         """Returns the default name of the metric."""
         ...
 
-    def __init__(self, name: str = None, language: str = 'en'):
+    def __init__(
+        self, name: str = None, language: str = 'en', preprocessor: Preprocessor = None
+    ):
         """
         Initialize the metric
         :param name: the name of the metric for reference later
         """
         self.name = name if name else self.default_name()
         self.language = language
+        self.preprocessor = preprocessor
 
     @abc.abstractmethod
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
@@ -251,7 +218,13 @@ class F1Score(Metric):
     def default_name(cls) -> str:
         return 'F1'
 
-    def __init__(self, average: str = 'micro', separate_match: bool = False):
+    def __init__(
+        self,
+        language="en",
+        preprocessor=None,
+        average: str = 'micro',
+        separate_match: bool = False,
+    ):
         """Constructor for f-measure
         :param average: What variety of average to measure
         :param separate_match: Whether to count matches separately for true and pred.
@@ -264,7 +237,11 @@ class F1Score(Metric):
         supported_averages = {'micro', 'macro'}
         if average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
-        super().__init__(name=self.default_name() + average)
+        super().__init__(
+            name=self.default_name() + average,
+            language=language,
+            preprocessor=preprocessor,
+        )
 
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """
@@ -452,53 +429,6 @@ class QAMetric(Metric):
     function.
     """
 
-    def normalize_answer(self, s: str) -> str:
-        """Lower text and remove punctuation, articles and extra whitespace."""
- 
-        def remove_articles(text, lang):
-            if lang == 'en':
-                return re.sub(r'\b(a|an|the)\b', ' ', text)
-            elif lang == 'es':
-                return re.sub(r'\b(un|una|unos|unas|el|la|los|las)\b', ' ', text)
-            elif lang == 'hi':
-                return text  # Hindi does not have formal articles
-            elif lang == 'vi':
-                return re.sub(r'\b(của|là|cái|chiếc|những)\b', ' ', text)
-            elif lang == 'de':
-                return re.sub(
-                    r'\b(ein|eine|einen|einem|eines|einer|der|die|das|den|dem|'
-                    r'des)\b',
-                    ' ',
-                    text,
-                )
-            elif lang == 'ar':
-                # TODO(Pengfei): W605 invalid escape sequence '\s'
-                return re.sub('\sال^|ال', ' ', text)  # noqa
-            elif lang == 'zh':
-                return text  # Chinese does not have formal articles
-            else:  # TODO(Pengfei): is this too strong?
-                raise Exception('Unknown Language {}'.format(lang))
-
-        def white_space_fix(text, lang):
-            if lang in WHITESPACE_LANGS:
-                tokens = whitespace_tokenize(text)
-            elif lang in MIXED_SEGMENTATION_LANGS:
-                tokens = mixed_segmentation(text)
-            else:
-                raise Exception('Unknown Language {}'.format(lang))
-            return ' '.join([t for t in tokens if t.strip() != ''])
-
-        def remove_punc(text):
-            return ''.join(ch for ch in text if ch not in PUNCT)
-
-        def lower(text):
-            return text.lower()
-
-        return white_space_fix(
-            remove_articles(remove_punc(lower(s)), self.language), self.language
-        )
- 
-
     def calc_stats_from_data(
         self, true_data: list[Union[str, list[str]]], pred_data: list[str]
     ) -> MetricStats:
@@ -532,7 +462,8 @@ class ExactMatchQA(QAMetric):
     def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
         return (
             1.0
-            if self.normalize_answer(prediction) == self.normalize_answer(ground_truth)
+            if self.preprocessor(prediction, self.language)
+            == self.preprocessor(ground_truth, self.language)
             else 0.0
         )
 
@@ -547,8 +478,8 @@ class F1ScoreQA(QAMetric):
         return 'F1ScoreQA'
 
     def sample_level_metric(self, ground_truth: str, prediction: str):
-        prediction_tokens = self.normalize_answer(prediction).split()
-        ground_truth_tokens = self.normalize_answer(ground_truth).split()
+        prediction_tokens = self.preprocessor(prediction, self.language).split()
+        ground_truth_tokens = self.preprocessor(ground_truth, self.language).split()
         common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
         num_same = sum(common.values())
         if num_same == 0:
