@@ -55,6 +55,25 @@ class TestMetric(unittest.TestCase):
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.5 / 6.0)
 
+    def test_ner_f1(self):
+
+        true = [
+            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'O', 'O'],
+            ['B-PER', 'I-PER', 'O'],
+        ]
+        pred = [
+            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
+            ['B-PER', 'I-PER', 'O'],
+        ]
+
+        metric = explainaboard.metric.BIOF1Score(average='micro')
+        result = metric.evaluate(true, pred, conf_value=0.05)
+        self.assertAlmostEqual(result.value, 2.0 / 3.0)
+
+        metric = explainaboard.metric.BIOF1Score(average='macro')
+        result = metric.evaluate(true, pred, conf_value=0.05)
+        self.assertAlmostEqual(result.value, 3.0 / 4.0)
+
     def _get_eaas_request(
         self,
         sys_output: list[dict],
@@ -92,8 +111,7 @@ class TestMetric(unittest.TestCase):
         sys_output = list(loader.load())
 
         # Initialize client and decide which metrics to test
-        eaas_client = AsyncEaaSClient()
-        eaas_client.load_config(Config())
+        eaas_client = AsyncEaaSClient(Config())
         metric_names = ['rouge1', 'bleu', 'chrf']
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
