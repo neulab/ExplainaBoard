@@ -454,7 +454,7 @@ class QAMetric(Metric):
 
     def normalize_answer(self, s: str) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
-
+ 
         def remove_articles(text, lang):
             if lang == 'en':
                 return re.sub(r'\b(a|an|the)\b', ' ', text)
@@ -497,8 +497,12 @@ class QAMetric(Metric):
         return white_space_fix(
             remove_articles(remove_punc(lower(s)), self.language), self.language
         )
+ 
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list[Union[str, list[str]]], pred_data: list[str]
+    ) -> MetricStats:
+        true_data = [[x] if isinstance(x, str) else x for x in true_data]
         return MetricStats(
             np.array(
                 [
