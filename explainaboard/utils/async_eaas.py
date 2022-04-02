@@ -5,7 +5,7 @@ from threading import Thread
 from typing import Any
 import uuid
 
-from eaas import Client
+from eaas import Client, Config
 
 
 class AsyncEaaSRequest:
@@ -31,8 +31,8 @@ class AsyncEaaSClient(Client):
          this method can be called only once for each request_id
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, config: Config):
+        super().__init__(config)
         self._threads: dict[str, Thread] = {}
         self._results: dict[str, Any] = {}
 
@@ -56,7 +56,7 @@ class AsyncEaaSClient(Client):
     ):
         return self._run_thread(
             lambda: super(AsyncEaaSClient, self).score(
-                inputs, task, metrics, lang, cal_attributes
+                inputs, metrics, task, lang, cal_attributes
             )
         )
 
