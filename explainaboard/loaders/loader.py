@@ -20,8 +20,8 @@ class Loader:
         data: base64 encoded system output content or a path for the system output file
         source: source of data
         file type: tsv, json, conll, etc.
-        file_loaders: a dict of file loaders. To customize the loading process, either implement
-            a custome FileLoader or override `load()`
+        file_loaders: a dict of file loaders. To customize the loading process, either
+            implement a custome FileLoader or override `load()`
     """
 
     _default_source = Source.local_filesystem
@@ -48,7 +48,8 @@ class Loader:
 
         if self._file_type not in self.file_loaders:
             raise NotImplementedError(
-                f"A file loader for {self._file_type} is not provided. please add it to the file_loaders."
+                f"A file loader for {self._file_type} is not provided. "
+                "please add it to the file_loaders."
             )
 
         self._user_defined_features_configs: dict = (
@@ -63,7 +64,8 @@ class Loader:
     def user_defined_features_configs(self) -> dict:
         if self._user_defined_features_configs is None:
             raise Exception(
-                "User defined features configs are not available (data has not been loaded))"
+                "User defined features configs are not available "
+                "(data has not been loaded))"
             )
         return self._user_defined_features_configs
 

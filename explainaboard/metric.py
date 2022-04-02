@@ -4,14 +4,14 @@ import abc
 from collections import Counter
 from dataclasses import dataclass
 import itertools
-import re
-import string
 import sys
 from typing import Any, Optional, Union
 
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
+from explainaboard.utils.preprocessor import Preprocessor
+from explainaboard.utils.span_utils import get_spans_from_bio
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -49,7 +49,9 @@ class MetricStats:
 
     def __init__(self, data: Optional[np.ndarray]):
         """
-        :param data: A numpy array of dimensions [x,y], where x in the length of the dataset, and y is the size of the sufficient statistics necessary to calculate the metric.
+        :param data: A numpy array of dimensions [x,y], where x in the length of the
+            dataset, and y is the size of the sufficient statistics necessary to
+            calculate the metric.
         """
         self._data = data
 
@@ -88,21 +90,27 @@ class Metric:
         """Returns the default name of the metric."""
         ...
 
-    def __init__(self, name: str = None):
+    def __init__(
+        self, name: str = None, language: str = 'en', preprocessor: Preprocessor = None
+    ):
         """
         Initialize the metric
         :param name: the name of the metric for reference later
         """
         self.name = name if name else self.default_name()
+        self.language = language
+        self.preprocessor = preprocessor
 
     @abc.abstractmethod
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
-        """From a list of true data and predicted data, calculate the sufficient statistics for each data example so
-        that the evaluation metric can be calculated later. In the simplest form, this is just the evaluation metric
-        value for each example.
+        """From a list of true data and predicted data, calculate the sufficient
+        statistics for each data example so that the evaluation metric can be calculated
+        later. In the simplest form, this is just the evaluation metric value for each
+        example.
         :param true_data: gold-standard data
         :param pred_data: predicted data
-        :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest case of decomposable eval metrics
+        :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest
+            case of decomposable eval metrics
         """
         ...
 
@@ -156,8 +164,8 @@ class Metric:
     ) -> MetricResult:
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
-        :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
-        intervals
+        :param conf_value: if set to not None, must be a number between 0 and 1,
+            indicating the p-value of confidence intervals
         :return: a resulting metric value
         """
         agg_stats = self.aggregate_stats(stats)
@@ -173,8 +181,8 @@ class Metric:
         """Return an evaluation result over true data and predicted data.
         :param true_data: gold-standard data
         :param pred_data: predicted data
-        :param conf_value: if set to not None, must be a number between 0 and 1, indicating the p-value of confidence
-        intervals
+        :param conf_value: if set to not None, must be a number between 0 and 1,
+            indicating the p-value of confidence intervals
         :return: a resulting metric value
         """
         stats = self.calc_stats_from_data(true_data, pred_data)
@@ -187,7 +195,8 @@ class Metric:
 
 class Accuracy(Metric):
     """
-    Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground truth
+    Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground
+    truth
     """
 
     @classmethod
@@ -202,39 +211,59 @@ class Accuracy(Metric):
 
 class F1Score(Metric):
     """
-    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's implementation.
+    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's
+    implementation.
     """
 
     @classmethod
     def default_name(cls) -> str:
         return 'F1'
 
-    def __init__(self, average: str = 'micro', separate_match: bool = False):
+    def __init__(
+        self,
+        language="en",
+        preprocessor=None,
+        average: str = 'micro',
+        separate_match: bool = False,
+        ignore_classes: Optional[list] = None,
+    ):
         """Constructor for f-measure
         :param average: What variety of average to measure
-        :param separate_match: Whether to count matches separately for true and pred. This is useful in, for example bucketing, when ref and pred are not aligned
+        :param separate_match: Whether to count matches separately for true and pred.
+            This is useful in, for example bucketing, when ref and pred are not aligned
+        :param ignore_classes: Classes to ignore
         """
         self.average: str = average
         self.separate_match: bool = separate_match
         self._stat_mult: int = 4 if separate_match else 3
         self._pred_match_offfset: int = 3 if separate_match else 2
+        self.ignore_classes: Optional[list] = ignore_classes
         supported_averages = {'micro', 'macro'}
         if average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
-        super().__init__(name=self.default_name() + average)
+        super().__init__(
+            name=self.default_name() + average,
+            language=language,
+            preprocessor=preprocessor,
+        )
 
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """
         Return sufficient statistics necessary to compute f-score.
         :param true_data: True outputs
         :param pred_data: Predicted outputs
-        :return: Returns stats for each class (integer id c) in the following columns of MetricStats
-          * c*self._stat_mult + 0: occurrences in the true output
-          * c*self._stat_mult + 1: occurrences in the predicted output
-          * c*self._stat_mult + 2: number of matches with the true output
-          * c*self._stat_mult + 3: number of matches with the predicted output (when self.separate_match=True only)
+        :return: Returns stats for each class (integer id c) in the following columns of
+            MetricStats
+            * c*self._stat_mult + 0: occurrences in the true output
+            * c*self._stat_mult + 1: occurrences in the predicted output
+            * c*self._stat_mult + 2: number of matches with the true output
+            * c*self._stat_mult + 3: number of matches with the predicted output
+                (when self.separate_match=True only)
         """
         id_map: dict[str, int] = {}
+        if self.ignore_classes is not None:
+            for ignore_class in self.ignore_classes:
+                id_map[ignore_class] = -1
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
                 id_map[word] = len(id_map)
@@ -244,12 +273,14 @@ class F1Score(Metric):
         stats = np.zeros((n_data, n_classes * self._stat_mult))
         for i, (t, p) in enumerate(zip(true_data, pred_data)):
             tid, pid = id_map[t], id_map[p]
-            stats[i, tid * self._stat_mult + 0] += 1
-            stats[i, pid * self._stat_mult + 1] += 1
-            if tid == pid:
-                stats[i, tid * self._stat_mult + 2] += 1
-                if self.separate_match:
-                    stats[i, tid * self._stat_mult + 3] += 1
+            if tid != -1:
+                stats[i, tid * self._stat_mult + 0] += 1
+            if pid != -1:
+                stats[i, pid * self._stat_mult + 1] += 1
+                if tid == pid:
+                    stats[i, tid * self._stat_mult + 2] += 1
+                    if self.separate_match:
+                        stats[i, tid * self._stat_mult + 3] += 1
         return MetricStats(stats)
 
     def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
@@ -286,9 +317,62 @@ class F1Score(Metric):
         return meta
 
 
+class BIOF1Score(F1Score):
+    """
+    Calculate F1 score over BIO-tagged spans.
+    """
+
+    def __init__(self, average: str = 'micro'):
+        """Constructor for BIO f-measure
+        :param average: What variety of average to measure
+        """
+        super().__init__(average=average)
+
+    def calc_stats_from_data(
+        self, true_data: list[list[str]], pred_data: list[list[str]]
+    ) -> MetricStats:
+        """
+        Return sufficient statistics necessary to compute f-score.
+        :param true_data: True outputs
+        :param pred_data: Predicted outputs
+        :return: Returns stats for each class (integer id c) in the following columns of
+            MetricStats
+            * c*self._stat_mult + 0: occurrences in the true output
+            * c*self._stat_mult + 1: occurrences in the predicted output
+            * c*self._stat_mult + 2: number of matches with the true output
+        """
+
+        # Identify the tag types
+        true_chain, pred_chain = (
+            itertools.chain.from_iterable(x) for x in (true_data, pred_data)
+        )
+        all_tags = set(itertools.chain(true_chain, pred_chain))
+        tag_ids = {
+            k: v for v, k in enumerate([x[2:] for x in all_tags if x.startswith('B-')])
+        }
+
+        # Create the sufficient statistics
+        n_data, n_classes = len(true_data), len(tag_ids)
+        # This is a bit memory inefficient if there's a large number of classes
+        stats = np.zeros((n_data, n_classes * self._stat_mult))
+
+        for i, (true_sent, pred_sent) in enumerate(zip(true_data, pred_data)):
+            true_spans, pred_spans = (
+                get_spans_from_bio(x) for x in (true_sent, pred_sent)
+            )
+            match_spans = [x for x in true_spans if x in pred_spans]
+            for offset, spans in enumerate((true_spans, pred_spans, match_spans)):
+                for chunk in spans:
+                    c = tag_ids[chunk[0]]
+                    stats[i, c * 3 + offset] += 1
+
+        return MetricStats(stats)
+
+
 class Hits(Metric):
     """
-    Calculates the hits metric, telling whether the predicted output is in a set of true outputs.
+    Calculates the hits metric, telling whether the predicted output is in a set of true
+    outputs.
     """
 
     @classmethod
@@ -303,7 +387,8 @@ class Hits(Metric):
 
 class MeanReciprocalRank(Metric):
     """
-    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is the rank of the true output in the predicted n-best list.
+    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is
+    the rank of the true output in the predicted n-best list.
     """
 
     @classmethod
@@ -325,7 +410,9 @@ class MeanReciprocalRank(Metric):
 
 class EaaSMetricStats(MetricStats):
     """
-    Stats from EaaS for calculation of any of the metrics. These are calculated lazily, so that a request is dispatched to the EaaS server and the results are retrieved when they're needed.
+    Stats from EaaS for calculation of any of the metrics. These are calculated lazily,
+    so that a request is dispatched to the EaaS server and the results are retrieved
+    when they're needed.
     """
 
     def __init__(self, name: str, eaas_request: AsyncEaaSRequest):
@@ -362,7 +449,7 @@ class EaaSMetricStats(MetricStats):
         """
         Return a view of these stats filtered down to the indicated indices
         """
-        sdata: np.ndarray = unwrap(self._data)
+        sdata: np.ndarray = self.get_data()
         if not isinstance(indices, np.ndarray):
             indices = np.array(indices)
         return MetricStats(sdata[indices])
@@ -383,7 +470,10 @@ class EaaSMetric(Metric):
         non_decomposable_metrics = ['bleu', 'chrf']
         if name in non_decomposable_metrics:
             print(
-                f'WARNING: corpus-level {name} is currently calculated as the average of sentence-level {name}, which is not technically correct. This is a known issue that we are working on: https://github.com/neulab/ExplainaBoard/issues/161',
+                f'WARNING: corpus-level {name} is currently calculated as the average '
+                f'of sentence-level {name}, which is not technically correct. '
+                'This is a known issue that we are working on: '
+                'https://github.com/neulab/ExplainaBoard/issues/161',
                 file=sys.stderr,
             )
         # !!! End temporary warning
@@ -395,19 +485,15 @@ class EaaSMetric(Metric):
 
 class QAMetric(Metric):
     """
-    An abstract class for extractive QA tasks that measures scores after normalization. The actual metric must inherit this class and implement the sample_level_metric() function.
+    An abstract class for extractive QA tasks that measures scores after normalization.
+    The actual metric must inherit this class and implement the sample_level_metric()
+    function.
     """
 
-    def normalize_answer(self, s: str) -> str:
-        """Lower text and remove punctuation, articles and extra whitespace."""
-        s = re.sub(r'\b(a|an|the)\b', ' ', s)
-        s = ' '.join(s.split())
-        exclude_punc = set(string.punctuation)
-        s = ''.join(ch for ch in s if ch not in exclude_punc)
-        s = s.lower()
-        return s
-
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list[Union[str, list[str]]], pred_data: list[str]
+    ) -> MetricStats:
+        true_data = [[x] if isinstance(x, str) else x for x in true_data]
         return MetricStats(
             np.array(
                 [
@@ -437,7 +523,8 @@ class ExactMatchQA(QAMetric):
     def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
         return (
             1.0
-            if self.normalize_answer(prediction) == self.normalize_answer(ground_truth)
+            if self.preprocessor(prediction, self.language)
+            == self.preprocessor(ground_truth, self.language)
             else 0.0
         )
 
@@ -452,8 +539,8 @@ class F1ScoreQA(QAMetric):
         return 'F1ScoreQA'
 
     def sample_level_metric(self, ground_truth: str, prediction: str):
-        prediction_tokens = self.normalize_answer(prediction).split()
-        ground_truth_tokens = self.normalize_answer(ground_truth).split()
+        prediction_tokens = self.preprocessor(prediction, self.language).split()
+        ground_truth_tokens = self.preprocessor(ground_truth, self.language).split()
         common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
         num_same = sum(common.values())
         if num_same == 0:

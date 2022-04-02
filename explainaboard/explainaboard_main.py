@@ -215,7 +215,10 @@ def main():
         type=str,
         required=False,
         nargs="+",
-        help="the directories of system outputs. Multiple one should be separated by space, for example: system1 system2",
+        help=(
+            "the directories of system outputs. Multiple one should be separated by "
+            "space, for example: system1 system2"
+        ),
     )
 
     parser.add_argument(
@@ -365,6 +368,7 @@ def main():
     datasets_aggregation = args.datasets_aggregation
     languages_aggregation = args.languages_aggregation
 
+
     #  explainaboard --system_outputs ./data/system_outputs/multilingual/json/CL-mlpp15out1sum/marc/*
     #  explainaboard --reports ./output/reports/*
 
@@ -445,7 +449,8 @@ def main():
     #     )
     if task not in TaskType.list():
         raise ValueError(
-            f'Task name {task} was not recognized. ExplainaBoard currently supports: {TaskType.list()}'
+            f'Task name {task} was not recognized. ExplainaBoard currently supports: '
+            f'{TaskType.list()}'
         )
 
     if file_type not in FileType.list():
@@ -470,7 +475,8 @@ def main():
             num0 = len(system_datasets[0])
             num1 = len(system_datasets[1])
             raise ValueError(
-                f'Data must be identical for pairwise analysis, but length of files {system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
+                f'Data must be identical for pairwise analysis, but length of files '
+                f'{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
             )
         if (
             loaders[0].user_defined_features_configs
@@ -519,8 +525,7 @@ def main():
         )
 
     if len(system_outputs) == 1:  # individual system analysis
-        # reports[0].print_as_json()
-        print("hello")
+        reports[0].print_as_json()
     elif len(system_outputs) == 2:  # pairwise analysis
         compare_analysis = get_pairwise_performance_gap(
             reports[0].to_dict(), reports[1].to_dict()

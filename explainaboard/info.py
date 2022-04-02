@@ -74,9 +74,10 @@ class SysOutputInfo:
         download_link (str): the url of the system output.
         paper (Paper, optional): the published paper of the system.
         features (Features, optional): the features used to describe system output's
-                                        column type.
+            column type.
         is_print_case (bool): Whether or not to print out cases
-        is_print_confidence_interval (bool): Whether or not to print out confidence intervals
+        is_print_confidence_interval (bool): Whether or not to print out confidence
+            intervals
     """
 
     # set in the system_output scripts
@@ -90,7 +91,7 @@ class SysOutputInfo:
     is_print_confidence_interval: bool = False
     language: str = "en"
     conf_value: float = 0.05
-    # language : str = "English"
+    language: str = "en"
 
     # set later
     # code: str = None
@@ -146,8 +147,8 @@ class SysOutputInfo:
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
         """Create SysOutputInfo from the JSON file in `sys_output_info_dir`.
         Args:
-            sys_output_info_dir (`str`): The directory containing the metadata file. This
-                should be the root directory of a specific dataset version.
+            sys_output_info_dir (`str`): The directory containing the metadata file.
+                This should be the root directory of a specific dataset version.
         """
         logger.info("Loading Dataset info from %s", sys_output_info_dir)
         if not sys_output_info_dir:
@@ -162,11 +163,6 @@ class SysOutputInfo:
         ) as f:
             sys_output_info_dict = json.load(f)
         return cls.from_dict(sys_output_info_dict)
-
-    # @classmethod
-    # def from_dict(cls, task_name: str, sys_output_info_dict: dict) -> "SysOutputInfo":
-    #     field_names = set(f.name for f in dataclasses.fields(cls))
-    #     return cls(task_name, **{k: v for k, v in sys_output_info_dict.items() if k in field_names})
 
     @classmethod
     def from_dict(cls, sys_output_info_dict: dict) -> "SysOutputInfo":

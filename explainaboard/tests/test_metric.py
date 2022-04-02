@@ -8,7 +8,7 @@ from eaas import Config
 import numpy as np
 import sklearn.metrics
 
-from explainaboard import FileType, Source, TaskType
+from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.loader import get_loader
 import explainaboard.metric
 from explainaboard.utils.async_eaas import AsyncEaaSClient
@@ -55,6 +55,25 @@ class TestMetric(unittest.TestCase):
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.5 / 6.0)
 
+    def test_ner_f1(self):
+
+        true = [
+            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'O', 'O'],
+            ['B-PER', 'I-PER', 'O'],
+        ]
+        pred = [
+            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
+            ['B-PER', 'I-PER', 'O'],
+        ]
+
+        metric = explainaboard.metric.BIOF1Score(average='micro')
+        result = metric.evaluate(true, pred, conf_value=0.05)
+        self.assertAlmostEqual(result.value, 2.0 / 3.0)
+
+        metric = explainaboard.metric.BIOF1Score(average='macro')
+        result = metric.evaluate(true, pred, conf_value=0.05)
+        self.assertAlmostEqual(result.value, 3.0 / 4.0)
+
     def _get_eaas_request(
         self,
         sys_output: list[dict],
@@ -92,10 +111,10 @@ class TestMetric(unittest.TestCase):
         sys_output = list(loader.load())
 
         # Initialize client and decide which metrics to test
-        eaas_client = AsyncEaaSClient()
-        eaas_client.load_config(Config())
+        eaas_client = AsyncEaaSClient(Config())
         metric_names = ['rouge1', 'bleu', 'chrf']
-        # Uncomment the following line to test all metrics, but beware that it will be very slow
+        # Uncomment the following line to test all metrics,
+        # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics
         metrics = [explainaboard.metric.EaaSMetric(name=name) for name in metric_names]
 
@@ -127,8 +146,47 @@ class TestMetric(unittest.TestCase):
                     half_result['corpus_level'][f'corpus_{name}'],
                     metric.evaluate_from_stats(half_stats).value,
                 )
-                # Stats calculated over half corpus should be the same as the stats split away from the full corpus
+                # Stats calculated over half corpus should be the same as the stats
+                # split away from the full corpus
                 self.assertAlmostEqual(
                     metric.evaluate_from_stats(half_stats).value,
                     metric.evaluate_from_stats(split_stats).value,
                 )
+
+    def test_qa_metrics(self):
+
+        path_data = artifacts_path + "test-xquad-en.json"
+        loader = get_loader(
+            TaskType.question_answering_extractive,
+            path_data,
+            Source.local_filesystem,
+            FileType.json,
+        )
+        data = loader.load()
+
+        metadata = {
+            "task_name": TaskType.question_answering_extractive.value,
+            "dataset_name": "squad",
+            "metric_names": ["F1ScoreQA", "ExactMatchQA"],
+        }
+
+        processor = get_processor(TaskType.question_answering_extractive)
+
+        sys_info = processor.process(metadata, data)
+
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
+        self.assertAlmostEqual(
+            sys_info.results.overall["ExactMatchQA"].value,
+            0.6974789915966386,
+            2,
+            "almost equal",
+        )
+        # should be 0.8235975260931867
+        self.assertAlmostEqual(
+            sys_info.results.overall["F1ScoreQA"].value,
+            0.8235975260931867,
+            2,
+            "almost equal",
+        )
