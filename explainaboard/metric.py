@@ -418,14 +418,17 @@ class QAMetric(Metric):
 
     def normalize_answer(self, s: str) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
-        s = re.sub(r'\b(a|an|the)\b', ' ', s)
-        s = ' '.join(s.split())
+        s = s.lower()
         exclude_punc = set(string.punctuation)
         s = ''.join(ch for ch in s if ch not in exclude_punc)
-        s = s.lower()
+        s = re.sub(r'\b(a|an|the)\b', ' ', s)
+        s = ' '.join(s.split())
         return s
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list[Union[str, list[str]]], pred_data: list[str]
+    ) -> MetricStats:
+        true_data = [[x] if isinstance(x, str) else x for x in true_data]
         return MetricStats(
             np.array(
                 [
