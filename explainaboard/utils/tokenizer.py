@@ -1,9 +1,10 @@
 from __future__ import annotations
-import re
-import sys
-import string
-import unicodedata
+
 from functools import lru_cache
+import re
+import string
+import sys
+import unicodedata
 
 
 class Tokenizer:

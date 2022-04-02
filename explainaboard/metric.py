@@ -225,8 +225,6 @@ class F1Score(Metric):
         preprocessor=None,
         average: str = 'micro',
         separate_match: bool = False,
-        average: str = 'micro',
-        separate_match: bool = False,
         ignore_classes: Optional[list] = None,
     ):
         """Constructor for f-measure
