@@ -10,13 +10,13 @@ from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
-from explainaboard.metric import MetricStats
+import explainaboard.metric
+from explainaboard.metric import Metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils import bucketing, eval_basic_ner
+from explainaboard.utils import bucketing, span_utils
 from explainaboard.utils.analysis import cap_feature
-from explainaboard.utils.eval_bucket import f1_seqeval_bucket
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.typing_utils import unwrap
 
@@ -206,7 +206,13 @@ class NERProcessor(Processor):
 
     @classmethod
     def default_metrics(cls) -> list[str]:
-        return ["f1_seqeval", "recall_seqeval", "precision_seqeval"]
+        return ["F1Score"]
+
+    def _get_true_label(self, data_point: dict):
+        return data_point["true_tags"]
+
+    def _get_predicted_label(self, data_point: dict):
+        return data_point["pred_tags"]
 
     def _get_statistics_resources(
         self, dataset_split: Dataset
@@ -312,13 +318,11 @@ class NERProcessor(Processor):
     # --- End feature functions
 
     # These return none because NER is not yet in the main metric interface
-    def _get_metrics(self, sys_info: SysOutputInfo):
-        return None
-
-    def _gen_metric_stats(
-        self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> Optional[list[MetricStats]]:
-        return None
+    def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
+        return [
+            getattr(explainaboard.metric, f'BIO{name}')()
+            for name in unwrap(sys_info.metric_names)
+        ]
 
     def _complete_span_features(self, sentence, tags, statistics=None):
 
@@ -328,7 +332,7 @@ class NERProcessor(Processor):
         efre_dic = statistics["efre_dic"] if has_stats else None
 
         span_dics = []
-        chunks = eval_basic_ner.get_chunks(tags)
+        chunks = span_utils.get_spans_from_bio(tags)
         for tag, sid, eid in chunks:
             span_text = ' '.join(sentence[sid:eid])
             # Basic features
@@ -389,35 +393,8 @@ class NERProcessor(Processor):
             dict_sysout["pred_entity_info"] = self._complete_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
-        return None
-
-    def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        metric_stats: Any = None,
-    ) -> dict[str, Performance]:
-        """
-        Get the overall performance according to metrics
-        :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :return: a dictionary of metrics to overall performance numbers
-        """
-
-        true_tags_list = [x['true_tags'] for x in sys_output]
-        pred_tags_list = [x['pred_tags'] for x in sys_output]
-
-        overall: dict[str, Performance] = {}
-        for metric_name in unwrap(sys_info.metric_names):
-            if not metric_name.endswith('_seqeval'):
-                raise NotImplementedError(f'Unsupported metric {metric_name}')
-            # This gets the appropriate metric from the eval_basic_ner package
-            score_func = getattr(eval_basic_ner, metric_name)
-            overall[metric_name] = Performance(
-                metric_name=metric_name,
-                value=score_func(true_tags_list, pred_tags_list),
-            )
-        return overall
+        # This is not used elsewhere, so just keep it as-is
+        return list()
 
     def _get_span_ids(
         self,
@@ -554,24 +531,24 @@ class NERProcessor(Processor):
             samples_over_bucket_true[bucket_interval], 'true', sample_dict
         )
 
-        error_case_list = []
+        case_list = []
         for pos, tags in sample_dict.items():
             true_label = tags.get('true', 'O')
             pred_label = tags.get('pred', 'O')
-            if true_label != pred_label:
-                split_pos = pos.split("|||")
-                sent_id = int(split_pos[0])
-                span = split_pos[-1]
-                system_output_id = sys_output[int(sent_id)]["id"]
-                error_case = {
-                    "span": span,
-                    "text": str(system_output_id),
-                    "true_label": true_label,
-                    "predicted_label": pred_label,
-                }
-                error_case_list.append(error_case)
 
-        return error_case_list
+            split_pos = pos.split("|||")
+            sent_id = int(split_pos[0])
+            span = split_pos[-1]
+            system_output_id = sys_output[int(sent_id)]["id"]
+            error_case = {
+                "span": span,
+                "text": str(system_output_id),
+                "true_label": true_label,
+                "predicted_label": pred_label,
+            }
+            case_list.append(error_case)
+
+        return case_list
 
     def get_bucket_performance_ner(
         self,
@@ -593,6 +570,12 @@ class NERProcessor(Processor):
             bucket performance
         """
 
+        metric_names = unwrap(sys_info.metric_names)
+        bucket_metrics = [
+            getattr(explainaboard.metric, name)(ignore_classes=['O'])
+            for name in metric_names
+        ]
+
         bucket_name_to_performance = {}
         for bucket_interval, spans_true in samples_over_bucket_true.items():
 
@@ -611,29 +594,29 @@ class NERProcessor(Processor):
                 samples_over_bucket_pred,
             )
 
+            true_labels = [x['true_label'] for x in bucket_samples]
+            pred_labels = [x['predicted_label'] for x in bucket_samples]
+
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
                 n_samples=len(spans_pred),
                 bucket_samples=bucket_samples,
             )
-            for metric_name in unwrap(sys_info.metric_names):
-                """
-                # Note that: for NER task, the bucket-wise evaluation function is a
-                # little different from overall evaluation function
-                # for overall: f1_seqeval
-                # for bucket:  f1_seqeval_bucket
-                """
-                f1, p, r = f1_seqeval_bucket(spans_pred, spans_true)
-                if metric_name == 'f1_seqeval':
-                    my_score = f1
-                elif metric_name == 'precision_seqeval':
-                    my_score = p
-                elif metric_name == 'recall_seqeval':
-                    my_score = r
-                else:
-                    raise NotImplementedError(f'Unsupported metric {metric_name}')
-                # TODO(gneubig): It'd be better to have significance tests here
-                performance = Performance(metric_name=metric_name, value=my_score)
+            for metric in bucket_metrics:
+
+                metric_val = metric.evaluate(
+                    true_labels, pred_labels, conf_value=sys_info.conf_value
+                )
+                conf_low, conf_high = (
+                    metric_val.conf_interval if metric_val.conf_interval else None,
+                    None,
+                )
+                performance = Performance(
+                    metric_name=metric.name,
+                    value=metric_val.value,
+                    confidence_score_low=conf_low,
+                    confidence_score_high=conf_high,
+                )
                 bucket_performance.performances.append(performance)
 
             bucket_name_to_performance[bucket_interval] = bucket_performance
@@ -647,7 +630,7 @@ def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
     Note: when matching, the text span and tag have been lowercased.
     """
     econ_dic = dict()
-    chunks_train = set(eval_basic_ner.get_chunks(tag_sequences_train))
+    chunks_train = set(span_utils.get_spans_from_bio(tag_sequences_train))
 
     # print('tags: ', tags)
     count_idx = 0
@@ -722,7 +705,7 @@ def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
 # Global functions for training set dependent features
 def get_efre_dic(train_word_sequences, tag_sequences_train):
     efre_dic = dict()
-    chunks_train = set(eval_basic_ner.get_chunks(tag_sequences_train))
+    chunks_train = set(span_utils.get_spans_from_bio(tag_sequences_train))
     count_idx = 0
     word_sequences_train_str = ' '.join(train_word_sequences).lower()
     for true_chunk in tqdm(chunks_train):
