@@ -167,10 +167,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
     def _get_eaas_client(self):
         if not self._eaas_client:
             self._eaas_config = Config()
-            self._eaas_client = AsyncEaaSClient()
-            self._eaas_client.load_config(
-                self._eaas_config
-            )  # The config you have created above
+            self._eaas_client = AsyncEaaSClient(self._eaas_config)
         return self._eaas_client
 
     def _get_true_label(self, data_point: dict):

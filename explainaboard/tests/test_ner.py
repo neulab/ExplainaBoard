@@ -24,7 +24,7 @@ class TestNER(unittest.TestCase):
             "task_name": TaskType.named_entity_recognition.value,
             # "dataset_name": "conll2003",
             # "sub_dataset_name":"ner",
-            "metric_names": ["f1_seqeval"],
+            "metric_names": ["F1Score"],
         }
 
         processor = get_processor(TaskType.named_entity_recognition)
