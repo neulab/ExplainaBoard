@@ -12,6 +12,7 @@ from typing import Any, Optional, Union
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
+from explainaboard.utils.span_utils import get_spans_from_bio
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -215,16 +216,23 @@ class F1Score(Metric):
     def default_name(cls) -> str:
         return 'F1'
 
-    def __init__(self, average: str = 'micro', separate_match: bool = False):
+    def __init__(
+        self,
+        average: str = 'micro',
+        separate_match: bool = False,
+        ignore_classes: Optional[list] = None,
+    ):
         """Constructor for f-measure
         :param average: What variety of average to measure
         :param separate_match: Whether to count matches separately for true and pred.
             This is useful in, for example bucketing, when ref and pred are not aligned
+        :param ignore_classes: Classes to ignore
         """
         self.average: str = average
         self.separate_match: bool = separate_match
         self._stat_mult: int = 4 if separate_match else 3
         self._pred_match_offfset: int = 3 if separate_match else 2
+        self.ignore_classes: Optional[list] = ignore_classes
         supported_averages = {'micro', 'macro'}
         if average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
@@ -244,6 +252,9 @@ class F1Score(Metric):
                 (when self.separate_match=True only)
         """
         id_map: dict[str, int] = {}
+        if self.ignore_classes is not None:
+            for ignore_class in self.ignore_classes:
+                id_map[ignore_class] = -1
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
                 id_map[word] = len(id_map)
@@ -253,12 +264,14 @@ class F1Score(Metric):
         stats = np.zeros((n_data, n_classes * self._stat_mult))
         for i, (t, p) in enumerate(zip(true_data, pred_data)):
             tid, pid = id_map[t], id_map[p]
-            stats[i, tid * self._stat_mult + 0] += 1
-            stats[i, pid * self._stat_mult + 1] += 1
-            if tid == pid:
-                stats[i, tid * self._stat_mult + 2] += 1
-                if self.separate_match:
-                    stats[i, tid * self._stat_mult + 3] += 1
+            if tid != -1:
+                stats[i, tid * self._stat_mult + 0] += 1
+            if pid != -1:
+                stats[i, pid * self._stat_mult + 1] += 1
+                if tid == pid:
+                    stats[i, tid * self._stat_mult + 2] += 1
+                    if self.separate_match:
+                        stats[i, tid * self._stat_mult + 3] += 1
         return MetricStats(stats)
 
     def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
@@ -293,6 +306,58 @@ class F1Score(Metric):
         meta = dict(super().get_metadata())
         meta['average'] = self.average
         return meta
+
+
+class BIOF1Score(F1Score):
+    """
+    Calculate F1 score over BIO-tagged spans.
+    """
+
+    def __init__(self, average: str = 'micro'):
+        """Constructor for BIO f-measure
+        :param average: What variety of average to measure
+        """
+        super().__init__(average=average)
+
+    def calc_stats_from_data(
+        self, true_data: list[list[str]], pred_data: list[list[str]]
+    ) -> MetricStats:
+        """
+        Return sufficient statistics necessary to compute f-score.
+        :param true_data: True outputs
+        :param pred_data: Predicted outputs
+        :return: Returns stats for each class (integer id c) in the following columns of
+            MetricStats
+            * c*self._stat_mult + 0: occurrences in the true output
+            * c*self._stat_mult + 1: occurrences in the predicted output
+            * c*self._stat_mult + 2: number of matches with the true output
+        """
+
+        # Identify the tag types
+        true_chain, pred_chain = (
+            itertools.chain.from_iterable(x) for x in (true_data, pred_data)
+        )
+        all_tags = set(itertools.chain(true_chain, pred_chain))
+        tag_ids = {
+            k: v for v, k in enumerate([x[2:] for x in all_tags if x.startswith('B-')])
+        }
+
+        # Create the sufficient statistics
+        n_data, n_classes = len(true_data), len(tag_ids)
+        # This is a bit memory inefficient if there's a large number of classes
+        stats = np.zeros((n_data, n_classes * self._stat_mult))
+
+        for i, (true_sent, pred_sent) in enumerate(zip(true_data, pred_data)):
+            true_spans, pred_spans = (
+                get_spans_from_bio(x) for x in (true_sent, pred_sent)
+            )
+            match_spans = [x for x in true_spans if x in pred_spans]
+            for offset, spans in enumerate((true_spans, pred_spans, match_spans)):
+                for chunk in spans:
+                    c = tag_ids[chunk[0]]
+                    stats[i, c * 3 + offset] += 1
+
+        return MetricStats(stats)
 
 
 class Hits(Metric):
