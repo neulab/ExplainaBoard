@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 from functools import lru_cache
 import re
 import string
@@ -8,21 +9,23 @@ import unicodedata
 
 
 class Tokenizer:
+    @abc.abstractmethod
     def __call__(self, text: str) -> list[str]:
         """
         Tokenize a string into a list of tokens
         :param text: The string to tokenize
         :returns: The list of tokens
         """
-        raise NotImplementedError
+        ...
 
+    @abc.abstractmethod
     def detokenize(self, tokens: list[str]) -> str:
         """
         Detokenize a list of tokens into a string
         :param tokens: A list of tokens
         :returns: The detokenized string
         """
-        raise NotImplementedError
+        ...
 
 
 class SingleSpaceTokenizer(Tokenizer):

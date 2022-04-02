@@ -35,9 +35,19 @@ class TestExtractiveQA(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
         # should be 0.6974789915966386
-        self.assertGreater(sys_info.results.overall["ExactMatchQA"].value, 0.69)
+        self.assertAlmostEqual(
+            sys_info.results.overall["ExactMatchQA"].value,
+            0.6974789915966386,
+            2,
+            "almost equal",
+        )
         # should be 0.8235975260931867
-        self.assertGreater(sys_info.results.overall["F1ScoreQA"].value, 0.82)
+        self.assertAlmostEqual(
+            sys_info.results.overall["F1ScoreQA"].value,
+            0.8235975260931867,
+            2,
+            "almost equal",
+        )
 
     def test_extractive_qa_zh(self):
         """TODO: should add harder tests"""
@@ -66,9 +76,19 @@ class TestExtractiveQA(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
         # 0.6285714285714286
-        self.assertGreater(sys_info.results.overall["ExactMatchQA"].value, 0.62)
+        self.assertAlmostEqual(
+            sys_info.results.overall["ExactMatchQA"].value,
+            0.6285714285714286,
+            2,
+            "almost equal",
+        )
         # 0.7559651817716333
-        self.assertGreater(sys_info.results.overall["F1ScoreQA"].value, 0.75)
+        self.assertAlmostEqual(
+            sys_info.results.overall["F1ScoreQA"].value,
+            0.7559651817716333,
+            2,
+            "almost equal",
+        )
 
 
 if __name__ == '__main__':

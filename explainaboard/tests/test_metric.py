@@ -177,7 +177,16 @@ class TestMetric(unittest.TestCase):
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
-        # should be 0.6974789915966386
-        self.assertGreater(sys_info.results.overall["ExactMatchQA"].value, 0.69)
+        self.assertAlmostEqual(
+            sys_info.results.overall["ExactMatchQA"].value,
+            0.6974789915966386,
+            2,
+            "almost equal",
+        )
         # should be 0.8235975260931867
-        self.assertGreater(sys_info.results.overall["F1ScoreQA"].value, 0.82)
+        self.assertAlmostEqual(
+            sys_info.results.overall["F1ScoreQA"].value,
+            0.8235975260931867,
+            2,
+            "almost equal",
+        )
