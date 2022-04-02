@@ -111,8 +111,7 @@ class TestMetric(unittest.TestCase):
         sys_output = list(loader.load())
 
         # Initialize client and decide which metrics to test
-        eaas_client = AsyncEaaSClient()
-        eaas_client.load_config(Config())
+        eaas_client = AsyncEaaSClient(Config())
         metric_names = ['rouge1', 'bleu', 'chrf']
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
