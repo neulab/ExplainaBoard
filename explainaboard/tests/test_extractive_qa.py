@@ -8,7 +8,7 @@ artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 
 
 class TestExtractiveQA(unittest.TestCase):
-    def test_generate_system_analysis(self):
+    def test_extractive_qa_en(self):
         """TODO: should add harder tests"""
 
         path_data = artifacts_path + "test-xquad-en.json"
@@ -38,6 +38,37 @@ class TestExtractiveQA(unittest.TestCase):
         self.assertGreater(sys_info.results.overall["ExactMatchQA"].value, 0.69)
         # should be 0.8235975260931867
         self.assertGreater(sys_info.results.overall["F1ScoreQA"].value, 0.82)
+
+    def test_extractive_qa_zh(self):
+        """TODO: should add harder tests"""
+
+        path_data = artifacts_path + "test-xquad-zh.json"
+        loader = get_loader(
+            TaskType.question_answering_extractive,
+            path_data,
+            Source.local_filesystem,
+            FileType.json,
+        )
+        data = loader.load()
+
+        metadata = {
+            "task_name": TaskType.question_answering_extractive.value,
+            "dataset_name": "squad",
+            "metric_names": ["F1ScoreQA", "ExactMatchQA"],
+            "language": "zh",
+        }
+
+        processor = get_processor(TaskType.question_answering_extractive)
+
+        sys_info = processor.process(metadata, data)
+
+        # analysis.write_to_directory("./")
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
+        # 0.6285714285714286
+        self.assertGreater(sys_info.results.overall["ExactMatchQA"].value, 0.62)
+        # 0.7559651817716333
+        self.assertGreater(sys_info.results.overall["F1ScoreQA"].value, 0.75)
 
 
 if __name__ == '__main__':
