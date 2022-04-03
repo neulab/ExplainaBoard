@@ -1,7 +1,7 @@
-from matplotlib import pyplot as plt
+import logging
 from typing import Dict, List, Optional
 
-import logging
+from matplotlib import pyplot as plt
 
 logging.basicConfig(level='INFO')
 

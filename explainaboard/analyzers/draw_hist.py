@@ -1,8 +1,10 @@
-import json
-from explainaboard.analyzers.bar_chart import plot
-import os
-from tqdm import tqdm
 import argparse
+import json
+import os
+
+from tqdm import tqdm
+
+from explainaboard.analyzers.bar_chart import plot
 
 
 def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
@@ -29,7 +31,8 @@ def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
     ):  # feature name, for example, sentence length
         for m in range(
             len(metrics)
-        ):  # each bucket_info consists of multiple sub_buckets caculated by different metrics (e.g, Accuracy, F1Score)
+        ):  # each bucket_info consists of multiple sub_buckets caculated by
+            # different metrics (e.g, Accuracy, F1Score)
             bar_chart = []
 
             for (
@@ -90,7 +93,8 @@ def main():
         type=str,
         required=True,
         nargs="+",
-        help="the directories of reports. Multiple one should be separated by space, for example: report1 report2",
+        help="the directories of reports. Multiple one should be separated by space, "
+        "for example: report1 report2",
     )
 
     parser.add_argument(
@@ -111,5 +115,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # explainaboard --system_outputs ./data/system_outputs/multilingual/json/CL-mlpp15out1sum/marc/test-de_9330.json > log.res
+    # explainaboard --system_outputs ./data/system_outputs/multilingual/json/
+    # CL-mlpp15out1sum/marc/test-de_9330.json
     # python draw_hist.py --reports ../log.res

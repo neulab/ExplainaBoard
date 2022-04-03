@@ -88,7 +88,6 @@ class SysOutputInfo:
     metric_names: Optional[list[str]] = None
     reload_stat: bool = True
     is_print_case: bool = True
-    is_print_confidence_interval: bool = False
     language: str = "en"
     conf_value: float = 0.05
     language: str = "en"
