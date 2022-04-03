@@ -73,7 +73,8 @@ class Loader:
     def user_defined_metadata_configs(self) -> dict:
         if self._user_defined_metadata_configs is None:
             raise Exception(
-                "User defined metadata configs are not available (data has not been loaded))"
+                "User defined metadata configs are not available "
+                "(data has not been loaded))"
             )
         return self._user_defined_metadata_configs
 

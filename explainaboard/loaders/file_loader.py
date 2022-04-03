@@ -89,7 +89,8 @@ class FileLoader:
         elif dtype == str:
             return str(data)
         elif dtype == dict:
-            return data  # TODO(Pengfei): I add the `dict` type for temporal use, but wonder if we need to generalize the current type mechanism,
+            return data  # TODO(Pengfei): I add the `dict` type for temporal use,
+            # but wonder if we need to generalize the current type mechanism,
         elif dtype is None:
             return data
         raise NotImplementedError(f"dtype {dtype} is not supported")
@@ -128,6 +129,7 @@ class FileLoader:
         """
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
+
         for idx, data_point in enumerate(raw_data):
             parsed_data_point = {}
 
