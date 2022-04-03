@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, List, Optional
+from typing import Optional
 
 from matplotlib import pyplot as plt
 
@@ -9,7 +9,7 @@ mlogger = logging.getLogger('matplotlib')
 mlogger.setLevel(logging.WARNING)
 
 
-def mp_format(data: List[Dict]) -> Dict:
+def mp_format(data: list[dict]) -> dict:
     """
     Adapt the format of data
     :param data:
@@ -61,7 +61,7 @@ def mp_format(data: List[Dict]) -> Dict:
     return data_mp
 
 
-def get_ylim(y_list: List) -> List:
+def get_ylim(y_list: list) -> list:
     """
     get the upper/lower bound for y axis
     :param y_list:
@@ -74,7 +74,7 @@ def get_ylim(y_list: List) -> List:
 
 
 def plot(
-    data: Dict, save_path: Optional[str] = None, x_label: str = "x", y_label: str = "y"
+    data: dict, save_path: Optional[str] = None, x_label: str = "x", y_label: str = "y"
 ) -> None:
     """
     Generate bar chart based on given data and x,y labels
