@@ -70,3 +70,6 @@ class MLQAMixTokenizer(Tokenizer):
             segs_out.extend(ss)
 
         return segs_out
+
+    def detokenize(self, tokens: list[str]) -> str:
+        raise NotImplementedError

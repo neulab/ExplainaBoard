@@ -136,11 +136,9 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 )
         return statistics
 
-    def _get_metrics(self, sys_info: SysOutputInfo) -> Optional[list[Metric]]:
+    def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
         return [
-            getattr(explainaboard.metric, name)(
-                language=sys_info.language, preprocessor=self._preprocessor
-            )  # some metrics are language-dependent
+            getattr(explainaboard.metric, name)()
             for name in unwrap(sys_info.metric_names)
         ]
 
