@@ -31,7 +31,7 @@ class FileLoaderField:
 
     src_name: Union[int, str]
     target_name: str
-    dtype: Union[type[int], type[float], type[str], None] = None
+    dtype: Union[type[int], type[float], type[str], type[dict]] = None
     strip_before_parsing: Optional[bool] = None
     parser: Optional[Callable] = None
 
@@ -48,8 +48,8 @@ class FileLoaderField:
             raise ValueError(
                 "strip_before_parsing only works with int, float and str types"
             )
-        if self.dtype not in (str, int, float, None):
-            raise ValueError("dtype must be one of str, int, float and None")
+        if self.dtype not in (str, int, float, dict, None):
+            raise ValueError("dtype must be one of str, int, float, dict and None")
 
 
 class FileLoader:
@@ -78,7 +78,9 @@ class FileLoader:
         if field.parser:
             return field.parser(data)
         if field.strip_before_parsing:
-            data = data.strip()
+            data = (
+                data.strip() if isinstance(data, str) else data
+            )  # some time data could be a nested json object
         dtype = field.dtype
         if dtype == int:
             return int(data)
@@ -86,6 +88,9 @@ class FileLoader:
             return float(data)
         elif dtype == str:
             return str(data)
+        elif dtype == dict:
+            return data  # TODO(Pengfei): I add the `dict` type for temporal use,
+            # but wonder if we need to generalize the current type mechanism,
         elif dtype is None:
             return data
         raise NotImplementedError(f"dtype {dtype} is not supported")
@@ -116,12 +121,15 @@ class FileLoader:
             "load_raw() is not implemented for the base FileLoader"
         )
 
-    def load(self, data: str, source: Source) -> Iterable[dict]:
-        """Load data from source, parse data points with fields information and return
-        an iterable of data points.
+    def load(
+        self, data: str, source: Source, user_defined_features_configs: dict
+    ) -> Iterable[dict]:
+        """Load data from source, parse data points with fields information and return an
+        iterable of data points.
         """
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
+
         for idx, data_point in enumerate(raw_data):
             parsed_data_point = {}
 
@@ -177,7 +185,9 @@ class CoNLLFileLoader(FileLoader):
             return content
         raise NotImplementedError
 
-    def load(self, data: str, source: Source) -> Iterable[dict]:
+    def load(
+        self, data: str, source: Source, user_defined_features_configs: dict
+    ) -> Iterable[dict]:
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
         guid = 0
@@ -230,6 +240,38 @@ class JSONFileLoader(FileLoader):
                 data = json_file.read()
                 return json.loads(data)
         raise NotImplementedError
+
+    def load(
+        self, data: str, source: Source, user_defined_features_configs: dict
+    ) -> Iterable[dict]:
+        raw_data = self.load_raw(data, source)
+        parsed_data_points: list[dict] = []
+
+        for idx, data_point in enumerate(raw_data):
+            parsed_data_point = {}
+
+            for field in self._fields:  # parse data point according to fields
+                parsed_data_point[field.target_name] = self.parse_data(
+                    data_point[field.src_name], field
+                )
+
+            # add idx as the sample id
+            self.generate_id(parsed_data_point, idx)
+
+            if (
+                user_defined_features_configs is not None
+                and len(user_defined_features_configs) != 0
+            ):
+                # additional user-defined features
+                parsed_data_point.update(
+                    {
+                        feature_name: data_point[feature_name]
+                        for feature_name in user_defined_features_configs
+                    }
+                )
+            parsed_data_points.append(parsed_data_point)
+
+        return parsed_data_points
 
 
 class DatalabFileLoader(FileLoader):
