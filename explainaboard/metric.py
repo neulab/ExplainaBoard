@@ -575,12 +575,10 @@ class ExactMatchQA(QAMetric):
     def default_name(cls) -> str:
         return 'ExactMatchQA'
 
-
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ) -> float:
         return 1.0 if preprocessor(prediction) == preprocessor(ground_truth) else 0.0
-
 
 
 class F1ScoreQA(QAMetric):
@@ -591,7 +589,6 @@ class F1ScoreQA(QAMetric):
     @classmethod
     def default_name(cls) -> str:
         return 'F1ScoreQA'
-
 
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
