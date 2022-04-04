@@ -11,6 +11,13 @@ from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
 
 @abc.abstractmethod
 class Preprocessor:
+    def __init__(self, language: str = "en"):
+        self.language = language
+
+    def set_language(self, language: str):
+        self.language = language
+        return self
+
     @abc.abstractmethod
     def __call__(self, text: str) -> str:
         """
@@ -83,5 +90,5 @@ class MLQAPreprocessor(Preprocessor):
             remove_articles(remove_punc(lower(s)), language), language
         )
 
-    def __call__(self, text: str, language: str) -> str:
-        return self.normalize_answer(text, language)
+    def __call__(self, text: str) -> str:
+        return self.normalize_answer(text, self.language)
