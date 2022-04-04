@@ -4,14 +4,13 @@ import abc
 from collections import Counter
 from dataclasses import dataclass
 import itertools
-import re
-import string
 import sys
 from typing import Any, Optional, Union
 
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
+from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.span_utils import get_spans_from_bio
 from explainaboard.utils.typing_utils import unwrap
 
@@ -91,12 +90,16 @@ class Metric:
         """Returns the default name of the metric."""
         ...
 
-    def __init__(self, name: str = None):
+    def __init__(
+        self, name: str = None, language: str = 'en', preprocessor: Preprocessor = None
+    ):
         """
         Initialize the metric
         :param name: the name of the metric for reference later
         """
         self.name = name if name else self.default_name()
+        self.language = language
+        self.preprocessor = preprocessor
 
     @abc.abstractmethod
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
@@ -218,6 +221,8 @@ class F1Score(Metric):
 
     def __init__(
         self,
+        language="en",
+        preprocessor=None,
         average: str = 'micro',
         separate_match: bool = False,
         ignore_classes: Optional[list] = None,
@@ -236,7 +241,11 @@ class F1Score(Metric):
         supported_averages = {'micro', 'macro'}
         if average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
-        super().__init__(name=self.default_name() + average)
+        super().__init__(
+            name=self.default_name() + average,
+            language=language,
+            preprocessor=preprocessor,
+        )
 
     def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """
@@ -481,15 +490,6 @@ class QAMetric(Metric):
     function.
     """
 
-    def normalize_answer(self, s: str) -> str:
-        """Lower text and remove punctuation, articles and extra whitespace."""
-        s = s.lower()
-        exclude_punc = set(string.punctuation)
-        s = ''.join(ch for ch in s if ch not in exclude_punc)
-        s = re.sub(r'\b(a|an|the)\b', ' ', s)
-        s = ' '.join(s.split())
-        return s
-
     def calc_stats_from_data(
         self, true_data: list[Union[str, list[str]]], pred_data: list[str]
     ) -> MetricStats:
@@ -523,7 +523,8 @@ class ExactMatchQA(QAMetric):
     def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
         return (
             1.0
-            if self.normalize_answer(prediction) == self.normalize_answer(ground_truth)
+            if self.preprocessor(prediction, self.language)
+            == self.preprocessor(ground_truth, self.language)
             else 0.0
         )
 
@@ -538,8 +539,8 @@ class F1ScoreQA(QAMetric):
         return 'F1ScoreQA'
 
     def sample_level_metric(self, ground_truth: str, prediction: str):
-        prediction_tokens = self.normalize_answer(prediction).split()
-        ground_truth_tokens = self.normalize_answer(ground_truth).split()
+        prediction_tokens = self.preprocessor(prediction, self.language).split()
+        ground_truth_tokens = self.preprocessor(ground_truth, self.language).split()
         common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
         num_same = sum(common.values())
         if num_same == 0:

@@ -89,7 +89,7 @@ class SysOutputInfo:
     reload_stat: bool = True
     is_print_case: bool = True
     conf_value: float = 0.05
-    # language : str = "English"
+    language: str = "en"
 
     # set later
     # code: str = None
