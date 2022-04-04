@@ -19,7 +19,7 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
-from explainaboard.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
 from explainaboard.utils.async_eaas import AsyncEaaSClient
 import explainaboard.utils.bucketing
@@ -136,10 +136,9 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 )
         return statistics
 
-    def _get_metrics(self, sys_info: SysOutputInfo) -> Optional[list[Metric]]:
-        config = MetricConfig(language=sys_info.language)
+    def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
         return [
-            getattr(explainaboard.metric, name)(config=config)
+            getattr(explainaboard.metric, name)()
             for name in unwrap(sys_info.metric_names)
         ]
 
