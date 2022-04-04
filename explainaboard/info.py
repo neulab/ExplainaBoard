@@ -90,7 +90,6 @@ class SysOutputInfo:
     is_print_case: bool = True
     language: str = "en"
     conf_value: float = 0.05
-    language: str = "en"
 
     # set later
     # code: str = None

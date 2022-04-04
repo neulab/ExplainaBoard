@@ -1,11 +1,11 @@
-# Multilingual Multitask Evaluation
+# Multilingual/Multitask Evaluation
 
-ExplainaBoard currently supports multilingual multitask evaluation.
+ExplainaBoard currently supports multilingual/multitask evaluation.
 
 
 
 ## Data Preparation
-To achieve multilingual multitask evaluation, the system outputs files must been organized into JSON
+To achieve multilingual/multitask evaluation, the system outputs files must been organized into JSON
 format with following skeleton:
 
 ```JSON
