@@ -21,9 +21,10 @@ class Preprocessor:
         ...
 
 
-class MLQAPreprocessor(Preprocessor):
+class QAPreprocessor(Preprocessor):
     """
-    Preprocess text follow MLQA's paper
+    A preprocessor to process answers in extractive QA tasks.
+    Currently it is based on the MLQA paper.
     """
 
     PUNCT = {
@@ -36,6 +37,9 @@ class MLQAPreprocessor(Preprocessor):
 
     ss_tokenizer = SingleSpaceTokenizer()
     mlqa_tokenizer = MLQAMixTokenizer()
+
+    def __init__(self, language: str):
+        self.language: str = language
 
     def normalize_answer(self, s: str, language: str) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
@@ -83,5 +87,5 @@ class MLQAPreprocessor(Preprocessor):
             remove_articles(remove_punc(lower(s)), language), language
         )
 
-    def __call__(self, text: str, language: str) -> str:
-        return self.normalize_answer(text, language)
+    def __call__(self, text: str) -> str:
+        return self.normalize_answer(text, self.language)
