@@ -94,7 +94,9 @@ class TestMultilingualMultiTask(unittest.TestCase):
                     score_tensor[model_name][dataset_name][language] = {}
                 score_tensor[model_name][dataset_name][language] = score_info
 
-        self.assertEqual(list(score_tensor.keys()), ['CL-mlpp15out1sum', 'CL-mt5base'])
+        self.assertEqual(
+            len(list(score_tensor.keys())), len(['CL-mlpp15out1sum', 'CL-mt5base'])
+        )
         print_score_tensor(score_tensor)
 
         # filter by three dimensions

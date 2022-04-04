@@ -91,7 +91,7 @@ class Metric:
         ...
 
     def __init__(
-        self, name: str = None, language: str = 'en', preprocessor: Preprocessor = None
+        self, name: str = None, language: str = "en", preprocessor: Preprocessor = None
     ):
         """
         Initialize the metric
@@ -523,8 +523,7 @@ class ExactMatchQA(QAMetric):
     def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
         return (
             1.0
-            if self.preprocessor(prediction, self.language)
-            == self.preprocessor(ground_truth, self.language)
+            if self.preprocessor(prediction) == self.preprocessor(ground_truth)
             else 0.0
         )
 
@@ -539,8 +538,8 @@ class F1ScoreQA(QAMetric):
         return 'F1ScoreQA'
 
     def sample_level_metric(self, ground_truth: str, prediction: str):
-        prediction_tokens = self.preprocessor(prediction, self.language).split()
-        ground_truth_tokens = self.preprocessor(ground_truth, self.language).split()
+        prediction_tokens = self.preprocessor(prediction).split()
+        ground_truth_tokens = self.preprocessor(ground_truth).split()
         common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
         num_same = sum(common.values())
         if num_same == 0:
