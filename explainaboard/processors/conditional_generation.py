@@ -444,7 +444,8 @@ class ConditionalGenerationProcessor(Processor):
         """
 
         bucket_name_to_performance: dict[str, BucketPerformance] = {}
-        f1_score = explainaboard.metric.F1Score(separate_match=True)
+        config = explainaboard.metric.F1ScoreConfig(separate_match=True)
+        f1_score = explainaboard.metric.F1Score(config=config)
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
             if bucket_interval not in samples_over_bucket_pred.keys():
