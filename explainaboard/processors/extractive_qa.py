@@ -103,10 +103,6 @@ class QAExtractiveProcessor(Processor):
         }]
         """
 
-        # TODO(gneubig):
-        # BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-        # tokenizer = SingleSpaceTokenizer()
-
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
             samples, lambda x: x['context'], self._tokenizer
         )
