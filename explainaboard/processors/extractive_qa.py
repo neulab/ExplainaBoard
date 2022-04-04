@@ -10,10 +10,15 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.preprocessor import MLQAPreprocessor
 
 
 @register_processor(TaskType.question_answering_extractive)
 class QAExtractiveProcessor(Processor):
+    def __init__(self):
+        super().__init__()
+        self._preprocessor: MLQAPreprocessor = MLQAPreprocessor()
+
     @classmethod
     def task_type(cls) -> TaskType:
         return TaskType.question_answering_extractive
