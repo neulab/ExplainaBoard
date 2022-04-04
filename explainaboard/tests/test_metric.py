@@ -25,7 +25,8 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_f1_micro(self):
-        metric = explainaboard.metric.F1Score(average='micro')
+        config = explainaboard.metric.F1ScoreConfig(average='micro')
+        metric = explainaboard.metric.F1Score(config=config)
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
 
@@ -34,11 +35,12 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_f1_macro(self):
-        metric = explainaboard.metric.F1Score(average='macro')
+        config = explainaboard.metric.F1ScoreConfig(average='macro')
+        metric = explainaboard.metric.F1Score(config=config)
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
         sklearn_f1 = sklearn.metrics.f1_score(true, pred, average='macro')
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_hits(self):
@@ -66,12 +68,14 @@ class TestMetric(unittest.TestCase):
             ['B-PER', 'I-PER', 'O'],
         ]
 
-        metric = explainaboard.metric.BIOF1Score(average='micro')
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        config = explainaboard.metric.F1ScoreConfig(average='micro')
+        metric = explainaboard.metric.BIOF1Score(config=config)
+        result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
-        metric = explainaboard.metric.BIOF1Score(average='macro')
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        config = explainaboard.metric.F1ScoreConfig(average='macro')
+        metric = explainaboard.metric.BIOF1Score(config=config)
+        result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 3.0 / 4.0)
 
     def _get_eaas_request(
@@ -162,7 +166,7 @@ class TestMetric(unittest.TestCase):
             Source.local_filesystem,
             FileType.json,
         )
-        data = loader.load()
+        data = list(loader.load())
 
         metadata = {
             "task_name": TaskType.question_answering_extractive.value,

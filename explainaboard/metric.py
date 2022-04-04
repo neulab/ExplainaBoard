@@ -5,14 +5,16 @@ from collections import Counter
 from dataclasses import dataclass
 import itertools
 import sys
-from typing import Any, Optional, Union
+from typing import Any, cast, Optional, TypeVar, Union
 
 import numpy as np
 
 from explainaboard.utils.async_eaas import AsyncEaaSRequest
-from explainaboard.utils.preprocessor import Preprocessor
+from explainaboard.utils.preprocessor import Preprocessor, QAPreprocessor
 from explainaboard.utils.span_utils import get_spans_from_bio
 from explainaboard.utils.typing_utils import unwrap
+
+T = TypeVar('T')
 
 
 @dataclass
@@ -23,6 +25,8 @@ class MetricResult:
 
     # Name of the metric that was computed
     name: str
+    # Configuration with which it was calculated
+    config: MetricConfig
     # Metric value
     value: float
     # Confidence interval of the metric values
@@ -33,6 +37,7 @@ class MetricResult:
     def to_dict(self):
         ret = {
             'name': self.name,
+            'config': self.config.__dict__,
             'value': self.value,
         }
         if self.conf_interval is not None:
@@ -40,6 +45,17 @@ class MetricResult:
         if self.conf_value is not None:
             ret['conf_value'] = self.conf_value
         return ret
+
+
+@dataclass
+class MetricConfig:
+    """
+    The configuration for the metric. This can be passed in to the metric either in
+    the constructor (e.g. for compute-intensive operations such as model loading),
+    or when performing individual metric computation.
+    """
+
+    language: str = "en"
 
 
 class MetricStats:
@@ -91,24 +107,39 @@ class Metric:
         ...
 
     def __init__(
-        self, name: str = None, language: str = "en", preprocessor: Preprocessor = None
+        self,
+        name: Optional[str] = None,
+        config: Optional[MetricConfig] = None,
     ):
         """
         Initialize the metric
         :param name: the name of the metric for reference later
         """
-        self.name = name if name else self.default_name()
-        self.language = language
-        self.preprocessor = preprocessor
+        self.name: str = unwrap(name) if name is not None else self.default_name()
+        self.config: MetricConfig = (
+            unwrap(config) if config is not None else MetricConfig()
+        )
+
+    def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
+        """
+        Get the configuration or overwritten configuration
+        :param config: Optional configuration to override the default configuration
+        :return: Either the default or overridden configuration
+        """
+        ret_config: MetricConfig = unwrap(config) if config is not None else self.config
+        return ret_config
 
     @abc.abstractmethod
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
         """From a list of true data and predicted data, calculate the sufficient
         statistics for each data example so that the evaluation metric can be calculated
         later. In the simplest form, this is just the evaluation metric value for each
         example.
         :param true_data: gold-standard data
         :param pred_data: predicted data
+        :param config: a configuration to over-ride the default for this object
         :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest
             case of decomposable eval metrics
         """
@@ -122,9 +153,12 @@ class Metric:
         """
         return np.mean(stats.get_data(), axis=0)
 
-    def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
+    def calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
         """From aggregated sufficient statistics, calculate the metric value
         :param agg_stats: aggregated statistics
+        :param config: a configuration to over-ride the default for this object
         :return: a single scalar metric value
         """
         if agg_stats.size == 1:
@@ -138,12 +172,14 @@ class Metric:
         conf_value: float,
         n_samples: int = 2000,
         prop_samples: float = 0.5,
+        config: Optional[MetricConfig] = None,
     ) -> tuple[float, float]:
         """
         :param stats: sufficient statistics as calculated by calc_stats_from_data
         :param conf_value: the p-value of the interval
         :param n_samples: the number of bootstrapping samples
         :param prop_samples: the proportion of samples to sample each time
+        :param config: a configuration to over-ride the default for this object
         """
         if conf_value <= 0.0 or conf_value >= 1.0:
             raise ValueError(f'Bad confidence value {conf_value}')
@@ -153,44 +189,50 @@ class Metric:
         for i in range(n_samples):
             indices = np.random.choice(all_indices, size=n_elems, replace=True)
             agg_stats = self.aggregate_stats(stats.filter(indices))
-            samp_results[i] = self.calc_metric_from_aggregate(agg_stats)
+            samp_results[i] = self.calc_metric_from_aggregate(agg_stats, config)
         samp_results = np.sort(samp_results)
         low = int(n_samples * conf_value / 2.0)
         high = int(n_samples * (1.0 - conf_value / 2.0))
         return samp_results[low], samp_results[high]
 
     def evaluate_from_stats(
-        self, stats: MetricStats, conf_value: Optional[float] = None
+        self,
+        stats: MetricStats,
+        conf_value: Optional[float] = None,
+        config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
         :param conf_value: if set to not None, must be a number between 0 and 1,
             indicating the p-value of confidence intervals
+        :param config: a configuration to over-ride the default for this object
         :return: a resulting metric value
         """
+        config = self._get_config(config)
         agg_stats = self.aggregate_stats(stats)
-        value = self.calc_metric_from_aggregate(agg_stats)
+        value = self.calc_metric_from_aggregate(agg_stats, config)
         conf_interval = (
             self.bootstrap_interval(stats, conf_value) if conf_value else None
         )
-        return MetricResult(self.name, value, conf_interval, conf_value)
+        return MetricResult(self.name, config, value, conf_interval, conf_value)
 
     def evaluate(
-        self, true_data: list, pred_data: list, conf_value: Optional[float] = None
+        self,
+        true_data: list,
+        pred_data: list,
+        conf_value: Optional[float] = None,
+        config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over true data and predicted data.
         :param true_data: gold-standard data
         :param pred_data: predicted data
         :param conf_value: if set to not None, must be a number between 0 and 1,
             indicating the p-value of confidence intervals
+        :param config: a configuration to over-ride the default for this object
         :return: a resulting metric value
         """
-        stats = self.calc_stats_from_data(true_data, pred_data)
-        return self.evaluate_from_stats(stats, conf_value)
-
-    def get_metadata(self) -> dict:
-        """Return metadata describing the metric in a reproducible way"""
-        return {'name': self.name}
+        stats = self.calc_stats_from_data(true_data, pred_data, config)
+        return self.evaluate_from_stats(stats, conf_value, config)
 
 
 class Accuracy(Metric):
@@ -203,10 +245,19 @@ class Accuracy(Metric):
     def default_name(cls) -> str:
         return 'Accuracy'
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
         return MetricStats(
             np.array([(1.0 if x == y else 0.0) for x, y in zip(true_data, pred_data)])
         )
+
+
+@dataclass
+class F1ScoreConfig(MetricConfig):
+    average: str = 'micro'
+    separate_match: bool = False
+    ignore_classes: Optional[list] = None
 
 
 class F1Score(Metric):
@@ -215,54 +266,46 @@ class F1Score(Metric):
     implementation.
     """
 
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        config: Optional[MetricConfig] = None,
+    ):
+        """
+        Initialize the metric
+        :param name: the name of the metric for reference later
+        """
+        self.config: MetricConfig = (
+            unwrap(config) if config is not None else F1ScoreConfig()
+        )
+        super().__init__(name=name, config=self.config)
+
     @classmethod
     def default_name(cls) -> str:
         return 'F1'
 
-    def __init__(
-        self,
-        language="en",
-        preprocessor=None,
-        average: str = 'micro',
-        separate_match: bool = False,
-        ignore_classes: Optional[list] = None,
-    ):
-        """Constructor for f-measure
-        :param average: What variety of average to measure
-        :param separate_match: Whether to count matches separately for true and pred.
-            This is useful in, for example bucketing, when ref and pred are not aligned
-        :param ignore_classes: Classes to ignore
-        """
-        self.average: str = average
-        self.separate_match: bool = separate_match
-        self._stat_mult: int = 4 if separate_match else 3
-        self._pred_match_offfset: int = 3 if separate_match else 2
-        self.ignore_classes: Optional[list] = ignore_classes
-        supported_averages = {'micro', 'macro'}
-        if average not in supported_averages:
-            raise ValueError(f'only {supported_averages} supported for now')
-        super().__init__(
-            name=self.default_name() + average,
-            language=language,
-            preprocessor=preprocessor,
-        )
-
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
         """
         Return sufficient statistics necessary to compute f-score.
         :param true_data: True outputs
         :param pred_data: Predicted outputs
+        :param config: Configuration, if overloading the default for this object
         :return: Returns stats for each class (integer id c) in the following columns of
             MetricStats
-            * c*self._stat_mult + 0: occurrences in the true output
-            * c*self._stat_mult + 1: occurrences in the predicted output
-            * c*self._stat_mult + 2: number of matches with the true output
-            * c*self._stat_mult + 3: number of matches with the predicted output
+            * c*stat_mult + 0: occurrences in the true output
+            * c*stat_mult + 1: occurrences in the predicted output
+            * c*stat_mult + 2: number of matches with the true output
+            * c*stat_mult + 3: number of matches with the predicted output
                 (when self.separate_match=True only)
         """
+        config = cast(F1ScoreConfig, self._get_config(config))
+        stat_mult: int = 4 if config.separate_match else 3
+
         id_map: dict[str, int] = {}
-        if self.ignore_classes is not None:
-            for ignore_class in self.ignore_classes:
+        if config.ignore_classes is not None:
+            for ignore_class in config.ignore_classes:
                 id_map[ignore_class] = -1
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
@@ -270,38 +313,43 @@ class F1Score(Metric):
         n_data = len(true_data)
         n_classes = len(id_map)
         # This is a bit memory inefficient if there's a large number of classes
-        stats = np.zeros((n_data, n_classes * self._stat_mult))
+        stats = np.zeros((n_data, n_classes * stat_mult))
         for i, (t, p) in enumerate(zip(true_data, pred_data)):
             tid, pid = id_map[t], id_map[p]
             if tid != -1:
-                stats[i, tid * self._stat_mult + 0] += 1
+                stats[i, tid * stat_mult + 0] += 1
             if pid != -1:
-                stats[i, pid * self._stat_mult + 1] += 1
+                stats[i, pid * stat_mult + 1] += 1
                 if tid == pid:
-                    stats[i, tid * self._stat_mult + 2] += 1
-                    if self.separate_match:
-                        stats[i, tid * self._stat_mult + 3] += 1
+                    stats[i, tid * stat_mult + 2] += 1
+                    if config.separate_match:
+                        stats[i, tid * stat_mult + 3] += 1
         return MetricStats(stats)
 
-    def calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> float:
-        n_classes = int(len(agg_stats) / self._stat_mult)
-        if self.average == 'micro':
+    def calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        config = cast(F1ScoreConfig, self._get_config(config))
+        supported_averages = {'micro', 'macro'}
+        stat_mult: int = 4 if config.separate_match else 3
+        if config.average not in supported_averages:
+            raise ValueError(f'only {supported_averages} supported for now')
+        n_classes = int(len(agg_stats) / stat_mult)
+        if config.average == 'micro':
             true, pred, true_match, pred_match = 0.0, 0.0, 0.0, 0.0
             for i in range(n_classes):
-                true += agg_stats[i * self._stat_mult + 0]
-                pred += agg_stats[i * self._stat_mult + 1]
-                true_match += agg_stats[i * self._stat_mult + 2]
-                pred_match += agg_stats[i * self._stat_mult + self._pred_match_offfset]
+                true += agg_stats[i * stat_mult + 0]
+                pred += agg_stats[i * stat_mult + 1]
+                true_match += agg_stats[i * stat_mult + 2]
+                pred_match += agg_stats[(i + 1) * stat_mult - 1]
             p = pred_match / pred if pred else 0.0
             r = true_match / true if true else 0.0
             f1_total = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
-        elif self.average == 'macro':
+        elif config.average == 'macro':
             f1_total = 0.0
             for i in range(n_classes):
-                true, pred, true_match = agg_stats[
-                    i * self._stat_mult : i * self._stat_mult + 3
-                ]
-                pred_match = agg_stats[i * self._stat_mult + self._pred_match_offfset]
+                true, pred, true_match = agg_stats[i * stat_mult : i * stat_mult + 3]
+                pred_match = agg_stats[(i + 1) * stat_mult - 1]
                 p = pred_match / pred if pred else 0.0
                 r = true_match / true if true else 0.0
                 f1 = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
@@ -311,36 +359,30 @@ class F1Score(Metric):
             raise NotImplementedError
         return f1_total
 
-    def get_metadata(self) -> dict:
-        meta = dict(super().get_metadata())
-        meta['average'] = self.average
-        return meta
-
 
 class BIOF1Score(F1Score):
     """
     Calculate F1 score over BIO-tagged spans.
     """
 
-    def __init__(self, average: str = 'micro'):
-        """Constructor for BIO f-measure
-        :param average: What variety of average to measure
-        """
-        super().__init__(average=average)
-
     def calc_stats_from_data(
-        self, true_data: list[list[str]], pred_data: list[list[str]]
+        self,
+        true_data: list[list[str]],
+        pred_data: list[list[str]],
+        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         """
         Return sufficient statistics necessary to compute f-score.
         :param true_data: True outputs
         :param pred_data: Predicted outputs
+        :param config: Configuration, if over-riding the default
         :return: Returns stats for each class (integer id c) in the following columns of
             MetricStats
-            * c*self._stat_mult + 0: occurrences in the true output
-            * c*self._stat_mult + 1: occurrences in the predicted output
-            * c*self._stat_mult + 2: number of matches with the true output
+            * c*stat_mult + 0: occurrences in the true output
+            * c*stat_mult + 1: occurrences in the predicted output
+            * c*stat_mult + 2: number of matches with the true output
         """
+        stat_mult = 3
 
         # Identify the tag types
         true_chain, pred_chain = (
@@ -354,7 +396,7 @@ class BIOF1Score(F1Score):
         # Create the sufficient statistics
         n_data, n_classes = len(true_data), len(tag_ids)
         # This is a bit memory inefficient if there's a large number of classes
-        stats = np.zeros((n_data, n_classes * self._stat_mult))
+        stats = np.zeros((n_data, n_classes * stat_mult))
 
         for i, (true_sent, pred_sent) in enumerate(zip(true_data, pred_data)):
             true_spans, pred_spans = (
@@ -379,7 +421,9 @@ class Hits(Metric):
     def default_name(cls) -> str:
         return 'Hits'
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
         return MetricStats(
             np.array([(1.0 if t in p else 0.0) for t, p in zip(true_data, pred_data)])
         )
@@ -402,7 +446,9 @@ class MeanReciprocalRank(Metric):
             true_rank = list(preds).index(true) + 1  # 1-indexed
             return 1.0 / true_rank
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
         return MetricStats(
             np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
@@ -479,7 +525,9 @@ class EaaSMetric(Metric):
         # !!! End temporary warning
         self.name = name
 
-    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
         raise NotImplementedError
 
 
@@ -491,20 +539,27 @@ class QAMetric(Metric):
     """
 
     def calc_stats_from_data(
-        self, true_data: list[Union[str, list[str]]], pred_data: list[str]
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
+        config = self._get_config(config)
+        preprocessor = QAPreprocessor(language=config.language)
         return MetricStats(
             np.array(
                 [
-                    max([self.sample_level_metric(t, p) for t in ts])
+                    max([self.sample_level_metric(t, p, preprocessor) for t in ts])
                     for ts, p in zip(true_data, pred_data)
                 ]
             )
         )
 
     @abc.abstractmethod
-    def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
+    def sample_level_metric(
+        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+    ) -> float:
         """
         Calculate a score given a ground truth answer string and a prediction.
         """
@@ -520,12 +575,12 @@ class ExactMatchQA(QAMetric):
     def default_name(cls) -> str:
         return 'ExactMatchQA'
 
-    def sample_level_metric(self, ground_truth: str, prediction: str) -> float:
-        return (
-            1.0
-            if self.preprocessor(prediction) == self.preprocessor(ground_truth)
-            else 0.0
-        )
+
+    def sample_level_metric(
+        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+    ) -> float:
+        return 1.0 if preprocessor(prediction) == preprocessor(ground_truth) else 0.0
+
 
 
 class F1ScoreQA(QAMetric):
@@ -537,9 +592,12 @@ class F1ScoreQA(QAMetric):
     def default_name(cls) -> str:
         return 'F1ScoreQA'
 
-    def sample_level_metric(self, ground_truth: str, prediction: str):
-        prediction_tokens = self.preprocessor(prediction).split()
-        ground_truth_tokens = self.preprocessor(ground_truth).split()
+
+    def sample_level_metric(
+        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+    ):
+        prediction_tokens = preprocessor(prediction).split()
+        ground_truth_tokens = preprocessor(ground_truth).split()
         common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
         num_same = sum(common.values())
         if num_same == 0:
