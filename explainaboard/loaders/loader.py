@@ -44,10 +44,11 @@ class Loader:
             self._source: Source = source or self._default_source
         if not file_type and not self._default_file_type:
             raise Exception("no file_type is provided for the loader")
-        elif not self._default_file_type:
-            self._file_type = unwrap(file_type)
         elif not file_type:
-            self._file_type = self._default_file_type
+            self._file_type = unwrap(self._default_file_type)
+        else:
+            self._file_type = unwrap(file_type)
+
         self.file_loaders: dict[FileType, FileLoader] = (
             file_loaders or self._default_file_loaders
         )
