@@ -144,7 +144,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
 
     def _gen_metric_stats(
         self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> Optional[list[MetricStats]]:
+    ) -> list[MetricStats]:
         """Generate sufficient statistics for scoring different metrics.
 
         :param sys_info: Information about the system outputs
@@ -233,7 +233,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
-    ) -> Optional[list[str]]:
+    ) -> list[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few
         other optional pieces of information, then calculates feature functions and
@@ -315,7 +315,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        metric_stats=None,
+        metric_stats: list[MetricStats],
     ) -> tuple[dict, dict]:
         """
         Separate samples into buckets and calculate performance over them
@@ -363,7 +363,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         samples_over_bucket: dict[str, list[int]],
-        metric_stats: Optional[list[MetricStats]] = None,
+        metric_stats: list[MetricStats],
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
