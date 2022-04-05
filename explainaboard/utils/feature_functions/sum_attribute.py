@@ -106,8 +106,9 @@ class SUMAttribute:
         return _ngrams
 
     def cal_novelty(self, text, summary, n=2):
-        """Proportion of segments in the summaries that haven’t appeared in source documents.
-        The segments can be instantiated as n-grams.
+        """Returns the novelty score.
+        Novelty is the proportion of segments in the summaries that haven’t appeared in
+        source documents. The segments can be instantiated as n-grams.
         """
         cnt_all = 0
         cnt_nov = 0
@@ -125,7 +126,9 @@ class SUMAttribute:
             return cnt_nov / cnt_all
 
     def cal_repetition(self, summary, n=3):
-        """Measures the rate of repeated segments in summaries. We choose n-gram as segment unit."""
+        """Measures the rate of repeated segments in summaries.
+        We choose n-gram as segment unit.
+        """
         cnt_all = 0
         cnt_rep = 0
         _ngrams = self.get_ngrams(summary, n=n)
@@ -175,13 +178,3 @@ class SUMAttribute:
             else:
                 a_start += 1
         return matches
-
-
-# if __name__ == "__main__":
-#     sum_class = SUMAttribute()
-#     summary = [
-#         "Follow the path and impact of flooding along the Mississippi River . Find out why officials are shutting down another Japanese nuclear plant . Visit a university in Illinois where students study the circus arts . Use the Daily Discussion to help students understand today's featured news stories .",
-#         "80,000 hard partiers jam streets of Cape Town, South Africa on January 2 . 12 Icelandic bonfires dot Reykjavík and bars open a little AFTER midnight . Rio de Janeiro, Brazil, offers all-night whirlwind of beach dancing, live concerts . Vegas has Tribute-Palooza: bands imitate U2, Kiss, Elton John and others ."
-#     ]
-#     results = sum_class(summary, summary)
-#     print(results)

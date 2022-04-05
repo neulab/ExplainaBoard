@@ -6,13 +6,14 @@ from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import JSONFileLoader
 from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_loader(TaskType.kg_link_tail_prediction)
 class KgLinkTailPredictionLoader(Loader):
     """
     Validate and Reformat system output file with json format:
-    "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
+    "head \t relation \t trueTail": [predTail1, predTail2, ..., predTail5],
 
     usage:
         please refer to `test_loaders.py`
@@ -23,13 +24,20 @@ class KgLinkTailPredictionLoader(Loader):
 
     def load(self) -> Iterable[dict]:
         """
-        :param path_system_output: the path of system output file with following format:
-        "head \t relation \t trueTail": [predTail1, predTail2, predTail3, predTail4, predTail5],
+        :param path_system_output:
+            the path of system output file with following format:
+            "head \t relation \t trueTail": [predTail1, predTail2, ..., predTail5],
 
         :return: class object
         """
         data: list[dict] = []
-        raw_data = self.file_loaders[self._file_type].load_raw(self._data, self._source)
+
+        # TODO(odashi):
+        # Avoid potential bug: load_raw returns Iterable[Any] which is not a dict.
+        raw_data: dict[str, dict[str, str]] = self.file_loaders[  # type: ignore
+            unwrap(self._file_type)
+        ].load_raw(self._data, self._source)
+
         if self.user_defined_features_configs:  # user defined features are present
             for id, (link, features_dict) in enumerate(raw_data.items()):
 

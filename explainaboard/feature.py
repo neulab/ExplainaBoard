@@ -5,7 +5,7 @@ import copy
 from dataclasses import dataclass, field
 import re
 import sys
-from typing import Any, ClassVar, Optional, Union
+from typing import Any, ClassVar, Optional, overload, Union
 
 import numpy as np
 import pandas as pd
@@ -13,12 +13,13 @@ import pyarrow as pa
 
 from explainaboard import config
 from explainaboard.utils.py_utils import zip_dict
+from explainaboard.utils.typing_utils import unwrap
 
 
 def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
     """
-    _arrow_to_datasets_dtype takes a pyarrow.DataType and converts it to a datasets string dtype.
-    In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
+    _arrow_to_datasets_dtype takes a pyarrow.DataType and converts it to a datasets
+    string dtype. In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
     """
 
     if pa.types.is_null(arrow_type):
@@ -73,11 +74,11 @@ def string_to_arrow(datasets_dtype: str) -> pa.DataType:
     """
     string_to_arrow takes a datasets string dtype and converts it to a pyarrow.DataType.
     In effect, `dt == string_to_arrow(_arrow_to_datasets_dtype(dt))`
-    This is necessary because the datasets.Value() primitive type is constructed using a string dtype
-    Value(dtype=str)
-    But Features.type (via `get_nested_type()` expects to resolve Features into a pyarrow Schema,
-        which means that each Value() must be able to resolve into a corresponding pyarrow.DataType, which is the
-        purpose of this function.
+    This is necessary because the datasets.Value() primitive type is constructed using a
+    string dtype Value(dtype=str)
+    But Features.type (via `get_nested_type()` expects to resolve Features into a
+    pyarrow Schema, which means that each Value() must be able to resolve into a
+    corresponding pyarrow.DataType, which is the purpose of this function.
     """
     timestamp_regex = re.compile(r"^timestamp\[(.*)\]$")
     timestamp_matches = timestamp_regex.search(datasets_dtype)
@@ -96,16 +97,21 @@ def string_to_arrow(datasets_dtype: str) -> pa.DataType:
             return pa.timestamp(internals_matches.group(1), internals_matches.group(2))
         else:
             raise ValueError(
-                f"{datasets_dtype} is not a validly formatted string representation of a pyarrow timestamp."
-                f"Examples include timestamp[us] or timestamp[us, tz=America/New_York]"
-                f"See: https://arrow.apache.org/docs/python/generated/pyarrow.timestamp.html#pyarrow.timestamp"
+                f"""
+{datasets_dtype} is not a validly formatted string representation of a pyarrow
+timestamp. Examples include timestamp[us] or timestamp[us, tz=America/New_York]
+See:
+https://arrow.apache.org/docs/python/generated/pyarrow.timestamp.html#pyarrow.timestamp
+"""
             )
     elif datasets_dtype not in pa.__dict__:
         if str(datasets_dtype + "_") not in pa.__dict__:
             raise ValueError(
-                f"Neither {datasets_dtype} nor {datasets_dtype + '_'} seems to be a pyarrow data type. "
-                f"Please make sure to use a correct data type, see: "
-                f"https://arrow.apache.org/docs/python/api/datatypes.html#factory-functions"
+                f"""
+Neither {datasets_dtype} nor {datasets_dtype + '_'} seems to be a pyarrow data type.
+Please make sure to use a correct data type, see:
+https://arrow.apache.org/docs/python/api/datatypes.html#factory-functions
+"""
             )
         arrow_data_factory_function_name = str(datasets_dtype + "_")
     else:
@@ -118,17 +124,23 @@ def _cast_to_python_objects(obj: Any, only_1d_for_numpy: bool) -> tuple[Any, boo
     """
     Cast pytorch/tensorflow/pandas objects to python numpy array/lists.
     It works recursively.
-    To avoid iterating over possibly long lists, it first checks if the first element that is not None has to be casted.
-    If the first element needs to be casted, then all the elements of the list will be casted, otherwise they'll stay the same.
-    This trick allows to cast objects that contain tokenizers outputs without iterating over every single token for example.
+    To avoid iterating over possibly long lists, it first checks if the first element
+    that is not None has to be casted.
+    If the first element needs to be casted, then all the elements of the list will be
+    casted, otherwise they'll stay the same.
+    This trick allows to cast objects that contain tokenizers outputs without iterating
+    over every single token for example.
     Args:
         obj: the object (nested struct) to cast
-        only_1d_for_numpy (bool): whether to keep the full multi-dim tensors as multi-dim numpy arrays, or convert them to
-            nested lists of 1-dimensional numpy arrays. This can be useful to keep only 1-d arrays to instantiate Arrow arrays.
-            Indeed Arrow only support converting 1-dimensional array values.
+        only_1d_for_numpy (bool): whether to keep the full multi-dim tensors as
+            multi-dim numpy arrays, or convert them to nested lists of 1-dimensional
+            numpy arrays. This can be useful to keep only 1-d arrays to instantiate
+            Arrow arrays. Indeed Arrow only support converting 1-dimensional array
+            values.
     Returns:
         casted_obj: the casted object
-        has_changed (bool): True if the object has been changed, False if it is identical
+        has_changed (bool): True if the object has been changed, False if it is
+            identical
     """
 
     if config.TF_AVAILABLE and "tensorflow" in sys.modules:
@@ -239,9 +251,12 @@ def cast_to_python_objects(obj: Any, only_1d_for_numpy=False) -> Any:
     """
     Cast numpy/pytorch/tensorflow/pandas objects to python lists.
     It works recursively.
-    To avoid iterating over possibly long lists, it first checks if the first element that is not None has to be casted.
-    If the first element needs to be casted, then all the elements of the list will be casted, otherwise they'll stay the same.
-    This trick allows to cast objects that contain tokenizers outputs without iterating over every single token for example.
+    To avoid iterating over possibly long lists, it first checks if the first element
+    that is not None has to be casted.
+    If the first element needs to be casted, then all the elements of the list will be
+    casted, otherwise they'll stay the same.
+    This trick allows to cast objects that contain tokenizers outputs without iterating
+    over every single token for example.
     Args:
         obj: the object (nested struct) to cast
     Returns:
@@ -265,6 +280,8 @@ class BucketInfo:
     setting: Any = 1  # For different bucket_methods, the settings are diverse
 
 
+# TODO(odashi): Make this class non-dataclass because __post_init__ does lots of
+# type-insensitive processes.
 @dataclass
 class ClassLabel:
     """
@@ -286,19 +303,19 @@ class ClassLabel:
         names_file:str, path to a file with names, one per line
     """
 
-    num_classes: int = None
-    names: list[str] = None
-    description: str = None
+    num_classes: Optional[int] = None
+    names: Optional[list[str]] = None
+    description: Optional[str] = None
     names_file: Optional[str] = None
     id: Optional[str] = None
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     # Class Variables
     dtype: ClassVar[str] = "int64"
-    _str2int: ClassVar[dict[str, int]] = None
-    _int2str: ClassVar[dict[int, int]] = None
+    _str2int: ClassVar[Optional[dict[str, int]]] = None
+    _int2str: ClassVar[Optional[dict[int, str]]] = None
     _type: str = field(default="ClassLabel", init=False, repr=False)
 
     def __post_init__(self):
@@ -333,54 +350,61 @@ class ClassLabel:
                 "Some label names are duplicated. Each label name should be unique."
             )
 
-    def str2int(self, values: Union[str, Iterable]):
-        """Conversion class name string => integer."""
-        assert isinstance(values, str) or isinstance(
-            values, Iterable
-        ), f"Values {values} should be a string or an Iterable (list, numpy array, pytorch, tensorflow tensors)"
-        return_list = True
-        if isinstance(values, str):
-            values = [values]
-            return_list = False
-
-        output = []
-        for value in values:
-            if self._str2int:
-                # strip key if not in dict
-                if value not in self._str2int:
-                    value = str(value).strip()
-                output.append(self._str2int[str(value)])
+    def str2int_scalar(self, value: str) -> int:
+        """Convert a class name into the corresponding ID."""
+        try:
+            if self._str2int is not None:
+                return self._str2int.get(value) or self._str2int[value.strip()]
             else:
                 # No names provided, try to integerize
-                failed_parse = False
-                try:
-                    output.append(int(value))
-                except ValueError:
-                    failed_parse = True
-                if failed_parse or not 0 <= value < self.num_classes:
-                    raise ValueError("Invalid string class label %s" % value)
-        return output if return_list else output[0]
+                output = int(value)
+                if 0 <= output < unwrap(self.num_classes):
+                    raise ValueError(f'{value} is out of range.')
+                return output
+        except Exception as ex:
+            raise ValueError(f'Invalid string class label: {value}.') from ex
 
-    def int2str(self, values: Union[int, Iterable]):
-        """Conversion integer => class name string."""
-        assert isinstance(values, int) or isinstance(
-            values, Iterable
-        ), f"Values {values} should be an integer or an Iterable (list, numpy array, pytorch, tensorflow tensors)"
-        return_list = True
-        if isinstance(values, int):
-            values = [values]
-            return_list = False
+    def str2int_vector(self, values: Iterable[str]) -> list[int]:
+        """Convert a list of class names into corresponding IDs."""
+        return [self.str2int_scalar(v) for v in values]
 
-        for v in values:
-            if not 0 <= v < self.num_classes:
-                raise ValueError("Invalid integer class label %d" % v)
-
-        if self._int2str:
-            output = [self._int2str[int(v)] for v in values]
+    def str2int(self, values: Iterable[str]) -> Union[int, list[int]]:
+        """Convert class names into corresponding IDs: generic version."""
+        # NOTE(odashi): str is also Iterable[str].
+        if isinstance(values, str):
+            return self.str2int_scalar(values)
         else:
-            # No names provided, return str(values)
-            output = [str(v) for v in values]
-        return output if return_list else output[0]
+            return self.str2int_vector(values)
+
+    def int2str_scalar(self, value: int) -> str:
+        """Convert a class ID into the corresponding name."""
+        if not 0 <= value < unwrap(self.num_classes):
+            raise ValueError(f'{value} is out of range.')
+
+        if self._int2str is not None:
+            return self._int2str[value]
+        else:
+            # No names provided, assuming the string representation is the name.
+            return str(value)
+
+    def int2str_vector(self, values: Iterable[int]) -> list[str]:
+        """Convert a list of class IDs into corresponding names."""
+        return [self.int2str_scalar(v) for v in values]
+
+    @overload
+    def int2str(self, values: int) -> str:
+        ...
+
+    @overload
+    def int2str(self, values: Iterable[int]) -> list[str]:
+        ...
+
+    def int2str(self, values):
+        """Convert class IDs into corresponding names: generic version."""
+        if isinstance(values, int):
+            return self.int2str_scalar(values)
+        else:
+            return self.int2str_vector(values)
 
     def encode_example(self, example_data):
         if self.num_classes is None:
@@ -434,7 +458,7 @@ class Set:
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     _type: str = field(default="Set", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
@@ -442,12 +466,12 @@ class Set:
 
 @dataclass
 class Position:
-    positions: list = None
-    dtype: ClassVar[str] = Any
+    positions: Optional[list] = None
+    dtype: ClassVar[Union[str, object]] = Any  # TODO(odashi): avoid using Any here.
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     _type: str = field(default="Position", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
@@ -455,11 +479,11 @@ class Position:
 
 @dataclass
 class Span:
-    dtype: ClassVar[str] = Any
+    dtype: ClassVar[Union[str, object]] = Any  # TODO(odashi): avoid using Any here.
     is_bucket: bool = False
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     _type: str = field(default="Span", init=False, repr=False)
     id: Optional[str] = None
     pa_type: ClassVar[Any] = None
@@ -491,11 +515,11 @@ class Value:
     """
 
     dtype: str  # must be initialized when created
-    description: str = None
+    description: Optional[str] = None
     is_bucket: bool = False  # don't need to be initialized
     require_training_set: bool = False
     is_pre_computed: bool = False
-    bucket_info: BucketInfo = None
+    bucket_info: Optional[BucketInfo] = None
     id: Optional[str] = None
     # Automatically constructed
     pa_type: ClassVar[Any] = None
@@ -542,7 +566,8 @@ FeatureType = Union[
 
 def encode_nested_example(schema, obj):
     """Encode a nested example.
-    This is used since some features (in particular ClassLabel) have some logic during encoding.
+    This is used since some features (in particular ClassLabel) have some logic during
+    encoding.
     """
     # Nested structures: we allow dict, list/tuples, sequences
     if isinstance(schema, dict):
@@ -588,21 +613,17 @@ def encode_nested_example(schema, obj):
             else None
         )
     # Object with special encoding:
-    # ClassLabel will convert from string to int, TranslationVariableLanguages does some checks
+    # ClassLabel will convert from string to int,
+    # TranslationVariableLanguages does some checks
     elif isinstance(schema, (ClassLabel, Value)):
         return schema.encode_example(obj)
-    # Other object should be directly convertible to a native Arrow type (like Translation and Translation)
+    # Other object should be directly convertible to a native Arrow type
+    # (like Translation and Translation)
     return obj
 
 
 class Features(dict):
-
-    # def __init__(self, dictionary):
-    #     print(dictionary)
-    #     for k, v in dictionary.items():
-    #         setattr(self,k,v)
-
-    def get_bucket_features(self, include_training_dependent=True) -> list:
+    def get_bucket_features(self, include_training_dependent=True) -> list[str]:
         """
         Get features that would be used for bucketing
         :param include_training_dependent: Include training-set dependent features
