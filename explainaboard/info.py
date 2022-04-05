@@ -10,20 +10,14 @@ from typing import Any, Optional
 from explainaboard import config
 from explainaboard.feature import Features
 from explainaboard.utils.logging import get_logger
+from explainaboard.utils.py_utils import eprint
 
 logger = get_logger(__name__)
 
 
 @dataclass
 class Table:
-    # def __init__(self,
-    #              table_iterator):
-    #     self.table = []
-    #     for _id, dict_features in table_iterator:
-    #         self.table.append(dict_features)
-    table: dict = None
-
-    # def __post_init__(self):
+    table: Optional[dict] = None
 
 
 @dataclass
@@ -47,23 +41,24 @@ class PaperInfo:
 
 @dataclass
 class Performance:
-    metric_name: str = None
-    value: float = None
+    metric_name: str
+    value: float
     confidence_score_low: Optional[float] = None
     confidence_score_high: Optional[float] = None
 
 
 @dataclass
-class BucketPerformance(Performance):
-    bucket_name: str = None
-    n_samples: float = None
-    bucket_samples: Any = None
+class BucketPerformance:
+    bucket_name: str
+    n_samples: float
+    bucket_samples: list[Any]
+    performances: list[Performance] = field(default_factory=list)
 
 
 @dataclass
 class Result:
     overall: Any = None
-    calibration: list[Performance] = None
+    calibration: Optional[list[Performance]] = None
     fine_grained: Any = None
 
 
@@ -79,9 +74,10 @@ class SysOutputInfo:
         download_link (str): the url of the system output.
         paper (Paper, optional): the published paper of the system.
         features (Features, optional): the features used to describe system output's
-                                        column type.
+            column type.
         is_print_case (bool): Whether or not to print out cases
-        is_print_confidence_interval (bool): Whether or not to print out confidence intervals
+        is_print_confidence_interval (bool): Whether or not to print out confidence
+            intervals
     """
 
     # set in the system_output scripts
@@ -92,14 +88,14 @@ class SysOutputInfo:
     metric_names: Optional[list[str]] = None
     reload_stat: bool = True
     is_print_case: bool = True
-    is_print_confidence_interval: bool = False
-    # language : str = "English"
+    language: str = "en"
+    conf_value: float = 0.05
 
     # set later
     # code: str = None
     # download_link: str = None
     # paper_info: PaperInfo = PaperInfo()
-    features: Features = None
+    features: Optional[Features] = None
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
@@ -121,11 +117,14 @@ class SysOutputInfo:
                 data[str(key)] = data[key]
                 del data[key]
 
-    def write_to_directory(self, dataset_info_dir):
+    def write_to_directory(self, dataset_info_dir, file_name=""):
         """Write `SysOutputInfo` as JSON to `dataset_info_dir`."""
-        with open(
-            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME), "wb"
-        ) as f:
+        file_path = (
+            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME)
+            if file_name == ""
+            else os.path.join(dataset_info_dir, file_name)
+        )
+        with open(file_path, "wb") as f:
             self._dump_info(f)
 
     def print_as_json(self):
@@ -146,8 +145,8 @@ class SysOutputInfo:
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
         """Create SysOutputInfo from the JSON file in `sys_output_info_dir`.
         Args:
-            sys_output_info_dir (`str`): The directory containing the metadata file. This
-                should be the root directory of a specific dataset version.
+            sys_output_info_dir (`str`): The directory containing the metadata file.
+                This should be the root directory of a specific dataset version.
         """
         logger.info("Loading Dataset info from %s", sys_output_info_dir)
         if not sys_output_info_dir:
@@ -162,11 +161,6 @@ class SysOutputInfo:
         ) as f:
             sys_output_info_dict = json.load(f)
         return cls.from_dict(sys_output_info_dict)
-
-    # @classmethod
-    # def from_dict(cls, task_name: str, sys_output_info_dict: dict) -> "SysOutputInfo":
-    #     field_names = set(f.name for f in dataclasses.fields(cls))
-    #     return cls(task_name, **{k: v for k, v in sys_output_info_dict.items() if k in field_names})
 
     @classmethod
     def from_dict(cls, sys_output_info_dict: dict) -> "SysOutputInfo":
@@ -191,13 +185,28 @@ class SysOutputInfo:
 
 @dataclass
 class OverallStatistics:
-    sys_info: SysOutputInfo = None
-    scoring_stats: Any = None
-    active_features: list[str] = None
-    overall_results: dict[str, Performance] = None
+    sys_info: SysOutputInfo
+    metric_stats: Any = None
+    active_features: Optional[list[str]] = None
+    overall_results: Optional[dict[str, Performance]] = None
 
 
 @dataclass
 class FineGrainedStatistics:
-    samples_over_bucket: dict = None
-    performance_over_bucket: dict = None
+    samples_over_bucket: dict
+    performance_over_bucket: dict
+
+
+def print_bucket_dict(dict_obj: dict[str, BucketPerformance], print_information: str):
+    metric_names = [x.metric_name for x in next(iter(dict_obj.values())).performances]
+    for i, metric_name in enumerate(metric_names):
+        # print("-----------------------------------------------")
+        eprint(f"the information of #{print_information}#")
+        eprint(f"bucket_interval\t{metric_name}\t#samples")
+        for k, v in dict_obj.items():
+            if len(k) == 1:
+                eprint(f"[{k[0]},]\t{v.performances[i].value}\t{v.n_samples}")
+            else:
+                eprint(f"[{k[0]},{k[1]}]\t{v.performances[i].value}\t{v.n_samples}")
+
+        eprint("")

@@ -86,7 +86,10 @@ class TextPairClassificationProcessor(Processor):
                 ),
                 "fre_rank": feature.Value(
                     dtype="float",
-                    description="the average rank of each work based on its frequency in training set",
+                    description=(
+                        "the average rank of each work based on its frequency in "
+                        "training set"
+                    ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -104,7 +107,8 @@ class TextPairClassificationProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples):
-        # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
+        # TODO(gneubig):
+        # BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
         tokenizer = self._tokenizer
 
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
@@ -143,7 +147,8 @@ class TextPairClassificationProcessor(Processor):
             self._tokenizer,
         )
 
-    # training set dependent features (this could be merged into the above one for further optimization)
+    # training set dependent features (this could be merged into the above one for
+    # further optimization)
     def _get_fre_rank(self, existing_features: dict, statistics: Any):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
@@ -151,30 +156,3 @@ class TextPairClassificationProcessor(Processor):
             lambda x: x['text1'] + x['text2'],
             self._tokenizer,
         )
-
-    # --- End feature functions
-
-
-# @aggregating(
-#     name="get_statistics",
-#     contributor="datalab",
-#     task="text-matching, natural-language-inference",
-#     description="Calculate the overall statistics (e.g., average length) of a given "
-#     "text pair classification datasets. e,g. natural language inference",
-# )
-# def get_statistics(samples: Iterator):
-#     """
-#     Input:
-#     samples: [{
-#      "text1":
-#      "text2":
-#      "label":
-#     }]
-#     """
-#
-#     # TODO(gneubig): BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-#     tokenizer = SingleSpaceTokenizer()
-#
-#     return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-#         samples, lambda x: x['text1'] + x['text2'], tokenizer
-#     )
