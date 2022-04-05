@@ -9,7 +9,7 @@ mlogger = logging.getLogger('matplotlib')
 mlogger.setLevel(logging.WARNING)
 
 
-def mp_format(data: list[dict]) -> dict:
+def mp_format(data) -> dict:
     """
     Adapt the format of data
     :param data:
