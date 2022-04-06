@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from tqdm import tqdm
@@ -10,6 +10,7 @@ from tqdm import tqdm
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 import explainaboard.metric
+from explainaboard.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -205,7 +206,9 @@ class ConditionalGenerationProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["hypothesis"]
 
-    def _gen_metric_stats(self, sys_info: SysOutputInfo, sys_output: list[dict]) -> Any:
+    def _gen_metric_stats(
+        self, sys_info: SysOutputInfo, sys_output: list[dict]
+    ) -> list[MetricStats]:
         """Generate sufficient statistics for scoring.
 
         :param sys_info: Information about the system outputs
@@ -259,7 +262,7 @@ class ConditionalGenerationProcessor(Processor):
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
-    ) -> Optional[list[str]]:
+    ) -> list[str]:
         """
         This function is used to calculate features used for bucketing, such as
         sentence_length
@@ -368,7 +371,7 @@ class ConditionalGenerationProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        metric_stats: Any = None,
+        metric_stats: list[MetricStats],
     ) -> tuple[dict, dict]:
 
         features = unwrap(sys_info.features)

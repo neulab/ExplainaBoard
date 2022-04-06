@@ -11,7 +11,7 @@ from tqdm import tqdm
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 import explainaboard.metric
-from explainaboard.metric import Metric
+from explainaboard.metric import Metric, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -361,7 +361,7 @@ class NERProcessor(Processor):
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
-    ) -> Optional[list[str]]:
+    ) -> list[str]:
         """
         This function takes in meta-data about system outputs, system outputs, and a few
         other optional pieces of information, then calculates feature functions and
@@ -433,7 +433,7 @@ class NERProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
-        metric_stats: Any = None,
+        metric_stats: list[MetricStats],
     ) -> tuple[dict, dict]:
 
         features = unwrap(sys_info.features)
