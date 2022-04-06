@@ -5,11 +5,11 @@ import dataclasses
 from dataclasses import asdict, dataclass, field
 import json
 import os
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from explainaboard import config
 from explainaboard.feature import Features
-from explainaboard.metric import MetricStats
+from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.py_utils import eprint
 
@@ -92,6 +92,7 @@ class SysOutputInfo:
     language: str = "en"
     conf_value: float = 0.05
     system_details: Optional[dict] = None
+    metric_configs: Optional[Dict[str, MetricConfig]] = None
 
     # set later
     # code: str = None
