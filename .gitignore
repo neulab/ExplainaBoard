@@ -32,6 +32,7 @@ report.json
 system_analysis.json
 venv
 output
+application
 
 analyzer/fig/0.png
 analyzer/fig/1.png
