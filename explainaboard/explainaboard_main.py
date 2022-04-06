@@ -341,6 +341,9 @@ def main():
     ):
 
         metadata.update(loader.user_defined_metadata_configs)
+        metadata.update(
+            {"user_defined_features_configs": loader._user_defined_features_configs}
+        )
 
         report = get_processor(task).process(
             metadata=metadata, sys_output=system_dataset
