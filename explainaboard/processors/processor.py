@@ -19,6 +19,7 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
+import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
 from explainaboard.utils.async_eaas import AsyncEaaSClient
@@ -50,6 +51,12 @@ class Processor(metaclass=abc.ABCMeta):
     def default_metrics(cls) -> list[str]:
         """Returns the default metrics of this processor."""
         ...
+
+    @classmethod
+    def default_metric_configs(
+        cls,
+    ) -> Optional[dict[str, explainaboard.metric.MetricConfig]]:
+        return None
 
     def __init__(self) -> None:
         # Things to use only if necessary
@@ -505,6 +512,9 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
             metadata["task_name"] = self.task_type().value
         if "metric_names" not in metadata.keys():
             metadata["metric_names"] = self.default_metrics()
+        if "metric_configs" not in metadata.keys():
+            metadata["metric_configs"] = self.default_metric_configs()
+
         sys_info = SysOutputInfo.from_dict(metadata)
 
         # declare customized features: _features will be updated

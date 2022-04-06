@@ -28,7 +28,7 @@ def aggregate_score_tensor(
         languages_aggregation = datasets_aggregation
 
     # Regarding language aggregation
-    score_tensor_aggregated_language = {}
+    score_tensor_aggregated_language: dict = {}
 
     if languages_aggregation == "average":
         for model_name, m_value in score_tensor.items():
@@ -52,7 +52,7 @@ def aggregate_score_tensor(
                 ] = score_info_template
 
     # Regarding dataset aggregation
-    score_tensor_aggregated_dataset = {}
+    score_tensor_aggregated_dataset: dict = {}
     if datasets_aggregation == "average":
         for model_name, m_value in score_tensor.items():
             score_tensor_aggregated_dataset[model_name] = {}
@@ -78,7 +78,7 @@ def aggregate_score_tensor(
     elif languages_aggregation is not None:
         score_tensor = score_tensor_aggregated_language
 
-    score_tensor_aggregated_model = {}
+    score_tensor_aggregated_model: dict = {}
     if models_aggregation == "minus":
         if len(score_tensor) != 2:
             raise ValueError("the number of systems should two")
@@ -133,7 +133,7 @@ def filter_score_tensor(
     """
     score_tensor_copy = copy.deepcopy(score_tensor)
 
-    score_tensor_filter = {}
+    score_tensor_filter: dict = {}
     for model_name, m_value in score_tensor.items():
         if models is not None and model_name not in models:
             continue

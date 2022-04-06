@@ -9,7 +9,7 @@ from typing import Any, Optional
 
 from explainaboard import config
 from explainaboard.feature import Features
-from explainaboard.metric import MetricStats
+from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.py_utils import eprint
 
@@ -91,9 +91,8 @@ class SysOutputInfo:
     is_print_case: bool = True
     language: str = "en"
     conf_value: float = 0.05
-    system_details: dict = (
-        None  # TODO(Pengfei): we can define a schema using `dataclass` in the future
-    )
+    system_details: Optional[dict] = None
+    metric_configs: Optional[dict[str, MetricConfig]] = None
 
     # set later
     # code: str = None
