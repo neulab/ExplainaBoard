@@ -26,10 +26,10 @@ class KGLinkTailPredictionProcessor(Processor):
     def default_features(cls) -> feature.Features:
         return feature.Features(
             {
-                "gold_head": feature.Value("string"),
-                "gold_predicate": feature.Value("string"),
-                "gold_tail": feature.Value("string"),
-                "gold_label": feature.Value("string"),
+                "true_head": feature.Value("string"),
+                "true_link": feature.Value("string"),
+                "true_tail": feature.Value("string"),
+                "true_label": feature.Value("string"),
                 "predictions": feature.Sequence(feature.Value("string")),
                 "tail_entity_length": feature.Value(
                     dtype="float",
@@ -270,4 +270,4 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         return data_point["true_label"]
 
     def _get_predicted_label(self, data_point: dict):
-        return data_point["true_label"]
+        return data_point["predictions"]
