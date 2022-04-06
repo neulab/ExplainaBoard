@@ -31,7 +31,7 @@ class FileLoaderField:
 
     src_name: Union[int, str]
     target_name: str
-    dtype: Union[type[int], type[float], type[str], type[dict]] = None
+    dtype: Optional[Union[type[int], type[float], type[str], type[dict]]] = None
     strip_before_parsing: Optional[bool] = None
     parser: Optional[Callable] = None
 
