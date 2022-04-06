@@ -6,6 +6,10 @@
                 "num_buckets": 2
         }
     },
+    "user_defined_metadata_configs": {
+        "sort_by": "value",
+        "sort_by_metric": "first"
+    },
     "predictions": {
         "1": {
             "gold_head": "/m/08966",

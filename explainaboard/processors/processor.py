@@ -643,8 +643,12 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         # sort before printing
         performance_over_bucket = self.sort_bucket_info(
             performance_over_bucket,
-            sort_by='value',  # or 'key' to sort by bucket name, alphabetically
-            sort_by_metric='first'  # or whichever metric the user wants.
+            sort_by=metadata.get(
+                'sort_by', 'key'
+            ),  # or 'key' to sort by bucket name, alphabetically
+            sort_by_metric=metadata.get(
+                'sort_by_metric', 'first'
+            )  # or whichever metric the user wants.
             # Applicable when sort_by == 'value'
         )
 
