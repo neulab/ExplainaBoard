@@ -93,6 +93,7 @@ class SysOutputInfo:
     conf_value: float = 0.05
     system_details: Optional[dict] = None
 
+
     # set later
     # code: str = None
     # download_link: str = None
