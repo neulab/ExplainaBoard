@@ -532,10 +532,13 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         Sorts the `performance_over_bucket` dictionary, which should be of the format
         {
             feature_name_1: {
-                (bucket_1_interval_low, bucket_1_interval_up): [
-                    BucketPerformance(metric_name=metric_1),
-                    ..., BucketPerformance(metric_name=metric_n)
-                ],
+                (bucket_1_interval_low, bucket_1_interval_up): BucketPerformance(
+                    performances = [
+                        Performance(metric_name = performance1),
+                        ...,
+                        Performance(metric_name = performancen)
+                    ]
+                ),
                 ...
             },
             ...
@@ -586,7 +589,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                         k: v
                         for k, v in sorted(
                             feature_value.items(),
-                            key=lambda item: item[1][0].value,
+                            key=lambda item: item[1].performances[0].value,
                             reverse=True,
                         )
                     }
@@ -595,9 +598,16 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                         k: v
                         for k, v in sorted(
                             feature_value.items(),
-                            key=lambda item: item[1][
-                                index_of_metric(item[1], target_metric=sort_by_metric)
-                            ].value,
+                            key=lambda item: item[1]
+                            .performances[
+                                index_of_metric(
+                                    item[
+                                        1
+                                    ].performances,  # list of Performance() objects
+                                    target_metric=sort_by_metric,
+                                )
+                            ]
+                            .value,
                             reverse=True,
                         )
                     }
@@ -630,13 +640,13 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
 
-        # # sort before printing
-        # performance_over_bucket = self.sort_bucket_info(
-        #   performance_over_bucket,
-        #   sort_by = 'value',  # or 'key' to sort by bucket name, alphabetically
-        #   sort_by_metric = 'first'  # or whichever metric the user wants.
-        #                             # Applicable when sort_by == 'value'
-        # )
+        # sort before printing
+        performance_over_bucket = self.sort_bucket_info(
+            performance_over_bucket,
+            sort_by='value',  # or 'key' to sort by bucket name, alphabetically
+            sort_by_metric='first'  # or whichever metric the user wants.
+            # Applicable when sort_by == 'value'
+        )
 
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
