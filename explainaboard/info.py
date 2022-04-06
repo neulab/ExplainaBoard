@@ -91,9 +91,7 @@ class SysOutputInfo:
     is_print_case: bool = True
     language: str = "en"
     conf_value: float = 0.05
-    system_details: dict = (
-        None  # TODO(Pengfei): we can define a schema using `dataclass` in the future
-    )
+    system_details: Optional[dict] = None
 
     # set later
     # code: str = None

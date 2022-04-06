@@ -116,11 +116,12 @@ class KGLinkTailPredictionProcessor(Processor):
     def _get_metrics(
         self, sys_info: SysOutputInfo
     ) -> list[explainaboard.metric.Metric]:
-        config = explainaboard.metric.HitsConfig(
-            hits_k=5
-        )  # TODO(Pengfei): this should be generalized
         return [
-            getattr(explainaboard.metric, name)(config=config)
+            getattr(explainaboard.metric, name)(
+                config=explainaboard.metric.HitsConfig(hits_k=3)
+                if name == "Hits"
+                else explainaboard.metric.MetricConfig()
+            )
             for name in unwrap(sys_info.metric_names)
         ]
 
