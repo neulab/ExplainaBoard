@@ -525,6 +525,95 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
             sys_info, metric_stats, active_features, overall_results
         )
 
+    def sort_bucket_info(
+        self, performance_over_bucket, sort_by='value', sort_by_metric='first'
+    ):
+        """
+        Sorts the `performance_over_bucket` dictionary, which should be of the format
+        {
+            feature_name_1: {
+                (bucket_1_interval_low, bucket_1_interval_up): BucketPerformance(
+                    performances = [
+                        Performance(metric_name = performance1),
+                        ...,
+                        Performance(metric_name = performancen)
+                    ]
+                ),
+                ...
+            },
+            ...
+        }
+
+        :param sort_by: 'key' or 'value';
+            if 'key', sort by the bucket's lower boundary, alphabetically, low-to-high;
+            if 'value', sort by the `value` attribute of the BucketPerformance objects,
+            high-to-low. Please see param sort_by_metric.
+        :param sort_by_metric: 'first' or any string matching the metrics associated
+        with this task.
+            if 'first', sort by the value of the first BucketPerformance object,
+            whichever that may be, high-to-low
+            else, sort by the value of that metric.
+            TODO figure out how to let user pass this in.
+        TODO implement another param to specify if they want high-to-low or low-to-high
+        sorting.
+        """
+
+        def index_of_metric(metric_bucket_perf_obj, target_metric):
+            return [
+                i
+                for i, bp in enumerate(metric_bucket_perf_obj)
+                if bp.metric_name == target_metric
+            ][0]
+
+        performance_over_bucket_sorted = {}
+        for feature_name, feature_value in performance_over_bucket.items():
+
+            feature_sorted = None
+            if (
+                sort_by == 'key'
+            ):  # based on alphabetical order of the bucket lower boundary; low to high
+                feature_sorted = {
+                    k: v
+                    for k, v in sorted(
+                        feature_value.items(),
+                        key=lambda item: item[0][0],
+                        reverse=False,
+                    )
+                }
+            elif sort_by == 'value':
+                if (
+                    sort_by_metric == 'first'
+                ):  # sort based on the value of the first feature, whichever that may
+                    # be; high to low
+                    feature_sorted = {
+                        k: v
+                        for k, v in sorted(
+                            feature_value.items(),
+                            key=lambda item: item[1].performances[0].value,
+                            reverse=True,
+                        )
+                    }
+                else:
+                    feature_sorted = {
+                        k: v
+                        for k, v in sorted(
+                            feature_value.items(),
+                            key=lambda item: item[1]
+                            .performances[
+                                index_of_metric(
+                                    item[
+                                        1
+                                    ].performances,  # list of Performance() objects
+                                    target_metric=sort_by_metric,
+                                )
+                            ]
+                            .value,
+                            reverse=True,
+                        )
+                    }
+            performance_over_bucket_sorted[feature_name] = feature_sorted
+        return performance_over_bucket_sorted
+
     def get_fine_grained_statistics(
         self,
         sys_info: SysOutputInfo,
@@ -550,6 +639,19 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
+
+        # sort before printing
+        performance_over_bucket = self.sort_bucket_info(
+            performance_over_bucket,
+            sort_by=metadata.get(
+                'sort_by', 'key'
+            ),  # or 'key' to sort by bucket name, alphabetically
+            sort_by_metric=metadata.get(
+                'sort_by_metric', 'first'
+            )  # or whichever metric the user wants.
+            # Applicable when sort_by == 'value'
+        )
+
         self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket
