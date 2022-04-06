@@ -4,36 +4,81 @@
 In this file we describe how to analyze models trained to predict the tail entity on knowledge graph link prediction tasks, for example
 [`fb15k-237`](https://www.microsoft.com/en-us/download/details.aspx?id=52312).
 
+## Outline
+* Evaluation with Build-in Features
+    * Data Preparation
+    * Perform Analysis with CLI
+    * Visualization Locally
+* Evaluation with Customized Features
+    * Data Preparation
+    * Perform Analysis with CLI
 
-## Data Preparation
 
+
+
+
+## Evaluation with Build-in Features
+
+
+
+### Data Preparation
 In order to perform analysis of your results, they should be in the following
 JSON format:
 
 ```json
 {
-    "<head 1>\t<relation 1>\t<tail 1>": [<rank-1 tail prediction>, ... , <rank-5 tail prediction>],
-    "<head 2>\t<relation 2>\t<tail 2>": [<rank-1 tail prediction>, ... , <rank-5 tail prediction>],
+    "1": {
+        "gold_head": "/m/08966",
+        "gold_predicate": "/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month",
+        "gold_tail": "/m/05lf_",
+        "predict": "tail",
+        "predictions": [
+            "/m/05lf_",
+            "/m/02x_y",
+            "/m/01nv4h",
+            "/m/02l6h",
+            "/m/0kz1h"
+        ]
+    },
+    "2": {
+        "gold_head": "/m/01hww_",
+        "gold_predicate": "/music/performance_role/regular_performances./music/group_membership/group",
+        "gold_tail": "/m/01q99h",
+        "predict": "tail",
+        "predictions": [
+            "/m/05563d",
+            "/m/02vnpv",
+            "/m/02r1tx7",
+            "/m/017lb_",
+            "/m/03c3yf"
+        ]
+    },
+    ...
     
 }
 ```
-where each record is indexed by a ground-truth link triple `(<head>, <relation>, <tail>)` in the knowledge graph described as tab-separated text; and the top-5 model-predicted tail entities as values.
+where
+* `gold_head`: true head entity
+* `gold_predicate`: true relation
+* `gold_tail`: true tail entity
+* `predict`: it suggest what type of information (e.g., `head`, `predicate`, `tail`) will be predicted
+* `predictions`: a list of predictions
 
 Let's say we have one system output file: 
-* [test-kg-link-tail-prediction.json](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/fb15k-237/test-kg-link-tail-prediction.json) 
+* [test-kg-prediction-no-user-defined-new.json](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-no-user-defined-new.json) 
 
 
 
-## Performing Basic Analysis
+### Perform Analysis with CLI
 
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-link-tail-prediction.json --dataset fb15k_237 > report.json
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --dataset fb15k_237 > report.json
 
 or
 
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-link-tail-prediction.json > report.json
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
 where
 * `--task`: denotes the task name. 
@@ -44,64 +89,161 @@ where
 
 
 
-## Bucketing Features
+### Bucketing Features
 * Toy feature `tail_entity_length`: the number of words in `true_tail`
 * More meaningful features to be added soon
 
-## User-Defined Features
-To provide your own bucketing features, submit a system output containing a declaration of your user-defined features (their names, data types, and number of buckets), along with your predictions on test examples. Make sure each test example contains a key for each feature defined in your configuration. Refer to the following example:
+
+### Visualization Locally
+Once the above command has been successfully conducted, histogram figures will be generated automatically in the folder
+`./output/figures/test-kg-prediction-no-user-defined-new/`, where each figure represent a fine-grained evaluation
+results along one features (e.g., relation type).
+ 
+We have carefully designed and beautified these figures which 
+could be directly applied for paper writing as needed.
+
+One example is shown below,
+
+
+<img src="./figures/entity_type_level_MeanReciprocalRank.png" width="600"/>
+
+
+
+
+
+## Evaluation with Customized Features
+
+### Data Preparation
+
+ExplainaBoard also allows users to customize features, specifically to provide your own bucketing features, submit a system output containing a declaration of your user-defined features (their names, data types, and number of buckets), along with your predictions on test examples. Make sure each test example contains a key for each feature defined in your configuration. Refer to the following example:
 
 ```json
 {
-    "user_defined_features_configs":
-    {
-        "user_defined_feature_1": {
-            "dtype": "string",
-            "description": "just a toy string feature for testing",
-            "num_buckets": 8
-        },
-        "user_defined_feature_2": {
-            "dtype": "float",
-            "description": "just a toy float feature for testing",
-            "num_buckets": 4
-        },
-        ...
-        "user_defined_feature_n": {
-            "dtype": "float",
-            "description": "just a toy float feature for testing",
-            "num_buckets": 6
-        },
+    "user_defined_features_configs": {
+        "rel_type": {
+                "dtype": "string",
+                "description": "symmetric or asymmetric",
+                "num_buckets": 2
+        }
     },
-
-
-    "predictions":
-    {
-        "<head 1>\t<relation 1>\t<tail 1>": {
-            "predictions": [<rank-1 tail prediction>, ... , <rank-5 tail prediction>],
-            "user_defined_feature_1": "string_value_1",
-            "user_defined_feature_2": 0.8374,
-            ...
-            "user_defined_feature_n": 0.5984
+    "predictions": {
+        "1": {
+            "gold_head": "/m/08966",
+            "gold_predicate": "/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month",
+            "gold_tail": "/m/05lf_",
+            "predict": "tail",
+            "predictions": [
+                "/m/05lf_",
+                "/m/02x_y",
+                "/m/01nv4h",
+                "/m/02l6h",
+                "/m/0kz1h"
+            ],
+            "rel_type": "asymmetric"
         },
-        "<head 2>\t<relation 2>\t<tail 2>": {
-            "predictions": [<rank-1 tail prediction>, ... , <rank-5 tail prediction>],
-            "user_defined_feature_1": "string_value_2",
-            "user_defined_feature_2": 0.1422,
-            ...
-            "user_defined_feature_n": 0.3795
+        "2": {
+            "gold_head": "/m/01hww_",
+            "gold_predicate": "/music/performance_role/regular_performances./music/group_membership/group",
+            "gold_tail": "/m/01q99h",
+            "predict": "tail",
+            "predictions": [
+                "/m/05563d",
+                "/m/02vnpv",
+                "/m/02r1tx7",
+                "/m/017lb_",
+                "/m/03c3yf"
+            ],
+            "rel_type": "asymmetric"
         },
-        ...
-    }
-}
+      ...
 ```
 
-An example system output is provided, and you can test it using the following command:
+### Perform Analysis with CLI
+
+An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-user-defined-new.json), and you can test it using the following command:
 
 ```shell
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-user-defined-features-prediction-short.json --dataset fb15k_237 > report.json
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-user-defined-new.json --dataset fb15k_237 > report.json
 
 or
 
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-user-defined-features-prediction-short.json > report.json
+    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-user-defined-new.json > report.json
 ```
 
+
+## Advanced Usage
+Intead of ExplainaBoard CLI, users could explore more functionality by using 
+pythonic interface provided by ExplainaBoard.
+
+
+### Customized Bucket Order
+In some situation, users aim to specify the bucket order according to their needs. Following [code](https://github.com/neulab/ExplainaBoard/blob/8ccd1a71531bc3b9e2f9e539cb001353cc49ebca/explainaboard/tests/test_kg_link_tail_prediction.py#L60) gives an example.
+
+
+
+```python
+        # tips: `artifacts_path` is located at: ExplainaBoard/explainaboard/tests/artifacts
+        path_data = artifacts_path + "test-kg-prediction-no-user-defined-new.json"
+        loader = get_loader(
+            TaskType.kg_link_tail_prediction,
+            path_data,
+            Source.local_filesystem,
+            FileType.json,
+        )
+        data = loader.load()
+
+        metadata = {
+            "task_name": TaskType.kg_link_tail_prediction.value,
+            "dataset_name": "fb15k-237",
+            "metric_names": ["Hits"],
+            "sort_by": "value",
+            "sort_by_metric": "first",
+        }
+
+        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+
+        sys_info = processor.process(metadata, data)
+```
+
+
+### Customized Hits K
+The value of K in `Hits` metric could also be specified by users when needed.
+
+```python
+        path_data = artifacts_path + "test-kg-prediction-no-user-defined-new.json" 
+        loader = get_loader(
+            TaskType.kg_link_tail_prediction,
+            path_data,
+            Source.local_filesystem,
+            FileType.json,
+        )
+        data = loader.load()
+        self.assertEqual(loader.user_defined_features_configs, {})
+
+        metadata = {
+            "task_name": TaskType.kg_link_tail_prediction.value,
+            "dataset_name": "fb15k-237-subset",
+            "metric_names": ["Hits"],
+            "metric_configs": {"Hits": HitsConfig(hits_k=4)}, # you can modify k here
+        }
+
+        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+
+        sys_info = processor.process(metadata, data)
+
+        # analysis.write_to_directory("./")
+```
+
+
+### Record Other System Detailed Information
+
+The basic idea is that users can specify other system-related information (e.g., hyper-parameters)
+via adding a key-value into `metadata`
+```python
+        metadata = {
+            "task_name": TaskType.text_classification.value,
+            "metric_names": ["Accuracy"],
+            "system_details": system_details,
+        }
+```
+[Here](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_system_details.py) is a complete code.
