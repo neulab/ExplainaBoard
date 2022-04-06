@@ -1,0 +1,155 @@
+{
+    "user_defined_features_configs": {
+        "rel_type": {
+                "dtype": "string",
+                "description": "symmetric or asymmetric",
+                "num_buckets": 2
+        }
+    },
+    "user_defined_metadata_configs": {
+        "sort_by": "value",
+        "sort_by_metric": "first"
+    },
+    "predictions": {
+        "1": {
+            "gold_head": "/m/08966",
+            "gold_predicate": "/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month",
+            "gold_tail": "/m/05lf_",
+            "predict": "tail",
+            "predictions": [
+                "/m/05lf_",
+                "/m/02x_y",
+                "/m/01nv4h",
+                "/m/02l6h",
+                "/m/0kz1h"
+            ],
+            "rel_type": "asymmetric"
+        },
+        "2": {
+            "gold_head": "/m/01hww_",
+            "gold_predicate": "/music/performance_role/regular_performances./music/group_membership/group",
+            "gold_tail": "/m/01q99h",
+            "predict": "tail",
+            "predictions": [
+                "/m/05563d",
+                "/m/02vnpv",
+                "/m/02r1tx7",
+                "/m/017lb_",
+                "/m/03c3yf"
+            ],
+            "rel_type": "asymmetric"
+        },
+        "3": {
+            "gold_head": "/m/09v3jyg",
+            "gold_predicate": "/film/film/release_date_s./film/film_regional_release_date/film_release_region",
+            "gold_tail": "/m/0f8l9c",
+            "predict": "tail",
+            "predictions": [
+                "/m/03ryn",
+                "/m/06c1y",
+                "/m/03rj0",
+                "/m/06f32",
+                "/m/0d0kn"
+            ],
+            "rel_type": "asymmetric"
+        },
+        "4": {
+            "gold_head": "/m/02jx1",
+            "gold_predicate": "/location/location/contains",
+            "gold_tail": "/m/013t85",
+            "predict": "tail",
+            "predictions": [
+                "/m/023sm8",
+                "/m/0dbdy",
+                "/m/011pcj",
+                "/m/03lrc",
+                "/m/01llj3"
+            ],
+            "rel_type": "asymmetric"
+        },
+        "5": {
+            "gold_head": "/m/01xdf5",
+            "gold_predicate": "/base/popstra/celebrity/friendship./base/popstra/friendship/participant",
+            "gold_tail": "/m/04t2l2",
+            "predict": "tail",
+            "predictions": [
+                "/m/04t2l2",
+                "/m/0dbdy",
+                "/m/011pcj",
+                "/m/03lrc",
+                "/m/01llj3"
+            ],
+            "rel_type": "symmetric"
+        },
+        "6": {
+            "gold_head": "/m/0mw89",
+            "gold_predicate": "/location/location/adjoin_s./location/adjoining_relationship/adjoins",
+            "gold_tail": "/m/0mw93",
+            "predict": "tail",
+            "predictions": [
+                "/m/0mw93",
+                "/m/0d90m",
+                "/m/0277j40",
+                "/m/01chpn",
+                "/m/02vqsll"
+            ],
+            "rel_type": "symmetric"
+        },
+        "7": {
+            "gold_head": "/m/01dw4q",
+            "gold_predicate": "/base/popstra/celebrity/dated./base/popstra/dated/participant",
+            "gold_tail": "/m/02qjj7",
+            "predict": "tail",
+            "predictions": [
+                "/m/01dw4q",
+                "/m/02qjj7",
+                "/m/07l450",
+                "/m/0b1y_2",
+                "/m/02_06s"
+            ],
+            "rel_type": "symmetric"
+        },
+        "8": {
+            "gold_head": "/m/014zcr",
+            "gold_predicate": "/base/popstra/celebrity/breakup./base/popstra/breakup/participant",
+            "gold_tail": "/m/05m63c",
+            "predict": "tail",
+            "predictions": [
+                "/m/05m63c",
+                "/m/06tw8",
+                "/m/047t_",
+                "/m/06s_2",
+                "/m/0jdd"
+            ],
+            "rel_type": "symmetric"
+        },
+        "9": {
+            "gold_head": "/m/07l450",
+            "gold_predicate": "/film/film/genre",
+            "gold_tail": "/m/082gq",
+            "predict": "tail",
+            "predictions": [
+                "/m/02l7c8",
+                "/m/06cvj",
+                "/m/0hn10",
+                "/m/0lsxr",
+                "/m/01t_vv"
+            ],
+            "rel_type": "asymmetric"
+        },
+        "10": {
+            "gold_head": "/m/0n5j_",
+            "gold_predicate": "/location/location/adjoin_s./location/adjoining_relationship/adjoins",
+            "gold_tail": "/m/0fm9_",
+            "predict": "tail",
+            "predictions": [
+                "/m/0fm9_",
+                "/m/0mw93",
+                "/m/0mw89",
+                "/m/0n5j_",
+                "/m/03zrhb"
+            ],
+            "rel_type": "symmetric"
+        }
+     }
+}
