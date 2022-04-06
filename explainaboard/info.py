@@ -9,6 +9,7 @@ from typing import Any, Optional
 
 from explainaboard import config
 from explainaboard.feature import Features
+from explainaboard.metric import MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.py_utils import eprint
 
@@ -186,9 +187,9 @@ class SysOutputInfo:
 @dataclass
 class OverallStatistics:
     sys_info: SysOutputInfo
-    metric_stats: Any = None
-    active_features: Optional[list[str]] = None
-    overall_results: Optional[dict[str, Performance]] = None
+    metric_stats: list[MetricStats]
+    active_features: list[str]
+    overall_results: dict[str, Performance]
 
 
 @dataclass
