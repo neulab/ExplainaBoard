@@ -31,6 +31,7 @@ publish.sh
 report.json
 system_analysis.json
 venv
+output
 
 analyzer/fig/0.png
 analyzer/fig/1.png

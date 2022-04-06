@@ -107,17 +107,18 @@ def plot(
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
 
-    if data_mp["y_errormin"][0] is not None:
-        (_, caps, _) = plt.errorbar(
-            data_mp["x"],
-            data_mp["y"],
-            yerr=[data_mp["y_errormin"], data_mp["y_errormax"]],
-            elinewidth=5,
-            capsize=5,
-        )  # you can use color ="r" for red or skip to default as blue
-        for cap in caps:
-            cap.set_color('gray')
-            cap.set_markeredgewidth(10)
+    # if data_mp["y_errormin"][0] is not None:
+    #     (_, caps, _) = plt.errorbar(
+    #         data_mp["x"],
+    #         data_mp["y"],
+    #         yerr=[data_mp["y_errormin"], data_mp["y_errormax"]],
+    #         elinewidth=5,
+    #         linestyle='',
+    #         capsize=5,
+    #     )
+    # for cap in caps:
+    #     cap.set_color('gray')
+    #     cap.set_markeredgewidth(10)
 
     for i in range(len(data_mp["x"])):
         plt.annotate(
