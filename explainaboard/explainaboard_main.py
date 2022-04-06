@@ -161,6 +161,13 @@ def main():
         help="the directory of output files",
     )
 
+    parser.add_argument(
+        '--system_details',
+        type=str,
+        required=False,
+        help="a json file to store detailed information for a system",
+    )
+
     args = parser.parse_args()
 
     dataset = args.dataset
@@ -180,6 +187,17 @@ def main():
     models_aggregation = args.models_aggregation
     datasets_aggregation = args.datasets_aggregation
     languages_aggregation = args.languages_aggregation
+
+    system_details_path = args.system_details
+
+    # get system_details from input json file
+    system_details = None
+    if system_details_path is not None:
+        try:
+            with open(system_details_path) as fin:
+                system_details = json.load(fin)
+        except ValueError as e:
+            print('invalid json: %s' % e)
 
     # If reports have been specified, ExplainaBoard cli will perform analysis
     # over report files.
@@ -329,6 +347,7 @@ def main():
         "task_name": task,
         "reload_stat": reload_stat,
         "conf_value": args.conf_value,
+        "system_details": system_details,
     }
 
     if metric_names is not None:
