@@ -65,3 +65,15 @@ jobs:
         uses: pre-commit/action@v2.0.3
         with:
           extra_args: upgrade-type-hints --all-files
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Python 3
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+      - name: mypy
+        uses: pre-commit/action@v2.0.3
+        with:
+          extra_args: mypy --all-files 
