@@ -26,10 +26,11 @@ class KGLinkTailPredictionProcessor(Processor):
     def default_features(cls) -> feature.Features:
         return feature.Features(
             {
-                "true_head": feature.Value("string"),
-                "link": feature.Value("string"),
-                "true_tail": feature.Value("string"),
-                "predicted_tails": feature.Sequence(feature.Value("string")),
+                "gold_head": feature.Value("string"),
+                "gold_predicate": feature.Value("string"),
+                "gold_tail": feature.Value("string"),
+                "gold_label": feature.Value("string"),
+                "predictions": feature.Sequence(feature.Value("string")),
                 "tail_entity_length": feature.Value(
                     dtype="float",
                     description="number of words in the tail entity",
@@ -251,14 +252,14 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
     def _get_link_fre(self, existing_features: dict):
         if (
             self.statistics is None
-            or existing_features["link"] not in self.statistics['link_fre'].keys()
+            or existing_features["true_link"] not in self.statistics['link_fre'].keys()
         ):
             return 0
         else:
-            return self.statistics['link_fre'][existing_features["link"]]
+            return self.statistics['link_fre'][existing_features["true_link"]]
 
     def _get_symmetry(self, existing_features: dict):
-        if existing_features['relation'] in self._symmetric_relations:
+        if existing_features['true_link'] in self._symmetric_relations:
             return 'symmetric'
         else:
             return 'asymmetric'
@@ -266,7 +267,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
     # --- End feature functions
 
     def _get_true_label(self, data_point: dict):
-        return data_point["true_tail"]
+        return data_point["true_label"]
 
     def _get_predicted_label(self, data_point: dict):
-        return data_point["predicted_tails"]
+        return data_point["true_label"]

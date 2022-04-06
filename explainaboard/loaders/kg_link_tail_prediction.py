@@ -39,15 +39,17 @@ class KgLinkTailPredictionLoader(Loader):
         ].load_raw(self._data, self._source)
 
         if self.user_defined_features_configs:  # user defined features are present
-            for id, (link, features_dict) in enumerate(raw_data.items()):
+            for _, (example_id, features_dict) in enumerate(raw_data.items()):
 
                 data_i = {
-                    "id": str(id),  # should be string type
-                    "link": link.strip(),
-                    "relation": link.split('\t')[1].strip(),
-                    "true_head": link.split('\t')[0].strip(),
-                    "true_tail": link.split('\t')[-1].strip(),
-                    "predicted_tails": features_dict["predictions"],
+                    "id": str(example_id),  # should be string type
+                    "true_head": features_dict["gold_head"],
+                    "true_link": features_dict["gold_predicate"],
+                    "true_tail": features_dict["gold_tail"],
+                    "true_label": features_dict[
+                        "gold_" + features_dict["predict"]
+                    ],  # the entity to which we compare the predictions
+                    "predictions": features_dict["predictions"],
                 }
 
                 # additional user-defined features
@@ -60,15 +62,17 @@ class KgLinkTailPredictionLoader(Loader):
 
                 data.append(data_i)
         else:
-            for id, (link, predictions) in enumerate(raw_data.items()):
+            for _, (example_id, features_dict) in enumerate(raw_data.items()):
                 data.append(
                     {
-                        "id": str(id),  # should be string type
-                        "link": link.strip(),
-                        "relation": link.split('\t')[1].strip(),
-                        "true_head": link.split('\t')[0].strip(),
-                        "true_tail": link.split('\t')[-1].strip(),
-                        "predicted_tails": predictions,
+                        "id": str(example_id),  # should be string type
+                        "true_head": features_dict["gold_head"],
+                        "true_link": features_dict["gold_predicate"],
+                        "true_tail": features_dict["gold_tail"],
+                        "true_label": features_dict[
+                            "gold_" + features_dict["predict"]
+                        ],  # the entity to which we compare the predictions
+                        "predictions": features_dict["predictions"],
                     }
                 )
         return data
