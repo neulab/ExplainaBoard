@@ -58,7 +58,6 @@ class Processor(metaclass=abc.ABCMeta):
     ) -> Optional[Dict[str, explainaboard.metric.MetricConfig]]:
         return None
 
-
     def __init__(self) -> None:
         # Things to use only if necessary
         self._eaas_config: Optional[Config] = None
