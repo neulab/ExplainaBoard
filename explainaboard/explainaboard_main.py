@@ -165,7 +165,6 @@ def main():
         '--system_details',
         type=str,
         required=False,
-        default="system_details.json",
         help="a json file to store detailed information for a system",
     )
 
