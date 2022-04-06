@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import logging
-from typing import Optional
+from typing import Any, Optional
 
 from matplotlib import pyplot as plt
 
@@ -9,13 +11,13 @@ mlogger = logging.getLogger('matplotlib')
 mlogger.setLevel(logging.WARNING)
 
 
-def mp_format(data) -> dict:
+def mp_format(data: list[dict[str, Any]]) -> dict:
     """
     Adapt the format of data
     :param data:
     :return:
     """
-    data_mp = {
+    data_mp: dict = {
         "x": [],
         "y": [],
         "y_errormin": [],
@@ -38,12 +40,12 @@ def mp_format(data) -> dict:
         # ])
 
         confidence_score_low = (
-            None
+            0
             if entry["confidence_score_low"] is None
             else float(entry["confidence_score_low"])
         )
         confidence_score_high = (
-            None
+            0
             if entry["confidence_score_high"] is None
             else float(entry["confidence_score_high"])
         )
@@ -74,7 +76,10 @@ def get_ylim(y_list: list) -> list:
 
 
 def plot(
-    data: dict, save_path: Optional[str] = None, x_label: str = "x", y_label: str = "y"
+    data: list[dict[str, Any]],
+    save_path: Optional[str] = None,
+    x_label: str = "x",
+    y_label: str = "y",
 ) -> None:
     """
     Generate bar chart based on given data and x,y labels
@@ -106,19 +111,6 @@ def plot(
 
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
-
-    # if data_mp["y_errormin"][0] is not None:
-    #     (_, caps, _) = plt.errorbar(
-    #         data_mp["x"],
-    #         data_mp["y"],
-    #         yerr=[data_mp["y_errormin"], data_mp["y_errormax"]],
-    #         elinewidth=5,
-    #         linestyle='',
-    #         capsize=5,
-    #     )
-    # for cap in caps:
-    #     cap.set_color('gray')
-    #     cap.set_markeredgewidth(10)
 
     for i in range(len(data_mp["x"])):
         plt.annotate(
