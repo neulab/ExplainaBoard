@@ -48,7 +48,7 @@ class MetricResult:
 
 
 @dataclass
-class MetricConfig:
+class MetricConfig(dict):
     """
     The configuration for the metric. This can be passed in to the metric either in
     the constructor (e.g. for compute-intensive operations such as model loading),
@@ -411,11 +411,30 @@ class BIOF1Score(F1Score):
         return MetricStats(stats)
 
 
+@dataclass
+class HitsConfig(MetricConfig):
+    hits_k: int = 5
+
+
 class Hits(Metric):
     """
     Calculates the hits metric, telling whether the predicted output is in a set of true
     outputs.
     """
+
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        config: Optional[MetricConfig] = None,
+    ):
+        """
+        Initialize the metric
+        :param name: the name of the metric for reference later
+        """
+        self.config: MetricConfig = (
+            unwrap(config) if config is not None else HitsConfig()
+        )
+        super().__init__(name=name, config=self.config)
 
     @classmethod
     def default_name(cls) -> str:
@@ -423,9 +442,15 @@ class Hits(Metric):
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        config = cast(HitsConfig, self._get_config(config))
         return MetricStats(
-            np.array([(1.0 if t in p else 0.0) for t, p in zip(true_data, pred_data)])
+            np.array(
+                [
+                    (1.0 if t in p[: config.hits_k] else 0.0)
+                    for t, p in zip(true_data, pred_data)
+                ]
+            )
         )
 
 
