@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from collections.abc import Mapping
 import json
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, load_dataset
 from eaas.config import Config
@@ -55,7 +55,7 @@ class Processor(metaclass=abc.ABCMeta):
     @classmethod
     def default_metric_configs(
         cls,
-    ) -> Optional[Dict[str, explainaboard.metric.MetricConfig]]:
+    ) -> Optional[dict[str, explainaboard.metric.MetricConfig]]:
         return None
 
     def __init__(self) -> None:
