@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 import json
 import os
+from typing import cast
 
 from datalabs import aggregating, load_dataset
 from tqdm import tqdm
@@ -113,13 +114,18 @@ class KGLinkTailPredictionProcessor(Processor):
     def default_metrics(cls) -> list[str]:
         return ["Hits", "MeanReciprocalRank"]
 
+    @classmethod
+    def default_metric_configs(cls) -> dict[str, explainaboard.metric.MetricConfig]:
+        return {"Hits": explainaboard.metric.HitsConfig(hits_k=3)}
+
     def _get_metrics(
         self, sys_info: SysOutputInfo
     ) -> list[explainaboard.metric.Metric]:
+        metric_configs_dict = cast(dict, sys_info.metric_configs)
         return [
             getattr(explainaboard.metric, name)(
-                config=explainaboard.metric.HitsConfig(hits_k=3)
-                if name == "Hits"
+                config=metric_configs_dict[name]
+                if name == "Hits" and name in metric_configs_dict.keys()
                 else explainaboard.metric.MetricConfig()
             )
             for name in unwrap(sys_info.metric_names)

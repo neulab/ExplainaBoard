@@ -48,7 +48,7 @@ class MetricResult:
 
 
 @dataclass
-class MetricConfig:
+class MetricConfig(dict):
     """
     The configuration for the metric. This can be passed in to the metric either in
     the constructor (e.g. for compute-intensive operations such as model loading),
@@ -442,9 +442,8 @@ class Hits(Metric):
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
         config = cast(HitsConfig, self._get_config(config))
-
         return MetricStats(
             np.array(
                 [
