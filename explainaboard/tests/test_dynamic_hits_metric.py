@@ -11,7 +11,7 @@ artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 class TestKgLinkTailPrediction(unittest.TestCase):
     def test_no_user_defined_features(self):
 
-        path_data = artifacts_path + "test-kg-link-tail-prediction.json"
+        path_data = artifacts_path + "test-kg-prediction-no-user-defined-new.json"
         loader = get_loader(
             TaskType.kg_link_tail_prediction,
             path_data,
