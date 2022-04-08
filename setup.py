@@ -36,7 +36,7 @@ setup(
     install_requires=[
         "datalabs>=0.3.7",
         "datasets>=2.0.0",
-        "eaas>=0.3.6",
+        "eaas>=0.3.7",
         "lexicalrichness",
         "matplotlib",
         "nltk>=3.2",
