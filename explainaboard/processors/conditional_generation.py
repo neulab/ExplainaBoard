@@ -4,6 +4,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from typing import Any
 
+from eaas.async_client import AsyncClient
 import numpy as np
 from tqdm import tqdm
 
@@ -228,16 +229,16 @@ class ConditionalGenerationProcessor(Processor):
             )
         async_request = self._get_eaas_client().async_score(
             inputs,
-            task="sum",  # TODO(pengfei): this should be generalized
             metrics=unwrap(sys_info.metric_names).copy(),
-            lang="en",
-            cal_attributes=False,
+            calculate=['corpus', 'stats'],
         )
 
         # Share the request result with all stats functions
         return [
-            explainaboard.metric.EaaSMetricStats(name=name, eaas_request=async_request)
-            for name in unwrap_generator(sys_info.metric_names)
+            explainaboard.metric.EaaSMetricStats(
+                name=name, pos=i, eaas_request=async_request
+            )
+            for i, name in enumerate(unwrap_generator(sys_info.metric_names))
         ]
 
     # TODO(odashi): Restructure this function (and EaaS client) to be type-safe.
@@ -247,7 +248,8 @@ class ConditionalGenerationProcessor(Processor):
         necessary.
         """
         if 'request_id' in metric_stats:
-            eaas_stats: dict[str, Any] = unwrap(self._eaas_client).wait_and_get_result(
+            client: AsyncClient = unwrap(self._eaas_client)
+            eaas_stats: dict[str, Any] = client.wait_and_get_result(
                 metric_stats['request_id']
             )
             metric_stats.clear()

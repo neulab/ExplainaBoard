@@ -4,12 +4,12 @@ import abc
 from collections import Counter
 from dataclasses import dataclass
 import itertools
-import sys
 from typing import Any, cast, Optional, TypeVar, Union
 
+from eaas.async_client import AsyncRequest
 import numpy as np
+import sacrebleu
 
-from explainaboard.utils.async_eaas import AsyncEaaSRequest
 from explainaboard.utils.preprocessor import Preprocessor, QAPreprocessor
 from explainaboard.utils.span_utils import get_spans_from_bio
 from explainaboard.utils.typing_utils import unwrap
@@ -486,9 +486,10 @@ class EaaSMetricStats(MetricStats):
     when they're needed.
     """
 
-    def __init__(self, name: str, eaas_request: AsyncEaaSRequest):
+    def __init__(self, name: str, pos: int, eaas_request: AsyncRequest):
         super().__init__(data=None)
         self.name = name
+        self.pos = pos
         self.eaas_request = eaas_request
         self._data: Optional[np.ndarray] = None
 
@@ -501,9 +502,8 @@ class EaaSMetricStats(MetricStats):
     def _fetch_results(self):
         if self._data is None:
             result = self.eaas_request.get_result()
-            self._corpus_value = result['corpus_level'][f'corpus_{self.name}']
-            samps = result['sample_level']
-            self._data = np.array([x[self.name] for x in samps])
+            self._corpus_value = result['scores'][self.pos]['corpus']
+            self._data = np.array(result['scores'][self.pos]['stats'])
 
     def get_corpus_value(self) -> float:
         """
@@ -537,18 +537,30 @@ class EaaSMetric(Metric):
 
     def __init__(self, name: str):
         super().__init__(name)
-        # !!! Temporary warning
-        non_decomposable_metrics = ['bleu', 'chrf']
-        if name in non_decomposable_metrics:
-            print(
-                f'WARNING: corpus-level {name} is currently calculated as the average '
-                f'of sentence-level {name}, which is not technically correct. '
-                'This is a known issue that we are working on: '
-                'https://github.com/neulab/ExplainaBoard/issues/161',
-                file=sys.stderr,
-            )
-        # !!! End temporary warning
         self.name = name
+
+    def calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        if self.name == 'bleu':
+            bleu_class = sacrebleu.BLEU()
+            return bleu_class._compute_score_from_stats(list(agg_stats)).score / 100.0
+        elif self.name == 'chrf':
+            chrf_class = sacrebleu.CHRF()
+            return chrf_class._compute_score_from_stats(list(agg_stats)).score / 100.0
+        else:
+            return float(agg_stats)
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+        if self.name in {'bleu', 'chrf'}:
+            return np.sum(stats.get_data(), axis=0)
+        else:
+            return np.mean(stats.get_data(), axis=0)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
