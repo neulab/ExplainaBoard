@@ -6,6 +6,7 @@ import json
 from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, load_dataset
+from eaas.async_client import AsyncClient
 from eaas.config import Config
 from tqdm import tqdm
 
@@ -22,7 +23,6 @@ from explainaboard.info import (
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
-from explainaboard.utils.async_eaas import AsyncEaaSClient
 import explainaboard.utils.bucketing
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
 from explainaboard.utils.py_utils import eprint, sort_dict
@@ -61,7 +61,7 @@ class Processor(metaclass=abc.ABCMeta):
     def __init__(self) -> None:
         # Things to use only if necessary
         self._eaas_config: Optional[Config] = None
-        self._eaas_client: Optional[AsyncEaaSClient] = None
+        self._eaas_client: Optional[AsyncClient] = None
         # self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._preprocessor = None
@@ -172,7 +172,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
     def _get_eaas_client(self):
         if not self._eaas_client:
             self._eaas_config = Config()
-            self._eaas_client = AsyncEaaSClient(self._eaas_config)
+            self._eaas_client = AsyncClient(self._eaas_config)
         return self._eaas_client
 
     def _get_true_label(self, data_point: dict):
