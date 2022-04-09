@@ -1,5 +1,5 @@
 from explainaboard.constants import FileType
-from explainaboard.loaders.file_loader import CoNLLFileLoader
+from explainaboard.loaders.file_loader import CoNLLFileLoader, FileLoader
 from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
 
@@ -14,5 +14,10 @@ class NERLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    _default_file_type = FileType.conll
-    _default_file_loaders = {FileType.conll: CoNLLFileLoader()}
+    @classmethod
+    def default_file_type(cls) -> FileType:
+        return FileType.conll
+
+    @classmethod
+    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {FileType.conll: CoNLLFileLoader()}

@@ -247,8 +247,7 @@ class JSONFileLoader(FileLoader):
             return json.loads(data)
         elif source == Source.local_filesystem:
             with open(data, 'r', encoding="utf8") as json_file:
-                data = json_file.read()
-                return json.loads(data)
+                return json.load(json_file)
         raise NotImplementedError
 
 
