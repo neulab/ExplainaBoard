@@ -3,16 +3,12 @@ from __future__ import annotations
 from collections.abc import Iterable
 from dataclasses import dataclass
 import json
-from typing import List, Mapping, Optional, Union
+from typing import Optional
 
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.tasks import TaskType
 from explainaboard.utils.typing_utils import unwrap
-
-JSON = Union[  # type: ignore
-    str, int, float, bool, None, Mapping[str, 'JSON'], List['JSON']  # type: ignore
-]
 
 
 class Loader:
@@ -23,12 +19,20 @@ class Loader:
         source: source of data
         file type: tsv, json, conll, etc.
         file_loaders: a dict of file loaders. To customize the loading process, either
-            implement a custome FileLoader or override `load()`
+            implement a custom FileLoader or override `load()`
     """
 
-    _default_source = Source.local_filesystem
-    _default_file_type: Optional[FileType] = None
-    _default_file_loaders: dict[FileType, FileLoader] = {}
+    @classmethod
+    def default_source(cls) -> Source:
+        return Source.local_filesystem
+
+    @classmethod
+    def default_file_type(cls) -> Optional[FileType]:
+        return None
+
+    @classmethod
+    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {}
 
     def __init__(
         self,
@@ -39,19 +43,18 @@ class Loader:
     ):
         if file_loaders is None:
             file_loaders = {}
-        if not source and not self._default_source:
-            raise Exception("no source is provided for the loader")
+        if not source and not self.default_source():
+            raise ValueError("no source is provided for the loader")
         else:
-            self._source: Source = source or self._default_source
-        if not file_type and not self._default_file_type:
-            raise Exception("no file_type is provided for the loader")
-        elif not file_type:
-            self._file_type = unwrap(self._default_file_type)
+            self._source: Source = source or self.default_source()
+
+        if not file_type and not self.default_file_type():
+            raise ValueError("no file_type is provided for the loader")
         else:
-            self._file_type = unwrap(file_type)
+            self._file_type = file_type or unwrap(self.default_file_type())
 
         self.file_loaders: dict[FileType, FileLoader] = (
-            file_loaders or self._default_file_loaders
+            file_loaders or self.default_dataset_file_loaders()
         )
         self._data = data  # base64 or filepath
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 from explainaboard.constants import FileType
-from explainaboard.loaders.file_loader import JSONFileLoader
+from explainaboard.loaders.file_loader import FileLoader, JSONFileLoader
 from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
 from explainaboard.utils.typing_utils import unwrap
@@ -19,8 +19,13 @@ class KgLinkTailPredictionLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    _default_file_type = FileType.json
-    _default_file_loaders = {FileType.json: JSONFileLoader(None, False)}
+    @classmethod
+    def default_file_type(cls) -> FileType:
+        return FileType.json
+
+    @classmethod
+    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {FileType.json: JSONFileLoader(None, False)}
 
     def load(self) -> Iterable[dict]:
         """
