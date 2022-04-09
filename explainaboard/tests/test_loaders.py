@@ -27,16 +27,6 @@ class BaseLoaderTests(TestCase):
         self.assertEqual(set(samples[0].keys()), {"id", "field0"})
 
 
-class FileLoaderTests(TestCase):
-    def test_tsv_validation(self):
-        self.assertRaises(
-            ValueError,
-            lambda: TSVFileLoader(
-                [FileLoaderField("0", "field0", str)], use_idx_as_id=True
-            ),
-        )
-
-
 class TextClassificationLoader(TestCase):
     def test_load_in_memory_tsv(self):
         loader = get_loader(
