@@ -9,29 +9,30 @@ from typing import Any, final, Optional, Union
 
 from explainaboard.constants import Source
 
+DType = Union[type[int], type[float], type[str], type[dict]]
+
 
 @dataclass
 class FileLoaderField:
     """
-    Args:
-        src_name: field name in the source file. use int for tsv column indices and use
-            str for dict keys
-        target_name: field name expected in the loaded data
-        dtype: data type of the field in the loaded data. It is only intended for simple
-            type conversion so it only supports int, float and str. Pass in None to turn
-            off type conversion.
-        strip_before_parsing: call strip() on strings before casting to either str, int
-            or float. It is only intended to be used with these three data types.
+    :param src_name: field name in the source file. use int for tsv column indices and
+        use str for dict keys
+    :param target_name: field name expected in the loaded data
+    :param dtype: data type of the field in the loaded data. It is only intended for
+        simple type conversion so it only supports int, float and str. Pass in None
+        to turn off type conversion.
+    :param strip_before_parsing: call strip() on strings before casting to either str,
+        int or float. It is only intended to be used with these three data types.
             It defaults to True for str. For all other types, it defaults to False
-        parser: a custom parser for the field. When called, `data_points[idx][src_name]`
-            is passed in as input, it is expected to return the parsed result.
-            If parser is not None, `strip_before_parsing` and dtype will not have any
-            effect.
+    :param parser: a custom parser for the field. When called,
+        `data_points[idx][src_name]` is passed in as input, it is expected to return
+        the parsed result. If parser is not None, `strip_before_parsing` and dtype
+        will not have any effect.
     """
 
     src_name: Union[int, str]
     target_name: str
-    dtype: Optional[Union[type[int], type[float], type[str], type[dict]]] = None
+    dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
     parser: Optional[Callable] = None
 
@@ -59,6 +60,12 @@ class FileLoader:
         use_idx_as_id: bool = True,
         id_field_name: Optional[str] = None,
     ) -> None:
+        """Loader that loads data according to fields
+
+        :param use_idx_as_id: whether to use sample indices as IDs. Generated IDs are
+        str even though it represents an index. (This is to make sure all sample IDs
+        are str.)
+        """
         self._fields = fields or []
         self._use_idx_as_id = use_idx_as_id
         self._id_field_name = id_field_name
@@ -120,10 +127,9 @@ class FileLoader:
         """Load data from source and return an iterable of data points. It does not use
         fields information to parse the data points.
 
-        Args:
-            data (str): base64 encoded system output content or a path for the system
+        :param data (str): base64 encoded system output content or a path for the system
                 output file
-            source: source of data
+        :param source: source of data
         """
         raise NotImplementedError(
             "load_raw() is not implemented for the base FileLoader"
@@ -252,3 +258,42 @@ class DatalabFileLoader(FileLoader):
         if source == Source.in_memory:
             return data
         raise NotImplementedError
+
+
+class TextFileLoader(FileLoader):
+    """loads a text file. Each line is a different sample.
+    - only one field is allowed. It is often used for predicted outputs.
+    """
+
+    def __init__(self, target_name: str = "output", dtype=DType) -> None:
+        # src_name is not used for this file loader, it overrides the base load method.
+        super().__init__(
+            [FileLoaderField("_", target_name, dtype, False)], use_idx_as_id=True
+        )
+
+    @classmethod
+    def load_raw(cls, data: str, source: Source) -> Iterable:
+        if source == Source.in_memory:
+            return data.splitlines()
+        elif source == Source.local_filesystem:
+            with open(data, "r", encoding="utf8") as f:
+                return f.readlines()
+        raise NotImplementedError
+
+    def validate(self):
+        super().validate()
+        if len(self._fields) != 1:
+            raise ValueError("Text File Loader only takes one field")
+
+    def load(self, data: str, source: Source) -> Iterable[dict]:
+        raw_data = self.load_raw(data, source)
+        parsed_data_points: list[dict] = []
+
+        for idx, data_point in enumerate(raw_data):
+            parsed_data_point = {}
+            field = self._fields[0]
+
+            parsed_data_point[field.target_name] = self.parse_data(data_point, field)
+            self.generate_id(parsed_data_point, idx)
+            parsed_data_points.append(parsed_data_point)
+        return parsed_data_points
