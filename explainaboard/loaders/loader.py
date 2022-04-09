@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import dataclass
 import json
 from typing import List, Mapping, Optional, Union
 
 from explainaboard.constants import FileType, Source
-from explainaboard.loaders.file_loader import FileLoader
+from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.tasks import TaskType
 from explainaboard.utils.typing_utils import unwrap
 
@@ -60,16 +61,16 @@ class Loader:
                 "please add it to the file_loaders."
             )
 
-        self._user_defined_features_configs: dict = (
-            self._parse_user_defined_features_configs()
-        )
+        self._user_defined_features_configs: dict[
+            str, CustomFeature
+        ] = self._parse_user_defined_features_configs()
 
         self._user_defined_metadata_configs: dict = (
             self._parse_user_defined_metadata_configs()
         )
 
     @property
-    def user_defined_features_configs(self) -> dict:
+    def user_defined_features_configs(self) -> dict[str, CustomFeature]:
         if self._user_defined_features_configs is None:
             raise Exception(
                 "User defined features configs are not available "
@@ -96,7 +97,20 @@ class Loader:
             ):
                 self._data = json.dumps(raw_data["predictions"])
                 self._source = Source.in_memory
-                return raw_data["user_defined_features_configs"]
+                custom_feature_configs: dict[str, CustomFeature] = {
+                    name: CustomFeature.from_dict(name, dikt)
+                    for name, dikt in raw_data["user_defined_features_configs"].items()
+                }
+                fields: list[FileLoaderField] = []
+                for feature in custom_feature_configs.values():
+                    fields.append(
+                        # dtype is set to None because custom feature configs doesn't
+                        # use the same set of dtypes as FileLoader (this is not
+                        # enforced anywhere)
+                        FileLoaderField(feature.name, feature.name, None, False)
+                    )
+                self.file_loaders[FileType.json].add_fields(fields)
+                return custom_feature_configs
         return {}
 
     def _parse_user_defined_metadata_configs(self) -> dict:
@@ -114,9 +128,7 @@ class Loader:
 
     def load(self) -> Iterable[dict]:
         file_loader = self.file_loaders[self._file_type]
-        return file_loader.load(
-            self._data, self._source, self.user_defined_features_configs
-        )
+        return file_loader.load(self._data, self._source)
 
 
 # loader_registry is a global variable, storing all basic loading functions
@@ -144,3 +156,20 @@ def register_loader(task_type: TaskType):
         return cls
 
     return register_loader_fn
+
+
+@dataclass
+class CustomFeature:
+    name: str
+    dtype: str
+    description: str
+    num_buckets: int
+
+    @classmethod
+    def from_dict(cls, name: str, dikt: dict) -> CustomFeature:
+        return CustomFeature(
+            name,
+            dtype=dikt["dtype"],
+            description=dikt["description"],
+            num_buckets=dikt["num_buckets"],
+        )
