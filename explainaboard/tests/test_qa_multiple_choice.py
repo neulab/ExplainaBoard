@@ -46,6 +46,7 @@ class TestQAMultipleChoice(unittest.TestCase):
             FileType.json,
         )
         data = list(loader.load())
+        self.assertIn("commonsense_category", data[0], "fails to load custom field")
 
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,

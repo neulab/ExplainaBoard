@@ -149,7 +149,6 @@ class KGLinkTailPredictionProcessor(Processor):
     def __init__(self):
         super().__init__()
         self.entity_type_level_map = None
-        self._user_defined_feature_config = None
 
     @aggregating()
     def _statistics_func(self, samples: Iterator[dict[str, str]]):

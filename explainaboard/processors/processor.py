@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 import json
 from typing import Any, Optional
 
@@ -20,6 +20,7 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
+from explainaboard.loaders.loader import CustomFeature
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
@@ -65,7 +66,7 @@ class Processor(metaclass=abc.ABCMeta):
         # self._statistics_func = None
         self._tokenizer = SingleSpaceTokenizer()
         self._preprocessor = None
-        self._user_defined_feature_config = None
+        self._user_defined_feature_config: Optional[dict[str, CustomFeature]] = None
         self._features = self.default_features()
 
     def _get_statistics_resources(
@@ -213,25 +214,25 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 feature_name,
                 feature_config,
             ) in self._user_defined_feature_config.items():
-                if feature_config["dtype"] == "string":
+                if feature_config.dtype == "string":
                     self._features[feature_name] = feature.Value(
                         dtype="string",
-                        description=feature_config["description"],
+                        description=feature_config.description,
                         is_bucket=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_discrete_value",
-                            number=feature_config["num_buckets"],
+                            number=feature_config.num_buckets,
                             setting=1,
                         ),
                     )
-                elif feature_config['dtype'] == 'float':
+                elif feature_config.dtype == 'float':
                     self._features[feature_name] = feature.Value(
                         dtype="float",
-                        description=feature_config["description"],
+                        description=feature_config.description,
                         is_bucket=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_specified_bucket_value",
-                            number=feature_config["num_buckets"],
+                            number=feature_config.num_buckets,
                             setting=(),
                         ),
                     )
@@ -248,12 +249,12 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
 
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param external_stats: Extenral statistics that are used to calculate training
+        :param external_stats: External statistics that are used to calculate training
             set specific features
         :return: The features that are active (e.g. skipping training set features when
             no training set available)
         """
-        bucket_feature_funcs = {}
+        bucket_feature_funcs: dict[str, tuple[Callable, bool]] = {}
         sys_features = unwrap(sys_info.features)
 
         for bucket_feature in sys_features.get_bucket_features():
@@ -270,7 +271,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 bucket_feature_funcs[bucket_feature] = (
                     # no need to call a function for user-defined features;
                     # they are already in the data point itself
-                    None,
+                    lambda x: x,
                     sys_features[bucket_feature].require_training_set,
                 )
 
@@ -297,7 +298,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 # handles user-defined features
                 if (
                     self._user_defined_feature_config is not None
-                    and bucket_key in self._user_defined_feature_config.keys()
+                    and bucket_key in self._user_defined_feature_config
                 ):
                     # TODO(Pengfei): this should be generalized
                     feature_value = (
