@@ -5,13 +5,13 @@ import pathlib
 import unittest
 
 from eaas import Config
+from eaas.async_client import AsyncClient
 import numpy as np
 import sklearn.metrics
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.loader import get_loader
 import explainaboard.metric
-from explainaboard.utils.async_eaas import AsyncEaaSClient
 
 artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
 
@@ -82,7 +82,7 @@ class TestMetric(unittest.TestCase):
         self,
         sys_output: list[dict],
         metric_names: list[str],
-        eaas_client: AsyncEaaSClient,
+        eaas_client: AsyncClient,
     ):
         # Queue up EaaS client request for all metrics
         inputs = []
@@ -95,11 +95,7 @@ class TestMetric(unittest.TestCase):
                 }
             )
         return eaas_client.async_score(
-            inputs,
-            task="sum",  # TODO(pengfei): this should be generalized
-            metrics=metric_names.copy(),
-            lang="en",
-            cal_attributes=False,
+            inputs, metrics=metric_names.copy(), calculate=['corpus', 'stats']
         )
 
     def test_eaas_decomposabiltiy(self):
@@ -115,7 +111,7 @@ class TestMetric(unittest.TestCase):
         sys_output = list(loader.load())
 
         # Initialize client and decide which metrics to test
-        eaas_client = AsyncEaaSClient(Config())
+        eaas_client = AsyncClient(Config())
         metric_names = ['rouge1', 'bleu', 'chrf']
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
@@ -132,22 +128,22 @@ class TestMetric(unittest.TestCase):
         full_result = full_request.get_result()
         half_result = half_request.get_result()
 
-        for name, metric in zip(metric_names, metrics):
+        for i, (name, metric) in enumerate(zip(metric_names, metrics)):
             with self.subTest(msg=name):
                 full_stats = explainaboard.metric.EaaSMetricStats(
-                    name=name, eaas_request=full_request
+                    name=name, pos=i, eaas_request=full_request
                 )
                 half_stats = explainaboard.metric.EaaSMetricStats(
-                    name=name, eaas_request=half_request
+                    name=name, pos=i, eaas_request=half_request
                 )
                 split_stats = full_stats.filter(half_ids)
                 # EaaS-returned value should be same as explainaboard-calculated value
                 self.assertAlmostEqual(
-                    full_result['corpus_level'][f'corpus_{name}'],
+                    full_result['scores'][i]['corpus'],
                     metric.evaluate_from_stats(full_stats).value,
                 )
                 self.assertAlmostEqual(
-                    half_result['corpus_level'][f'corpus_{name}'],
+                    half_result['scores'][i]['corpus'],
                     metric.evaluate_from_stats(half_stats).value,
                 )
                 # Stats calculated over half corpus should be the same as the stats
