@@ -19,6 +19,25 @@ class TestNER(unittest.TestCase):
             FileType.conll,
         )
         data = loader.load()
+        self.assertEqual(len(data), 4)
+        self.assertEqual(
+            data[0]["tokens"],
+            [
+                "SOCCER",
+                "-",
+                "JAPAN",
+                "GET",
+                "LUCKY",
+                "WIN",
+                ",",
+                "CHINA",
+                "IN",
+                "SURPRISE",
+                "DEFEAT",
+                ".",
+            ],
+        )
+        self.assertEqual(data[1]["pred_tags"], ["B-PER", "I-PER"])
 
         metadata = {
             "task_name": TaskType.named_entity_recognition.value,
@@ -31,7 +50,6 @@ class TestNER(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
 
