@@ -16,15 +16,20 @@ class BaseLoaderTests(TestCase):
             load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
             Source.in_memory,
             FileType.tsv,
-            {
-                FileType.tsv: TSVFileLoader(
-                    [FileLoaderField(0, "field0", str)], use_idx_as_id=True
-                )
-            },
+            TSVFileLoader([FileLoaderField(0, "field0", str)], use_idx_as_id=True),
         )
         samples = [sample for sample in loader.load()]
         self.assertEqual(len(samples), 10)
         self.assertEqual(set(samples[0].keys()), {"id", "field0"})
+
+    def test_missing_loader(self):
+        """raises ValueError because a tsv file loader is not provided by default"""
+        self.assertRaises(
+            ValueError,
+            lambda: Loader(
+                f"{artifacts_path}sys_out1.tsv", Source.local_filesystem, FileType.tsv
+            ),
+        )
 
 
 class TextClassificationLoader(TestCase):

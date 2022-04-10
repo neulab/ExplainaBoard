@@ -6,7 +6,6 @@ from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import FileLoader, JSONFileLoader
 from explainaboard.loaders.loader import Loader, register_loader
 from explainaboard.tasks import TaskType
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_loader(TaskType.kg_link_tail_prediction)
@@ -39,9 +38,11 @@ class KgLinkTailPredictionLoader(Loader):
 
         # TODO(odashi):
         # Avoid potential bug: load_raw returns Iterable[Any] which is not a dict.
-        raw_data: dict[str, dict[str, str]] = self.file_loaders[  # type: ignore
-            unwrap(self._file_type)
-        ].load_raw(self._data, self._source)
+        # kg format is the only special case we have now. The format will change to use
+        # our standard sys output format in the future.
+        raw_data: dict[str, dict[str, str]] = self.file_loader.load_raw(  # type: ignore
+            self._data, self._source
+        )
 
         if self.user_defined_features_configs:  # user defined features are present
             for _, (example_id, features_dict) in enumerate(raw_data.items()):
