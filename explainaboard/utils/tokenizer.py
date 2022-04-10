@@ -7,6 +7,29 @@ import string
 import sys
 import unicodedata
 
+from sacrebleu.tokenizers.tokenizer_intl import TokenizerV14International
+from sacrebleu.tokenizers.tokenizer_ja_mecab import TokenizerJaMecab
+from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
+
+from explainaboard.tasks import TaskType
+
+
+def get_default_tokenizer(task_type: TaskType, lang: str) -> Tokenizer:
+    cond_gen_tasks = {
+        TaskType.conditional_generation,
+        TaskType.machine_translation,
+        TaskType.summarization,
+    }
+    if task_type in cond_gen_tasks:
+        if lang == 'zh':
+            return SacreBleuTokenizer(variety='zh')
+        elif lang == 'ja':
+            return SacreBleuTokenizer(variety='ja')
+        else:
+            return SacreBleuTokenizer(variety='intl')
+    else:
+        return SingleSpaceTokenizer()
+
 
 class Tokenizer:
     @abc.abstractmethod
@@ -27,6 +50,13 @@ class Tokenizer:
         """
         ...
 
+    @abc.abstractmethod
+    def json_repr(self) -> dict:
+        """
+        Return a representation of this class that is serializable in json
+        """
+        ...
+
 
 class SingleSpaceTokenizer(Tokenizer):
     """
@@ -39,6 +69,36 @@ class SingleSpaceTokenizer(Tokenizer):
 
     def detokenize(self, tokens: list[str]) -> str:
         return ' '.join(tokens)
+
+    def json_repr(self):
+        return {'cls': 'SingleSpaceTokenizer'}
+
+
+class SacreBleuTokenizer(Tokenizer):
+    """
+    Split a string based on the strategy in SacreBLEU
+    """
+
+    def __init__(self, variety: str = 'intl'):
+        self.variety = variety
+        if variety == 'intl':
+            self.tokenizer = TokenizerV14International()
+        elif variety == 'zh':
+            self.tokenizer = TokenizerZh()
+        elif variety == 'ja-mecab':
+            self.tokenizer = TokenizerJaMecab()
+        else:
+            raise ValueError(f'Illegal variety of SacreBleuTokenizer: {variety}')
+
+    @lru_cache(maxsize=20)
+    def __call__(self, text: str) -> list[str]:
+        return self.tokenizer(text).split(' ')
+
+    def detokenize(self, tokens: list[str]) -> str:
+        raise NotImplementedError
+
+    def json_repr(self):
+        return {'cls': 'SacreBleuTokenizer', 'variety': self.variety}
 
 
 class MLQAMixTokenizer(Tokenizer):
@@ -73,3 +133,6 @@ class MLQAMixTokenizer(Tokenizer):
 
     def detokenize(self, tokens: list[str]) -> str:
         raise NotImplementedError
+
+    def json_repr(self):
+        return {'cls': 'MLQAMixTokenizer'}
