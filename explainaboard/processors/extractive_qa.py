@@ -12,6 +12,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -103,7 +104,7 @@ class QAExtractiveProcessor(Processor):
         ]
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator):
+    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
         """
         Input:
         samples: [{
@@ -116,23 +117,25 @@ class QAExtractiveProcessor(Processor):
         """
 
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['context'], self._tokenizer
+            samples, lambda x: x['context'], tokenizer
         )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_context_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["context"]))
+    def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["context"]))
 
-    def _get_question_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["question"]))
+    def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["question"]))
 
-    def _get_answer_length(self, existing_features: dict):
+    def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
         if isinstance(existing_features["answers"]["text"], list):
-            return len(self._tokenizer(existing_features["answers"]["text"][0]))
+            return len(sys_info.tokenize(existing_features["answers"]["text"][0]))
         else:
-            return len(self._tokenizer(existing_features["answers"]["text"]))
+            return len(sys_info.tokenize(existing_features["answers"]["text"]))
 
-    def _get_sim_context_question(self, existing_features: dict):
+    def _get_sim_context_question(
+        self, sys_info: SysOutputInfo, existing_features: dict
+    ):
 
         references = existing_features["context"]
         hypothesis = existing_features["question"]
@@ -141,14 +144,18 @@ class QAExtractiveProcessor(Processor):
         return res_json["corpus_bleu"]
 
     # training set dependent features (could be merged for optimization?)
-    def _get_num_oov(self, existing_features: dict, statistics: Any):
+    def _get_num_oov(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['context'], self._tokenizer
+            existing_features, statistics, lambda x: x['context'], sys_info.tokenizer
         )
 
-    def _get_fre_rank(self, existing_features: dict, statistics: Any):
+    def _get_fre_rank(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['context'], self._tokenizer
+            existing_features, statistics, lambda x: x['context'], sys_info.tokenizer
         )
 
     # --- End feature functions

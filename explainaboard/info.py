@@ -12,6 +12,8 @@ from explainaboard.feature import Features
 from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer, Tokenizer
+from explainaboard.utils.typing_utils import unwrap
 
 logger = get_logger(__name__)
 
@@ -65,11 +67,13 @@ class Result:
 
 @dataclass
 class SysOutputInfo:
-    """Information about a system output
+    """Information about a system output and its analysis settings
 
     Attributes:
+        task_name (str): the name of the task.
         model_name (str): the name of the system .
         dataset_name (str): the dataset used of the system.
+        sub_dataset_name (str): the name of the sub-dataset.
         language (str): the language of the dataset.
         code (str): the url of the code.
         download_link (str): the url of the system output.
@@ -77,8 +81,7 @@ class SysOutputInfo:
         features (Features, optional): the features used to describe system output's
             column type.
         is_print_case (bool): Whether or not to print out cases
-        is_print_confidence_interval (bool): Whether or not to print out confidence
-            intervals
+        conf_value (float): The p-value of the confidence interval
     """
 
     # set in the system_output scripts
@@ -87,12 +90,13 @@ class SysOutputInfo:
     dataset_name: Optional[str] = None
     sub_dataset_name: Optional[str] = None
     metric_names: Optional[list[str]] = None
+    language: str = "en"
     reload_stat: bool = True
     is_print_case: bool = True
-    language: str = "en"
     conf_value: float = 0.05
     system_details: Optional[dict] = None
     metric_configs: Optional[dict[str, MetricConfig]] = None
+    tokenizer: Tokenizer = SingleSpaceTokenizer()
 
     # set later
     # code: str = None
@@ -103,6 +107,9 @@ class SysOutputInfo:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+    def tokenize(self, src: str) -> list[str]:
+        return unwrap(self.tokenizer)(src)
 
     def replace_bad_keys(self, data):
         if isinstance(data, list):
@@ -134,7 +141,7 @@ class SysOutputInfo:
         data_dict = self.to_dict()
         self.replace_bad_keys(data_dict)
         try:
-            print(json.dumps(data_dict, indent=4))
+            print(json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()))
         except TypeError as e:
             raise e
 
@@ -142,7 +149,11 @@ class SysOutputInfo:
         """SystemOutputInfo => JSON"""
         data_dict = self.to_dict()
         self.replace_bad_keys(data_dict)
-        file.write(json.dumps(data_dict, indent=4).encode("utf-8"))
+        file.write(
+            json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()).encode(
+                "utf-8"
+            )
+        )
 
     @classmethod
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
