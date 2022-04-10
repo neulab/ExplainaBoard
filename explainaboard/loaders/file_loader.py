@@ -156,13 +156,8 @@ class FileLoader:
 
 
 class TSVFileLoader(FileLoader):
-    def __init__(
-        self,
-        fields: list[FileLoaderField] = None,
-        use_idx_as_id: bool = True,
-        id_field_name: Optional[str] = None,
-    ) -> None:
-        super().__init__(fields, use_idx_as_id, id_field_name)
+    def validate(self):
+        super().validate()
         for field in self._fields:
             if not isinstance(field.src_name, int):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
@@ -182,8 +177,13 @@ class TSVFileLoader(FileLoader):
 
 
 class CoNLLFileLoader(FileLoader):
-    def __init__(self) -> None:
-        super().__init__(fields=[], use_idx_as_id=False, id_field_name=None)
+    def __init__(self, fields: list[FileLoaderField] = None) -> None:
+        super().__init__(fields, False)
+
+    def validate(self):
+        super().validate()
+        if len(self._fields) != 3:
+            raise ValueError("CoNLL file loader expects 3 fields")
 
     @classmethod
     def load_raw(cls, data: str, source: Source) -> Iterable:
@@ -198,46 +198,43 @@ class CoNLLFileLoader(FileLoader):
         raise NotImplementedError
 
     def load(self, data: str, source: Source) -> Iterable[dict]:
+        """each sample is a sentence"""
         raw_data = self.load_raw(data, source)
-        parsed_data_points: list[dict] = []
+        parsed_samples: list[dict] = []
         guid = 0
-        tokens: list[str] = []
-        ner_true_tags: list[str] = []
-        ner_pred_tags: list[str] = []
+        curr_sentence_fields: dict[Union[str, int], list[str]] = {
+            field.src_name: [] for field in self._fields
+        }
 
-        for id, line in enumerate(raw_data):
-            if line.startswith("-DOCSTART-") or line == "" or line == "\n":
-                if tokens:
-                    parsed_data_points.append(
-                        {
-                            "id": str(guid),
-                            "tokens": tokens,
-                            "true_tags": ner_true_tags,
-                            "pred_tags": ner_pred_tags,
-                        }
-                    )
-                    guid += 1
-                    tokens = []
-                    ner_true_tags = []
-                    ner_pred_tags = []
+        def add_sample():
+            nonlocal guid, curr_sentence_fields
+            if curr_sentence_fields[0]:  # data not empty
+                new_sample: dict = {}
+                for field in self._fields:  # parse data point according to fields
+                    new_sample[field.target_name] = curr_sentence_fields[field.src_name]
+                new_sample["id"] = str(guid)
+                parsed_samples.append(new_sample)
+                guid += 1
+                curr_sentence_fields = {
+                    field.src_name: [] for field in self._fields
+                }  # reset
+
+        for line in raw_data:
+            if (
+                line.startswith("-DOCSTART-") or line == "" or line == "\n"
+            ):  # at sentence boundary
+                add_sample()
             else:
                 splits = (
                     line.split("\t") if len(line.split("\t")) == 3 else line.split(" ")
                 )
-                tokens.append(splits[0].strip())
-                ner_true_tags.append(splits[1].strip())
-                ner_pred_tags.append(splits[2].strip())
+                for field in self._fields:
+                    curr_sentence_fields[field.src_name].append(
+                        self.parse_data(splits[field.src_name], field)
+                    )
 
-        # last example
-        parsed_data_points.append(
-            {
-                "id": str(guid),
-                "tokens": tokens,
-                "true_tags": ner_true_tags,
-                "pred_tags": ner_pred_tags,
-            }
-        )
-        return parsed_data_points
+        add_sample()  # add last example
+        return parsed_samples
 
 
 class JSONFileLoader(FileLoader):
