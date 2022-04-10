@@ -165,11 +165,11 @@ class TSVFileLoader(FileLoader):
     def load_raw(cls, data: str, source: Source) -> Iterable:
         if source == Source.in_memory:
             file = StringIO(data)
-            return csv.reader(file, delimiter='\t')
+            return csv.reader(file, delimiter='\t', quoting=csv.QUOTE_NONE)
         elif source == Source.local_filesystem:
             content: list[list[str]] = []
             with open(data, "r", encoding="utf8") as fin:
-                for record in csv.reader(fin, delimiter='\t'):
+                for record in csv.reader(fin, delimiter='\t', quoting=csv.QUOTE_NONE):
                     content.append(record)
             return content
         raise NotImplementedError
