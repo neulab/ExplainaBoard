@@ -6,7 +6,11 @@ import json
 from typing import Optional
 
 from explainaboard.constants import FileType, Source
-from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
+from explainaboard.loaders.file_loader import (
+    FileLoader,
+    FileLoaderField,
+    TextFileLoader,
+)
 from explainaboard.tasks import TaskType
 from explainaboard.utils.typing_utils import unwrap
 
@@ -14,12 +18,12 @@ from explainaboard.utils.typing_utils import unwrap
 class Loader:
     """Base class of Loaders
 
-    Args:
-        data: base64 encoded system output content or a path for the system output file
-        source: source of data
-        file type: tsv, json, conll, etc.
-        file_loaders: a dict of file loaders. To customize the loading process, either
-            implement a custom FileLoader or override `load()`
+    :param data: base64 encoded system output content or a path for the system output
+    file
+    :param source: source of data
+    :param file type: tsv, json, conll, etc.
+    :param file_loaders: a dict of file loaders. To customize the loading process,
+    either implement a custom FileLoader or override `load()`
     """
 
     @classmethod
@@ -34,15 +38,17 @@ class Loader:
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {}
 
+    @classmethod
+    def default_output_file_loaders(cls) -> FileLoader:
+        return TextFileLoader("output", str)
+
     def __init__(
         self,
         data: str,
         source: Optional[Source] = None,
         file_type: Optional[FileType] = None,
-        file_loaders: Optional[dict[FileType, FileLoader]] = None,
+        file_loader: FileLoader = None,
     ):
-        if file_loaders is None:
-            file_loaders = {}
         if not source and not self.default_source():
             raise ValueError("no source is provided for the loader")
         else:
@@ -53,17 +59,19 @@ class Loader:
         else:
             self._file_type = file_type or unwrap(self.default_file_type())
 
-        self.file_loaders: dict[FileType, FileLoader] = (
-            file_loaders or self.default_dataset_file_loaders()
-        )
+        if file_loader:
+            self.file_loader: FileLoader = file_loader
+        else:
+            default_file_loaders = self.default_dataset_file_loaders()
+            if self._file_type not in default_file_loaders:
+                raise ValueError(
+                    f"A file loader for {self._file_type} is not provided. "
+                    "please pass it in as an argument."
+                )
+            else:
+                self.file_loader = default_file_loaders[self._file_type]
+
         self._data = data  # base64 or filepath
-
-        if self._file_type not in self.file_loaders:
-            raise NotImplementedError(
-                f"A file loader for {self._file_type} is not provided. "
-                "please add it to the file_loaders."
-            )
-
         self._user_defined_features_configs: dict[
             str, CustomFeature
         ] = self._parse_user_defined_features_configs()
@@ -91,10 +99,9 @@ class Loader:
         return self._user_defined_metadata_configs
 
     def _parse_user_defined_features_configs(self) -> dict:
+        """custom features can only be defined in JSON files"""
         if self._file_type == FileType.json:
-            raw_data = self.file_loaders[FileType.json].load_raw(
-                self._data, self._source
-            )
+            raw_data = self.file_loader.load_raw(self._data, self._source)
             if isinstance(raw_data, dict) and raw_data.get(
                 "user_defined_features_configs"
             ):
@@ -112,15 +119,13 @@ class Loader:
                         # enforced anywhere)
                         FileLoaderField(feature.name, feature.name, None, False)
                     )
-                self.file_loaders[FileType.json].add_fields(fields)
+                self.file_loader.add_fields(fields)
                 return custom_feature_configs
         return {}
 
     def _parse_user_defined_metadata_configs(self) -> dict:
         if self._file_type == FileType.json:
-            raw_data = self.file_loaders[FileType.json].load_raw(
-                self._data, self._source
-            )
+            raw_data = self.file_loader.load_raw(self._data, self._source)
             if isinstance(raw_data, dict) and raw_data.get(
                 "user_defined_metadata_configs"
             ):
@@ -130,8 +135,7 @@ class Loader:
         return {}
 
     def load(self) -> Iterable[dict]:
-        file_loader = self.file_loaders[self._file_type]
-        return file_loader.load(self._data, self._source)
+        return self.file_loader.load(self._data, self._source)
 
 
 # loader_registry is a global variable, storing all basic loading functions
