@@ -27,7 +27,7 @@ def main():
     parser.add_argument(
         '--system_outputs',
         type=str,
-        required=False,
+        required=True,
         nargs="+",
         help=(
             "the directories of system outputs. Multiple one should be separated by "
