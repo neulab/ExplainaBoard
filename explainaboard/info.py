@@ -111,18 +111,18 @@ class SysOutputInfo:
     def tokenize(self, src: str) -> list[str]:
         return unwrap(self.tokenizer)(src)
 
-    def replace_bad_keys(self, data):
+    def replace_nonstring_keys(self, data):
         if isinstance(data, list):
             for value in data:
                 if isinstance(value, dict):
-                    self.replace_bad_keys(value)
+                    self.replace_nonstring_keys(value)
         else:
             replace_keys = []
             for key, value in data.items():
                 if not isinstance(key, str):
                     replace_keys.append(key)
                 if isinstance(value, dict) or isinstance(value, list):
-                    self.replace_bad_keys(value)
+                    self.replace_nonstring_keys(value)
             for key in replace_keys:
                 data[str(key)] = data[key]
                 del data[key]
@@ -139,7 +139,7 @@ class SysOutputInfo:
 
     def print_as_json(self):
         data_dict = self.to_dict()
-        self.replace_bad_keys(data_dict)
+        self.replace_nonstring_keys(data_dict)
         try:
             print(json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()))
         except TypeError as e:
@@ -148,7 +148,7 @@ class SysOutputInfo:
     def _dump_info(self, file):
         """SystemOutputInfo => JSON"""
         data_dict = self.to_dict()
-        self.replace_bad_keys(data_dict)
+        self.replace_nonstring_keys(data_dict)
         file.write(
             json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()).encode(
                 "utf-8"
