@@ -3,9 +3,11 @@ from explainaboard.loaders.file_loader import (
     FileLoader,
     FileLoaderField,
     JSONFileLoader,
+    TextFileLoader,
     TSVFileLoader,
 )
-from explainaboard.loaders.loader import Loader, register_loader
+from explainaboard.loaders.loader import Loader
+from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.tasks import TaskType
 
 
@@ -20,19 +22,18 @@ class AspectBasedSentimentClassificationLoader(Loader):
     """
 
     @classmethod
-    def default_file_type(cls) -> FileType:
+    def default_dataset_file_type(cls) -> FileType:
         return FileType.tsv
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        field_names = ["aspect", "text", "true_label", "predicted_label"]
+        field_names = ["aspect", "text", "true_label"]
         return {
             FileType.tsv: TSVFileLoader(
                 [
                     FileLoaderField(0, field_names[0], str),
                     FileLoaderField(1, field_names[1], str),
                     FileLoaderField(2, field_names[2], str),
-                    FileLoaderField(3, field_names[3], str),
                 ],
             ),
             FileType.json: JSONFileLoader(
@@ -40,7 +41,16 @@ class AspectBasedSentimentClassificationLoader(Loader):
                     FileLoaderField(field_names[0], field_names[0], str),
                     FileLoaderField(field_names[1], field_names[1], str),
                     FileLoaderField(field_names[2], field_names[2], str),
-                    FileLoaderField(field_names[3], field_names[3], str),
                 ]
+            ),
+        }
+
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        field_name = "predicted_label"
+        return {
+            FileType.text: TextFileLoader(field_name, str),
+            FileType.json: JSONFileLoader(
+                [FileLoaderField(field_name, field_name, str)]
             ),
         }

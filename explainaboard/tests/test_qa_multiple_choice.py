@@ -1,25 +1,56 @@
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, Source, TaskType
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestQAMultipleChoice(unittest.TestCase):
-    def test_generate_system_analysis(self):
-        """TODO: should add harder tests"""
+    artifact_path = os.path.join(test_artifacts_path, "qa_multiple_choice")
+    json_dataset = os.path.join(artifact_path, "dataset_synthetic_metaphor_qa.json")
+    json_output = os.path.join(artifact_path, "output.json")
 
-        path_data = artifacts_path + "synthetic_metaphor_qa.json"
-        loader = get_loader(
+    def test_load_json(self):
+        loader = get_loader_custom_dataset(
             TaskType.qa_multiple_choice,
-            path_data,
+            self.json_dataset,
+            self.json_output,
+            Source.local_filesystem,
             Source.local_filesystem,
             FileType.json,
+            FileType.json,
         )
-        data = list(loader.load())
+        data = loader.load()
+        self.assertEqual(len(data), 4)
+        self.assertEqual(
+            data[0],
+            {
+                'context': 'The girl was as down-to-earth as a Michelin-starred canape',
+                'question': '',
+                'answers': {
+                    'text': 'The girl was not down-to-earth at all.',
+                    'option_index': 0,
+                },
+                'id': '0',
+                'predicted_answers': {
+                    'text': 'The girl was not down-to-earth at all.',
+                    'option_index': 0,
+                },
+            },
+        )
 
+    def test_generate_system_analysis(self):
+        loader = get_loader_custom_dataset(
+            TaskType.qa_multiple_choice,
+            self.json_dataset,
+            self.json_output,
+            Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.json,
+            FileType.json,
+        )
+        data = loader.load()
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
             "dataset_name": "metaphor_qa",
@@ -27,26 +58,27 @@ class TestQAMultipleChoice(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.qa_multiple_choice.value)
-
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_multiple_qa_customized_feature(self):
-        """TODO: should add harder tests"""
-
-        path_data = artifacts_path + "test-metaphor-qa-customized-features.json"
-
-        loader = get_loader(
+        dataset_path = os.path.join(self.artifact_path, "dataset_metaphor_qa.json")
+        output_path = os.path.join(
+            self.artifact_path, "output_metaphor_qa_customized_features.json"
+        )
+        loader = get_loader_custom_dataset(
             TaskType.qa_multiple_choice,
-            path_data,
+            dataset_path,
+            output_path,
+            Source.local_filesystem,
             Source.local_filesystem,
             FileType.json,
+            FileType.json,
         )
-        data = list(loader.load())
-        self.assertIn("commonsense_category", data[0], "fails to load custom field")
+        data = loader.load()
+        self.assertEqual(data[0]["commonsense_category"], ["obj", "cul"])
 
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
@@ -60,7 +92,6 @@ class TestQAMultipleChoice(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
 

@@ -1,0 +1,26 @@
+[
+  {
+    "predicted_answers": {
+      "text": "The girl was not down-to-earth at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was very down-to-earth.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's room was a total mess.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's room was very clean.",
+      "option_index": 1
+    }
+  }
+]

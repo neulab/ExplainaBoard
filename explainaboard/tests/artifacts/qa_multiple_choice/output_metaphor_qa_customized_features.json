@@ -1,0 +1,46 @@
+{
+  "user_defined_features_configs": {
+    "commonsense_category": {
+      "dtype": "string",
+      "description": "commonsense_category",
+      "num_buckets": 8
+    }
+  },
+  "predictions": [
+    {
+      "predicted_answers": {
+        "text": "The girl was not down-to-earth at all.",
+        "option_index": 0
+      },
+      "commonsense_category": ["obj", "cul"]
+    },
+    {
+      "predicted_answers": {
+        "text": "The girl was not down-to-earth at all.",
+        "option_index": 0
+      },
+      "commonsense_category": ["obj", "cul"]
+    },
+    {
+      "predicted_answers": {
+        "text": "The girl's room was a total mess.",
+        "option_index": 0
+      },
+      "commonsense_category": ["obj", "vis"]
+    },
+    {
+      "predicted_answers": {
+        "text": "The girl's room was a total mess.",
+        "option_index": 0
+      },
+      "commonsense_category": ["soc"]
+    },
+    {
+      "predicted_answers": {
+        "text": "The view was very clear.",
+        "option_index": 0
+      },
+      "commonsense_category": ["vis"]
+    }
+  ]
+}

@@ -1,34 +1,45 @@
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, Source, TaskType
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestExtractiveQA(unittest.TestCase):
-    def test_extractive_qa_en(self):
-        """TODO: should add harder tests"""
+    artifact_path = os.path.join(test_artifacts_path, "extractive_qa")
 
-        path_data = artifacts_path + "test-xquad-en.json"
-        loader = get_loader(
+    def test_extractive_qa_en(self):
+        json_en_dataset = os.path.join(self.artifact_path, "dataset-xquad-en.json")
+        json_en_output = os.path.join(self.artifact_path, "output-xquad-en.json")
+        loader = get_loader_custom_dataset(
             TaskType.question_answering_extractive,
-            path_data,
+            json_en_dataset,
+            json_en_output,
             Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.json,
             FileType.json,
         )
         data = loader.load()
+        self.assertEqual(len(data), 1190)
+        sample = data[0]
+        self.assertEqual(sample["predicted_answers"], {"text": "308"})
+        self.assertEqual(sample["id"], "0")
+        self.assertEqual(sample["answers"], {"answer_start": [-1], "text": ["308"]})
+        self.assertEqual(
+            sample["question"], "How many points did the Panthers defense surrender ?"
+        )
+        self.assertTrue(sample["context"].startswith("The Panthers"))
 
         metadata = {
-            "task_name": TaskType.question_answering_extractive.value,
+            "task_name": TaskType.question_answering_extractive,
             "dataset_name": "squad",
             "metric_names": ["F1ScoreQA", "ExactMatchQA"],
             # "language":"en"
         }
 
         processor = get_processor(TaskType.question_answering_extractive)
-
         sys_info = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
@@ -50,17 +61,18 @@ class TestExtractiveQA(unittest.TestCase):
         )
 
     def test_extractive_qa_zh(self):
-        """TODO: should add harder tests"""
-
-        path_data = artifacts_path + "test-xquad-zh.json"
-        loader = get_loader(
+        json_zh_dataset = os.path.join(self.artifact_path, "dataset-xquad-zh.json")
+        json_zh_output = os.path.join(self.artifact_path, "output-xquad-zh.json")
+        loader = get_loader_custom_dataset(
             TaskType.question_answering_extractive,
-            path_data,
+            json_zh_dataset,
+            json_zh_output,
             Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.json,
             FileType.json,
         )
         data = loader.load()
-
         metadata = {
             "task_name": TaskType.question_answering_extractive.value,
             "dataset_name": "squad",
@@ -89,7 +101,3 @@ class TestExtractiveQA(unittest.TestCase):
             2,
             "almost equal",
         )
-
-
-if __name__ == '__main__':
-    unittest.main()

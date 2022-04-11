@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 import csv
 from dataclasses import dataclass
 from io import StringIO
 import json
 from typing import Any, final, Optional, Union
 
+from datalabs import load_dataset
+
 from explainaboard.constants import Source
+from explainaboard.utils.typing_utils import narrow
 
 DType = Union[type[int], type[float], type[str], type[dict]]
 
@@ -122,20 +125,19 @@ class FileLoader:
                 )
             parsed_data_point["id"] = str(parsed_data_point[self._id_field_name])
 
-    @classmethod
-    def load_raw(cls, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list:
         """Load data from source and return an iterable of data points. It does not use
         fields information to parse the data points.
 
-        :param data (str): base64 encoded system output content or a path for the system
-                output file
+        :param data (str|DatalabLoaderOption): if str, it's either base64 encoded system
+            output or a path
         :param source: source of data
         """
         raise NotImplementedError(
             "load_raw() is not implemented for the base FileLoader"
         )
 
-    def load(self, data: str, source: Source) -> Iterable[dict]:
+    def load(self, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
         """Load data from source, parse data points with fields information and return an
         iterable of data points.
         """
@@ -163,17 +165,19 @@ class TSVFileLoader(FileLoader):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
 
     @classmethod
-    def load_raw(cls, data: str, source: Source) -> Iterable:
+    def load_raw(
+        cls, data: str | DatalabLoaderOption, source: Source
+    ) -> list[list[str]]:
+        data = narrow(data, str)
         if source == Source.in_memory:
             file = StringIO(data)
-            return csv.reader(file, delimiter='\t', quoting=csv.QUOTE_NONE)
+            lines = list(csv.reader(file, delimiter='\t', quoting=csv.QUOTE_NONE))
         elif source == Source.local_filesystem:
-            content: list[list[str]] = []
             with open(data, "r", encoding="utf8") as fin:
-                for record in csv.reader(fin, delimiter='\t', quoting=csv.QUOTE_NONE):
-                    content.append(record)
-            return content
-        raise NotImplementedError
+                lines = list(csv.reader(fin, delimiter='\t', quoting=csv.QUOTE_NONE))
+        else:
+            raise NotImplementedError
+        return list(filter(lambda line: line, lines))  # remove empty lines
 
 
 class CoNLLFileLoader(FileLoader):
@@ -182,11 +186,15 @@ class CoNLLFileLoader(FileLoader):
 
     def validate(self):
         super().validate()
-        if len(self._fields) != 3:
-            raise ValueError("CoNLL file loader expects 3 fields")
+        if len(self._fields) not in [1, 2]:
+            raise ValueError(
+                "CoNLL file loader expects 1 or 2 fields "
+                + f"({len(self._fields)} given)"
+            )
 
     @classmethod
-    def load_raw(cls, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[str]:
+        data = narrow(data, str)
         if source == Source.in_memory:
             return data.splitlines()
         elif source == Source.local_filesystem:
@@ -197,8 +205,7 @@ class CoNLLFileLoader(FileLoader):
             return content
         raise NotImplementedError
 
-    def load(self, data: str, source: Source) -> Iterable[dict]:
-        """each sample is a sentence"""
+    def load(self, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
         raw_data = self.load_raw(data, source)
         parsed_samples: list[dict] = []
         guid = 0
@@ -220,17 +227,21 @@ class CoNLLFileLoader(FileLoader):
                 }  # reset
 
         for line in raw_data:
-            if (
-                line.startswith("-DOCSTART-") or line == "" or line == "\n"
-            ):  # at sentence boundary
+            # at sentence boundary
+            if line.startswith("-DOCSTART-") or line == "" or line == "\n":
                 add_sample()
             else:
-                splits = (
-                    line.split("\t") if len(line.split("\t")) == 3 else line.split(" ")
-                )
+                splits = line.split("\t")
+                if len(splits) < len(self._fields):  # not separated by tabs
+                    splits = line.split(" ")
+                    if len(splits) < len(self._fields):  # not separated by spaces
+                        raise ValueError(
+                            f"not enough fields for {line} (sentence index: {guid})"
+                        )
+
                 for field in self._fields:
                     curr_sentence_fields[field.src_name].append(
-                        self.parse_data(splits[field.src_name], field)
+                        self.parse_data(splits[narrow(field.src_name, int)], field)
                     )
 
         add_sample()  # add last example
@@ -239,7 +250,8 @@ class CoNLLFileLoader(FileLoader):
 
 class JSONFileLoader(FileLoader):
     @classmethod
-    def load_raw(cls, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> Any:
+        data = narrow(data, str)
         if source == Source.in_memory:
             return json.loads(data)
         elif source == Source.local_filesystem:
@@ -248,12 +260,23 @@ class JSONFileLoader(FileLoader):
         raise NotImplementedError
 
 
+@dataclass
+class DatalabLoaderOption:
+    dataset: str
+    subdataset: str | None = None
+    split: str = "test"
+
+
 class DatalabFileLoader(FileLoader):
     @classmethod
-    def load_raw(cls, data: str, source: Source) -> Iterable:
-        if source == Source.in_memory:
-            return data
-        raise NotImplementedError
+    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
+        config = narrow(data, DatalabLoaderOption)
+        dataset = list(
+            load_dataset(
+                config.dataset, config.subdataset, split=config.split, streaming=False
+            )
+        )
+        return dataset
 
 
 class TextFileLoader(FileLoader):
@@ -261,14 +284,21 @@ class TextFileLoader(FileLoader):
     - only one field is allowed. It is often used for predicted outputs.
     """
 
-    def __init__(self, target_name: str = "output", dtype=DType) -> None:
+    def __init__(
+        self,
+        target_name: str = "output",
+        dtype: DType = str,
+        strip_before_parsing: Optional[bool] = None,
+    ) -> None:
         # src_name is not used for this file loader, it overrides the base load method.
         super().__init__(
-            [FileLoaderField("_", target_name, dtype, False)], use_idx_as_id=True
+            [FileLoaderField("_", target_name, dtype, strip_before_parsing)],
+            use_idx_as_id=True,
         )
 
     @classmethod
-    def load_raw(cls, data: str, source: Source) -> Iterable:
+    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list:
+        data = narrow(data, str)
         if source == Source.in_memory:
             return data.splitlines()
         elif source == Source.local_filesystem:
@@ -281,7 +311,7 @@ class TextFileLoader(FileLoader):
         if len(self._fields) != 1:
             raise ValueError("Text File Loader only takes one field")
 
-    def load(self, data: str, source: Source) -> Iterable[dict]:
+    def load(self, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
 

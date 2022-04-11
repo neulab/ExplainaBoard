@@ -1,36 +1,43 @@
 import json
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, Source, TaskType
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestSysDetails(unittest.TestCase):
     def test_generate_system_analysis(self):
-        """TODO: should add harder tests"""
-
-        path_system_details = artifacts_path + "test_system_details.json"
-        path_data = artifacts_path + "sys_out1.tsv"
+        path_system_details = os.path.join(
+            test_artifacts_path, "test_system_details.json"
+        )
+        dataset_data = os.path.join(
+            test_artifacts_path, "text_classification", "dataset.tsv"
+        )
+        output_data = os.path.join(
+            test_artifacts_path, "text_classification", "output.txt"
+        )
 
         with open(path_system_details) as fin:
             system_details = json.load(fin)
 
         metadata = {
-            "task_name": TaskType.text_classification.value,
+            "task_name": TaskType.text_classification,
             "metric_names": ["Accuracy"],
             "system_details": system_details,
         }
 
-        loader = get_loader(
+        loader = get_loader_custom_dataset(
             TaskType.text_classification,
-            path_data,
+            dataset_data,
+            output_data,
+            Source.local_filesystem,
             Source.local_filesystem,
             FileType.tsv,
+            FileType.text,
         )
-        data = list(loader.load())
+        data = loader.load()
         processor = get_processor(TaskType.text_classification)
 
         sys_info = processor.process(metadata, data)
@@ -39,7 +46,3 @@ class TestSysDetails(unittest.TestCase):
         self.assertIsNotNone(
             sys_info.system_details, {"learning_rate": 0.0001, "number_of_layers": 10}
         )
-
-
-if __name__ == '__main__':
-    unittest.main()

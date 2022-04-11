@@ -1,0 +1,5 @@
+neutral
+entailment
+contradiction
+neutral
+entailment

@@ -1,0 +1,62 @@
+[
+  {
+    "context": "The girl was as down-to-earth as a Michelin-starred canape",
+    "question": "",
+    "answers": {
+      "text": "The girl was not down-to-earth at all.",
+      "option_index": 0
+    },
+    "options": [
+      "The girl was not down-to-earth at all.",
+      "The girl was very down-to-earth."
+    ]
+  },
+  {
+    "context": "The girl was as down-to-earth as eggs and potatoes",
+    "question": "",
+    "answers": {
+      "text": "The girl was very down-to-earth.",
+      "option_index": 1
+    },
+    "options": [
+      "The girl was not down-to-earth at all.",
+      "The girl was very down-to-earth."
+    ]
+  },
+  {
+    "context": "The girl's room was as messy as pig slops",
+    "question": "",
+    "answers": {
+      "text": "The girl's room was a total mess.",
+      "option_index": 0
+    },
+    "options": [
+      "The girl's room was a total mess.",
+      "The girl's room was very clean."
+    ]
+  },
+  {
+    "context": "The girl's room was as messy as a housekeeper",
+    "question": "",
+    "answers": {
+      "text": "The girl's room was very clean.",
+      "option_index": 1
+    },
+    "options": [
+      "The girl's room was a total mess.",
+      "The girl's room was very clean."
+    ]
+  },
+  {
+    "context": "The view as as clear as day",
+    "question": "",
+    "answers": {
+      "text": "The view was very clear.",
+      "option_index": 0
+    },
+    "options": [
+      "The view was very clear.",
+      "The view as obstructed and not clear."
+    ]
+  }
+]
