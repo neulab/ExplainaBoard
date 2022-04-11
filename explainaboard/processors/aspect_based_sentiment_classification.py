@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from explainaboard import feature
+from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -91,22 +92,22 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         return ["Accuracy"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_sentence_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["text"]))
+    def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["text"]))
 
-    def _get_token_number(self, existing_feature: dict):
+    def _get_token_number(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(existing_feature["text"])
 
-    def _get_entity_number(self, existing_feature: dict):
+    def _get_entity_number(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(get_named_entities(existing_feature["text"]))
 
-    def _get_label(self, existing_feature: dict):
+    def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
         return existing_feature["true_label"]
 
-    def _get_aspect_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["aspect"]))
+    def _get_aspect_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["aspect"]))
 
-    def _get_aspect_index(self, existing_features: dict):
+    def _get_aspect_index(self, sys_info: SysOutputInfo, existing_features: dict):
         return existing_features["text"].find(existing_features["aspect"])
 
     # --- End feature functions

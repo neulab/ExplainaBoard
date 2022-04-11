@@ -175,24 +175,28 @@ class ConditionalGenerationProcessor(Processor):
         return ["rouge1", "rouge2", "rougeL", "bleu"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_source_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["source"]))
+    def _get_source_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["source"]))
 
-    def _get_reference_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["reference"]))
+    def _get_reference_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["reference"]))
 
-    def _get_hypothesis_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["hypothesis"]))
+    def _get_hypothesis_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["hypothesis"]))
 
     # training set dependent features (could be merged for optimization?)
-    def _get_num_oov(self, existing_features: dict, statistics: Any):
+    def _get_num_oov(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['source'], self._tokenizer
+            existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
         )
 
-    def _get_src_fre_rank(self, existing_features: dict, statistics: Any):
+    def _get_src_fre_rank(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['source'], self._tokenizer
+            existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
         )
 
     def _get_metrics(self, sys_info: SysOutputInfo):
@@ -275,9 +279,9 @@ class ConditionalGenerationProcessor(Processor):
         ref_test_freq: dict[str, int] = {}
         src_test_freq: dict[str, int] = {}
         for dict_sysout in sys_output:
-            for ref_tok in self._tokenizer(dict_sysout['reference']):
+            for ref_tok in sys_info.tokenize(dict_sysout['reference']):
                 ref_test_freq[ref_tok] = ref_test_freq.get(ref_tok, 0) + 1
-            for src_tok in self._tokenizer(dict_sysout['source']):
+            for src_tok in sys_info.tokenize(dict_sysout['source']):
                 src_test_freq[src_tok] = src_test_freq.get(src_tok, 0) + 1
 
         sys_features = unwrap(sys_info.features)
@@ -309,14 +313,16 @@ class ConditionalGenerationProcessor(Processor):
             ) in bucket_feature_funcs.items():
                 # TODO(pengfei): should check the feature value type
                 if training_dependent:
-                    dict_sysout[bucket_key] = bucket_func(dict_sysout, external_stats)
+                    dict_sysout[bucket_key] = bucket_func(
+                        sys_info, dict_sysout, external_stats
+                    )
                 else:
-                    dict_sysout[bucket_key] = bucket_func(dict_sysout)
+                    dict_sysout[bucket_key] = bucket_func(sys_info, dict_sysout)
                     # print(dict_sysout[bucket_key])
 
             # span features for true and predicted spans
-            ref_toks = self._tokenizer(dict_sysout['reference'])
-            hyp_toks = self._tokenizer(dict_sysout['hypothesis'])
+            ref_toks = sys_info.tokenize(dict_sysout['reference'])
+            hyp_toks = sys_info.tokenize(dict_sysout['hypothesis'])
             dict_sysout["ref_tok_info"] = self._complete_tok_features(
                 ref_toks, hyp_toks, ref_test_freq, statistics=external_stats
             )

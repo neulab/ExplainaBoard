@@ -9,6 +9,7 @@ from datalabs.operations.featurize.summarization import get_oracle_summary
 import numpy
 
 from explainaboard import feature
+from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -130,31 +131,31 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def default_metrics(cls) -> list[str]:
         return ["rouge1", "rouge2", "rougeL"]
 
-    def _get_oracle_position(self, existing_features: dict):
+    def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
         return get_oracle(existing_features)["oracle_position"]
 
-    def _get_oracle_score(self, existing_features: dict):
+    def _get_oracle_score(self, sys_info: SysOutputInfo, existing_features: dict):
         return get_oracle(existing_features)["oracle_score"]
 
-    def _get_attr_compression(self, existing_features: dict):
+    def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
         res = summary_attribute.cal_attributes_each(
             existing_features["source"], existing_features["reference"]
         )
         return res["attr_compression"]
 
-    def _get_attr_copy_len(self, existing_features: dict):
+    def _get_attr_copy_len(self, sys_info: SysOutputInfo, existing_features: dict):
         res = summary_attribute.cal_attributes_each(
             existing_features["source"], existing_features["reference"]
         )
         return res["attr_copy_len"]
 
-    def _get_attr_coverage(self, existing_features: dict):
+    def _get_attr_coverage(self, sys_info: SysOutputInfo, existing_features: dict):
         res = summary_attribute.cal_attributes_each(
             existing_features["source"], existing_features["reference"]
         )
         return res["attr_coverage"]
 
-    def _get_attr_novelty(self, existing_features: dict):
+    def _get_attr_novelty(self, sys_info: SysOutputInfo, existing_features: dict):
         res = summary_attribute.cal_attributes_each(
             existing_features["source"], existing_features["reference"]
         )

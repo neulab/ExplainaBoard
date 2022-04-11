@@ -226,7 +226,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_entity_type_level(self, existing_features: dict):
+    def _get_entity_type_level(self, sys_info: SysOutputInfo, existing_features: dict):
 
         # list of entity types at each level:
         # [type_level_0, type_level_1, ... type_level_6]
@@ -244,13 +244,13 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
             most_specific_level = len(tail_entity_type_levels) - 1
         return str(most_specific_level)
 
-    def _get_tail_entity_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["true_tail"]))
+    def _get_tail_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["true_tail"]))
 
-    def _get_head_entity_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["true_head"]))
+    def _get_head_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["true_head"]))
 
-    def _get_tail_fre(self, existing_features: dict):
+    def _get_tail_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (
             self.statistics is None
             or existing_features["true_tail"] not in self.statistics['tail_fre'].keys()
@@ -259,7 +259,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         else:
             return self.statistics['tail_fre'][existing_features["true_tail"]]
 
-    def _get_head_fre(self, existing_features: dict):
+    def _get_head_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (
             self.statistics is None
             or existing_features["true_head"] not in self.statistics['head_fre'].keys()
@@ -268,7 +268,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         else:
             return self.statistics['head_fre'][existing_features["true_head"]]
 
-    def _get_link_fre(self, existing_features: dict):
+    def _get_link_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (
             self.statistics is None
             or existing_features["true_link"] not in self.statistics['link_fre'].keys()
@@ -277,7 +277,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         else:
             return self.statistics['link_fre'][existing_features["true_link"]]
 
-    def _get_symmetry(self, existing_features: dict):
+    def _get_symmetry(self, sys_info: SysOutputInfo, existing_features: dict):
         if existing_features['true_link'] in self._symmetric_relations:
             return 'symmetric'
         else:
