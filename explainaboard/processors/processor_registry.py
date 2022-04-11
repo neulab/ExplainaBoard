@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 from explainaboard.processors.processor import Processor
 from explainaboard.tasks import TaskType
 
 _processor_registry: dict = {}
 
 
-def get_processor(task: TaskType) -> Processor:
+def get_processor(task: TaskType | str) -> Processor:
     """
     return a processor based on the task type
     TODO: error handling
     """
-    return _processor_registry[task]()
+    task_cast: TaskType = TaskType(task)
+    return _processor_registry[task_cast]()
 
 
 def register_processor(task_type: TaskType):
