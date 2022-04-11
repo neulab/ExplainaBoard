@@ -6,12 +6,14 @@ from datalabs import aggregating
 from tqdm import tqdm
 
 from explainaboard import feature
+from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.spacy_loader import get_named_entities
+from explainaboard.utils.tokenizer import Tokenizer
 
 
 @register_processor(TaskType.text_classification)
@@ -131,41 +133,47 @@ class TextClassificationProcessor(Processor):
         return ["Accuracy"]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_sentence_length(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["text"]))
+    def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["text"]))
 
-    def _get_token_number(self, existing_feature: dict):
+    def _get_token_number(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(existing_feature["text"])
 
-    def _get_entity_number(self, existing_feature: dict):
+    def _get_entity_number(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(get_named_entities(existing_feature["text"]))
 
-    def _get_label(self, existing_feature: dict):
+    def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
         return existing_feature["true_label"]
 
-    def _get_basic_words(self, existing_feature: dict):
+    def _get_basic_words(self, sys_info: SysOutputInfo, existing_feature: dict):
         return get_basic_words(existing_feature["text"])
 
-    def _get_lexical_richness(self, existing_feature: dict):
+    def _get_lexical_richness(self, sys_info: SysOutputInfo, existing_feature: dict):
         return get_lexical_richness(existing_feature["text"])
 
     # training set dependent features
-    def _get_num_oov(self, existing_features: dict, statistics: Any):
+    def _get_num_oov(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['text'], self._tokenizer
+            existing_features, statistics, lambda x: x['text'], sys_info.tokenizer
         )
 
     # training set dependent features
     # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, existing_features: dict, statistics: Any):
+    def _get_fre_rank(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['text'], self._tokenizer
+            existing_features, statistics, lambda x: x['text'], sys_info.tokenizer
         )
 
     # training set dependent features
-    def _get_length_fre(self, existing_features: dict, statistics: Any):
+    def _get_length_fre(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
         length_fre = 0
-        length = len(self._tokenizer(existing_features["text"]))
+        length = len(sys_info.tokenize(existing_features["text"]))
 
         if length in statistics['length_fre'].keys():
             length_fre = statistics['length_fre'][length]
@@ -175,7 +183,7 @@ class TextClassificationProcessor(Processor):
     # --- End feature functions
 
     @aggregating()
-    def _statistics_func(self, samples):
+    def _statistics_func(self, samples, tokenizer: Tokenizer):
         """
         Input:
         samples: [{
@@ -184,29 +192,19 @@ class TextClassificationProcessor(Processor):
         }]
         """
 
-        # TODO(gneubig):
-        # BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-        # tokenizer = SingleSpaceTokenizer()
-
-        vocab = {}
-        length_fre = {}
+        vocab: dict[str, float] = {}
+        length_fre: dict[int, float] = {}
         total_samps = 0
         for sample in tqdm(samples):
             text = sample["text"]
-            tokens = self._tokenizer(text)
+            tokens = tokenizer(text)
             length = len(tokens)
 
-            if length in length_fre.keys():
-                length_fre[length] += 1
-            else:
-                length_fre[length] = 1
+            length_fre[length] = length_fre.get(length, 0.0) + 1.0
 
             # update vocabulary
             for w in tokens:
-                if w in vocab.keys():
-                    vocab[w] += 1
-                else:
-                    vocab[w] = 1
+                vocab[w] = vocab.get(w, 0.0) + 1.0
 
             total_samps += 1
 

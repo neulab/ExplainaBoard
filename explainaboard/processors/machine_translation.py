@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from explainaboard import feature
+from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -40,7 +41,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
     def default_metrics(cls) -> list[str]:
         return ["bleu"]
 
-    def _get_attr_compression(self, existing_features: dict):
-        return len(self._tokenizer(existing_features["source"])) / len(
-            self._tokenizer(existing_features["reference"])
+    def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
+        return len(sys_info.tokenize(existing_features["source"])) / len(
+            sys_info.tokenize(existing_features["reference"])
         )

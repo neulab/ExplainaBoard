@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 import json
 from typing import Any, Optional
 
@@ -27,7 +27,7 @@ from explainaboard.tasks import TaskType
 import explainaboard.utils.bucketing
 from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
 from explainaboard.utils.py_utils import eprint, sort_dict
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.utils.tokenizer import get_default_tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
@@ -64,18 +64,17 @@ class Processor(metaclass=abc.ABCMeta):
         self._eaas_config: Optional[Config] = None
         self._eaas_client: Optional[AsyncClient] = None
         # self._statistics_func = None
-        self._tokenizer = SingleSpaceTokenizer()
         self._preprocessor = None
         self._user_defined_feature_config: Optional[dict[str, CustomFeature]] = None
         self._features = self.default_features()
 
     def _get_statistics_resources(
-        self, dataset_split: Dataset
-    ) -> Optional[Mapping[str, Any]]:
+        self, sys_info: SysOutputInfo, dataset_split: Dataset
+    ) -> dict[str, Any]:
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        return {"cls": self}  #
+        return {"cls": self, "tokenizer": sys_info.tokenizer}  #
 
     @aggregating
     def _statistics_func(self):
@@ -119,7 +118,7 @@ class Processor(metaclass=abc.ABCMeta):
                 ):
                     dataset = load_dataset(sys_info.dataset_name, sub_dataset)
                     self._statistics_func.resources = self._get_statistics_resources(
-                        dataset[split_name]
+                        sys_info, dataset[split_name]
                     )
                     # print(f"self._statistics_func.resources:f\t{self._statistics_func.resources}")
                     new_train = dataset[split_name].apply(
@@ -311,9 +310,9 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
                 # handles all other features
                 else:
                     dict_sysout[bucket_key] = (
-                        bucket_func(dict_sysout, external_stats)
+                        bucket_func(sys_info, dict_sysout, external_stats)
                         if training_dependent
-                        else bucket_func(dict_sysout)
+                        else bucket_func(sys_info, dict_sysout)
                     )
 
         return list(bucket_feature_funcs.keys())
@@ -511,12 +510,16 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = self.task_type().value
-        if "metric_names" not in metadata.keys():
-            metadata["metric_names"] = self.default_metrics()
-        if "metric_configs" not in metadata.keys():
-            metadata["metric_configs"] = self.default_metric_configs()
 
         sys_info = SysOutputInfo.from_dict(metadata)
+        if sys_info.metric_names is None:
+            sys_info.metric_names = self.default_metrics()
+        if sys_info.metric_configs is None:
+            sys_info.metric_configs = self.default_metric_configs()
+        if sys_info.tokenizer is None:
+            sys_info.tokenizer = get_default_tokenizer(
+                task_type=self.task_type(), lang=sys_info.language
+            )
 
         # declare customized features: _features will be updated
         self._init_customized_features(metadata)

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Callable, Iterator
 import re
-from typing import Any, Optional
+from typing import Any
 
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
@@ -215,12 +215,14 @@ class NERProcessor(Processor):
         return data_point["pred_tags"]
 
     def _get_statistics_resources(
-        self, dataset_split: Dataset
-    ) -> Optional[Mapping[str, Any]]:
+        self, sys_info: SysOutputInfo, dataset_split: Dataset
+    ) -> dict[str, Any]:
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        base_resources = unwrap(super()._get_statistics_resources(dataset_split))
+        base_resources = unwrap(
+            super()._get_statistics_resources(sys_info, dataset_split)
+        )
         task_specific_resources = {
             'tag_id2str': dataset_split._info.task_templates[0].labels
         }
@@ -280,7 +282,7 @@ class NERProcessor(Processor):
         }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_sentence_length(self, existing_features: dict):
+    def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(existing_features["tokens"])
 
     def _get_stat_values(
