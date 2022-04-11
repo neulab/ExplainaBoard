@@ -6,14 +6,19 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
     JSONFileLoader,
 )
-from explainaboard.loaders.loader import Loader, register_loader
+from explainaboard.loaders.loader import Loader
+from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.tasks import TaskType
 
 
 @register_loader(TaskType.qa_multiple_choice)
 class QAMultipleChoiceLoader(Loader):
     @classmethod
-    def default_file_type(cls) -> FileType:
+    def default_dataset_file_type(cls) -> FileType:
+        return FileType.json
+
+    @classmethod
+    def default_output_file_type(cls) -> FileType:
         return FileType.json
 
     @classmethod
@@ -25,7 +30,14 @@ class QAMultipleChoiceLoader(Loader):
                     FileLoaderField("context", target_field_names[0], str),
                     FileLoaderField("question", target_field_names[1], str),
                     FileLoaderField("answers", target_field_names[2], dict),
-                    FileLoaderField("predicted_answers", target_field_names[3], dict),
                 ]
             ),
+        }
+
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {
+            FileType.json: JSONFileLoader(
+                [FileLoaderField("predicted_answers", "predicted_answers", dict)]
+            )
         }

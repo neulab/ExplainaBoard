@@ -14,6 +14,7 @@ class FileType(str, Enum):
     csv = "csv"
     conll = "conll"  # for tagging task such as named entity recognition
     datalab = "datalab"
+    text = "text"
 
     @staticmethod
     def list():

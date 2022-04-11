@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Generator, Iterable
-from typing import Optional, TypeVar
+from typing import Any, Optional, TypeVar
 
 T = TypeVar('T')
 
@@ -40,3 +40,15 @@ def unwrap_generator(obj: Optional[Iterable[T]]) -> Generator[T, None, None]:
     '''
     if obj is not None:
         yield from obj
+
+
+NarrowType = TypeVar("NarrowType")
+
+
+def narrow(obj: Any, narrow_type: type[NarrowType]) -> NarrowType:
+    """returns the object with the narrowed type or raises a TypeError
+    (obj: Any, new_type: type[T]) -> T"""
+    if isinstance(obj, narrow_type):
+        return obj
+    else:
+        raise TypeError(f"{obj} is expected to be {narrow_type}")

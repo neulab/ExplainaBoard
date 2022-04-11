@@ -1,22 +1,49 @@
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, Source, TaskType
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestMachineTranslation(unittest.TestCase):
-    def test_generate_system_analysis(self):
-        """TODO: should add harder tests"""
+    artifact_path = os.path.join(test_artifacts_path, "machine_translation")
+    tsv_dataset = os.path.join(artifact_path, "dataset.tsv")
+    txt_output = os.path.join(artifact_path, "output.txt")
 
-        path_data = artifacts_path + "test-mt.tsv"
-        loader = get_loader(
+    def test_load_tsv(self):
+        loader = get_loader_custom_dataset(
             TaskType.machine_translation,
-            path_data,
+            self.tsv_dataset,
+            self.txt_output,
+            Source.local_filesystem,
             Source.local_filesystem,
             FileType.tsv,
+            FileType.text,
+        )
+        data = loader.load()
+        self.assertEqual(len(data), 4)
+        self.assertEqual(
+            data[0],
+            {
+                'source': 'Ak sa chcete dostať ešte hlbšie, môžete si všimnúť '
+                + 'trhlinky.',
+                'reference': 'Now just to get really deep in , you can really get to '
+                + 'the cracks .',
+                'id': '0',
+                'hypothesis': 'If you want to get a deeper , you can see the forces .',
+            },
+        )
+
+    def test_generate_system_analysis(self):
+        loader = get_loader_custom_dataset(
+            TaskType.machine_translation,
+            self.tsv_dataset,
+            self.txt_output,
+            Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.tsv,
+            FileType.text,
         )
         data = loader.load()
 

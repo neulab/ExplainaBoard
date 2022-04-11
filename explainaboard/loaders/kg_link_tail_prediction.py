@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import FileLoader, JSONFileLoader
-from explainaboard.loaders.loader import Loader, register_loader
+from explainaboard.loaders.loader import Loader
+from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.tasks import TaskType
 
 
@@ -16,17 +15,32 @@ class KgLinkTailPredictionLoader(Loader):
 
     usage:
         please refer to `test_loaders.py`
+
+    NOTE: kg task has a system output format that's different from all the
+    other tasks. Samples are stored in a dict instead of a list so we have
+    special loading logic implemented here. We have plans to change this in
+    the in the future. Also, the dataset and the output is stored in the same
+    file so the dataset file loader doesn't do anything. We also plan to change
+    this behavior in the future.
     """
 
     @classmethod
-    def default_file_type(cls) -> FileType:
+    def default_dataset_file_type(cls) -> FileType:
+        return FileType.json
+
+    @classmethod
+    def default_output_file_type(cls) -> FileType:
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {FileType.json: JSONFileLoader(None, False)}
 
-    def load(self) -> Iterable[dict]:
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {FileType.json: JSONFileLoader(None, False)}
+
+    def load(self) -> list[dict]:
         """
         :param path_system_output:
             the path of system output file with following format:
@@ -38,15 +52,12 @@ class KgLinkTailPredictionLoader(Loader):
 
         # TODO(odashi):
         # Avoid potential bug: load_raw returns Iterable[Any] which is not a dict.
-        # kg format is the only special case we have now. The format will change to use
-        # our standard sys output format in the future.
-        raw_data: dict[str, dict[str, str]] = self.file_loader.load_raw(  # type: ignore
-            self._data, self._source
+        raw_data: dict[str, dict] = self._output_file_loader.load_raw(  # type: ignore
+            self._output_data, self._output_source
         )
 
         if self.user_defined_features_configs:  # user defined features are present
-            for _, (example_id, features_dict) in enumerate(raw_data.items()):
-
+            for example_id, features_dict in raw_data.items():
                 data_i = {
                     "id": str(example_id),  # should be string type
                     "true_head": features_dict["gold_head"],

@@ -1,21 +1,44 @@
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, Source, TaskType
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders import get_loader_custom_dataset
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestSummarization(unittest.TestCase):
-    def test_generate_system_analysis(self):
-        """TODO: should add harder tests"""
+    artifact_path = os.path.join(test_artifacts_path, "summarization")
+    tsv_dataset = os.path.join(artifact_path, "dataset.tsv")
+    txt_output = os.path.join(artifact_path, "output.txt")
 
-        path_data = artifacts_path + "test-summ.tsv"
-        loader = get_loader(
-            TaskType.summarization, path_data, Source.local_filesystem, FileType.tsv
+    def test_load_tsv(self):
+        loader = get_loader_custom_dataset(
+            TaskType.summarization,
+            self.tsv_dataset,
+            self.txt_output,
+            Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.tsv,
+            FileType.text,
         )
-        data = list(loader.load())
+        data = loader.load()
+        self.assertEqual(len(data), 3)
+        sample = data[0]
+        self.assertTrue(sample["source"].startswith("washington"))
+        self.assertTrue(sample["reference"].startswith("in an"))
+        self.assertTrue(sample["hypothesis"].startswith("washington"))
+
+    def test_generate_system_analysis(self):
+        loader = get_loader_custom_dataset(
+            TaskType.summarization,
+            self.tsv_dataset,
+            self.txt_output,
+            Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.tsv,
+            FileType.text,
+        )
+        data = loader.load()
 
         metadata = {
             "task_name": TaskType.summarization.value,

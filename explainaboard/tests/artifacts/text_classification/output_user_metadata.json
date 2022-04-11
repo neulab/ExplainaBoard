@@ -1,0 +1,31 @@
+{
+  "user_defined_metadata_configs": {
+    "task_name": "text-classification",
+    "model_name": "test-for-users-specific",
+    "dataset_name": "sst2",
+    "language": "en"
+  },
+  "predictions": [
+    {
+      "predicted_label": "0"
+    },
+    {
+      "predicted_label": "1"
+    },
+    {
+      "predicted_label": "0"
+    },
+    {
+      "predicted_label": "0"
+    },
+    {
+      "predicted_label": "0"
+    },
+    {
+      "predicted_label": "0"
+    },
+    {
+      "predicted_label": "1"
+    }
+  ]
+}

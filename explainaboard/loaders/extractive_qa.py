@@ -5,14 +5,19 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
     JSONFileLoader,
 )
-from explainaboard.loaders.loader import Loader, register_loader
+from explainaboard.loaders.loader import Loader
+from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.tasks import TaskType
 
 
 @register_loader(TaskType.question_answering_extractive)
 class QAExtractiveLoader(Loader):
     @classmethod
-    def default_file_type(cls) -> FileType:
+    def default_dataset_file_type(cls) -> FileType:
+        return FileType.json
+
+    @classmethod
+    def default_output_file_type(cls) -> FileType:
         return FileType.json
 
     @classmethod
@@ -34,7 +39,6 @@ class QAExtractiveLoader(Loader):
                         strip_before_parsing=False,
                     ),
                     FileLoaderField(target_field_names[2], target_field_names[2]),
-                    FileLoaderField(target_field_names[3], target_field_names[3]),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
@@ -52,11 +56,14 @@ class QAExtractiveLoader(Loader):
                         strip_before_parsing=False,
                     ),
                     FileLoaderField("answers", target_field_names[2]),
-                    FileLoaderField(
-                        "prediction",
-                        target_field_names[3],
-                        parser=lambda x: {"text": x},
-                    ),
                 ]
             ),
+        }
+
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {
+            FileType.json: JSONFileLoader(
+                [FileLoaderField("predicted_answers", "predicted_answers")]
+            )
         }
