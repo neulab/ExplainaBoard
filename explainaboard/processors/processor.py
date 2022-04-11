@@ -643,7 +643,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         """
         return FineGrainedStatistics(samples_over_bucket, performance_over_bucket)
 
-    def process(self, metadata: dict, sys_output: list[dict]):
+    def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = unwrap(overall_statistics.sys_info)

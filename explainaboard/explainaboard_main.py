@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -10,6 +12,7 @@ from explainaboard import (
     TaskType,
 )
 from explainaboard.analyzers.draw_hist import draw_bar_chart_from_report
+from explainaboard.info import SysOutputInfo
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
@@ -170,25 +173,25 @@ def main():
 
     args = parser.parse_args()
 
-    dataset = args.dataset
-    sub_dataset = args.sub_dataset
-    language = args.language
-    task = args.task
-    reload_stat = False if args.reload_stat == "0" else True
-    system_outputs = args.system_outputs
+    dataset: str | None = args.dataset
+    sub_dataset: str | None = args.sub_dataset
+    language: str | None = args.language
+    task: str | None = args.task
+    reload_stat: bool = False if args.reload_stat == "0" else True
+    system_outputs: list[str] = args.system_outputs
 
-    reports = args.reports
-    metric_names = args.metrics
-    file_type = args.file_type
-    output_dir = args.output_dir
-    models = args.models
-    datasets = args.datasets
-    languages = args.languages
-    models_aggregation = args.models_aggregation
-    datasets_aggregation = args.datasets_aggregation
-    languages_aggregation = args.languages_aggregation
+    reports: list[str] | None = args.reports
+    metric_names: list[str] | None = args.metrics
+    file_type: str | None = args.file_type
+    output_dir: str | None = args.output_dir
+    models: list[str] | None = args.models
+    datasets: list[str] | None = args.datasets
+    languages: list[str] | None = args.languages
+    models_aggregation: str | None = args.models_aggregation
+    datasets_aggregation: str | None = args.datasets_aggregation
+    languages_aggregation: str | None = args.languages_aggregation
 
-    system_details_path = args.system_details
+    system_details_path: str | None = args.system_details
 
     # get system_details from input json file
     system_details = None
@@ -204,7 +207,7 @@ def main():
     if reports is not None:
 
         """
-        score_tensor is a nested dict, for exampple
+        score_tensor is a nested dict, for example
         score_tensor[model_name][dataset_name][language] =
         {
             'metric_name':
@@ -309,17 +312,20 @@ def main():
     if file_type is not None:
         if task is not None:
             loaders = [
-                get_loader(task, data=x, file_type=file_type) for x in system_outputs
+                get_loader(task=task, data=x, file_type=file_type)
+                for x in system_outputs
             ]
         elif len(real_tasks) > 0:
             loaders = [
-                get_loader(task, data=x, file_type=file_type)
+                get_loader(task=task, data=x, file_type=file_type)
                 for x, task in zip(system_outputs, real_tasks)
             ]
+        else:
+            raise NotImplementedError
     else:
         loaders = [
-            get_loader(task, data=x) for x in system_outputs
-        ]  # use the default loaders that has been pre-defiend for each task
+            get_loader(task=task, data=x) for x in system_outputs
+        ]  # use the default loaders that has been pre-defined for each task
     system_datasets = [list(loader.load()) for loader in loaders]
 
     # validation
@@ -354,7 +360,7 @@ def main():
         metadata["metric_names"] = metric_names
 
     # Run analysis
-    reports = []
+    reports: list[SysOutputInfo] = []
     for loader, system_dataset, system_full_path, task in zip(
         loaders, system_datasets, system_outputs, real_tasks
     ):
@@ -364,7 +370,7 @@ def main():
             {"user_defined_features_configs": loader._user_defined_features_configs}
         )
 
-        report = get_processor(task).process(
+        report = get_processor(task=task).process(
             metadata=metadata, sys_output=system_dataset
         )
         reports.append(report)
