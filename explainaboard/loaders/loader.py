@@ -142,7 +142,9 @@ def get_loader(
     file_type: FileType | str | None = None,
 ) -> Loader:
     task_cast: TaskType = TaskType(task)
-    file_type_cast: FileType = FileType(file_type)
+    file_type_cast: FileType | None = (
+        FileType(file_type) if file_type is not None else None
+    )
     return _loader_registry[task_cast](data, source, file_type_cast)
 
 
