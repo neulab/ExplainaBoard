@@ -136,13 +136,14 @@ _loader_registry: dict[TaskType, type[Loader]] = {}
 
 
 def get_loader(
-    task: TaskType,
+    task: TaskType | str,
     data: str,
-    source: Optional[Source] = None,
-    file_type: Optional[FileType] = None,
+    source: Source | None = None,
+    file_type: FileType | str | None = None,
 ) -> Loader:
-
-    return _loader_registry[task](data, source, file_type)
+    task_cast: TaskType = TaskType(task)
+    file_type_cast: FileType = FileType(file_type)
+    return _loader_registry[task_cast](data, source, file_type_cast)
 
 
 def register_loader(task_type: TaskType):
