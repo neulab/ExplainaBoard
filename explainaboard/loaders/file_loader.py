@@ -198,11 +198,8 @@ class CoNLLFileLoader(FileLoader):
         if source == Source.in_memory:
             return data.splitlines()
         elif source == Source.local_filesystem:
-            content = []
             with open(data, "r", encoding="utf8") as fin:
-                for record in fin:
-                    content.append(record)
-            return content
+                return [line.strip() for line in fin]
         raise NotImplementedError
 
     def load(self, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
@@ -215,7 +212,8 @@ class CoNLLFileLoader(FileLoader):
 
         def add_sample():
             nonlocal guid, curr_sentence_fields
-            if curr_sentence_fields[0]:  # data not empty
+            # uses the first field to check if data is empty
+            if curr_sentence_fields.get(self._fields[0].src_name):
                 new_sample: dict = {}
                 for field in self._fields:  # parse data point according to fields
                     new_sample[field.target_name] = curr_sentence_fields[field.src_name]
