@@ -274,7 +274,7 @@ def main():
 
     reports: list[str] | None = args.reports
     metric_names: list[str] | None = args.metrics
-    datset_file_type: str | None = args.custom_dataset_file_type
+    dataset_file_type: str | None = args.custom_dataset_file_type
     output_file_type: str | None = args.output_file_type
     output_dir: str = args.output_dir
 
@@ -312,7 +312,7 @@ def main():
         # system_outputs/sst2/user_specified_metadata.json
         num_systems = len(system_outputs)
         tasks = get_tasks(args.task, system_outputs)
-        dataset_file_types: list[str | None] = [datset_file_type] * num_systems
+        dataset_file_types: list[str | None] = [dataset_file_type] * num_systems
         output_file_types: list[str | None] = [output_file_type] * num_systems
         custom_dataset_paths: list[str] | None = args.custom_dataset_paths
         dataset: str | None = args.dataset

@@ -1,50 +1,50 @@
 SOCCER	O
 -	O
 JAPAN	B-LOC
-GET	O	O
-LUCKY	O	O
-WIN	O	O
-,	O	O
-CHINA	B-PER	B-ORG
-IN	O	O
-SURPRISE	O	O
-DEFEAT	O	O
-.	O	O
+GET	O
+LUCKY	O
+WIN	O
+,	O
+CHINA	B-PER
+IN	O
+SURPRISE	O
+DEFEAT	O
+.	O
 
-Nadim	B-PER	B-PER
-Ladki	I-PER	I-PER
+Nadim	B-PER
+Ladki	I-PER
 
-AL-AIN	B-LOC	B-LOC
-,	O	O
-United	B-LOC	B-LOC
-Arab	I-LOC	I-LOC
-Emirates	I-LOC	I-LOC
-1996-12-06	O	O
+AL-AIN	B-LOC
+,	O
+United	B-LOC
+Arab	I-LOC
+Emirates	I-LOC
+1996-12-06	O
 
-Japan	B-LOC	B-LOC
-began	O	O
-the	O	O
-defence	O	O
-of	O	O
-their	O	O
-Asian	B-MISC	B-MISC
-Cup	I-MISC	I-MISC
-title	O	O
-with	O	O
-a	O	O
-lucky	O	O
-2-1	O	O
-win	O	O
-against	O	O
-Syria	B-LOC	B-LOC
-in	O	O
-a	O	O
-Group	O	O
-C	O	O
-championship	O	O
-match	O	O
-on	O	O
-Friday	O	O
-.	O	O
+Japan	B-LOC
+began	O
+the	O
+defence	O
+of	O
+their	O
+Asian	B-MISC
+Cup	I-MISC
+title	O
+with	O
+a	O
+lucky	O
+2-1	O
+win	O
+against	O
+Syria	B-LOC
+in	O
+a	O
+Group	O
+C	O
+championship	O
+match	O
+on	O
+Friday	O
+.	O
 
 

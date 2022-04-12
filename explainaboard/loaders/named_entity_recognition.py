@@ -40,4 +40,4 @@ class NERLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
-        return {FileType.conll: CoNLLFileLoader([FileLoaderField(0, "pred_tags", str)])}
+        return {FileType.conll: CoNLLFileLoader([FileLoaderField(1, "pred_tags", str)])}

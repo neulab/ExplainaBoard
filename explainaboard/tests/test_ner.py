@@ -9,7 +9,7 @@ from explainaboard.tests.utils import test_artifacts_path
 class TestNER(unittest.TestCase):
     artifact_path = os.path.join(test_artifacts_path, "ner")
     conll_dataset = os.path.join(artifact_path, "dataset.tsv")
-    conll_output = os.path.join(artifact_path, "output.txt")
+    conll_output = os.path.join(artifact_path, "output.tsv")
 
     def test_generate_system_analysis(self):
         loader = get_loader_custom_dataset(
@@ -56,7 +56,3 @@ class TestNER(unittest.TestCase):
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
-
-
-if __name__ == '__main__':
-    unittest.main()

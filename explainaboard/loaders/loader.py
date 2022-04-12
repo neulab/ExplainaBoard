@@ -112,20 +112,10 @@ class Loader:
 
     @property
     def user_defined_features_configs(self) -> dict[str, CustomFeature]:
-        if self._user_defined_features_configs is None:
-            raise Exception(
-                "User defined features configs are not available "
-                "(data has not been loaded))"
-            )
         return self._user_defined_features_configs
 
     @property
     def user_defined_metadata_configs(self) -> dict:
-        if self._user_defined_metadata_configs is None:
-            raise Exception(
-                "User defined metadata configs are not available "
-                "(data has not been loaded))"
-            )
         return self._user_defined_metadata_configs
 
     def _parse_user_defined_fields(self) -> tuple[dict[str, CustomFeature], dict]:
