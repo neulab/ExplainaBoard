@@ -60,9 +60,9 @@ class BucketPerformance:
 
 @dataclass
 class Result:
-    overall: Any = None
+    overall: Optional[dict[str, Performance]] = None
     calibration: Optional[list[Performance]] = None
-    fine_grained: Any = None
+    fine_grained: Optional[dict] = None
 
 
 @dataclass
@@ -202,7 +202,6 @@ class OverallStatistics:
     sys_info: SysOutputInfo
     metric_stats: list[MetricStats]
     active_features: list[str]
-    overall_results: dict[str, Performance]
 
 
 @dataclass
