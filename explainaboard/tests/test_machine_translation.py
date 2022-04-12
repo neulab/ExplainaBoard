@@ -2,7 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -12,7 +12,7 @@ class TestMachineTranslation(unittest.TestCase):
     txt_output = os.path.join(artifact_path, "output.txt")
 
     def test_load_tsv(self):
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.machine_translation,
             self.tsv_dataset,
             self.txt_output,
@@ -36,7 +36,7 @@ class TestMachineTranslation(unittest.TestCase):
         )
 
     def test_generate_system_analysis(self):
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.machine_translation,
             self.tsv_dataset,
             self.txt_output,

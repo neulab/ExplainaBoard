@@ -11,8 +11,8 @@ from explainaboard.loaders import (
     text_pair_classification,
 )
 
-get_loader = loader_registry.get_loader
-get_loader_custom_dataset = loader_registry.get_loader_custom_dataset
+get_datalab_loader = loader_registry.get_datalab_loader
+get_custom_dataset_loader = loader_registry.get_custom_dataset_loader
 
 __all__ = [
     'aspect_based_sentiment_classification',

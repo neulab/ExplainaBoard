@@ -2,7 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -12,7 +12,7 @@ class TestQAMultipleChoice(unittest.TestCase):
     json_output = os.path.join(artifact_path, "output.json")
 
     def test_load_json(self):
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.qa_multiple_choice,
             self.json_dataset,
             self.json_output,
@@ -41,7 +41,7 @@ class TestQAMultipleChoice(unittest.TestCase):
         )
 
     def test_generate_system_analysis(self):
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.qa_multiple_choice,
             self.json_dataset,
             self.json_output,
@@ -68,7 +68,7 @@ class TestQAMultipleChoice(unittest.TestCase):
         output_path = os.path.join(
             self.artifact_path, "output_metaphor_qa_customized_features.json"
         )
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.qa_multiple_choice,
             dataset_path,
             output_path,
