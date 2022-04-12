@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from explainaboard_main import main
+from explainaboard.explainaboard_main import main
 
 
 class TestCLI(TestCase):
