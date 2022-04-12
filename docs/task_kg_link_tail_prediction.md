@@ -184,7 +184,7 @@ In some situation, users aim to specify the bucket order according to their need
 ```python
         # tips: `artifacts_path` is located at: ExplainaBoard/explainaboard/tests/artifacts
         dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
             dataset,
             dataset,
@@ -210,7 +210,7 @@ The value of K in `Hits` metric could also be specified by users when needed.
 
 ```python
         dataset = "explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
             dataset,
             dataset,

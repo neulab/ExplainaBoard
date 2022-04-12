@@ -98,9 +98,9 @@ more [supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/su
 ### Example for Python SDK
 
 ```python
-from explainaboard import TaskType, get_loader_custom_dataset, get_processor, get_loader
+from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
 # using a dataset we provide (datalab)
-loader = get_loader(
+loader = get_datalab_loader(
     TaskType.text_classification,
     dataset=DatalabLoaderOption("sst2"),
     output_data="./explainaboard/tests/artifacts/text_classification/output_sst2.txt",
@@ -115,7 +115,7 @@ analysis.write_to_directory("./")
 # using a custom dataset
 dataset = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
 output = "./explainaboard/tests/artifacts/summarization/output.tsv"
-loader = get_loader_custom_dataset(TaskType.summarization, dataset=dataset, output=output)
+loader = get_custom_dataset_loader(TaskType.summarization, dataset=dataset, output=output)
 data = loader.load()
 processor = get_processor(TaskType.summarization)
 analysis = processor.process(metadata={}, sys_output=data)
