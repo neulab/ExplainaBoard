@@ -535,9 +535,10 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         overall_results = self.get_overall_performance(
             sys_info, sys_output, metric_stats=metric_stats
         )
-        return OverallStatistics(
-            sys_info, metric_stats, active_features, overall_results
+        sys_info.results = Result(
+            overall=overall_results, calibration=None, fine_grained=None
         )
+        return OverallStatistics(sys_info, metric_stats, active_features)
 
     def sort_bucket_info(
         self, performance_over_bucket, sort_by='value', sort_by_metric='first'
@@ -649,7 +650,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         sys_info = unwrap(overall_statistics.sys_info)
         metric_stats = overall_statistics.metric_stats
         active_features = unwrap(overall_statistics.active_features)
-        overall_results = overall_statistics.overall_results
+        overall_results = sys_info.results.overall
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
