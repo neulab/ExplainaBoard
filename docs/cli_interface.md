@@ -1,10 +1,13 @@
 # CLI Interface Currently Supported Tasks
 
 Below is a (somewhat incomplete) list of tasks that ExplainaBoard currently supports, along with examples of how to analyze different tasks.
-Click the link on the task name for more details, or when no link exists you can open the example data to see what the file format looks like.
 In particular [text classification](#text-classification) is a good example to start with.
 
-All of the examples below will output a json report to standard out, and you can use Python's pretty printing tool to see it in a more readable format (add `| python -m json.tool` at the end of any of the lines).
+**General notes:**
+* Click the link on the task name for more details, or when no link exists you can open the example data to see what the file format looks like.
+* You can either analyze an existing dataset included in [Datalab](https://github.com/expressai/datalab) or use your own custom dataset. The directions below describe how to do both.
+* All of the examples below will output a json report to standard out, and you can use Python's pretty printing tool to see it in a more readable format (add `| python -m json.tool` at the end of any of the lines).
+
 
 We welcome contributions of [more tasks](add_new_tasks.md), or detailed documentation for tasks where the documentation does not yet exist! Please open an issue or file a PR.
 
@@ -24,9 +27,16 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 Text classification consists of classifying text into different categories, such as sentiment values or topics.
 The below example performs an analysis on the Stanford Sentiment Treebank, a set of sentiment tags over English reviews.
 
-**CLI Example**
+**CLI Examples**
+
+The below example loads the `sst2` dataset from DataLab:
 ```shell
-explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv
+explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+```
+
+The below example loads a dataset from an existing file:
+```shell
+explainaboard --task text-classification --custom_dataset_paths ./data/system_outputs/sst2/sst2-dataset.tsv --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 
@@ -36,8 +46,15 @@ Classification of pairs of text, such as natural language inference or paraphras
 The example below concerns natural language infernce, predicting whether a premise, entails, contradicts, or is neutral with respect to a hypothesis, on the Stanford Natural Language Inference dataset.
 
 **CLI Example**
+
+The below example loads the `snli` dataset from DataLab:
 ```shell
-explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert
+explainaboard --task text-pair-classification --dataset snli --system_outputs ./data/system_outputs/snli/snli-bert-output.txt
+```
+
+The below example loads a dataset from an existing file:
+```shell
+explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-bert-output.txt
 ```
 
 
