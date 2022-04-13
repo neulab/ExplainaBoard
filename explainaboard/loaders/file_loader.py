@@ -5,14 +5,14 @@ import csv
 from dataclasses import dataclass
 from io import StringIO
 import json
-from typing import Any, final, Optional, Union
+from typing import Any, final, Optional, Type, Union
 
 from datalabs import load_dataset
 
 from explainaboard.constants import Source
 from explainaboard.utils.typing_utils import narrow
 
-DType = Union[type[int], type[float], type[str], type[dict]]
+DType = Union[Type[int], Type[float], Type[str], Type[dict]]
 
 
 @dataclass
