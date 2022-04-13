@@ -15,7 +15,7 @@
   <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
   <a href="https://pypi.org/project//"><img alt="PyPI" src="https://img.shields.io/pypi/v/explainaboard" /></a>
   <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-  <a href=".github/workflows/ci.yml"><img alt="Integration Tests", src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
+  <a href=".github/workflows/ci.yml"><img alt="Integration Tests" src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
 </p>
 
 ## What is ExplainaBoard?
@@ -78,7 +78,7 @@ pre-commit install
         - `# noqa` signals flake8 to ignore the current line. (`flake8: noqa` ignores the current file.)
         - lines between `# fmt: on` and `# fmt: off` are skipped by black. 
 
-Then, you can run following examples via bash
+Then, you can perform analyses on your favorite tasks.
 
 
 ## Acknowledgement
