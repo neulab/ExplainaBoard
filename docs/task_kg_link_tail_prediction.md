@@ -183,14 +183,14 @@ In some situation, users aim to specify the bucket order according to their need
 
 ```python
         # tips: `artifacts_path` is located at: ExplainaBoard/explainaboard/tests/artifacts
-        path_data = artifacts_path + "test-kg-prediction-no-user-defined-new.json"
-        loader = get_loader(
+        dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
+        loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
-            path_data,
-            Source.local_filesystem,
-            FileType.json,
+            dataset,
+            dataset,
         )
         data = loader.load()
+        self.assertEqual(loader.user_defined_features_configs, {})
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
@@ -201,7 +201,6 @@ In some situation, users aim to specify the bucket order according to their need
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
-
         sys_info = processor.process(metadata, data)
 ```
 
@@ -210,15 +209,17 @@ In some situation, users aim to specify the bucket order according to their need
 The value of K in `Hits` metric could also be specified by users when needed.
 
 ```python
-        path_data = artifacts_path + "test-kg-prediction-no-user-defined-new.json" 
-        loader = get_loader(
+        dataset = "explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
+        loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
-            path_data,
+            dataset,
+            dataset,
             Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.json,
             FileType.json,
         )
         data = loader.load()
-        self.assertEqual(loader.user_defined_features_configs, {})
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,

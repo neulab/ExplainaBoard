@@ -6,13 +6,16 @@ import os
 
 from explainaboard import (
     FileType,
-    get_loader,
+    get_custom_dataset_loader,
+    get_datalab_loader,
     get_pairwise_performance_gap,
     get_processor,
     TaskType,
 )
 from explainaboard.analyzers.draw_hist import draw_bar_chart_from_report
+from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
+from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
@@ -20,13 +23,97 @@ from explainaboard.utils.tensor_analysis import (
 )
 
 
-# TODO(Pengfei): The overall implementation of this script should be deduplicated
-def main():
+def get_tasks(task: str, system_outputs: list[str]) -> list[str]:
+    """TODO: TaskType.text_classification is set for temporal use, this needs to be
+    fixed
+    """
+    real_tasks: list[str]
+    if task:
+        real_tasks = [task] * len(system_outputs)
+        if task not in TaskType.list():
+            raise ValueError(
+                f'Task name {task} was not recognized. ExplainaBoard currently '
+                f'supports:{TaskType.list()}'
+            )
+        return real_tasks
+    else:
+        file_type = FileType.json
+        dummy_task = TaskType.text_classification
+        for sys_output in system_outputs:
+            loader = get_custom_dataset_loader(
+                dummy_task,
+                sys_output,
+                sys_output,
+                dataset_file_type=file_type,
+                output_file_type=file_type,
+            )
+            if not loader.user_defined_metadata_configs:
+                raise ValueError(
+                    f"user_defined_metadata_configs in system output {sys_output} "
+                    "hasn't been specified or task name should be specified"
+                )
+            real_tasks.append(loader.user_defined_metadata_configs['task_name'])
+    return real_tasks
 
+
+def analyze_reports(args):
+    """
+    score_tensor is a nested dict, for example
+    score_tensor[model_name][dataset_name][language] =
+    {
+        'metric_name':
+        'Accuracy',
+        'value': 0.8802855573860516,
+        'confidence_score_low': 0.8593406593406593,
+        'confidence_score_high': 0.9
+    }
+    """
+    reports = args.reports
+    models: list[str] | None = args.models
+    datasets: list[str] | None = args.datasets
+    languages: list[str] | None = args.languages
+    models_aggregation: str | None = args.models_aggregation
+    datasets_aggregation: str | None = args.datasets_aggregation
+    languages_aggregation: str | None = args.languages_aggregation
+    score_tensor = {}
+    for report in reports:
+        with open(report) as fin:
+
+            report_dict = json.load(fin)
+
+            model_name = report_dict["model_name"]
+            dataset_name = report_dict["dataset_name"]
+            language = report_dict["language"]
+            # TODO(Pengfei): So far, only one metric is considered
+            metric = report_dict["metric_names"][0]
+            score_info = report_dict["results"]["overall"][metric]
+
+            # print(model_name, dataset_name, language)
+
+            if model_name not in score_tensor.keys():
+                score_tensor[model_name] = {}
+            if dataset_name not in score_tensor[model_name].keys():
+                score_tensor[model_name][dataset_name] = {}
+            if language not in score_tensor[model_name][dataset_name].keys():
+                score_tensor[model_name][dataset_name][language] = {}
+            score_tensor[model_name][dataset_name][language] = score_info
+
+    # filter by three dimensions
+    score_tensor_filter = filter_score_tensor(score_tensor, models, datasets, languages)
+
+    # aggregation by three dimensions
+    score_tensor_aggregated = aggregate_score_tensor(
+        score_tensor_filter,
+        models_aggregation,
+        datasets_aggregation,
+        languages_aggregation,
+    )
+    print_score_tensor(score_tensor_aggregated)
+
+
+def create_parser():
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
-
     parser.add_argument('--task', type=str, required=False, help="the task name")
-
     parser.add_argument(
         '--system_outputs',
         type=str,
@@ -93,14 +180,6 @@ def main():
     )
 
     parser.add_argument(
-        '--type',
-        type=str,
-        required=False,
-        default="single",
-        help="analysis type: single|pair|combine",
-    )
-
-    parser.add_argument(
         '--dataset',
         type=str,
         required=False,
@@ -141,7 +220,7 @@ def main():
     )
 
     parser.add_argument(
-        '--file_type',
+        '--output_file_type',
         type=str,
         required=False,
         default=None,
@@ -171,229 +250,177 @@ def main():
         help="a json file to store detailed information for a system",
     )
 
-    args = parser.parse_args()
+    parser.add_argument(
+        '--custom_dataset_paths',
+        type=str,
+        nargs="*",
+        help="path to custom dataset",
+    )
 
-    dataset: str | None = args.dataset
-    sub_dataset: str | None = args.sub_dataset
-    language: str | None = args.language
-    task: str | None = args.task
+    parser.add_argument(
+        '--custom_dataset_file_type',
+        type=str,
+        help="file types for custom datasets",
+    )
+    return parser
+
+
+# TODO(Pengfei): The overall implementation of this script should be deduplicated
+def main():
+    args = create_parser().parse_args()
+
     reload_stat: bool = False if args.reload_stat == "0" else True
     system_outputs: list[str] = args.system_outputs
 
     reports: list[str] | None = args.reports
     metric_names: list[str] | None = args.metrics
-    file_type: str | None = args.file_type
-    output_dir: str | None = args.output_dir
-    models: list[str] | None = args.models
-    datasets: list[str] | None = args.datasets
-    languages: list[str] | None = args.languages
-    models_aggregation: str | None = args.models_aggregation
-    datasets_aggregation: str | None = args.datasets_aggregation
-    languages_aggregation: str | None = args.languages_aggregation
-
-    system_details_path: str | None = args.system_details
-
-    # get system_details from input json file
-    system_details = None
-    if system_details_path is not None:
-        try:
-            with open(system_details_path) as fin:
-                system_details = json.load(fin)
-        except ValueError as e:
-            print('invalid json: %s' % e)
+    dataset_file_type: str | None = args.custom_dataset_file_type
+    output_file_type: str | None = args.output_file_type
+    output_dir: str = args.output_dir
 
     # If reports have been specified, ExplainaBoard cli will perform analysis
     # over report files.
-    if reports is not None:
+    if args.reports:
+        analyze_reports(args)
+    else:
 
-        """
-        score_tensor is a nested dict, for example
-        score_tensor[model_name][dataset_name][language] =
-        {
-            'metric_name':
-            'Accuracy',
-            'value': 0.8802855573860516,
-            'confidence_score_low': 0.8593406593406593,
-            'confidence_score_high': 0.9
-        }
-        """
-        score_tensor = {}
-        for report in reports:
-            with open(report) as fin:
+        def load_system_details_path():
+            if args.system_details:
+                try:
+                    with open(args.system_details) as fin:
+                        return json.load(fin)
+                except ValueError as e:
+                    print('invalid json: %s for system details' % e)
 
-                report_dict = json.load(fin)
+        output_dir_figures = os.path.join(output_dir, "figures")
+        output_dir_reports = os.path.join(output_dir, "reports")
 
-                model_name = report_dict["model_name"]
-                dataset_name = report_dict["dataset_name"]
-                language = report_dict["language"]
-                # TODO(Pengfei): So far, only one metric is considered
-                metric = report_dict["metric_names"][0]
-                score_info = report_dict["results"]["overall"][metric]
+        def setup_output_folders():
+            """Setup for generated reports and figures"""
+            # This part could be generalized
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            if not os.path.exists(output_dir_figures):
+                os.makedirs(output_dir_figures)
+            if not os.path.exists(output_dir_reports):
+                os.makedirs(output_dir_reports)
 
-                # print(model_name, dataset_name, language)
+        system_details: dict | None = load_system_details_path()
+        setup_output_folders()
 
-                if model_name not in score_tensor.keys():
-                    score_tensor[model_name] = {}
-                if dataset_name not in score_tensor[model_name].keys():
-                    score_tensor[model_name][dataset_name] = {}
-                if language not in score_tensor[model_name][dataset_name].keys():
-                    score_tensor[model_name][dataset_name][language] = {}
-                score_tensor[model_name][dataset_name][language] = score_info
+        # check for benchmark submission: explainaboard  --system_outputs ./data/
+        # system_outputs/sst2/user_specified_metadata.json
+        num_systems = len(system_outputs)
+        tasks = get_tasks(args.task, system_outputs)
+        dataset_file_types: list[str | None] = [dataset_file_type] * num_systems
+        output_file_types: list[str | None] = [output_file_type] * num_systems
+        custom_dataset_paths: list[str] | None = args.custom_dataset_paths
+        dataset: str | None = args.dataset
+        sub_dataset: str | None = args.sub_dataset
 
-        # filter by three dimensions
-        score_tensor_filter = filter_score_tensor(
-            score_tensor, models, datasets, languages
-        )
+        if custom_dataset_paths:  # load custom datasets
+            loaders = [
+                get_custom_dataset_loader(
+                    task,
+                    dataset,
+                    output,
+                    Source.local_filesystem,
+                    Source.local_filesystem,
+                    dataset_file_type,
+                    output_file_type,
+                )
+                for task, dataset, output, dataset_file_type, output_file_type in zip(
+                    tasks,
+                    custom_dataset_paths,
+                    system_outputs,
+                    dataset_file_types,
+                    output_file_types,
+                )
+            ]
+        else:  # load from datalab
+            if not dataset:
+                raise ValueError("neither custom_dataset_paths or dataset is defined")
+            loaders = [
+                get_datalab_loader(
+                    task,
+                    DatalabLoaderOption(dataset, sub_dataset),
+                    sys_output,
+                    Source.local_filesystem,
+                    output_file_type,
+                )
+                for task, sys_output, output_file_type in zip(
+                    tasks, system_outputs, output_file_types
+                )
+            ]
+        system_datasets = [loader.load() for loader in loaders]
 
-        # aggregation by three dimensions
-        score_tensor_aggregated = aggregate_score_tensor(
-            score_tensor_filter,
-            models_aggregation,
-            datasets_aggregation,
-            languages_aggregation,
-        )
-        print_score_tensor(score_tensor_aggregated)
-
-        return True
-
-    # Setup for generated reports and figures
-    output_dir_figures = output_dir + "/" + "figures"
-    output_dir_reports = output_dir + "/" + "reports"
-
-    # This part could be generalized
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    if not os.path.exists(output_dir_figures):
-        os.makedirs(output_dir_figures)
-    if not os.path.exists(output_dir_reports):
-        os.makedirs(output_dir_reports)
-
-    # check for benchmark submission: explainaboard  --system_outputs ./data/
-    # system_outputs/sst2/user_specified_metadata.json
-    real_tasks = [] if task is None else [task]
-    if task is None:
-        file_type = "json"
-        dummy_task = TaskType.text_classification
-        # TaskType.text_classification is set for temporal use, and this need to be
-        # generalized
-        for x in system_outputs:
-            loader = get_loader(dummy_task, data=x, file_type=file_type)
+        # validation
+        if len(system_datasets) == 2:
+            if len(system_datasets[0]) != len(system_datasets[1]):
+                num0 = len(system_datasets[0])
+                num1 = len(system_datasets[1])
+                raise ValueError(
+                    f'Data must be identical for pairwise analysis, but length of '
+                    'files '
+                    f'{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
+                )
             if (
-                loader.user_defined_metadata_configs is None
-                or len(loader.user_defined_metadata_configs) == 0
+                loaders[0].user_defined_features_configs
+                != loaders[1].user_defined_features_configs
             ):
                 raise ValueError(
-                    f"user_defined_metadata_configs in system output {x} has n't "
-                    f"been specified or task name should be specified"
+                    "User defined features must be the same for pairwise analysis."
                 )
-            real_tasks.append(loader.user_defined_metadata_configs['task_name'])
 
-    # Checks on other inputs
-    # if num_outputs > 2:
-    #     raise ValueError(
-    #         f'ExplainaBoard currently only supports 1 or 2 system outputs,
-    #         but received {num_outputs}'
-    #     )
-    if task is not None:
-        if task not in TaskType.list():
-            raise ValueError(
-                f'Task name {task} was not recognized. ExplainaBoard currently '
-                f'supports:{TaskType.list()}'
-            )
+        # Setup metadata
+        metadata = {
+            "dataset_name": dataset,
+            "sub_dataset_name": sub_dataset,
+            "language": args.language,
+            "reload_stat": reload_stat,
+            "conf_value": args.conf_value,
+            "system_details": system_details,
+        }
 
-    if file_type is not None:
-        if file_type not in FileType.list():
-            raise ValueError(
-                f'File type {file_type} was not recognized. ExplainaBoard currently '
-                f'supports: {FileType.list()}'
-            )
+        if metric_names is not None:
+            metadata["metric_names"] = metric_names
 
-    # Read in data and check validity
-    if file_type is not None:
-        if task is not None:
-            loaders = [
-                get_loader(task=task, data=x, file_type=file_type)
-                for x in system_outputs
-            ]
-        elif len(real_tasks) > 0:
-            loaders = [
-                get_loader(task=task, data=x, file_type=file_type)
-                for x, task in zip(system_outputs, real_tasks)
-            ]
-        else:
-            raise NotImplementedError
-    else:
-        loaders = [
-            get_loader(task=task, data=x) for x in system_outputs
-        ]  # use the default loaders that has been pre-defined for each task
-    system_datasets = [list(loader.load()) for loader in loaders]
-
-    # validation
-    if len(system_datasets) == 2:
-        if len(system_datasets[0]) != len(system_datasets[1]):
-            num0 = len(system_datasets[0])
-            num1 = len(system_datasets[1])
-            raise ValueError(
-                f'Data must be identical for pairwise analysis, but length of files '
-                f'{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
-            )
-        if (
-            loaders[0].user_defined_features_configs
-            != loaders[1].user_defined_features_configs
+        # Run analysis
+        reports: list[SysOutputInfo] = []
+        for loader, system_dataset, system_full_path, task in zip(
+            loaders, system_datasets, system_outputs, tasks
         ):
-            raise ValueError(
-                "User defined features must be the same for pairwise analysis."
+
+            metadata.update(loader.user_defined_metadata_configs)
+            metadata[
+                "user_defined_features_configs"
+            ] = loader.user_defined_features_configs
+            metadata["task_name"] = task
+
+            report = get_processor(task=task).process(
+                metadata=metadata, sys_output=system_dataset
+            )
+            reports.append(report)
+
+            # save report to `output_dir_reports`
+            x_file_name = os.path.basename(system_full_path).split(".")[0]
+            report.write_to_directory(output_dir_reports, f"{x_file_name}.json")
+
+            # generate figures and save them into  `output_dir_figures`
+            if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
+                os.makedirs(f"{output_dir_figures}/{x_file_name}")
+            draw_bar_chart_from_report(
+                f"{output_dir_reports}/{x_file_name}.json",
+                f"{output_dir_figures}/{x_file_name}",
             )
 
-    # Setup metadata
-    metadata = {
-        "dataset_name": dataset,
-        "sub_dataset_name": sub_dataset,
-        "language": language,
-        "task_name": task,
-        "reload_stat": reload_stat,
-        "conf_value": args.conf_value,
-        "system_details": system_details,
-    }
-
-    if metric_names is not None:
-        metadata["metric_names"] = metric_names
-
-    # Run analysis
-    reports: list[SysOutputInfo] = []
-    for loader, system_dataset, system_full_path, task in zip(
-        loaders, system_datasets, system_outputs, real_tasks
-    ):
-
-        metadata.update(loader.user_defined_metadata_configs)
-        metadata.update(
-            {"user_defined_features_configs": loader._user_defined_features_configs}
-        )
-
-        report = get_processor(task=task).process(
-            metadata=metadata, sys_output=system_dataset
-        )
-        reports.append(report)
-
-        # save report to `output_dir_reports`
-        x_file_name = os.path.basename(system_full_path).split(".")[0]
-        report.write_to_directory(output_dir_reports, f"{x_file_name}.json")
-
-        # generate figures and save them into  `output_dir_figures`
-        if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
-            os.makedirs(f"{output_dir_figures}/{x_file_name}")
-        draw_bar_chart_from_report(
-            f"{output_dir_reports}/{x_file_name}.json",
-            f"{output_dir_figures}/{x_file_name}",
-        )
-
-    if len(system_outputs) == 1:  # individual system analysis
-        reports[0].print_as_json()
-    elif len(system_outputs) == 2:  # pairwise analysis
-        compare_analysis = get_pairwise_performance_gap(
-            reports[0].to_dict(), reports[1].to_dict()
-        )
-        print(json.dumps(compare_analysis, indent=4))
+        if len(system_outputs) == 1:  # individual system analysis
+            reports[0].print_as_json()
+        elif len(system_outputs) == 2:  # pairwise analysis
+            compare_analysis = get_pairwise_performance_gap(
+                reports[0].to_dict(), reports[1].to_dict()
+            )
+            print(json.dumps(compare_analysis, indent=4))
 
 
 if __name__ == '__main__':

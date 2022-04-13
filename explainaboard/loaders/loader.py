@@ -1,164 +1,183 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from dataclasses import dataclass
 import json
-from typing import List, Mapping, Optional, Union
+from typing import final, Literal, Optional
 
 from explainaboard.constants import FileType, Source
-from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
-from explainaboard.tasks import TaskType
-from explainaboard.utils.typing_utils import unwrap
-
-JSON = Union[  # type: ignore
-    str, int, float, bool, None, Mapping[str, 'JSON'], List['JSON']  # type: ignore
-]
+from explainaboard.loaders.file_loader import (
+    DatalabLoaderOption,
+    FileLoader,
+    FileLoaderField,
+    JSONFileLoader,
+    TextFileLoader,
+)
 
 
 class Loader:
     """Base class of Loaders
-
-    Args:
-        data: base64 encoded system output content or a path for the system output file
-        source: source of data
-        file type: tsv, json, conll, etc.
-        file_loaders: a dict of file loaders. To customize the loading process, either
-            implement a custome FileLoader or override `load()`
+    - system output is split into two parts: the dataset (features and true labels) and
+    the output (predicted labels)
+    :param data: if str, base64 encoded system output or a path.
+    :param source: source of data
+    :param file_type: tsv, json, conll, etc.
+    :param file_loader: a dict of file loaders. To customize the loading process,
+    either implement a custom FileLoader or override `load()`
     """
 
-    _default_source = Source.local_filesystem
-    _default_file_type: Optional[FileType] = None
-    _default_file_loaders: dict[FileType, FileLoader] = {}
+    @classmethod
+    def default_source(cls) -> Source:
+        return Source.local_filesystem
+
+    @classmethod
+    def default_dataset_file_type(cls) -> FileType:
+        return FileType.json
+
+    @classmethod
+    def default_output_file_type(cls) -> FileType:
+        return FileType.text
+
+    @classmethod
+    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {}
+
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        return {FileType.text: TextFileLoader()}
 
     def __init__(
         self,
-        data: str,
-        source: Optional[Source] = None,
-        file_type: Optional[FileType] = None,
-        file_loaders: Optional[dict[FileType, FileLoader]] = None,
+        dataset_data: str | DatalabLoaderOption,
+        output_data: str,
+        dataset_source: Optional[Source] = None,
+        output_source: Optional[Source] = None,
+        dataset_file_type: Optional[FileType] = None,
+        output_file_type: Optional[FileType] = None,
+        dataset_file_loader: Optional[FileLoader] = None,
+        output_file_loader: Optional[FileLoader] = None,
     ):
-        if file_loaders is None:
-            file_loaders = {}
-        if not source and not self._default_source:
-            raise Exception("no source is provided for the loader")
-        else:
-            self._source: Source = source or self._default_source
-        if not file_type and not self._default_file_type:
-            raise Exception("no file_type is provided for the loader")
-        elif not file_type:
-            self._file_type = unwrap(self._default_file_type)
-        else:
-            self._file_type = unwrap(file_type)
+        # determine sources
+        self._dataset_source: Source = dataset_source or self.default_source()
+        self._output_source: Source = output_source or self.default_source()
 
-        self.file_loaders: dict[FileType, FileLoader] = (
-            file_loaders or self._default_file_loaders
+        # determine file types
+        if not dataset_file_type:
+            dataset_file_type = self.default_dataset_file_type()
+        if not output_file_type:
+            output_file_type = self.default_output_file_type()
+
+        # determine file loaders
+        self._dataset_file_loader = self.select_file_loader(
+            "dataset", dataset_file_type, dataset_file_loader
         )
-        self._data = data  # base64 or filepath
-
-        if self._file_type not in self.file_loaders:
-            raise NotImplementedError(
-                f"A file loader for {self._file_type} is not provided. "
-                "please add it to the file_loaders."
-            )
-
-        self._user_defined_features_configs: dict[
-            str, CustomFeature
-        ] = self._parse_user_defined_features_configs()
-
-        self._user_defined_metadata_configs: dict = (
-            self._parse_user_defined_metadata_configs()
+        self._output_file_loader = self.select_file_loader(
+            "output", output_file_type, output_file_loader
         )
+
+        self._dataset_data = dataset_data  # base64, filepath or datalab options
+        self._output_data = output_data
+
+        self._user_defined_features_configs: dict[str, CustomFeature] = {}
+        self._user_defined_metadata_configs: dict = {}
+        if output_file_type == FileType.json:
+            (
+                self._user_defined_features_configs,
+                self._user_defined_metadata_configs,
+            ) = self._parse_user_defined_fields()
+
+    @classmethod
+    @final
+    def select_file_loader(
+        cls,
+        split: Literal["dataset", "output"],
+        file_type: FileType,
+        custom_loader: Optional[FileLoader],
+    ) -> FileLoader:
+        if custom_loader:
+            return custom_loader
+        else:
+            if split == "dataset":
+                default_file_loaders = cls.default_dataset_file_loaders()
+            elif split == "output":
+                default_file_loaders = cls.default_output_file_loaders()
+            else:
+                raise ValueError("split must be one of [dataset, output]")
+            if file_type not in default_file_loaders:
+                raise ValueError(
+                    f"A file loader for {file_type} is not provided. "
+                    "please pass it in as an argument."
+                )
+            else:
+                return default_file_loaders[file_type]
 
     @property
     def user_defined_features_configs(self) -> dict[str, CustomFeature]:
-        if self._user_defined_features_configs is None:
-            raise Exception(
-                "User defined features configs are not available "
-                "(data has not been loaded))"
-            )
         return self._user_defined_features_configs
 
     @property
     def user_defined_metadata_configs(self) -> dict:
-        if self._user_defined_metadata_configs is None:
-            raise Exception(
-                "User defined metadata configs are not available "
-                "(data has not been loaded))"
-            )
         return self._user_defined_metadata_configs
 
-    def _parse_user_defined_features_configs(self) -> dict:
-        if self._file_type == FileType.json:
-            raw_data = self.file_loaders[FileType.json].load_raw(
-                self._data, self._source
+    def _parse_user_defined_fields(self) -> tuple[dict[str, CustomFeature], dict]:
+        """custom features and metadata can only be defined in the output file and it
+        needs to be in JSON format"""
+        if isinstance(self._output_file_loader, JSONFileLoader):
+            raw_data = self._output_file_loader.load_raw(
+                self._output_data, self._output_source
             )
-            if isinstance(raw_data, dict) and raw_data.get(
-                "user_defined_features_configs"
-            ):
-                self._data = json.dumps(raw_data["predictions"])
-                self._source = Source.in_memory
-                custom_feature_configs: dict[str, CustomFeature] = {
-                    name: CustomFeature.from_dict(name, dikt)
-                    for name, dikt in raw_data["user_defined_features_configs"].items()
-                }
-                fields: list[FileLoaderField] = []
-                for feature in custom_feature_configs.values():
-                    fields.append(
-                        # dtype is set to None because custom feature configs doesn't
-                        # use the same set of dtypes as FileLoader (this is not
-                        # enforced anywhere)
-                        FileLoaderField(feature.name, feature.name, None, False)
-                    )
-                self.file_loaders[FileType.json].add_fields(fields)
-                return custom_feature_configs
-        return {}
+            if isinstance(raw_data, dict):
+                custom_features = raw_data.get("user_defined_features_configs", {})
+                metadata = raw_data.get("user_defined_metadata_configs", {})
 
-    def _parse_user_defined_metadata_configs(self) -> dict:
-        if self._file_type == FileType.json:
-            raw_data = self.file_loaders[FileType.json].load_raw(
-                self._data, self._source
+                if custom_features or metadata:
+                    if "predictions" not in raw_data:
+                        raise ValueError(
+                            "system output file is missing predictions field"
+                        )
+                    # replace output data with the predictions only
+                    self._output_data = json.dumps(raw_data["predictions"])
+                    self._output_source = Source.in_memory
+
+                custom_feature_configs: dict[str, CustomFeature] = {}
+                if custom_features:  # add custom features to output file loader fields
+                    custom_feature_configs = {
+                        name: CustomFeature.from_dict(name, dikt)
+                        for name, dikt in raw_data[
+                            "user_defined_features_configs"
+                        ].items()
+                    }
+                    fields: list[FileLoaderField] = []
+                    for feature in custom_feature_configs.values():
+                        fields.append(
+                            # dtype is set to None because custom feature configs
+                            # doesn't use the same set of dtypes as FileLoader
+                            # (this is not enforced anywhere)
+                            FileLoaderField(feature.name, feature.name, None, False)
+                        )
+                    self._output_file_loader.add_fields(fields)
+                return custom_feature_configs, metadata
+            return {}, {}
+        else:
+            raise Exception(
+                "_parse_user_defined_fields can only be called with a JSON system "
+                + "output file"
             )
-            if isinstance(raw_data, dict) and raw_data.get(
-                "user_defined_metadata_configs"
-            ):
-                self._data = json.dumps(raw_data["predictions"])
-                self._source = Source.in_memory
-                return raw_data["user_defined_metadata_configs"]
-        return {}
 
-    def load(self) -> Iterable[dict]:
-        file_loader = self.file_loaders[self._file_type]
-        return file_loader.load(self._data, self._source)
-
-
-# loader_registry is a global variable, storing all basic loading functions
-_loader_registry: dict[TaskType, type[Loader]] = {}
-
-
-def get_loader(
-    task: TaskType | str,
-    data: str,
-    source: Source | None = None,
-    file_type: FileType | str | None = None,
-) -> Loader:
-    task_cast: TaskType = TaskType(task)
-    file_type_cast: FileType | None = (
-        FileType(file_type) if file_type is not None else None
-    )
-    return _loader_registry[task_cast](data, source, file_type_cast)
-
-
-def register_loader(task_type: TaskType):
-    """
-    a register for different data loaders, for example
-    For example, `@register_loader(TaskType.text_classification)`
-    """
-
-    def register_loader_fn(cls):
-        _loader_registry[task_type] = cls
-        return cls
-
-    return register_loader_fn
+    def load(self) -> list[dict]:
+        dataset_loaded_data = self._dataset_file_loader.load(
+            self._dataset_data, self._dataset_source
+        )
+        output_loaded_data = self._output_file_loader.load(
+            self._output_data, self._output_source
+        )
+        if len(dataset_loaded_data) != len(output_loaded_data):
+            raise Exception(
+                "dataset and output are of different length"
+                + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
+            )
+        for i, output in enumerate(output_loaded_data):
+            dataset_loaded_data[i].update(output)
+        return dataset_loaded_data
 
 
 @dataclass

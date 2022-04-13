@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import unittest
 
 from eaas import Config
@@ -10,10 +9,9 @@ import numpy as np
 import sklearn.metrics
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader import get_loader
+from explainaboard.loaders import get_custom_dataset_loader
 import explainaboard.metric
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestMetric(unittest.TestCase):
@@ -99,16 +97,23 @@ class TestMetric(unittest.TestCase):
         )
 
     def test_eaas_decomposabiltiy(self):
-
         # Get data
-        path_data = artifacts_path + "test-mt.tsv"
-        loader = get_loader(
+        tsv_dataset = os.path.join(
+            test_artifacts_path, "machine_translation", "dataset.tsv"
+        )
+        txt_output = os.path.join(
+            test_artifacts_path, "machine_translation", "output.txt"
+        )
+        loader = get_custom_dataset_loader(
             TaskType.machine_translation,
-            path_data,
+            tsv_dataset,
+            txt_output,
+            Source.local_filesystem,
             Source.local_filesystem,
             FileType.tsv,
+            FileType.text,
         )
-        sys_output = list(loader.load())
+        sys_output = loader.load()
 
         # Initialize client and decide which metrics to test
         eaas_client = AsyncClient(Config())
@@ -154,15 +159,22 @@ class TestMetric(unittest.TestCase):
                 )
 
     def test_qa_metrics(self):
-
-        path_data = artifacts_path + "test-xquad-en.json"
-        loader = get_loader(
+        json_en_dataset = os.path.join(
+            test_artifacts_path, "extractive_qa", "dataset-xquad-en.json"
+        )
+        json_en_output = os.path.join(
+            test_artifacts_path, "extractive_qa", "output-xquad-en.json"
+        )
+        loader = get_custom_dataset_loader(
             TaskType.question_answering_extractive,
-            path_data,
+            json_en_dataset,
+            json_en_output,
+            Source.local_filesystem,
             Source.local_filesystem,
             FileType.json,
+            FileType.json,
         )
-        data = list(loader.load())
+        data = loader.load()
 
         metadata = {
             "task_name": TaskType.question_answering_extractive.value,

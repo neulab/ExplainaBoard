@@ -1,73 +1,83 @@
 import json
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, TaskType
+from explainaboard import FileType, get_processor, TaskType
+from explainaboard.loaders.loader_registry import get_custom_dataset_loader
+from explainaboard.tests.utils import test_artifacts_path
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
     print_score_tensor,
 )
 
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
-
 
 class TestMultilingualMultiTask(unittest.TestCase):
-    def test_batch_processing(self):
+    artifact_path = os.path.join(test_artifacts_path, "multilingual")
 
-        path_system_output_folder = artifacts_path + "multilingual/CL-mt5base/xnli/"
-        system_outputs = [
-            path_system_output_folder + system_output_name
-            for system_output_name in os.listdir(path_system_output_folder)
+    def test_batch_processing(self):
+        sys_out_dir = os.path.join(self.artifact_path, "CL-mt5base", "xnli")
+
+        datasets = [
+            os.path.join(sys_out_dir, "datasets", file)
+            for file in os.listdir(os.path.join(sys_out_dir, "datasets"))
+        ]
+
+        outputs = [
+            os.path.join(sys_out_dir, "outputs", file)
+            for file in os.listdir(os.path.join(sys_out_dir, "outputs"))
         ]
 
         file_type = FileType.json
         task_dummy = TaskType.text_classification
-        task_system_outputs = []
-        for x in system_outputs:
-            loader = get_loader(task_dummy, data=x, file_type=file_type)
-            if (
-                loader.user_defined_metadata_configs is None
-                or len(loader.user_defined_metadata_configs) == 0
-            ):
-                raise ValueError(
-                    f"user_defined_metadata_configs in system output {x} has n't "
-                    f"been specified or task name should be specified"
-                )
-            task_system_outputs.append(
-                loader.user_defined_metadata_configs['task_name']
+        tasks = []
+        for dataset, output in zip(datasets, outputs):
+            loader = get_custom_dataset_loader(
+                task_dummy,
+                dataset,
+                output,
+                dataset_file_type=file_type,
+                output_file_type=file_type,
             )
+            if not loader.user_defined_metadata_configs:
+                raise ValueError(
+                    f"user_defined_metadata_configs in system output {output} hasn't "
+                    "been specified or task name should be specified"
+                )
+            tasks.append(loader.user_defined_metadata_configs['task_name'])
 
         # Get loaders using real `task` and `file_type`
         loaders = [
-            get_loader(task, data=x, file_type=FileType.json)
-            for x, task in zip(system_outputs, task_system_outputs)
+            get_custom_dataset_loader(
+                task,
+                dataset,
+                output,
+                dataset_file_type=file_type,
+                output_file_type=file_type,
+            )
+            for dataset, output, task in zip(datasets, outputs, tasks)
         ]
-        system_datasets = [list(loader.load()) for loader in loaders]
+        system_outputs = [loader.load() for loader in loaders]
 
         # Run analysis
         reports = []
         metadata = {}
-        for loader, system_dataset, system_full_path, task in zip(
-            loaders, system_datasets, system_outputs, task_system_outputs
-        ):
+        for loader, system_output, task in zip(loaders, system_outputs, tasks):
 
             metadata.update(loader.user_defined_metadata_configs)
 
             report = get_processor(task).process(
-                metadata=metadata, sys_output=system_dataset
+                metadata=metadata, sys_output=system_output
             )
             reports.append(report)
 
         self.assertEqual(len(reports), 2)
 
     def test_batch_meta_analysis(self):
-
         # Get reports
-        path_reports_folder = artifacts_path + "reports/"
+        path_reports_folder = os.path.join(test_artifacts_path, "reports")
         reports = [
-            path_reports_folder + report_name
+            os.path.join(path_reports_folder, report_name)
             for report_name in os.listdir(path_reports_folder)
         ]
 
@@ -142,7 +152,3 @@ class TestMultilingualMultiTask(unittest.TestCase):
         self.assertEqual(
             list(score_tensor_aggregated.keys()), ['CL-mlpp15out1sum V.S CL-mt5base']
         )
-
-
-if __name__ == '__main__':
-    unittest.main()
