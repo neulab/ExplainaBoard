@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
+    FileLoader,
     FileLoaderField,
     JSONFileLoader,
+    TextFileLoader,
     TSVFileLoader,
 )
-from explainaboard.loaders.loader import Loader, register_loader
+from explainaboard.loaders.loader import Loader
+from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.tasks import TaskType
 
 
@@ -19,28 +24,40 @@ class TextClassificationLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    _default_file_type = FileType.tsv
-    _target_field_names = ["text", "true_label", "predicted_label"]
-    _default_file_loaders = {
-        FileType.tsv: TSVFileLoader(
-            [
-                FileLoaderField(0, _target_field_names[0], str),
-                FileLoaderField(1, _target_field_names[1], str),
-                FileLoaderField(2, _target_field_names[2], str),
-            ],
-        ),
-        FileType.json: JSONFileLoader(
-            [
-                FileLoaderField("text", _target_field_names[0], str),
-                FileLoaderField("true_label", _target_field_names[1], str),
-                FileLoaderField("predicted_label", _target_field_names[2], str),
-            ]
-        ),
-        FileType.datalab: DatalabFileLoader(
-            [
-                FileLoaderField("text", _target_field_names[0], str),
-                FileLoaderField("label", _target_field_names[1], str),
-                FileLoaderField("prediction", _target_field_names[2], str),
-            ]
-        ),
-    }
+    @classmethod
+    def default_dataset_file_type(cls) -> FileType:
+        return FileType.tsv
+
+    @classmethod
+    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        target_field_names = ["text", "true_label"]
+        return {
+            FileType.tsv: TSVFileLoader(
+                [
+                    FileLoaderField(0, target_field_names[0], str),
+                    FileLoaderField(1, target_field_names[1], str),
+                ],
+            ),
+            FileType.json: JSONFileLoader(
+                [
+                    FileLoaderField("text", target_field_names[0], str),
+                    FileLoaderField("true_label", target_field_names[1], str),
+                ]
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("text", target_field_names[0], str),
+                    FileLoaderField("label", target_field_names[1], str),
+                ]
+            ),
+        }
+
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        field_name = "predicted_label"
+        return {
+            FileType.text: TextFileLoader(field_name, str),
+            FileType.json: JSONFileLoader(
+                [FileLoaderField(field_name, field_name, str)]
+            ),
+        }

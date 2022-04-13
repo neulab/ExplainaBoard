@@ -1,0 +1,50 @@
+SOCCER	O
+-	O
+JAPAN	B-LOC
+GET	O
+LUCKY	O
+WIN	O
+,	O
+CHINA	B-PER
+IN	O
+SURPRISE	O
+DEFEAT	O
+.	O
+
+Nadim	B-PER
+Ladki	I-PER
+
+AL-AIN	B-LOC
+,	O
+United	B-LOC
+Arab	I-LOC
+Emirates	I-LOC
+1996-12-06	O
+
+Japan	B-LOC
+began	O
+the	O
+defence	O
+of	O
+their	O
+Asian	B-MISC
+Cup	I-MISC
+title	O
+with	O
+a	O
+lucky	O
+2-1	O
+win	O
+against	O
+Syria	B-LOC
+in	O
+a	O
+Group	O
+C	O
+championship	O
+match	O
+on	O
+Friday	O
+.	O
+
+

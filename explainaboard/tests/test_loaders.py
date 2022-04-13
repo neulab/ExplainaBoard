@@ -1,66 +1,59 @@
 import os
-import pathlib
 from unittest import TestCase
 
-from explainaboard import FileType, get_loader, Source, TaskType
-from explainaboard.loaders.file_loader import FileLoaderField, TSVFileLoader
+from explainaboard import FileType, get_datalab_loader, Source, TaskType
+from explainaboard.loaders.file_loader import (
+    DatalabLoaderOption,
+    FileLoaderField,
+    TextFileLoader,
+    TSVFileLoader,
+)
 from explainaboard.loaders.loader import Loader
-from explainaboard.tests.utils import load_file_as_str
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard.tests.utils import load_file_as_str, test_artifacts_path
 
 
 class BaseLoaderTests(TestCase):
+    dataset = os.path.join(test_artifacts_path, "text_classification", "dataset.tsv")
+
     def test_load_in_memory_tsv(self):
         loader = Loader(
-            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
-            Source.in_memory,
-            FileType.tsv,
-            {
-                FileType.tsv: TSVFileLoader(
-                    [FileLoaderField(0, "field0", str)], use_idx_as_id=True
-                )
-            },
+            dataset_data=load_file_as_str(self.dataset),
+            output_data=load_file_as_str(
+                os.path.join(test_artifacts_path, "text_classification", "output.txt")
+            ),
+            dataset_source=Source.in_memory,
+            output_source=Source.in_memory,
+            dataset_file_type=FileType.tsv,
+            output_file_type=FileType.text,
+            dataset_file_loader=TSVFileLoader(
+                [FileLoaderField(0, "field0", str)], use_idx_as_id=True
+            ),
+            output_file_loader=TextFileLoader("output", str),
         )
         samples = [sample for sample in loader.load()]
         self.assertEqual(len(samples), 10)
-        self.assertEqual(set(samples[0].keys()), {"id", "field0"})
+        self.assertEqual(set(samples[0].keys()), {"id", "field0", "output"})
 
-
-class TextClassificationLoader(TestCase):
-    def test_load_in_memory_tsv(self):
-        loader = get_loader(
-            TaskType.text_classification,
-            load_file_as_str(f"{artifacts_path}sys_out1.tsv"),
-            Source.in_memory,
-            FileType.tsv,
-        )
-        data = loader.load()
-        self.assertEqual(len(data), 10)
-        self.assertEqual(
-            set(data[0].keys()), {"id", "text", "true_label", "predicted_label"}
+    def test_missing_loader(self):
+        """raises ValueError because a tsv file loader is not provided by default"""
+        self.assertRaises(
+            ValueError,
+            lambda: Loader(
+                dataset_data=self.dataset,
+                output_data=self.dataset,
+                dataset_file_type=FileType.tsv,
+                output_file_type=FileType.tsv,
+            ),
         )
 
 
-class QASquadLoader(TestCase):
-    def test_load_json(self):
-        loader = get_loader(
-            TaskType.question_answering_extractive,
-            f"{artifacts_path}test-qa-squad.json",
-            Source.local_filesystem,
-            FileType.json,
+class TestLoadFromDatalab(TestCase):
+    def test_invalid_dataset_name(self):
+        loader = get_datalab_loader(
+            task=TaskType.text_classification,
+            dataset=DatalabLoaderOption("invalid_name"),
+            output_data="outputdata",
+            output_source=Source.in_memory,
+            output_file_type=FileType.text,
         )
-        data = loader.load()
-        self.assertEqual(len(data), 5)
-
-
-class SummSquadLoader(TestCase):
-    def test_load_json(self):
-        loader = get_loader(
-            TaskType.summarization,
-            f"{artifacts_path}test-summ.tsv",
-            Source.local_filesystem,
-            FileType.tsv,
-        )
-        data = loader.load()
-        self.assertEqual(len(data), 70)
+        self.assertRaises(FileNotFoundError, loader.load)

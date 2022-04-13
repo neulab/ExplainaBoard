@@ -1,21 +1,24 @@
 import os
-import pathlib
 import unittest
 
-from explainaboard import FileType, get_loader, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.metric import HitsConfig
-
-artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts/"
+from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestKgLinkTailPrediction(unittest.TestCase):
-    def test_no_user_defined_features(self):
+    artifact_path = os.path.join(test_artifacts_path, "kg_link_tail_prediction")
 
-        path_data = artifacts_path + "test-kg-prediction-no-user-defined-new.json"
-        loader = get_loader(
+    def test_no_user_defined_features(self):
+        dataset = os.path.join(self.artifact_path, "no_custom_feature.json")
+        loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
-            path_data,
+            dataset,
+            dataset,
             Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.json,
             FileType.json,
         )
         data = loader.load()
@@ -32,10 +35,5 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -34,7 +34,7 @@ setup(
         ],
     },
     install_requires=[
-        "datalabs>=0.3.7",
+        "datalabs>=0.3.10",
         "datasets>=2.0.0",
         "eaas>=0.3.8",
         "lexicalrichness",

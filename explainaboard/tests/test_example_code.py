@@ -1,8 +1,8 @@
-import os
-import pathlib
 import unittest
 
-from explainaboard import get_loader, get_processor, TaskType
+from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders import get_custom_dataset_loader, get_datalab_loader
+from explainaboard.loaders.file_loader import DatalabLoaderOption
 
 
 class TestExampleCode(unittest.TestCase):
@@ -10,18 +10,27 @@ class TestExampleCode(unittest.TestCase):
     This tests example code that is included in the documentation.
     """
 
-    def test_top_readme(self):
-        """
-        This tests the code in the top README.md file.
-        """
+    def test_readme_datalab_dataset(self):
+        loader = get_datalab_loader(
+            TaskType.text_classification,
+            dataset=DatalabLoaderOption("sst2"),
+            output_data="./explainaboard/tests/artifacts/text_classification/"
+            "output_sst2.txt",
+            output_source=Source.local_filesystem,
+            output_file_type=FileType.text,
+        )
+        data = loader.load()
+        processor = get_processor(TaskType.text_classification)
+        analysis = processor.process(metadata={}, sys_output=data)
+        analysis.write_to_directory("./")
 
-        # The following code is not actually verbatim from the example
-        artifacts_path = os.path.dirname(pathlib.Path(__file__)) + "/artifacts"
-        path_data = f"{artifacts_path}/test-summ.tsv"
-        # End non-verbatim code
-
-        loader = get_loader(TaskType.summarization, data=path_data)
-        data = list(loader.load())
+    def test_readme_custom_dataset(self):
+        dataset = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
+        output = "./explainaboard/tests/artifacts/summarization/output.txt"
+        loader = get_custom_dataset_loader(
+            TaskType.summarization, dataset_data=dataset, output_data=output
+        )
+        data = loader.load()
         processor = get_processor(TaskType.summarization)
         analysis = processor.process(metadata={}, sys_output=data)
         analysis.write_to_directory("./")

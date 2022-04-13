@@ -85,7 +85,11 @@ Then, you can run following examples via bash
 
 * text-classification:
 ```shell
-explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv
+# datalab dataset
+explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt --dataset sst2
+
+# custom dataset
+explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt --custom_dataset_paths ./data/system_outputs/sst2/sst2-dataset.tsv
 ```
 See detailed [description](https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.md) and 
 more [supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md).
@@ -94,14 +98,30 @@ more [supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/su
 ### Example for Python SDK
 
 ```python
-from explainaboard import TaskType, get_loader, get_processor
+from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
+# using a dataset we provide (datalab)
+loader = get_datalab_loader(
+    TaskType.text_classification,
+    dataset=DatalabLoaderOption("sst2"),
+    output_data="./explainaboard/tests/artifacts/text_classification/output_sst2.txt",
+    output_source=Source.local_filesystem,
+    output_file_type=FileType.text,
+)
+data = loader.load()
+processor = get_processor(TaskType.text_classification)
+analysis = processor.process(metadata={}, sys_output=data)
+analysis.write_to_directory("./")
 
-path_data = "./explainaboard/tests/artifacts/test-summ.tsv"
-loader = get_loader(TaskType.summarization, data=path_data)
-data = list(loader.load())
+# using a custom dataset
+dataset = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
+output = "./explainaboard/tests/artifacts/summarization/output.tsv"
+loader = get_custom_dataset_loader(TaskType.summarization, dataset=dataset, output=output)
+data = loader.load()
 processor = get_processor(TaskType.summarization)
 analysis = processor.process(metadata={}, sys_output=data)
 analysis.write_to_directory("./")
+
+
 ```
 
 
