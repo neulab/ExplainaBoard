@@ -108,7 +108,10 @@ class Processor(metaclass=abc.ABCMeta):
                     sys_info.dataset_name, sub_dataset
                 )
             if statistics is None:
-                dataset = load_dataset(sys_info.dataset_name, sub_dataset)
+                try:
+                    dataset = load_dataset(sys_info.dataset_name, sub_dataset)
+                except Exception:
+                    dataset = None
                 if dataset is None:
                     eprint(
                         f"{sys_info.dataset_name} hasn't been supported by DataLab so"
