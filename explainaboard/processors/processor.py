@@ -103,7 +103,10 @@ class Processor(metaclass=abc.ABCMeta):
                 else sys_info.sub_dataset_name
             )
             # read statistics from cache
-            statistics = read_statistics_from_cache(sys_info.dataset_name, sub_dataset)
+            if sys_info.reload_stat:
+                statistics = read_statistics_from_cache(
+                    sys_info.dataset_name, sub_dataset
+                )
             if statistics is None:
                 dataset = load_dataset(sys_info.dataset_name, sub_dataset)
                 if dataset is None:
