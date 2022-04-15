@@ -2,6 +2,8 @@ import os
 import pathlib
 from typing import Final
 
+OPTIONAL_TEST_SUITES = ['cli_all']
+
 
 def load_file_as_str(path) -> str:
     content = ""
