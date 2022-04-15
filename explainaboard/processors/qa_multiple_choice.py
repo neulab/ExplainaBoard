@@ -11,7 +11,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer
+from explainaboard.utils.tokenizer import Tokenizer
 
 
 @register_processor(TaskType.qa_multiple_choice)
@@ -95,7 +95,6 @@ class QAMultipleChoiceProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        # self._statistics_func = get_statistics
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
@@ -142,30 +141,8 @@ class QAMultipleChoiceProcessor(Processor):
         """
         return data_point["predicted_answers"]["option_index"]
 
-
-@aggregating(
-    name="get_statistics",
-    contributor="datalab",
-    task="qa-multiple-choice",
-    description="Calculate the overall statistics (e.g., average length) of "
-    "a given text classification dataset",
-)
-def get_statistics(samples: Iterator):
-    """
-    Input:
-    samples: [{
-     "id":str
-     "context":str
-     "question":str
-     "answers":Dict
-     "options"
-    }]
-    """
-
-    # TODO(gneubig):
-    # BEWARE THIS IS HACKY. This should use the same tokenizer as the processor.
-    tokenizer = SingleSpaceTokenizer()
-
-    return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-        samples, lambda x: x['context'], tokenizer
-    )
+    @aggregating()
+    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
+        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+            samples, lambda x: x['context'], tokenizer
+        )
