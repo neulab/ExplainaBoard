@@ -145,3 +145,42 @@ class TestCLI(TestCase):
         ]
         with patch('sys.argv', args):
             main()
+
+    def test_kglinktail_datalab(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'kg-link-tail-prediction',
+            '--dataset',
+            'fb15k_237',
+            '--system_outputs',
+            './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_kglinktail_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'kg-link-tail-prediction',
+            '--custom_dataset_paths',
+            './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            '--system_outputs',
+            './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_absa_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'aspect-based-sentiment-classification',
+            '--custom_dataset_paths',
+            './data/system_outputs/absa/absa-dataset.tsv',
+            '--system_outputs',
+            './data/system_outputs/absa/absa-example-output.txt',
+        ]
+        with patch('sys.argv', args):
+            main()
