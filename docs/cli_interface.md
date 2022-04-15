@@ -1,11 +1,11 @@
-# CLI Interface Currently Supported Tasks
+# CLI Interface to Various Tasks
 
-Below is a (somewhat incomplete) list of tasks that ExplainaBoard currently supports, along with examples of how to analyze different tasks.
+Below is a (mostly complete) list of tasks that ExplainaBoard currently supports, along with examples of how to analyze different tasks.
 In particular [text classification](#text-classification) is a good example to start with.
 
 **General notes:**
 * Click the link on the task name for more details, or when no link exists you can open the example data to see what the file format looks like.
-* You can either analyze an existing dataset included in [Datalab](https://github.com/expressai/datalab) or use your own custom dataset. The directions below describe how to do both.
+* You can either analyze an existing dataset included in [Datalab](https://github.com/expressai/datalab) or use your own custom dataset. The directions below describe how to do both in most cases.
 * All of the examples below will output a json report to standard out, and you can use Python's pretty printing tool to see it in a more readable format (add `| python -m json.tool` at the end of any of the lines).
 
 
@@ -83,14 +83,15 @@ Named entity recognition recognizes entities such as people, organizations, or l
 The below examples demonstrate how you can perform such analysis on the CoNLL 2003 English named entity recognition dataset.
 
 **CLI Example**
+
+The below example loads the `conll2003` NER dataset from DataLab:
 ```shell
-explainaboard --task named-entity-recognition --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+explainaboard --task named-entity-recognition --dataset conll2003 --sub_dataset ner --system_outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll
 ```
 
-Alternatively, you can reference the dataset directly. 
-
-```
-explainaboard --task named-entity-recognition --dataset conll2003 --sub_dataset ner  --system_outputs ./data/system_outputs/conll2003/conll2003.elmo
+Alternatively, you can reference a dataset file directly.
+```shell
+explainaboard --task named-entity-recognition --custom_dataset_paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system_outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll 
 ```
 
 
@@ -100,8 +101,15 @@ Extractive QA attempts to answer queries based on extracting segments from an ev
 The below example performs this extraction on the dataset SQuAD.
 
 **CLI Example**
+
+Below is an example of referencing the dataset directly.
 ```shell
-explainaboard --task question-answering-extractive --system_outputs ./data/system_outputs/squad/test-qa-extractive.json > report.json
+explainaboard --task question-answering-extractive --custom_dataset_paths ./data/system_outputs/squad/squad_mini-dataset.json --system_outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
+```
+
+The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
+```shell
+explainaboard --task question-answering-extractive --dataset squad --system_outputs MY_FILE > report.json
 ```
 
 
