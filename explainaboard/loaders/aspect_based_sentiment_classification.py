@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
     JSONFileLoader,
@@ -39,6 +40,13 @@ class AspectBasedSentimentClassificationLoader(Loader):
                 ],
             ),
             FileType.json: JSONFileLoader(
+                [
+                    FileLoaderField(field_names[0], field_names[0], str),
+                    FileLoaderField(field_names[1], field_names[1], str),
+                    FileLoaderField(field_names[2], field_names[2], str),
+                ]
+            ),
+            FileType.datalab: DatalabFileLoader(
                 [
                     FileLoaderField(field_names[0], field_names[0], str),
                     FileLoaderField(field_names[1], field_names[1], str),

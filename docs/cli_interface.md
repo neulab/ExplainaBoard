@@ -136,10 +136,14 @@ explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_out
 Predicting the tail entity of missing links in knowledge graphs
 
 **CLI Example**
+
+The below example loads the `fb15k_237` dataset from DataLab.
 ```shell
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
-    # or
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --dataset fb15k_237 > report.json
+    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
+```
+
+```shell
+    explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
  
 
@@ -148,6 +152,8 @@ Predicting the tail entity of missing links in knowledge graphs
 Predict the sentiment of a text based on a specific aspect.
 
 **CLI Example**
+
+This is an example with a custom dataset.
 ```shell
-explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv > ./data/reports/report_absa.json
+explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
 ```
