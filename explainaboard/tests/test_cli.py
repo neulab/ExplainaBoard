@@ -106,3 +106,42 @@ class TestCLI(TestCase):
         ]
         with patch('sys.argv', args):
             main()
+
+    def test_multichoiceqa_datalab(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'qa-multiple-choice',
+            '--dataset',
+            'metaphor_qa',
+            '--system_outputs',
+            './data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_multichoiceqa_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'qa-multiple-choice',
+            '--custom_dataset_paths',
+            './data/system_outputs/metaphor_qa/metaphor_qa-dataset.json',
+            '--system_outputs',
+            './data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_extractiveqa_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'question-answering-extractive',
+            '--custom_dataset_paths',
+            './data/system_outputs/squad/squad_mini-dataset.json',
+            '--system_outputs',
+            './data/system_outputs/squad/squad_mini-example-output.json',
+        ]
+        with patch('sys.argv', args):
+            main()
