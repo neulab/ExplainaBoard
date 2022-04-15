@@ -62,3 +62,19 @@ class TestCLI(TestCase):
         ]
         with patch('sys.argv', args):
             main()
+
+    def test_summ_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'summarization',
+            '--custom_dataset_paths',
+            './data/system_outputs/cnndm/cnndm_mini-dataset.tsv',
+            '--system_outputs',
+            './data/system_outputs/cnndm/cnndm_mini-bart-output.txt',
+            '--metrics',
+            'rouge2',
+            'bart_score_en_ref',
+        ]
+        with patch('sys.argv', args):
+            main()
