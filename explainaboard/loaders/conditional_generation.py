@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
     JSONFileLoader,
@@ -14,7 +15,6 @@ from explainaboard.tasks import TaskType
 
 
 @register_loader(TaskType.conditional_generation)
-@register_loader(TaskType.summarization)
 @register_loader(TaskType.machine_translation)
 class ConditionalGenerationLoader(Loader):
     """
@@ -45,6 +45,12 @@ class ConditionalGenerationLoader(Loader):
                     FileLoaderField("references", field_names[1], str),
                 ]
             ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("source", field_names[0], str),
+                    FileLoaderField("references", field_names[1], str),
+                ]
+            ),
         }
 
     @classmethod
@@ -54,5 +60,32 @@ class ConditionalGenerationLoader(Loader):
             FileType.text: TextFileLoader(field_name, str),
             FileType.json: JSONFileLoader(
                 [FileLoaderField(field_name, field_name, str)]
+            ),
+        }
+
+
+@register_loader(TaskType.summarization)
+class SummarizationLoader(ConditionalGenerationLoader):
+    @classmethod
+    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        field_names = ["source", "reference"]
+        return {
+            FileType.tsv: TSVFileLoader(
+                [
+                    FileLoaderField(0, field_names[0], str),
+                    FileLoaderField(1, field_names[1], str),
+                ],
+            ),
+            FileType.json: JSONFileLoader(
+                [
+                    FileLoaderField("source", field_names[0], str),
+                    FileLoaderField("references", field_names[1], str),
+                ]
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("text", field_names[0], str),
+                    FileLoaderField("summary", field_names[1], str),
+                ]
             ),
         }

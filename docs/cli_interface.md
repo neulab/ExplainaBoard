@@ -64,10 +64,17 @@ Conditional text generation concerns generation of one text based on other texts
 The below example evaluates a summarization system on the CNN-daily mail dataset.
 
 **CLI Example**
+
+The below example loads a miniature version of the CNN-daily mail dataset (100 lines only) from an existing file:
 ```shell
-explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics rouge2 bart_score_summ
+explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system_outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
 ```
 Note that this uses two different metrics separated by a space.
+
+You could also load the `cnn_dailymail` dataset from DataLab, but because the test set is large we don't include it directly in the explainaboard repository. Replace MY_FILE below with an output from your system and it should work:
+```shell
+explainaboard --task summarization --dataset cnn_dailymail --system_outputs MY_FILE --metrics rouge2 bart_score_summ
+```
 
 
 ## Named Entity Recognition
