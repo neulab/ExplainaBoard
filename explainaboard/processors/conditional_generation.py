@@ -347,7 +347,7 @@ class ConditionalGenerationProcessor(Processor):
         for i, tok in enumerate(toks):
             # Basic features
             my_other = other_tok_list.get(tok, list())
-            matched = my_other.pop(0) if len(my_other) > 1 else -1
+            matched = my_other.pop(0) if len(my_other) > 0 else -1
             tok_dic = {
                 'tok_text': tok,
                 'tok_pos': (i, i + 1),
