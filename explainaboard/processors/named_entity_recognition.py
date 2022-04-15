@@ -610,8 +610,7 @@ class NERProcessor(Processor):
                     true_labels, pred_labels, conf_value=sys_info.conf_value
                 )
                 conf_low, conf_high = (
-                    metric_val.conf_interval if metric_val.conf_interval else None,
-                    None,
+                    metric_val.conf_interval if metric_val.conf_interval else None
                 )
                 performance = Performance(
                     metric_name=metric.name,
