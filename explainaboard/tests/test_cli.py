@@ -78,3 +78,31 @@ class TestCLI(TestCase):
         ]
         with patch('sys.argv', args):
             main()
+
+    def test_ner_datalab(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'named-entity-recognition',
+            '--dataset',
+            'conll2003',
+            '--sub_dataset',
+            'ner',
+            '--system_outputs',
+            './data/system_outputs/conll2003/conll2003-elmo-output.conll',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_ner_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'named-entity-recognition',
+            '--custom_dataset_paths',
+            './data/system_outputs/conll2003/conll2003-dataset.conll',
+            '--system_outputs',
+            './data/system_outputs/conll2003/conll2003-elmo-output.conll',
+        ]
+        with patch('sys.argv', args):
+            main()
