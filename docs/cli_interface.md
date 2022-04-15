@@ -119,8 +119,15 @@ Answer a question from multiple options.
 The following example demonstrates this on the metaphor QA dataset.
 
 **CLI Example**
+
+The below example loads the `metaphor_qa` dataset from DataLab.
 ```shell
-explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/metaphor_qa/gpt2.json > report.json
+explainaboard --task qa-multiple-choice --dataset metaphor_qa --system_outputs ./data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json > report.json
+```
+
+And this is what it looks like with a custom dataset.
+```shell
+explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_outputs/metaphor_qa/metaphor_qa-dataset.json --system_outputs ./data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json > report.json
 ```
 
 
