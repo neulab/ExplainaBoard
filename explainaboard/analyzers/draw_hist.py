@@ -18,9 +18,6 @@ def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
     with open(report) as fin:
         report_dict = json.load(fin)
 
-    # read meta data from report
-    metrics = report_dict["metric_names"]
-
     fine_grained_results = report_dict["results"]["fine_grained"]
 
     # print(fine_grained_results.keys())
@@ -30,7 +27,9 @@ def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
     for feature_name, buckets in tqdm(
         fine_grained_results.items()
     ):  # feature name, for example, sentence length
-        for metric_id, metric_name in enumerate(metrics):
+        bucket_values = list(buckets.values())
+        bucket_metrics = [x['metric_name'] for x in bucket_values[0]['performances']]
+        for metric_id, metric_name in enumerate(bucket_metrics):
 
             plot_chart_from_buckets(
                 buckets,
