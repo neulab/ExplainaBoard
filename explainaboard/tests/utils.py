@@ -4,8 +4,8 @@ import os
 import pathlib
 from typing import Final
 
-OPTIONAL_TEST_SUITES = ['cli_all']
-# OPTIONAL_TEST_SUITES: list[str] = []
+# OPTIONAL_TEST_SUITES = ['cli_all']
+OPTIONAL_TEST_SUITES: list[str] = []
 
 
 def load_file_as_str(path) -> str:
