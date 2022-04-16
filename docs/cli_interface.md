@@ -71,9 +71,15 @@ explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/
 ```
 Note that this uses two different metrics separated by a space.
 
-You could also load the `cnn_dailymail` dataset from DataLab, but because the test set is large we don't include it directly in the explainaboard repository. Replace MY_FILE below with an output from your system and it should work:
+You could also load the `cnn_dailymail` dataset from DataLab.
+Because the test set is large we don't include it directly in the explainaboard repository, but you can get an example by downloading with wget:
 ```shell
-explainaboard --task summarization --dataset cnn_dailymail --system_outputs MY_FILE --metrics rouge2 bart_score_summ
+wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart-output.txt
+```
+
+Then run the below command and it should work:
+```shell
+explainaboard --task summarization --dataset cnn_dailymail --system_outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
 ```
 
 

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from functools import lru_cache
 
+from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
@@ -15,9 +17,12 @@ from explainaboard.processors.conditional_generation import (
 )
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
+import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import hash_dict
 
 # to calculate advanced features
+from explainaboard.utils.tokenizer import Tokenizer
+
 summary_attribute = SUMAttribute()
 
 
@@ -160,3 +165,9 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
             existing_features["source"], existing_features["reference"]
         )
         return res["attr_novelty"]
+
+    @aggregating()
+    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
+        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+            samples, lambda x: x['summary'], tokenizer
+        )

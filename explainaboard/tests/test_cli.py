@@ -1,6 +1,9 @@
+import os
 import unittest
 from unittest import TestCase
 from unittest.mock import patch
+
+import requests
 
 from explainaboard.explainaboard_main import main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES
@@ -75,6 +78,28 @@ class TestCLI(TestCase):
             '--metrics',
             'rouge2',
             'bart_score_en_ref',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
+    def test_summ_datalab(self):
+        fname = 'cnndm-bart-output.txt'
+        local_file = f'./data/system_outputs/cnndm/{fname}'
+        if not os.path.exists(local_file):
+            url = 'http://www.phontron.com/download/' + fname
+            r = requests.get(url)
+            open(local_file, 'wb').write(r.content)
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'summarization',
+            '--dataset',
+            'cnn_dailymail',
+            '--system_outputs',
+            './data/system_outputs/cnndm/cnndm-bart-output.txt',
+            '--metrics',
+            'rouge2',
         ]
         with patch('sys.argv', args):
             main()
