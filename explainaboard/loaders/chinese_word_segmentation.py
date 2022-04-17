@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,

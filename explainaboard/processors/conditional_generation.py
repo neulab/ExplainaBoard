@@ -119,7 +119,7 @@ class ConditionalGenerationProcessor(Processor):
                                     setting=1,
                                 ),
                             ),
-                            "span_position": feature.Value(
+                            "span_rel_pos": feature.Value(
                                 dtype="float",
                                 description=(
                                     "The relative position of a span in a sentence"
@@ -463,7 +463,7 @@ class ConditionalGenerationProcessor(Processor):
             else:
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
-            matched_true_index, matched_pred_index, _ = NgramSpanOps.get_matched_spans(
+            matched_true_index, matched_pred_index, _, _ = NgramSpanOps.get_matched_spans(
                 spans_a=toks_true,
                 spans_b=toks_pred,
                 activate_features=["sample_id", "span_text"],

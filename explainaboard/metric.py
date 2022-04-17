@@ -441,6 +441,7 @@ class BIOF1Score(F1Score):
                 matched_a_index,
                 matched_b_index,
                 matched_spans,
+                _,
             ) = bio_span_ops.get_matched_spans(
                 true_spans,
                 pred_spans,
@@ -523,6 +524,7 @@ class BMESF1Score(F1Score):
                 matched_a_index,
                 matched_b_index,
                 matched_spans,
+                _,
             ) = bmes_span_ops.get_matched_spans(
                 true_spans,
                 pred_spans,

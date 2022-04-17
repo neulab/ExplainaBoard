@@ -96,24 +96,36 @@ def get_spans_from_bmes(seq: list) -> list[tuple[str, int, int]]:
 class Span:
     def __init__(
         self,
+        # surface string a span
         span_text: Optional[str] = None,
+        # the tag of a span
         span_tag: Optional[str] = None,
+        # the position of a span
         span_pos: Optional[tuple] = None,
+        # span capital features
         span_capitalness: Optional[str] = None,
-        span_position: Optional[float] = None,
+        # the relative position of a span in a sequence
+        span_rel_pos: Optional[float] = None,
+        # the number of characters of a span
         span_chars: Optional[int] = None,
+        # the number of tokens of a span
         span_tokens: Optional[int] = None,
+        # the consistency of span label in training set
         span_econ: Optional[float] = None,
+        # the frequency of a span in training set
         span_efre: Optional[float] = None,
+        # the id of samples where a span is located
         sample_id: Optional[int] = None,
+        # the frequency of span in test set
         span_test_freq: Optional[float] = None,
+        # the frequency of span in training set (TODO: duplicated?)
         span_train_freq: Optional[float] = None,
     ):
         self.span_text = span_text
         self.span_tag = span_tag
         self.span_pos = span_pos
         self.span_capitalness = span_capitalness
-        self.span_position = span_position
+        self.span_rel_pos = span_rel_pos
         self.span_chars = span_chars
         self.span_tokens = span_tokens
         self.span_econ = span_econ
@@ -122,6 +134,14 @@ class Span:
         self.span_test_freq = span_test_freq
         self.span_train_freq = span_train_freq
 
+    @property
+    def get_span_tag(self):
+        return self.span_tag
+
+    @property
+    def get_span_text(self):
+        return self.span_text
+
 
 class SpanOps:
     def __init__(self, resources: dict[str, Any] = {}):
@@ -129,7 +149,7 @@ class SpanOps:
 
     @abc.abstractmethod
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
-        """Returns the task type of this processor."""
+        """Return spans from a sequence of tags and tokens"""
         ...
 
     @classmethod
@@ -138,15 +158,16 @@ class SpanOps:
         spans_a: list[Span],
         spans_b: list[Span],
         activate_features: list = ["span_text"],
-    ) -> tuple[list[int], list[int], list[Span]]:
-        """Return matched spans based on given conditions and two span lists"""
+    ) -> tuple[list[int], list[int], list[Span], list[Span]]:
 
+        # TODO(Pengfei): add more matched condition
         def is_equal(dict_a, dict_b, key):
             return True if getattr(dict_a, key) == getattr(dict_b, key) else False
 
         matched_a_index = []
         matched_b_index = []
-        matched_spans = []
+        matched_spans_a = []
+        matched_spans_b = []
 
         for idx, span_dic_a in enumerate(spans_a):
             for idy, span_dic_b in enumerate(spans_b):
@@ -158,10 +179,9 @@ class SpanOps:
                 ):
                     matched_a_index.append(idx)
                     matched_b_index.append(idy)
-                    matched_spans.append(
-                        span_dic_a
-                    )  # return the matched a span as default this should be generalized
-        return matched_a_index, matched_b_index, matched_spans
+                    matched_spans_a.append(span_dic_a)
+                    matched_spans_b.append(span_dic_b)
+        return matched_a_index, matched_b_index, matched_spans_a, matched_spans_b
 
 
 class NgramSpanOps(SpanOps):
@@ -190,7 +210,7 @@ class NgramSpanOps(SpanOps):
                     else self.resources["span_tag"](span),
                     span_pos=(start_ind, end_ind),
                     span_capitalness=cap_feature(span),  # type: ignore
-                    span_position=start_ind * 1.0 / len(tags),  # type: ignore
+                    span_rel_pos=start_ind * 1.0 / len(tags),  # type: ignore
                     span_chars=len(span),
                     span_tokens=len(span.split(" ")),
                     span_test_freq=0
@@ -230,7 +250,7 @@ class BMESSpanOps(SpanOps):
                     span_text=span_text,
                     span_tag="S",
                     span_pos=(i, i + 1),
-                    span_position=i * 1.0 / len(tags),
+                    span_rel_pos=i * 1.0 / len(tags),
                     span_chars=len(span_text),
                 )
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
@@ -258,7 +278,7 @@ class BMESSpanOps(SpanOps):
                     span_text=span_text,
                     span_tag=tag,
                     span_pos=(w_start, i + 1),
-                    span_position=w_start * 1.0 / len(tags),
+                    span_rel_pos=w_start * 1.0 / len(tags),
                     span_chars=len(span_text),
                 )
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
@@ -302,7 +322,7 @@ class BIOSpanOps(SpanOps):
                     span_tag=span_type,
                     span_pos=(span_start, i),
                     span_capitalness=cap_feature(span_text),
-                    span_position=i * 1.0 / len(seq),
+                    span_rel_pos=i * 1.0 / len(seq),
                     span_chars=len(span_text),
                     span_tokens=len(span_text.split(" ")),
                 )
@@ -337,7 +357,7 @@ class BIOSpanOps(SpanOps):
                         span_tag=span_type,
                         span_pos=(span_start, i),
                         span_capitalness=cap_feature(span_text),
-                        span_position=i * 1.0 / len(seq),
+                        span_rel_pos=i * 1.0 / len(seq),
                         span_chars=len(span_text),
                         span_tokens=len(span_text.split(" ")),
                     )
@@ -370,7 +390,7 @@ class BIOSpanOps(SpanOps):
                 span_tag=span_type,
                 span_pos=(span_start, len(tags)),
                 span_capitalness=cap_feature(span_text),
-                span_position=len(tags) * 1.0 / len(seq),
+                span_rel_pos=len(tags) * 1.0 / len(seq),
                 span_chars=len(span_text),
                 span_tokens=len(span_text.split(" ")),
             )
