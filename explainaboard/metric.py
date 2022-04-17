@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections import Counter
+import copy
 from dataclasses import dataclass
 import itertools
 from typing import Any, cast, Optional, TypeVar, Union
@@ -11,7 +12,7 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.utils.preprocessor import Preprocessor, QAPreprocessor
-from explainaboard.utils.span_utils import get_spans_from_bio
+from explainaboard.utils.span_utils import BIOSpanOps, get_spans_from_bmes, Span
 from explainaboard.utils.typing_utils import unwrap
 
 T = TypeVar('T')
@@ -151,7 +152,13 @@ class Metric:
         :param stats: stats for every example
         :return: aggregated stats
         """
-        return np.mean(stats.get_data(), axis=0)
+
+        res = copy.deepcopy(stats)
+
+        if res.get_data().size == 0:
+            return np.array(0.0)
+        else:
+            return np.mean(stats.get_data(), axis=0)
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
@@ -307,6 +314,7 @@ class F1Score(Metric):
         if config.ignore_classes is not None:
             for ignore_class in config.ignore_classes:
                 id_map[ignore_class] = -1
+
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:
                 id_map[word] = len(id_map)
@@ -329,12 +337,18 @@ class F1Score(Metric):
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
+
+        if agg_stats.size == 1:
+            return float(agg_stats)
+
+        # print(agg_stats)
         config = cast(F1ScoreConfig, self._get_config(config))
         supported_averages = {'micro', 'macro'}
         stat_mult: int = 4 if config.separate_match else 3
         if config.average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
         n_classes = int(len(agg_stats) / stat_mult)
+
         if config.average == 'micro':
             true, pred, true_match, pred_match = 0.0, 0.0, 0.0, 0.0
             for i in range(n_classes):
@@ -345,6 +359,7 @@ class F1Score(Metric):
             p = pred_match / pred if pred else 0.0
             r = true_match / true if true else 0.0
             f1_total = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
+
         elif config.average == 'macro':
             f1_total = 0.0
             for i in range(n_classes):
@@ -367,8 +382,8 @@ class BIOF1Score(F1Score):
 
     def calc_stats_from_data(
         self,
-        true_data: list[list[str]],
-        pred_data: list[list[str]],
+        true_data: list[list[str]] | list[list[Span]],
+        pred_data: list[list[str]] | list[list[Span]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         """
@@ -382,31 +397,138 @@ class BIOF1Score(F1Score):
             * c*stat_mult + 1: occurrences in the predicted output
             * c*stat_mult + 2: number of matches with the true output
         """
-        stat_mult = 3
 
-        # Identify the tag types
-        true_chain, pred_chain = (
-            itertools.chain.from_iterable(x) for x in (true_data, pred_data)
+        # 1. Span extraction
+        bio_span_ops = BIOSpanOps()
+        true_spans_list: list[list[Span]] = (
+            [
+                bio_span_ops.get_spans(true_tags)
+                for true_tags in true_data  # type: ignore
+            ]
+            if len(true_data[0]) == 0 or isinstance(true_data[0][0], Span) is False
+            else true_data
         )
-        all_tags = set(itertools.chain(true_chain, pred_chain))
-        tag_ids = {
-            k: v for v, k in enumerate([x[2:] for x in all_tags if x.startswith('B-')])
-        }
+        pred_spans_list: list[list[Span]] = (
+            [
+                bio_span_ops.get_spans(pred_tags)  # type: ignore
+                for pred_tags in pred_data
+            ]
+            if len(pred_data[0]) == 0 or isinstance(pred_data[0][0], Span) is False
+            else pred_data
+        )
+
+        # 2. Get tag space
+        all_tags = set(
+            [
+                span.span_tag  # type: ignore
+                for span in list(itertools.chain.from_iterable(true_spans_list))
+                + list(itertools.chain.from_iterable(pred_spans_list))
+            ]
+        )
+        tag_ids = {k: v for v, k in enumerate([x for x in all_tags])}
 
         # Create the sufficient statistics
+        stat_mult = 3
         n_data, n_classes = len(true_data), len(tag_ids)
         # This is a bit memory inefficient if there's a large number of classes
         stats = np.zeros((n_data, n_classes * stat_mult))
 
-        for i, (true_sent, pred_sent) in enumerate(zip(true_data, pred_data)):
-            true_spans, pred_spans = (
-                get_spans_from_bio(x) for x in (true_sent, pred_sent)
+        for i, (true_spans, pred_spans) in enumerate(
+            zip(true_spans_list, pred_spans_list)
+        ):
+
+            (
+                matched_a_index,
+                matched_b_index,
+                matched_spans,
+            ) = bio_span_ops.get_matched_spans(
+                true_spans,
+                pred_spans,
+                # strict evaluation
+                activate_features=["sample_id", "span_pos", "span_tag"]
+                # loose evaluation
+                # activate_features = ["sample_id", "span_pos"]
             )
-            match_spans = [x for x in true_spans if x in pred_spans]
-            for offset, spans in enumerate((true_spans, pred_spans, match_spans)):
-                for chunk in spans:
+
+            for offset, spans in enumerate((true_spans, pred_spans, matched_spans)):
+                for span in spans:
+                    c = tag_ids[span.span_tag]
+                    stats[i, c * stat_mult + offset] += 1
+        return MetricStats(stats)
+
+
+class BMESF1Score(F1Score):
+    """
+    Calculate F1 score over BIO-tagged spans.
+    """
+
+    def calc_stats_from_data(
+        self,
+        true_data: list[list[str]] | list[list[tuple]],
+        pred_data: list[list[str]] | list[list[tuple]],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+        """
+        Return sufficient statistics necessary to compute f-score.
+        :param true_data: True outputs
+        :param pred_data: Predicted outputs
+        :param config: Configuration, if over-riding the default
+        :return: Returns stats for each class (integer id c) in the following columns of
+            MetricStats
+            * c*stat_mult + 0: occurrences in the true output
+            * c*stat_mult + 1: occurrences in the predicted output
+            * c*stat_mult + 2: number of matches with the true output
+        """
+
+        # 1. Span extraction
+        # print(f"true_data:\t{true_data}")
+        true_span_tuple_list = (
+            [get_spans_from_bmes(true_tags) for true_tags in true_data]
+            if len(true_data[0]) == 0 or isinstance(true_data[0][0], tuple) is False
+            else true_data
+        )
+        pred_span_tuple_list = (
+            [get_spans_from_bmes(pred_tags) for pred_tags in pred_data]
+            if len(pred_data[0]) == 0 or isinstance(pred_data[0][0], tuple) is False
+            else pred_data
+        )
+
+        # 2. Get tag space
+        all_tags = set(
+            [
+                x[0]
+                for x in list(itertools.chain.from_iterable(true_span_tuple_list))
+                + list(itertools.chain.from_iterable(pred_span_tuple_list))
+            ]
+        )
+        tag_ids = {k: v for v, k in enumerate([x for x in all_tags])}
+
+        # Create the sufficient statistics
+        stat_mult = 3
+        n_data, n_classes = len(true_data), len(tag_ids)
+        # This is a bit memory inefficient if there's a large number of classes
+        stats = np.zeros((n_data, n_classes * stat_mult))
+
+        for i, (true_span_tuples, pred_span_tuples) in enumerate(
+            zip(true_span_tuple_list, pred_span_tuple_list)
+        ):
+
+            # matched_spans = get_matched_spans(
+            #     true_span_tuples,
+            #     pred_span_tuples,
+            #     include_tag=False,
+            #     include_position=True,
+            # )
+
+            matched_spans: list[Span] = []
+
+            for offset, spans in enumerate(
+                (true_span_tuples, pred_span_tuples, matched_spans)
+            ):
+                for chunk in spans:  # type: ignore
+
                     c = tag_ids[chunk[0]]
-                    stats[i, c * 3 + offset] += 1
+                    stats[i, c * stat_mult + offset] += 1
 
         return MetricStats(stats)
 

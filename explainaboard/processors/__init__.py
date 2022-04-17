@@ -1,6 +1,7 @@
 # when a new processor is implemented, remember to import it here so it gets registered
 from explainaboard.processors import (
     aspect_based_sentiment_classification,
+    chinese_word_segmentation,
     conditional_generation,
     extractive_qa,
     kg_link_tail_prediction,
@@ -25,4 +26,5 @@ __all__ = [
     'summarization',
     'text_classification',
     'text_pair_classification',
+    "chinese_word_segmentation",
 ]

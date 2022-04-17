@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from collections.abc import Callable
 from typing import Any
 
@@ -16,9 +15,9 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing
-from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.span_utils import NgramSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
@@ -91,27 +90,27 @@ class ConditionalGenerationProcessor(Processor):
                     require_training_set=True,
                 ),
                 # --- the following are features of each token ---
-                "ref_tok_info": feature.Sequence(
+                "ref_span_info": feature.Sequence(
                     feature.Set(
                         {
-                            "tok_text": feature.Value("string"),
-                            "tok_pos": feature.Position(positions=[0, 0]),
-                            "tok_matched": feature.Value(
+                            "span_text": feature.Value("string"),
+                            "span_pos": feature.Position(positions=[0, 0]),
+                            "span_matched": feature.Value(
                                 # this is actually "int" but int is not supported
                                 dtype="float",
                                 description=(
-                                    "which token the ref/hyp token matches in the "
+                                    "which span the ref/hyp span matches in the "
                                     "hyp/ref sentence, or -1 if none"
                                 ),
                                 is_bucket=False,
                             ),
-                            "tok_capitalness": feature.Value(
+                            "span_capitalness": feature.Value(
                                 dtype="string",
                                 description=(
-                                    "The capitalness of an token. For example, "
+                                    "The capitalness of a span. For example, "
                                     "first_caps represents only the first character of "
-                                    "the token is capital. full_caps denotes all "
-                                    "characters of the token are capital"
+                                    "the span is capital. full_caps denotes all "
+                                    "characters of the span are capital"
                                 ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
@@ -120,10 +119,10 @@ class ConditionalGenerationProcessor(Processor):
                                     setting=1,
                                 ),
                             ),
-                            "tok_position": feature.Value(
+                            "span_position": feature.Value(
                                 dtype="float",
                                 description=(
-                                    "The relative position of a token in a sentence"
+                                    "The relative position of a span in a sentence"
                                 ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
@@ -132,9 +131,9 @@ class ConditionalGenerationProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "tok_chars": feature.Value(
+                            "span_chars": feature.Value(
                                 dtype="float",
-                                description="The number of characters in a token",
+                                description="The number of characters in a span",
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -142,9 +141,19 @@ class ConditionalGenerationProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "tok_test_freq": feature.Value(
+                            "span_tokens": feature.Value(
                                 dtype="float",
-                                description="tok frequency in the test set",
+                                description="The number of tokens in span",
+                                is_bucket=True,
+                                bucket_info=feature.BucketInfo(
+                                    method="bucket_attribute_specified_bucket_value",
+                                    number=4,
+                                    setting=(),
+                                ),
+                            ),
+                            "span_test_freq": feature.Value(
+                                dtype="float",
+                                description="span frequency in the test set",
                                 is_bucket=True,
                                 require_training_set=False,
                                 bucket_info=feature.BucketInfo(
@@ -153,9 +162,9 @@ class ConditionalGenerationProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "tok_train_freq": feature.Value(
+                            "span_train_freq": feature.Value(
                                 dtype="float",
-                                description="tok frequency in the training set",
+                                description="span frequency in the training set",
                                 is_bucket=True,
                                 require_training_set=True,
                                 bucket_info=feature.BucketInfo(
@@ -264,7 +273,7 @@ class ConditionalGenerationProcessor(Processor):
         if name in self._features:
             return self._features[name]
         else:
-            return self._features['ref_tok_info'][name]
+            return self._features['ref_span_info'][name]
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -323,55 +332,40 @@ class ConditionalGenerationProcessor(Processor):
             # span features for true and predicted spans
             ref_toks = sys_info.tokenize(dict_sysout['reference'])
             hyp_toks = sys_info.tokenize(dict_sysout['hypothesis'])
-            dict_sysout["ref_tok_info"] = self._complete_tok_features(
-                ref_toks, hyp_toks, ref_test_freq, statistics=external_stats
+            dict_sysout["ref_span_info"] = self._complete_tok_features(
+                ref_toks, ref_test_freq, statistics=external_stats
             )
-            dict_sysout["hyp_tok_info"] = self._complete_tok_features(
-                hyp_toks, ref_toks, ref_test_freq, statistics=external_stats
+            dict_sysout["hyp_span_info"] = self._complete_tok_features(
+                hyp_toks, ref_test_freq, statistics=external_stats
             )
 
         return active_features
 
-    def _complete_tok_features(self, toks, other_toks, ref_test_freq, statistics=None):
+    def _complete_tok_features(self, toks, ref_test_freq, statistics=None):
 
         # Get training set stats if they exist
         has_stats = statistics is not None and len(statistics) > 0
         fre_dic = statistics["vocab"] if has_stats else None
 
-        # Find tokens in other set
-        other_tok_list = defaultdict(list)
-        for i, tok in enumerate(other_toks):
-            other_tok_list[tok].append(i)
+        ngram_span_ops = NgramSpanOps(
+            n_grams=[1, 2],
+            resources={
+                "ref_test_freq": ref_test_freq,
+                "fre_dic": fre_dic,
+            },
+        )
+        spans = ngram_span_ops.get_spans(seq=toks)
 
-        tok_dics = []
-        for i, tok in enumerate(toks):
-            # Basic features
-            my_other = other_tok_list.get(tok, list())
-            matched = my_other.pop(0) if len(my_other) > 1 else -1
-            tok_dic = {
-                'tok_text': tok,
-                'tok_pos': (i, i + 1),
-                'tok_matched': matched,
-                'tok_capitalness': cap_feature(tok),
-                'tok_position': i * 1.0 / len(toks),
-                'tok_chars': len(tok),
-                'tok_test_freq': ref_test_freq.get(tok, 0),
-            }
-            # Training set dependent features
-            if has_stats:
-                tok_dic['tok_train_freq'] = fre_dic.get(tok, 0)
-            # Save the features
-            tok_dics.append(tok_dic)
-
-        return tok_dics
+        return spans
 
     def _get_feature_dict(
         self, sys_output: list[dict], feature_name: str, output_to_toks: Callable
     ):
         feat_dict = {}
-        for samp_id, my_output in enumerate(sys_output):
-            for tok_id, tok_info in enumerate(output_to_toks(my_output)):
-                feat_dict[(samp_id, tok_id)] = tok_info[feature_name]
+        for sample_id, my_output in enumerate(sys_output):
+            for tok_id, span_info in enumerate(output_to_toks(my_output)):
+                span_info.sample_id = sample_id
+                feat_dict[span_info] = getattr(span_info, feature_name)
         return feat_dict
 
     def _bucketing_samples(
@@ -398,15 +392,18 @@ class ConditionalGenerationProcessor(Processor):
         for feature_name in tqdm(tok_feats, desc="bucketing token features"):
 
             # Choose behavior based on whether this is a feature of samples or spans
-            my_feature = features["ref_tok_info"].feature.feature[feature_name]
+            my_feature = features["ref_span_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
             bucket_func = getattr(bucketing, bucket_info.method)
 
             feat_dict = self._get_feature_dict(
-                sys_output, feature_name, lambda x: x['ref_tok_info']
+                sys_output, feature_name, lambda x: x['ref_span_info']
             )
+
+            # print(f"!!!-1:\n{[dict(k)['tok_text'] for k,v in feat_dict.items()]}")
+
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feat_dict,
                 bucket_number=bucket_info.number,
@@ -415,7 +412,7 @@ class ConditionalGenerationProcessor(Processor):
 
             # Get buckets for predicted spans
             feat_dict = self._get_feature_dict(
-                sys_output, feature_name, lambda x: x['hyp_tok_info']
+                sys_output, feature_name, lambda x: x['hyp_span_info']
             )
             samples_over_bucket_pred[
                 feature_name
@@ -432,14 +429,15 @@ class ConditionalGenerationProcessor(Processor):
                 samples_over_bucket[feature_name],
                 samples_over_bucket_pred[feature_name],
             )
+
         return samples_over_bucket, performances_over_bucket
 
     def get_bucket_performance_tok(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[tuple[int, int]]],
-        samples_over_bucket_pred: dict[str, list[tuple[int, int]]],
+        samples_over_bucket_true: dict[str, list[Span]],
+        samples_over_bucket_pred: dict[str, list[Span]],
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
@@ -457,6 +455,7 @@ class ConditionalGenerationProcessor(Processor):
         bucket_name_to_performance: dict[str, BucketPerformance] = {}
         config = explainaboard.metric.F1ScoreConfig(separate_match=True)
         f1_score = explainaboard.metric.F1Score(config=config)
+
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
             if bucket_interval not in samples_over_bucket_pred.keys():
@@ -464,23 +463,23 @@ class ConditionalGenerationProcessor(Processor):
             else:
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
+            matched_true_index, matched_pred_index, _ = NgramSpanOps.get_matched_spans(
+                spans_a=toks_true,
+                spans_b=toks_pred,
+                activate_features=["sample_id", "span_text"],
+            )
+
             stats_list = []
-            for sid, tid in toks_true:
-                matched = (
-                    1.0
-                    if sys_output[sid]['ref_tok_info'][tid]['tok_matched'] >= 0
-                    else 0.0
-                )
+            for idx, span in enumerate(toks_true):
+                matched = 1.0 if idx in matched_true_index else 0
                 stats_list.append([1.0, 0.0, matched, 0.0])
-            for sid, tid in toks_pred:
-                matched = (
-                    1.0
-                    if sys_output[sid]['hyp_tok_info'][tid]['tok_matched'] >= 0
-                    else 0.0
-                )
+
+            for idx, span in enumerate(toks_pred):
+                matched = 1.0 if idx in matched_pred_index else 0
                 stats_list.append([0.0, 1.0, 0.0, matched])
 
             stats = explainaboard.metric.MetricStats(np.array(stats_list))
+
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
             conf_low, conf_high = unwrap(result.conf_interval)
             performance = Performance(

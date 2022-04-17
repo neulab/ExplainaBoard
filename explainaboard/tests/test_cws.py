@@ -7,13 +7,13 @@ from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestNER(unittest.TestCase):
-    artifact_path = os.path.join(test_artifacts_path, "ner")
-    conll_dataset = os.path.join(artifact_path, "dataset.tsv")
-    conll_output = os.path.join(artifact_path, "output.tsv")
+    artifact_path = os.path.join(test_artifacts_path, "cws")
+    conll_dataset = os.path.join(artifact_path, "test.tsv")
+    conll_output = os.path.join(artifact_path, "prediction.tsv")
 
     def test_generate_system_analysis(self):
         loader = get_loader_custom_dataset(
-            TaskType.named_entity_recognition,
+            TaskType.chinese_word_segmentation,
             self.conll_dataset,
             self.conll_output,
             Source.local_filesystem,
@@ -24,13 +24,13 @@ class TestNER(unittest.TestCase):
         data = loader.load()
 
         metadata = {
-            "task_name": TaskType.named_entity_recognition.value,
+            "task_name": TaskType.chinese_word_segmentation.value,
             # "dataset_name": "conll2003",
             # "sub_dataset_name":"ner",
             "metric_names": ["F1Score"],
         }
 
-        processor = get_processor(TaskType.named_entity_recognition)
+        processor = get_processor(TaskType.chinese_word_segmentation)
 
         sys_info = processor.process(metadata, data)
 
