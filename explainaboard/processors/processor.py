@@ -104,12 +104,16 @@ class Processor(metaclass=abc.ABCMeta):
                 # read statistics from db
                 message = None
                 if sys_info.reload_stat:
+                    eprint(f"sys_info.reload_stat: {sys_info.reload_stat}")
+                    eprint(f"sys_info.dataset_name: {sys_info.dataset_name}")
+                    eprint(f"sub_dataset: {sub_dataset}")
                     response = read_statistics_from_db(
                         sys_info.dataset_name, sub_dataset
                     )
                     message = json.loads(response.text.replace("null", ""))["message"]
                     if message == "success":
                         return json.loads(response.content)['content']
+                eprint(f"-------------\n{message}")
                 # calculate statistics if not reloading or not found
                 if (
                     not sys_info.reload_stat
