@@ -139,7 +139,7 @@ class NERProcessor(Processor):
                                     setting=1,
                                 ),
                             ),
-                            "span_position": feature.Value(
+                            "span_rel_pos": feature.Value(
                                 dtype="float",
                                 description=(
                                     "The relative position of an entity in a sentence"
