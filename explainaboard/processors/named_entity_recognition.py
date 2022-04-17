@@ -475,7 +475,9 @@ class NERProcessor(Processor):
         (e.g., length)
         """
         for span in spans:
-            sample_dict[span][type_id] = span.span_tag if span.span_tag is not None else ""
+            sample_dict[span][type_id] = (
+                span.span_tag if span.span_tag is not None else ""
+            )
 
     def get_bucket_cases_ner(
         self,
@@ -511,7 +513,9 @@ class NERProcessor(Processor):
                 span.sample_id,
             )
 
-            system_output_id = sys_output[span.sample_id]["id"] if span.sample_id is not None else None #TODO(Pengfei: should be checked)
+            system_output_id = (
+                sys_output[span.sample_id]["id"] if span.sample_id is not None else None
+            )  # TODO(Pengfei: should be checked)
             error_case = {
                 "span": span.span_text,
                 "text": str(system_output_id),

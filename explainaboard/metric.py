@@ -12,7 +12,7 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.utils.preprocessor import Preprocessor, QAPreprocessor
-from explainaboard.utils.span_utils import BIOSpanOps, get_spans_from_bmes, Span
+from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap
 
 T = TypeVar('T')
@@ -464,8 +464,8 @@ class BMESF1Score(F1Score):
 
     def calc_stats_from_data(
         self,
-        true_data: list[list[str]] | list[list[tuple]],
-        pred_data: list[list[str]] | list[list[tuple]],
+        true_data: list[list[str]] | list[list[Span]],
+        pred_data: list[list[str]] | list[list[Span]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         """
@@ -481,24 +481,30 @@ class BMESF1Score(F1Score):
         """
 
         # 1. Span extraction
-        # print(f"true_data:\t{true_data}")
-        true_span_tuple_list = (
-            [get_spans_from_bmes(true_tags) for true_tags in true_data]
-            if len(true_data[0]) == 0 or isinstance(true_data[0][0], tuple) is False
+        bmes_span_ops = BMESSpanOps()
+        true_spans_list: list[list[Span]] = (
+            [
+                bmes_span_ops.get_spans(true_tags)
+                for true_tags in true_data  # type: ignore
+            ]
+            if len(true_data[0]) == 0 or isinstance(true_data[0][0], Span) is False
             else true_data
         )
-        pred_span_tuple_list = (
-            [get_spans_from_bmes(pred_tags) for pred_tags in pred_data]
-            if len(pred_data[0]) == 0 or isinstance(pred_data[0][0], tuple) is False
+        pred_spans_list: list[list[Span]] = (
+            [
+                bmes_span_ops.get_spans(pred_tags)  # type: ignore
+                for pred_tags in pred_data
+            ]
+            if len(pred_data[0]) == 0 or isinstance(pred_data[0][0], Span) is False
             else pred_data
         )
 
         # 2. Get tag space
         all_tags = set(
             [
-                x[0]
-                for x in list(itertools.chain.from_iterable(true_span_tuple_list))
-                + list(itertools.chain.from_iterable(pred_span_tuple_list))
+                span.span_tag  # type: ignore
+                for span in list(itertools.chain.from_iterable(true_spans_list))
+                + list(itertools.chain.from_iterable(pred_spans_list))
             ]
         )
         tag_ids = {k: v for v, k in enumerate([x for x in all_tags])}
@@ -509,27 +515,27 @@ class BMESF1Score(F1Score):
         # This is a bit memory inefficient if there's a large number of classes
         stats = np.zeros((n_data, n_classes * stat_mult))
 
-        for i, (true_span_tuples, pred_span_tuples) in enumerate(
-            zip(true_span_tuple_list, pred_span_tuple_list)
+        for i, (true_spans, pred_spans) in enumerate(
+            zip(true_spans_list, pred_spans_list)
         ):
 
-            # matched_spans = get_matched_spans(
-            #     true_span_tuples,
-            #     pred_span_tuples,
-            #     include_tag=False,
-            #     include_position=True,
-            # )
+            (
+                matched_a_index,
+                matched_b_index,
+                matched_spans,
+            ) = bmes_span_ops.get_matched_spans(
+                true_spans,
+                pred_spans,
+                # strict evaluation
+                activate_features=["sample_id", "span_pos", "span_tag"]
+                # loose evaluation
+                # activate_features = ["sample_id", "span_pos"]
+            )
 
-            matched_spans: list[Span] = []
-
-            for offset, spans in enumerate(
-                (true_span_tuples, pred_span_tuples, matched_spans)
-            ):
-                for chunk in spans:  # type: ignore
-
-                    c = tag_ids[chunk[0]]
+            for offset, spans in enumerate((true_spans, pred_spans, matched_spans)):
+                for span in spans:
+                    c = tag_ids[span.span_tag]
                     stats[i, c * stat_mult + offset] += 1
-
         return MetricStats(stats)
 
 

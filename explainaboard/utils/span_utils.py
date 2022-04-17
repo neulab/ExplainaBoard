@@ -207,6 +207,81 @@ class NgramSpanOps(SpanOps):
         return span_dics
 
 
+class BMESSpanOps(SpanOps):
+    def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
+        """
+        :param seq: ["B", "E", "S", "B", "E","B","M","E"]
+        :return:
+        ([('BE', 0, 2), ('S', 2, 3), ('BE', 3, 5), ('BME', 5, 8)],
+         ['BE', 'BE', 'S', 'BE', 'BE', 'BME', 'BME', 'BME'])
+        """
+        if seq is None:
+            seq = tags
+        spans = []
+        w_start = 0
+        tag = ""
+
+        for i, tok in enumerate(tags):
+            tag += tok
+            if tok == "S":
+
+                span_text = " ".join(seq[i : i + 1])
+                span = Span(
+                    span_text=span_text,
+                    span_tag="S",
+                    span_pos=(i, i + 1),
+                    span_position=i * 1.0 / len(tags),
+                    span_chars=len(span_text),
+                )
+                if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
+                    lower_tag = span.span_tag
+                    lower_text = span.span_text
+                    span.span_econ = 0
+                    if (
+                        span.span_text in self.resources["econ_dic"]
+                        and lower_tag in self.resources["econ_dic"][lower_text]
+                    ):
+                        span.span_econ = float(
+                            self.resources["econ_dic"][lower_text][lower_tag]
+                        )
+                    span.span_efre = self.resources["efre_dic"].get(  # type: ignore
+                        lower_text, 0.0
+                    )
+
+                spans.append(span)
+                tag = ""
+            if tok == "B":
+                w_start = i
+            if tok == "E":
+                span_text = " ".join(seq[w_start : i + 1])
+                span = Span(
+                    span_text=span_text,
+                    span_tag=tag,
+                    span_pos=(w_start, i + 1),
+                    span_position=w_start * 1.0 / len(tags),
+                    span_chars=len(span_text),
+                )
+                if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
+                    lower_tag = span.span_tag
+                    lower_text = span.span_text
+                    span.span_econ = 0
+                    if (
+                        span.span_text in self.resources["econ_dic"]
+                        and lower_tag in self.resources["econ_dic"][lower_text]
+                    ):
+                        span.span_econ = float(
+                            self.resources["econ_dic"][lower_text][lower_tag]
+                        )
+                    span.span_efre = self.resources["efre_dic"].get(  # type: ignore
+                        lower_text, 0.0
+                    )
+
+                spans.append(span)
+                tag = ""
+
+        return spans
+
+
 class BIOSpanOps(SpanOps):
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
         """Generate a list of spans:Span based a sequence of tokens:str"""
