@@ -14,9 +14,9 @@ from explainaboard.metric import Metric, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
-from explainaboard.utils import bucketing, span_utils
-from explainaboard.utils.analysis import cap_feature
+from explainaboard.utils import bucketing
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.span_utils import BMESSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -34,30 +34,20 @@ class CWSProcessor(Processor):
                 "true_tags": feature.Sequence(
                     feature.ClassLabel(
                         names=[
-                            "O",
-                            "B-PER",
-                            "I-PER",
-                            "B-ORG",
-                            "I-ORG",
-                            "B-LOC",
-                            "I-LOC",
-                            "B-MISC",
-                            "I-MISC",
+                            "B",
+                            "M",
+                            "E",
+                            "S",
                         ]
                     )
                 ),
                 "pred_tags": feature.Sequence(
                     feature.ClassLabel(
                         names=[
-                            "O",
-                            "B-PER",
-                            "I-PER",
-                            "B-ORG",
-                            "I-ORG",
-                            "B-LOC",
-                            "I-LOC",
-                            "B-MISC",
-                            "I-MISC",
+                            "B",
+                            "M",
+                            "E",
+                            "S",
                         ]
                     )
                 ),
@@ -72,21 +62,11 @@ class CWSProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                # --- the following are features of each entity ---
-                "true_entity_info": feature.Sequence(
+                # --- the following are features of each word ---
+                "true_word_info": feature.Sequence(
                     feature.Set(
                         {
                             "span_text": feature.Value("string"),
-                            "span_len": feature.Value(
-                                dtype="float",
-                                description="entity length",
-                                is_bucket=True,
-                                bucket_info=feature.BucketInfo(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
                             "span_pos": feature.Position(positions=[0, 0]),
                             "span_tag": feature.Value(
                                 dtype="string",
@@ -110,14 +90,9 @@ class CWSProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "span_density": feature.Value(
+                            "span_chars": feature.Value(
                                 dtype="float",
-                                description=(
-                                    "Entity density. Given a sentence (or a sample), "
-                                    "entity density tallies the ratio between the "
-                                    "number of all entity tokens and tokens in this "
-                                    "sentence"
-                                ),
+                                description="The number of characters of an entity",
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -166,46 +141,11 @@ class CWSProcessor(Processor):
         Output:dict:
         """
 
-        if tag_id2str is None:
-            tag_id2str = []
-        tokens_sequences = []
-        tags_sequences = []
-        # tags_without_bio = list(
-        #     set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
-        # )
-
-        vocab: dict[str, int] = {}
-        for sample in tqdm(samples):
-            tokens, tag_ids = sample["tokens"], sample["tags"]
-            tags = [tag_id2str[tag_id] for tag_id in tag_ids]
-
-            # update vocabulary
-            for w in tokens:
-                if w in vocab.keys():
-                    vocab[w] += 1
-                else:
-                    vocab[w] = 1
-
-            tokens_sequences += tokens
-            tags_sequences += tags
-
-        # efre_dic
-        econ_dic = None
-        # econ_dic = {"a":1} # for debugging purpose
-        # econ_dic
-        efre_dic = None
-        # vocab_rank: the rank of each word based on its frequency
-        sorted_dict = {
-            key: rank
-            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-        }
-        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
         return {
-            "efre_dic": efre_dic,
-            "econ_dic": econ_dic,
-            "vocab": vocab,
-            "vocab_rank": vocab_rank,
+            "efre_dic": {},
+            "econ_dic": {},
+            "vocab": {},
+            "vocab_rank": {},
         }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
@@ -226,6 +166,26 @@ class CWSProcessor(Processor):
         efre_val = efre_dic.get(span_text, 0.0)
         return econ_val, efre_val
 
+    # training set dependent features
+    def _get_num_oov(self, tokens, statistics):
+        num_oov = 0
+        for w in tokens:
+            if w not in statistics['vocab']:
+                num_oov += 1
+        return num_oov
+
+    # training set dependent features
+    # (this could be merged into the above one for further optimization)
+    def _get_fre_rank(self, tokens, statistics):
+        vocab_stats = statistics['vocab_rank']
+        fre_rank = 0.0
+        for w in tokens:
+            fre_rank += vocab_stats.get(w, len(vocab_stats))
+        fre_rank = 0 if len(tokens) == 0 else fre_rank / len(tokens)
+        return fre_rank
+
+    # --- End feature functions
+
     # These return none because NER is not yet in the main metric interface
     def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
         return [
@@ -235,25 +195,21 @@ class CWSProcessor(Processor):
 
     def _complete_span_features(self, sentence, tags, statistics=None):
 
-        span_dics = []
-        chunks = span_utils.get_spans_from_bmes(tags)
-        for tag, sid, eid in chunks:
-            span_text = ' '.join(sentence[sid:eid])
-            # Basic features
-            span_dic = {
-                'span_text': span_text,
-                'span_len': eid - sid,
-                'span_pos': (sid, eid),
-                'span_tag': tag,
-                'span_capitalness': cap_feature(span_text),
-                'span_position': eid * 1.0 / len(sentence),
-                'span_chars': len(span_text),
-                'span_density': len(chunks) * 1.0 / len(sentence),
-            }
-            # Save the features
-            span_dics.append(span_dic)
+        # Get training set stats if they exist
+        has_stats = statistics is not None and len(statistics) > 0
+        econ_dic = statistics["econ_dic"] if has_stats else None
+        efre_dic = statistics["efre_dic"] if has_stats else None
 
-        return span_dics
+        bmes_span_ops = BMESSpanOps(
+            resources={
+                "has_stats": has_stats,
+                "econ_dic": econ_dic,
+                "efre_dic": efre_dic,
+            }
+        )
+        spans = bmes_span_ops.get_spans(seq=sentence, tags=tags)
+
+        return spans
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -270,6 +226,13 @@ class CWSProcessor(Processor):
         :return: The features that are active (e.g. skipping training set features when
             no training set available)
         """
+        sys_features = unwrap(sys_info.features)
+        active_features = list(
+            sys_features.get_bucket_features(
+                include_training_dependent=external_stats is not None
+            )
+        )
+
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
@@ -277,27 +240,30 @@ class CWSProcessor(Processor):
             # sentence_length
             dict_sysout["sentence_length"] = len(tokens)
 
+            # sentence-level training set dependent features
+            if external_stats is not None:
+                dict_sysout["num_oov"] = self._get_num_oov(tokens, external_stats)
+                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, external_stats)
+
             # span features for true and predicted spans
-            dict_sysout["true_entity_info"] = self._complete_span_features(
+            dict_sysout["true_word_info"] = self._complete_span_features(
                 tokens, dict_sysout["true_tags"], statistics=external_stats
             )
-            dict_sysout["pred_entity_info"] = self._complete_span_features(
+            dict_sysout["pred_word_info"] = self._complete_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
         # This is not used elsewhere, so just keep it as-is
-        return list()
+        return active_features
 
-    def _get_span_ids(
-        self,
-        sys_output: list[dict],
-        output_to_spans: Callable,
-    ) -> Iterator[str]:
+    def _get_feature_dict(
+        self, sys_output: list[dict], feature_name: str, output_to_toks: Callable
+    ):
+        feat_dict = {}
         for sample_id, my_output in enumerate(sys_output):
-            for span_info in output_to_spans(my_output):
-                span_text = span_info["span_text"]
-                sid, eid = span_info["span_pos"]
-                span_label = span_info["span_tag"]
-                yield f'{sample_id}|||{sid}|||{eid}|||{span_text}|||{span_label}'
+            for tok_id, span_info in enumerate(output_to_toks(my_output)):
+                span_info.sample_id = sample_id
+                feat_dict[span_info] = getattr(span_info, feature_name)
+        return feat_dict
 
     def _get_span_sample_features(
         self,
@@ -317,7 +283,7 @@ class CWSProcessor(Processor):
     ) -> Iterator[str]:
         for sample_id, my_output in enumerate(sys_output):
             for span_info in output_to_spans(my_output):
-                yield span_info[feature_name]
+                yield getattr(span_info, feature_name)
 
     def _bucketing_samples(
         self,
@@ -328,40 +294,31 @@ class CWSProcessor(Processor):
     ) -> tuple[dict, dict]:
 
         features = unwrap(sys_info.features)
+        sent_feats: list[str] = []
+        tok_feats: list[str] = []
+        for x in active_features:
+            (sent_feats if (x in features) else tok_feats).append(x)
 
-        bucket_features = features.get_bucket_features()
-        pcf_set = set(features.get_pre_computed_features())
-
-        span_ids_true = list(
-            self._get_span_ids(sys_output, lambda x: x["true_entity_info"])
-        )
-        span_ids_pred = list(
-            self._get_span_ids(sys_output, lambda x: x["pred_entity_info"])
+        # First, get the buckets for sentences using the standard protocol
+        samples_over_bucket_true, performances_over_bucket = super()._bucketing_samples(
+            sys_info, sys_output, sent_feats, metric_stats
         )
 
         # Bucketing
-        samples_over_bucket_true = {}
-        samples_over_bucket_pred = {}
-        performances_over_bucket = {}
-        for feature_name in tqdm(bucket_features, desc="bucketing"):
 
+        samples_over_bucket_pred = {}
+        for feature_name in tqdm(tok_feats, desc="bucketing"):
             # Choose behavior based on whether this is a feature of samples or spans
-            if feature_name in pcf_set:
-                continue
-            if feature_name in features:
-                my_feature = features[feature_name]
-                my_feature_func = self._get_span_sample_features
-            else:
-                my_feature = features["true_entity_info"].feature.feature[feature_name]
-                my_feature_func = self._get_span_span_features
+            my_feature = features["true_word_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
             bucket_func = getattr(bucketing, bucket_info.method)
-            feat_vals = my_feature_func(
-                feature_name, sys_output, lambda x: x["true_entity_info"]
+
+            feat_dict = self._get_feature_dict(
+                sys_output, feature_name, lambda x: x['true_word_info']
             )
-            feat_dict = {x: y for x, y in zip(span_ids_true, feat_vals)}
+
             samples_over_bucket_true[feature_name] = bucket_func(
                 dict_obj=feat_dict,
                 bucket_number=bucket_info.number,
@@ -369,10 +326,9 @@ class CWSProcessor(Processor):
             )
 
             # Get buckets for predicted spans
-            feat_vals = my_feature_func(
-                feature_name, sys_output, lambda x: x["pred_entity_info"]
+            feat_dict = self._get_feature_dict(
+                sys_output, feature_name, lambda x: x['pred_word_info']
             )
-            feat_dict = {x: y for x, y in zip(span_ids_pred, feat_vals)}
             samples_over_bucket_pred[
                 feature_name
             ] = bucketing.bucket_attribute_specified_bucket_interval(
@@ -382,7 +338,7 @@ class CWSProcessor(Processor):
             )
 
             # evaluating bucket: get bucket performance
-            performances_over_bucket[feature_name] = self.get_bucket_performance_ner(
+            performances_over_bucket[feature_name] = self.get_bucket_performance_cws(
                 sys_info,
                 sys_output,
                 samples_over_bucket_true[feature_name],
@@ -392,29 +348,28 @@ class CWSProcessor(Processor):
 
     def _add_to_sample_dict(
         self,
-        spans: list[str],
+        spans: list[Span],
         type_id: str,
-        sample_dict: defaultdict[str, dict[str, str]],
+        sample_dict: defaultdict[Span, dict[str, str]],
     ):
         """
         Get bucket samples (with mis-predicted entities) for each bucket given a feature
         (e.g., length)
         """
         for span in spans:
-            split_span = span.split("|||")
-            pos = "|||".join(split_span[0:4])
-            tag = split_span[-1]
-            sample_dict[pos][type_id] = tag
+            sample_dict[span][type_id] = (
+                span.span_tag if span.span_tag is not None else ""
+            )
 
-    def get_bucket_cases_ner(
+    def get_bucket_cases_cws(
         self,
         bucket_interval: str,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[str]],
-        samples_over_bucket_pred: dict[str, list[str]],
+        samples_over_bucket_true: dict[str, list[Span]],
+        samples_over_bucket_pred: dict[str, list[Span]],
     ) -> list:
         # Index samples for easy comparison
-        sample_dict: defaultdict[str, dict[str, str]] = defaultdict(lambda: dict())
+        sample_dict: defaultdict[Span, dict[str, str]] = defaultdict(lambda: dict())
         self._add_to_sample_dict(
             samples_over_bucket_pred[bucket_interval], 'pred', sample_dict
         )
@@ -423,30 +378,28 @@ class CWSProcessor(Processor):
         )
 
         case_list = []
-        for pos, tags in sample_dict.items():
+        for span, tags in sample_dict.items():
             true_label = tags.get('true', 'O')
             pred_label = tags.get('pred', 'O')
 
-            split_pos = pos.split("|||")
-            sent_id = int(split_pos[0])
-            span = split_pos[-1]
-
             true_span_triple = (
                 true_label,
-                int(split_pos[1]),
-                int(split_pos[2]),
-                int(sent_id),
+                span.span_pos[0] if span.span_pos is not None else None,
+                span.span_pos[1] if span.span_pos is not None else None,
+                span.sample_id,
             )
             pred_span_triple = (
                 pred_label,
-                int(split_pos[1]),
-                int(split_pos[2]),
-                int(sent_id),
+                span.span_pos[0] if span.span_pos is not None else None,
+                span.span_pos[1] if span.span_pos is not None else None,
+                span.sample_id,
             )
 
-            system_output_id = sys_output[int(sent_id)]["id"]
+            system_output_id = (
+                sys_output[span.sample_id]["id"] if span.sample_id is not None else None
+            )  # TODO(Pengfei: should be checked)
             error_case = {
-                "span": span,
+                "span": span.span_text,
                 "text": str(system_output_id),
                 "true_label": true_label,
                 "predicted_label": pred_label,
@@ -457,12 +410,12 @@ class CWSProcessor(Processor):
 
         return case_list
 
-    def get_bucket_performance_ner(
+    def get_bucket_performance_cws(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[str]],
-        samples_over_bucket_pred: dict[str, list[str]],
+        samples_over_bucket_true: dict[str, list[Span]],
+        samples_over_bucket_pred: dict[str, list[Span]],
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
@@ -478,7 +431,7 @@ class CWSProcessor(Processor):
         """
         # getattr(explainaboard.metric, f'BIO{name}')
         metric_names = unwrap(sys_info.metric_names)
-        config = explainaboard.metric.F1ScoreConfig(ignore_classes=[])
+        config = explainaboard.metric.F1ScoreConfig(ignore_classes=['O'])
         bucket_metrics = [
             getattr(explainaboard.metric, f'BMES{name}')(config=config)
             for name in metric_names
@@ -495,26 +448,12 @@ class CWSProcessor(Processor):
             """
             Get bucket samples for ner task
             """
-            bucket_samples = self.get_bucket_cases_ner(
+            bucket_samples = self.get_bucket_cases_cws(
                 bucket_interval,
                 sys_output,
                 samples_over_bucket_true,
                 samples_over_bucket_pred,
             )
-
-            # true_labels = [x['true_label'] for x in bucket_samples]
-            # pred_labels = [x['predicted_label'] for x in bucket_samples]
-
-            true_labels = []
-            pred_labels = []
-            for x in bucket_samples:
-                if x['true_span_triple'][0] != "O":
-                    true_labels.append(x['true_span_triple'])
-                if x["pred_span_triple"][0] != "O":
-                    pred_labels.append(x['pred_span_triple'])
-
-            # print(true_labels)
-            # print(pred_labels)
 
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
@@ -524,7 +463,9 @@ class CWSProcessor(Processor):
             for metric in bucket_metrics:
 
                 metric_val = metric.evaluate(
-                    [true_labels], [pred_labels], conf_value=sys_info.conf_value
+                    [samples_over_bucket_true[bucket_interval]],
+                    [samples_over_bucket_pred[bucket_interval]],
+                    conf_value=sys_info.conf_value,
                 )
                 conf_low, conf_high = (
                     metric_val.conf_interval if metric_val.conf_interval else None,
@@ -541,3 +482,20 @@ class CWSProcessor(Processor):
             bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
+
+
+# TODO(gneubig): below is not done with refactoring
+def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
+    """
+    Note: when matching, the text span and tag have been lowercased.
+    """
+    econ_dic = dict()
+    # exit()
+    return econ_dic
+
+
+# Global functions for training set dependent features
+def get_efre_dic(train_word_sequences, tag_sequences_train):
+    efre_dic = dict()
+
+    return efre_dic

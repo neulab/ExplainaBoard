@@ -347,7 +347,6 @@ class ConditionalGenerationProcessor(Processor):
         has_stats = statistics is not None and len(statistics) > 0
         fre_dic = statistics["vocab"] if has_stats else None
 
-
         ngram_span_ops = NgramSpanOps(
             n_grams=[1, 2],
             resources={
@@ -355,8 +354,7 @@ class ConditionalGenerationProcessor(Processor):
                 "fre_dic": fre_dic,
             },
         )
-        spans = ngram_span_ops.get_spans(seq=toks)
-
+        spans = ngram_span_ops.get_spans(tags=toks)
 
         return spans
 
