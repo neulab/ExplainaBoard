@@ -560,8 +560,8 @@ class NERProcessor(Processor):
 
             if bucket_interval not in samples_over_bucket_pred.keys():
                 raise ValueError("Predict Label Bucketing Errors")
-            else:
-                spans_pred = samples_over_bucket_pred[bucket_interval]
+            # else:
+            #     spans_pred = samples_over_bucket_pred[bucket_interval]
 
             """
             Get bucket samples for ner task
@@ -575,7 +575,7 @@ class NERProcessor(Processor):
 
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
-                n_samples=len(spans_pred),
+                n_samples=len(spans_true),
                 bucket_samples=bucket_samples,
             )
             for metric in bucket_metrics:
