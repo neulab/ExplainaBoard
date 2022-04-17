@@ -463,7 +463,12 @@ class ConditionalGenerationProcessor(Processor):
             else:
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
-            matched_true_index, matched_pred_index, _, _ = NgramSpanOps.get_matched_spans(
+            (
+                matched_true_index,
+                matched_pred_index,
+                _,
+                _,
+            ) = NgramSpanOps.get_matched_spans(
                 spans_a=toks_true,
                 spans_b=toks_pred,
                 activate_features=["sample_id", "span_text"],
@@ -491,7 +496,8 @@ class ConditionalGenerationProcessor(Processor):
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
                 n_samples=len(toks_true),
-                bucket_samples=toks_true,
+                # TODO: Generalized?
+                bucket_samples=[span.__dict__ for span in toks_true],
                 performances=[performance],
             )
             bucket_name_to_performance[bucket_interval] = bucket_performance
