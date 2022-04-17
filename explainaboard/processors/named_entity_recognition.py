@@ -32,7 +32,7 @@ class NERProcessor(Processor):
         return feature.Features(
             {
                 "tokens": feature.Sequence(feature.Value("string")),
-                "ner_true_tags": feature.Sequence(
+                "true_tags": feature.Sequence(
                     feature.ClassLabel(
                         names=[
                             "O",
@@ -47,7 +47,7 @@ class NERProcessor(Processor):
                         ]
                     )
                 ),
-                "ner_pred_tags": feature.Sequence(
+                "pred_tags": feature.Sequence(
                     feature.ClassLabel(
                         names=[
                             "O",
@@ -66,6 +66,17 @@ class NERProcessor(Processor):
                 "sentence_length": feature.Value(
                     dtype="float",
                     description="sentence length",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "entity_density": feature.Value(
+                    dtype="float",
+                    description="the ration between all entity "
+                    "tokens and sentence tokens ",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -266,10 +277,6 @@ class NERProcessor(Processor):
             "vocab_rank": vocab_rank,
         }
 
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(existing_features["tokens"])
-
     def _get_stat_values(
         self, econ_dic: dict, efre_dic: dict, span_text: str, span_tag: str
     ):
@@ -357,6 +364,10 @@ class NERProcessor(Processor):
 
             # sentence_length
             dict_sysout["sentence_length"] = len(tokens)
+            # entity density
+            dict_sysout["entity_density"] = len(
+                BIOSpanOps().get_spans(tags=dict_sysout["true_tags"])
+            ) / len(tokens)
 
             # sentence-level training set dependent features
             if external_stats is not None:
@@ -412,6 +423,7 @@ class NERProcessor(Processor):
     ) -> tuple[dict, dict]:
 
         features = unwrap(sys_info.features)
+
         sent_feats: list[str] = []
         tok_feats: list[str] = []
         for x in active_features:

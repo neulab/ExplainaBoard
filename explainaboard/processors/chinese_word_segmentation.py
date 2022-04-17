@@ -62,6 +62,17 @@ class CWSProcessor(Processor):
                         setting=(),
                     ),
                 ),
+                "word_density": feature.Value(
+                    dtype="float",
+                    description="the ration between all word tokens "
+                    "and sentence tokens ",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
                 # --- the following are features of each word ---
                 "true_word_info": feature.Sequence(
                     feature.Set(
@@ -147,10 +158,6 @@ class CWSProcessor(Processor):
             "vocab": {},
             "vocab_rank": {},
         }
-
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(existing_features["tokens"])
 
     def _get_stat_values(
         self, econ_dic: dict, efre_dic: dict, span_text: str, span_tag: str
@@ -239,6 +246,11 @@ class CWSProcessor(Processor):
 
             # sentence_length
             dict_sysout["sentence_length"] = len(tokens)
+
+            # entity density
+            dict_sysout["word_density"] = len(
+                BMESSpanOps().get_spans(tags=dict_sysout["true_tags"])
+            ) / len(tokens)
 
             # sentence-level training set dependent features
             if external_stats is not None:
