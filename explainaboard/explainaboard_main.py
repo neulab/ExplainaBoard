@@ -6,7 +6,8 @@ import os
 
 from explainaboard import (
     FileType,
-    get_loader,
+    get_custom_dataset_loader,
+    get_datalab_loader,
     get_pairwise_performance_gap,
     get_processor,
     TaskType,
@@ -15,7 +16,6 @@ from explainaboard.analyzers.draw_hist import draw_bar_chart_from_report
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_loader_custom_dataset
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
@@ -40,7 +40,7 @@ def get_tasks(task: str, system_outputs: list[str]) -> list[str]:
         file_type = FileType.json
         dummy_task = TaskType.text_classification
         for sys_output in system_outputs:
-            loader = get_loader_custom_dataset(
+            loader = get_custom_dataset_loader(
                 dummy_task,
                 sys_output,
                 sys_output,
@@ -320,7 +320,7 @@ def main():
 
         if custom_dataset_paths:  # load custom datasets
             loaders = [
-                get_loader_custom_dataset(
+                get_custom_dataset_loader(
                     task,
                     dataset,
                     output,
@@ -341,7 +341,7 @@ def main():
             if not dataset:
                 raise ValueError("neither custom_dataset_paths or dataset is defined")
             loaders = [
-                get_loader(
+                get_datalab_loader(
                     task,
                     DatalabLoaderOption(dataset, sub_dataset),
                     sys_output,

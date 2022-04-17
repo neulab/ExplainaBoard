@@ -20,10 +20,10 @@ For example, suppose that you have a system output of the summarization task
 in `tsv` format:
 
 ```python
-from explainaboard import TaskType, get_loader, get_loader_custom_dataset
+from explainaboard import TaskType, get_datalab_loader, get_custom_dataset_loader
 dataset_path = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
 output_path = "./explainaboard/tests/artifacts/summarization/output.txt"
-loader = get_loader_custom_dataset(
+loader = get_custom_dataset_loader(
             TaskType.summarization,
             dataset_path,
             output_path,

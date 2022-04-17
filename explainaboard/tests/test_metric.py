@@ -9,7 +9,7 @@ import numpy as np
 import sklearn.metrics
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders import get_loader_custom_dataset
+from explainaboard.loaders import get_custom_dataset_loader
 import explainaboard.metric
 from explainaboard.tests.utils import test_artifacts_path
 
@@ -104,7 +104,7 @@ class TestMetric(unittest.TestCase):
         txt_output = os.path.join(
             test_artifacts_path, "machine_translation", "output.txt"
         )
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.machine_translation,
             tsv_dataset,
             txt_output,
@@ -165,7 +165,7 @@ class TestMetric(unittest.TestCase):
         json_en_output = os.path.join(
             test_artifacts_path, "extractive_qa", "output-xquad-en.json"
         )
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.question_answering_extractive,
             json_en_dataset,
             json_en_output,
