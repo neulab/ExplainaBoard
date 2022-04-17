@@ -3,7 +3,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -28,7 +28,7 @@ class TestSysDetails(unittest.TestCase):
             "system_details": system_details,
         }
 
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.text_classification,
             dataset_data,
             output_data,

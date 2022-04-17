@@ -2,7 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_custom_dataset
+from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.tests.utils import load_file_as_str, test_artifacts_path
 
 
@@ -14,7 +14,7 @@ class TestAspectBasedSentimentClassification(unittest.TestCase):
     txt_output = load_file_as_str(os.path.join(artifact_path, "output.txt"))
 
     def test_e2e(self):
-        loader = get_loader_custom_dataset(
+        loader = get_custom_dataset_loader(
             TaskType.aspect_based_sentiment_classification,
             self.tsv_dataset,
             self.txt_output,

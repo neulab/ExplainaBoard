@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from explainaboard import FileType, get_loader, Source, TaskType
+from explainaboard import FileType, get_datalab_loader, Source, TaskType
 from explainaboard.loaders.file_loader import (
     DatalabLoaderOption,
     FileLoaderField,
@@ -49,7 +49,7 @@ class BaseLoaderTests(TestCase):
 
 class TestLoadFromDatalab(TestCase):
     def test_invalid_dataset_name(self):
-        loader = get_loader(
+        loader = get_datalab_loader(
             task=TaskType.text_classification,
             dataset=DatalabLoaderOption("invalid_name"),
             output_data="outputdata",

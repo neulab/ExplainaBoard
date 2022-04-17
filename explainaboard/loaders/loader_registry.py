@@ -11,7 +11,7 @@ from explainaboard.tasks import TaskType
 _loader_registry: dict[TaskType, type[Loader]] = {}
 
 
-def get_loader_custom_dataset(
+def get_custom_dataset_loader(
     task: TaskType | str,
     dataset_data: str,
     output_data: str,
@@ -32,7 +32,7 @@ def get_loader_custom_dataset(
     )
 
 
-def get_loader(
+def get_datalab_loader(
     task: TaskType | str,
     dataset: DatalabLoaderOption,
     output_data: str,

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Callable
-import json
 from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, load_dataset
@@ -25,7 +24,10 @@ import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.tasks import TaskType
 import explainaboard.utils.bucketing
-from explainaboard.utils.db_api import read_statistics_from_db, write_statistics_to_db
+from explainaboard.utils.cache_api import (
+    read_statistics_from_cache,
+    write_statistics_to_cache,
+)
 from explainaboard.utils.py_utils import eprint, sort_dict
 from explainaboard.utils.tokenizer import get_default_tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
@@ -86,7 +88,6 @@ class Processor(metaclass=abc.ABCMeta):
         """Generate external statistics that are gathered from a relatively costly
         source, such as the training set.
         These are gathered once and then cached for future use.
-
         :param sys_info: Information about the system outputs
         :param statistics_func: The function used to get the statistics
         :return: Statistics from, usually, the training set that are used to calculate
@@ -100,27 +101,23 @@ class Processor(metaclass=abc.ABCMeta):
                 if sys_info.sub_dataset_name == "default"
                 else sys_info.sub_dataset_name
             )
-            try:
-                # read statistics from db
-                message = None
-                if sys_info.reload_stat:
-                    eprint(f"sys_info.reload_stat: {sys_info.reload_stat}")
-                    eprint(f"sys_info.dataset_name: {sys_info.dataset_name}")
-                    eprint(f"sub_dataset: {sub_dataset}")
-                    response = read_statistics_from_db(
-                        sys_info.dataset_name, sub_dataset
-                    )
-                    message = json.loads(response.text.replace("null", ""))["message"]
-                    if message == "success":
-                        return json.loads(response.content)['content']
-                eprint(f"-------------\n{message}")
-                # calculate statistics if not reloading or not found
-                if (
-                    not sys_info.reload_stat
-                    or message
-                    == "the dataset does not include the information of _stat"
-                ):
+            # read statistics from cache
+            if sys_info.reload_stat:
+                statistics = read_statistics_from_cache(
+                    sys_info.dataset_name, sub_dataset
+                )
+            if statistics is None:
+                try:
                     dataset = load_dataset(sys_info.dataset_name, sub_dataset)
+                except Exception:
+                    dataset = None
+                if dataset is None:
+                    eprint(
+                        f"{sys_info.dataset_name} hasn't been supported by DataLab so"
+                        " no training set dependent features will be supported by"
+                        " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                    )
+                else:
                     self._statistics_func.resources = self._get_statistics_resources(
                         sys_info, dataset[split_name]
                     )
@@ -129,22 +126,10 @@ class Processor(metaclass=abc.ABCMeta):
                         self._statistics_func, mode="local"
                     )
                     statistics = new_train._stat
-                    eprint("saving to database")
-                    response = write_statistics_to_db(
-                        sys_info.dataset_name, sub_dataset, content=statistics
+                    eprint(f"caching stats for {sys_info.dataset_name} {sub_dataset}")
+                    write_statistics_to_cache(
+                        statistics, sys_info.dataset_name, sub_dataset
                     )
-                    eprint(response.content)
-                # dataset does not exist
-                else:
-                    raise FileNotFoundError
-            except FileNotFoundError:
-                eprint(
-                    """
-The dataset hasn't been supported by DataLab so no training set dependent features will
-be supported by ExplainaBoard. You can add the dataset by:
-https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md
-"""
-                )
         return statistics
 
     def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
@@ -539,9 +524,10 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         overall_results = self.get_overall_performance(
             sys_info, sys_output, metric_stats=metric_stats
         )
-        return OverallStatistics(
-            sys_info, metric_stats, active_features, overall_results
+        sys_info.results = Result(
+            overall=overall_results, calibration=None, fine_grained=None
         )
+        return OverallStatistics(sys_info, metric_stats, active_features)
 
     def sort_bucket_info(
         self, performance_over_bucket, sort_by='value', sort_by_metric='first'
@@ -653,7 +639,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         sys_info = unwrap(overall_statistics.sys_info)
         metric_stats = overall_statistics.metric_stats
         active_features = unwrap(overall_statistics.active_features)
-        overall_results = overall_statistics.overall_results
+        overall_results = sys_info.results.overall
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
