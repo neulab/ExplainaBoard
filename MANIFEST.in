@@ -1,5 +1,6 @@
 include *.txt *.png *.json *.pkl
 recursive-include explainaboard/pre_computed/* *.aspects *.pkl *.json
+recursive-include explainaboard/pre_computed/kg/ *.aspects *.pkl *.json
 recursive-include explainaboard/utils/resources/ *.json
 recursive-include explainaboard/datasets/squad/ *.json
 

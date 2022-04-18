@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+import os
+
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import FileLoader, JSONFileLoader
 from explainaboard.loaders.loader import Loader
@@ -56,13 +59,26 @@ class KgLinkTailPredictionLoader(Loader):
             self._output_data, self._output_source
         )
 
+        # Map entity into an interpretable version
+        scriptpath = os.path.dirname(__file__)
+        entity_dic = {}
+        with open(
+            os.path.join(scriptpath, '../pre_computed/kg/entity2wikidata.json'),
+            'r',
+        ) as file:
+            entity_dic = json.loads(file.read())
+
         if self.user_defined_features_configs:  # user defined features are present
             for example_id, features_dict in raw_data.items():
                 data_i = {
                     "id": str(example_id),  # should be string type
-                    "true_head": features_dict["gold_head"],
+                    "true_head": entity_dic.get(
+                        features_dict["gold_head"]["label"], features_dict["gold_head"]
+                    ),
                     "true_link": features_dict["gold_predicate"],
-                    "true_tail": features_dict["gold_tail"],
+                    "true_tail": entity_dic.get(
+                        features_dict["gold_tail"]["label"], features_dict["gold_tail"]
+                    ),
                     "true_label": features_dict[
                         "gold_" + features_dict["predict"]
                     ],  # the entity to which we compare the predictions
@@ -83,9 +99,13 @@ class KgLinkTailPredictionLoader(Loader):
                 data.append(
                     {
                         "id": str(example_id),  # should be string type
-                        "true_head": features_dict["gold_head"],
+                        "true_head": entity_dic[features_dict["gold_head"]]["label"]
+                        if features_dict["gold_head"] in entity_dic.keys()
+                        else features_dict["gold_head"],
                         "true_link": features_dict["gold_predicate"],
-                        "true_tail": features_dict["gold_tail"],
+                        "true_tail": entity_dic[features_dict["gold_tail"]]["label"]
+                        if features_dict["gold_tail"] in entity_dic.keys()
+                        else features_dict["gold_tail"],
                         "true_label": features_dict[
                             "gold_" + features_dict["predict"]
                         ],  # the entity to which we compare the predictions
