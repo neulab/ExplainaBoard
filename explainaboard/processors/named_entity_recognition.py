@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Iterator
-import re
-from typing import Any
 
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.loaders.file_loader import DatalabFileLoader
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.processors.processor import Processor
@@ -18,6 +17,7 @@ from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing, span_utils
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.span_utils import BIOSpanOps, Span
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -172,7 +172,7 @@ class NERProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "econ": feature.Value(
+                            "span_econ": feature.Value(
                                 dtype="float",
                                 description="entity label consistency",
                                 is_bucket=True,
@@ -183,7 +183,7 @@ class NERProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "efre": feature.Value(
+                            "span_efre": feature.Value(
                                 dtype="float",
                                 description="entity frequency",
                                 is_bucket=True,
@@ -210,22 +210,8 @@ class NERProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["pred_tags"]
 
-    def _get_statistics_resources(
-        self, sys_info: SysOutputInfo, dataset_split: Dataset
-    ) -> dict[str, Any]:
-        """
-        From a DataLab dataset split, get resources necessary to calculate statistics
-        """
-        base_resources = unwrap(
-            super()._get_statistics_resources(sys_info, dataset_split)
-        )
-        task_specific_resources = {
-            'tag_id2str': dataset_split._info.task_templates[0].labels
-        }
-        return {**base_resources, **task_specific_resources}
-
     @aggregating()
-    def _statistics_func(self, samples: Iterator, tag_id2str=None):
+    def _statistics_func(self, samples: Dataset, tokenizer: Tokenizer | None = None):
         """
         Input:
         samples: [{
@@ -235,34 +221,27 @@ class NERProcessor(Processor):
         Output:dict:
         """
 
-        if tag_id2str is None:
-            tag_id2str = []
+        dl_features = samples.info.features
+
         tokens_sequences = []
         tags_sequences = []
-        tags_without_bio = list(
-            set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
-        )
 
         vocab: dict[str, int] = {}
+        tag_vocab: dict[str, int] = {}
         for sample in tqdm(samples):
-            tokens, tag_ids = sample["tokens"], sample["tags"]
-            tags = [tag_id2str[tag_id] for tag_id in tag_ids]
+            rep_sample = DatalabFileLoader.replace_labels(dl_features, sample)
+            tokens, tags = rep_sample["tokens"], rep_sample["tags"]
 
             # update vocabulary
-            for w in tokens:
-                if w in vocab.keys():
-                    vocab[w] += 1
-                else:
-                    vocab[w] = 1
+            for token, tag in zip(tokens, tags):
+                vocab[token] = vocab.get(token, 0) + 1
+                tag_vocab[tag] = tag_vocab.get(tag, 0) + 1
 
             tokens_sequences += tokens
             tags_sequences += tags
 
-        # efre_dic
-        econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)
-        # econ_dic = {"a":1} # for debugging purpose
-        # econ_dic
-        efre_dic = get_efre_dic(tokens_sequences, tags_sequences)
+        # econ and efre dictionaries
+        econ_dic, efre_dic = self.get_econ_efre_dic(tokens_sequences, tags_sequences)
         # vocab_rank: the rank of each word based on its frequency
         sorted_dict = {
             key: rank
@@ -285,9 +264,7 @@ class NERProcessor(Processor):
         """
         span_tag = span_tag.lower()
         span_text = span_text.lower()
-        econ_val = 0.0
-        if span_text in econ_dic and span_tag in econ_dic[span_text]:
-            econ_val = float(econ_dic[span_text][span_tag])
+        econ_val = econ_dic.get(f'{span_text}|||{span_tag}', 0.0)
         efre_val = efre_dic.get(span_text, 0.0)
         return econ_val, efre_val
 
@@ -598,8 +575,7 @@ class NERProcessor(Processor):
                     conf_value=sys_info.conf_value,
                 )
                 conf_low, conf_high = (
-                    metric_val.conf_interval if metric_val.conf_interval else None,
-                    None,
+                    metric_val.conf_interval if metric_val.conf_interval else None
                 )
                 performance = Performance(
                     metric_name=metric.name,
@@ -613,119 +589,56 @@ class NERProcessor(Processor):
 
         return sort_dict(bucket_name_to_performance)
 
+    @classmethod
+    def get_econ_efre_dic(
+        cls, words: list[str], bio_tags: list[str]
+    ) -> tuple[dict[str, float], dict[str, int]]:
+        """
+        Calculate the entity label consistency and frequency features from this paper
+        https://aclanthology.org/2020.emnlp-main.489.pdf
+        :param words: a list of all words in the corpus
+        :param bio_tags: a list of all tags in the corpus
+        :return: Returns two dictionaries:
+                    econ: 'span|||tag' pointing to entity consistency values
+                    efre: 'span' pointing to entity frequency values
+        """
+        chunks_train = span_utils.get_spans_from_bio(bio_tags)
 
-# TODO(gneubig): below is not done with refactoring
-def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
-    """
-    Note: when matching, the text span and tag have been lowercased.
-    """
-    econ_dic = dict()
-    chunks_train = set(span_utils.get_spans_from_bio(tag_sequences_train))
+        # Create pseudo-trie
+        prefixes: set[str] = set()
+        chunk_to_tag: dict[tuple[int, int], str] = {}
+        entity_to_tagcnt: dict[str, dict[str, int]] = {}
+        efre_dic: dict[str, int] = {}
+        for true_chunk in tqdm(chunks_train):
+            idx_start = true_chunk[1]
+            idx_end = true_chunk[2]
+            chunk_to_tag[(idx_start, idx_end)] = true_chunk[0]
+            span_str = ''
+            for i in range(0, idx_end - idx_start):
+                w = words[idx_start + i].lower()
+                span_str += w if i == 0 else f' {w}'
+                prefixes.add(span_str)
+            entity_to_tagcnt[span_str] = {}
+            efre_dic[span_str] = efre_dic.get(span_str, 0) + 1
 
-    count_idx = 0
-    word_sequences_train_str = ' '.join(train_word_sequences).lower()
-    for true_chunk in tqdm(chunks_train):
-        count_idx += 1
-        idx_start = true_chunk[1]
-        idx_end = true_chunk[2]
+        # Actually calculate stats
+        ltws = len(words)
+        for idx_start in range(ltws):
+            span_str = ''
+            for i in range(0, ltws - idx_start):
+                w = words[idx_start + i].lower()
+                span_str += w if i == 0 else f' {w}'
+                if span_str not in prefixes:
+                    break
+                if span_str in entity_to_tagcnt:
+                    my_tag = chunk_to_tag.get((idx_start, idx_start + i + 1), 'O')
+                    entity_to_tagcnt[span_str][my_tag] = (
+                        entity_to_tagcnt[span_str].get(my_tag, 0) + 1
+                    )
 
-        entity_span = ' '.join(train_word_sequences[idx_start:idx_end]).lower()
-        if entity_span in econ_dic:
-            continue
-        else:
-            econ_dic[entity_span] = dict()
-            for tag in tags:
-                econ_dic[entity_span][tag] = 0.0
-
-        # Determine if the same position in pred list giving a right prediction.
-        entity_span_new = ' ' + entity_span + ' '
-
-        entity_span_new = (
-            entity_span_new.replace('(', '')
-            .replace(')', '')
-            .replace('*', '')
-            .replace('+', '')
-        )
-        entity_str_sid = [
-            m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)
-        ]
-        if len(entity_str_sid) > 0:
-            label_list = []
-            # convert the string index into list index...
-            entity_sids = []
-            for str_idx in entity_str_sid:
-                entity_sid = len(word_sequences_train_str[0:str_idx].split())
-                entity_sids.append(entity_sid)
-            entity_len = len(entity_span.split())
-
-            for sid in entity_sids:
-                label_candi_list = tag_sequences_train[sid : sid + entity_len]
-                for label in label_candi_list:
-                    klab = 'o'
-                    if len(label.split('-')) > 1:
-                        klab = label.split('-')[1].lower()
-                    label_list.append(klab)
-
-            label_norep = list(set(label_list))
-            for lab_norep in label_norep:
-                hard = float(
-                    '%.3f' % (float(label_list.count(lab_norep)) / len(label_list))
-                )
-                econ_dic[entity_span][lab_norep] = hard
-
-    # fwrite = open(path_write, 'wb')
-    # pickle.dump(econ_dic, fwrite)
-    # fwrite.close()
-    """
-    {
-        'benson koech': {'O': 0.0, 'org': 0.0, 'loc': 0.0, 'per': 1.0, 'misc': 0.0}
-    }
-    """
-    # exit()
-    return econ_dic
-
-
-# Global functions for training set dependent features
-def get_efre_dic(train_word_sequences, tag_sequences_train):
-    efre_dic = dict()
-    chunks_train = set(span_utils.get_spans_from_bio(tag_sequences_train))
-    count_idx = 0
-    word_sequences_train_str = ' '.join(train_word_sequences).lower()
-    for true_chunk in tqdm(chunks_train):
-        count_idx += 1
-        # print('progress: %d / %d: ' % (count_idx, len(chunks_train)))
-        idx_start = true_chunk[1]
-        idx_end = true_chunk[2]
-
-        entity_span = ' '.join(train_word_sequences[idx_start:idx_end]).lower()
-        if entity_span in efre_dic:
-            continue
-        else:
-            efre_dic[entity_span] = []
-
-        # Determine if the same position in pred list giving a right prediction.
-        entity_span_new = ' ' + entity_span + ' '
-        entity_span_new = (
-            entity_span_new.replace('(', '')
-            .replace(')', '')
-            .replace('*', '')
-            .replace('+', '')
-        )
-        entity_str_sid = [
-            m.start() for m in re.finditer(entity_span_new, word_sequences_train_str)
-        ]
-
-        efre_dic[entity_span] = len(entity_str_sid)
-
-    sorted_efre_dic = sorted(efre_dic.items(), key=lambda item: item[1], reverse=True)
-
-    efre_dic_keep = {}
-    count_bigger_than_max_freq = 0
-    max_freq = float(sorted_efre_dic[4][1])
-    for span, freq in efre_dic.items():
-        if freq <= max_freq:
-            efre_dic_keep[span] = '%.3f' % (float(freq) / max_freq)
-        else:
-            count_bigger_than_max_freq += 1
-
-    return efre_dic_keep
+        econ_dic: dict[str, float] = {}
+        for span_str, cnt_dic in entity_to_tagcnt.items():
+            cnt_sum = float(sum(cnt_dic.values()))
+            for tag, cnt in cnt_dic.items():
+                econ_dic[f'{span_str}|||{tag}'] = cnt / cnt_sum
+        return econ_dic, efre_dic

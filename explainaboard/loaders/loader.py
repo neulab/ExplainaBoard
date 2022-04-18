@@ -12,6 +12,7 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
     TextFileLoader,
 )
+from explainaboard.utils.py_utils import eprint
 
 
 class Loader:
@@ -103,6 +104,7 @@ class Loader:
             else:
                 raise ValueError("split must be one of [dataset, output]")
             if file_type not in default_file_loaders:
+                eprint(file_type)
                 raise ValueError(
                     f"A file loader for {file_type} is not provided. "
                     "please pass it in as an argument."
