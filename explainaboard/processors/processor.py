@@ -531,7 +531,11 @@ class Processor(metaclass=abc.ABCMeta):
         return OverallStatistics(sys_info, metric_stats, active_features)
 
     def sort_bucket_info(
-        self, performance_over_bucket, sort_by='value', sort_by_metric='first'
+        self,
+        performance_over_bucket,
+        sort_by='value',
+        sort_by_metric='first',
+        sort_ascending=False,
     ):
         """
         Sorts the `performance_over_bucket` dictionary, which should be of the format
@@ -551,16 +555,17 @@ class Processor(metaclass=abc.ABCMeta):
 
         :param sort_by: 'key' or 'value';
             if 'key', sort by the bucket's lower boundary, alphabetically, low-to-high;
-            if 'value', sort by the `value` attribute of the BucketPerformance objects,
-            high-to-low. Please see param sort_by_metric.
+            if 'performance_value', sort by the `value` attribute of the
+            BucketPerformance objects. Since each bucket has multiple metrics
+            associated with it, see param sort_by_metric to choose which metric to
+            sort on.
+            if 'n_bucket_samples', sort by the number of samples in each bucket.
         :param sort_by_metric: 'first' or any string matching the metrics associated
         with this task.
             if 'first', sort by the value of the first BucketPerformance object,
             whichever that may be, high-to-low
             else, sort by the value of that metric.
-            TODO figure out how to let user pass this in.
-        TODO implement another param to specify if they want high-to-low or low-to-high
-        sorting.
+        :param sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
         """
 
         def index_of_metric(metric_bucket_perf_obj, target_metric):
@@ -585,7 +590,7 @@ class Processor(metaclass=abc.ABCMeta):
                         reverse=False,
                     )
                 }
-            elif sort_by == 'value':
+            elif sort_by == 'performance_value':
                 if (
                     sort_by_metric == 'first'
                 ):  # sort based on the value of the first feature, whichever that may
@@ -595,7 +600,7 @@ class Processor(metaclass=abc.ABCMeta):
                         for k, v in sorted(
                             feature_value.items(),
                             key=lambda item: item[1].performances[0].value,
-                            reverse=True,
+                            reverse=True if not sort_ascending else False,
                         )
                     }
                 else:
@@ -613,9 +618,20 @@ class Processor(metaclass=abc.ABCMeta):
                                 )
                             ]
                             .value,
-                            reverse=True,
+                            reverse=True if not sort_ascending else False,
                         )
                     }
+            elif (
+                sort_by == 'n_bucket_samples'
+            ):  # sort by the number of samples in each bucket
+                feature_sorted = {
+                    k: v
+                    for k, v in sorted(
+                        feature_value.items(),
+                        key=lambda item: item[1].n_samples,
+                        reverse=True if not sort_ascending else False,
+                    )
+                }
             performance_over_bucket_sorted[feature_name] = feature_sorted
         return performance_over_bucket_sorted
 
@@ -653,8 +669,9 @@ class Processor(metaclass=abc.ABCMeta):
             ),  # or 'key' to sort by bucket name, alphabetically
             sort_by_metric=metadata.get(
                 'sort_by_metric', 'first'
-            )  # or whichever metric the user wants.
+            ),  # or whichever metric the user wants.
             # Applicable when sort_by == 'value'
+            sort_ascending=metadata.get('sort_ascending', False),
         )
 
         self._print_bucket_info(performance_over_bucket)

@@ -182,6 +182,20 @@ In some situation, users aim to specify the bucket order according to their need
 
 
 ```python
+
+        from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
+        from explainaboard.loaders.file_loader import DatalabLoaderOption
+        from explainaboard.constants import Source
+        from explainaboard import (
+            FileType,
+            get_custom_dataset_loader,
+            get_datalab_loader,
+            get_pairwise_performance_gap,
+            get_processor,
+            TaskType,
+        )
+        from explainaboard.metric import HitsConfig
+
         # tips: `artifacts_path` is located at: ExplainaBoard/explainaboard/tests/artifacts
         dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
         loader = get_custom_dataset_loader(
@@ -196,19 +210,45 @@ In some situation, users aim to specify the bucket order according to their need
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237",
             "metric_names": ["Hits"],
-            "sort_by": "value",
+            "sort_by": "performance_value",
             "sort_by_metric": "first",
+            "sort_ascending": False,
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
         sys_info = processor.process(metadata, data)
 ```
+The options for the `"sort_by"` option are:
+1. `"key"` (default): sort by the bucket's lower boundary, alphabetically, low-to-high.
+2. `"performance_value"`: sort by bucket performance. Since each bucket has multiple metrics associated with it, use the `"sort_by_metric"` to choose which metric to sort on.
+3. `"n_bucket_samples"`, sort by the number of samples in each bucket.
 
+The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set to `"performance_value"`. The options for the `"sort_by_metric"` option are:
+1. `"Hits"`, `"MeanRank"`, `"MeanReciprocalRank"`, etc: sort by a specific metric name.
+2. `"first"` (default): sort by the value of the first BucketPerformance object which Explainaboard internally uses, whichever that may be. Not recommended to use this option; instead, specify the metric to sort on explicitly.
+
+The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set to either `"performance_value"` or `"n_bucket_samples"`. The options for the `"sort_ascending"` option are:
+1. `False` (default): sort high-to-low.
+2. `True`: sort low-to-high; useful for e.g. the `"MeanRank"` metric.
 
 ### Customized Hits K
-The value of K in `Hits` metric could also be specified by users when needed.
+The value of K in `Hits` metric could also be specified by users when needed. Below is an example of how to use this configuration while performing bucket sorting by bucket size:
 
 ```python
+
+        from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
+        from explainaboard.loaders.file_loader import DatalabLoaderOption
+        from explainaboard.constants import Source
+        from explainaboard import (
+            FileType,
+            get_custom_dataset_loader,
+            get_datalab_loader,
+            get_pairwise_performance_gap,
+            get_processor,
+            TaskType,
+        )
+        from explainaboard.metric import HitsConfig
+
         dataset = "explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
         loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
@@ -225,7 +265,9 @@ The value of K in `Hits` metric could also be specified by users when needed.
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237-subset",
             "metric_names": ["Hits"],
-            "metric_configs": {"Hits": HitsConfig(hits_k=4)}, # you can modify k here
+            "metric_configs": {"Hits": HitsConfig(hits_k=4)},  # you can modify k here
+            "sort_by": "n_bucket_samples",
+            "sort_ascending": False,  # buckets with many samples appear first
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
