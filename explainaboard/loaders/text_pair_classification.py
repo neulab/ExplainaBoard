@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
     JSONFileLoader,
@@ -43,6 +44,13 @@ class TextPairClassificationLoader(Loader):
                     FileLoaderField("text1", target_names[0], str),
                     FileLoaderField("text2", target_names[1], str),
                     FileLoaderField("true_label", target_names[2], str),
+                ]
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("text1", target_names[0], str),
+                    FileLoaderField("text2", target_names[1], str),
+                    FileLoaderField("label", target_names[2], str),
                 ]
             ),
         }

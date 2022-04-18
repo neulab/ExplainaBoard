@@ -3,6 +3,7 @@ from __future__ import annotations
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
 )
@@ -31,13 +32,20 @@ class NERLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        field_names = ["tokens", "true_tags"]
         return {
             FileType.conll: CoNLLFileLoader(
                 [
-                    FileLoaderField(0, "tokens", str),
-                    FileLoaderField(1, "true_tags", str),
+                    FileLoaderField(0, field_names[0], str),
+                    FileLoaderField(1, field_names[1], str),
                 ]
-            )
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("tokens", field_names[0], list),
+                    FileLoaderField("tags", field_names[1], list),
+                ]
+            ),
         }
 
     @classmethod

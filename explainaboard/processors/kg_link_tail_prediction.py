@@ -113,7 +113,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
     @classmethod
     def default_metrics(cls) -> list[str]:
-        return ["Hits", "MeanReciprocalRank"]
+        return ["Hits", "MeanReciprocalRank", "MeanRank"]
 
     @classmethod
     def default_metric_configs(cls) -> dict[str, explainaboard.metric.MetricConfig]:
