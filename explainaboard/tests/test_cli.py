@@ -171,6 +171,10 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    @unittest.skip(
+        reason="to be fixed in future PR: "
+        "https://github.com/neulab/ExplainaBoard/issues/247"
+    )
     def test_kglinktail_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
