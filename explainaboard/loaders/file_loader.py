@@ -12,7 +12,17 @@ from datalabs import load_dataset
 from explainaboard.constants import Source
 from explainaboard.utils.typing_utils import narrow
 
-DType = Union[Type[int], Type[float], Type[str], Type[dict]]
+
+class DatalabLabel(str):
+    """
+    This class doesn't do anything other than note that this is a label in datalab
+    and needs to convert the input integer into a string
+    """
+
+    pass
+
+
+DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[DatalabLabel]]
 
 
 @dataclass
@@ -52,8 +62,10 @@ class FileLoaderField:
             raise ValueError(
                 "strip_before_parsing only works with int, float and str types"
             )
-        if self.dtype not in (str, int, float, dict, None):
-            raise ValueError("dtype must be one of str, int, float, dict and None")
+        if self.dtype not in (str, int, float, dict, DatalabLabel, None):
+            raise ValueError(
+                "dtype must be one of str, int, float, dict, or DatalabLabel and None"
+            )
 
 
 class FileLoader:
@@ -105,6 +117,9 @@ class FileLoader:
         elif dtype == float:
             return float(data)
         elif dtype == str:
+            return str(data)
+        # TODO(gneubig): this is temporary until we can find a way to convert labels
+        elif dtype == DatalabLabel:
             return str(data)
         elif dtype == dict:
             return data  # TODO(Pengfei): I add the `dict` type for temporal use,
@@ -266,15 +281,31 @@ class DatalabLoaderOption:
 
 
 class DatalabFileLoader(FileLoader):
+    def __init__(
+        self,
+        fields: list[FileLoaderField] = None,
+        use_idx_as_id: bool = True,
+        id_field_name: Optional[str] = None,
+    ):
+        super().__init__(
+            fields=fields, use_idx_as_id=use_idx_as_id, id_field_name=id_field_name
+        )
+        self._labels = None
+
+    def get_label_str(self, label_int: int) -> str:
+        if label_int == -1:
+            return '_NULL_'
+        if self._labels is None:
+            raise ValueError('attempted to get label string without setting labels')
+        return self._labels[label_int]
+
     @classmethod
     def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
         config = narrow(data, DatalabLoaderOption)
-        dataset = list(
-            load_dataset(
-                config.dataset, config.subdataset, split=config.split, streaming=False
-            )
+        dataset = load_dataset(
+            config.dataset, config.subdataset, split=config.split, streaming=False
         )
-        return dataset
+        return list(dataset)
 
 
 class TextFileLoader(FileLoader):

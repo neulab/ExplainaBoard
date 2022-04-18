@@ -49,12 +49,12 @@ The example below concerns natural language infernce, predicting whether a premi
 
 The below example loads the `snli` dataset from DataLab:
 ```shell
-explainaboard --task text-pair-classification --dataset snli --system_outputs ./data/system_outputs/snli/snli-bert-output.txt
+explainaboard --task text-pair-classification --dataset snli --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
 The below example loads a dataset from an existing file:
 ```shell
-explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-bert-output.txt
+explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
 
