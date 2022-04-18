@@ -479,6 +479,31 @@ class MeanReciprocalRank(Metric):
         )
 
 
+class MeanRank(Metric):
+    """
+    Calculates the mean rank, rank(true_output), the rank of the true output in the
+    predicted n-best list.
+    """
+
+    @classmethod
+    def default_name(cls) -> str:
+        return 'MR'
+
+    def mr_val(self, true: Any, preds: list):
+        if true not in preds:
+            return -1  # placeholder for "infinity"; when `true` is not in `preds`
+        else:
+            true_rank = list(preds).index(true) + 1  # 1-indexed
+            return true_rank
+
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        return MetricStats(
+            np.array([self.mr_val(t, p) for t, p in zip(true_data, pred_data)])
+        )
+
+
 class EaaSMetricStats(MetricStats):
     """
     Stats from EaaS for calculation of any of the metrics. These are calculated lazily,
