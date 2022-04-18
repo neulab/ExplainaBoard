@@ -8,22 +8,12 @@ import json
 from typing import Any, cast, final, Optional, Type, Union
 
 from datalabs import load_dataset
-from datalabs.features.features import ClassLabel
+from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.constants import Source
 from explainaboard.utils.typing_utils import narrow
 
-
-class DatalabLabel(str):
-    """
-    This class doesn't do anything other than note that this is a label in datalab
-    and needs to convert the input integer into a string
-    """
-
-    pass
-
-
-DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[DatalabLabel]]
+DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
 
 
 @dataclass
@@ -63,9 +53,9 @@ class FileLoaderField:
             raise ValueError(
                 "strip_before_parsing only works with int, float and str types"
             )
-        if self.dtype not in (str, int, float, dict, DatalabLabel, None):
+        if self.dtype not in (str, int, float, dict, list, None):
             raise ValueError(
-                "dtype must be one of str, int, float, dict, or DatalabLabel and None"
+                "dtype must be one of str, int, float, dict, list, and None"
             )
 
 
@@ -119,10 +109,7 @@ class FileLoader:
             return float(data)
         elif dtype == str:
             return str(data)
-        # TODO(gneubig): this is temporary until we can find a way to convert labels
-        elif dtype == DatalabLabel:
-            return str(data)
-        elif dtype == dict:
+        elif dtype == list or dtype == dict:
             return data  # TODO(Pengfei): I add the `dict` type for temporal use,
             # but wonder if we need to generalize the current type mechanism,
         elif dtype is None:
@@ -279,16 +266,30 @@ class DatalabLoaderOption:
 
 
 class DatalabFileLoader(FileLoader):
-    @staticmethod
-    def replace_labels(features: dict, example: dict) -> dict:
+    @classmethod
+    def replace_one(cls, names: list[str], lab: int):
+        return names[lab] if lab != -1 else '_NULL_'
+
+    @classmethod
+    def replace_labels(cls, features: dict, example: dict) -> dict:
         new_example = {}
         for examp_k, examp_v in example.items():
             examp_f = features[examp_k]
+            # Label feature
             if isinstance(examp_f, ClassLabel):
-                examp_cl = cast(ClassLabel, examp_f)
-                new_example[examp_k] = (
-                    examp_cl.names[examp_v] if examp_v != -1 else '_NULL_'
-                )
+                names = cast(ClassLabel, examp_f).names
+                new_example[examp_k] = cls.replace_one(names, examp_v)
+            # Sequence feature
+            elif isinstance(examp_f, Sequence):
+                examp_seq = cast(Sequence, examp_f)
+                # Sequence of labels
+                if isinstance(examp_seq.feature, ClassLabel):
+                    names = cast(ClassLabel, examp_seq.feature).names
+                    new_example[examp_k] = [cls.replace_one(names, x) for x in examp_v]
+                # Sequence of anything else
+                else:
+                    new_example[examp_k] = examp_v
+            # Anything else
             else:
                 new_example[examp_k] = examp_v
         return new_example
