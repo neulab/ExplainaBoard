@@ -5,6 +5,7 @@ import dataclasses
 from dataclasses import asdict, dataclass, field
 import json
 import os
+import sys
 from typing import Any, Optional
 
 from explainaboard import config
@@ -137,11 +138,13 @@ class SysOutputInfo:
         with open(file_path, "wb") as f:
             self._dump_info(f)
 
-    def print_as_json(self):
+    def print_as_json(self, file=None):
+        if file is None:
+            file = sys.stdout
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
         try:
-            print(json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()))
+            json.dump(data_dict, fp=file, indent=2, default=lambda x: x.json_repr())
         except TypeError as e:
             raise e
 

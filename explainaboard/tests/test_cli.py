@@ -22,6 +22,8 @@ class TestCLI(TestCase):
             './data/system_outputs/sst2/sst2-lstm-output.txt',
             '--dataset',
             'sst2',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -35,6 +37,8 @@ class TestCLI(TestCase):
             './data/system_outputs/sst2/sst2-lstm-output.txt',
             '--custom_dataset_paths',
             './data/system_outputs/sst2/sst2-dataset.tsv',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -49,6 +53,8 @@ class TestCLI(TestCase):
             './data/system_outputs/snli/snli-roberta-output.txt',
             '--dataset',
             'snli',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -62,6 +68,8 @@ class TestCLI(TestCase):
             './data/system_outputs/snli/snli-roberta-output.txt',
             '--custom_dataset_paths',
             './data/system_outputs/snli/snli-dataset.tsv',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -77,7 +85,9 @@ class TestCLI(TestCase):
             './data/system_outputs/cnndm/cnndm_mini-bart-output.txt',
             '--metrics',
             'rouge2',
-            'bart_score_en_ref',
+            'chrf',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -100,6 +110,8 @@ class TestCLI(TestCase):
             './data/system_outputs/cnndm/cnndm-bart-output.txt',
             '--metrics',
             'rouge2',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -115,6 +127,8 @@ class TestCLI(TestCase):
             'ner',
             '--system_outputs',
             './data/system_outputs/conll2003/conll2003-elmo-output.conll',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -128,6 +142,8 @@ class TestCLI(TestCase):
             './data/system_outputs/conll2003/conll2003-dataset.conll',
             '--system_outputs',
             './data/system_outputs/conll2003/conll2003-elmo-output.conll',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -141,6 +157,8 @@ class TestCLI(TestCase):
             'metaphor_qa',
             '--system_outputs',
             './data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -154,6 +172,8 @@ class TestCLI(TestCase):
             './data/system_outputs/metaphor_qa/metaphor_qa-dataset.json',
             '--system_outputs',
             './data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -167,6 +187,8 @@ class TestCLI(TestCase):
             './data/system_outputs/squad/squad_mini-dataset.json',
             '--system_outputs',
             './data/system_outputs/squad/squad_mini-example-output.json',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -184,6 +206,8 @@ class TestCLI(TestCase):
             'fb15k_237',
             '--system_outputs',
             './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -197,6 +221,8 @@ class TestCLI(TestCase):
             './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
             '--system_outputs',
             './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
@@ -210,6 +236,8 @@ class TestCLI(TestCase):
             './data/system_outputs/absa/absa-dataset.tsv',
             '--system_outputs',
             './data/system_outputs/absa/absa-example-output.txt',
+            '--report_json',
+            '/dev/null',
         ]
         with patch('sys.argv', args):
             main()
