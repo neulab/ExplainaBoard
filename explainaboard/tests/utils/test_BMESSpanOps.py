@@ -36,7 +36,7 @@ class TestBMESSpanOps(unittest.TestCase):
         spans_b = span_ops.get_spans(tags=tags, seq=toks)
 
         a_ind, b_ind, a_matched, b_matched = span_ops.get_matched_spans(
-            spans_a, spans_b, activate_features=["span_text"]
+            spans_a, spans_b
         )
         # print([span.get_span_text for span in a_matched])
         self.assertEqual([span.get_span_text for span in a_matched], ['我', '纽 约'])

@@ -330,7 +330,7 @@ class NERProcessor(Processor):
                 "has_stats": has_stats,
                 "econ_dic": econ_dic,
                 "efre_dic": efre_dic,
-            }
+            },
         )
         spans = bio_span_ops.get_spans(seq=sentence, tags=tags)
 

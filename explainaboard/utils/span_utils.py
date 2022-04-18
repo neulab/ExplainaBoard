@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+from collections import defaultdict
 from typing import Any, Optional
 
 
@@ -100,6 +101,8 @@ class Span:
         span_text: Optional[str] = None,
         # the tag of a span
         span_tag: Optional[str] = None,
+        # whether span could be matched
+        span_matched: int = 0,
         # the position of a span
         span_pos: Optional[tuple] = None,
         # span capital features
@@ -124,6 +127,7 @@ class Span:
         self.span_text = span_text
         self.span_tag = span_tag
         self.span_pos = span_pos
+        self.span_matched = span_matched
         self.span_capitalness = span_capitalness
         self.span_rel_pos = span_rel_pos
         self.span_chars = span_chars
@@ -144,39 +148,82 @@ class Span:
 
 
 class SpanOps:
-    def __init__(self, resources: dict[str, Any] = {}):
+    def __init__(
+        self, resources: dict[str, Any] = {}, match_type: Optional[str] = None
+    ):
         self.resources = resources
+        self.match_type: str = (
+            self.default_match_type() if match_type is None else match_type
+        )
+        self.match_func = self.get_match_funcs()[self.match_type]
+
+    @classmethod
+    def default_match_type(cls) -> str:
+        return "tag"
+
+    def set_match_type(self, match_type) -> str:
+        self.match_type = match_type
+        self.match_func = self.get_match_funcs()[self.match_type]
+        return self.match_type
+
+    def get_match_funcs(self):
+
+        match_funcs = {}
+
+        def span_tag_match(span_a: Span, span_b: Span):
+            return span_a.span_tag == span_b.span_tag
+
+        def span_text_match(span_a: Span, span_b: Span):
+            return span_a.span_text == span_b.span_text
+
+        def span_text_tag_match(span_a: Span, span_b: Span):
+            return (
+                span_a.span_tag == span_b.span_tag
+                and span_a.span_text == span_b.span_text
+            )
+
+        def span_position_match(span_a: Span, span_b: Span):
+            return span_a.span_pos == span_b.span_pos
+
+        def span_position_tag_match(span_a: Span, span_b: Span):
+            return (
+                span_a.span_tag == span_b.span_tag
+                and span_a.span_pos == span_b.span_pos
+            )
+
+        match_funcs["tag"] = span_tag_match
+        match_funcs["text"] = span_text_match
+        match_funcs["text_tag"] = span_text_tag_match
+        match_funcs["position"] = span_position_match
+        match_funcs["position_tag"] = span_position_tag_match
+
+        return match_funcs
 
     @abc.abstractmethod
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
         """Return spans from a sequence of tags and tokens"""
         ...
 
-    @classmethod
     def get_matched_spans(
-        cls,
-        spans_a: list[Span],
-        spans_b: list[Span],
-        activate_features: list = ["span_text"],
+        self, spans_a: list[Span], spans_b: list[Span]
     ) -> tuple[list[int], list[int], list[Span], list[Span]]:
 
-        # TODO(Pengfei): add more matched condition
-        def is_equal(dict_a, dict_b, key):
-            return True if getattr(dict_a, key) == getattr(dict_b, key) else False
+        # # TODO(Pengfei): add more matched condition
+        # def is_equal(dict_a, dict_b, key):
+        #     return True if getattr(dict_a, key) == getattr(dict_b, key) else False
 
         matched_a_index = []
         matched_b_index = []
         matched_spans_a = []
         matched_spans_b = []
 
+        # return matched_a_index, matched_b_index, matched_spans_a, matched_spans_b
+        # TODO(Pengfei): this part is not very efficient
         for idx, span_dic_a in enumerate(spans_a):
             for idy, span_dic_b in enumerate(spans_b):
-                if all(
-                    [
-                        is_equal(span_dic_a, span_dic_b, feature)
-                        for feature in activate_features
-                    ]
-                ):
+                if span_dic_a.sample_id != span_dic_b.sample_id:
+                    continue
+                if self.match_func(span_dic_a, span_dic_b):
                     matched_a_index.append(idx)
                     matched_b_index.append(idy)
                     matched_spans_a.append(span_dic_a)
@@ -185,32 +232,48 @@ class SpanOps:
 
 
 class NgramSpanOps(SpanOps):
-    def __init__(self, resources: dict[str, Any] = {}, n_grams: list = [1, 2]):
-        super().__init__(resources)
+    def __init__(
+        self,
+        resources: dict[str, Any] = {},
+        match_type: str = "tag",
+        n_grams: list = [1, 2],
+    ):
+        super().__init__(resources, match_type)
         self.n_grams = n_grams
 
-    def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
-        span_dics = []
-        deduplication: dict[tuple, int] = {}
-        for k in self.n_grams:
+    @classmethod
+    def default_match_type(cls) -> str:
+        return "tag"
 
-            for i, tok in enumerate(tags):
-                if i + k > len(tags):
-                    break
-                span = " ".join(tags[i : i + k])
-                start_ind = i
-                end_ind = i + k
-                if (span, start_ind, end_ind) in deduplication.keys():
-                    continue
-                deduplication[(span, start_ind, end_ind)] = 1
+    def get_spans_and_match(self, tags: list, tags_other: list):
+        def get_ngrams(tags, n_grams: list[int]):
+            spans = []
+            for k in n_grams:
+                for i, tok in enumerate(tags):
+                    if i + k > len(tags):
+                        break
+                    span = " ".join(tags[i : i + k])
+                    spans.append((span, i, i + k))
+            return spans
+
+        def get_span_from_ngrams(ngrams, tags_other_table, tags_length):
+            span_dics = []
+            for ngram in ngrams:
+                span = ngram[0]
+
+                # match
+                my_other = tags_other_table.get(span, list())
+                matched = my_other.pop(0) if len(my_other) > 0 else -1
+
                 span_dic = Span(
                     span_text=span,
                     span_tag=span
                     if "span_tag" not in self.resources.keys()
                     else self.resources["span_tag"](span),
-                    span_pos=(start_ind, end_ind),
+                    span_pos=(ngram[1], ngram[2]),
+                    span_matched=matched,
                     span_capitalness=cap_feature(span),  # type: ignore
-                    span_rel_pos=start_ind * 1.0 / len(tags),  # type: ignore
+                    span_rel_pos=ngram[2] * 1.0 / tags_length,  # type: ignore
                     span_chars=len(span),
                     span_tokens=len(span.split(" ")),
                     span_test_freq=0
@@ -219,15 +282,38 @@ class NgramSpanOps(SpanOps):
                     span_train_freq=0
                     if "fre_dic" not in self.resources.keys()
                     or self.resources["fre_dic"] is None
-                    else self.resources["fre_dic"].get(tok, 0),  # type: ignore
+                    else self.resources["fre_dic"].get(span, 0),  # type: ignore
                 )
                 # Save the features
                 span_dics.append(span_dic)
+            return span_dics
 
-        return span_dics
+        tags_ngrams = get_ngrams(tags, self.n_grams)
+        tags_other_ngrams = get_ngrams(tags_other, self.n_grams)
+
+        # Find tokens in other set
+        tags_other_table = defaultdict(list)
+        for i, tok in enumerate(tags_other_ngrams):
+            tags_other_table[tok[0]].append(i)
+
+        # Find tokens in other set
+        tags_table = defaultdict(list)
+        for i, tok in enumerate(tags_ngrams):
+            tags_table[tok[0]].append(i)
+
+        span_dics = get_span_from_ngrams(tags_ngrams, tags_other_table, len(tags))
+        span_dics_other = get_span_from_ngrams(
+            tags_other_ngrams, tags_table, len(tags_other)
+        )
+
+        return span_dics, span_dics_other
 
 
 class BMESSpanOps(SpanOps):
+    @classmethod
+    def default_match_type(cls) -> str:
+        return "position_tag"
+
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
         """
         :param seq: ["B", "E", "S", "B", "E","B","M","E"]
@@ -303,6 +389,10 @@ class BMESSpanOps(SpanOps):
 
 
 class BIOSpanOps(SpanOps):
+    @classmethod
+    def default_match_type(cls) -> str:
+        return "position_tag"
+
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
         """Generate a list of spans:Span based a sequence of tokens:str"""
         default = 'O'
