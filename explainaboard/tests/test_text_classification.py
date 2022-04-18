@@ -29,9 +29,9 @@ class TestTextClassification(unittest.TestCase):
             data[6],
             {
                 "text": "a weird and wonderful comedy .",
-                "true_label": "1",
+                "true_label": "positive",
                 "id": "6",
-                "predicted_label": "1",
+                "predicted_label": "positive",
             },
         )
 
@@ -50,9 +50,9 @@ class TestTextClassification(unittest.TestCase):
             data[6],
             {
                 'text': 'guaranteed to move anyone who ever , , or rolled .',
-                'true_label': '1',
+                'true_label': 'positive',
                 'id': '6',
-                'predicted_label': '1',
+                'predicted_label': 'positive',
             },
         )
 
@@ -71,9 +71,9 @@ class TestTextClassification(unittest.TestCase):
             {
                 'text': 'if you sometimes like to go to the movies to have fun , '
                 'wasabi is a good place to start .',
-                'true_label': '0',
+                'true_label': 'positive',
                 'id': '0',
-                'predicted_label': '1',
+                'predicted_label': 'positive',
             },
         )
 
