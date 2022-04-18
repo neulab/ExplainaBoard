@@ -555,8 +555,11 @@ class Processor(metaclass=abc.ABCMeta):
 
         :param sort_by: 'key' or 'value';
             if 'key', sort by the bucket's lower boundary, alphabetically, low-to-high;
-            if 'value', sort by the `value` attribute of the BucketPerformance objects,
-            high-to-low. Please see param sort_by_metric.
+            if 'performance_value', sort by the `value` attribute of the
+            BucketPerformance objects. Since each bucket has multiple metrics
+            associated with it, see param sort_by_metric to choose which metric to
+            sort on.
+            if 'n_bucket_samples', sort by the number of samples in each bucket.
         :param sort_by_metric: 'first' or any string matching the metrics associated
         with this task.
             if 'first', sort by the value of the first BucketPerformance object,
@@ -587,7 +590,7 @@ class Processor(metaclass=abc.ABCMeta):
                         reverse=False,
                     )
                 }
-            elif sort_by == 'value':
+            elif sort_by == 'performance_value':
                 if (
                     sort_by_metric == 'first'
                 ):  # sort based on the value of the first feature, whichever that may
@@ -618,6 +621,17 @@ class Processor(metaclass=abc.ABCMeta):
                             reverse=True if not sort_ascending else False,
                         )
                     }
+            elif (
+                sort_by == 'n_bucket_samples'
+            ):  # sort by the number of samples in each bucket
+                feature_sorted = {
+                    k: v
+                    for k, v in sorted(
+                        feature_value.items(),
+                        key=lambda item: item[1].n_samples,
+                        reverse=True if not sort_ascending else False,
+                    )
+                }
             performance_over_bucket_sorted[feature_name] = feature_sorted
         return performance_over_bucket_sorted
 
