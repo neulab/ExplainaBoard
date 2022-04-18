@@ -3,6 +3,7 @@ from __future__ import annotations
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
+    DatalabLabel,
     FileLoader,
     FileLoaderField,
     JSONFileLoader,
@@ -47,7 +48,7 @@ class TextClassificationLoader(Loader):
             FileType.datalab: DatalabFileLoader(
                 [
                     FileLoaderField("text", target_field_names[0], str),
-                    FileLoaderField("label", target_field_names[1], str),
+                    FileLoaderField("label", target_field_names[1], DatalabLabel),
                 ]
             ),
         }
