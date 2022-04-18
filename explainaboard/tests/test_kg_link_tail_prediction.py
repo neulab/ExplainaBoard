@@ -72,7 +72,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237",
             "metric_names": ["Hits"],
-            "sort_by": "value",
+            "sort_by": "performance_value",
             "sort_by_metric": "first",
         }
 
