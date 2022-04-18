@@ -445,10 +445,6 @@ class BIOF1Score(F1Score):
             ) = bio_span_ops.get_matched_spans(
                 true_spans,
                 pred_spans,
-                # strict evaluation
-                activate_features=["sample_id", "span_pos", "span_tag"]
-                # loose evaluation
-                # activate_features = ["sample_id", "span_pos"]
             )
 
             for offset, spans in enumerate((true_spans, pred_spans, matched_spans)):
@@ -528,10 +524,6 @@ class BMESF1Score(F1Score):
             ) = bmes_span_ops.get_matched_spans(
                 true_spans,
                 pred_spans,
-                # strict evaluation
-                activate_features=["sample_id", "span_pos", "span_tag"]
-                # loose evaluation
-                # activate_features = ["sample_id", "span_pos"]
             )
 
             for offset, spans in enumerate((true_spans, pred_spans, matched_spans)):

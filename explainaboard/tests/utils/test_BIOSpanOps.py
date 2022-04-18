@@ -41,43 +41,51 @@ class TestBIOSpanOps(unittest.TestCase):
         bio_span_ops = BIOSpanOps()
         spans_c = bio_span_ops.get_spans(tags=tags, seq=toks)
 
-        # print("-------1-----------")
+        print([span.get_span_text for span in spans_a])
+        print([span.get_span_text for span in spans_b])
+
+        print("-------1-----------")
+        bio_span_ops.set_match_type("text")
         a_ind, b_ind, a_matched, b_matched = bio_span_ops.get_matched_spans(
-            spans_a, spans_b, activate_features=["span_text"]
+            spans_a, spans_b
         )
-        # print([span.get_span_text for span in a_matched])
+        print([span.get_span_text for span in a_matched])
         self.assertEqual(
             [span.get_span_text for span in a_matched], ['New York', 'Beijing']
         )
 
-        # print("-------2----------")
+        print("-------2----------")
+        bio_span_ops.set_match_type("tag")
         a_ind, b_ind, a_matched, b_matched = bio_span_ops.get_matched_spans(
-            spans_a, spans_b, activate_features=["span_tag"]
+            spans_a, spans_b
         )
-        # print([span.get_span_text for span in a_matched])
+        print([span.get_span_text for span in a_matched])
         self.assertEqual(
             [span.get_span_text for span in a_matched], ['New York', 'Beijing']
         )
 
-        # print("-------3-----------")
+        print("-------3-----------")
+        bio_span_ops.set_match_type("text_tag")
         a_ind, b_ind, a_matched, b_matched = bio_span_ops.get_matched_spans(
-            spans_a, spans_b, activate_features=["span_tag", "span_text"]
+            spans_a, spans_b
         )
-        # print([span.get_span_text for span in a_matched])
+        print([span.get_span_text for span in a_matched])
         self.assertEqual([span.get_span_text for span in a_matched], ['Beijing'])
 
-        # print("-------4-----------")
+        print("-------4-----------")
+        bio_span_ops.set_match_type("text_tag")
         b_ind, c_ind, b_matched, c_matched = bio_span_ops.get_matched_spans(
-            spans_b, spans_c, activate_features=["span_tag", "span_text"]
+            spans_b, spans_c
         )
-        # print([span.get_span_text for span in b_matched])
+        print([span.get_span_text for span in b_matched])
         self.assertEqual(
             [span.get_span_text for span in b_matched], ['New York', 'Beijing']
         )
 
-        # print("-------5-----------")
+        print("-------5-----------")
+        bio_span_ops.set_match_type("position_tag")
         b_ind, c_ind, b_matched, c_matched = bio_span_ops.get_matched_spans(
-            spans_b, spans_c, activate_features=["span_tag", "span_text", "span_pos"]
+            spans_b, spans_c
         )
-        # print([span.get_span_text for span in b_matched])
+        print([span.get_span_text for span in b_matched])
         self.assertEqual([span.get_span_text for span in b_matched], [])

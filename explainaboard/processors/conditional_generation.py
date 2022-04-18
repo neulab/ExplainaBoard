@@ -332,31 +332,41 @@ class ConditionalGenerationProcessor(Processor):
             # span features for true and predicted spans
             ref_toks = sys_info.tokenize(dict_sysout['reference'])
             hyp_toks = sys_info.tokenize(dict_sysout['hypothesis'])
-            dict_sysout["ref_span_info"] = self._complete_tok_features(
-                ref_toks, ref_test_freq, statistics=external_stats
+            # dict_sysout["ref_span_info"] = self._complete_tok_features(
+            #     ref_toks, ref_test_freq, statistics=external_stats
+            # )
+            # dict_sysout["hyp_span_info"] = self._complete_tok_features(
+            #     hyp_toks, ref_test_freq, statistics=external_stats
+            # )
+
+            a, b = self._complete_tok_features(
+                ref_toks, hyp_toks, ref_test_freq, statistics=external_stats
             )
-            dict_sysout["hyp_span_info"] = self._complete_tok_features(
-                hyp_toks, ref_test_freq, statistics=external_stats
-            )
+            # print(a)
+            dict_sysout["ref_span_info"] = a
+            dict_sysout["hyp_span_info"] = b
 
         return active_features
 
-    def _complete_tok_features(self, toks, ref_test_freq, statistics=None):
+    def _complete_tok_features(self, toks, toks_other, ref_test_freq, statistics=None):
 
         # Get training set stats if they exist
         has_stats = statistics is not None and len(statistics) > 0
         fre_dic = statistics["vocab"] if has_stats else None
 
         ngram_span_ops = NgramSpanOps(
-            n_grams=[1, 2],
+            n_grams=[1],
             resources={
                 "ref_test_freq": ref_test_freq,
                 "fre_dic": fre_dic,
             },
         )
-        spans = ngram_span_ops.get_spans(tags=toks)
 
-        return spans
+        spans_true, spans_pred = ngram_span_ops.get_spans_and_match(
+            tags=toks, tags_other=toks_other
+        )
+
+        return spans_true, spans_pred
 
     def _get_feature_dict(
         self, sys_output: list[dict], feature_name: str, output_to_toks: Callable
@@ -463,24 +473,13 @@ class ConditionalGenerationProcessor(Processor):
             else:
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
-            (
-                matched_true_index,
-                matched_pred_index,
-                _,
-                _,
-            ) = NgramSpanOps.get_matched_spans(
-                spans_a=toks_true,
-                spans_b=toks_pred,
-                activate_features=["sample_id", "span_text"],
-            )
-
             stats_list = []
             for idx, span in enumerate(toks_true):
-                matched = 1.0 if idx in matched_true_index else 0
+                matched = 1.0 if span.span_matched >= 0 else 0
                 stats_list.append([1.0, 0.0, matched, 0.0])
 
             for idx, span in enumerate(toks_pred):
-                matched = 1.0 if idx in matched_pred_index else 0
+                matched = 1.0 if span.span_matched >= 0 else 0
                 stats_list.append([0.0, 1.0, 0.0, matched])
 
             stats = explainaboard.metric.MetricStats(np.array(stats_list))
@@ -497,7 +496,7 @@ class ConditionalGenerationProcessor(Processor):
                 bucket_name=bucket_interval,
                 n_samples=len(toks_true),
                 # TODO: Generalized?
-                bucket_samples=[span.__dict__ for span in toks_true],
+                bucket_samples=[],
                 performances=[performance],
             )
             bucket_name_to_performance[bucket_interval] = bucket_performance
