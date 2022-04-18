@@ -342,17 +342,10 @@ class BMESSpanOps(SpanOps):
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
                     lower_tag = span.span_tag
                     lower_text = span.span_text
-                    span.span_econ = 0
-                    if (
-                        span.span_text in self.resources["econ_dic"]
-                        and lower_tag in self.resources["econ_dic"][lower_text]
-                    ):
-                        span.span_econ = float(
-                            self.resources["econ_dic"][lower_text][lower_tag]
-                        )
-                    span.span_efre = self.resources["efre_dic"].get(  # type: ignore
-                        lower_text, 0.0
+                    span.span_econ = self.resources["econ_dic"].get(
+                        f'{lower_text}|||{lower_tag}', 0.0
                     )
+                    span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
 
                 spans.append(span)
                 tag = ""
@@ -370,17 +363,10 @@ class BMESSpanOps(SpanOps):
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
                     lower_tag = span.span_tag
                     lower_text = span.span_text
-                    span.span_econ = 0
-                    if (
-                        span.span_text in self.resources["econ_dic"]
-                        and lower_tag in self.resources["econ_dic"][lower_text]
-                    ):
-                        span.span_econ = float(
-                            self.resources["econ_dic"][lower_text][lower_tag]
-                        )
-                    span.span_efre = self.resources["efre_dic"].get(  # type: ignore
-                        lower_text, 0.0
+                    span.span_econ = self.resources["econ_dic"].get(
+                        f'{lower_text}|||{lower_tag}', 0.0
                     )
+                    span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
 
                 spans.append(span)
                 tag = ""
@@ -417,19 +403,12 @@ class BIOSpanOps(SpanOps):
                     span_tokens=len(span_text.split(" ")),
                 )
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
-                    lower_tag = span.span_tag.lower()
+                    lower_tag = span.span_tag
                     lower_text = span.span_text.lower()
-                    span.span_econ = 0
-                    if (
-                        span.span_text in self.resources["econ_dic"]
-                        and lower_tag in self.resources["econ_dic"][lower_text]
-                    ):
-                        span.span_econ = float(
-                            self.resources["econ_dic"][lower_text][lower_tag]
-                        )
-                    span.span_efre = self.resources["efre_dic"].get(  # type: ignore
-                        lower_text, 0.0
+                    span.span_econ = self.resources["econ_dic"].get(
+                        f'{lower_text}|||{lower_tag}', 0.0
                     )
+                    span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
 
                 spans.append(span)
                 span_type, span_start = None, -1
@@ -457,17 +436,10 @@ class BIOSpanOps(SpanOps):
                     ):
                         lower_tag = span.span_tag.lower()
                         lower_text = span.span_text.lower()
-                        span.span_econ = 0
-                        if (
-                            span.span_text in self.resources["econ_dic"]
-                            and lower_tag in self.resources["econ_dic"][lower_text]
-                        ):
-                            span.span_econ = float(
-                                self.resources["econ_dic"][lower_text][lower_tag]
-                            )
-                        span.span_efre = self.resources["efre_dic"].get(  # type: ignore
-                            lower_text, 0.0
+                        span.span_econ = self.resources["econ_dic"].get(
+                            f'{lower_text}|||{lower_tag}', 0.0
                         )
+                        span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
                     spans.append(span)
                     span_type, span_start = tok_span_type, i
             else:
@@ -496,17 +468,10 @@ class BIOSpanOps(SpanOps):
                     if span.span_text is not None
                     else span.span_text
                 )
-                span.span_econ = 0
-                if (
-                    span.span_text in self.resources["econ_dic"]
-                    and lower_tag in self.resources["econ_dic"][lower_text]
-                ):
-                    span.span_econ = float(
-                        self.resources["econ_dic"][lower_text][lower_tag]
-                    )
-                span.span_efre = self.resources["efre_dic"].get(  # type: ignore
-                    lower_text, 0.0
+                span.span_econ = self.resources["econ_dic"].get(
+                    f'{lower_text}|||{lower_tag}', 0.0
                 )
+                span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
             spans.append(span)
 
         return spans
