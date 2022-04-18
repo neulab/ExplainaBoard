@@ -39,14 +39,14 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
-    @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
+    # @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_textpair_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
             '--task',
             'text-pair-classification',
             '--system_outputs',
-            './data/system_outputs/snli/snli-bert-output.txt',
+            './data/system_outputs/snli/snli-roberta-output.txt',
             '--dataset',
             'snli',
         ]
@@ -59,7 +59,7 @@ class TestCLI(TestCase):
             '--task',
             'text-pair-classification',
             '--system_outputs',
-            './data/system_outputs/snli/snli-bert-output.txt',
+            './data/system_outputs/snli/snli-roberta-output.txt',
             '--custom_dataset_paths',
             './data/system_outputs/snli/snli-dataset.tsv',
         ]
