@@ -3,13 +3,13 @@ from __future__ import annotations
 from collections import defaultdict
 from collections.abc import Callable, Iterator
 import re
-from typing import Any
 
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.loaders.file_loader import DatalabFileLoader
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.processors.processor import Processor
@@ -18,6 +18,7 @@ from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing, span_utils
 from explainaboard.utils.analysis import cap_feature
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -214,22 +215,8 @@ class NERProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["pred_tags"]
 
-    def _get_statistics_resources(
-        self, sys_info: SysOutputInfo, dataset_split: Dataset
-    ) -> dict[str, Any]:
-        """
-        From a DataLab dataset split, get resources necessary to calculate statistics
-        """
-        base_resources = unwrap(
-            super()._get_statistics_resources(sys_info, dataset_split)
-        )
-        task_specific_resources = {
-            'tag_id2str': dataset_split._info.task_templates[0].labels
-        }
-        return {**base_resources, **task_specific_resources}
-
     @aggregating()
-    def _statistics_func(self, samples: Iterator, tag_id2str=None):
+    def _statistics_func(self, samples: Dataset, tokenizer: Tokenizer | None = None):
         """
         Input:
         samples: [{
@@ -239,28 +226,29 @@ class NERProcessor(Processor):
         Output:dict:
         """
 
-        if tag_id2str is None:
-            tag_id2str = []
+        dl_features = samples.info.features
+
         tokens_sequences = []
         tags_sequences = []
-        tags_without_bio = list(
-            set([t.split('-')[1].lower() if len(t) > 1 else t for t in tag_id2str])
-        )
 
         vocab: dict[str, int] = {}
+        tag_vocab: dict[str, int] = {}
         for sample in tqdm(samples):
-            tokens, tag_ids = sample["tokens"], sample["tags"]
-            tags = [tag_id2str[tag_id] for tag_id in tag_ids]
+            rep_sample = DatalabFileLoader.replace_labels(dl_features, sample)
+            tokens, tags = rep_sample["tokens"], rep_sample["tags"]
 
             # update vocabulary
-            for w in tokens:
-                if w in vocab.keys():
-                    vocab[w] += 1
-                else:
-                    vocab[w] = 1
+            for token, tag in zip(tokens, tags):
+                vocab[token] = vocab.get(token, 0) + 1
+                tag_vocab[tag] = tag_vocab.get(tag, 0) + 1
 
             tokens_sequences += tokens
             tags_sequences += tags
+
+        print(tag_vocab.keys())
+        tags_without_bio = list(
+            set([x.split('-')[-1] for x in tag_vocab.keys() if '-' in x])
+        )
 
         # efre_dic
         econ_dic = get_econ_dic(tokens_sequences, tags_sequences, tags_without_bio)

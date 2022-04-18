@@ -42,8 +42,8 @@ class NERLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("tokens", field_names[0], str),
-                    FileLoaderField("tags", field_names[1], str),
+                    FileLoaderField("tokens", field_names[0], list),
+                    FileLoaderField("tags", field_names[1], list),
                 ]
             ),
         }
