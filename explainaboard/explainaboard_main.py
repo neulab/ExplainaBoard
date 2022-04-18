@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 
 from explainaboard import (
     FileType,
@@ -244,6 +245,14 @@ def create_parser():
     )
 
     parser.add_argument(
+        '--report_json',
+        type=str,
+        required=False,
+        default=None,
+        help="the place to write the report json file",
+    )
+
+    parser.add_argument(
         '--system_details',
         type=str,
         required=False,
@@ -414,13 +423,19 @@ def main():
                 f"{output_dir_figures}/{x_file_name}",
             )
 
+        if args.report_json is not None:
+            report_file = open(args.report_json, 'w')
+        else:
+            report_file = sys.stdout
         if len(system_outputs) == 1:  # individual system analysis
-            reports[0].print_as_json()
+            reports[0].print_as_json(file=report_file)
         elif len(system_outputs) == 2:  # pairwise analysis
             compare_analysis = get_pairwise_performance_gap(
                 reports[0].to_dict(), reports[1].to_dict()
             )
-            print(json.dumps(compare_analysis, indent=4))
+            json.dump(compare_analysis, fp=report_file, indent=2)
+        if args.report_json is not None:
+            report_file.close()
 
 
 if __name__ == '__main__':

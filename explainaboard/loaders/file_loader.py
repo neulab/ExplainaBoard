@@ -5,14 +5,15 @@ import csv
 from dataclasses import dataclass
 from io import StringIO
 import json
-from typing import Any, final, Optional, Type, Union
+from typing import Any, cast, final, Optional, Type, Union
 
 from datalabs import load_dataset
+from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.constants import Source
 from explainaboard.utils.typing_utils import narrow
 
-DType = Union[Type[int], Type[float], Type[str], Type[dict]]
+DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
 
 
 @dataclass
@@ -52,8 +53,10 @@ class FileLoaderField:
             raise ValueError(
                 "strip_before_parsing only works with int, float and str types"
             )
-        if self.dtype not in (str, int, float, dict, None):
-            raise ValueError("dtype must be one of str, int, float, dict and None")
+        if self.dtype not in (str, int, float, dict, list, None):
+            raise ValueError(
+                "dtype must be one of str, int, float, dict, list, and None"
+            )
 
 
 class FileLoader:
@@ -106,7 +109,7 @@ class FileLoader:
             return float(data)
         elif dtype == str:
             return str(data)
-        elif dtype == dict:
+        elif dtype == list or dtype == dict:
             return data  # TODO(Pengfei): I add the `dict` type for temporal use,
             # but wonder if we need to generalize the current type mechanism,
         elif dtype is None:
@@ -125,7 +128,7 @@ class FileLoader:
                 )
             parsed_data_point["id"] = str(parsed_data_point[self._id_field_name])
 
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> list:
         """Load data from source and return an iterable of data points. It does not use
         fields information to parse the data points.
 
@@ -164,9 +167,8 @@ class TSVFileLoader(FileLoader):
             if not isinstance(field.src_name, int):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
 
-    @classmethod
     def load_raw(
-        cls, data: str | DatalabLoaderOption, source: Source
+        self, data: str | DatalabLoaderOption, source: Source
     ) -> list[list[str]]:
         data = narrow(data, str)
         if source == Source.in_memory:
@@ -192,8 +194,7 @@ class CoNLLFileLoader(FileLoader):
                 + f"({len(self._fields)} given)"
             )
 
-    @classmethod
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[str]:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> list[str]:
         data = narrow(data, str)
         if source == Source.in_memory:
             return data.splitlines()
@@ -247,8 +248,7 @@ class CoNLLFileLoader(FileLoader):
 
 
 class JSONFileLoader(FileLoader):
-    @classmethod
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> Any:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> Any:
         data = narrow(data, str)
         if source == Source.in_memory:
             return json.loads(data)
@@ -267,14 +267,39 @@ class DatalabLoaderOption:
 
 class DatalabFileLoader(FileLoader):
     @classmethod
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
+    def replace_one(cls, names: list[str], lab: int):
+        return names[lab] if lab != -1 else '_NULL_'
+
+    @classmethod
+    def replace_labels(cls, features: dict, example: dict) -> dict:
+        new_example = {}
+        for examp_k, examp_v in example.items():
+            examp_f = features[examp_k]
+            # Label feature
+            if isinstance(examp_f, ClassLabel):
+                names = cast(ClassLabel, examp_f).names
+                new_example[examp_k] = cls.replace_one(names, examp_v)
+            # Sequence feature
+            elif isinstance(examp_f, Sequence):
+                examp_seq = cast(Sequence, examp_f)
+                # Sequence of labels
+                if isinstance(examp_seq.feature, ClassLabel):
+                    names = cast(ClassLabel, examp_seq.feature).names
+                    new_example[examp_k] = [cls.replace_one(names, x) for x in examp_v]
+                # Sequence of anything else
+                else:
+                    new_example[examp_k] = examp_v
+            # Anything else
+            else:
+                new_example[examp_k] = examp_v
+        return new_example
+
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
         config = narrow(data, DatalabLoaderOption)
-        dataset = list(
-            load_dataset(
-                config.dataset, config.subdataset, split=config.split, streaming=False
-            )
+        dataset = load_dataset(
+            config.dataset, config.subdataset, split=config.split, streaming=False
         )
-        return dataset
+        return [self.replace_labels(dataset.info.features, x) for x in dataset]
 
 
 class TextFileLoader(FileLoader):

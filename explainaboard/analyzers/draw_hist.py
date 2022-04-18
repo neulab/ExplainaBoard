@@ -4,7 +4,7 @@ import os
 
 from tqdm import tqdm
 
-from explainaboard.analyzers.bar_chart import plot
+from explainaboard.analyzers.bar_chart import plot_chart_from_buckets
 
 
 def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
@@ -18,65 +18,25 @@ def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
     with open(report) as fin:
         report_dict = json.load(fin)
 
-    # read meta data from report
-    metrics = report_dict["metric_names"]
-
     fine_grained_results = report_dict["results"]["fine_grained"]
 
     # print(fine_grained_results.keys())
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
-    bar_charts = []
     for feature_name, buckets in tqdm(
         fine_grained_results.items()
     ):  # feature name, for example, sentence length
-        for m in range(
-            len(metrics)
-        ):  # each bucket_info consists of multiple sub_buckets caculated by
-            # different metrics (e.g, Accuracy, F1Score)
-            bar_chart = []
+        bucket_values = list(buckets.values())
+        bucket_metrics = [x['metric_name'] for x in bucket_values[0]['performances']]
+        for metric_id, metric_name in enumerate(bucket_metrics):
 
-            for (
-                bucket_name,
-                bucket_info,
-            ) in (
-                buckets.items()
-            ):  # the number of buckets, for example, [1,5], [5,10], [10,15], [10,]
-                """
-                the structure of sub_bucket_info
-                {
-                    "metric_name":string
-                    "value":string
-                    "confidence_score_low":Optional[float]
-                    "confidence_score_high":Optional[float]
-                    "bucket_name":List[Any]
-                    "n_samples":int
-                }
-                """
-
-                bucket_info_revised = {
-                    "n_samples": bucket_info["n_samples"],
-                    "bucket_name": bucket_info["bucket_name"],
-                    "metric_name": bucket_info["performances"][m]["metric_name"],
-                    "value": bucket_info["performances"][m]["value"],
-                    "confidence_score_low": bucket_info["performances"][m][
-                        "confidence_score_low"
-                    ],
-                    "confidence_score_high": bucket_info["performances"][m][
-                        "confidence_score_high"
-                    ],
-                }
-
-                bar_chart.append(bucket_info_revised)
-            bar_charts.append(bar_chart)
-
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-
-            plot(
-                bar_chart,
-                save_path=output_dir + "/" + feature_name + "_" + metrics[m] + ".png",
+            plot_chart_from_buckets(
+                buckets,
+                metric_id,
+                save_path=f'{output_dir}/{feature_name}_{metric_name}.png',
                 x_label=feature_name,
-                y_label=metrics[m],
+                y_label=metric_name,
             )
 
 

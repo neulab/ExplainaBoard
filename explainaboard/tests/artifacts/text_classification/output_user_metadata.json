@@ -7,25 +7,25 @@
   },
   "predictions": [
     {
-      "predicted_label": "0"
+      "predicted_label": "negative"
     },
     {
-      "predicted_label": "1"
+      "predicted_label": "positive"
     },
     {
-      "predicted_label": "0"
+      "predicted_label": "negative"
     },
     {
-      "predicted_label": "0"
+      "predicted_label": "negative"
     },
     {
-      "predicted_label": "0"
+      "predicted_label": "negative"
     },
     {
-      "predicted_label": "0"
+      "predicted_label": "negative"
     },
     {
-      "predicted_label": "1"
+      "predicted_label": "positive"
     }
   ]
 }
