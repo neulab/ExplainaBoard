@@ -39,7 +39,7 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
-    # @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
+    @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_textpair_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
