@@ -1,0 +1,6878 @@
+[
+  {
+    "predicted_answers": {
+      "text": "The girl was not down-to-earth at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was not down-to-earth at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's room was a total mess.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's room was very clean.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The view was very clear.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The view as obstructed and not clear.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "World peace is an unattainable ideal",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "World peace is an unattainable ideal",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her greeting was affectionate and genuine.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her greeting was affectionate and genuine.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The test was hard.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The test was easy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The view was beautiful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The view was ugly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a lot of money",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a lot of money",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The conversation is boring",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The conversation is boring",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The football player put forth a ton of effort.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The football player put forth a ton of effort.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the cat was in good shape",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the cat was in bad shape",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her waist is really wide.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her waist is really wide.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pass was very fast and direct",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pass was very fast and direct",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's dress pattern was highly uniform.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's dress pattern was highly uniform.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The illusion is not convincing at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The illusion is not convincing at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog snores loudly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog snores loudly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a bad attitude",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a bad attitude",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It was slow",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It was fast",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The groom was happy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The groom was happy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "do not let one bad thing ruin your whole day",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "do not let one bad thing ruin your whole day",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The butler had poor posture.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The butler had good posture",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The music was loud",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The music was loud",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The city was very big.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The city was very small.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog barked loudly.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog barked loudly.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pills are very chalky",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pills are very chalky",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The jumper didn't jump high.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The jumper didn't jump high.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie was scary",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie was scary",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The problem was small.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The problem was big.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it's god like",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it's god like",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It is a learning experience",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It is a learning experience",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl doesn't have any grace.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl doesn't have any grace.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is brave.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is not brave.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her eyes made him feel uncomfortable.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her eyes were comforting.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gambling at the casino was boring",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gambling at the casino was boring",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is stupid.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is a genius.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her dress was not flattering.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her dress was beautiful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl treats her friends poorly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl treats her friends poorly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He didn't really have a temper.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He didn't really have a temper.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The job was terrible.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The job was fun.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the jokes were bad",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the jokes were bad",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the dress was ugly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the dress was ugly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His mother disrespected him",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His mother disrespected him",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bowl was valuable",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bowl was worthless",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The mother's soup was very nasty",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The mother's soup was very nasty",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bowl is very durable",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bowl is very durable",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was an angry person.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was an angry person.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The list was short.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The list was short.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The child is cold and un-loving.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The child is very loving.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The plot of the show isn't clear at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The plot of the show is very clear.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The building was big",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The building was small",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There's a lot of room",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There's a lot of room",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The flea medication is ineffective.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The flea medication is efficacious.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Each link was huge",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Each link was tiny",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He writes well",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He writes badly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The table was old",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The table was young",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Raising a teenager is a pleasant surprise",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Raising a teenager is a pleasant surprise",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Raising a puppy is really tough.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Raising a puppy is pleasant and easy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Owning a cat is not pleasant.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Owning a cat is not pleasant.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My professor's lecture is so boring that it puts me to sleep.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My professor's lecture is so boring that it puts me to sleep.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hyperlink doesn't work",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hyperlink doesn't work",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hospital mattress was very hard.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hospital mattress was very soft.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The classroom was quiet.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The classroom was quiet.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her dress was brightly colored.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her dress was brightly colored.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sadness was large",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sadness was small",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Comedy is good",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Comedy is bad",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The disease is not serious",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The disease is very serious",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is tired",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is tired",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is excited",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is tired",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her voice was beautiful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her voice was beautiful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl has a steady temperament.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl has a steady temperament.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sound of her violin is terrible.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sound of her violin is smooth.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car was fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car was slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it was calm",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it was calm",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl lies all the time.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl lies all the time.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl has a boring personality.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl has a bubbly personality.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's practically unbreakable",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's practically unbreakable",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The football player was clumsy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The football player was clumsy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The NHL player was sloppy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The NHL player was careful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Reading the comic was very exciting",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Reading the comic was very boring",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He wasn't energized at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He wasn't energized at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The contract was very short.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The contract was very short.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He plays badly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He plays well",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he was embarrassed",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he was embarrassed",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Joe was not very hungry because he had so much to do",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Joe was not very hungry because he had so much to do",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The family was very rich",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The family was very poor",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The spa is enjoyable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The spa is enjoyable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The football player is a klutz.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The football player is a klutz.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's very moist",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's very moist",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Winning this game is close to impossible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Winning this game is close to impossible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it is a lot",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it is cheap",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Defeating the dark lord would be very difficult.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Defeating the dark lord would be very easy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He dove well.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He dove poorly, and sank as he hit the water.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's very bright.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's very bright.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The weightlifter is weak.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The weightlifter is weak.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The math test was complicated.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The math test was complicated.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The clothing smells pleasant",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The clothing smells awful",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pot roast is very tender.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pot roast is very tender.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It was flimsy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It was flimsy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His belly is large",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His belly is large",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he was nice",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he was mean",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His thinking is rigid and mathematical.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His thinking is frenetic and open.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He awoke slowly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He awoke slowly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her eyes were bright and shiny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her eyes were bright and shiny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was deadly.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was totally harmless.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The linebacker is tough and can hold his ground.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The linebacker is tough and can hold his ground.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the man is timid",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the man is courageous",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the light is dim",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the light is dim",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The marriage was getting old.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The marriage was new.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bath was very hot",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bath was very hot",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The play was good and successful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The play was terrible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cougar is quite dangerous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cougar is quite dangerous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat had a strong meow",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat's meow was weak",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is very stylish and hip.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is very stylish and hip.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The poem wasn't romantic at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The poem wasn't romantic at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His style is so old-fashioned.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His style is so old-fashioned.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This football game is full of action.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This football game is full of action.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His style is out of date.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His style is up to date.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He feels a lot of love",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He feels a lot of love",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The rat is very slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The rat is very slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The flowers have a good scent",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The flowers have an awful scent",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Love is terrible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Love is terrible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her morals were inflexible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her morals were inflexible",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party is popping",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party is popping",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He entered quietly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He entered quietly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair was red.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair was blonde.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cop used a lot of pressure.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cop used a lot of pressure.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The singer sounded good.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The singer sounded bad.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "You have no money",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "You have no money",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat's tail was fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat's tail was slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sisters did not mix well with each other.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sisters did not mix well with each other.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His love was straight and true.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His love was straight and true.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I am a freak",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I am a freak",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl doesn't want any attention.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl doesn't want any attention.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The doctor is cold and unfeeling.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The doctor is cold and unfeeling.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is only weakly devoted to her family.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is only weakly devoted to her family.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her writing skill is poor.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her writing skill is poor.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was very passionate.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was not passionate.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The chemicals were stable.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The chemicals were stable.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The victory was very hard-fought.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The victory was very hard-fought.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gun was powerful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gun was weak.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the boy was pure",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the boy was evil",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the pants were messed up",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the pants were well put togther",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is short",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is short",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That surface is smooth",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That surface is rough",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It is tall",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It is tall",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tactic is simple, easy to figure out",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tactic is simple, easy to figure out",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The job is difficult",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The job is quite easy and almost everyone can do it",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The win wasn't satisfying at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The win wasn't satisfying at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The blimp was very light",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The blimp was very light",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The picture was clear",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The picture was hard to see",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book was easy to read.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book was easy to read.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he's cute",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he's ugly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is exciting",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is boring",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it is mean",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "it is mean",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was dedicated.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was undedicated.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is very courageous and brave",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is scared",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dancer landed her jump gracefully.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dancer landed her jump gracefully.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The teacher's grading policy was very flexible.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The teacher's grading policy was very rigid.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Dinner smelled good.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Dinner smelled bad.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bottle was rare",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bottle was rare",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The toddler's cries were loud.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The toddler's cries were quiet.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man's addiction isn't very bad",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man's addiction isn't very bad",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The camel is flat and lacks humps",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The camel is flat and lacks humps",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not sturdy, in fact he's easily knocked down.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not sturdy, in fact he's easily knocked down.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair had a lot of volume.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair had a lot of volume.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the room is spotless",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the room is filthy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the water is clean",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the water is clean",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The math test was very difficult.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The math test was very difficult.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The knife is dull",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The knife is sharp",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bottle was thin.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bottle was thin.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is very moral",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is very moral",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had a lot of fear",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had a lot of fear",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The coffee is not hot",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The coffee is not hot",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The song has a beautiful melody.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The song has a beautiful melody.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog is fearless and unbothered.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog is fearless and unbothered.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boss was even-tempered.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boss was even-tempered.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There\u2019s no one at the church",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The church has many visitors",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It\u2019s quite deep",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It\u2019s shallow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She sings well",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She can't sing",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I'm tired",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I'm tired",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's not at all red",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's not at all red",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was very handsome",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was ugly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gem was bright and shiny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gem was dark and dull",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The CEO is honest",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The CEO is honest",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The photography is unattractive.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The photography is very attractive.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This actor is not dynamic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This actor is not dynamic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The golfer is inaccurate.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The golfer is highly accurate.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The floor is dull, not shiny at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The floor is dull, not shiny at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her boyfriend doesn't treat her well.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her boyfriend treats her very well.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The army protected the country.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The army protected the country.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She has no artistic skills.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She has no artistic skills.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The line moves slowly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The line moves slowly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is sneaky.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is honest.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a lot of money",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a lot of money",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat was docile",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat was docile",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I am irritated",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I am calm",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The choir boy had good vocals.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The choir boy had poor vocals.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The student was unintelligent.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The student was unintelligent.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog is big",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dog is tiny",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It uses a lot of power",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It uses a lot of power",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The structure will not last long.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The structure will not last long.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fireworks were loud",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fireworks were quiet",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was skillful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was skillful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His drive home was not nice.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His drive home was not nice.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The well water is pure and drinkable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The well water is pure and drinkable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The soup wasn't spicy at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The soup wasn't spicy at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "JON IS A KNOWLEDGEABLE PERSON.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "JON IS A KNOWLEDGEABLE PERSON.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "To her, facts are confusing and hard to navigate in.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "To her, facts are confusing and hard to navigate in.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The facts were obvious.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The facts were obscure.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The conductor is careful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The conductor is sloppy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie has a lot of mystery to it.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie has a lot of mystery to it.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The film wasn't impressive at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The film wasn't impressive at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The storm was loud.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The storm was quiet.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her skin is smooth",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her skin is smooth",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Most Americans are as awake as an adrenaline filled runner.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Most Americans are as asleep as old people who are tired frequently.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her skin was red and splotchy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her skin was red and splotchy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's completely unconscious",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's completely unconscious",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The woman was fat.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The woman was fat.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They are madly in love",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They are madly in love",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The painter is forceful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The painter is gentle",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The painting is tacky and commercial",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The painting is tacky and commercial",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person is very cold.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person is cold, but used to it and thriving",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It is well thought out and systematic",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It is well thought out and systematic",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She wasn't very honest.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She wasn't very honest.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl is slow.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl is fast.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The child lacks energy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The child is energetic.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His argument is weak.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His argument is weak.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Matt's girlfriend is fast.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Matt's girlfriend is fast.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had a lot of energy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had a lot of energy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His movements were not graceful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His movements were not graceful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The beach was not very serene.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The beach was not very serene.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was lucky.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was lucky.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The woman's back is wavy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The woman's back is straight.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dirt road is straight.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The dirt road is straight.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man's toe is bent.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man's toe is straight.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My mind is full of thoughts.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My mind is full of thoughts.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is unapproachable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is unapproachable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the wind was very strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wind was very soft",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's quite rational",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's quite rational",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The art is superficial.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The art is profound.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book was easy to finish.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book was easy to finish.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car's engine runs rough",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car's engine runs smooth",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wind was light.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wind was heavy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl is really shallow.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl has a lot of layers to her.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was plain-looking.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was plain-looking.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not ready at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not ready at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pool is very very deep.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pool is very very deep.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's muscular and strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's flimsy and weak",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is slow.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is slow.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is repetitive.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is original.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat food smells awful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat food smells delicious.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her room was very messy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her room was very clean.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He doesn't hustle at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He doesn't hustle at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The employee was frazzled with work.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The employee had nothing to do.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "We're headed to danger.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "We're headed to safety.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The horse is attractive.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The horse is unattractive.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The food looks terrible",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The food looks amazing",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man is weak",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man is strong",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The painter is deeply talented",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The painter is deeply talented",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was not worth much to him.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was not worth much to him.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair was strong as metal.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair was brittle.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The auditorium had no people in it.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The auditorium had tons of people in it.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has really big feet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has small feet",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His abs were soft.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His abs were hard.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His bathroom was filthy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His bathroom was spotless",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The accountant was intelligent.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The accountant was stupid.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I can't think clearly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I can't think clearly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He does not have a lot of anger.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He does not have a lot of anger.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The worker has little discipline",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The worker has little discipline",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My colleague's project is very rudimentary.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My colleague's project is very sophisticated.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He worked quickly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He worked slowly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sky is bright and clear.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sky is bright and clear.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The concert was very unpleasant",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The concert was quite pleasant",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was very strong.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was very weak.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The play had a depth of meaning, was both poetic and entertaining, and had the quality of something that would last.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The play had a depth of meaning, was both poetic and entertaining, and had the quality of something that would last.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The album was very popular and achieved great success.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The album was not popular and achieved very little success.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The track was very slippery.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The track was very slippery.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wedding was very splashy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wedding was very ordinary.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The event was very fancy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The event was very fancy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He doesn't float at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He doesn't float at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They don't go together at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They don't go together at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His life was rich and fulfilling",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His life was dull",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sweater had many stripes",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sweater had many stripes",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "they are smart",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "they aren't very intelligent",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was not very smart",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was not very smart",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her voice is terrible",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her voice is lovely",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Time moves quickly.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Time moves slowly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He punched hard",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He punched softly",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is beautiful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is beautiful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The house wasn't clean at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The house wasn't clean at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's career skyrocketed.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's career stagnated.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was very well-respected.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was very well-respected.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The table is bumpy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The table is smooth.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The highway is winding.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The highway is straight.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car is elegant.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car is clunky.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The project is unlikeable",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The project is likeable",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was feeling right",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was feeling right",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hamburger is heavy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hamburger is light",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is sad",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is funny",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The memoir was very entertaining",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The memoir was boring",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The project is very simple",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The project is very complicated",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The game is boring",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The game is exciting",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The preacher has an unpleasant voice.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The preacher has an impressive voice.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The food had a bad smell",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The food had a good smell",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The things she said were noisy and random",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The things she said or did were methodical and calculating.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sex was fantastic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sex was fantastic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The businessman went all out in negotiations.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The businessman went all out in negotiations.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is thought provoking.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is thought provoking.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is epic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is epic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Jeremy could not drink a lot.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Jeremy could not drink a lot.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "he is small and fearful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is big and brave.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book is colorful",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book is dull and lacks color",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The plane seat area is cramped.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The plane seat area is comfortable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The lawn mower doesn't work well.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The lawn mower doesn't work well.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pop song was upbeat and catchy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pop song was slow.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The school was full of slow, lethargic children.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The school was full of slow, lethargic children.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The writer is very quiet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The writer is very quiet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "George ran fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "George ran slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is profound",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is profound",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gymnast was clumsy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gymnast was graceful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her presence at the wedding was very expected",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her presence at the wedding was very expected",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The court trial is very fair.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The court trial is very fair.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His new job is very easy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His new job is very easy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The meal was invigorating",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The meal was invigorating",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The high school student doesn't have much on her to-do list.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The high school student doesn't have much on her to-do list.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the judge is rigorous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the judge is relaxed",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car has lots of power.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car has lots of power.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wave is loud.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The wave is quiet.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car is fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car is slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "To the audience, Sara's speech was hurtful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "To the audience, Sara's speech was pleasant.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Legal professions are exciting",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Legal professions are exciting",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She's very angry",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She's very angry",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He isn't good at swimming",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He isn't good at swimming",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My sister is smart",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My sister is not smart",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's wet.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's dry.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The actor is very well known",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The actor is not very well known",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Fame lasts a long time",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Fame lasts a long time",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "You have no idea why old friends contact you",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "You have no idea why old friends contact you",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was really happy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was really happy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party lasted a short amount of time",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party lasted a short amount of time",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man's sneeze was unmistakably noticeable.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man's sneeze was undetected.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sixth grader's homework assignment was very difficult to complete.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sixth grader's homework assignment was very difficult to complete.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His anger was very well hidden",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His anger was very well hidden",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party was large and full of excitement",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party was large and full of excitement",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The room was cold",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The room was hot",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was vivacious.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was vivacious.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was laidback.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was laidback.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The chair was unstable.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The chair was stable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book was boring.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book was profound.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He moved in a light, graceful way.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He moved in a clumsy, heavy way.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is really efficient and thinks in a straightforward way.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is really efficient and thinks in a straightforward way.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Jeremy was comforting.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Jeremy was comforting.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had little class",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had little class",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was warm.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was cold.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It was melodious.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It was melodious.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The kids don't have any energy at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The kids don't have any energy at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His nose is good looking",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His nose is good looking",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The game is fairly challenging",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The game lacks challenge",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book is boring.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book is profound.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was wise.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was ignorant.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The meaning was clear",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The meaning was clear",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car had a lot of shine.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car had a lot of shine.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cake is moist",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cake is dry",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His father was not reliable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His father was not reliable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is clumsy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is graceful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tea was warm",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tea was cold",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tea was strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tea was pleasant to drink",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was not sleepy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was not sleepy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This guy is bland and boring, with no appeal.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This guy is incredibly appealing to the point of being legendary.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ball is bouncy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ball is not bouncy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ball is bouncy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ball is not bouncy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat is aggressive",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cat is meek",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He talks really fast.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He talks really fast.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My house is loud.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My house is quiet.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The razor can barely cut at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The razor can barely cut at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The lion has a lot of pouncing ability",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The lion has a lot of pouncing ability",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ball is large and red.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ball is small.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The giraffe was tall",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The giraffe was short",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is timid.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is fearless.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is colorful and fun",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is colorful and fun",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was skinny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was skinny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My friend would take a secret to the grave.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My friend would take a secret to the grave.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The professor is stupid.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The professor is intelligent.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car ride was very bumpy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car ride was very bumpy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Jane was a comforting friend.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Jane was a comforting friend.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The architect's building design was a masterpiece",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The architect's building design was a masterpiece",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I was famished.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "I was famished.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The light was bright",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The light was dark",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl isn't reliable at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl isn't reliable at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not productive at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not productive at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tap dancer was clumsy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tap dancer was graceful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is very exciting",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is very exciting",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The blanket provides a lot of warmth",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The blanket provides a lot of warmth",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "School is rowdy and entertaining",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "School is rowdy and entertaining",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's facial expression was obvious.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's facial expression was obvious.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book plot was very straightforward.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book plot was very straightforward.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gambler was lucky",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gambler was lucky",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The lion's roar is loud",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The lion's roar is loud",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The washing machine leaves behind a lot of filth",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The washing machine cleans very well",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Love is trash.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Love is beautiful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The woman is ugly.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The woman is beautiful.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The office environment was full of life.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The office environment was full of life.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She swam very well.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She swam very well.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He wasn't smooth at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He wasn't smooth at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gossip was entertaining",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The gossip was entertaining",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cake is dry",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The cake is dry",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ice cream is bland",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The ice cream is bland",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The poem flowed smoothly and was easy to follow along with.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The poem had a clunky feel to it and was not smooth to follow.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The diamond on the engagement ring is huge.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The diamond on the engagement ring is huge.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Inflation is very high.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Inflation is very low.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The villain is hideous.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The villain is gorgeous.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bag is heavy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bag is light",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hero was strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The hero was not strong",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's voice was very bubbly.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's voice was flat and monotonous.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book's plot was all over the place.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book's plot was all over the place.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car is fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car is slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not very country at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not very country at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her eyes were a clear blue",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her eyes were a clear blue",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The officer is well trained",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The officer is well trained",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not very villainous",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He's not very villainous",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The driveway is bumpy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The driveway is bumpy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The road is muddy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The road is icy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was very smart and had a lot of good ideas.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was very smart and had a lot of good ideas.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The toothbrush is very firm",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The toothbrush is very firm",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The director is stupid",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The director is intelligent",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a really good attention span.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His attention span is nonexistent.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The speaker hates their depression but has not had to deal with it in a while.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The speaker hates their depression but has not had to deal with it in a while.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's very loud",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It makes no noise at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Everyone in the room was aware of his depression and getting warning signs from it.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Everyone in the room was aware of his depression and getting warning signs from it.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "you are very skinny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "you are very skinny",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The process is simple",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The process is simple",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That guys voice is unpleasant",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That guys voice is pleasant",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The night was very rowdy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The night was very rowdy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is cold and heartless",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is cold and heartless",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her sight is excellent",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her sight is excellent",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His life lasted only a short amount of time.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His life lasted only a short amount of time.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sculptor is careful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The sculptor is sloppy.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The security team is very effective",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The security team is very effective",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The mall was expansive.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The mall was cramped.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The chocolate cake is light.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The chocolate cake is dense.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a flat and boring personality.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He has a sweet and friendly personality.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie plot was convoluted",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie plot was convoluted",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This guy is nice",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This guy is nice",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The night sky was pitch black.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The night sky was very light.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My wife is a terrible cook.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My wife is an excellent cook.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My sister is very graceful when she's busy working.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My sister is very clumsy and awkward while she works.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party was very boring.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The party was really fun.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The military is not organized at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The military is not organized at all.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Their family is combative",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Their family is helpful",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The student's performance was great.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The student's performance was lackluster.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl found herself overflowing with love.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl found herself surrounded by death.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He runs fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is a slow runner",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The running dog is man's best friend",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The running dog is man's best friend",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book shows psychological depth, lyrical poetry, and appeal of a classic work of literature.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The book is simplistic and amateurish.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had no moral values.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He had a tremendous amount of moral values.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is long.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is short.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is not charming.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is charming.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's life was full of drama.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl's life was full of drama.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "George was very focused",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "George was very focused",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His ideas are large",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "His ideas are small",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The board game requires a lot of strategy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The board game requires a lot of strategy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The food has a ton of flavor",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The food has a ton of flavor",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The house is flimsy, and could fall apart easily.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The house is flimsy, and could fall apart easily.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The assignment was easy to understand.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The assignment was easy to understand.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My house is elegant and proud.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "My house is a mess.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The couch is hard",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The couch is soft",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man is stupid",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man is smart",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car was fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car was slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was very inconspicuous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was very inconspicuous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The quarterback put forth great effort",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The quarterback put forth great effort",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Democrats and Republicans do not get along.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Democrats and Republicans do not get along.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person is unkind.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person is unkind.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The song is superficial",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The song is superficial",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her voice is annoying",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her voice is soothing",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person's presence has no value.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person's presence has no value.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tower is very short",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tower is extremely tall",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The phone is very quiet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The phone is very quiet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is very slow.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The boy is very slow.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The desktop was bumpy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The desktop was smooth.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That man is not deep at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That man is not deep at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Things around there are not orderly at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Things around there are not orderly at all.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person has a great memory.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The person has a great memory.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pillow was soft",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pillow was soft",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was someone who couldn't be trusted",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was someone who couldn't be trusted",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is mean",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is mean",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl left a huge impact.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl left a huge impact.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The complex is strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The complex has a noticeable weak point",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man is stupid.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man is smart.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Cats are friendly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Cats are friendly.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The critic's review was negative and bad",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The critic's review was good and full of praise",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The group worked slowly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The group worked slowly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The teacher was inventive, at the forefront of her occupation, and highly successful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The teacher was inventive, at the forefront of her occupation, and highly successful.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They get along really well.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They get along really well.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The individuals are homogenous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The individuals are homogenous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pudding is not at all edible",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pudding is not at all edible",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The grass was healthy and bright green",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The grass was healthy and bright green",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was healthy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The man was not healthy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the air was hot and humid",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the air was hot and humid",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was sad",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was happy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The panda is very spotted",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The panda is very spotted",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tree was old",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tree was young",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This life is filled with good and bad things, happy and sad moments.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This life is filled with good and bad things, happy and sad moments.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Chess is very easy.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Chess is very hard.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The park is disgusting.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The park is disgusting.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl was slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pizza was enormous.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pizza was tiny.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's clean as can be",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's clean as can be",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Love cannot always be explained (in a good way)",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Love is trouble",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fruit isn't blue at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fruit isn't blue at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her garden was teeming with life.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her garden was filled with dead plants.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl is very knowledgeable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The girl is very knowledgeable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This place is friendly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This place is unfriendly and hostile",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He didn't have much energy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He didn't have much energy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was precise in his way of cooking.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He was bad at cooking.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The episode is boring.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The episode is boring.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The actor's skin is bumpy and flaky.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The actor's skin is smooth.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fan has poor circulation.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fan circulates efficiently.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The enemy is menacing.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The enemy is nonthreatening.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The deceit was large",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The deceit was small",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie was long",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie was short",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Inflation has gotten out of control.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Inflation has gotten out of control.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There aren't that many interns.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There aren't that many interns.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car ride is smooth and soothing",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The car ride is bumpy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That book was boring and tedious",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "That book was a fun adventure",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was dull at the best of times.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was dull at the best of times.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This song is fast",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This song is slow",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fortress was easily breached.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fortress was easily breached.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The horse has lots of endurance.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The horse has lots of endurance.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The opera's plot has many holes.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The opera's plot has many holes.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fortress is large",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fortress is small",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bag is extremely heavy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bag is extremely heavy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This place is so hot it could burn you",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "This place is so hot it could burn you",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair is dry and lifeless",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her hair is dry and lifeless",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The temperature is extremely hot",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The temperature is extremely hot",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tree is not tall at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The tree is not tall at all",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The departmental store manager is unfriendly, cruel and unkind",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The departmental store manager is unfriendly, cruel and unkind",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The old woman was feisty, fiery, energetic, kinetic.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The old woman was still and unmovable.",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "brain is hypersensitive and connects many things.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "brain is hypersensitive and connects many things.",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is quiet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He is quiet",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The water is very clear",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The water is very clear",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Riding a motorcycle is very dangerous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Riding a motorcycle is very dangerous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fortress was very strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The fortress was very strong",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They don't give up anything easily",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "They don't give up anything easily",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The war was not fun, hard, and mind-numbing",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The war was not fun, hard, and mind-numbing",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is weak",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is strong",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's a very loud and deep laugh",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "It's a very loud and deep laugh",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The planning was easy and without issue",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The planning was easy and without issue",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He will be back quickly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He will be back quickly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was committed",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was uncommitted",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The crowd was unenthusiastic",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The crowd was unenthusiastic",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pilot flew in a creative way",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The pilot flew in a creative way",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "People were intimidated by him",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "People were intimidated by him",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The venture was innovative",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The venture was unsuccessful",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was intelligent",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She was unintelligent",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Vanity destroys reason",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Vanity destroys reason",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is profound",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The movie is profound",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Novices can succeed sometimes",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Novices can succeed sometimes",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "You can't change the future",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "You can't change the future",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bar is far away",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The bar is far away",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He did not pay attention",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "He did not pay attention",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There were many submissions",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "There were many submissions",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is dimwitted",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is dimwitted",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The software is well protected",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "the software is messy",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her gaze is focused",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Her gaze is focused",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The argument was sound",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The argument was sound",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is unintelligent",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "She is intelligent",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Electrons orbit the nucleus",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Electrons orbit the nucleus",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Blood is flowing smoothly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Blood is flowing smoothly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Chromosomes are messy",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "Chromosomes are well organized",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The reaction happened all at once",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The reaction happened all at once",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The camera has multiple lenses",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The camera has multiple lenses",
+      "option_index": 1
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The current is continuous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The current is continuous",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The reaction is orderly",
+      "option_index": 0
+    }
+  },
+  {
+    "predicted_answers": {
+      "text": "The reaction is disorderly",
+      "option_index": 1
+    }
+  }
+]

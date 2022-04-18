@@ -5,13 +5,9 @@
         "question": "How many points did the Panthers defense surrender?",
         "answers":
           {
-            "answer_start": 470,
-            "text": "136"
+            "answer_start": 34,
+            "text": "308"
           }
-        ,
-        "predicted_answers": {
-            "text": "The girl was not down-to-earth at all."
-        }
     },
     {
         "id": "1",
@@ -19,13 +15,9 @@
         "question": "How many career sacks did Jared Allen have?",
         "answers":
           {
-            "answer_start": 789,
-            "text": "118"
+            "answer_start": 470,
+            "text": "136"
           }
-        ,
-        "predicted_answers": {
-            "text": "118"
-        }
     },
     {
         "id": "3",
@@ -36,10 +28,6 @@
             "answer_start": 140,
             "text": "four"
           }
-        ,
-        "predicted_answers": {
-            "text": "four"
-        }
     },
     {
         "id": "4",
@@ -50,10 +38,6 @@
             "answer_start": 192,
             "text": "Kawann Short"
           }
-        ,
-        "predicted_answers": {
-            "text": "Kawann Short"
-        }
     },
     {
         "id": "5",
@@ -64,9 +48,5 @@
             "answer_start": 124,
             "text": "24"
           }
-        ,
-        "predicted_answers": {
-            "text": "24"
-        }
     }
 ]

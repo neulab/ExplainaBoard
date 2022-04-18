@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from typing import Any
 
+from datalabs import aggregating
 from eaas.async_client import AsyncClient
 import numpy as np
 from tqdm import tqdm
@@ -19,6 +20,7 @@ from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
@@ -498,3 +500,9 @@ class ConditionalGenerationProcessor(Processor):
             bucket_name_to_performance[bucket_interval] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
+
+    @aggregating()
+    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
+        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+            samples, lambda x: x['reference'], tokenizer
+        )

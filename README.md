@@ -15,7 +15,7 @@
   <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
   <a href="https://pypi.org/project//"><img alt="PyPI" src="https://img.shields.io/pypi/v/explainaboard" /></a>
   <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-  <a href=".github/workflows/ci.yml"><img alt="Integration Tests", src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
+  <a href=".github/workflows/ci.yml"><img alt="Integration Tests" src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
 </p>
 
 ## What is ExplainaBoard?
@@ -37,11 +37,11 @@ How do you get started?
 
 1. *Browse Outputs Online*: We provide an [online interface](http://explainaboard.nlpedia.ai/) where you can browse and understand outputs from various state-of-the-art systems.
 2. *Upload Your Own Outputs*: You can also [upload your own system outputs](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) through the online interace, and we will process them so you can view them alongside other systems.
-3. *Run Your Own Analyses Offline*: You can follow the installation instructions below to run analyses on your own system data offline. We also plan to [support command-line upload to the web interface](https://github.com/neulab/ExplainaBoard/issues/60) soon!
+3. *Run Your Own Analyses Offline*: You can follow the installation instructions below then view [CLI instructions for supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md). We also plan to [support command-line upload to the web interface](https://github.com/neulab/ExplainaBoard/issues/60) soon!
+4. *Access ExplainaBoard Programmatically*: ExplainaBoard can also be [accessed programmatically](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md) through a library.
 
 
 ## Web-based Toolkit
-
 
 We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks and will be more,
 40 datasets and 300 systems. Detailed information is as follows.
@@ -78,54 +78,13 @@ pre-commit install
         - `# noqa` signals flake8 to ignore the current line. (`flake8: noqa` ignores the current file.)
         - lines between `# fmt: on` and `# fmt: off` are skipped by black. 
 
-Then, you can run following examples via bash
-
-
-### Example for CLI
-
-* text-classification:
-```shell
-# datalab dataset
-explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt --dataset sst2
-
-# custom dataset
-explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt --custom_dataset_paths ./data/system_outputs/sst2/sst2-dataset.tsv
-```
-See detailed [description](https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.md) and 
-more [supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md).
-
-
-### Example for Python SDK
-
-```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
-# using a dataset we provide (datalab)
-loader = get_datalab_loader(
-    TaskType.text_classification,
-    dataset=DatalabLoaderOption("sst2"),
-    output_data="./explainaboard/tests/artifacts/text_classification/output_sst2.txt",
-    output_source=Source.local_filesystem,
-    output_file_type=FileType.text,
-)
-data = loader.load()
-processor = get_processor(TaskType.text_classification)
-analysis = processor.process(metadata={}, sys_output=data)
-analysis.write_to_directory("./")
-
-# using a custom dataset
-dataset = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
-output = "./explainaboard/tests/artifacts/summarization/output.tsv"
-loader = get_custom_dataset_loader(TaskType.summarization, dataset=dataset, output=output)
-data = loader.load()
-processor = get_processor(TaskType.summarization)
-analysis = processor.process(metadata={}, sys_output=data)
-analysis.write_to_directory("./")
-
-
-```
+Then, you can perform analyses on your favorite tasks.
 
 
 ## Acknowledgement
+
+ExplainaBoard is developed by Carnegie Mellon University, Inspired Cognition Inc., and other collaborators.
+
 We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
 Colin Raffel, Yang Liu, Li Dong. We also thank
 Vijay Viswanathan, Yiran Chen, Hiroaki Hayashi for useful discussion and feedback about ExplainaBoard.
