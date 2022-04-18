@@ -148,6 +148,7 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    @unittest.skip(reason='metaphor QA dataset is temporarily unavailable')
     def test_multichoiceqa_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
