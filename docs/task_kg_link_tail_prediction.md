@@ -215,6 +215,12 @@ In some situation, users aim to specify the bucket order according to their need
             "sort_ascending": False,
         }
 
+        # if system outputs have user-defined features, update metadata before passing to processor
+        metadata.update(loader.user_defined_metadata_configs)  
+        metadata[
+            "user_defined_features_configs"
+        ] = loader.user_defined_features_configs
+
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
         sys_info = processor.process(metadata, data)
 ```
@@ -269,6 +275,12 @@ The value of K in `Hits` metric could also be specified by users when needed. Be
             "sort_by": "n_bucket_samples",
             "sort_ascending": False,  # buckets with many samples appear first
         }
+
+        # if system outputs have user-defined features, update metadata before passing to processor
+        metadata.update(loader.user_defined_metadata_configs)  
+        metadata[
+            "user_defined_features_configs"
+        ] = loader.user_defined_features_configs
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
