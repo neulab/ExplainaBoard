@@ -25,7 +25,7 @@ def get_statistics_path(dataset_name: str, subset_name: str | None = None) -> st
             'dataset names cannot contain slashes:'
             f'dataset_name={dataset_name}, subset_name={subset_name}'
         )
-    file_name = 'stats.json' if subset_name is None else 'stats-{subset_name}.json'
+    file_name = 'stats.json' if subset_name is None else f'stats-{subset_name}.json'
     return os.path.join(get_cache_dir(), dataset_name, file_name)
 
 
