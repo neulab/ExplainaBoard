@@ -5,9 +5,10 @@ import csv
 from dataclasses import dataclass
 from io import StringIO
 import json
-from typing import Any, final, Optional, Type, Union
+from typing import Any, cast, final, Optional, Type, Union
 
 from datalabs import load_dataset
+from datalabs.features.features import ClassLabel
 
 from explainaboard.constants import Source
 from explainaboard.utils.typing_utils import narrow
@@ -140,7 +141,7 @@ class FileLoader:
                 )
             parsed_data_point["id"] = str(parsed_data_point[self._id_field_name])
 
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> list:
         """Load data from source and return an iterable of data points. It does not use
         fields information to parse the data points.
 
@@ -179,9 +180,8 @@ class TSVFileLoader(FileLoader):
             if not isinstance(field.src_name, int):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
 
-    @classmethod
     def load_raw(
-        cls, data: str | DatalabLoaderOption, source: Source
+        self, data: str | DatalabLoaderOption, source: Source
     ) -> list[list[str]]:
         data = narrow(data, str)
         if source == Source.in_memory:
@@ -207,8 +207,7 @@ class CoNLLFileLoader(FileLoader):
                 + f"({len(self._fields)} given)"
             )
 
-    @classmethod
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[str]:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> list[str]:
         data = narrow(data, str)
         if source == Source.in_memory:
             return data.splitlines()
@@ -262,8 +261,7 @@ class CoNLLFileLoader(FileLoader):
 
 
 class JSONFileLoader(FileLoader):
-    @classmethod
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> Any:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> Any:
         data = narrow(data, str)
         if source == Source.in_memory:
             return json.loads(data)
@@ -281,31 +279,26 @@ class DatalabLoaderOption:
 
 
 class DatalabFileLoader(FileLoader):
-    def __init__(
-        self,
-        fields: list[FileLoaderField] = None,
-        use_idx_as_id: bool = True,
-        id_field_name: Optional[str] = None,
-    ):
-        super().__init__(
-            fields=fields, use_idx_as_id=use_idx_as_id, id_field_name=id_field_name
-        )
-        self._labels = None
+    @staticmethod
+    def replace_labels(features: dict, example: dict) -> dict:
+        new_example = {}
+        for examp_k, examp_v in example.items():
+            examp_f = features[examp_k]
+            if isinstance(examp_f, ClassLabel):
+                examp_cl = cast(ClassLabel, examp_f)
+                new_example[examp_k] = (
+                    examp_cl.names[examp_v] if examp_v != -1 else '_NULL_'
+                )
+            else:
+                new_example[examp_k] = examp_v
+        return new_example
 
-    def get_label_str(self, label_int: int) -> str:
-        if label_int == -1:
-            return '_NULL_'
-        if self._labels is None:
-            raise ValueError('attempted to get label string without setting labels')
-        return self._labels[label_int]
-
-    @classmethod
-    def load_raw(cls, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
+    def load_raw(self, data: str | DatalabLoaderOption, source: Source) -> list[dict]:
         config = narrow(data, DatalabLoaderOption)
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
         )
-        return list(dataset)
+        return [self.replace_labels(dataset.info.features, x) for x in dataset]
 
 
 class TextFileLoader(FileLoader):
