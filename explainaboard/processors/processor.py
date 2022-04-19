@@ -239,8 +239,9 @@ class Processor(metaclass=abc.ABCMeta):
         my_feature = (
             sys_info.features[bucket_key]  # type: ignore
             if token_feature_name is None
-            else sys_info.features[token_feature_name]. # type: ignore
-                feature.feature[bucket_key]
+            else sys_info.features[token_feature_name].feature.feature[  # type: ignore
+                bucket_key
+            ]
         )
 
         if my_feature.dtype in set(["float", "float32", "int32", "int64"]):
@@ -375,12 +376,12 @@ class Processor(metaclass=abc.ABCMeta):
                 dict_obj={
                     x: sys_output[x][feature_name] for x in range(len(sys_output))
                 },
-                max_value=sys_info.features[feature_name].max_value # type: ignore
-                if sys_info.features[feature_name].dtype # type: ignore
+                max_value=sys_info.features[feature_name].max_value  # type: ignore
+                if sys_info.features[feature_name].dtype  # type: ignore
                 in set(["float", "float32", "int32", "int64"])
                 else None,
-                min_value=sys_info.features[feature_name].min_value # type: ignore
-                if sys_info.features[feature_name].dtype # type: ignore
+                min_value=sys_info.features[feature_name].min_value  # type: ignore
+                if sys_info.features[feature_name].dtype  # type: ignore
                 in set(["float", "float32", "int32", "int64"])
                 else None,
                 bucket_number=sys_features[feature_name].bucket_info.number,
