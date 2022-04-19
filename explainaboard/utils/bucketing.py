@@ -3,7 +3,7 @@ from explainaboard.utils.py_utils import sort_dict
 
 
 def bucket_attribute_specified_bucket_value(
-    dict_obj=None, bucket_number=4, bucket_setting=None
+    dict_obj=None, max_value=None, min_value=None, bucket_number=4, bucket_setting=None
 ):
     if not dict_obj or len(dict_obj) == 0:
         return None
@@ -11,11 +11,8 @@ def bucket_attribute_specified_bucket_value(
     dict_span2att_val = dict_obj
     n_buckets = bucket_number
     hardcoded_bucket_values = bucket_setting
-
-    # hardcoded_bucket_values = [set([float(0), float(1)])]
-    # print("!!!debug-7--")
-    p_infinity = 1000000
-    n_infinity = -1000000
+    p_infinity = max_value if max_value is not None else 100000
+    n_infinity = min_value if min_value is not None else -100000
     n_spans = len(dict_span2att_val)
     dict_att_val2span = reverse_dict(dict_span2att_val)
     dict_att_val2span = sort_dict(dict_att_val2span)
@@ -23,8 +20,6 @@ def bucket_attribute_specified_bucket_value(
 
     for bucket_value in hardcoded_bucket_values:
         if bucket_value in dict_att_val2span.keys():
-            # print("------------work!!!!---------")
-            # print(bucket_value)
             dict_bucket2span[(bucket_value,)] = dict_att_val2span[bucket_value]
             n_spans -= len(dict_att_val2span[bucket_value])
             n_buckets -= 1
@@ -34,21 +29,13 @@ def bucket_attribute_specified_bucket_value(
     entity_list = []
     val_list = []
 
-    #
-    # print("-----avg_entity----------")
-    # print(avg_entity)
-
     for att_val, entity in dict_att_val2span.items():
         if att_val in hardcoded_bucket_values:
             continue
 
-        # print("debug-att_val:\t",att_val)
         val_list.append(att_val)
         entity_list += entity
         n_tmp += len(entity)
-
-        # print(att_val)
-        # print(n_tmp, avg_entity)
 
         if n_tmp > avg_entity:
 
@@ -78,14 +65,14 @@ def bucket_attribute_specified_bucket_value(
 
 
 def bucket_attribute_discrete_value(
-    dict_obj=None, bucket_number=100000000, bucket_setting=1
+    dict_obj=None,
+    max_value=None,
+    min_value=None,
+    bucket_number=100000000,
+    bucket_setting=1,
 ):
     # Bucketing different Attributes
-
-    # print("!!!!!debug---------")
-    # 	hardcoded_bucket_values = [set([float(0), float(1)])]
     dict_span2att_val = dict_obj
-    # print(f"dict_span2att_val:\n{dict_span2att_val}")
     n_buckets = bucket_number
     n_entities = bucket_setting
 
@@ -93,7 +80,6 @@ def bucket_attribute_discrete_value(
 
     dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
     dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
-    # dict["q_id"] = 2
 
     n_total = 1
     for att_val, entity in dict_att_val2span.items():
@@ -108,7 +94,11 @@ def bucket_attribute_discrete_value(
 
 
 def bucket_attribute_specified_bucket_interval(
-    dict_obj=None, bucket_number=None, bucket_setting=None
+    dict_obj=None,
+    max_value=None,
+    min_value=None,
+    bucket_number=None,
+    bucket_setting=None,
 ):
     # Bucketing different Attributes
 
@@ -119,9 +109,6 @@ def bucket_attribute_specified_bucket_interval(
     intervals = bucket_setting
 
     dict_bucket2span = {}
-
-    # print("!!!!!!!enter into bucket_attribute_SpecifiedBucketInterval")
-
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
         dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
         dict_att_val2span = sort_dict(dict_att_val2span, flag="value")

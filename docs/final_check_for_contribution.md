@@ -1,4 +1,4 @@
-# Final Check when You're Contributing SDK
+# Final Check when You're Contributing as SDK Developers
 
 
 Hi, first, thanks for your brilliant contribution to ExplainaBoard SDK :smiley: !

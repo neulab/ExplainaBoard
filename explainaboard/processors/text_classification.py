@@ -12,7 +12,6 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
-from explainaboard.utils.spacy_loader import get_named_entities
 from explainaboard.utils.tokenizer import Tokenizer
 
 
@@ -79,16 +78,6 @@ class TextClassificationProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                "entity_number": feature.Value(
-                    dtype="float",
-                    description="the number of entities",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
                 "num_oov": feature.Value(
                     dtype="float",
                     description="the number of out-of-vocabulary words",
@@ -138,9 +127,6 @@ class TextClassificationProcessor(Processor):
 
     def _get_token_number(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(existing_feature["text"])
-
-    def _get_entity_number(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return len(get_named_entities(existing_feature["text"]))
 
     def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
         return existing_feature["true_label"]
