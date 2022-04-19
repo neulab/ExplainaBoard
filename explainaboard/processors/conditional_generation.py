@@ -304,6 +304,12 @@ class ConditionalGenerationProcessor(Processor):
                 include_training_dependent=external_stats is not None
             )
         )
+
+        sent_feats: list[str] = []
+        tok_feats: list[str] = []
+        for x in active_features:
+            (sent_feats if (x in sys_features) else tok_feats).append(x)
+
         for bucket_feature in active_features:
             if bucket_feature in sys_features:
                 bucket_feature_funcs[bucket_feature] = (
@@ -327,9 +333,13 @@ class ConditionalGenerationProcessor(Processor):
                     dict_sysout[bucket_key] = bucket_func(
                         sys_info, dict_sysout, external_stats
                     )
+
                 else:
                     dict_sysout[bucket_key] = bucket_func(sys_info, dict_sysout)
-                    # print(dict_sysout[bucket_key])
+                # Store max/min value for bucketable features with float/int type
+                sys_info = self._get_max_min_value(
+                    sys_info, bucket_key, dict_sysout[bucket_key]
+                )
 
             # span features for true and predicted spans
             ref_toks = sys_info.tokenize(dict_sysout['reference'])
@@ -341,12 +351,24 @@ class ConditionalGenerationProcessor(Processor):
             #     hyp_toks, ref_test_freq, statistics=external_stats
             # )
 
-            a, b = self._complete_tok_features(
+            (
+                dict_sysout["ref_span_info"],
+                dict_sysout["hyp_span_info"],
+            ) = self._complete_tok_features(
                 ref_toks, hyp_toks, ref_test_freq, statistics=external_stats
             )
-            # print(a)
-            dict_sysout["ref_span_info"] = a
-            dict_sysout["hyp_span_info"] = b
+
+            # store max and min value for bucket features with float and int type
+            for bucket_key in tok_feats:
+                for span in dict_sysout["ref_span_info"] + dict_sysout["hyp_span_info"]:
+                    current_value = getattr(span, bucket_key)
+                    # token_feature_name should be true_entity_info
+                    self._get_max_min_value(
+                        sys_info,
+                        bucket_key,
+                        current_value,
+                        token_feature_name="ref_span_info",
+                    )
 
         return active_features
 
@@ -418,6 +440,12 @@ class ConditionalGenerationProcessor(Processor):
 
             samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feat_dict,
+                max_value=my_feature.max_value
+                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
+                else None,
+                min_value=my_feature.min_value
+                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
+                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
@@ -430,6 +458,12 @@ class ConditionalGenerationProcessor(Processor):
                 feature_name
             ] = bucketing.bucket_attribute_specified_bucket_interval(
                 dict_obj=feat_dict,
+                max_value=my_feature.max_value
+                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
+                else None,
+                min_value=my_feature.min_value
+                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
+                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=samples_over_bucket[feature_name].keys(),
             )
