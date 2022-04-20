@@ -364,7 +364,7 @@ class Processor(metaclass=abc.ABCMeta):
         # Bucketing
         samples_over_bucket = {}
         performances_over_bucket = {}
-        for feature_name in tqdm(active_features, desc="bucketing"):
+        for feature_name in tqdm(active_features, desc="sample-level bucketing"):
             # Preparation for bucketing
             bucket_func = getattr(
                 explainaboard.utils.bucketing,

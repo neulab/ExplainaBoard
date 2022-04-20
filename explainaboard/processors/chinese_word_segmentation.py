@@ -362,14 +362,15 @@ class CWSProcessor(Processor):
         self,
         spans: list[Span],
         type_id: str,
-        sample_dict: defaultdict[Span, dict[str, str]],
+        sample_dict: defaultdict[tuple, dict[str, str]],
     ):
         """
         Get bucket samples (with mis-predicted entities) for each bucket given a feature
         (e.g., length)
         """
         for span in spans:
-            sample_dict[span][type_id] = (
+            pos = (span.sample_id, span.span_pos, span.span_text)
+            sample_dict[pos][type_id] = (
                 span.span_tag if span.span_tag is not None else ""
             )
 
@@ -381,7 +382,7 @@ class CWSProcessor(Processor):
         samples_over_bucket_pred: dict[str, list[Span]],
     ) -> list:
         # Index samples for easy comparison
-        sample_dict: defaultdict[Span, dict[str, str]] = defaultdict(lambda: dict())
+        sample_dict: defaultdict[tuple, dict[str, str]] = defaultdict(lambda: dict())
         self._add_to_sample_dict(
             samples_over_bucket_pred[bucket_interval], 'pred', sample_dict
         )
@@ -394,29 +395,12 @@ class CWSProcessor(Processor):
             true_label = tags.get('true', 'O')
             pred_label = tags.get('pred', 'O')
 
-            true_span_triple = (
-                true_label,
-                span.span_pos[0] if span.span_pos is not None else None,
-                span.span_pos[1] if span.span_pos is not None else None,
-                span.sample_id,
-            )
-            pred_span_triple = (
-                pred_label,
-                span.span_pos[0] if span.span_pos is not None else None,
-                span.span_pos[1] if span.span_pos is not None else None,
-                span.sample_id,
-            )
-
-            system_output_id = (
-                sys_output[span.sample_id]["id"] if span.sample_id is not None else None
-            )  # TODO(Pengfei: should be checked)
+            system_output_id = sys_output[span[0]]["id"]
             error_case = {
-                "span": span.span_text,
+                "span": span[2],
                 "text": str(system_output_id),
                 "true_label": true_label,
                 "predicted_label": pred_label,
-                "true_span_triple": true_span_triple,
-                "pred_span_triple": pred_span_triple,
             }
             case_list.append(error_case)
 
@@ -445,7 +429,7 @@ class CWSProcessor(Processor):
         metric_names = unwrap(sys_info.metric_names)
         config = explainaboard.metric.F1ScoreConfig(ignore_classes=['O'])
         bucket_metrics = [
-            getattr(explainaboard.metric, f'BMES{name}')(config=config)
+            getattr(explainaboard.metric, f'{name}')(config=config)
             for name in metric_names
         ]
 
@@ -458,7 +442,7 @@ class CWSProcessor(Processor):
             #     spans_pred = samples_over_bucket_pred[bucket_interval]
 
             """
-            Get bucket samples for ner task
+            Get bucket samples for cws task
             """
             bucket_samples = self.get_bucket_cases_cws(
                 bucket_interval,
@@ -467,21 +451,25 @@ class CWSProcessor(Processor):
                 samples_over_bucket_pred,
             )
 
+            true_labels = [x['true_label'] for x in bucket_samples]
+            pred_labels = [x['predicted_label'] for x in bucket_samples]
+
+            # print(true_labels)
+
+            bucket_samples_errors = [
+                v for v in bucket_samples if v["true_label"] != v["predicted_label"]
+            ]
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
                 n_samples=len(spans_true),
-                bucket_samples=bucket_samples,
+                bucket_samples=bucket_samples_errors,
             )
             for metric in bucket_metrics:
-
                 metric_val = metric.evaluate(
-                    [samples_over_bucket_true[bucket_interval]],
-                    [samples_over_bucket_pred[bucket_interval]],
-                    conf_value=sys_info.conf_value,
+                    true_labels, pred_labels, conf_value=sys_info.conf_value
                 )
                 conf_low, conf_high = (
-                    metric_val.conf_interval if metric_val.conf_interval else None,
-                    None,
+                    metric_val.conf_interval if metric_val.conf_interval else None
                 )
                 performance = Performance(
                     metric_name=metric.name,
