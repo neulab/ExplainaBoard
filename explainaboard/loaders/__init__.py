@@ -2,6 +2,7 @@ from explainaboard.loaders import (
     aspect_based_sentiment_classification,
     conditional_generation,
     extractive_qa,
+    file_loader,
     kg_link_tail_prediction,
     loader,
     loader_registry,
@@ -13,6 +14,7 @@ from explainaboard.loaders import (
 
 get_datalab_loader = loader_registry.get_datalab_loader
 get_custom_dataset_loader = loader_registry.get_custom_dataset_loader
+DatalabLoaderOption = file_loader.DatalabLoaderOption
 
 __all__ = [
     'aspect_based_sentiment_classification',
