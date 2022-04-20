@@ -186,8 +186,10 @@ class Metric:
         n_elems = int(prop_samples * len(stats))
         samp_results = np.zeros(shape=(n_samples,))
         all_indices = np.array(range(len(stats)))
+        rng = np.random.default_rng()
+        all_indices = rng.choice(all_indices, size=(n_samples, n_elems), replace=True)
         for i in range(n_samples):
-            indices = np.random.choice(all_indices, size=n_elems, replace=True)
+            indices = all_indices[i]
             agg_stats = self.aggregate_stats(stats.filter(indices))
             samp_results[i] = self.calc_metric_from_aggregate(agg_stats, config)
         samp_results = np.sort(samp_results)
