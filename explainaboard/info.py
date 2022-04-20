@@ -90,6 +90,7 @@ class SysOutputInfo:
     model_name: Optional[str] = None
     dataset_name: Optional[str] = None
     sub_dataset_name: Optional[str] = None
+    dataset_split: Optional[str] = None
     metric_names: Optional[list[str]] = None
     language: str = "en"
     reload_stat: bool = True
