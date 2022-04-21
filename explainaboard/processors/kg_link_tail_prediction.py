@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator
 import json
-import os
 from typing import cast
 
 from datalabs import aggregating, load_dataset
@@ -15,6 +14,7 @@ import explainaboard.metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
+from explainaboard.utils import cache_api
 from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.typing_utils import unwrap
 
@@ -193,13 +193,11 @@ class KGLinkTailPredictionProcessor(Processor):
         if sys_info.dataset_name != "fb15k_237":  # to be generalized
             self.entity_type_level_map = {}
         else:
-            scriptpath = os.path.dirname(__file__)
-            with open(
-                os.path.join(
-                    scriptpath, '../pre_computed/kg/entity_type_level_map.json'
-                ),
-                'r',
-            ) as file:
+            file_path = cache_api.cache_online_file(
+                'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
+                'pre_computed/kg/entity_type_level_map.json',
+            )
+            with open(file_path, 'r') as file:
                 self.entity_type_level_map = json.loads(file.read())
 
         # Calculate statistics of training set
