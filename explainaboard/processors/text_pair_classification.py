@@ -4,11 +4,10 @@ from typing import Any
 
 from datalabs import aggregating
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.tokenizer import Tokenizer
 

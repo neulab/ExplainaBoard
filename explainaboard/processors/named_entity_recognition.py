@@ -6,14 +6,13 @@ from collections.abc import Callable, Iterator
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabFileLoader
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing, span_utils
 from explainaboard.utils.analysis import cap_feature
 from explainaboard.utils.py_utils import sort_dict

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -11,7 +12,6 @@ from explainaboard.loaders.file_loader import (
 )
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
-from explainaboard.tasks import TaskType
 
 
 @register_loader(TaskType.text_pair_classification)
