@@ -10,6 +10,7 @@ from explainaboard.processors import (
     summarization,
     text_classification,
     text_pair_classification,
+    word_segmentation,
 )
 from explainaboard.processors.processor_registry import get_processor
 
@@ -25,4 +26,5 @@ __all__ = [
     'summarization',
     'text_classification',
     'text_pair_classification',
+    "word_segmentation",
 ]

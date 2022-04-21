@@ -10,6 +10,7 @@ from explainaboard.loaders import (
     qa_multiple_choice,
     text_classification,
     text_pair_classification,
+    word_segmentation,
 )
 
 get_datalab_loader = loader_registry.get_datalab_loader
@@ -26,4 +27,5 @@ __all__ = [
     'qa_multiple_choice',
     'text_classification',
     'text_pair_classification',
+    'word_segmentation',
 ]

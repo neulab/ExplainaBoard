@@ -152,9 +152,27 @@ See one example of the uploaded file:
 https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/conll2003.elmo
 """,
                 supported=True,
-                supported_metrics=["f1_seqeval", "recall_seqeval", "precision_seqeval"],
+                supported_metrics=["F1Score"],
                 supported_formats=get_supported_file_types_for_loader(
                     TaskType.named_entity_recognition
+                ),
+                supported_datasets=[],
+            )
+        ],
+    ),
+    TaskCategory(
+        "structure-prediction",
+        "predicting structural properties of the text, such as syntax",
+        [
+            Task(
+                name=TaskType.word_segmentation,
+                description="""
+identify word boundaries of some languages (e.g., Chinese).
+""",
+                supported=True,
+                supported_metrics=["F1Score"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.word_segmentation
                 ),
                 supported_datasets=[],
             )
@@ -232,7 +250,7 @@ See more details about the format of upload files:
 https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_prediction.md
 """,
                 supported=True,
-                supported_metrics=["Hits", "MeanReciprocalRank"],
+                supported_metrics=["Hits", "MeanReciprocalRank", "MeanRank"],
                 supported_formats=get_supported_file_types_for_loader(
                     TaskType.kg_link_tail_prediction
                 ),

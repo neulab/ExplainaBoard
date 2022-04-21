@@ -2,29 +2,29 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Iterator
+from typing import Any
 
 from datalabs import aggregating, Dataset
 from tqdm import tqdm
 
-from explainaboard import feature, TaskType
+from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
-from explainaboard.loaders.file_loader import DatalabFileLoader
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils import bucketing, span_utils
+from explainaboard.tasks import TaskType
+from explainaboard.utils import bucketing
 from explainaboard.utils.py_utils import sort_dict
-from explainaboard.utils.span_utils import BIOSpanOps, Span
-from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.span_utils import BMESSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.named_entity_recognition)
-class NERProcessor(Processor):
+@register_processor(TaskType.word_segmentation)
+class CWSProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.named_entity_recognition
+        return TaskType.word_segmentation
 
     @classmethod
     def default_features(cls) -> feature.Features:
@@ -34,30 +34,20 @@ class NERProcessor(Processor):
                 "true_tags": feature.Sequence(
                     feature.ClassLabel(
                         names=[
-                            "O",
-                            "B-PER",
-                            "I-PER",
-                            "B-ORG",
-                            "I-ORG",
-                            "B-LOC",
-                            "I-LOC",
-                            "B-MISC",
-                            "I-MISC",
+                            "B",
+                            "M",
+                            "E",
+                            "S",
                         ]
                     )
                 ),
                 "pred_tags": feature.Sequence(
                     feature.ClassLabel(
                         names=[
-                            "O",
-                            "B-PER",
-                            "I-PER",
-                            "B-ORG",
-                            "I-ORG",
-                            "B-LOC",
-                            "I-LOC",
-                            "B-MISC",
-                            "I-MISC",
+                            "B",
+                            "M",
+                            "E",
+                            "S",
                         ]
                     )
                 ),
@@ -72,10 +62,10 @@ class NERProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                "entity_density": feature.Value(
+                "word_density": feature.Value(
                     dtype="float",
-                    description="the ration between all entity "
-                    "tokens and sentence tokens ",
+                    description="the ration between all word tokens "
+                    "and sentence tokens ",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -83,65 +73,15 @@ class NERProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each work based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                # --- the following are features of each entity ---
-                "true_entity_info": feature.Sequence(
+                # --- the following are features of each word ---
+                "true_word_info": feature.Sequence(
                     feature.Set(
                         {
                             "span_text": feature.Value("string"),
-                            "span_tokens": feature.Value(
-                                dtype="float",
-                                description="entity length",
-                                is_bucket=True,
-                                bucket_info=feature.BucketInfo(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
                             "span_pos": feature.Position(positions=[0, 0]),
                             "span_tag": feature.Value(
                                 dtype="string",
                                 description="entity tag",
-                                is_bucket=True,
-                                bucket_info=feature.BucketInfo(
-                                    method="bucket_attribute_discrete_value",
-                                    number=4,
-                                    setting=1,
-                                ),
-                            ),
-                            "span_capitalness": feature.Value(
-                                dtype="string",
-                                description=(
-                                    "The capitalness of an entity. For example, "
-                                    "first_caps represents only the first character of "
-                                    "the entity is capital. full_caps denotes all "
-                                    "characters of the entity are capital"
-                                ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_discrete_value",
@@ -171,28 +111,6 @@ class NERProcessor(Processor):
                                     setting=(),
                                 ),
                             ),
-                            "span_econ": feature.Value(
-                                dtype="float",
-                                description="entity label consistency",
-                                is_bucket=True,
-                                require_training_set=True,
-                                bucket_info=feature.BucketInfo(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
-                            "span_efre": feature.Value(
-                                dtype="float",
-                                description="entity frequency",
-                                is_bucket=True,
-                                require_training_set=True,
-                                bucket_info=feature.BucketInfo(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
                         }
                     )
                 ),
@@ -209,8 +127,22 @@ class NERProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["pred_tags"]
 
+    def _get_statistics_resources(
+        self, sys_info: SysOutputInfo, dataset_split: Dataset
+    ) -> dict[str, Any]:
+        """
+        From a DataLab dataset split, get resources necessary to calculate statistics
+        """
+        base_resources = unwrap(
+            super()._get_statistics_resources(sys_info, dataset_split)
+        )
+        task_specific_resources = {
+            'tag_id2str': dataset_split._info.task_templates[0].labels
+        }
+        return {**base_resources, **task_specific_resources}
+
     @aggregating()
-    def _statistics_func(self, samples: Dataset, tokenizer: Tokenizer | None = None):
+    def _statistics_func(self, samples: Iterator, tag_id2str=None):
         """
         Input:
         samples: [{
@@ -220,39 +152,11 @@ class NERProcessor(Processor):
         Output:dict:
         """
 
-        dl_features = samples.info.features
-
-        tokens_sequences = []
-        tags_sequences = []
-
-        vocab: dict[str, int] = {}
-        tag_vocab: dict[str, int] = {}
-        for sample in tqdm(samples):
-            rep_sample = DatalabFileLoader.replace_labels(dl_features, sample)
-            tokens, tags = rep_sample["tokens"], rep_sample["tags"]
-
-            # update vocabulary
-            for token, tag in zip(tokens, tags):
-                vocab[token] = vocab.get(token, 0) + 1
-                tag_vocab[tag] = tag_vocab.get(tag, 0) + 1
-
-            tokens_sequences += tokens
-            tags_sequences += tags
-
-        # econ and efre dictionaries
-        econ_dic, efre_dic = self.get_econ_efre_dic(tokens_sequences, tags_sequences)
-        # vocab_rank: the rank of each word based on its frequency
-        sorted_dict = {
-            key: rank
-            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-        }
-        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
         return {
-            "efre_dic": efre_dic,
-            "econ_dic": econ_dic,
-            "vocab": vocab,
-            "vocab_rank": vocab_rank,
+            "efre_dic": {},
+            "econ_dic": {},
+            "vocab": {},
+            "vocab_rank": {},
         }
 
     def _get_stat_values(
@@ -263,7 +167,9 @@ class NERProcessor(Processor):
         """
         span_tag = span_tag.lower()
         span_text = span_text.lower()
-        econ_val = econ_dic.get(f'{span_text}|||{span_tag}', 0.0)
+        econ_val = 0.0
+        if span_text in econ_dic and span_tag in econ_dic[span_text]:
+            econ_val = float(econ_dic[span_text][span_tag])
         efre_val = efre_dic.get(span_text, 0.0)
         return econ_val, efre_val
 
@@ -290,7 +196,7 @@ class NERProcessor(Processor):
     # These return none because NER is not yet in the main metric interface
     def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
         return [
-            getattr(explainaboard.metric, f'BIO{name}')()
+            getattr(explainaboard.metric, f'BMES{name}')()
             for name in unwrap(sys_info.metric_names)
         ]
 
@@ -301,14 +207,14 @@ class NERProcessor(Processor):
         econ_dic = statistics["econ_dic"] if has_stats else None
         efre_dic = statistics["efre_dic"] if has_stats else None
 
-        bio_span_ops = BIOSpanOps(
+        bmes_span_ops = BMESSpanOps(
             resources={
                 "has_stats": has_stats,
                 "econ_dic": econ_dic,
                 "efre_dic": efre_dic,
-            },
+            }
         )
-        spans = bio_span_ops.get_spans(seq=sentence, tags=tags)
+        spans = bmes_span_ops.get_spans(seq=sentence, tags=tags)
 
         return spans
 
@@ -334,27 +240,17 @@ class NERProcessor(Processor):
             )
         )
 
-        sent_feats: list[str] = []
-        tok_feats: list[str] = []
-        for x in active_features:
-            (sent_feats if (x in sys_features) else tok_feats).append(x)
-
-        bio_span_ops = BIOSpanOps()
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
 
             # sentence_length
             dict_sysout["sentence_length"] = len(tokens)
-            self._get_max_min_value(sys_info, "sentence_length", len(tokens))
 
             # entity density
-            dict_sysout["entity_density"] = len(
-                bio_span_ops.get_spans(tags=dict_sysout["true_tags"])
+            dict_sysout["word_density"] = len(
+                BMESSpanOps().get_spans(tags=dict_sysout["true_tags"])
             ) / len(tokens)
-            self._get_max_min_value(
-                sys_info, "entity_density", dict_sysout["entity_density"]
-            )
 
             # sentence-level training set dependent features
             if external_stats is not None:
@@ -362,37 +258,12 @@ class NERProcessor(Processor):
                 dict_sysout["fre_rank"] = self._get_fre_rank(tokens, external_stats)
 
             # span features for true and predicted spans
-            dict_sysout["true_entity_info"] = self._complete_span_features(
+            dict_sysout["true_word_info"] = self._complete_span_features(
                 tokens, dict_sysout["true_tags"], statistics=external_stats
             )
-
-            # store max and min value for bucket features with float and int type
-            for bucket_key in tok_feats:
-                for span in dict_sysout["true_entity_info"]:
-                    current_value = getattr(span, bucket_key)
-                    self._get_max_min_value(
-                        sys_info,
-                        bucket_key,
-                        current_value,
-                        token_feature_name="true_entity_info",
-                    )
-
-            dict_sysout["pred_entity_info"] = self._complete_span_features(
+            dict_sysout["pred_word_info"] = self._complete_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
-
-            # store max and min value for bucket features with float and int type
-            for bucket_key in tok_feats:
-                for span in dict_sysout["pred_entity_info"]:
-                    current_value = getattr(span, bucket_key)
-                    # token_feature_name should be true_entity_info
-                    self._get_max_min_value(
-                        sys_info,
-                        bucket_key,
-                        current_value,
-                        token_feature_name="true_entity_info",
-                    )
-
         # This is not used elsewhere, so just keep it as-is
         return active_features
 
@@ -435,7 +306,6 @@ class NERProcessor(Processor):
     ) -> tuple[dict, dict]:
 
         features = unwrap(sys_info.features)
-
         sent_feats: list[str] = []
         tok_feats: list[str] = []
         for x in active_features:
@@ -447,50 +317,40 @@ class NERProcessor(Processor):
         )
 
         # Bucketing
+
         samples_over_bucket_pred = {}
-        for feature_name in tqdm(tok_feats, desc="span-level bucketing"):
-            my_feature = features["true_entity_info"].feature.feature[feature_name]
+        for feature_name in tqdm(tok_feats, desc="bucketing"):
+            # Choose behavior based on whether this is a feature of samples or spans
+            my_feature = features["true_word_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
             bucket_func = getattr(bucketing, bucket_info.method)
 
             feat_dict = self._get_feature_dict(
-                sys_output, feature_name, lambda x: x['true_entity_info']
+                sys_output, feature_name, lambda x: x['true_word_info']
             )
 
             samples_over_bucket_true[feature_name] = bucket_func(
                 dict_obj=feat_dict,
-                max_value=my_feature.max_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=my_feature.min_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
 
             # Get buckets for predicted spans
             feat_dict = self._get_feature_dict(
-                sys_output, feature_name, lambda x: x['pred_entity_info']
+                sys_output, feature_name, lambda x: x['pred_word_info']
             )
             samples_over_bucket_pred[
                 feature_name
             ] = bucketing.bucket_attribute_specified_bucket_interval(
                 dict_obj=feat_dict,
-                max_value=my_feature.max_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=my_feature.min_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=samples_over_bucket_true[feature_name].keys(),
             )
 
             # evaluating bucket: get bucket performance
-            performances_over_bucket[feature_name] = self.get_bucket_performance_ner(
+            performances_over_bucket[feature_name] = self.get_bucket_performance_cws(
                 sys_info,
                 sys_output,
                 samples_over_bucket_true[feature_name],
@@ -508,14 +368,13 @@ class NERProcessor(Processor):
         Get bucket samples (with mis-predicted entities) for each bucket given a feature
         (e.g., length)
         """
-
         for span in spans:
             pos = (span.sample_id, span.span_pos, span.span_text)
             sample_dict[pos][type_id] = (
                 span.span_tag if span.span_tag is not None else ""
             )
 
-    def get_bucket_cases_ner(
+    def get_bucket_cases_cws(
         self,
         bucket_interval: str,
         sys_output: list[dict],
@@ -547,7 +406,7 @@ class NERProcessor(Processor):
 
         return case_list
 
-    def get_bucket_performance_ner(
+    def get_bucket_performance_cws(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
@@ -566,10 +425,12 @@ class NERProcessor(Processor):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to
             bucket performance
         """
+        # getattr(explainaboard.metric, f'BIO{name}')
         metric_names = unwrap(sys_info.metric_names)
         config = explainaboard.metric.F1ScoreConfig(ignore_classes=['O'])
         bucket_metrics = [
-            getattr(explainaboard.metric, name)(config=config) for name in metric_names
+            getattr(explainaboard.metric, f'{name}')(config=config)
+            for name in metric_names
         ]
 
         bucket_name_to_performance = {}
@@ -577,11 +438,13 @@ class NERProcessor(Processor):
 
             if bucket_interval not in samples_over_bucket_pred.keys():
                 raise ValueError("Predict Label Bucketing Errors")
+            # else:
+            #     spans_pred = samples_over_bucket_pred[bucket_interval]
 
             """
-            Get bucket samples for ner task
+            Get bucket samples for cws task
             """
-            bucket_samples = self.get_bucket_cases_ner(
+            bucket_samples = self.get_bucket_cases_cws(
                 bucket_interval,
                 sys_output,
                 samples_over_bucket_true,
@@ -620,56 +483,19 @@ class NERProcessor(Processor):
 
         return sort_dict(bucket_name_to_performance)
 
-    @classmethod
-    def get_econ_efre_dic(
-        cls, words: list[str], bio_tags: list[str]
-    ) -> tuple[dict[str, float], dict[str, int]]:
-        """
-        Calculate the entity label consistency and frequency features from this paper
-        https://aclanthology.org/2020.emnlp-main.489.pdf
-        :param words: a list of all words in the corpus
-        :param bio_tags: a list of all tags in the corpus
-        :return: Returns two dictionaries:
-                    econ: 'span|||tag' pointing to entity consistency values
-                    efre: 'span' pointing to entity frequency values
-        """
-        chunks_train = span_utils.get_spans_from_bio(bio_tags)
 
-        # Create pseudo-trie
-        prefixes: set[str] = set()
-        chunk_to_tag: dict[tuple[int, int], str] = {}
-        entity_to_tagcnt: dict[str, dict[str, int]] = {}
-        efre_dic: dict[str, int] = {}
-        for true_chunk in tqdm(chunks_train):
-            idx_start = true_chunk[1]
-            idx_end = true_chunk[2]
-            chunk_to_tag[(idx_start, idx_end)] = true_chunk[0]
-            span_str = ''
-            for i in range(0, idx_end - idx_start):
-                w = words[idx_start + i].lower()
-                span_str += w if i == 0 else f' {w}'
-                prefixes.add(span_str)
-            entity_to_tagcnt[span_str] = {}
-            efre_dic[span_str] = efre_dic.get(span_str, 0) + 1
+# TODO(gneubig): below is not done with refactoring
+def get_econ_dic(train_word_sequences, tag_sequences_train, tags):
+    """
+    Note: when matching, the text span and tag have been lowercased.
+    """
+    econ_dic = dict()
+    # exit()
+    return econ_dic
 
-        # Actually calculate stats
-        ltws = len(words)
-        for idx_start in range(ltws):
-            span_str = ''
-            for i in range(0, ltws - idx_start):
-                w = words[idx_start + i].lower()
-                span_str += w if i == 0 else f' {w}'
-                if span_str not in prefixes:
-                    break
-                if span_str in entity_to_tagcnt:
-                    my_tag = chunk_to_tag.get((idx_start, idx_start + i + 1), 'O')
-                    entity_to_tagcnt[span_str][my_tag] = (
-                        entity_to_tagcnt[span_str].get(my_tag, 0) + 1
-                    )
 
-        econ_dic: dict[str, float] = {}
-        for span_str, cnt_dic in entity_to_tagcnt.items():
-            cnt_sum = float(sum(cnt_dic.values()))
-            for tag, cnt in cnt_dic.items():
-                econ_dic[f'{span_str}|||{tag}'] = cnt / cnt_sum
-        return econ_dic, efre_dic
+# Global functions for training set dependent features
+def get_efre_dic(train_word_sequences, tag_sequences_train):
+    efre_dic = dict()
+
+    return efre_dic
