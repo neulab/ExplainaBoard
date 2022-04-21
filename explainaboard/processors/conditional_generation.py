@@ -216,7 +216,6 @@ class ConditionalGenerationProcessor(Processor):
         self, sys_info: SysOutputInfo, sys_output: list[dict]
     ) -> list[MetricStats]:
         """Generate sufficient statistics for scoring.
-
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
         :return: Statistics sufficient for scoring

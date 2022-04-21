@@ -108,6 +108,32 @@ For example, in this file `explainaboard/processors/__init__.py`, we have:
 from . import text_classification
 ```
 
+
+## Update new task information
+Once you finish all the above steps, you need to register the new task in the script tasks.py by declaring the supported formats, metrics, etc.
+
+For example, the following information can be added for text classification tasks.
+```python
+    TaskCategory(
+        "text-classification",
+        "predicting a class index or boolean value.  ",
+        [
+            Task(
+                name=TaskType.text_classification,
+                description="""
+                Classify a text into one or multiple predefined categories.
+                See more details about the format of upload files:
+                https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.md
+                """,
+                supported=True,
+                supported_metrics=["F1Score", "Accuracy"],
+                supported_formats=["tsv"],
+                supported_datasets=[],
+            )
+        ],
+    ),
+```
+
 ## Finally, create a Unittest module for your task
 
 (1) Create a new python file `test_text_classification.py` in the folder `explainaboard/tests/`

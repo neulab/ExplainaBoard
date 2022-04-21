@@ -1,0 +1,125 @@
+{
+  "user_defined_metadata_configs": {
+    "task_name": "named-entity-recognition",
+    "model_name": "BERT",
+    "dataset_name": "conll2003",
+    "sub_dataset_name": "ner",
+    "language": "en"
+  },
+  "predictions": [
+    {
+      "tokens": [
+        'SOCCER',
+        '-',
+        'JAPAN',
+        'GET',
+        'LUCKY',
+        'WIN',
+        ',',
+        'CHINA',
+        'IN',
+        'SURPRISE',
+        'DEFEAT',
+        '.'
+      ],
+      "pred_tags": [
+        "O",
+        "O",
+        "B-MISC",
+        "O",
+        "O",
+        "O",
+        "O",
+        "B-ORG",
+        "O",
+        "O",
+        "O",
+        "O"
+      ]
+    },
+    {
+      "tokens": [
+        'Nadim',
+        'Ladki'
+      ],
+      "pred_tags": [
+        "B-PER",
+        "I-PER"
+      ]
+    },
+    {
+      "tokens": [
+        'AL-AIN',
+        ',',
+        'United',
+        'Arab',
+        'Emirates',
+        '1996-12-06'
+      ],
+      "pred_tags": [
+        "B-LOC",
+        "O",
+        "B-LOC",
+        "I-LOC",
+        "I-LOC",
+        "O"
+      ]
+    },
+    {
+      "tokens": [
+        'Japan',
+        'began',
+        'the',
+        'defence',
+        'of',
+        'their',
+        'Asian',
+        'Cup',
+        'title',
+        'with',
+        'a',
+        'lucky',
+        '2-1',
+        'win',
+        'against',
+        'Syria',
+        'in',
+        'a',
+        'Group',
+        'C',
+        'championship',
+        'match',
+        'on',
+        'Friday',
+        '.'
+      ],
+      "pred_tags": [
+        "B-LOC",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "B-MISC",
+        "I-MISC",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "B-LOC",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O",
+        "O"
+      ]
+    }
+  ]
+}
