@@ -3,6 +3,13 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+import urllib.request
+
+from explainaboard.utils.py_utils import eprint
+
+
+def sanitize_path(path):
+    return os.path.relpath(os.path.normpath(os.path.join("/", path)), "/")
 
 
 def get_cache_dir() -> str:
@@ -53,3 +60,21 @@ def write_statistics_to_cache(
         os.makedirs(path_dir)
     with open(stats_path, 'w') as stats_out:
         return json.dump(content, stats_out)
+
+
+def cache_online_file(online_path: str, local_path: str) -> str:
+    """
+    Caches an online file locally and returns the path to the local file.
+    :param online_path: The path online
+    :param local_path: The relative path to the file locally
+    :return: The absolute file to the cached path locally
+    """
+    sanitized_path = sanitize_path(local_path)
+    file_path = os.path.join(get_cache_dir(), sanitized_path)
+    if not os.path.exists(file_path):
+        eprint(f'Caching {online_path} to {file_path}')
+        path_dir = Path(file_path).parent.absolute()
+        if not os.path.exists(path_dir):
+            os.makedirs(path_dir)
+        urllib.request.urlretrieve(online_path, file_path)
+    return file_path
