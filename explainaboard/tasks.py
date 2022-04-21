@@ -1,25 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 
+from explainaboard import TaskType
+from explainaboard.loaders.loader_registry import (
+    get_supported_file_types_for_loader,
+    SupportedFileFormats,
+)
 
-class TaskType(str, Enum):
-    text_classification = "text-classification"
-    named_entity_recognition = "named-entity-recognition"
-    question_answering_extractive = "question-answering-extractive"
-    summarization = "summarization"
-    machine_translation = "machine-translation"
-    text_pair_classification = "text-pair-classification"
-    aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
-    kg_link_tail_prediction = "kg-link-tail-prediction"
-    qa_multiple_choice = "qa-multiple-choice"
-    conditional_generation = "conditional-generation"
-    word_segmentation = "word-segmentation"
-
-    @staticmethod
-    def list():
-        return list(map(lambda c: c.value, TaskType))
 
 
 @dataclass
@@ -28,7 +16,9 @@ class Task:
     description: str = "task description"
     supported: bool = field(default=False)
     supported_metrics: list[str] = field(default_factory=list)
-    supported_formats: list[str] = field(default_factory=list)
+    supported_formats: SupportedFileFormats = field(
+        default_factory=SupportedFileFormats
+    )
     supported_datasets: list[str] = field(default_factory=list)
 
 
@@ -67,7 +57,9 @@ _task_categories: list[TaskCategory] = [
                     "mover_score",
                     "prism",
                 ],
-                supported_formats=["tsv"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.machine_translation
+                ),
                 supported_datasets=[],
             ),
             Task(
@@ -94,7 +86,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_summarization.md
                     "mover_score",
                     "prism",
                 ],
-                supported_formats=["tsv"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.summarization
+                ),
                 supported_datasets=[],
             ),
             Task(
@@ -120,7 +114,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_summarization.md
                     "mover_score",
                     "prism",
                 ],
-                supported_formats=["tsv"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.conditional_generation
+                ),
                 supported_datasets=[],
             ),
         ],
@@ -138,7 +134,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.
 """,
                 supported=True,
                 supported_metrics=["F1Score", "Accuracy"],
-                supported_formats=["tsv"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.text_classification
+                ),
                 supported_datasets=[],
             )
         ],
@@ -156,7 +154,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/
 """,
                 supported=True,
                 supported_metrics=["F1Score"],
-                supported_formats=["conll"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.named_entity_recognition
+                ),
                 supported_datasets=[],
             )
         ],
@@ -190,7 +190,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.
 """,
                 supported=True,
                 supported_metrics=["F1ScoreQA", "ExactMatchQA"],
-                supported_formats=["json"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.question_answering_extractive
+                ),
                 supported_datasets=[],
             ),
         ],
@@ -208,7 +210,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-
 """,
                 supported=True,
                 supported_metrics=["F1Score", "Accuracy"],
-                supported_formats=["tsv"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.aspect_based_sentiment_classification
+                ),
                 supported_datasets=[],
             ),
         ],
@@ -226,7 +230,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_pair_classifica
 """,
                 supported=True,
                 supported_metrics=["F1Score", "Accuracy"],
-                supported_formats=["tsv"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.text_pair_classification
+                ),
                 supported_datasets=[],
             ),
         ],
@@ -244,7 +250,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
 """,
                 supported=True,
                 supported_metrics=["Hits", "MeanReciprocalRank", "MeanRank"],
-                supported_formats=["json"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.kg_link_tail_prediction
+                ),
                 supported_datasets=[],
             ),
         ],
@@ -258,7 +266,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
                 description="Answer a question from multiple options",
                 supported=True,
                 supported_metrics=["F1Score", "Accuracy"],
-                supported_formats=["json"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.qa_multiple_choice
+                ),
                 supported_datasets=[],
             )
         ],

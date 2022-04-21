@@ -5,11 +5,10 @@ from typing import Any
 from datalabs import aggregating
 from tqdm import tqdm
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.tokenizer import Tokenizer

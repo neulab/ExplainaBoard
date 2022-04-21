@@ -1,4 +1,4 @@
-from explainaboard.tasks import TaskType
+from explainaboard import TaskType
 
 """
 Each schema is a list of dictionary, which is used to instruct how to print bucket-level
