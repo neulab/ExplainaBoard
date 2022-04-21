@@ -569,8 +569,7 @@ class NERProcessor(Processor):
         metric_names = unwrap(sys_info.metric_names)
         config = explainaboard.metric.F1ScoreConfig(ignore_classes=['O'])
         bucket_metrics = [
-            getattr(explainaboard.metric, name)(config=config)
-            for name in metric_names
+            getattr(explainaboard.metric, name)(config=config) for name in metric_names
         ]
 
         bucket_name_to_performance = {}

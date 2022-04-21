@@ -9,7 +9,6 @@ from explainaboard.loaders.loader_registry import (
 )
 
 
-
 @dataclass
 class Task:
     name: str
@@ -172,7 +171,9 @@ identify word boundaries of some languages (e.g., Chinese).
 """,
                 supported=True,
                 supported_metrics=["F1Score"],
-                supported_formats=["conll"],
+                supported_formats=get_supported_file_types_for_loader(
+                    TaskType.word_segmentation
+                ),
                 supported_datasets=[],
             )
         ],
