@@ -1,6 +1,23 @@
 from enum import Enum
 
 
+class TaskType(str, Enum):
+    text_classification = "text-classification"
+    named_entity_recognition = "named-entity-recognition"
+    question_answering_extractive = "question-answering-extractive"
+    summarization = "summarization"
+    machine_translation = "machine-translation"
+    text_pair_classification = "text-pair-classification"
+    aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
+    kg_link_tail_prediction = "kg-link-tail-prediction"
+    qa_multiple_choice = "qa-multiple-choice"
+    conditional_generation = "conditional-generation"
+
+    @staticmethod
+    def list():
+        return list(map(lambda c: c.value, TaskType))
+
+
 class Source(str, Enum):
     in_memory = "in_memory"  # content has been loaded in memory
     local_filesystem = "local_filesystem"

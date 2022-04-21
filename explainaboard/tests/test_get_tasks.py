@@ -16,3 +16,5 @@ class TestTasks(unittest.TestCase):
                     len(set(task.supported_metrics)),
                     f"duplicate metrics in {task.name}",
                 )
+                self.assertGreater(len(task.supported_formats.custom_dataset), 0)
+                self.assertGreater(len(task.supported_formats.system_output), 0)

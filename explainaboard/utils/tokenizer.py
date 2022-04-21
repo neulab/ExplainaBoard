@@ -11,7 +11,7 @@ from sacrebleu.tokenizers.tokenizer_intl import TokenizerV14International
 from sacrebleu.tokenizers.tokenizer_ja_mecab import TokenizerJaMecab
 from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
 
-from explainaboard.tasks import TaskType
+from explainaboard import TaskType
 
 
 def get_default_tokenizer(task_type: TaskType, lang: str) -> Tokenizer:
