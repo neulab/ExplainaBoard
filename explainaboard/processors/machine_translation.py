@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 
 
 @register_processor(TaskType.machine_translation)

@@ -9,13 +9,12 @@ from eaas.async_client import AsyncClient
 import numpy as np
 from tqdm import tqdm
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 import explainaboard.metric
 from explainaboard.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.feature_funcs

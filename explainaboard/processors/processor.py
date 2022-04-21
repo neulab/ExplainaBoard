@@ -9,7 +9,7 @@ from eaas.async_client import AsyncClient
 from eaas.config import Config
 from tqdm import tqdm
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import (
     BucketPerformance,
     FineGrainedStatistics,
@@ -22,7 +22,6 @@ from explainaboard.info import (
 from explainaboard.loaders.loader import CustomFeature
 import explainaboard.metric
 from explainaboard.metric import Metric, MetricStats
-from explainaboard.tasks import TaskType
 import explainaboard.utils.bucketing
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
