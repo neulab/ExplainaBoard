@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 from collections import Counter
-import copy
 from dataclasses import dataclass
 import itertools
 from typing import Any, cast, Optional, TypeVar, Union
@@ -153,12 +152,11 @@ class Metric:
         :return: aggregated stats
         """
 
-        res = copy.deepcopy(stats)
-
-        if res.get_data().size == 0:
+        data = stats.get_data()
+        if data.size == 0:
             return np.array(0.0)
         else:
-            return np.mean(stats.get_data(), axis=0)
+            return np.mean(data, axis=0)
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
