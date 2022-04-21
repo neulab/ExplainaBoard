@@ -9,12 +9,11 @@ from datalabs import aggregating, load_dataset
 from tqdm import tqdm
 
 # TODO(odashi): Add a function to obtain metric class instead of using getattr.
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 import explainaboard.metric
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 from explainaboard.utils.py_utils import eprint
 from explainaboard.utils.typing_utils import unwrap
 

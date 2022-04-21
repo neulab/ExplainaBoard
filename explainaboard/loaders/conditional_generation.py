@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from explainaboard.constants import FileType
+from explainaboard.constants import FileType, TaskType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
     FileLoader,
@@ -11,7 +11,6 @@ from explainaboard.loaders.file_loader import (
 )
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
-from explainaboard.tasks import TaskType
 
 
 @register_loader(TaskType.conditional_generation)

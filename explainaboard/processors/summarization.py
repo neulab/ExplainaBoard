@@ -10,13 +10,12 @@ from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
 from datalabs.operations.featurize.summarization import get_oracle_summary
 import numpy
 
-from explainaboard import feature
+from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.tasks import TaskType
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import hash_dict
 
