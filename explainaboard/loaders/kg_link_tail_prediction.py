@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 import json
 import os
 from explainaboard import TaskType
@@ -8,6 +7,8 @@ from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import FileLoader, JSONFileLoader
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
+from explainaboard.utils import cache_api
+
 
 
 @register_loader(TaskType.kg_link_tail_prediction)
@@ -60,12 +61,12 @@ class KgLinkTailPredictionLoader(Loader):
         )
 
         # Map entity into an interpretable version
-        scriptpath = os.path.dirname(__file__)
         entity_dic = {}
-        with open(
-            os.path.join(scriptpath, '../pre_computed/kg/entity2wikidata.json'),
-            'r',
-        ) as file:
+        file_path = cache_api.cache_online_file(
+            'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
+            'pre_computed/kg/entity2wikidata.json',
+        )
+        with open(file_path, 'r') as file:
             entity_dic = json.loads(file.read())
 
         if self.user_defined_features_configs:  # user defined features are present
