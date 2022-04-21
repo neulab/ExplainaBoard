@@ -173,7 +173,7 @@ class Loader:
             self._output_data, self._output_source
         )
         if len(dataset_loaded_data) != len(output_loaded_data):
-            raise Exception(
+            raise ValueError(
                 "dataset and output are of different length"
                 + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
             )
