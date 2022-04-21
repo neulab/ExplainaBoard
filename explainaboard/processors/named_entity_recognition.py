@@ -340,6 +340,7 @@ class NERProcessor(Processor):
         for x in active_features:
             (sent_feats if (x in sys_features) else tok_feats).append(x)
 
+        bio_span_ops = BIOSpanOps()
         for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
@@ -350,7 +351,7 @@ class NERProcessor(Processor):
 
             # entity density
             dict_sysout["entity_density"] = len(
-                BIOSpanOps().get_spans(tags=dict_sysout["true_tags"])
+                bio_span_ops.get_spans(tags=dict_sysout["true_tags"])
             ) / len(tokens)
             self._get_max_min_value(
                 sys_info, "entity_density", dict_sysout["entity_density"]
@@ -449,7 +450,6 @@ class NERProcessor(Processor):
         # Bucketing
         samples_over_bucket_pred = {}
         for feature_name in tqdm(tok_feats, desc="span-level bucketing"):
-            # Choose behavior based on whether this is a feature of samples or spans
             my_feature = features["true_entity_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
@@ -537,19 +537,6 @@ class NERProcessor(Processor):
             true_label = tags.get('true', 'O')
             pred_label = tags.get('pred', 'O')
 
-            # true_span_triple = (
-            #     true_label,
-            #     span.span_pos[0] if span.span_pos is not None else None,
-            #     span.span_pos[1] if span.span_pos is not None else None,
-            #     span.sample_id,
-            # )
-            # pred_span_triple = (
-            #     pred_label,
-            #     span.span_pos[0] if span.span_pos is not None else None,
-            #     span.span_pos[1] if span.span_pos is not None else None,
-            #     span.sample_id,
-            # )
-
             system_output_id = sys_output[span[0]]["id"]
             error_case = {
                 "span": span[2],
@@ -580,11 +567,10 @@ class NERProcessor(Processor):
         :return: bucket_name_to_performance: a dictionary that maps bucket names to
             bucket performance
         """
-        # getattr(explainaboard.metric, f'BIO{name}')
         metric_names = unwrap(sys_info.metric_names)
         config = explainaboard.metric.F1ScoreConfig(ignore_classes=['O'])
         bucket_metrics = [
-            getattr(explainaboard.metric, f'{name}')(config=config)
+            getattr(explainaboard.metric, name)(config=config)
             for name in metric_names
         ]
 
@@ -593,8 +579,6 @@ class NERProcessor(Processor):
 
             if bucket_interval not in samples_over_bucket_pred.keys():
                 raise ValueError("Predict Label Bucketing Errors")
-            # else:
-            #     spans_pred = samples_over_bucket_pred[bucket_interval]
 
             """
             Get bucket samples for ner task

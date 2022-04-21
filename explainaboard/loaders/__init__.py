@@ -1,6 +1,5 @@
 from explainaboard.loaders import (
     aspect_based_sentiment_classification,
-    chinese_word_segmentation,
     conditional_generation,
     extractive_qa,
     kg_link_tail_prediction,
@@ -10,6 +9,7 @@ from explainaboard.loaders import (
     qa_multiple_choice,
     text_classification,
     text_pair_classification,
+    word_segmentation,
 )
 
 get_datalab_loader = loader_registry.get_datalab_loader
@@ -25,5 +25,5 @@ __all__ = [
     'qa_multiple_choice',
     'text_classification',
     'text_pair_classification',
-    'chinese_word_segmentation',
+    'word_segmentation',
 ]

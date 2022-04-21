@@ -13,7 +13,7 @@ class TestNER(unittest.TestCase):
 
     def test_generate_system_analysis(self):
         loader = get_custom_dataset_loader(
-            TaskType.chinese_word_segmentation,
+            TaskType.word_segmentation,
             self.conll_dataset,
             self.conll_output,
             Source.local_filesystem,
@@ -24,13 +24,13 @@ class TestNER(unittest.TestCase):
         data = loader.load()
 
         metadata = {
-            "task_name": TaskType.chinese_word_segmentation.value,
+            "task_name": TaskType.word_segmentation.value,
             # "dataset_name": "conll2003",
             # "sub_dataset_name":"ner",
             "metric_names": ["F1Score"],
         }
 
-        processor = get_processor(TaskType.chinese_word_segmentation)
+        processor = get_processor(TaskType.word_segmentation)
 
         sys_info = processor.process(metadata, data)
 

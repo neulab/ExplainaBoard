@@ -15,7 +15,7 @@ class TaskType(str, Enum):
     kg_link_tail_prediction = "kg-link-tail-prediction"
     qa_multiple_choice = "qa-multiple-choice"
     conditional_generation = "conditional-generation"
-    chinese_word_segmentation = "chinese-word-segmentation"
+    word_segmentation = "word-segmentation"
 
     @staticmethod
     def list():
@@ -166,9 +166,9 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/
         "predicting structural properties of the text, such as syntax",
         [
             Task(
-                name=TaskType.named_entity_recognition,
+                name=TaskType.word_segmentation,
                 description="""
-identify word boundaries of a Chinese sentence.
+identify word boundaries of some languages (e.g., Chinese).
 """,
                 supported=True,
                 supported_metrics=["F1Score"],

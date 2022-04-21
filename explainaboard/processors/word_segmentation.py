@@ -20,11 +20,11 @@ from explainaboard.utils.span_utils import BMESSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.chinese_word_segmentation)
+@register_processor(TaskType.word_segmentation)
 class CWSProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.chinese_word_segmentation
+        return TaskType.word_segmentation
 
     @classmethod
     def default_features(cls) -> feature.Features:

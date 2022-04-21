@@ -11,8 +11,8 @@ from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.tasks import TaskType
 
 
-@register_loader(TaskType.chinese_word_segmentation)
-class CWSLoader(Loader):
+@register_loader(TaskType.word_segmentation)
+class WSLoader(Loader):
     """
     Validate and Reformat system output file with tsv format:
     token \t true_tag \t predicted_tag

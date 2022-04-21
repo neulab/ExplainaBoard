@@ -112,7 +112,7 @@ from . import text_classification
 ## Update new task information
 Once you finish all the above steps, you need to register the new task in the script tasks.py by declaring the supported formats, metrics, etc.
 
-For example, the following registered information is made for text classification tasks.
+For example, the following information can be added for text classification tasks.
 ```python
     TaskCategory(
         "text-classification",
