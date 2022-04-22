@@ -346,15 +346,11 @@ class NERProcessor(Processor):
 
             # sentence_length
             dict_sysout["sentence_length"] = len(tokens)
-            self._get_max_min_value(sys_info, "sentence_length", len(tokens))
 
             # entity density
             dict_sysout["entity_density"] = len(
                 bio_span_ops.get_spans(tags=dict_sysout["true_tags"])
             ) / len(tokens)
-            self._get_max_min_value(
-                sys_info, "entity_density", dict_sysout["entity_density"]
-            )
 
             # sentence-level training set dependent features
             if external_stats is not None:
@@ -366,32 +362,9 @@ class NERProcessor(Processor):
                 tokens, dict_sysout["true_tags"], statistics=external_stats
             )
 
-            # store max and min value for bucket features with float and int type
-            for bucket_key in tok_feats:
-                for span in dict_sysout["true_entity_info"]:
-                    current_value = getattr(span, bucket_key)
-                    self._get_max_min_value(
-                        sys_info,
-                        bucket_key,
-                        current_value,
-                        token_feature_name="true_entity_info",
-                    )
-
             dict_sysout["pred_entity_info"] = self._complete_span_features(
                 tokens, dict_sysout["pred_tags"], statistics=external_stats
             )
-
-            # store max and min value for bucket features with float and int type
-            for bucket_key in tok_feats:
-                for span in dict_sysout["pred_entity_info"]:
-                    current_value = getattr(span, bucket_key)
-                    # token_feature_name should be true_entity_info
-                    self._get_max_min_value(
-                        sys_info,
-                        bucket_key,
-                        current_value,
-                        token_feature_name="true_entity_info",
-                    )
 
         # This is not used elsewhere, so just keep it as-is
         return active_features
@@ -461,12 +434,6 @@ class NERProcessor(Processor):
 
             samples_over_bucket_true[feature_name] = bucket_func(
                 dict_obj=feat_dict,
-                max_value=my_feature.max_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=my_feature.min_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
@@ -479,12 +446,6 @@ class NERProcessor(Processor):
                 feature_name
             ] = bucketing.bucket_attribute_specified_bucket_interval(
                 dict_obj=feat_dict,
-                max_value=my_feature.max_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=my_feature.min_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=samples_over_bucket_true[feature_name].keys(),
             )
