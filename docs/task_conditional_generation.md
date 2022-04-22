@@ -11,61 +11,69 @@ This can include a wide variety of tasks, such as:
 ## Data Preparation
 
 In order to perform analysis of your results, they should be in the following
-TSV format:
+text format:
 
 ```
-input_text \t reference_output_text \t predicted_output_text
+predicted_output_text
 ```
 
-Here is an example system output file for summarization of CNN/Daily Mail articles:
-* [cnndm_mini.bart](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/cnndm/cnndm_mini.bart) 
+Here is an example system output file for summarization on a subset of the CNN/Daily Mail articles:
+* [cnndm_mini-bart-output.txt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/cnndm/cnndm_mini-bart-output.txt) 
 
-And here are two examples for machine translation from Slovak to English:
-* [ted_multi_slk_eng.pbmt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/ted_multi/ted_multi_slk_eng.pbmt) 
-* [ted_multi_slk_eng.nmt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/ted_multi/ted_multi_slk_eng.nmt) 
+And here are two examples for machine translation from Slovak to English, an NMT and phrase-based MT system:
+* [ted_multi_slk_eng-nmt-output.txt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt) 
+* [ted_multi_slk_eng-pbmt-output.txt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/ted_multi/ted_multi_slk_eng-pbmt-output.txt) 
 
 
 
 ## Performing Basic Analysis
 
-In order to perform your basic analysis, you can run the following commands for summarization and MT respectively:
-
+The preferred method of doing analysis is to load the dataset from DataLab.
+You can load the`cnn_dailymail` dataset but because the test set is large we don't
+include it directly in the explainaboard repository, but you can get an example by
+downloading with wget:
 ```shell
-explainaboard --task summarization --system_outputs ./data/system_outputs/cnndm/cnndm_mini.bart --metrics bart_score_summ rouge2
+wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart-output.txt
 ```
 
+Then run the below command and it should work:
 ```shell
-explainaboard --task machine-translation --system_outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng.nmt --metrics bleu
+explainaboard --task summarization --dataset cnn_dailymail --system_outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
 ```
 
-where
-* `--task`: denotes the task name. 
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
+* `--task`: denotes the task name.
+* `--system_outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: optional, denotes the dataset name
 * `--metrics`: optional, different metrics should be separated by space. See [more supported metrics](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md#summarization)
 * `report.json`: the generated analysis file with json format. Tips: you can use a json viewer
-                  like [this one](http://jsonviewer.stack.hu/) or Python's `python -m json.tool` to convert
-                  the JSON into a prettified and readable format.
+  like [this one](http://jsonviewer.stack.hu/) or Python's `python -m json.tool` to convert
+  the JSON into a prettified and readable format.
 
+In addition, you can use a custom dataset, in which case the format should be
+```
+source_sentence \t target_sentence
+```
 
+In this case, we can directly use the miniature dataset distributed with the repo:
+```shell
+explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system_outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
+```
 
-## Bucketing Features
-* `source_len`: the length of the source document
-* `compression`: the compression ratio `len(src)/len(ref)`
-* [`copy_len`](https://aclanthology.org/2020.findings-emnlp.329.pdf): measures the average length of segments in summary copied from source document.
-* [`coverage`](https://aclanthology.org/2020.findings-emnlp.329.pdf): illustrates the overlap rate between document and summary, it is defined as the proportion of the copied segments in
-summary.
-* [`novelty`]((https://aclanthology.org/2020.findings-emnlp.329.pdf)): is defined as the proportion of segments in the summaries that haven’t
-appeared in source documents. The segments is instantiated as 2-grams.
+You can also try it for translation as below:
+```shell
+explainaboard --task machine-translation --custom_dataset_paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system_outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
+```
+
 
 ## Notes
 
-**Other Conditional Text Generation Tasks:** You can probably also get a start on analyzing other sequence-to-sequence
-tasks (e.g. text style transfer) by just specifying `machine-translation` or `summarization` and feeding in the data
-from your dataset. This would give you a start, but you may want to design other features that are specific for this
-task. If you'd like help with this, feel free to open an issue!
+**Other Conditional Text Generation Tasks:** You can probably also get a start on
+analyzing other sequence-to-sequence tasks (e.g. text style transfer) by just specifying
+`machine-translation` or `summarization` and feeding in the data from your dataset.
+This would give you a start, but you may want to design other features that are specific
+for this  task. If you'd like help with this, feel free to open an issue!
 
-**Multi-document Summarization:** ExplainaBoard supports single-document summarization and text compression, but not
-multi-document summarization or other similar tasks like retrieval-based QA.
-We would welcome help with adding support for this, so similarly open an issue!
+**Multi-document Summarization:** ExplainaBoard supports single-document summarization
+and text compression, but not multi-document summarization or other similar tasks like
+retrieval-based QA.  We would welcome help with adding support for this, so similarly open an issue!

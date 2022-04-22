@@ -1,4 +1,3 @@
-from explainaboard.analyzers import get_pairwise_performance_gap
 from explainaboard.constants import FileType, Source, TaskType
 from explainaboard.loaders import (
     DatalabLoaderOption,
@@ -13,7 +12,6 @@ __all__ = [
     'get_datalab_loader',
     'DatalabLoaderOption',
     'get_custom_dataset_loader',
-    'get_pairwise_performance_gap',
     'get_processor',
     'get_task_categories',
     'Source',

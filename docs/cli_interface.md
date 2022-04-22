@@ -1,15 +1,27 @@
 # CLI Interface to Various Tasks
 
-Below is a (mostly complete) list of tasks that ExplainaBoard currently supports, along with examples of how to analyze different tasks.
-In particular [text classification](#text-classification) is a good example to start with.
+Below is a (mostly complete) list of tasks that ExplainaBoard currently supports, along
+with examples of how to analyze different tasks. In particular
+[text classification](#text-classification) is a good example to start with.
 
 **General notes:**
-* Click the link on the task name for more details, or when no link exists you can open the example data to see what the file format looks like.
-* You can either analyze an existing dataset included in [Datalab](https://github.com/expressai/datalab) or use your own custom dataset. The directions below describe how to do both in most cases.
-* All of the examples below will output a json report to standard out, and you can use Python's pretty printing tool to see it in a more readable format (add `| python -m json.tool` at the end of any of the lines).
+* Click the link on the task name for more details, or when no link exists you can open
+  the example data to see what the file format looks like.
+* You can either analyze an existing dataset included in
+  [Datalab](https://github.com/expressai/datalab) or use your own custom dataset.
+  The directions below describe how to do both in most cases, but using DataLab has some
+  advantages such as allowing for easy calculation of training-set features and
+  compatibility with ExplainaBoard online leaderboards. You can check the list of
+  [datasets supported in DataLab](https://github.com/ExpressAI/DataLab/tree/main/datasets)
+  and [add your dataset](https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md)
+  if it doesn't exist.
+* All of the examples below will output a json report to standard out, and you can use
+  Python's pretty printing tool to see it in a more readable format (add
+  `| python -m json.tool` at the end of any of the lines).
 
 
-We welcome contributions of [more tasks](add_new_tasks.md), or detailed documentation for tasks where the documentation does not yet exist! Please open an issue or file a PR.
+We welcome contributions of [more tasks](add_new_tasks.md), or detailed documentation
+for tasks where the documentation does not yet exist! Please open an issue or file a PR.
 
 **Table of Contents**
 * [Text Classification](#text-classification)
@@ -24,8 +36,9 @@ We welcome contributions of [more tasks](add_new_tasks.md), or detailed document
 
 ## [Text Classification](task_text_classification.md)
 
-Text classification consists of classifying text into different categories, such as sentiment values or topics.
-The below example performs an analysis on the Stanford Sentiment Treebank, a set of sentiment tags over English reviews.
+Text classification consists of classifying text into different categories, such as
+sentiment values or topics. The below example performs an analysis on the Stanford
+Sentiment Treebank, a set of sentiment tags over English reviews.
 
 **CLI Examples**
 
@@ -42,8 +55,10 @@ explainaboard --task text-classification --custom_dataset_paths ./data/system_ou
 
 ## [Text Pair Classification](task_text_pair_classification.md)
 
-Classification of pairs of text, such as natural language inference or paraphrase detection.
-The example below concerns natural language infernce, predicting whether a premise, entails, contradicts, or is neutral with respect to a hypothesis, on the Stanford Natural Language Inference dataset.
+Classification of pairs of text, such as natural language inference or paraphrase
+detection. The example below concerns natural language infernce, predicting whether a
+premise, entails, contradicts, or is neutral with respect to a hypothesis, on the
+Stanford Natural Language Inference dataset.
 
 **CLI Example**
 
@@ -60,8 +75,9 @@ explainaboard --task text-pair-classification --custom_dataset_paths ./data/syst
 
 ## [Conditional Text Generation](task_conditional_generation.md)
 
-Conditional text generation concerns generation of one text based on other texts, including tasks like summarization and machine translation.
-The below example evaluates a summarization system on the CNN-daily mail dataset.
+Conditional text generation concerns generation of one text based on other texts,
+including tasks like summarization and machine translation. The below example evaluates
+a summarization system on the CNN-daily mail dataset.
 
 **CLI Example**
 

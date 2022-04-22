@@ -6,7 +6,7 @@ from unittest.mock import patch
 import requests
 
 from explainaboard.explainaboard_main import main
-from explainaboard.tests.utils import OPTIONAL_TEST_SUITES
+from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, top_path
 
 
 class TestCLI(TestCase):
@@ -19,7 +19,23 @@ class TestCLI(TestCase):
             '--task',
             'text-classification',
             '--system_outputs',
-            './data/system_outputs/sst2/sst2-lstm-output.txt',
+            f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
+            '--dataset',
+            'sst2',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_textclass_datalab_pairwise(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'text-classification',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
+            f'{top_path}/data/system_outputs/sst2/sst2-cnn-output.txt',
             '--dataset',
             'sst2',
             '--report_json',
@@ -34,9 +50,9 @@ class TestCLI(TestCase):
             '--task',
             'text-classification',
             '--system_outputs',
-            './data/system_outputs/sst2/sst2-lstm-output.txt',
+            f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
             '--custom_dataset_paths',
-            './data/system_outputs/sst2/sst2-dataset.tsv',
+            f'{top_path}/data/system_outputs/sst2/sst2-dataset.tsv',
             '--report_json',
             '/dev/null',
         ]
@@ -50,7 +66,7 @@ class TestCLI(TestCase):
             '--task',
             'text-pair-classification',
             '--system_outputs',
-            './data/system_outputs/snli/snli-roberta-output.txt',
+            f'{top_path}/data/system_outputs/snli/snli-roberta-output.txt',
             '--dataset',
             'snli',
             '--report_json',
@@ -65,9 +81,9 @@ class TestCLI(TestCase):
             '--task',
             'text-pair-classification',
             '--system_outputs',
-            './data/system_outputs/snli/snli-roberta-output.txt',
+            f'{top_path}/data/system_outputs/snli/snli-roberta-output.txt',
             '--custom_dataset_paths',
-            './data/system_outputs/snli/snli-dataset.tsv',
+            f'{top_path}/data/system_outputs/snli/snli-dataset.tsv',
             '--report_json',
             '/dev/null',
         ]
@@ -80,9 +96,9 @@ class TestCLI(TestCase):
             '--task',
             'summarization',
             '--custom_dataset_paths',
-            './data/system_outputs/cnndm/cnndm_mini-dataset.tsv',
+            f'{top_path}/data/system_outputs/cnndm/cnndm_mini-dataset.tsv',
             '--system_outputs',
-            './data/system_outputs/cnndm/cnndm_mini-bart-output.txt',
+            f'{top_path}/data/system_outputs/cnndm/cnndm_mini-bart-output.txt',
             '--metrics',
             'rouge2',
             'chrf',
@@ -107,9 +123,26 @@ class TestCLI(TestCase):
             '--dataset',
             'cnn_dailymail',
             '--system_outputs',
-            './data/system_outputs/cnndm/cnndm-bart-output.txt',
+            f'{top_path}/data/system_outputs/cnndm/cnndm-bart-output.txt',
             '--metrics',
             'rouge2',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_mt_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'machine-translation',
+            '--custom_dataset_paths',
+            f'{top_path}/data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt',  # noqa
+            '--metrics',
+            'bleu',
             '--report_json',
             '/dev/null',
         ]
@@ -126,7 +159,7 @@ class TestCLI(TestCase):
             '--sub_dataset',
             'ner',
             '--system_outputs',
-            './data/system_outputs/conll2003/conll2003-elmo-output.conll',
+            f'{top_path}/data/system_outputs/conll2003/conll2003-elmo-output.conll',
             '--report_json',
             '/dev/null',
         ]
@@ -139,9 +172,9 @@ class TestCLI(TestCase):
             '--task',
             'named-entity-recognition',
             '--custom_dataset_paths',
-            './data/system_outputs/conll2003/conll2003-dataset.conll',
+            f'{top_path}/data/system_outputs/conll2003/conll2003-dataset.conll',
             '--system_outputs',
-            './data/system_outputs/conll2003/conll2003-elmo-output.conll',
+            f'{top_path}/data/system_outputs/conll2003/conll2003-elmo-output.conll',
             '--report_json',
             '/dev/null',
         ]
@@ -157,7 +190,7 @@ class TestCLI(TestCase):
             '--dataset',
             'metaphor_qa',
             '--system_outputs',
-            './data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',
+            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -170,9 +203,9 @@ class TestCLI(TestCase):
             '--task',
             'qa-multiple-choice',
             '--custom_dataset_paths',
-            './data/system_outputs/metaphor_qa/metaphor_qa-dataset.json',
+            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-dataset.json',
             '--system_outputs',
-            './data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',
+            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -185,9 +218,9 @@ class TestCLI(TestCase):
             '--task',
             'question-answering-extractive',
             '--custom_dataset_paths',
-            './data/system_outputs/squad/squad_mini-dataset.json',
+            f'{top_path}/data/system_outputs/squad/squad_mini-dataset.json',
             '--system_outputs',
-            './data/system_outputs/squad/squad_mini-example-output.json',
+            f'{top_path}/data/system_outputs/squad/squad_mini-example-output.json',
             '--report_json',
             '/dev/null',
         ]
@@ -206,7 +239,7 @@ class TestCLI(TestCase):
             '--dataset',
             'fb15k_237',
             '--system_outputs',
-            './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -219,9 +252,9 @@ class TestCLI(TestCase):
             '--task',
             'kg-link-tail-prediction',
             '--custom_dataset_paths',
-            './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
             '--system_outputs',
-            './data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -234,9 +267,9 @@ class TestCLI(TestCase):
             '--task',
             'aspect-based-sentiment-classification',
             '--custom_dataset_paths',
-            './data/system_outputs/absa/absa-dataset.tsv',
+            f'{top_path}/data/system_outputs/absa/absa-dataset.tsv',
             '--system_outputs',
-            './data/system_outputs/absa/absa-example-output.txt',
+            f'{top_path}/data/system_outputs/absa/absa-example-output.txt',
             '--report_json',
             '/dev/null',
         ]
