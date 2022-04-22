@@ -79,7 +79,7 @@ class KgLinkTailPredictionLoader(Loader):
                     "true_tail": entity_dic[features_dict["gold_tail"]]["label"]
                     if features_dict["gold_tail"] in entity_dic.keys()
                     else features_dict["gold_tail"],
-                    "true_tail_anonymity":features_dict["gold_tail"],
+                    "true_tail_anonymity": features_dict["gold_tail"],
                     "true_label": features_dict[
                         "gold_" + features_dict["predict"]
                     ],  # the entity to which we compare the predictions
