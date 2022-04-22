@@ -33,7 +33,7 @@ def bucket_attribute_specified_bucket_value(
     n_examps = len(keys)
     sorted_idxs = np.argsort(vals)
     sorted_vals = vals[sorted_idxs]
-    max_val, min_val = sorted_vals[-1], sorted_vals[0]
+    max_val, min_val = conv(sorted_vals[-1]), conv(sorted_vals[0])
 
     start_val, last_val = min_val, min_val
     start_i, cutoff_i = 0, n_examps / float(bucket_number)
