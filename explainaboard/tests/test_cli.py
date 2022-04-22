@@ -132,6 +132,23 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    def test_mt_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'machine-translation',
+            '--custom_dataset_paths',
+            f'{top_path}/data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt',  # noqa
+            '--metrics',
+            'bleu',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
     def test_ner_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
