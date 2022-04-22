@@ -1,25 +1,32 @@
-def get_pairwise_performance_gap(sys1, sys2):
+import copy
 
-    for metric_name, performance_unit in sys1["results"]["overall"].items():
-        sys1["results"]["overall"][metric_name]["value"] = float(
-            sys1["results"]["overall"][metric_name]["value"]
-        ) - float(sys2["results"]["overall"][metric_name]["value"])
-        sys1["results"]["overall"][metric_name]["confidence_score_low"] = None
-        sys1["results"]["overall"][metric_name]["confidence_score_high"] = None
+from explainaboard.info import SysOutputInfo
+from explainaboard.utils.typing_utils import unwrap
 
-    for attr, performance_list in sys1["results"]["fine_grained"].items():
-        for idx, performances in enumerate(performance_list):
-            for idy, performance_unit in enumerate(
-                performances
-            ):  # multiple metrics' results
-                sys1["results"]["fine_grained"][attr][idx][idy]["value"] = float(
-                    sys1["results"]["fine_grained"][attr][idx][idy]["value"]
-                ) - float(sys2["results"]["fine_grained"][attr][idx][idy]["value"])
-                sys1["results"]["fine_grained"][attr][idx][idy][
-                    "confidence_score_low"
-                ] = None
-                sys1["results"]["fine_grained"][attr][idx][idy][
-                    "confidence_score_high"
-                ] = None
 
-    return sys1
+def get_pairwise_performance_gap(
+    sys1: SysOutputInfo, sys2: SysOutputInfo
+) -> SysOutputInfo:
+
+    sys = copy.deepcopy(sys1)
+
+    orm, or1, or2 = (unwrap(x.results.overall) for x in (sys, sys1, sys2))
+    for metric_name, performance_unit in orm.items():
+        orm[metric_name].value = float(or1[metric_name].value) - float(
+            or2[metric_name].value
+        )
+        orm[metric_name].confidence_score_low = None
+        orm[metric_name].confidence_score_high = None
+
+    fgr, fgr1, fgr2 = (unwrap(x.results.fine_grained) for x in (sys, sys1, sys2))
+    for bucket_attr, buckets in fgr.items():
+        for bucket_name, bucket in buckets.items():
+            for perf_id, perf in enumerate(bucket.performances):
+                perf.value = float(
+                    fgr1[bucket_attr][bucket_name].performances[perf_id].value
+                ) - float(fgr2[bucket_attr][bucket_name].performances[perf_id].value)
+                # TODO(gneubig): these could be done via pairwise bootstraps
+                perf.confidence_score_low = None
+                perf.confidence_score_high = None
+
+    return sys
