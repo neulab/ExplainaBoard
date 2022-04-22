@@ -8,38 +8,42 @@ We will give an example using the `nature-language-inference`
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following
-tsv format (don't need to contain the column names that the first line):
+In order to perform analysis of your results, your system outputs should be one
+predicted label per line:
 
 ```
-text1 \t text2 \t true_label \t predicted_label
+predicted_label
 ```
 
-Let's say we have oen system output file from BERT model. 
-* [snli.bert](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/snli/snli.bert) 
+Let's say we have one system output file from a RoBERTa model. 
+* [snli.bert](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/snli/snli-roberta-output.txt) 
 
 
 
 ## Performing Basic Analysis
 
-In order to perform your basic analysis, we can run the following command:
+The below example loads the `snli` dataset from DataLab:
+```shell
+explainaboard --task text-pair-classification --dataset snli --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
+```
+
+where
+* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
+* `--system_outputs`: denote the path of system outputs. Multiple one should be
+  separated by space, for example, system1 system2
+* `--dataset`: denotes the dataset name
+* `report.json`: the generated analysis file with json format. Tips: use a json viewer
+  like [this one](http://jsonviewer.stack.hu/) for better interpretation.
+
+Alternatively, you can load the dataset from an existing file using the
+`--custom_dataset_paths` option
 
 ```shell
-    explainaboard --task text-pair-classification --system_outputs ./data/system_outputs/snli/snli.bert > report.json
+explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
-where
-* `--task`: denotes the task name. this could be applied for any sentence pair classification subtasks.
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
-  separated by space, for example, system1 system2
-* `--dataset`:optional, denotes the dataset name
-* `report.json`: the generated analysis file with json format. . Tips: use a json viewer
-                  like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
+in which case the file format of this file is TSV
 
-
-## Bucketing Features
-* `label`: the relationship types of two texts
-* `text1_length`: the length of `text1`
-* `text2_length`: the length of `text2`
-* `similarity`: the semantic similarity of two texts measured by `bleu`
-* `text1_divided_text2`: text1_length/text2_length
+```
+text1 \t text2 \t true_label
+```
