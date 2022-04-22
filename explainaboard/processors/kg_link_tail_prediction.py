@@ -112,7 +112,14 @@ class KGLinkTailPredictionProcessor(Processor):
 
     @classmethod
     def default_metrics(cls) -> list[str]:
-        return ["Hits", "MeanReciprocalRank", "MeanRank"]
+        return [
+            "Hit1",
+            "Hit2",
+            "Hit3",
+            "Hit5",
+            "MeanReciprocalRank",
+            "MeanRank",
+        ]
 
     @classmethod
     def default_metric_configs(cls) -> dict[str, explainaboard.metric.MetricConfig]:
@@ -189,7 +196,8 @@ class KGLinkTailPredictionProcessor(Processor):
         # TODO(gneubig):
         # this will be reloaded for every dataset, maybe should be fixed for multiple
         # analysis
-        # TODO(Pengfei): uncomment following code once datalab loader of this task  is introduced
+        # TODO(Pengfei): uncomment following code once datalab loader
+        #  of this task  is introduced
         # if sys_info.dataset_name != "fb15k_237":  # to be generalized
         #     self.entity_type_level_map = {}
         # else:
