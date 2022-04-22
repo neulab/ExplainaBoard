@@ -25,14 +25,15 @@ def bucket_attribute_specified_bucket_value(
     vals = np.array(list(dict_obj.values()))
     # Function to convert numpy datatypes to Python native types
     conv = int if np.issubdtype(vals[0], int) else float
-    max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
     # Special case of one bucket
     if bucket_number == 1:
+        max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
         return {(min_val, max_val): keys}
 
     n_examps = len(keys)
     sorted_idxs = np.argsort(vals)
     sorted_vals = vals[sorted_idxs]
+    max_val, min_val = sorted_vals[-1], sorted_vals[0]
 
     start_val, last_val = min_val, min_val
     start_i, cutoff_i = 0, n_examps / float(bucket_number)
