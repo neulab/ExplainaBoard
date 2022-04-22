@@ -22,6 +22,8 @@
 
 When developing a natural language processing (NLP or AI) system, often one of the hardest things is to understand where your system is working and where it is failing, and deciding what to do next. ExplainaBoard is a tool that *inspects your system outputs*, *identifies what is working and what is not working*, and helps *inspire you with ideas of where to go next*.
 
+<img src="./fig/intro.png" width="300" align="right">
+
 It offers a number of different ways with which you can evaluate and understand your data:
 
 1. *Single-system Analysis*: What is a system good or bad at?
@@ -31,25 +33,25 @@ It offers a number of different ways with which you can evaluate and understand 
 5. *Fine-grained Error Analysis*: where do errors occur?
 6. *System Combination*: Is there potential complementarity between different systems?
 
-<img src="./fig/intro.png" width="400" class="center">
 
-How do you get started?
+## Using Explainaboard
 
-1. *Browse Outputs Online*: We provide an [online interface](http://explainaboard.nlpedia.ai/) where you can browse and understand outputs from various state-of-the-art systems.
-2. *Upload Your Own Outputs*: You can also [upload your own system outputs](https://docs.google.com/forms/d/e/1FAIpQLSdb_3PPRTXXjkl9MWUeVLc8Igw0eI-EtOrU93i6B61X9FRJKg/viewform) through the online interace, and we will process them so you can view them alongside other systems.
-3. *Run Your Own Analyses Offline*: You can follow the installation instructions below then view [CLI instructions for supported tasks](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md). We also plan to [support command-line upload to the web interface](https://github.com/neulab/ExplainaBoard/issues/60) soon!
-4. *Access ExplainaBoard Programmatically*: ExplainaBoard can also be [accessed programmatically](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md) through a library.
+ExplainaBoard can be used online or offline.
+
+### Online Usage
+
+Browse the [**web interface**](https://explainaboard.inspiredco.ai), which gives you the
+ability to browse outputs and upload your own system outputs.
+
+<a href="https://explainaboard.inspiredco.ai"><img src="./fig/demo-v2.png" width="500" class="center"></a>
+
+### Offline Usage
+
+First, follow the installation directions below, then take a look at our
+[**CLI examples**](docs/cli_interface.md).
 
 
-## Web-based Toolkit
-
-We have deployed ExplainaBoard as a [Web toolkit](http://explainaboard.nlpedia.ai/), which includes 9 NLP tasks and will be more,
-40 datasets and 300 systems. Detailed information is as follows.
-<img src="./fig/demo.gif" width="800" class="center">
-
-### Installation
-
-**Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
+**Install Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
 ```
 pip install --upgrade pip  # recommending the newest version of pip.
@@ -57,7 +59,7 @@ pip install explainaboard
 python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
 ```
 
-**Method 2 - Development:** Install from the source and develop locally (Python 3 only)
+**Install Method 2 - Development:** Install from the source and develop locally (Python 3 only)
 
 ```bash
 # Clone current repo
@@ -74,12 +76,10 @@ pre-commit install
     - run `python -m black .` to format code
     - run `flake8` to lint code
     - You can also configure your IDE to automatically format and lint the files as you are writing code.
-    - There are various ways to skip formatting or linting if you find it necessary. The following are some examples (please refer to official documentation for more options)
-        - `# noqa` signals flake8 to ignore the current line. (`flake8: noqa` ignores the current file.)
-        - lines between `# fmt: on` and `# fmt: off` are skipped by black. 
 
-Then, you can perform analyses on your favorite tasks.
-
+After trying things out in the [CLI](docs/cli_interface.md), you can read how to add
+new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
+[file formats](docs/add_new_formats.md).
 
 ## Acknowledgement
 
