@@ -175,7 +175,7 @@ class Metric:
         self,
         stats: MetricStats,
         conf_value: float,
-        n_samples: int = 2000,
+        n_samples: int = 1000,
         prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float]:

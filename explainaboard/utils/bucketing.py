@@ -1,73 +1,66 @@
-from explainaboard.utils.analysis import find_key, reverse_dict, reverse_dict_discrete
+from __future__ import annotations
+
+from typing import Any, TypeVar
+
+import numpy as np
+
+from explainaboard.utils.analysis import find_key, reverse_dict
 from explainaboard.utils.py_utils import sort_dict
+
+T = TypeVar('T')
 
 
 def bucket_attribute_specified_bucket_value(
-    dict_obj=None, max_value=None, min_value=None, bucket_number=4, bucket_setting=None
-):
-    if not dict_obj or len(dict_obj) == 0:
-        return None
+    dict_obj: dict[Any, T], bucket_number: int = 4, bucket_setting: Any = None
+) -> dict[tuple[T, T], list]:
+    if len(dict_obj) == 0:
+        return {}
+    if bucket_setting is not None and len(bucket_setting) > 0:
+        raise NotImplementedError(
+            'bucket_setting incompatible with '
+            'bucket_attribute_specified_bucket_value'
+        )
     # Bucketing different Attributes
-    dict_span2att_val = dict_obj
-    n_buckets = bucket_number
-    hardcoded_bucket_values = bucket_setting
-    p_infinity = max_value if max_value is not None else 100000
-    n_infinity = min_value if min_value is not None else -100000
-    n_spans = len(dict_span2att_val)
-    dict_att_val2span = reverse_dict(dict_span2att_val)
-    dict_att_val2span = sort_dict(dict_att_val2span)
-    dict_bucket2span = {}
+    keys = list(dict_obj.keys())
+    vals = np.array(list(dict_obj.values()))
+    # Function to convert numpy datatypes to Python native types
+    conv = int if np.issubdtype(vals[0], int) else float
+    # Special case of one bucket
+    if bucket_number == 1:
+        max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
+        return {(min_val, max_val): keys}
 
-    for bucket_value in hardcoded_bucket_values:
-        if bucket_value in dict_att_val2span.keys():
-            dict_bucket2span[(bucket_value,)] = dict_att_val2span[bucket_value]
-            n_spans -= len(dict_att_val2span[bucket_value])
-            n_buckets -= 1
+    n_examps = len(keys)
+    sorted_idxs = np.argsort(vals)
+    sorted_vals = vals[sorted_idxs]
+    max_val, min_val = conv(sorted_vals[-1]), conv(sorted_vals[0])
 
-    avg_entity = n_spans * 1.0 / n_buckets
-    n_tmp = 0
-    entity_list = []
-    val_list = []
+    start_val, last_val = min_val, min_val
+    start_i, cutoff_i = 0, n_examps / float(bucket_number)
+    bucket_dict: dict[tuple[T, T], list[Any]] = {}
+    for i, val in enumerate(sorted_vals):
+        # Return the final bucket
+        if bucket_number - len(bucket_dict) == 1 or val == max_val:
+            bucket_dict[(conv(start_val), max_val)] = [
+                keys[j] for j in sorted_idxs[start_i:]
+            ]
+            break
+        # If the last value is not the same, maybe make a new bucket
+        elif val != last_val:
+            if i >= cutoff_i:
+                bucket_dict[(conv(start_val), conv(last_val))] = [
+                    keys[j] for j in sorted_idxs[start_i:i]
+                ]
+                start_val = val
+                start_i = i
+                cutoff_i = i + (n_examps - i) / float(bucket_number - len(bucket_dict))
+            last_val = val
 
-    for att_val, entity in dict_att_val2span.items():
-        if att_val in hardcoded_bucket_values:
-            continue
-
-        val_list.append(att_val)
-        entity_list += entity
-        n_tmp += len(entity)
-
-        if n_tmp > avg_entity:
-
-            if len(val_list) >= 2:
-                key_bucket = (val_list[0], val_list[-1])
-                dict_bucket2span[key_bucket] = entity_list
-            # print("debug key bucket:\t", key_bucket)
-            else:
-                dict_bucket2span[(val_list[0],)] = entity_list
-            entity_list = []
-            n_tmp = 0
-            val_list = []
-    if n_tmp != 0:
-        if n_buckets == 1:
-            dict_bucket2span[(n_infinity, p_infinity)] = entity_list
-        else:
-            if val_list[0] <= 1:
-                p_infinity = 1.0
-            # print("!!!!!-debug-2")
-            if len(val_list) >= 2:
-                key_bucket = (val_list[0], p_infinity)
-                dict_bucket2span[key_bucket] = entity_list
-            else:
-                dict_bucket2span[(val_list[0], p_infinity)] = entity_list  # fix bugs
-
-    return dict_bucket2span
+    return bucket_dict
 
 
 def bucket_attribute_discrete_value(
     dict_obj=None,
-    max_value=None,
-    min_value=None,
     bucket_number=100000000,
     bucket_setting=1,
 ):
@@ -78,7 +71,7 @@ def bucket_attribute_discrete_value(
 
     dict_bucket2span = {}
 
-    dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
+    dict_att_val2span = reverse_dict(dict_span2att_val)
     dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
 
     n_total = 1
@@ -95,8 +88,6 @@ def bucket_attribute_discrete_value(
 
 def bucket_attribute_specified_bucket_interval(
     dict_obj=None,
-    max_value=None,
-    min_value=None,
     bucket_number=None,
     bucket_setting=None,
 ):
@@ -110,7 +101,7 @@ def bucket_attribute_specified_bucket_interval(
 
     dict_bucket2span = {}
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
-        dict_att_val2span = reverse_dict_discrete(dict_span2att_val)
+        dict_att_val2span = reverse_dict(dict_span2att_val)
         dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
         for att_val, entity in dict_att_val2span.items():
             att_val_tuple = (att_val,)

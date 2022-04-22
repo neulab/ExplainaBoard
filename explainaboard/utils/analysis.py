@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import json
+from typing import TypeVar
 
 
 def cap_feature(s):
@@ -72,25 +75,15 @@ def find_key(dict_obj, x):
             return k
 
 
-def reverse_dict(dict_a2b):
+T1 = TypeVar('T1')
+T2 = TypeVar('T2')
+
+
+def reverse_dict(dict_a2b: dict[T1, T2]) -> dict[T2, list[T1]]:
     dict_b2a = {}
     for k, v in dict_a2b.items():
-        v = float(v)
-        if v not in dict_b2a.keys():
-            dict_b2a[float(v)] = [k]
-        else:
-            dict_b2a[float(v)].append(k)
-
-    return dict_b2a
-
-
-def reverse_dict_discrete(dict_a2b):
-    dict_b2a = {}
-    # print(dict_a2b)
-    for k, v in dict_a2b.items():
-        if v not in dict_b2a.keys():
+        if v not in dict_b2a:
             dict_b2a[v] = [k]
         else:
             dict_b2a[v].append(k)
-
     return dict_b2a

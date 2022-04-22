@@ -99,13 +99,13 @@ class TestNER(unittest.TestCase):
         )
         self.assertAlmostEqual(
             second_interval[1],
-            0.9565217391304348,
+            0.8603351955307262,
             4,
             "almost equal",
         )
         # 4. Unittest: test detailed bucket information: bucket samples
         self.assertEqual(
-            sys_info.results.fine_grained["span_econ"][second_interval].n_samples, 1428
+            sys_info.results.fine_grained["span_econ"][second_interval].n_samples, 999
         )
 
         # 5. Unittest: test detailed bucket information: metric
@@ -119,7 +119,7 @@ class TestNER(unittest.TestCase):
             sys_info.results.fine_grained["span_econ"][second_interval]
             .performances[0]
             .value,
-            0.9442300947036127,
+            0.9273461150353179,
             4,
             "almost equal",
         )
