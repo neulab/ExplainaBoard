@@ -28,13 +28,12 @@ explainaboard --task text-classification --dataset sst2 --system_outputs ./data/
 ```
 
 where
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
+* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
 * `--system_outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: denotes the dataset name
 * `report.json`: the generated analysis file with json format. Tips: use a json viewer
   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
-
 
 Alternatively, you can load the dataset from an existing file using the
 `--custom_dataset_paths` option
