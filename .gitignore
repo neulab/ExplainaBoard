@@ -43,3 +43,4 @@ analyzer/fig/5.png
 
 # This is an example file downloaded in doc but not stored here
 data/system_outputs/cnndm/cnndm-bart-output.txt
+data/system_outputs/fb15k-237/larger/*
