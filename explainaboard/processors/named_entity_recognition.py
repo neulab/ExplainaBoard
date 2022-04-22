@@ -461,12 +461,6 @@ class NERProcessor(Processor):
 
             samples_over_bucket_true[feature_name] = bucket_func(
                 dict_obj=feat_dict,
-                max_value=my_feature.max_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=my_feature.min_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
@@ -479,12 +473,6 @@ class NERProcessor(Processor):
                 feature_name
             ] = bucketing.bucket_attribute_specified_bucket_interval(
                 dict_obj=feat_dict,
-                max_value=my_feature.max_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=my_feature.min_value
-                if my_feature.dtype in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=bucket_info.number,
                 bucket_setting=samples_over_bucket_true[feature_name].keys(),
             )

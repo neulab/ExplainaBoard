@@ -375,14 +375,6 @@ class Processor(metaclass=abc.ABCMeta):
                 dict_obj={
                     x: sys_output[x][feature_name] for x in range(len(sys_output))
                 },
-                max_value=sys_info.features[feature_name].max_value  # type: ignore
-                if sys_info.features[feature_name].dtype  # type: ignore
-                in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=sys_info.features[feature_name].min_value  # type: ignore
-                if sys_info.features[feature_name].dtype  # type: ignore
-                in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=sys_features[feature_name].bucket_info.number,
                 bucket_setting=sys_features[feature_name].bucket_info.setting,
             )
