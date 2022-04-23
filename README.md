@@ -1,11 +1,4 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
-[**Introduction**](#introduction) | 
-[**Web Tool**](https://github.com/neulab/ExplainaBoard#web-based-toolkit-quick-learning) |
-[**API Tool**](#api-based-toolkit-quick-installation) |
-[**Download**](#download-system-outputs) |
-[**Paper**](https://arxiv.org/pdf/2104.06387.pdf) |
-[**Video**](https://www.youtube.com/watch?v=3X6NgpbN_GU) |
-[**Bib**](http://explainaboard.nlpedia.ai/explainaboard.bib)
 
 <p align="center">
   <img src="./fig/logo-full-v2.png" width="800" class="center">
@@ -84,6 +77,20 @@ new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
 ## Acknowledgement
 
 ExplainaBoard is developed by Carnegie Mellon University, Inspired Cognition Inc., and other collaborators.
+If you find it useful in research, you can cite it in papers:
+
+    @inproceedings{liu-etal-2021-explainaboard,
+        title = "{E}xplaina{B}oard: An Explainable Leaderboard for {NLP}",
+        author = "Liu, Pengfei and Fu, Jinlan and Xiao, Yang and Yuan, Weizhe and Chang, Shuaichen and Dai, Junqi and Liu, Yixin and Ye, Zihuiwen and Neubig, Graham",
+        booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing: System Demonstrations",
+        month = aug,
+        year = "2021",
+        address = "Online",
+        publisher = "Association for Computational Linguistics",
+        url = "https://aclanthology.org/2021.acl-demo.34",
+        doi = "10.18653/v1/2021.acl-demo.34",
+        pages = "280--289",
+    }
 
 We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
 Colin Raffel, Yang Liu, Li Dong. We also thank
