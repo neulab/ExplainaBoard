@@ -24,7 +24,7 @@ def draw_bar_chart_from_reports(
 
     # TODO(gneubig): This should get the system name from inside the report
     if sys_names is None:
-        sys_names = [os.path.basename(x) for x in reports]
+        sys_names = [os.path.basename(x).replace('.json', '') for x in reports]
     elif len(sys_names) != len(reports):
         raise ValueError('Length of sys_names must equal that of reports')
 
@@ -83,9 +83,6 @@ def draw_bar_chart_from_reports(
                     for y in performances
                 ]
 
-            if sys_names is None:
-                sys_names = [os.path.basename(x).replace('.json', '') for x in reports]
-
             make_bar_chart(
                 ys,
                 output_dir,
@@ -123,6 +120,7 @@ def main():
         type=str,
         required=False,
         nargs="+",
+        default=None,
         help="names of each system, separated by spaces",
     )
 
