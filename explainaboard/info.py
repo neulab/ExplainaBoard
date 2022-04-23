@@ -50,6 +50,11 @@ class Performance:
     confidence_score_low: Optional[float] = None
     confidence_score_high: Optional[float] = None
 
+    @classmethod
+    def from_dict(cls, data_dict: dict) -> Performance:
+        field_names = set(f.name for f in dataclasses.fields(cls))
+        return cls(**{k: v for k, v in data_dict.items() if k in field_names})
+
 
 @dataclass
 class BucketPerformance:
@@ -58,12 +63,48 @@ class BucketPerformance:
     bucket_samples: list[Any]
     performances: list[Performance] = field(default_factory=list)
 
+    @classmethod
+    def dict_conv(cls, k: str, v: dict):
+        if k == 'performances':
+            return [Performance.from_dict(v1) for v1 in v]
+        else:
+            return v
+
+    @classmethod
+    def from_dict(cls, data_dict: dict) -> BucketPerformance:
+        field_names = set(f.name for f in dataclasses.fields(cls))
+        return cls(
+            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
+        )
+
 
 @dataclass
 class Result:
     overall: Optional[dict[str, Performance]] = None
+    # {feature_name: {bucket_name: performance}}
+    fine_grained: Optional[dict[str, dict[str, BucketPerformance]]] = None
     calibration: Optional[list[Performance]] = None
-    fine_grained: Optional[dict] = None
+
+    @classmethod
+    def dict_conv(cls, k: str, v: dict):
+        if k == 'overall':
+            return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
+        elif k == 'fine_grained':
+            return {
+                k1: {k2: BucketPerformance.from_dict(v2) for k2, v2 in v1.items()}
+                for k1, v1 in v.items()
+            }
+        elif k == 'calibration':
+            return None if v is None else [Performance.from_dict(v1) for v1 in v]
+        else:
+            raise NotImplementedError
+
+    @classmethod
+    def from_dict(cls, data_dict: dict) -> Result:
+        field_names = set(f.name for f in dataclasses.fields(cls))
+        return cls(
+            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
+        )
 
 
 @dataclass
@@ -177,14 +218,21 @@ class SysOutputInfo:
             "r",
             encoding="utf-8",
         ) as f:
-            sys_output_info_dict = json.load(f)
-        return cls.from_dict(sys_output_info_dict)
+            data_dict = json.load(f)
+        return cls.from_dict(data_dict)
 
     @classmethod
-    def from_dict(cls, sys_output_info_dict: dict) -> "SysOutputInfo":
+    def dict_conv(cls, k: str, v: dict):
+        if k == 'results':
+            return Result.from_dict(v)
+        else:
+            return v
+
+    @classmethod
+    def from_dict(cls, data_dict: dict) -> SysOutputInfo:
         field_names = set(f.name for f in dataclasses.fields(cls))
         return cls(
-            **{k: v for k, v in sys_output_info_dict.items() if k in field_names}
+            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
         )
 
     def update(self, other_sys_output_info: "SysOutputInfo", ignore_none=True):
