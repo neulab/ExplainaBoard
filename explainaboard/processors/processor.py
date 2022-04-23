@@ -226,37 +226,6 @@ class Processor(metaclass=abc.ABCMeta):
                 else:
                     raise NotImplementedError
 
-    def _get_max_min_value(
-        self,
-        sys_info: SysOutputInfo,
-        bucket_key: str,
-        current_value,
-        token_feature_name: Optional[str] = None,
-    ) -> SysOutputInfo:
-        # Store max and min value for bucketable features with float and int type
-        # TODO(Pengfei): Use snakeviz to check if below is time-consuming
-        my_feature = (
-            sys_info.features[bucket_key]  # type: ignore
-            if token_feature_name is None
-            else sys_info.features[token_feature_name].feature.feature[  # type: ignore
-                bucket_key
-            ]
-        )
-
-        if my_feature.dtype in set(["float", "float32", "int32", "int64"]):
-            my_feature.max_value = (
-                current_value
-                if my_feature.max_value is None or my_feature.max_value < current_value
-                else my_feature.max_value
-            )
-
-            my_feature.min_value = (
-                current_value
-                if my_feature.min_value is None or my_feature.min_value > current_value
-                else my_feature.min_value
-            )
-        return sys_info
-
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
     ) -> list[str]:
@@ -334,11 +303,6 @@ class Processor(metaclass=abc.ABCMeta):
                         else bucket_func(sys_info, dict_sysout)
                     )
 
-                # Store max/min value for bucketable features with float/int type
-                sys_info = self._get_max_min_value(
-                    sys_info, bucket_key, dict_sysout[bucket_key]
-                )
-
         return list(bucket_feature_funcs.keys())
 
     def _bucketing_samples(
@@ -375,14 +339,6 @@ class Processor(metaclass=abc.ABCMeta):
                 dict_obj={
                     x: sys_output[x][feature_name] for x in range(len(sys_output))
                 },
-                max_value=sys_info.features[feature_name].max_value  # type: ignore
-                if sys_info.features[feature_name].dtype  # type: ignore
-                in set(["float", "float32", "int32", "int64"])
-                else None,
-                min_value=sys_info.features[feature_name].min_value  # type: ignore
-                if sys_info.features[feature_name].dtype  # type: ignore
-                in set(["float", "float32", "int32", "int64"])
-                else None,
                 bucket_number=sys_features[feature_name].bucket_info.number,
                 bucket_setting=sys_features[feature_name].bucket_info.setting,
             )
