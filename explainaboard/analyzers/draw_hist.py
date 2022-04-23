@@ -1,42 +1,93 @@
+from __future__ import annotations
+
 import argparse
 import json
 import os
 
 from tqdm import tqdm
 
-from explainaboard.analyzers.bar_chart import plot_chart_from_buckets
+from explainaboard.analyzers.bar_chart import make_bar_chart
+from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.typing_utils import unwrap
 
 
-def draw_bar_chart_from_report(report: str, output_dir: str) -> None:
+def draw_bar_chart_from_reports(
+    reports: list[str], output_dir: str, sys_names: list[str] | None
+) -> None:
     """
     Draw bar charts from report file generated from ExplainaBoard
-    :param report:
+    :param reports: Reports to plot
     :param output_dir:
     :return:
     """
 
-    with open(report) as fin:
-        report_dict = json.load(fin)
+    # TODO(gneubig): This should get the system name from inside the report
+    if sys_names is None:
+        sys_names = [os.path.basename(x) for x in reports]
+    elif len(sys_names) != len(reports):
+        raise ValueError('Length of sys_names must equal that of reports')
 
-    fine_grained_results = report_dict["results"]["fine_grained"]
+    report_info: list[SysOutputInfo] = []
+    for report in reports:
+        with open(report) as fin:
+            report_info.append(SysOutputInfo.from_dict(json.load(fin)))
+    fg_results = [unwrap(x.results.fine_grained) for x in report_info]
 
-    # print(fine_grained_results.keys())
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    for feature_name, buckets in tqdm(
-        fine_grained_results.items()
-    ):  # feature name, for example, sentence length
-        bucket_values = list(buckets.values())
-        bucket_metrics = [x['metric_name'] for x in bucket_values[0]['performances']]
+    # feature name, for example, sentence length
+    for feature_name in tqdm(fg_results[0].keys()):
+        # Make sure that buckets exist
+        buckets: list[dict[str, BucketPerformance]] = []
+        for i, fg_result in enumerate(fg_results):
+            if feature_name not in fg_result:
+                eprint(f'error: feature {feature_name} not in {reports[i]}')
+            else:
+                buckets.append(fg_result[feature_name])
+                bnames0, bnames = buckets[0].keys(), buckets[-1].keys()
+                if len(bnames0) != len(bnames):
+                    eprint(
+                        f'error: different number of buckets for {feature_name} in '
+                        f'{reports[0]} and {reports[i]}'
+                    )
+                    buckets = []
+                elif bnames0 != bnames:
+                    eprint(
+                        f'warning: different bucket labels for {feature_name} in '
+                        f'{reports[0]} and {reports[i]}'
+                    )
+            if len(buckets) != i:
+                break
+        if len(buckets) != len(reports):
+            continue
+
+        bucket0_values = list(buckets[0].values())
+        bucket_metrics = [x.metric_name for x in bucket0_values[0].performances]
         for metric_id, metric_name in enumerate(bucket_metrics):
 
-            plot_chart_from_buckets(
-                buckets,
-                metric_id,
-                save_path=f'{output_dir}/{feature_name}_{metric_name}.png',
-                x_label=feature_name,
-                y_label=metric_name,
+            performances: list[list[Performance]] = [
+                [x.performances[metric_id] for x in y.values()] for y in buckets
+            ]
+            ys = [[x.value for x in y] for y in performances]
+
+            # if performances[0][0].confidence_score_low is not None:
+            #     y_low = [[x.confidence_score_low for x in y] for y in performances]
+            #     y_high = [[x.confidence_score_high for x in y] for y in performances]
+
+            make_bar_chart(
+                ys,
+                output_dir,
+                f'{feature_name}_{metric_name}',
+                output_fig_format='png',
+                fig_size=10,
+                sys_names=reports,
+                errs=None,
+                title=None,
+                xlabel=feature_name,
+                xticklabels=None,
+                ylabel=metric_name,
             )
 
 
@@ -58,6 +109,14 @@ def main():
     )
 
     parser.add_argument(
+        '--sys_names',
+        type=str,
+        required=False,
+        nargs="+",
+        help="names of each system, separated by spaces",
+    )
+
+    parser.add_argument(
         '--output_dir',
         type=str,
         required=False,
@@ -68,9 +127,10 @@ def main():
     args = parser.parse_args()
 
     reports = args.reports
+    sys_names = args.sys_names
     output_dir = "figures" if args.output_dir is None else args.output_dir
 
-    draw_bar_chart_from_report(reports[0], output_dir)
+    draw_bar_chart_from_reports(reports, output_dir, sys_names=sys_names)
 
 
 if __name__ == '__main__':
