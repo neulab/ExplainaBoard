@@ -58,11 +58,12 @@ def draw_bar_chart_from_reports(
                         f'warning: different bucket labels for {feature_name} in '
                         f'{reports[0]} and {reports[i]}'
                     )
-            if len(buckets) != i:
+            if len(buckets) != i + 1:
                 break
         if len(buckets) != len(reports):
             continue
 
+        bucket0_names = list(buckets[0].keys())
         bucket0_values = list(buckets[0].values())
         bucket_metrics = [x.metric_name for x in bucket0_values[0].performances]
         for metric_id, metric_name in enumerate(bucket_metrics):
@@ -72,21 +73,30 @@ def draw_bar_chart_from_reports(
             ]
             ys = [[x.value for x in y] for y in performances]
 
-            # if performances[0][0].confidence_score_low is not None:
-            #     y_low = [[x.confidence_score_low for x in y] for y in performances]
-            #     y_high = [[x.confidence_score_high for x in y] for y in performances]
+            y_errs = None
+            if performances[0][0].confidence_score_low is not None:
+                y_errs = [
+                    (
+                        [x.value - unwrap(x.confidence_score_low) for x in y],
+                        [unwrap(x.confidence_score_high) - x.value for x in y],
+                    )
+                    for y in performances
+                ]
+
+            if sys_names is None:
+                sys_names = [os.path.basename(x).replace('.json', '') for x in reports]
 
             make_bar_chart(
                 ys,
                 output_dir,
                 f'{feature_name}_{metric_name}',
                 output_fig_format='png',
-                fig_size=10,
-                sys_names=reports,
-                errs=None,
+                fig_size=(8, 6),
+                sys_names=sys_names,
+                errs=y_errs,
                 title=None,
                 xlabel=feature_name,
-                xticklabels=None,
+                xticklabels=bucket0_names,
                 ylabel=metric_name,
             )
 
