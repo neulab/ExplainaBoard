@@ -13,7 +13,7 @@ from explainaboard.utils.typing_utils import unwrap
 
 
 def draw_bar_chart_from_reports(
-    reports: list[str], output_dir: str, sys_names: list[str] | None
+    reports: list[str], output_dir: str, sys_names: list[str] | None = None
 ) -> None:
     """
     Draw bar charts from report file generated from ExplainaBoard
