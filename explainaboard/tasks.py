@@ -157,13 +157,7 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/
                     TaskType.named_entity_recognition
                 ),
                 supported_datasets=[],
-            )
-        ],
-    ),
-    TaskCategory(
-        "structure-prediction",
-        "predicting structural properties of the text, such as syntax",
-        [
+            ),
             Task(
                 name=TaskType.word_segmentation,
                 description="""
@@ -175,7 +169,7 @@ identify word boundaries of some languages (e.g., Chinese).
                     TaskType.word_segmentation
                 ),
                 supported_datasets=[],
-            )
+            ),
         ],
     ),
     TaskCategory(
