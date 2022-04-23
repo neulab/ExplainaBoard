@@ -6,49 +6,54 @@ can be analyzed in a similar way.
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following
-tsv format (don't need to contain the column names that the first line):
+In order to perform analysis of your results, your system outputs should be one
+predicted label per line:
 
 ```
-text \t true_label \t predicted_label
+predicted_label
 ```
 
 Let's say we have several files such as 
-* [sst2-lstm.tsv](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-lstm.tsv) 
-* [sst2-cnn.tsv](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-cnn.tsv)
+* [sst2-lstm.tsv](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-lstm-output.txt) 
+* [sst2-cnn.tsv](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-cnn-output.txt)
 
 etc. from different systems.
 
 
 ## Performing Basic Analysis
 
-In order to perform your basic analysis, we can run the following command:
+The below example loads the `sst2` dataset from DataLab:
+```shell
+explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+```
+
+where
+* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
+* `--system_outputs`: denote the path of system outputs. Multiple one should be
+  separated by space, for example, system1 system2
+* `--dataset`: denotes the dataset name
+* `report.json`: the generated analysis file with json format. Tips: use a json viewer
+  like [this one](http://jsonviewer.stack.hu/) for better interpretation.
+
+Alternatively, you can load the dataset from an existing file using the
+`--custom_dataset_paths` option
 
 ```shell
-    explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv > report.json
+explainaboard --task text-classification --custom_dataset_paths ./data/system_outputs/sst2/sst2-dataset.tsv --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
-where
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
-  separated by space, for example, system1 system2
-* `--dataset`:optional, denotes the dataset name
-* `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/neulab/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer
-                  like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
-
-
-
-Now let's look at the results to see what sort of interesting insights we can
-glean from them.
-
-TODO: add insights
+in which case the file format of this file is TSV
+```
+text \t true_label
+```
 
 ## Advanced Analysis Options
 
 One also can perform pair-wise analysis:
 ```shell
-explainaboard --task text-classification --system_outputs ./data/system_outputs/sst2/sst2-lstm.tsv ./data/system_outputs/sst2/sst2-cnn.tsv > report.json
+explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt ./data/system_outputs/sst2/sst2-cnn-output.txt > report.json
 ```
 where two system outputs are fed separated by space.
-* `report.json`: the generated analysis file with json format, whose schema is similar to the above one with single system evaluation except that
-   all performance values are obtained using the sys1 subtract sys2.
+* `report.json`: the generated analysis file with json format, whose schema is similar 
+  to the above one with single system evaluation except that
+  all performance values are obtained using the sys1 subtract sys2.

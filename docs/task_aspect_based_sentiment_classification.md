@@ -7,14 +7,14 @@ can be analyzed in a similar way.
 ## Data Preparation
 
 In order to perform analysis of your results, they should be in the following
-tsv format (don't need to contain the column names that the first line):
+text format with one predicted label per line.
 
 ```
-aspect \t sentence \t true_label \t predicted_label
+predicted_label
 ```
 
 Let's say we have several files such as 
-* [test-aspect.tsv](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv) 
+* [absa-example-output.tsv](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/absa-example-output.tsv) 
  
 
 etc. from different systems.
@@ -22,10 +22,16 @@ etc. from different systems.
 
 ## Performing Basic Analysis
 
+If your dataset exists in DataLab you can read it directly from there. However, here
+we will give an example of using a custom dataset, which takes this form:
+```
+aspect \t sentence \t true_label 
+```
+
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task aspect-based-sentiment-classification --system_outputs ./data/system_outputs/absa/test-aspect.tsv > report.json
+explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
@@ -34,12 +40,3 @@ where
 * `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/neulab/ExplainaBoard/blob/main/data/reports/report_absa.json). Tips: use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
-
-
-
-Now let's look at the results to see what sort of interesting insights we can
-glean from them.
-
-TODO: add insights
-
- 

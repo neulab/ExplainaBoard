@@ -9,10 +9,10 @@ from explainaboard import (
     FileType,
     get_custom_dataset_loader,
     get_datalab_loader,
-    get_pairwise_performance_gap,
     get_processor,
     TaskType,
 )
+from explainaboard.analyzers import get_pairwise_performance_gap
 from explainaboard.analyzers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
@@ -419,7 +419,7 @@ def main():
             if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
                 os.makedirs(f"{output_dir_figures}/{x_file_name}")
             draw_bar_chart_from_reports(
-                f"{output_dir_reports}/{x_file_name}.json",
+                [f"{output_dir_reports}/{x_file_name}.json"],
                 f"{output_dir_figures}/{x_file_name}",
             )
 
@@ -430,10 +430,8 @@ def main():
         if len(system_outputs) == 1:  # individual system analysis
             reports[0].print_as_json(file=report_file)
         elif len(system_outputs) == 2:  # pairwise analysis
-            compare_analysis = get_pairwise_performance_gap(
-                reports[0].to_dict(), reports[1].to_dict()
-            )
-            json.dump(compare_analysis, fp=report_file, indent=2)
+            compare_analysis = get_pairwise_performance_gap(reports[0], reports[1])
+            compare_analysis.print_as_json(file=report_file)
         if args.report_json is not None:
             report_file.close()
 

@@ -34,6 +34,7 @@ venv
 output
 application
 
+figures/
 analyzer/fig/0.png
 analyzer/fig/1.png
 analyzer/fig/2.png
@@ -41,4 +42,5 @@ analyzer/fig/3.png
 analyzer/fig/4.png
 analyzer/fig/5.png
 
-figures/
+# This is an example file downloaded in doc but not stored here
+data/system_outputs/cnndm/cnndm-bart-output.txt

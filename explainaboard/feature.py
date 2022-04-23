@@ -307,8 +307,6 @@ class ClassLabel:
     names: Optional[list[str]] = None
     description: Optional[str] = None
     names_file: Optional[str] = None
-    max_value: Optional[int] = None
-    min_value: Optional[int] = None
     id: Optional[str] = None
     is_bucket: bool = False
     require_training_set: bool = False
