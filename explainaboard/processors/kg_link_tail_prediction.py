@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator
 import json
-from typing import cast
 
 from datalabs import aggregating, load_dataset
 from tqdm import tqdm
@@ -10,12 +9,16 @@ from tqdm import tqdm
 # TODO(odashi): Add a function to obtain metric class instead of using getattr.
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-import explainaboard.metric
+from explainaboard.metric import (
+    HitsConfig,
+    MeanRankConfig,
+    MeanReciprocalRankConfig,
+    MetricConfig,
+)
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.py_utils import eprint
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -111,31 +114,14 @@ class KGLinkTailPredictionProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
         return [
-            "Hit1",
-            "Hit2",
-            "Hit3",
-            "Hit5",
-            "MeanReciprocalRank",
-            "MeanRank",
-        ]
-
-    @classmethod
-    def default_metric_configs(cls) -> dict[str, explainaboard.metric.MetricConfig]:
-        return {"Hits": explainaboard.metric.HitsConfig(hits_k=3)}
-
-    def _get_metrics(
-        self, sys_info: SysOutputInfo
-    ) -> list[explainaboard.metric.Metric]:
-        metric_configs_dict = cast(dict, sys_info.metric_configs)
-        return [
-            getattr(explainaboard.metric, name)(
-                config=metric_configs_dict[name]
-                if name == "Hits" and name in metric_configs_dict.keys()
-                else explainaboard.metric.MetricConfig()
-            )
-            for name in unwrap(sys_info.metric_names)
+            HitsConfig(name='Hits1', hits_k=1, language=language),
+            HitsConfig(name='Hits2', hits_k=2, language=language),
+            HitsConfig(name='Hits3', hits_k=3, language=language),
+            HitsConfig(name='Hits5', hits_k=5, language=language),
+            MeanReciprocalRankConfig(name='MRR', language=language),
+            MeanRankConfig(name='MR', language=language),
         ]
 
     # TODO: is this the best place to put this?
@@ -207,7 +193,7 @@ class KGLinkTailPredictionProcessor(Processor):
             'pre_computed/kg/entity_type_level_map.json',
         )
         with open(file_path, 'r') as file:
-            self.entity_type_level_map = json.loads(file.read())
+            self.entity_type_level_map = json.load(file)
 
         # Calculate statistics of training set
         self.statistics = None

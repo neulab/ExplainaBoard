@@ -4,9 +4,11 @@ import abc
 from collections import Counter
 from dataclasses import dataclass
 import itertools
+import sys
 from typing import Any, cast, Optional, TypeVar, Union
 
 from eaas.async_client import AsyncRequest
+from eaas.endpoint import EndpointConfig
 import numpy as np
 import sacrebleu
 
@@ -23,8 +25,6 @@ class MetricResult:
     A result of computing a metric over some data
     """
 
-    # Name of the metric that was computed
-    name: str
     # Configuration with which it was calculated
     config: MetricConfig
     # Metric value
@@ -36,7 +36,6 @@ class MetricResult:
 
     def to_dict(self):
         ret = {
-            'name': self.name,
             'config': self.config.__dict__,
             'value': self.value,
         }
@@ -55,7 +54,11 @@ class MetricConfig(dict):
     or when performing individual metric computation.
     """
 
+    name: str
     language: str = "en"
+
+    def to_metric(self):
+        raise NotImplementedError
 
 
 class MetricStats:
@@ -100,25 +103,15 @@ class Metric:
     A class representing an evaluation metric
     """
 
-    @classmethod
-    @abc.abstractmethod
-    def default_name(cls) -> str:
-        """Returns the default name of the metric."""
-        ...
-
     def __init__(
         self,
-        name: Optional[str] = None,
-        config: Optional[MetricConfig] = None,
+        config: MetricConfig,
     ):
         """
         Initialize the metric
-        :param name: the name of the metric for reference later
+        :param config: The configuration for the metric
         """
-        self.name: str = unwrap(name) if name is not None else self.default_name()
-        self.config: MetricConfig = (
-            unwrap(config) if config is not None else MetricConfig()
-        )
+        self.config: MetricConfig = config
 
     def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
         """
@@ -221,7 +214,7 @@ class Metric:
         conf_interval = (
             self.bootstrap_interval(stats, conf_value) if conf_value else None
         )
-        return MetricResult(self.name, config, value, conf_interval, conf_value)
+        return MetricResult(config, value, conf_interval, conf_value)
 
     def evaluate(
         self,
@@ -242,15 +235,17 @@ class Metric:
         return self.evaluate_from_stats(stats, conf_value, config)
 
 
+@dataclass
+class AccuracyConfig(MetricConfig):
+    def to_metric(self):
+        return Accuracy(self)
+
+
 class Accuracy(Metric):
     """
     Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground
     truth
     """
-
-    @classmethod
-    def default_name(cls) -> str:
-        return 'Accuracy'
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -266,30 +261,15 @@ class F1ScoreConfig(MetricConfig):
     separate_match: bool = False
     ignore_classes: Optional[list] = None
 
+    def to_metric(self):
+        return F1Score(self)
+
 
 class F1Score(Metric):
     """
     Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's
     implementation.
     """
-
-    def __init__(
-        self,
-        name: Optional[str] = None,
-        config: Optional[MetricConfig] = None,
-    ):
-        """
-        Initialize the metric
-        :param name: the name of the metric for reference later
-        """
-        self.config: MetricConfig = (
-            unwrap(config) if config is not None else F1ScoreConfig()
-        )
-        super().__init__(name=name, config=self.config)
-
-    @classmethod
-    def default_name(cls) -> str:
-        return 'F1'
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -375,6 +355,12 @@ class F1Score(Metric):
         return f1_total
 
 
+@dataclass
+class BIOF1ScoreConfig(F1ScoreConfig):
+    def to_metric(self):
+        return BIOF1Score(self)
+
+
 class BIOF1Score(F1Score):
     """
     Calculate F1 score over BIO-tagged spans.
@@ -452,6 +438,12 @@ class BIOF1Score(F1Score):
                     c = tag_ids[span.span_tag]
                     stats[i, c * stat_mult + offset] += 1
         return MetricStats(stats)
+
+
+@dataclass
+class BMESF1ScoreConfig(F1ScoreConfig):
+    def to_metric(self):
+        return BMESF1Score(self)
 
 
 class BMESF1Score(F1Score):
@@ -537,6 +529,9 @@ class BMESF1Score(F1Score):
 class HitsConfig(MetricConfig):
     hits_k: int = 5
 
+    def to_metric(self):
+        return Hits(self)
+
 
 class Hits(Metric):
     """
@@ -544,24 +539,6 @@ class Hits(Metric):
     outputs.
     """
 
-    def __init__(
-        self,
-        name: Optional[str] = None,
-        config: Optional[MetricConfig] = None,
-    ):
-        """
-        Initialize the metric
-        :param name: the name of the metric for reference later
-        """
-        self.config: MetricConfig = (
-            unwrap(config) if config is not None else HitsConfig()
-        )
-        super().__init__(name=name, config=self.config)
-
-    @classmethod
-    def default_name(cls) -> str:
-        return 'Hits'
-
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
@@ -576,84 +553,10 @@ class Hits(Metric):
         )
 
 
-class Hit1(Hits):
-    @classmethod
-    def default_name(cls) -> str:
-        return 'Hit1'
-
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
-        config = cast(HitsConfig, self._get_config(config))
-        config.hits_k = 1
-        return MetricStats(
-            np.array(
-                [
-                    (1.0 if t in p[: config.hits_k] else 0.0)
-                    for t, p in zip(true_data, pred_data)
-                ]
-            )
-        )
-
-
-class Hit2(Hits):
-    @classmethod
-    def default_name(cls) -> str:
-        return 'Hit2'
-
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
-        config = cast(HitsConfig, self._get_config(config))
-        config.hits_k = 2
-        return MetricStats(
-            np.array(
-                [
-                    (1.0 if t in p[: config.hits_k] else 0.0)
-                    for t, p in zip(true_data, pred_data)
-                ]
-            )
-        )
-
-
-class Hit3(Hits):
-    @classmethod
-    def default_name(cls) -> str:
-        return 'Hit3'
-
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
-        config = cast(HitsConfig, self._get_config(config))
-        config.hits_k = 3
-        return MetricStats(
-            np.array(
-                [
-                    (1.0 if t in p[: config.hits_k] else 0.0)
-                    for t, p in zip(true_data, pred_data)
-                ]
-            )
-        )
-
-
-class Hit5(Hits):
-    @classmethod
-    def default_name(cls) -> str:
-        return 'Hit5'
-
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
-        config = cast(HitsConfig, self._get_config(config))
-        config.hits_k = 5
-        return MetricStats(
-            np.array(
-                [
-                    (1.0 if t in p[: config.hits_k] else 0.0)
-                    for t, p in zip(true_data, pred_data)
-                ]
-            )
-        )
+@dataclass
+class MeanReciprocalRankConfig(MetricConfig):
+    def to_metric(self):
+        return MeanReciprocalRank(self)
 
 
 class MeanReciprocalRank(Metric):
@@ -681,15 +584,17 @@ class MeanReciprocalRank(Metric):
         )
 
 
+@dataclass
+class MeanRankConfig(MetricConfig):
+    def to_metric(self):
+        return MeanRank(self)
+
+
 class MeanRank(Metric):
     """
     Calculates the mean rank, rank(true_output), the rank of the true output in the
     predicted n-best list.
     """
-
-    @classmethod
-    def default_name(cls) -> str:
-        return 'MR'
 
     def mr_val(self, true: Any, preds: list):
         if true not in preds:
@@ -753,26 +658,24 @@ class EaaSMetricStats(MetricStats):
         return MetricStats(sdata[indices])
 
 
+@dataclass
+class EaaSMetricConfig(MetricConfig):
+    def to_metric(self):
+        return EaaSMetric(self)
+
+
 class EaaSMetric(Metric):
     """
     A metric that calculates evaluation scores using EaaS.
     """
 
-    @classmethod
-    def default_name(cls) -> str:
-        raise NotImplementedError
-
-    def __init__(self, name: str):
-        super().__init__(name)
-        self.name = name
-
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
-        if self.name == 'bleu':
+        if self.config.name == 'bleu':
             bleu_class = sacrebleu.BLEU()
             return bleu_class._compute_score_from_stats(list(agg_stats)).score / 100.0
-        elif self.name == 'chrf':
+        elif self.config.name == 'chrf':
             chrf_class = sacrebleu.CHRF()
             return chrf_class._compute_score_from_stats(list(agg_stats)).score / 100.0
         else:
@@ -784,7 +687,7 @@ class EaaSMetric(Metric):
         :param stats: stats for every example
         :return: aggregated stats
         """
-        if self.name in {'bleu', 'chrf'}:
+        if self.config.name in {'bleu', 'chrf'}:
             return np.sum(stats.get_data(), axis=0)
         else:
             return np.mean(stats.get_data(), axis=0)
@@ -830,14 +733,16 @@ class QAMetric(Metric):
         ...
 
 
+@dataclass
+class ExactMatchQAConfig(MetricConfig):
+    def to_metric(self):
+        return ExactMatchQA(self)
+
+
 class ExactMatchQA(QAMetric):
     """
     Calculate a score for extractive QA based on exact match.
     """
-
-    @classmethod
-    def default_name(cls) -> str:
-        return 'ExactMatchQA'
 
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
@@ -845,14 +750,16 @@ class ExactMatchQA(QAMetric):
         return 1.0 if preprocessor(prediction) == preprocessor(ground_truth) else 0.0
 
 
+@dataclass
+class F1ScoreQAConfig(MetricConfig):
+    def to_metric(self):
+        return F1ScoreQA(self)
+
+
 class F1ScoreQA(QAMetric):
     """
     Calculate a score for extractive QA based on F1 score.
     """
-
-    @classmethod
-    def default_name(cls) -> str:
-        return 'F1ScoreQA'
 
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
@@ -867,3 +774,15 @@ class F1ScoreQA(QAMetric):
         recall = 1.0 * num_same / len(ground_truth_tokens)
         f1 = (2 * precision * recall) / (precision + recall)
         return f1
+
+
+def metric_name_to_config(name: str) -> MetricConfig:
+    try:
+        metric_module = sys.modules[__name__]
+        metric_config = getattr(metric_module, f'{name}Config')
+        return metric_config(name=name)
+    except AttributeError:
+        if name in EndpointConfig().valid_metrics:
+            return EaaSMetricConfig(name=name)
+        else:
+            raise ValueError(f'Invalid metric {name}')

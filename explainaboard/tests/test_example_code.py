@@ -3,6 +3,7 @@ import unittest
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_custom_dataset_loader, get_datalab_loader
 from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.tests.utils import top_path
 
 
 class TestExampleCode(unittest.TestCase):
@@ -14,7 +15,7 @@ class TestExampleCode(unittest.TestCase):
         loader = get_datalab_loader(
             TaskType.text_classification,
             dataset=DatalabLoaderOption("sst2"),
-            output_data="./explainaboard/tests/artifacts/text_classification/"
+            output_data=f"{top_path}/explainaboard/tests/artifacts/text_classification/"
             "output_sst2.txt",
             output_source=Source.local_filesystem,
             output_file_type=FileType.text,
@@ -25,8 +26,8 @@ class TestExampleCode(unittest.TestCase):
         analysis.write_to_directory("./")
 
     def test_readme_custom_dataset(self):
-        dataset = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
-        output = "./explainaboard/tests/artifacts/summarization/output.txt"
+        dataset = f"{top_path}/explainaboard/tests/artifacts/summarization/dataset.tsv"
+        output = f"{top_path}/explainaboard/tests/artifacts/summarization/output.txt"
         loader = get_custom_dataset_loader(
             TaskType.summarization, dataset_data=dataset, output_data=output
         )

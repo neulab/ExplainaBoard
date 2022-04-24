@@ -17,6 +17,7 @@ from explainaboard.analyzers.draw_hist import draw_bar_chart_from_report
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.metric import metric_name_to_config
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
@@ -392,7 +393,13 @@ def main():
         }
 
         if metric_names is not None:
-            metadata["metric_names"] = metric_names
+            if 'metric_configs' in metadata:
+                raise ValueError('Cannot specify both metric names and metric configs')
+            metric_configs = [metric_name_to_config(name) for name in metric_names]
+            if args.language is not None:
+                for metric_config in metric_configs:
+                    metric_config.language = args.language
+            metadata["metric_configs"] = metric_configs
 
         # Run analysis
         reports: list[SysOutputInfo] = []
