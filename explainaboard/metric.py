@@ -576,6 +576,86 @@ class Hits(Metric):
         )
 
 
+class Hit1(Hits):
+    @classmethod
+    def default_name(cls) -> str:
+        return 'Hit1'
+
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        config = cast(HitsConfig, self._get_config(config))
+        config.hits_k = 1
+        return MetricStats(
+            np.array(
+                [
+                    (1.0 if t in p[: config.hits_k] else 0.0)
+                    for t, p in zip(true_data, pred_data)
+                ]
+            )
+        )
+
+
+class Hit2(Hits):
+    @classmethod
+    def default_name(cls) -> str:
+        return 'Hit2'
+
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        config = cast(HitsConfig, self._get_config(config))
+        config.hits_k = 2
+        return MetricStats(
+            np.array(
+                [
+                    (1.0 if t in p[: config.hits_k] else 0.0)
+                    for t, p in zip(true_data, pred_data)
+                ]
+            )
+        )
+
+
+class Hit3(Hits):
+    @classmethod
+    def default_name(cls) -> str:
+        return 'Hit3'
+
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        config = cast(HitsConfig, self._get_config(config))
+        config.hits_k = 3
+        return MetricStats(
+            np.array(
+                [
+                    (1.0 if t in p[: config.hits_k] else 0.0)
+                    for t, p in zip(true_data, pred_data)
+                ]
+            )
+        )
+
+
+class Hit5(Hits):
+    @classmethod
+    def default_name(cls) -> str:
+        return 'Hit5'
+
+    def calc_stats_from_data(
+        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        config = cast(HitsConfig, self._get_config(config))
+        config.hits_k = 5
+        return MetricStats(
+            np.array(
+                [
+                    (1.0 if t in p[: config.hits_k] else 0.0)
+                    for t, p in zip(true_data, pred_data)
+                ]
+            )
+        )
+
+
 class MeanReciprocalRank(Metric):
     """
     Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is
