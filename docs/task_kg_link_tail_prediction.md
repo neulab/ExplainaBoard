@@ -74,14 +74,12 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --dataset fb15k_237 > report.json
+explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 
-or
-
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
 where
 * `--task`: denotes the task name. 
+* `--custom_dataset_paths`: the path of test samples
 * `--system_outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
@@ -163,11 +161,7 @@ ExplainaBoard also allows users to customize features, specifically to provide y
 An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-user-defined-new.json), and you can test it using the following command:
 
 ```shell
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-user-defined-new.json --dataset fb15k_237 > report.json
-
-or
-
-    explainaboard --task kg-link-tail-prediction --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-user-defined-new.json > report.json
+explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
 
 

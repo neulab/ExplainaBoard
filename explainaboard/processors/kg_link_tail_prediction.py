@@ -112,7 +112,14 @@ class KGLinkTailPredictionProcessor(Processor):
 
     @classmethod
     def default_metrics(cls) -> list[str]:
-        return ["Hits", "MeanReciprocalRank", "MeanRank"]
+        return [
+            "Hit1",
+            "Hit2",
+            "Hit3",
+            "Hit5",
+            "MeanReciprocalRank",
+            "MeanRank",
+        ]
 
     @classmethod
     def default_metric_configs(cls) -> dict[str, explainaboard.metric.MetricConfig]:
@@ -189,15 +196,18 @@ class KGLinkTailPredictionProcessor(Processor):
         # TODO(gneubig):
         # this will be reloaded for every dataset, maybe should be fixed for multiple
         # analysis
-        if sys_info.dataset_name != "fb15k_237":  # to be generalized
-            self.entity_type_level_map = {}
-        else:
-            file_path = cache_api.cache_online_file(
-                'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
-                'pre_computed/kg/entity_type_level_map.json',
-            )
-            with open(file_path, 'r') as file:
-                self.entity_type_level_map = json.loads(file.read())
+        # TODO(Pengfei): uncomment following code once datalab loader
+        #  of this task  is introduced
+        # if sys_info.dataset_name != "fb15k_237":  # to be generalized
+        #     self.entity_type_level_map = {}
+        # else:
+        self.entity_type_level_map = {}
+        file_path = cache_api.cache_online_file(
+            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
+            'pre_computed/kg/entity_type_level_map.json',
+        )
+        with open(file_path, 'r') as file:
+            self.entity_type_level_map = json.loads(file.read())
 
         # Calculate statistics of training set
         self.statistics = None
@@ -229,7 +239,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         # [type_level_0, type_level_1, ... type_level_6]
         # e.g. ["Thing", "Agent", "Person", None, None, None, None]
         tail_entity_type_levels = self.entity_type_level_map.get(
-            existing_features['true_tail'], None
+            existing_features['true_tail_anonymity'], None
         )
         if tail_entity_type_levels is None:
             return "-1"  # entity types not found
