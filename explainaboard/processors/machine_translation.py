@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
+from explainaboard.metric import EaaSMetricConfig, MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -37,8 +38,8 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["bleu"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [EaaSMetricConfig(name='bleu', language=language)]
 
     def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(sys_info.tokenize(existing_features["source"])) / len(

@@ -6,6 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
+from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
@@ -103,8 +104,8 @@ class TextPairClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["Accuracy"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [AccuracyConfig(name='Accuracy', language=language)]
 
     @aggregating()
     def _statistics_func(self, samples, tokenizer: Tokenizer):

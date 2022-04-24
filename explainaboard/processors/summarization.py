@@ -12,6 +12,7 @@ import numpy
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
+from explainaboard.metric import EaaSMetricConfig, MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -132,8 +133,12 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["rouge1", "rouge2", "rougeL"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [
+            EaaSMetricConfig(name='rouge1', language=language),
+            EaaSMetricConfig(name='rouge2', language=language),
+            EaaSMetricConfig(name='rougeL', language=language),
+        ]
 
     def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
         return get_oracle(existing_features)["oracle_position"]

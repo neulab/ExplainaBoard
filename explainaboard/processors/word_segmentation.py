@@ -9,8 +9,12 @@ from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
-import explainaboard.metric
-from explainaboard.metric import Metric, MetricStats
+from explainaboard.metric import (
+    BMESF1ScoreConfig,
+    F1ScoreConfig,
+    MetricConfig,
+    MetricStats,
+)
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
@@ -118,8 +122,8 @@ class CWSProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["F1Score"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [BMESF1ScoreConfig(name='F1', language=language)]
 
     def _get_true_label(self, data_point: dict):
         return data_point["true_tags"]
@@ -192,13 +196,6 @@ class CWSProcessor(Processor):
         return fre_rank
 
     # --- End feature functions
-
-    # These return none because NER is not yet in the main metric interface
-    def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
-        return [
-            getattr(explainaboard.metric, f'BMES{name}')()
-            for name in unwrap(sys_info.metric_names)
-        ]
 
     def _complete_span_features(self, sentence, tags, statistics=None):
 
@@ -426,12 +423,7 @@ class CWSProcessor(Processor):
             bucket performance
         """
         # getattr(explainaboard.metric, f'BIO{name}')
-        metric_names = unwrap(sys_info.metric_names)
-        config = explainaboard.metric.F1ScoreConfig(ignore_classes=['O'])
-        bucket_metrics = [
-            getattr(explainaboard.metric, f'{name}')(config=config)
-            for name in metric_names
-        ]
+        bucket_metrics = [F1ScoreConfig(name='F1', ignore_classes=['O']).to_metric()]
 
         bucket_name_to_performance = {}
         for bucket_interval, spans_true in samples_over_bucket_true.items():
@@ -472,7 +464,7 @@ class CWSProcessor(Processor):
                     metric_val.conf_interval if metric_val.conf_interval else None
                 )
                 performance = Performance(
-                    metric_name=metric.name,
+                    metric_name=metric.config.name,
                     value=metric_val.value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
