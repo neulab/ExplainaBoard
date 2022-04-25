@@ -56,7 +56,7 @@ class MetricConfig(dict):
 
     name: str
     language: str = "en"
-    cls: str = None
+    cls: str = ''
 
     def __post_init__(self):
         # Save the class name

@@ -200,7 +200,6 @@ class ConditionalGenerationProcessor(Processor):
         ]
         return [EaaSMetricConfig(name=x, language=language) for x in full_metrics]
 
-
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(sys_info.tokenize(existing_features["source"]))

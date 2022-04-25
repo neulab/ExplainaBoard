@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from explainaboard import TaskType
+
 
 @dataclass
 class Task:
