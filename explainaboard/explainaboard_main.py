@@ -13,7 +13,7 @@ from explainaboard import (
     TaskType,
 )
 from explainaboard.analyzers import get_pairwise_performance_gap
-from explainaboard.analyzers.draw_hist import draw_bar_chart_from_report
+from explainaboard.analyzers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabLoaderOption
@@ -425,8 +425,8 @@ def main():
             # generate figures and save them into  `output_dir_figures`
             if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
                 os.makedirs(f"{output_dir_figures}/{x_file_name}")
-            draw_bar_chart_from_report(
-                f"{output_dir_reports}/{x_file_name}.json",
+            draw_bar_chart_from_reports(
+                [f"{output_dir_reports}/{x_file_name}.json"],
                 f"{output_dir_figures}/{x_file_name}",
             )
 
