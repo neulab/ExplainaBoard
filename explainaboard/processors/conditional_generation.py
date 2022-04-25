@@ -177,12 +177,29 @@ class ConditionalGenerationProcessor(Processor):
 
     @classmethod
     def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [
-            EaaSMetricConfig(name="rouge1", language=language),
-            EaaSMetricConfig(name="rouge2", language=language),
-            EaaSMetricConfig(name="rougeL", language=language),
-            EaaSMetricConfig(name="bleu", language=language),
+        defaults = ['rouge1', 'rouge2', 'rougeL', 'bleu']
+        return [EaaSMetricConfig(name=x, language=language) for x in defaults]
+
+    @classmethod
+    def full_metric_list(cls, language=None) -> list[MetricConfig]:
+        full_metrics = [
+            "bleu",
+            "bart_score_summ",
+            "bart_score_mt",
+            "bart_score_cnn_hypo_ref",
+            "rouge1",
+            "rouge2",
+            "rougeL",
+            "bert_score_f",
+            "bert_score_p",
+            "bert_score_r",
+            "chrf",
+            "comet",
+            "mover_score",
+            "prism",
         ]
+        return [EaaSMetricConfig(name=x, language=language) for x in full_metrics]
+
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, sys_info: SysOutputInfo, existing_features: dict):
