@@ -157,13 +157,7 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/
                     TaskType.named_entity_recognition
                 ),
                 supported_datasets=[],
-            )
-        ],
-    ),
-    TaskCategory(
-        "structure-prediction",
-        "predicting structural properties of the text, such as syntax",
-        [
+            ),
             Task(
                 name=TaskType.word_segmentation,
                 description="""
@@ -175,7 +169,7 @@ identify word boundaries of some languages (e.g., Chinese).
                     TaskType.word_segmentation
                 ),
                 supported_datasets=[],
-            )
+            ),
         ],
     ),
     TaskCategory(
@@ -250,7 +244,14 @@ See more details about the format of upload files:
 https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_prediction.md
 """,
                 supported=True,
-                supported_metrics=["Hits", "MeanReciprocalRank", "MeanRank"],
+                supported_metrics=[
+                    "Hit1",
+                    "Hit2",
+                    "Hit3",
+                    "Hit5",
+                    "MeanReciprocalRank",
+                    "MeanRank",
+                ],
                 supported_formats=get_supported_file_types_for_loader(
                     TaskType.kg_link_tail_prediction
                 ),
