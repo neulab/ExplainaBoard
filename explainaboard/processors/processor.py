@@ -46,12 +46,21 @@ class Processor(metaclass=abc.ABCMeta):
         """Returns default features for this processor."""
         ...
 
-    # TODO(gneubig): this could potentially be moved directly into the task definition
     @classmethod
     @abc.abstractmethod
     def default_metrics(cls, language=None) -> list[MetricConfig]:
         """Returns the default metrics of this processor."""
         ...
+
+    @classmethod
+    def full_metric_list(cls, language=None) -> list[MetricConfig]:
+        """Returns an extensive list of metrics that may be used."""
+        return cls.default_metrics(language=language)
+
+    @classmethod
+    def metric_is_valid(cls, metric_config: MetricConfig) -> bool:
+        """Checks if a particular metric is valid for a particular task"""
+        return True
 
     def __init__(self) -> None:
         # Things to use only if necessary
