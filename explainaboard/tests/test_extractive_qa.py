@@ -45,16 +45,17 @@ class TestExtractiveQA(unittest.TestCase):
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
+        print(f'OVERALL={sys_info.results.overall}')
         # should be 0.6974789915966386
         self.assertAlmostEqual(
-            sys_info.results.overall["ExactMatchQA"].value,
+            sys_info.results.overall["ExactMatch"].value,
             0.6974789915966386,
             2,
             "almost equal",
         )
         # should be 0.8235975260931867
         self.assertAlmostEqual(
-            sys_info.results.overall["F1ScoreQA"].value,
+            sys_info.results.overall["F1"].value,
             0.8235975260931867,
             2,
             "almost equal",
@@ -76,27 +77,28 @@ class TestExtractiveQA(unittest.TestCase):
         metadata = {
             "task_name": TaskType.question_answering_extractive.value,
             "dataset_name": "squad",
-            "metric_names": ["F1ScoreQA", "ExactMatchQA"],
+            "metric_names": ["F1Score", "ExactMatch"],
             "language": "zh",
         }
 
         processor = get_processor(TaskType.question_answering_extractive)
 
         sys_info = processor.process(metadata, data)
+        print(f'--------- sys_info.metric_configs {sys_info.metric_configs}')
 
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
         # 0.6285714285714286
         self.assertAlmostEqual(
-            sys_info.results.overall["ExactMatchQA"].value,
+            sys_info.results.overall["ExactMatch"].value,
             0.6285714285714286,
             2,
             "almost equal",
         )
         # 0.7559651817716333
         self.assertAlmostEqual(
-            sys_info.results.overall["F1ScoreQA"].value,
+            sys_info.results.overall["F1"].value,
             0.7559651817716333,
             2,
             "almost equal",

@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
+from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
@@ -117,8 +118,8 @@ class TextClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["Accuracy"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [AccuracyConfig(name='Accuracy', language=language)]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):

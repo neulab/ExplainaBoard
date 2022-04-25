@@ -7,12 +7,11 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-import explainaboard.metric
+from explainaboard.metric import ExactMatchQAConfig, F1ScoreQAConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.tokenizer import Tokenizer
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.question_answering_extractive)
@@ -90,16 +89,10 @@ class QAExtractiveProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["F1ScoreQA", "ExactMatchQA"]
-
-    def _get_metrics(
-        self, sys_info: SysOutputInfo
-    ) -> list[explainaboard.metric.Metric]:
-        config = explainaboard.metric.MetricConfig(language=sys_info.language)
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
         return [
-            getattr(explainaboard.metric, name)(config=config)
-            for name in unwrap(sys_info.metric_names)
+            F1ScoreQAConfig(name='F1', language=language),
+            ExactMatchQAConfig(name='ExactMatch', language=language),
         ]
 
     @aggregating()
