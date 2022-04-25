@@ -16,15 +16,16 @@ from explainaboard.tests.utils import test_artifacts_path
 
 class TestMetric(unittest.TestCase):
     def test_accuracy(self):
-        metric = explainaboard.metric.Accuracy()
+        metric = explainaboard.metric.AccuracyConfig(name='Accuracy').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_f1_micro(self):
-        config = explainaboard.metric.F1ScoreConfig(average='micro')
-        metric = explainaboard.metric.F1Score(config=config)
+        metric = explainaboard.metric.F1ScoreConfig(
+            name='F1', average='micro'
+        ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
 
@@ -33,8 +34,9 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_f1_macro(self):
-        config = explainaboard.metric.F1ScoreConfig(average='macro')
-        metric = explainaboard.metric.F1Score(config=config)
+        metric = explainaboard.metric.F1ScoreConfig(
+            name='F1', average='macro'
+        ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
         sklearn_f1 = sklearn.metrics.f1_score(true, pred, average='macro')
@@ -42,14 +44,14 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_hits(self):
-        metric = explainaboard.metric.Hits()
+        metric = explainaboard.metric.HitsConfig(name='Hits').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 4.0 / 6.0)
 
     def test_mrr(self):
-        metric = explainaboard.metric.MeanReciprocalRank()
+        metric = explainaboard.metric.MeanReciprocalRankConfig(name='MRR').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
         result = metric.evaluate(true, pred, conf_value=0.05)
@@ -66,13 +68,15 @@ class TestMetric(unittest.TestCase):
             ['B-PER', 'I-PER', 'O'],
         ]
 
-        config = explainaboard.metric.F1ScoreConfig(average='micro')
-        metric = explainaboard.metric.BIOF1Score(config=config)
+        metric = explainaboard.metric.BIOF1ScoreConfig(
+            name='MicroF1', average='micro'
+        ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
-        config = explainaboard.metric.F1ScoreConfig(average='macro')
-        metric = explainaboard.metric.BIOF1Score(config=config)
+        metric = explainaboard.metric.BIOF1ScoreConfig(
+            name='MacroF1', average='macro'
+        ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 3.0 / 4.0)
 
@@ -121,7 +125,10 @@ class TestMetric(unittest.TestCase):
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics
-        metrics = [explainaboard.metric.EaaSMetric(name=name) for name in metric_names]
+        metrics = [
+            explainaboard.metric.EaaSMetricConfig(name=name).to_metric()
+            for name in metric_names
+        ]
 
         # Get results for full data and half data
         half_bound = int(len(sys_output) / 2)
@@ -190,14 +197,14 @@ class TestMetric(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
-            sys_info.results.overall["ExactMatchQA"].value,
+            sys_info.results.overall["ExactMatch"].value,
             0.6974789915966386,
             2,
             "almost equal",
         )
         # should be 0.8235975260931867
         self.assertAlmostEqual(
-            sys_info.results.overall["F1ScoreQA"].value,
+            sys_info.results.overall["F1"].value,
             0.8235975260931867,
             2,
             "almost equal",

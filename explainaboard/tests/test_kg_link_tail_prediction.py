@@ -53,6 +53,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
                 "true_head",
                 "true_link",
                 "true_tail",
+                "true_tail_anonymity",
                 "true_label",
                 "predictions",
                 "rel_type",

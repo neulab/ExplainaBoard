@@ -52,7 +52,7 @@ class QAPreprocessor(Preprocessor):
         """Lower text and remove punctuation, articles and extra whitespace."""
 
         def remove_articles(text, lang):
-            if lang == 'en':
+            if lang == 'en' or lang is None:
                 return re.sub(r'\b(a|an|the)\b', ' ', text)
             elif lang == 'es':
                 return re.sub(r'\b(un|una|unos|unas|el|la|los|las)\b', ' ', text)
@@ -76,7 +76,7 @@ class QAPreprocessor(Preprocessor):
                 raise Exception('Unknown Language {}'.format(lang))
 
         def white_space_fix(text, lang):
-            if lang in self.WHITESPACE_LANGS:
+            if lang in self.WHITESPACE_LANGS or lang is None:
                 tokens = self.ss_tokenizer(text)
             elif lang in self.MIXED_SEGMENTATION_LANGS:
                 tokens = self.mlqa_tokenizer(text)
