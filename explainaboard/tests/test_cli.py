@@ -181,7 +181,6 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
-    @unittest.skip(reason='metaphor QA dataset is temporarily unavailable')
     def test_multichoiceqa_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
@@ -189,6 +188,8 @@ class TestCLI(TestCase):
             'qa-multiple-choice',
             '--dataset',
             'metaphor_qa',
+            '--split',
+            'validation',
             '--system_outputs',
             f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
             '--report_json',

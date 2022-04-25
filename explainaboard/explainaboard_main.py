@@ -198,6 +198,14 @@ def create_parser():
     )
 
     parser.add_argument(
+        '--split',
+        type=str,
+        required=False,
+        default='test',
+        help="the name of the split within the dataset",
+    )
+
+    parser.add_argument(
         '--language',
         type=str,
         required=False,
@@ -327,6 +335,7 @@ def main():
         custom_dataset_paths: list[str] | None = args.custom_dataset_paths
         dataset: str | None = args.dataset
         sub_dataset: str | None = args.sub_dataset
+        split: str = args.split
 
         if custom_dataset_paths:  # load custom datasets
             loaders = [
@@ -353,7 +362,7 @@ def main():
             loaders = [
                 get_datalab_loader(
                     task,
-                    DatalabLoaderOption(dataset, sub_dataset),
+                    DatalabLoaderOption(dataset, sub_dataset, split=split),
                     sys_output,
                     Source.local_filesystem,
                     output_file_type,
@@ -386,6 +395,7 @@ def main():
         metadata = {
             "dataset_name": dataset,
             "sub_dataset_name": sub_dataset,
+            "split_name": split,
             "language": args.language,
             "reload_stat": reload_stat,
             "conf_value": args.conf_value,
