@@ -7,6 +7,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
+from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
@@ -26,10 +27,14 @@ class QAMultipleChoiceProcessor(Processor):
                 "context": feature.Value("string"),
                 "question": feature.Value("string"),
                 "options": feature.Sequence(feature.Value("string")),
-                "answers": {
-                    "text": feature.Value("string"),
-                    "option_index": feature.Value("int32"),
-                },
+                "answers": feature.Sequence(
+                    feature.Set(
+                        {
+                            "text": feature.Value("string"),
+                            "option_index": feature.Value("int32"),
+                        }
+                    )
+                ),
                 "context_length": feature.Value(
                     dtype="float",
                     description="the length of context",
@@ -89,8 +94,8 @@ class QAMultipleChoiceProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["Accuracy"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [AccuracyConfig(name='Accuracy', language=language)]
 
     def __init__(self):
         super().__init__()

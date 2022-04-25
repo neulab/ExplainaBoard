@@ -20,8 +20,7 @@ from explainaboard.info import (
     SysOutputInfo,
 )
 from explainaboard.loaders.loader import CustomFeature
-import explainaboard.metric
-from explainaboard.metric import Metric, MetricStats
+from explainaboard.metric import Metric, MetricConfig, MetricStats
 import explainaboard.utils.bucketing
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -50,15 +49,9 @@ class Processor(metaclass=abc.ABCMeta):
     # TODO(gneubig): this could potentially be moved directly into the task definition
     @classmethod
     @abc.abstractmethod
-    def default_metrics(cls) -> list[str]:
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
         """Returns the default metrics of this processor."""
         ...
-
-    @classmethod
-    def default_metric_configs(
-        cls,
-    ) -> Optional[dict[str, explainaboard.metric.MetricConfig]]:
-        return None
 
     def __init__(self) -> None:
         # Things to use only if necessary
@@ -132,10 +125,7 @@ class Processor(metaclass=abc.ABCMeta):
         return statistics
 
     def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
-        return [
-            getattr(explainaboard.metric, name)()
-            for name in unwrap(sys_info.metric_names)
-        ]
+        return [config.to_metric() for config in unwrap(sys_info.metric_configs)]
 
     def _gen_metric_stats(
         self, sys_info: SysOutputInfo, sys_output: list[dict]
@@ -396,8 +386,8 @@ class Processor(metaclass=abc.ABCMeta):
                 bucket_samples=bucket_cases,
             )
 
-            for metric_name, metric_func, metric_stat in zip(
-                unwrap_generator(sys_info.metric_names),
+            for metric_cfg, metric_func, metric_stat in zip(
+                unwrap_generator(sys_info.metric_configs),
                 unwrap_generator(metric_funcs),
                 unwrap_generator(metric_stats),
             ):
@@ -414,7 +404,7 @@ class Processor(metaclass=abc.ABCMeta):
                 )
 
                 performance = Performance(
-                    metric_name=metric_name,
+                    metric_name=metric_cfg.name,
                     value=metric_result.value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
@@ -448,8 +438,8 @@ class Processor(metaclass=abc.ABCMeta):
         metric_funcs = self._get_metrics(sys_info)
 
         overall_results = {}
-        for metric_name, metric_func, metric_stat in zip(
-            unwrap_generator(sys_info.metric_names),
+        for metric_cfg, metric_func, metric_stat in zip(
+            unwrap_generator(sys_info.metric_configs),
             unwrap_generator(metric_funcs),
             metric_stats,
         ):
@@ -465,12 +455,12 @@ class Processor(metaclass=abc.ABCMeta):
             )
 
             overall_performance = Performance(
-                metric_name=metric_name,
+                metric_name=metric_cfg.name,
                 value=metric_result.value,
                 confidence_score_low=conf_low,
                 confidence_score_high=conf_high,
             )
-            overall_results[metric_name] = overall_performance
+            overall_results[metric_cfg.name] = overall_performance
         return overall_results
 
     def _print_bucket_info(
@@ -499,10 +489,8 @@ class Processor(metaclass=abc.ABCMeta):
             metadata["task_name"] = self.task_type().value
 
         sys_info = SysOutputInfo.from_dict(metadata)
-        if sys_info.metric_names is None:
-            sys_info.metric_names = self.default_metrics()
         if sys_info.metric_configs is None:
-            sys_info.metric_configs = self.default_metric_configs()
+            sys_info.metric_configs = self.default_metrics(language=sys_info.language)
         if sys_info.tokenizer is None:
             sys_info.tokenizer = get_default_tokenizer(
                 task_type=self.task_type(), lang=sys_info.language
