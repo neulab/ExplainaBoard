@@ -91,13 +91,12 @@ class SysOutputInfo:
     dataset_name: Optional[str] = None
     sub_dataset_name: Optional[str] = None
     dataset_split: Optional[str] = None
-    metric_names: Optional[list[str]] = None
     language: str = "en"
     reload_stat: bool = True
     is_print_case: bool = True
     conf_value: float = 0.05
     system_details: Optional[dict] = None
-    metric_configs: Optional[dict[str, MetricConfig]] = None
+    metric_configs: Optional[list[MetricConfig]] = None
     tokenizer: Tokenizer = SingleSpaceTokenizer()
 
     # set later

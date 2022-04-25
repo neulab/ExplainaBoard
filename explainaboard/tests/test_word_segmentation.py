@@ -6,7 +6,7 @@ from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.tests.utils import test_artifacts_path
 
 
-class TestNER(unittest.TestCase):
+class TestWordSegmentation(unittest.TestCase):
     artifact_path = os.path.join(test_artifacts_path, "cws")
     conll_dataset = os.path.join(artifact_path, "test.tsv")
     conll_output = os.path.join(artifact_path, "prediction.tsv")

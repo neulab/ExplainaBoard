@@ -11,8 +11,12 @@ from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
-import explainaboard.metric
-from explainaboard.metric import MetricStats
+from explainaboard.metric import (
+    EaaSMetricConfig,
+    F1ScoreConfig,
+    MetricConfig,
+    MetricStats,
+)
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
@@ -172,8 +176,13 @@ class ConditionalGenerationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls) -> list[str]:
-        return ["rouge1", "rouge2", "rougeL", "bleu"]
+    def default_metrics(cls, language=None) -> list[MetricConfig]:
+        return [
+            EaaSMetricConfig(name="rouge1", language=language),
+            EaaSMetricConfig(name="rouge2", language=language),
+            EaaSMetricConfig(name="rougeL", language=language),
+            EaaSMetricConfig(name="bleu", language=language),
+        ]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, sys_info: SysOutputInfo, existing_features: dict):
@@ -200,12 +209,6 @@ class ConditionalGenerationProcessor(Processor):
             existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
         )
 
-    def _get_metrics(self, sys_info: SysOutputInfo):
-        return [
-            explainaboard.metric.EaaSMetric(name=name)
-            for name in unwrap_generator(sys_info.metric_names)
-        ]
-
     def _get_true_label(self, data_point: dict):
         return data_point["reference"]
 
@@ -231,9 +234,10 @@ class ConditionalGenerationProcessor(Processor):
                     "hypothesis": feature_table["hypothesis"],
                 }
             )
+        metric_names = [x.name for x in unwrap_generator(sys_info.metric_configs)]
         async_request = self._get_eaas_client().async_score(
             inputs,
-            metrics=unwrap(sys_info.metric_names).copy(),
+            metrics=metric_names,
             calculate=['corpus', 'stats'],
         )
 
@@ -242,7 +246,7 @@ class ConditionalGenerationProcessor(Processor):
             explainaboard.metric.EaaSMetricStats(
                 name=name, pos=i, eaas_request=async_request
             )
-            for i, name in enumerate(unwrap_generator(sys_info.metric_names))
+            for i, name in enumerate(metric_names)
         ]
 
     # TODO(odashi): Restructure this function (and EaaS client) to be type-safe.
@@ -455,8 +459,7 @@ class ConditionalGenerationProcessor(Processor):
         """
 
         bucket_name_to_performance: dict[str, BucketPerformance] = {}
-        config = explainaboard.metric.F1ScoreConfig(separate_match=True)
-        f1_score = explainaboard.metric.F1Score(config=config)
+        f1_score = F1ScoreConfig(name='F1', separate_match=True).to_metric()
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
             if bucket_interval not in samples_over_bucket_pred.keys():
@@ -482,7 +485,8 @@ class ConditionalGenerationProcessor(Processor):
 
             stats = explainaboard.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
-            conf_low, conf_high = unwrap(result.conf_interval)
+            conf_interval: tuple[float, float] = unwrap(result.conf_interval)
+            conf_low, conf_high = conf_interval
             performance = Performance(
                 metric_name='F1',
                 value=result.value,

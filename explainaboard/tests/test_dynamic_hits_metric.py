@@ -27,8 +27,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237-subset",
-            "metric_names": ["Hits"],
-            "metric_configs": {"Hits": HitsConfig(hits_k=4)},
+            "metric_configs": [HitsConfig(name='Hits4', hits_k=4)],
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
