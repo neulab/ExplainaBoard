@@ -27,10 +27,14 @@ class QAMultipleChoiceProcessor(Processor):
                 "context": feature.Value("string"),
                 "question": feature.Value("string"),
                 "options": feature.Sequence(feature.Value("string")),
-                "answers": {
-                    "text": feature.Value("string"),
-                    "option_index": feature.Value("int32"),
-                },
+                "answers": feature.Sequence(
+                    feature.Set(
+                        {
+                            "text": feature.Value("string"),
+                            "option_index": feature.Value("int32"),
+                        }
+                    )
+                ),
                 "context_length": feature.Value(
                     dtype="float",
                     description="the length of context",
