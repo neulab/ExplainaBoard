@@ -8,7 +8,7 @@ from explainaboard.tests.utils import test_artifacts_path
 
 class TestQAMultipleChoice(unittest.TestCase):
     artifact_path = os.path.join(test_artifacts_path, "qa_multiple_choice")
-    json_dataset = os.path.join(artifact_path, "dataset_synthetic_metaphor_qa.json")
+    json_dataset = os.path.join(artifact_path, "dataset_synthetic_fig_qa.json")
     json_output = os.path.join(artifact_path, "output.json")
 
     def test_load_json(self):
@@ -53,7 +53,7 @@ class TestQAMultipleChoice(unittest.TestCase):
         data = loader.load()
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
-            "dataset_name": "metaphor_qa",
+            "dataset_name": "fig_qa",
             "metric_names": ["Accuracy"],
         }
 
@@ -64,9 +64,9 @@ class TestQAMultipleChoice(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_multiple_qa_customized_feature(self):
-        dataset_path = os.path.join(self.artifact_path, "dataset_metaphor_qa.json")
+        dataset_path = os.path.join(self.artifact_path, "dataset_fig_qa.json")
         output_path = os.path.join(
-            self.artifact_path, "output_metaphor_qa_customized_features.json"
+            self.artifact_path, "output_fig_qa_customized_features.json"
         )
         loader = get_custom_dataset_loader(
             TaskType.qa_multiple_choice,
@@ -82,7 +82,7 @@ class TestQAMultipleChoice(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
-            "dataset_name": "metaphor_qa",
+            "dataset_name": "fig_qa",
             "metric_names": ["Accuracy"],
             # don't forget this, otherwise the user-defined features will be ignored
             "user_defined_features_configs": loader.user_defined_features_configs,

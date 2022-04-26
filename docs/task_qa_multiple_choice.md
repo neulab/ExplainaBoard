@@ -1,7 +1,7 @@
 # Analyzing Multiple Choices QA
 
 In this file we describe how to analyze multiple-choice QA models.
-We will give an example using the  [metaphor_qa](http://datalab.nlpedia.ai/normal_dataset/62139f3dc5fa557614d36df2/dataset_metadata) dataset, but other datasets
+We will give an example using the  [fig_qa](http://datalab.nlpedia.ai/normal_dataset/62139f3dc5fa557614d36df2/dataset_metadata) dataset, but other datasets
 can be analyzed in a similar way.
 
 ## Data Preparation
@@ -42,7 +42,7 @@ where
     
 
 Let's say we have several files such as 
-* [gpt2.json](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/metaphor_qa/gpt2.json) 
+* [gpt2.json](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/fig_qa/gpt2.json) 
 
 
 etc. from different systems.
@@ -53,7 +53,7 @@ etc. from different systems.
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/metaphor_qa/gpt2.json > report.json
+    explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/fig_qa/gpt2.json > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
