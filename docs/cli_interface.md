@@ -26,9 +26,9 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 **Table of Contents**
 * [Text Classification](#text-classification)
 * [Text Pair Classification](#text-pair-classification)
-* [Conditional Text Generation](#conditional-generation)
+* [Conditional Text Generation](#conditional-text-generation)
 * [Named Entity Recognition](#named-entity-recognition)
-* [Extractive QA](#extractive-qa-extractive)
+* [Extractive QA](#extractive-qa)
 * [Multiple Choice QA](#multiple-choice-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
