@@ -142,14 +142,14 @@ The following example demonstrates this on the metaphor QA dataset.
 
 **CLI Example**
 
-The below example loads the `metaphor_qa` dataset from DataLab.
+The below example loads the `fig_qa` dataset from DataLab.
 ```shell
-explainaboard --task qa-multiple-choice --dataset metaphor_qa --system_outputs ./data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json > report.json
+explainaboard --task qa-multiple-choice --dataset fig_qa --system_outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
 ```
 
 And this is what it looks like with a custom dataset.
 ```shell
-explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_outputs/metaphor_qa/metaphor_qa-dataset.json --system_outputs ./data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json > report.json
+explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_outputs/fig_qa/fig_qa-dataset.json --system_outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
 ```
 
 

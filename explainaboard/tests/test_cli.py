@@ -187,11 +187,11 @@ class TestCLI(TestCase):
             '--task',
             'qa-multiple-choice',
             '--dataset',
-            'metaphor_qa',
+            'fig_qa',
             '--split',
             'validation',
             '--system_outputs',
-            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
+            f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -204,9 +204,9 @@ class TestCLI(TestCase):
             '--task',
             'qa-multiple-choice',
             '--custom_dataset_paths',
-            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-dataset.json',
+            f'{top_path}/data/system_outputs/fig_qa/fig_qa-dataset.json',
             '--system_outputs',
-            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
+            f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
