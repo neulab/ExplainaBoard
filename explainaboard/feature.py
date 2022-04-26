@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import dataclasses
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -19,6 +18,10 @@ class BucketInfo:
     method: str = "bucket_attribute_specified_bucket_value"
     number: int = 4
     setting: Any = 1  # For different bucket_methods, the settings are diverse
+    _type: Optional[str] = None
+
+    def __post_init__(self):
+        self._type: str = self.__class__.__name__
 
 
 def is_dataclass_dict(obj):
@@ -30,12 +33,6 @@ def is_dataclass_dict(obj):
         return False
     else:
         return True
-
-
-def fromdict(obj):
-    if not is_dataclass_dict(obj):
-        raise TypeError("fromdict() should be called on dict with _type")
-    return _fromdict_inner(obj)
 
 
 def _fromdict_inner(obj):
@@ -67,11 +64,17 @@ class FeatureType:
     require_training_set: bool = False
     id: Optional[str] = None
 
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> FeatureType:
-        field_names = set(f.name for f in dataclasses.fields(cls))
+    # @classmethod
+    # def from_dict(cls, data_dict: dict) -> FeatureType:
+    #
+    #     field_names = set(f.name for f in dataclasses.fields(cls))
+    #     return cls(**{k: v for k, v in data_dict.items() if k in field_names})
 
-        return cls(**{k: v for k, v in data_dict.items() if k in field_names})
+    @classmethod
+    def from_dict(cls, obj: dict) -> FeatureType:
+        if not is_dataclass_dict(obj):
+            raise TypeError("from_dict() should be called on dict with _type")
+        return _fromdict_inner(obj)
 
     def __post_init__(self):
         self._type: str = self.__class__.__name__
@@ -130,6 +133,7 @@ FEATURETYPE_REGISTRY = {
     "Set": Set,
     "Position": Position,
     "Value": Value,
+    "BucketInfo": BucketInfo,
 }
 
 
@@ -167,9 +171,6 @@ class Features(dict):
                     for k, v in dict_feature.items():
                         dict_res[k] = v
 
-            # curr_feature = self[feature_name].copy()
-            # while "feature" in self[feature_name].__dict__.keys():
-        # print("--++----- leaf features ---++------")
         for feature_name, feature_info in dict_res.items():
             # print(k,v)
             if feature_info.is_bucket:
@@ -210,18 +211,11 @@ class Features(dict):
                     for k, v in dict_feature.items():
                         dict_res[k] = v
 
-            # curr_feature = self[feature_name].copy()
-            # while "feature" in self[feature_name].__dict__.keys():
-        # print("--++----- leaf features ---++------")
         for feature_name, feature_info in dict_res.items():
             # print(k,v)
             if "require_training_set" not in feature_info.__dict__.keys():
                 continue
             if feature_info.require_training_set:
                 pre_computed_features.append(feature_name)
-
-        # print("--++----- pre_computed features ---++------")
-        # for feature_name in pre_computed_features:
-        #     print(feature_name)
 
         return pre_computed_features
