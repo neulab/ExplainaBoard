@@ -34,27 +34,9 @@ class CWSProcessor(Processor):
     def default_features(cls) -> feature.Features:
         return feature.Features(
             {
-                "tokens": feature.Sequence(feature.Value("string")),
-                "true_tags": feature.Sequence(
-                    feature.ClassLabel(
-                        names=[
-                            "B",
-                            "M",
-                            "E",
-                            "S",
-                        ]
-                    )
-                ),
-                "pred_tags": feature.Sequence(
-                    feature.ClassLabel(
-                        names=[
-                            "B",
-                            "M",
-                            "E",
-                            "S",
-                        ]
-                    )
-                ),
+                "tokens": feature.Sequence(feature=feature.Value("string")),
+                "true_tags": feature.Sequence(feature=feature.Value("string")),
+                "pred_tags": feature.Sequence(feature=feature.Value("string")),
                 # --- the following are features of the sentences ---
                 "sentence_length": feature.Value(
                     dtype="float",
@@ -79,8 +61,8 @@ class CWSProcessor(Processor):
                 ),
                 # --- the following are features of each word ---
                 "true_word_info": feature.Sequence(
-                    feature.Set(
-                        {
+                    feature=feature.Set(
+                        feature={
                             "span_text": feature.Value("string"),
                             "span_pos": feature.Position(positions=[0, 0]),
                             "span_tag": feature.Value(

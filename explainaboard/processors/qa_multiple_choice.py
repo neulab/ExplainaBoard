@@ -26,10 +26,10 @@ class QAMultipleChoiceProcessor(Processor):
             {
                 "context": feature.Value("string"),
                 "question": feature.Value("string"),
-                "options": feature.Sequence(feature.Value("string")),
+                "options": feature.Sequence(feature=feature.Value("string")),
                 "answers": feature.Sequence(
-                    feature.Set(
-                        {
+                    feature=feature.Set(
+                        feature={
                             "text": feature.Value("string"),
                             "option_index": feature.Value("int32"),
                         }

@@ -28,7 +28,7 @@ class QAExtractiveProcessor(Processor):
                 "context": feature.Value("string"),
                 "question": feature.Value("string"),
                 "id": feature.Value("string"),
-                "answers": feature.Sequence(feature.Value("string")),
+                "answers": feature.Sequence(feature=feature.Value("string")),
                 "predicted_answers": feature.Value("string"),
                 "context_length": feature.Value(
                     dtype="float",

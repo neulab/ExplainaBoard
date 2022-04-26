@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 import copy
+import dataclasses
 from dataclasses import dataclass, field
 import re
 import sys
-from typing import Any, ClassVar, Optional, overload, Union
+from typing import Any, Optional
 
 import numpy as np
 import pandas as pd
 import pyarrow as pa
 
 from explainaboard import config
-from explainaboard.utils.py_utils import zip_dict
-from explainaboard.utils.typing_utils import unwrap
 
 
 def _arrow_to_datasets_dtype(arrow_type: pa.DataType) -> str:
@@ -280,348 +278,116 @@ class BucketInfo:
     setting: Any = 1  # For different bucket_methods, the settings are diverse
 
 
-# TODO(odashi): Make this class non-dataclass because __post_init__ does lots of
-# type-insensitive processes.
+def is_dataclass_dict(obj):
+    if (
+        not isinstance(obj, dict)
+        or '_type' not in obj.keys()
+        or obj['_type'] not in FEATURETYPE_REGISTRY.keys()
+    ):
+        return False
+    else:
+        return True
+
+
+def fromdict(obj):
+    if not is_dataclass_dict(obj):
+        raise TypeError("fromdict() should be called on dict with _type")
+    return _fromdict_inner(obj)
+
+
+def _fromdict_inner(obj):
+    # reconstruct the dataclass using the type tag
+    if is_dataclass_dict(obj):
+        result = {}
+        for name, data in obj.items():
+            result[name] = _fromdict_inner(data)
+        return FEATURETYPE_REGISTRY[obj["_type"]](**result)
+
+    # exactly the same as before (without the tuple clause)
+    elif isinstance(obj, (list, tuple)):
+        return type(obj)(_fromdict_inner(v) for v in obj)
+    elif isinstance(obj, dict):
+        return type(obj)(
+            (_fromdict_inner(k), _fromdict_inner(v)) for k, v in obj.items()
+        )
+    else:
+        return copy.deepcopy(obj)
+
+
 @dataclass
-class ClassLabel:
-    """
-    (Most part of this class are from huggingface)
-    This class is used to define a new dataclass for sample's class label.
-    For example, in sentiment classification task, we have sample:
-        I love this movie \t  positive
-    in this case, "positive" is the class label.
-    There are three ways to create a ClassLabel object,
-    based on three objects:
-        * `num_classes`: create 0 to (num_classes-1) labels
-        * `names`: a list of label names
-        * `names_file`:a file that consists of the list of labels.
-
-    Args:
-        num_classes: int, number of classes. If users adopt this way to create
-            an object, then all labels are str(numbers) less than num_classes.
-        names: list<str>
-        names_file:str, path to a file with names, one per line
-    """
-
-    num_classes: Optional[int] = None
-    names: Optional[list[str]] = None
+class FeatureType:
+    dtype: Optional[str] = None
+    _type: Optional[str] = None
     description: Optional[str] = None
-    names_file: Optional[str] = None
-    id: Optional[str] = None
     is_bucket: bool = False
-    require_training_set: bool = False
-    is_pre_computed: bool = False
     bucket_info: Optional[BucketInfo] = None
-    # Class Variables
-    dtype: ClassVar[str] = "int64"
-    _str2int: ClassVar[Optional[dict[str, int]]] = None
-    _int2str: ClassVar[Optional[dict[int, str]]] = None
-    _type: str = field(default="ClassLabel", init=False, repr=False)
+    require_training_set: bool = False
+    id: Optional[str] = None
+
+    @classmethod
+    def from_dict(cls, data_dict: dict) -> FeatureType:
+        field_names = set(f.name for f in dataclasses.fields(cls))
+
+        return cls(**{k: v for k, v in data_dict.items() if k in field_names})
 
     def __post_init__(self):
-        if self.is_bucket and self.bucket_info is None:
-            self.bucket_info = BucketInfo(
-                _method="bucket_attribute_discrete_value", _number=4, _setting=1
-            )
-        if self.names_file is not None and self.names is not None:
-            raise ValueError("Please provide either names or names_file but not both")
-        # Set self.names
-        if self.names is None:
-            if self.names_file is not None:
-                self.names = self._load_names_from_file(self.names_file)
-            elif self.num_classes is not None:
-                self.names = [str(i) for i in range(self.num_classes)]
-            else:
-                raise ValueError(
-                    "Please either provide num_classes, names or names_file."
-                )
-        # Set self.num_classes
-        if self.num_classes is None:
-            self.num_classes = len(self.names)
-        elif self.num_classes != len(self.names):
-            raise ValueError(
-                "ClassLabel number of names do not match the defined num_classes."
-            )
-        # Prepare mappings
-        self._int2str = [str(name) for name in self.names]
-        self._str2int = {name: i for i, name in enumerate(self._int2str)}
-        if len(self._int2str) != len(self._str2int):
-            raise ValueError(
-                "Some label names are duplicated. Each label name should be unique."
-            )
-
-    def str2int_scalar(self, value: str) -> int:
-        """Convert a class name into the corresponding ID."""
-        try:
-            if self._str2int is not None:
-                return self._str2int.get(value) or self._str2int[value.strip()]
-            else:
-                # No names provided, try to integerize
-                output = int(value)
-                if 0 <= output < unwrap(self.num_classes):
-                    raise ValueError(f'{value} is out of range.')
-                return output
-        except Exception as ex:
-            raise ValueError(f'Invalid string class label: {value}.') from ex
-
-    def str2int_vector(self, values: Iterable[str]) -> list[int]:
-        """Convert a list of class names into corresponding IDs."""
-        return [self.str2int_scalar(v) for v in values]
-
-    def str2int(self, values: Iterable[str]) -> Union[int, list[int]]:
-        """Convert class names into corresponding IDs: generic version."""
-        # NOTE(odashi): str is also Iterable[str].
-        if isinstance(values, str):
-            return self.str2int_scalar(values)
-        else:
-            return self.str2int_vector(values)
-
-    def int2str_scalar(self, value: int) -> str:
-        """Convert a class ID into the corresponding name."""
-        if not 0 <= value < unwrap(self.num_classes):
-            raise ValueError(f'{value} is out of range.')
-
-        if self._int2str is not None:
-            return self._int2str[value]
-        else:
-            # No names provided, assuming the string representation is the name.
-            return str(value)
-
-    def int2str_vector(self, values: Iterable[int]) -> list[str]:
-        """Convert a list of class IDs into corresponding names."""
-        return [self.int2str_scalar(v) for v in values]
-
-    @overload
-    def int2str(self, values: int) -> str:
-        ...
-
-    @overload
-    def int2str(self, values: Iterable[int]) -> list[str]:
-        ...
-
-    def int2str(self, values):
-        """Convert class IDs into corresponding names: generic version."""
-        if isinstance(values, int):
-            return self.int2str_scalar(values)
-        else:
-            return self.int2str_vector(values)
-
-    def encode_example(self, example_data):
-        if self.num_classes is None:
-            raise ValueError(
-                "Trying to use ClassLabel feature with undefined number of class. "
-                "Please set ClassLabel.names or num_classes."
-            )
-
-        # If a string is given, convert to associated integer
-        if isinstance(example_data, str):
-            example_data = self.str2int(example_data)
-
-        # Allowing -1 to mean no label.
-        if not -1 <= example_data < self.num_classes:
-            raise ValueError(
-                "Class label %d greater than configured num_classes %d"
-                % (example_data, self.num_classes)
-            )
-        return example_data
-
-    @staticmethod
-    def _load_names_from_file(names_filepath):
-        with open(names_filepath, "r", encoding="utf-8") as f:
-            return [
-                name.strip() for name in f.read().split("\n") if name.strip()
-            ]  # Filter empty names
+        self._type: str = self.__class__.__name__
 
 
 @dataclass
-class Sequence:
-    """Construct a list of feature from a single type or a dict of types.
-    Mostly here for compatiblity with tfds.
-    """
+class Sequence(FeatureType):
+    feature: FeatureType = field(default_factory=FeatureType)
 
-    feature: Any
-    length: int = -1
-    id: Optional[str] = None
-    is_bucket: bool = False
-    require_training_set: bool = False
-    # Automatically constructed
-    dtype: ClassVar[str] = "list"
-    pa_type: ClassVar[Any] = None
-    _type: str = field(default="Sequence", init=False, repr=False)
+    def __post_init__(self):
+        super().__post_init__()
+        self.dtype = "list"
 
 
 @dataclass
-class Set:
-    feature: dict
+class Set(FeatureType):
+    feature: dict[str, FeatureType] = field(default_factory=dict)
 
-    dtype: ClassVar[str] = "dict"
-    is_bucket: bool = False
-    require_training_set: bool = False
-    is_pre_computed: bool = False
-    bucket_info: Optional[BucketInfo] = None
-    _type: str = field(default="Set", init=False, repr=False)
-    id: Optional[str] = None
-    pa_type: ClassVar[Any] = None
+    def __post_init__(self):
+        super().__post_init__()
+        self.dtype = "dict"
 
 
 @dataclass
-class Position:
+class Position(FeatureType):
     positions: Optional[list] = None
-    dtype: ClassVar[Union[str, object]] = Any  # TODO(odashi): avoid using Any here.
-    is_bucket: bool = False
-    require_training_set: bool = False
-    is_pre_computed: bool = False
-    bucket_info: Optional[BucketInfo] = None
-    _type: str = field(default="Position", init=False, repr=False)
-    id: Optional[str] = None
-    pa_type: ClassVar[Any] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        self._type: str = "Position"
 
 
 @dataclass
-class Span:
-    dtype: ClassVar[Union[str, object]] = Any  # TODO(odashi): avoid using Any here.
-    is_bucket: bool = False
-    require_training_set: bool = False
-    is_pre_computed: bool = False
-    bucket_info: Optional[BucketInfo] = None
-    _type: str = field(default="Span", init=False, repr=False)
-    id: Optional[str] = None
-    pa_type: ClassVar[Any] = None
+class Value(FeatureType):
 
-
-@dataclass
-class Value:
-    """
-    The Value dtypes are as follows:
-    null
-    bool
-    int8
-    int16
-    int32
-    int64
-    uint8
-    uint16
-    uint32
-    uint64
-    float16
-    float32 (alias float)
-    float64 (alias double)
-    timestamp[(s|ms|us|ns)]
-    timestamp[(s|ms|us|ns), tz=(tzstring)]
-    binary
-    large_binary
-    string
-    large_string
-    """
-
-    dtype: str  # must be initialized when created
-    description: Optional[str] = None
     max_value: Optional[float | int] = None
     min_value: Optional[float | int] = None
-    is_bucket: bool = False  # don't need to be initialized
-    require_training_set: bool = False
-    is_pre_computed: bool = False
-    bucket_info: Optional[BucketInfo] = None
-    id: Optional[str] = None
-    # Automatically constructed
-    pa_type: ClassVar[Any] = None
-    _type: str = field(default="Value", init=False, repr=False)
-    # is_bucket: str = field(default=False, init=False, repr=False)
 
     def __post_init__(self):
+        super().__post_init__()
         if self.is_bucket and self.bucket_info is None:
             self.bucket_info = BucketInfo(
-                _method="bucket_attribute_specified_bucket_value",
-                _number=4,
-                _setting=(),
+                method="bucket_attribute_specified_bucket_value",
+                number=4,
+                setting=(),
             )
         if self.dtype == "double":  # fix inferred type
             self.dtype = "float64"
         if self.dtype == "float":  # fix inferred type
             self.dtype = "float32"
-        self.pa_type = string_to_arrow(self.dtype)
-
-    def __call__(self):
-        return self.pa_type
-
-    def encode_example(self, value):
-        if pa.types.is_boolean(self.pa_type):
-            return bool(value)
-        elif pa.types.is_integer(self.pa_type):
-            return int(value)
-        elif pa.types.is_floating(self.pa_type):
-            return float(value)
-        else:
-            return value
 
 
-FeatureType = Union[
-    dict,
-    list,
-    tuple,
-    ClassLabel,
-    Value,
-    Sequence,
-    Span,
-]
-
-
-def encode_nested_example(schema, obj):
-    """Encode a nested example.
-    This is used since some features (in particular ClassLabel) have some logic during
-    encoding.
-    """
-    # Nested structures: we allow dict, list/tuples, sequences
-    if isinstance(schema, dict):
-        return {
-            k: encode_nested_example(sub_schema, sub_obj)
-            for k, (sub_schema, sub_obj) in zip_dict(schema, obj)
-        }
-    elif isinstance(schema, (list, tuple)):
-        sub_schema = schema[0]
-        return (
-            [encode_nested_example(sub_schema, o) for o in obj]
-            if obj is not None
-            else None
-        )
-    elif isinstance(schema, Sequence):
-        # We allow to reverse list of dict => dict of list for compatiblity with tfds
-        if isinstance(schema.feature, dict):
-            # dict of list to fill
-            list_dict = {}
-            if isinstance(obj, (list, tuple)):
-                # obj is a list of dict
-                for k, dict_tuples in zip_dict(schema.feature, *obj):
-                    list_dict[k] = [
-                        encode_nested_example(dict_tuples[0], o)
-                        for o in dict_tuples[1:]
-                    ]
-                return list_dict
-            else:
-                # obj is a single dict
-                for k, (sub_schema, sub_objs) in zip_dict(schema.feature, obj):
-                    list_dict[k] = [
-                        encode_nested_example(sub_schema, o) for o in sub_objs
-                    ]
-                return list_dict
-        # schema.feature is not a dict
-        if isinstance(obj, str):  # don't interpret a string as a list
-            raise ValueError(
-                "Got a string but expected a list instead: '{}'".format(obj)
-            )
-        return (
-            [encode_nested_example(schema.feature, o) for o in obj]
-            if obj is not None
-            else None
-        )
-    # Object with special encoding:
-    # ClassLabel will convert from string to int,
-    # TranslationVariableLanguages does some checks
-    elif isinstance(schema, (ClassLabel, Value)):
-        return schema.encode_example(obj)
-    # Other object should be directly convertible to a native Arrow type
-    # (like Translation and Translation)
-    return obj
+FEATURETYPE_REGISTRY = {
+    "FeatureType": FeatureType,
+    "Sequence": Sequence,
+    "Set": Set,
+    "Position": Position,
+    "Value": Value,
+}
 
 
 class Features(dict):
@@ -716,14 +482,3 @@ class Features(dict):
         #     print(feature_name)
 
         return pre_computed_features
-
-    def encode_example(self, example):
-        """
-        Encode example. (The original version of huggingface is prepared for arrow.)
-        Args:
-            example (:obj:`dict[str, Any]`): Data in a Dataset row.
-        Returns:
-            :obj:`dict[str, Any]`
-        """
-        example = cast_to_python_objects(example)
-        return encode_nested_example(self, example)

@@ -20,12 +20,8 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             {
                 "aspect": feature.Value("string"),
                 "text": feature.Value("string"),
-                "true_label": feature.ClassLabel(
-                    names=["positive", "negative"], is_bucket=False
-                ),
-                "predicted_label": feature.ClassLabel(
-                    names=["positive", "negative"], is_bucket=False
-                ),
+                "true_label": feature.Value("string"),
+                "predicted_label": feature.Value("string"),
                 "label": feature.Value(
                     dtype="string",
                     description="category",
