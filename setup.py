@@ -10,7 +10,7 @@ setup(
     description="Explainable Leaderboards for Natural Language Processing",
     long_description=codecs.open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/ExpressAI/ExplainaBoard",
+    url="https://github.com/neulab/ExplainaBoard",
     author="Pengfei Liu",
     license="MIT License",
     classifiers=[
@@ -23,11 +23,6 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     packages=find_packages(),
-    # packages=find_packages("explainaboard"),
-    # package_data={
-    #     "":["*.txt"],
-    #     "tasks":["ner/*.aspects","ner/*.json"],
-    # },
     entry_points={
         "console_scripts": [
             "explainaboard=explainaboard.explainaboard_main:main",
@@ -41,8 +36,6 @@ setup(
         "matplotlib",
         "nltk>=3.2",
         "numpy",
-        "pandas",
-        "pyarrow",
         "sacrebleu",
         "scikit-learn",
         "scipy",
