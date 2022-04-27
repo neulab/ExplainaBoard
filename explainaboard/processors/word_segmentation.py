@@ -61,7 +61,7 @@ class CWSProcessor(Processor):
                 ),
                 # --- the following are features of each word ---
                 "true_word_info": feature.Sequence(
-                    feature=feature.Set(
+                    feature=feature.Dict(
                         feature={
                             "span_text": feature.Value("string"),
                             "span_pos": feature.Position(positions=[0, 0]),

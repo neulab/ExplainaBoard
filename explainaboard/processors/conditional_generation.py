@@ -97,7 +97,7 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 # --- the following are features of each token ---
                 "ref_tok_info": feature.Sequence(
-                    feature=feature.Set(
+                    feature=feature.Dict(
                         feature={
                             "tok_text": feature.Value("string"),
                             "tok_pos": feature.Position(positions=[0, 0]),

@@ -3,10 +3,10 @@ import unittest
 
 from explainaboard.feature import (
     BucketInfo,
+    Dict,
     FeatureType,
     Position,
     Sequence,
-    Set,
     Value,
 )
 
@@ -20,7 +20,7 @@ class TestFeature(unittest.TestCase):
         value2 = Value(dtype="double", is_bucket=True)
         self.assertEqual(value2.bucket_info.number, 4)
 
-        value3 = Set(feature={"a": 1})
+        value3 = Dict(feature={"a": 1})
         self.assertEqual(value3.feature, {'a': 1})
 
         value4 = Position(positions=[1, 2])
@@ -30,7 +30,7 @@ class TestFeature(unittest.TestCase):
         self.assertEqual(asdict(value2), asdict(Value.from_dict(value2_dict)))
 
         a = Sequence(
-            feature=Set(
+            feature=Dict(
                 feature={
                     "span_text": Value("string"),
                     "span_tokens": Value(

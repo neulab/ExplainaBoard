@@ -28,7 +28,7 @@ class QAMultipleChoiceProcessor(Processor):
                 "question": feature.Value("string"),
                 "options": feature.Sequence(feature=feature.Value("string")),
                 "answers": feature.Sequence(
-                    feature=feature.Set(
+                    feature=feature.Dict(
                         feature={
                             "text": feature.Value("string"),
                             "option_index": feature.Value("int32"),

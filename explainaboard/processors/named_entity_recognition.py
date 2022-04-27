@@ -86,7 +86,7 @@ class NERProcessor(Processor):
                 ),
                 # --- the following are features of each entity ---
                 "true_entity_info": feature.Sequence(
-                    feature=feature.Set(
+                    feature=feature.Dict(
                         feature={
                             "span_text": feature.Value("string"),
                             "span_tokens": feature.Value(

@@ -25,6 +25,11 @@ class BucketInfo:
 
 
 def is_dataclass_dict(obj):
+    """
+    this function is used to judge if obj is a dictionary with a key `_type`
+    :param obj: a python object with different potential type
+    :return: boolean variable
+    """
     if (
         not isinstance(obj, dict)
         or '_type' not in obj.keys()
@@ -36,6 +41,12 @@ def is_dataclass_dict(obj):
 
 
 def _fromdict_inner(obj):
+    """
+    This function aim to construct a dataclass based on a potentially nested
+    dictionary (obj) recursively
+    :param obj: python object
+    :return: an object with dataclass
+    """
     # reconstruct the dataclass using the type tag
     if is_dataclass_dict(obj):
         result = {}
@@ -56,19 +67,20 @@ def _fromdict_inner(obj):
 
 @dataclass
 class FeatureType:
+    # dtype: declare the data type of a feature, e.g. dict, list, float
     dtype: Optional[str] = None
+    # _type: declare the class type of the feature: Sequence, Position
     _type: Optional[str] = None
+    # description: descriptive information of a feature
     description: Optional[str] = None
+    # is_bucket: whether the feature will be used for bucketing
     is_bucket: bool = False
+    # bucket_info: hyper-parameters for bucketing when is_bucket is True
     bucket_info: Optional[BucketInfo] = None
+    # require_training_set: whether calculating this feature
+    # relies on the training samples
     require_training_set: bool = False
     id: Optional[str] = None
-
-    # @classmethod
-    # def from_dict(cls, data_dict: dict) -> FeatureType:
-    #
-    #     field_names = set(f.name for f in dataclasses.fields(cls))
-    #     return cls(**{k: v for k, v in data_dict.items() if k in field_names})
 
     @classmethod
     def from_dict(cls, obj: dict) -> FeatureType:
@@ -90,7 +102,7 @@ class Sequence(FeatureType):
 
 
 @dataclass
-class Set(FeatureType):
+class Dict(FeatureType):
     feature: dict[str, FeatureType] = field(default_factory=dict)
 
     def __post_init__(self):
@@ -110,7 +122,11 @@ class Position(FeatureType):
 @dataclass
 class Value(FeatureType):
 
+    # the maximum value (inclusive) of a feature with the
+    # dtype of `float` or `int`
     max_value: Optional[float | int] = None
+    # the minimum value (inclusive) of a feature with the
+    # dtype of `float` or `int`
     min_value: Optional[float | int] = None
 
     def __post_init__(self):
@@ -130,7 +146,7 @@ class Value(FeatureType):
 FEATURETYPE_REGISTRY = {
     "FeatureType": FeatureType,
     "Sequence": Sequence,
-    "Set": Set,
+    "Dict": Dict,
     "Position": Position,
     "Value": Value,
     "BucketInfo": BucketInfo,
