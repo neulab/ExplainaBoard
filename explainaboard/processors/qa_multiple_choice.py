@@ -79,7 +79,7 @@ class QAMultipleChoiceProcessor(Processor):
                 "fre_rank": feature.Value(
                     dtype="float",
                     description=(
-                        "the average rank of each work based on its frequency in "
+                        "the average rank of each word based on its frequency in "
                         "training set"
                     ),
                     is_bucket=True,
