@@ -137,7 +137,7 @@
         },
         "fre_rank": {
             "dtype": "float32",
-            "description": "the average rank of each work based on its frequency in training set",
+            "description": "the average rank of each word based on its frequency in training set",
             "is_bucket": true,
             "require_training_set": true,
             "is_pre_computed": false,

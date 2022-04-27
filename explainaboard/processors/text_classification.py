@@ -36,9 +36,9 @@ class TextClassificationProcessor(Processor):
                         method="bucket_attribute_discrete_value", number=4, setting=1
                     ),
                 ),
-                "sentence_length": feature.Value(
+                "text_length": feature.Value(
                     dtype="float",
-                    description="text length",
+                    description="text length in tokens",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -46,9 +46,9 @@ class TextClassificationProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                "token_number": feature.Value(
+                "text_chars": feature.Value(
                     dtype="float",
-                    description="the number of chars",
+                    description="text length in characters",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -90,7 +90,7 @@ class TextClassificationProcessor(Processor):
                 "fre_rank": feature.Value(
                     dtype="float",
                     description=(
-                        "the average rank of each work based on its frequency in "
+                        "the average rank of each word based on its frequency in "
                         "training set"
                     ),
                     is_bucket=True,
@@ -120,10 +120,10 @@ class TextClassificationProcessor(Processor):
         return [AccuracyConfig(name='Accuracy', language=language)]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
+    def _get_text_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(sys_info.tokenize(existing_features["text"]))
 
-    def _get_token_number(self, sys_info: SysOutputInfo, existing_feature: dict):
+    def _get_text_chars(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(existing_feature["text"])
 
     def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):

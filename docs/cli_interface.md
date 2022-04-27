@@ -27,6 +27,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Text Classification](#text-classification)
 * [Text Pair Classification](#text-pair-classification)
 * [Conditional Text Generation](#conditional-text-generation)
+* [Language Modeling](#language-modeling)
 * [Named Entity Recognition](#named-entity-recognition)
 * [Extractive QA](#extractive-qa)
 * [Multiple Choice QA](#multiple-choice-qa)
@@ -98,6 +99,18 @@ Then run the below command and it should work:
 explainaboard --task summarization --dataset cnn_dailymail --system_outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
 ```
 
+## Language Modeling
+
+Language modeling is the task of predicting the probability for words in a text.
+You can analyze your language model outputs by inputting a file that has one log
+probability for each space-separated word. Here is an example:
+
+**CLI Example**
+
+The below example analyzes the wikitext corpus:
+```shell
+explainaboard --task language-modeling --custom_dataset_paths ./data/system_outputs/wikitext/wikitext-dataset.txt --system_outputs ./data/system_outputs/wikitext-sys1-output.txt
+```
 
 ## Named Entity Recognition
 
@@ -142,14 +155,14 @@ The following example demonstrates this on the metaphor QA dataset.
 
 **CLI Example**
 
-The below example loads the `metaphor_qa` dataset from DataLab.
+The below example loads the `fig_qa` dataset from DataLab.
 ```shell
-explainaboard --task qa-multiple-choice --dataset metaphor_qa --system_outputs ./data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json > report.json
+explainaboard --task qa-multiple-choice --dataset fig_qa --system_outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
 ```
 
 And this is what it looks like with a custom dataset.
 ```shell
-explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_outputs/metaphor_qa/metaphor_qa-dataset.json --system_outputs ./data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json > report.json
+explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_outputs/fig_qa/fig_qa-dataset.json --system_outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
 ```
 
 

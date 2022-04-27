@@ -149,6 +149,21 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    def test_lm_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'language-modeling',
+            '--custom_dataset_paths',
+            f'{top_path}/data/system_outputs/wikitext/wikitext-dataset.txt',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/wikitext/wikitext-sys1-output.txt',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
     def test_ner_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
@@ -187,11 +202,11 @@ class TestCLI(TestCase):
             '--task',
             'qa-multiple-choice',
             '--dataset',
-            'metaphor_qa',
+            'fig_qa',
             '--split',
             'validation',
             '--system_outputs',
-            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
+            f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -204,9 +219,9 @@ class TestCLI(TestCase):
             '--task',
             'qa-multiple-choice',
             '--custom_dataset_paths',
-            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-dataset.json',
+            f'{top_path}/data/system_outputs/fig_qa/fig_qa-dataset.json',
             '--system_outputs',
-            f'{top_path}/data/system_outputs/metaphor_qa/metaphor_qa-gptneo-output.json',  # noqa
+            f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
