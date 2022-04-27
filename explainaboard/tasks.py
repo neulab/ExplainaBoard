@@ -147,6 +147,16 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
             )
         ],
     ),
+    TaskCategory(
+        "language-modeling",
+        "Predict the log probability of words in a sequence",
+        [
+            Task(
+                name=TaskType.language_modeling,
+                description="Predict the log probability of words in a sequence",
+            )
+        ],
+    ),
 ]
 
 

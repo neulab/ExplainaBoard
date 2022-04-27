@@ -13,6 +13,7 @@ class TaskType(str, Enum):
     qa_multiple_choice = "qa-multiple-choice"
     conditional_generation = "conditional-generation"
     word_segmentation = "word-segmentation"
+    language_modeling = "language-modeling"
 
     @staticmethod
     def list():

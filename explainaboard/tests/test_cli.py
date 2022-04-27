@@ -149,6 +149,21 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    def test_lm_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'language-modeling',
+            '--custom_dataset_paths',
+            f'{top_path}/data/system_outputs/wikitext/wikitext-dataset.txt',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/wikitext/wikitext-sys1-output.txt',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
     def test_ner_datalab(self):
         args = [
             'explainaboard.explainaboard_main',
