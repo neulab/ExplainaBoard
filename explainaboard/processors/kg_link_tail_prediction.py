@@ -35,7 +35,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 "true_link": feature.Value("string"),
                 "true_tail": feature.Value("string"),
                 "true_label": feature.Value("string"),
-                "predictions": feature.Sequence(feature.Value("string")),
+                "predictions": feature.Sequence(feature=feature.Value("string")),
                 "tail_entity_length": feature.Value(
                     dtype="float",
                     description="number of words in the tail entity",

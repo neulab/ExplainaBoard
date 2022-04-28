@@ -34,37 +34,9 @@ class NERProcessor(Processor):
     def default_features(cls) -> feature.Features:
         return feature.Features(
             {
-                "tokens": feature.Sequence(feature.Value("string")),
-                "true_tags": feature.Sequence(
-                    feature.ClassLabel(
-                        names=[
-                            "O",
-                            "B-PER",
-                            "I-PER",
-                            "B-ORG",
-                            "I-ORG",
-                            "B-LOC",
-                            "I-LOC",
-                            "B-MISC",
-                            "I-MISC",
-                        ]
-                    )
-                ),
-                "pred_tags": feature.Sequence(
-                    feature.ClassLabel(
-                        names=[
-                            "O",
-                            "B-PER",
-                            "I-PER",
-                            "B-ORG",
-                            "I-ORG",
-                            "B-LOC",
-                            "I-LOC",
-                            "B-MISC",
-                            "I-MISC",
-                        ]
-                    )
-                ),
+                "tokens": feature.Sequence(feature=feature.Value("string")),
+                "true_tags": feature.Sequence(feature=feature.Value("string")),
+                "pred_tags": feature.Sequence(feature=feature.Value("string")),
                 # --- the following are features of the sentences ---
                 "sentence_length": feature.Value(
                     dtype="float",
@@ -114,8 +86,8 @@ class NERProcessor(Processor):
                 ),
                 # --- the following are features of each entity ---
                 "true_entity_info": feature.Sequence(
-                    feature.Set(
-                        {
+                    feature=feature.Dict(
+                        feature={
                             "span_text": feature.Value("string"),
                             "span_tokens": feature.Value(
                                 dtype="float",

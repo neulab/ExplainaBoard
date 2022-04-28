@@ -26,10 +26,8 @@ class TextClassificationProcessor(Processor):
         return feature.Features(
             {
                 "text": feature.Value("string"),
-                "true_label": feature.ClassLabel(names=["1", "0"], is_bucket=False),
-                "predicted_label": feature.ClassLabel(
-                    names=["1", "0"], is_bucket=False
-                ),
+                "true_label": feature.Value("string"),
+                "predicted_label": feature.Value("string"),
                 "label": feature.Value(
                     dtype="string",
                     description="category",
