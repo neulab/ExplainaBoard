@@ -5,7 +5,6 @@ from collections.abc import Callable, Iterator
 from typing import Any
 
 from datalabs import aggregating, Dataset
-from tqdm import tqdm
 
 from explainaboard import feature
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
@@ -19,6 +18,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing
+from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.span_utils import BMESSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap
@@ -219,7 +219,7 @@ class CWSProcessor(Processor):
             )
         )
 
-        for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
+        for _id, dict_sysout in progress(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
 
@@ -298,7 +298,7 @@ class CWSProcessor(Processor):
         # Bucketing
 
         samples_over_bucket_pred = {}
-        for feature_name in tqdm(tok_feats, desc="bucketing"):
+        for feature_name in progress(tok_feats, desc="bucketing"):
             # Choose behavior based on whether this is a feature of samples or spans
             my_feature = features["true_word_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
@@ -427,8 +427,6 @@ class CWSProcessor(Processor):
 
             true_labels = [x['true_label'] for x in bucket_samples]
             pred_labels = [x['predicted_label'] for x in bucket_samples]
-
-            # print(true_labels)
 
             bucket_samples_errors = [
                 v for v in bucket_samples if v["true_label"] != v["predicted_label"]

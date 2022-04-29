@@ -4,11 +4,9 @@ import argparse
 import json
 import os
 
-from tqdm import tqdm
-
 from explainaboard.analyzers.bar_chart import make_bar_chart
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
-from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.logging import get_logger, progress
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -38,23 +36,23 @@ def draw_bar_chart_from_reports(
         os.makedirs(output_dir)
 
     # feature name, for example, sentence length
-    for feature_name in tqdm(fg_results[0].keys()):
+    for feature_name in progress(fg_results[0].keys()):
         # Make sure that buckets exist
         buckets: list[dict[str, BucketPerformance]] = []
         for i, fg_result in enumerate(fg_results):
             if feature_name not in fg_result:
-                eprint(f'error: feature {feature_name} not in {reports[i]}')
+                get_logger().error(f'error: feature {feature_name} not in {reports[i]}')
             else:
                 buckets.append(fg_result[feature_name])
                 bnames0, bnames = buckets[0].keys(), buckets[-1].keys()
                 if len(bnames0) != len(bnames):
-                    eprint(
+                    get_logger().error(
                         f'error: different number of buckets for {feature_name} in '
                         f'{reports[0]} and {reports[i]}'
                     )
                     buckets = []
                 elif bnames0 != bnames:
-                    eprint(
+                    get_logger().warning(
                         f'warning: different bucket labels for {feature_name} in '
                         f'{reports[0]} and {reports[i]}'
                     )

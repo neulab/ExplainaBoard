@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import functools
 import itertools
-import sys
 
 
 def freeze(d):
@@ -11,10 +10,6 @@ def freeze(d):
     elif isinstance(d, list):
         return tuple(freeze(value) for value in d)
     return d
-
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
 
 
 def zip_dict(*dicts):

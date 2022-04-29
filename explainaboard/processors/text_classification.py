@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from datalabs import aggregating
-from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
@@ -12,6 +11,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
+from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
@@ -186,7 +186,7 @@ class TextClassificationProcessor(Processor):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0
-        for sample in tqdm(samples):
+        for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)
             length = len(tokens)

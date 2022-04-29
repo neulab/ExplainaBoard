@@ -1,15 +1,14 @@
 import logging
+import os
 from typing import Optional
 
-log_levels = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warning": logging.WARNING,
-    "error": logging.ERROR,
-    "critical": logging.CRITICAL,
-}
+from tqdm import tqdm
 
-_default_log_level = logging.WARNING
+hide_progress = 'EXPLAINABOARD_HIDE_PROGRESS' in os.environ
+
+
+def progress(gen, desc: str = None):
+    return gen if hide_progress else tqdm(gen, desc=desc)
 
 
 def _get_library_name() -> str:
@@ -20,6 +19,7 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
     """Return a logger with the specified name.
     This function can be used in dataset and metrics scripts.
     """
-    if name is None:
-        name = _get_library_name()
-    return logging.getLogger(name)
+    full_name = _get_library_name()
+    if name is not None:
+        full_name = f'{full_name}.{name}'
+    return logging.getLogger(full_name)

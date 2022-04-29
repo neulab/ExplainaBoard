@@ -4,7 +4,6 @@ from collections.abc import Callable, Iterator
 import json
 
 from datalabs import aggregating, load_dataset
-from tqdm import tqdm
 
 # TODO(odashi): Add a function to obtain metric class instead of using getattr.
 from explainaboard import feature, TaskType
@@ -18,7 +17,7 @@ from explainaboard.metric import (
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
-from explainaboard.utils.py_utils import eprint
+from explainaboard.utils.logging import get_logger, progress
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -154,7 +153,7 @@ class KGLinkTailPredictionProcessor(Processor):
         dict_link: dict[str, int] = {}
         dict_tail: dict[str, int] = {}
 
-        for sample in tqdm(samples):
+        for sample in progress(samples):
 
             if sample['tail'] not in dict_tail.keys():
                 dict_tail[sample['tail']] = 1
@@ -210,7 +209,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 else:
                     self.statistics = dataset["train"]._stat
             except FileNotFoundError:
-                eprint(
+                get_logger().warning(
                     """
 The dataset hasn't been supported by DataLab so no training set dependent features will
 be supported by ExplainaBoard. You can add the dataset by:

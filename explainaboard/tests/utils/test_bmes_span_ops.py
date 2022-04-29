@@ -15,9 +15,6 @@ class TestBMESSpanOps(unittest.TestCase):
         span_text_list = [span.get_span_text for span in spans]
         span_tag_list = [span.get_span_tag for span in spans]
 
-        # print(span_text_list)
-        # print(span_tag_list)
-
         self.assertEqual(span_text_list, ['我', '喜 欢', '纽 约'])
         self.assertEqual(span_tag_list, ['S', 'BE', 'BE'])
 
@@ -38,5 +35,4 @@ class TestBMESSpanOps(unittest.TestCase):
         a_ind, b_ind, a_matched, b_matched = span_ops.get_matched_spans(
             spans_a, spans_b
         )
-        # print([span.get_span_text for span in a_matched])
         self.assertEqual([span.get_span_text for span in a_matched], ['我', '纽 约'])

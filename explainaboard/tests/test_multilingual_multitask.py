@@ -94,8 +94,6 @@ class TestMultilingualMultiTask(unittest.TestCase):
                 metric = report_dict["metric_names"][0]
                 score_info = report_dict["results"]["overall"][metric]
 
-                # print(model_name, dataset_name, language)
-
                 if model_name not in score_tensor.keys():
                     score_tensor[model_name] = {}
                 if dataset_name not in score_tensor[model_name].keys():
@@ -130,7 +128,6 @@ class TestMultilingualMultiTask(unittest.TestCase):
             datasets_aggregation,
             languages_aggregation,
         )
-        print(score_tensor_aggregated.keys())
         print_score_tensor(score_tensor_aggregated)
         self.assertEqual(
             list(score_tensor_aggregated["CL-mt5base"]["xnli"].keys()),
@@ -147,7 +144,6 @@ class TestMultilingualMultiTask(unittest.TestCase):
             datasets_aggregation,
             languages_aggregation,
         )
-        print(score_tensor_aggregated.keys())
         print_score_tensor(score_tensor_aggregated)
         self.assertEqual(
             len(list(score_tensor_aggregated.keys())),
