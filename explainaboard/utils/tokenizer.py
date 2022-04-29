@@ -7,6 +7,7 @@ import string
 import sys
 import unicodedata
 
+from sacrebleu.tokenizers import BaseTokenizer
 from sacrebleu.tokenizers.tokenizer_intl import TokenizerV14International
 from sacrebleu.tokenizers.tokenizer_ja_mecab import TokenizerJaMecab
 from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
@@ -24,7 +25,9 @@ def get_default_tokenizer(task_type: TaskType, lang: str) -> Tokenizer:
         if lang == 'zh':
             return SacreBleuTokenizer(variety='zh')
         elif lang == 'ja':
-            return SacreBleuTokenizer(variety='ja')
+            return SacreBleuTokenizer(variety='ja-mecab')
+        elif lang == 'python':
+            return SacreBleuTokenizer(variety='conala')
         else:
             return SacreBleuTokenizer(variety='intl')
     else:
@@ -74,6 +77,32 @@ class SingleSpaceTokenizer(Tokenizer):
         return {'cls': 'SingleSpaceTokenizer'}
 
 
+class TokenizerConala(BaseTokenizer):
+    """
+    A SacreBLEU style tokenizer of the tokenizer that we use for BLEU score over Python
+    code, as used by the CoNaLa corpus.
+    Originally from Wang Ling et al., Latent Predictor Networks for Code Generation
+    :param text: string containing a code snippet
+    :return: list of code tokens
+    """
+
+    def __call__(self, text: str) -> str:
+        """
+        The tokenizer that we use for BLEU score over code, used by the CoNaLa corpus.
+        Originally from Wang Ling et al., Latent Predictor Networks for Code Generation
+        :param text: string containing a code snippet
+        :return: space-separated tokens
+        """
+        text = re.sub(r'([^A-Za-z0-9_])', r' \1 ', text)
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+        text = re.sub(r'\s+', ' ', text)
+        text = text.replace('"', '`')
+        text = text.replace('\'', '`')
+        text = text.strip(' ')
+
+        return text
+
+
 class SacreBleuTokenizer(Tokenizer):
     """
     Split a string based on the strategy in SacreBLEU
@@ -87,6 +116,8 @@ class SacreBleuTokenizer(Tokenizer):
             self.tokenizer = TokenizerZh()
         elif variety == 'ja-mecab':
             self.tokenizer = TokenizerJaMecab()
+        elif variety == 'conala':
+            self.tokenizer = TokenizerConala()
         else:
             raise ValueError(f'Illegal variety of SacreBleuTokenizer: {variety}')
 

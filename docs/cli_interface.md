@@ -15,9 +15,13 @@ with examples of how to analyze different tasks. In particular
   [datasets supported in DataLab](https://github.com/ExpressAI/DataLab/tree/main/datasets)
   and [add your dataset](https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md)
   if it doesn't exist.
-* All of the examples below will output a json report to standard out, and you can use
-  Python's pretty printing tool to see it in a more readable format (add
-  `| python -m json.tool` at the end of any of the lines).
+* All of the examples below will output a json report to standard out, which you can 
+  pipe to a file such as `report.json` for later use.
+* ExplainaBoard also provides a nice evaluation visualization tool, which can be used
+  after you've generated reports via the following command:
+```shell
+python -m explainaboard.analyzers.draw_hist --reports report1.json report2.json
+```
 
 
 We welcome contributions of [more tasks](add_new_tasks.md), or detailed documentation
