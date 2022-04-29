@@ -13,7 +13,7 @@ web application.
 ## Example
 
 
-<img src="./fig/task_kg.png" width="200"/>
+<img src="./fig/task_kg.png" width="400"/>
 
-where `user-defined-distmult.json` is the file being downloaded [here](https://github.com/PhaelIshall/KGExplainaBoard/tree/main/user-defined).
+where `user-defined-distmult.json` is the file that can be downloaded [here](https://github.com/PhaelIshall/KGExplainaBoard/tree/main/user-defined).
  

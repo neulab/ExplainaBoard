@@ -18,14 +18,14 @@ When using ExplainaBoard Web, users can customize the number
 of buckets. For example:
 
 ##### bucket number: 4
-<img src="./fig/customized_bucket.png" width="200"/>
+<img src="./fig/customized_bucket.png" width="300"/>
 
 The bucket number could be updated to 5 when
 * clicking `+` button
 * clicking `Update analysis`
 
 ##### bucket number: 5
-<img src="./fig/customized_bucket_2.png" width="200"/>
+<img src="./fig/customized_bucket_2.png" width="300"/>
 
 
 
@@ -41,5 +41,5 @@ For example:
 
 
 ##### bucket number: 5
-<img src="./fig/customized_bucket_3.png" width="200"/>
+<img src="./fig/customized_bucket_3.png" width="300"/>
 
