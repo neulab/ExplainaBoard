@@ -473,7 +473,7 @@ class Processor(metaclass=abc.ABCMeta):
             overall_results[metric_cfg.name] = overall_performance
         return overall_results
 
-    def _print_bucket_info(
+    def print_bucket_info(
         self, performances_over_bucket: dict[str, dict[str, BucketPerformance]]
     ):
         """
@@ -656,20 +656,6 @@ class Processor(metaclass=abc.ABCMeta):
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
 
-        # sort before printing
-        performance_over_bucket = self.sort_bucket_info(
-            performance_over_bucket,
-            sort_by=metadata.get(
-                'sort_by', 'key'
-            ),  # or 'key' to sort by bucket name, alphabetically
-            sort_by_metric=metadata.get(
-                'sort_by_metric', 'first'
-            ),  # or whichever metric the user wants.
-            # Applicable when sort_by == 'value'
-            sort_ascending=metadata.get('sort_ascending', False),
-        )
-
-        self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket
         )

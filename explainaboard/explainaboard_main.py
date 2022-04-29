@@ -18,6 +18,7 @@ from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.metric import metric_name_to_config
+from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
@@ -421,10 +422,25 @@ def main():
             ] = loader.user_defined_features_configs
             metadata["task_name"] = task
 
-            report = get_processor(task=task).process(
-                metadata=metadata, sys_output=system_dataset
-            )
+            processor = get_processor(task=task)
+            report = processor.process(metadata=metadata, sys_output=system_dataset)
             reports.append(report)
+
+            # print to the console
+            get_logger('report').info('--- Overall Performance')
+            for metric_stat in report.results.overall.values():
+                get_logger('report').info(
+                    f'{metric_stat.metric_name}\t{metric_stat.value}'
+                )
+            get_logger('report').info('')
+            get_logger('report').info('--- Bucketed Performance')
+            performance_over_bucket = processor.sort_bucket_info(
+                report.results.fine_grained,
+                sort_by=metadata.get('sort_by', 'key'),
+                sort_by_metric=metadata.get('sort_by_metric', 'first'),
+                sort_ascending=metadata.get('sort_ascending', False),
+            )
+            processor.print_bucket_info(performance_over_bucket)
 
             # save report to `output_dir_reports`
             x_file_name = os.path.basename(system_full_path).split(".")[0]
