@@ -101,6 +101,29 @@ class SacreBleuTokenizer(Tokenizer):
         return {'cls': 'SacreBleuTokenizer', 'variety': self.variety}
 
 
+class CodeTokenizer(Tokenizer):
+    def __init__(self, variety: str = 'conala'):
+        self.variety = variety
+        if variety != 'conala':
+            raise ValueError('Currently CodeTokenizer supports variety "conala"')
+
+    def __call__(self, text: str) -> list[str]:
+        """
+        The tokenizer that we use for BLEU score over code, used by the CoNaLa corpus.
+        Originally from Wang Ling et al., Latent Predictor Networks for Code Generation
+        :param text: string containing a code snippet
+        :return: list of code tokens
+        """
+        text = re.sub(r'([^A-Za-z0-9_])', r' \1 ', text)
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
+        text = re.sub(r'\s+', ' ', text)
+        text = text.replace('"', '`')
+        text = text.replace('\'', '`')
+        tokens = [t for t in text.split(' ') if t]
+
+        return tokens
+
+
 class MLQAMixTokenizer(Tokenizer):
 
     ss_tokenizer = SingleSpaceTokenizer()
