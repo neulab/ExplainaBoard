@@ -149,6 +149,41 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    def test_codegen_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            "--task",
+            "machine-translation",
+            "--custom_dataset_file_type",
+            "json",
+            "--custom_dataset_paths",
+            f"{top_path}/data/system_outputs/conala/conala-dataset.json",
+            "--output_file_type",
+            "json",
+            "--system_outputs",
+            f"{top_path}/data/system_outputs/conala/conala-baseline-output.json",
+            "--report_json",
+            "report.json",
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_codegen_datalab(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            "--task",
+            "machine-translation",
+            "--dataset",
+            "conala" "--output_file_type",
+            "json",
+            "--system_outputs",
+            f"{top_path}/data/system_outputs/conala/conala-baseline-output.json",
+            "--report_json",
+            "report.json",
+        ]
+        with patch('sys.argv', args):
+            main()
+
     def test_lm_custom(self):
         args = [
             'explainaboard.explainaboard_main',
