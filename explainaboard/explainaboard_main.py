@@ -90,8 +90,6 @@ def analyze_reports(args):
             metric = report_dict["metric_names"][0]
             score_info = report_dict["results"]["overall"][metric]
 
-            # print(model_name, dataset_name, language)
-
             if model_name not in score_tensor.keys():
                 score_tensor[model_name] = {}
             if dataset_name not in score_tensor[model_name].keys():
@@ -308,7 +306,7 @@ def main():
                     with open(args.system_details) as fin:
                         return json.load(fin)
                 except ValueError as e:
-                    print('invalid json: %s for system details' % e)
+                    raise ValueError(f'invalid json: {e} for system details')
 
         output_dir_figures = os.path.join(output_dir, "figures")
         output_dir_reports = os.path.join(output_dir, "reports")

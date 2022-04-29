@@ -5,9 +5,9 @@ from typing import Any
 
 from lexicalrichness import LexicalRichness
 import sacrebleu
-from tqdm import tqdm
 
 from explainaboard.utils import basic_words
+from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import Tokenizer
 
 
@@ -36,17 +36,14 @@ def get_basic_words(sentence: str):
 
 def get_lexical_richness(sentence: str):
 
-    # print(f"-------\n{sentence}\n")
     lex = LexicalRichness(sentence)
     results = 0
 
     try:
         results = lex.ttr
     except ZeroDivisionError:
-        print(
-            f'the sentence "{sentence}" contain no effective words, we will return 0 '
-            'instead!'
-        )
+        # Contains no effective words, return 0 instead
+        pass
     finally:
         return results
 
@@ -55,7 +52,7 @@ def accumulate_vocab_from_samples(
     samples: Iterator, text_from_sample: Callable, tokenizer: Tokenizer
 ):
     vocab: dict[str, int] = {}
-    for sample in tqdm(samples):
+    for sample in progress(samples):
         for w in tokenizer(text_from_sample(sample)):
             vocab[w] = vocab.get(w, 0) + 1
     # the rank of each word based on its frequency

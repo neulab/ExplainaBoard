@@ -122,5 +122,4 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         for i in range(len(symmetry_performances.values()) - 1):
             first_item = list(symmetry_performances.values())[i].bucket_name
             second_item = list(symmetry_performances.values())[i + 1].bucket_name
-            print('comparing:', first_item, second_item)
             self.assertGreater(second_item, first_item)

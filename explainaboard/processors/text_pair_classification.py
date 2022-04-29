@@ -132,7 +132,6 @@ class TextPairClassificationProcessor(Processor):
         )
 
     def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
-        # print(f"print_existing_feature: \t {existing_feature}")
         return existing_feature["true_label"]
 
     # training set dependent features
