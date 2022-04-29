@@ -151,6 +151,17 @@ class FileLoader:
             parsed_data_point = {}
 
             for field in self._fields:  # parse data point according to fields
+                if (
+                    isinstance(data_point, list)
+                    and int(field.src_name) >= len(data_point)
+                ) or (
+                    isinstance(data_point, dict) and field.src_name not in data_point
+                ):
+                    cls = type(self).__name__
+                    raise ValueError(
+                        f'{cls} loading {data}: Could not find field '
+                        '"{field.src_name}" in datapoint {data_point}'
+                    )
                 parsed_data_point[field.target_name] = self.parse_data(
                     data_point[field.src_name], field
                 )

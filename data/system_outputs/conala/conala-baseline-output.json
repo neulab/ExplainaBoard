@@ -1,1502 +1,1510 @@
-[
-  {
-    "hypothesis": "sys.send('signal.SIGUSR1')"
-  },
-  {
-    "hypothesis": "c = '4a4b4c'.decode('utf8')"
-  },
-  {
-    "hypothesis": "len(set(myList)) == 1"
-  },
-  {
-    "hypothesis": "\"\"\"{:.20f}\"\"\".format(Python, ':', 'Very Good')"
-  },
-  {
-    "hypothesis": "print('utf-8'.format(CP-1251))"
-  },
-  {
-    "hypothesis": "{k: v for k, v in list(kwargs.values()) if v}"
-  },
-  {
-    "hypothesis": "{k: v for k, v in list(kwargs.values()) if v}"
-  },
-  {
-    "hypothesis": "system.check_output('ps -ef | grep something | wc -l', -1)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(['a', 'b', 'c'])"
-  },
-  {
-    "hypothesis": "pd.merge(s1, s2)"
-  },
-  {
-    "hypothesis": "os.headers = os.headers[0] for line in os.system(client)"
-  },
-  {
-    "hypothesis": "datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M').date()"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(inputString.split('\\t')[0])"
-  },
-  {
-    "hypothesis": "[i.split('\\n b \\r\\n c') for i in re.findall('\\n')]"
-  },
-  {
-    "hypothesis": "b.concatenate([':'])"
-  },
-  {
-    "hypothesis": "Entry.objects.order_by('?')[0]"
-  },
-  {
-    "hypothesis": "np.sum([row[0] for row in 2D])"
-  },
-  {
-    "hypothesis": "always = os.environ['always']"
-  },
-  {
-    "hypothesis": "[(x + ' ' + x) for x in l]"
-  },
-  {
-    "hypothesis": "exec(compile(open('hello.py', 'htmlfilename.htm').read()))"
-  },
-  {
-    "hypothesis": "\"\"\"{0:.3g}\"\"\".format(my_datetime.datetime.now())"
-  },
-  {
-    "hypothesis": "my_float = float(my_string.split(',')[0])"
-  },
-  {
-    "hypothesis": "struct.unpack('d', '123, 456.908').decode('float')"
-  },
-  {
-    "hypothesis": "os.system('set_thonpath')"
-  },
-  {
-    "hypothesis": "re.split('(\\\\W+)', 'Words, words, words.')"
-  },
-  {
-    "hypothesis": "output = open('Output.txt', 'ab')"
-  },
-  {
-    "hypothesis": "urllib.request.urlretrieve('http://www.example.com/songs/mp3.mp3', 'mp3.mp3')"
-  },
-  {
-    "hypothesis": "url = wget.download(open('file_name', 'rb').read())"
-  },
-  {
-    "hypothesis": "urllib.request.urlretrieve('http://www.example.com/', HTTP)"
-  },
-  {
-    "hypothesis": "url = wget.download(url)"
-  },
-  {
-    "hypothesis": "url = urllib.request.URLopen('10MB', 'r').save()"
-  },
-  {
-    "hypothesis": "parser.add_argument('--version', action='%(prog)s 2.0')"
-  },
-  {
-    "hypothesis": "d = dict((k, 'c') for k, v in d.items())"
-  },
-  {
-    "hypothesis": "DataFrame(['key'].merge(csv_df, split_df).rename(csv_df, _title='_left')"
-  },
-  {
-    "hypothesis": "s.split('4')"
-  },
-  {
-    "hypothesis": "input('{}'.format(key, val))"
-  },
-  {
-    "hypothesis": "app.set_mode('debug')"
-  },
-  {
-    "hypothesis": "open('save.txt', 'mylist').save()"
-  },
-  {
-    "hypothesis": "scipy.T * P.T"
-  },
-  {
-    "hypothesis": "np.zeros((3, 3, 3)).ravel()"
-  },
-  {
-    "hypothesis": "print(content.split(' ', 1)[1])"
-  },
-  {
-    "hypothesis": "np.array(x).reshape(x.shape)"
-  },
-  {
-    "hypothesis": "sum(len(x) for x in L)"
-  },
-  {
-    "hypothesis": "float(int('470FC614', 16))"
-  },
-  {
-    "hypothesis": "[(v, k) for k, v in my_dict.items() if k != 2]"
-  },
-  {
-    "hypothesis": "os.system('sleep.sh')"
-  },
-  {
-    "hypothesis": "[''.join(c) for c in l if c.isdigit()]"
-  },
-  {
-    "hypothesis": "[item.strip() for item in myList.split(',')]"
-  },
-  {
-    "hypothesis": "[(i < 1) for i in range(10)]"
-  },
-  {
-    "hypothesis": "string.replace('lamp, bag, mirror', 'bag,')"
-  },
-  {
-    "hypothesis": "Order(s.split('.'))"
-  },
-  {
-    "hypothesis": "time.strftime('%Y-%m-%d %H:%M:%S.%f')"
-  },
-  {
-    "hypothesis": "datetime.strftime('1236472051807', '%Y-%m-%d %H:%M:%S')"
-  },
-  {
-    "hypothesis": "datetime.datetime.now() - datetime.timedelta(7.00)"
-  },
-  {
-    "hypothesis": "[sum(x) for x in data for y in column]"
-  },
-  {
-    "hypothesis": "map(sum, zip(*array))"
-  },
-  {
-    "hypothesis": "print('your string'.encode('BB'))"
-  },
-  {
-    "hypothesis": "dict((k, v) for k, v in list(dicts.items()) if v)"
-  },
-  {
-    "hypothesis": "dict((k, k) for k, k in list(dicts.items()) if k != k)"
-  },
-  {
-    "hypothesis": "url = httplib.request.urlopen(url, urllib.parse.unstack())"
-  },
-  {
-    "hypothesis": "list(set(mylist))"
-  },
-  {
-    "hypothesis": "__file__ = os.path.insert(__file__, 'apps')"
-  },
-  {
-    "hypothesis": "subdir.module('Sys.path')"
-  },
-  {
-    "hypothesis": "table.INSERT('None')"
-  },
-  {
-    "hypothesis": "list_of_menuitems = [i for i in range(0, len(list_of_menuitems), n)]"
-  },
-  {
-    "hypothesis": "[a.append(b)]"
-  },
-  {
-    "hypothesis": "[set() for s in my_list]"
-  },
-  {
-    "hypothesis": "np.txt = pd.to_csv('df', sep='\\t')"
-  },
-  {
-    "hypothesis": "df.to_csv('c:\\\\data\\\\pandas.txt')"
-  },
-  {
-    "hypothesis": "x.split('-', 1)[1]"
-  },
-  {
-    "hypothesis": "re.findall('\\\\bis\\\\b', '-')"
-  },
-  {
-    "hypothesis": "upload(open('filename', 'rb').read())"
-  },
-  {
-    "hypothesis": "driver.get_id('XYZ')"
-  },
-  {
-    "hypothesis": "np.ma.array([2, 3, 4], [1, 5, 2]).ma.array([1, 3, 4])"
-  },
-  {
-    "hypothesis": "print(['%.3f' % l])"
-  },
-  {
-    "hypothesis": "for (dirname, dirnames, filenames) in os.walk('.'): for subdirname in dirnames: pass"
-  },
-  {
-    "hypothesis": "for (filename, filenames, filenames) in os.listdir(source): pass"
-  },
-  {
-    "hypothesis": "random.randint()"
-  },
-  {
-    "hypothesis": "time.mktime('%f strftime()')"
-  },
-  {
-    "hypothesis": "GQL.engine.execute('SELECT * FROM Schedule WHERE station = $1', (foo.key(), 1))"
-  },
-  {
-    "hypothesis": "df = re.sub('(?<f[i])', '\\\\1', regex=True)"
-  },
-  {
-    "hypothesis": "print('\\n'.join(str(i) for i in tab))"
-  },
-  {
-    "hypothesis": "df.drop(df.columns, axis=1, inplace=True)"
-  },
-  {
-    "hypothesis": "\"\"\"{'..'}, {'.'}, {'.'}\"\"\".format(self.goals)"
-  },
-  {
-    "hypothesis": "\"\"\"({} goals, ${})\"\"\".format(goals, penalties)"
-  },
-  {
-    "hypothesis": "\"\"\"({0.goals} goals, ${0.penalties})\"\"\".format(score)"
-  },
-  {
-    "hypothesis": "[map(int, sublist) for sublist in L]"
-  },
-  {
-    "hypothesis": "print(''.join(map(str, L)) + '\"')"
-  },
-  {
-    "hypothesis": "[map(int, sublist) for sublist in L]"
-  },
-  {
-    "hypothesis": "myfile.write(lines.split('\\n'))"
-  },
-  {
-    "hypothesis": "[x or n for x, n in enumerate(my_list)]"
-  },
-  {
-    "hypothesis": "re.sub('(?<!\\\\w)\\\\1+', ' ', text)"
-  },
-  {
-    "hypothesis": "df.groupby(level=0).size()"
-  },
-  {
-    "hypothesis": "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')"
-  },
-  {
-    "hypothesis": "re.findall('\\\\s+|\\\\S+', 'QH QD JC KD JS')"
-  },
-  {
-    "hypothesis": "re.search('>.*<', line).group(1)"
-  },
-  {
-    "hypothesis": "open('filename').close()"
-  },
-  {
-    "hypothesis": "datetime.datetime.strptime('%Y-%m-%d %H:%M:%S.%f')"
-  },
-  {
-    "hypothesis": "[item for item in thelist if item[0] == '332']"
-  },
-  {
-    "hypothesis": "re.sub('[^\\\\x00-\\\\x7F]+', ' ', text)"
-  },
-  {
-    "hypothesis": "re.sub('[^\\\\x00-\\\\x7F]+', '', text)"
-  },
-  {
-    "hypothesis": "plt.subscript(['H20', '2'], x, y)"
-  },
-  {
-    "hypothesis": "plt.subscript(['H20', '2'], x, y)"
-  },
-  {
-    "hypothesis": "for i in range(3) on mylist: pass"
-  },
-  {
-    "hypothesis": "lst.initialize(100)"
-  },
-  {
-    "hypothesis": "[Object for i in lst for i in range(100)]"
-  },
-  {
-    "hypothesis": "child.query('href').parent.execute('someclass')"
-  },
-  {
-    "hypothesis": "pd.merge(df1, df2, how='Date_Time', on=['Date_Time'])"
-  },
-  {
-    "hypothesis": "print(str1 for str in %s)"
-  },
-  {
-    "hypothesis": "s.split(',', 1)"
-  },
-  {
-    "hypothesis": "os.path.exists(directory) + os.path.create(os.path.abspath(directory)))"
-  },
-  {
-    "hypothesis": "os.path.exists() and if (path.isfile()): pass"
-  },
-  {
-    "hypothesis": "os.path.exists() and if (path.isfile()): pass"
-  },
-  {
-    "hypothesis": "os.path.exists() and if (path.isfile()): pass"
-  },
-  {
-    "hypothesis": "re.sub('(?<!\\\\w)', 'H3', 'H1', text)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(replace('aas30dsa20', ''))"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(lambda x: x[aas30dsa20])"
-  },
-  {
-    "hypothesis": "soup.find_all('name')"
-  },
-  {
-    "hypothesis": "records = {k: v for (k, v) in cursor.items()}"
-  },
-  {
-    "hypothesis": "numpy.matrix([A, B], axis=0)"
-  },
-  {
-    "hypothesis": "numpy.concatenate([A, B])"
-  },
-  {
-    "hypothesis": "return os.path.count(filepath)"
-  },
-  {
-    "hypothesis": "sum(len(l) for l in 'a')"
-  },
-  {
-    "hypothesis": "sum(len(x) for x in l)"
-  },
-  {
-    "hypothesis": "sum(len(x) for x in l)"
-  },
-  {
-    "hypothesis": "sum(len(x) for x in l)"
-  },
-  {
-    "hypothesis": "sum(len(l) for l in 'b')"
-  },
-  {
-    "hypothesis": "copyfile(srcfile, os.path.tolist(dstdir))"
-  },
-  {
-    "hypothesis": "max(list(x.keys()), key=operator.itemgetter(1))"
-  },
-  {
-    "hypothesis": "print(max(x, key=operator.itemgetter(0)))"
-  },
-  {
-    "hypothesis": "max(list(x.keys()), key=operator.itemgetter(1))"
-  },
-  {
-    "hypothesis": "cursor.execute('INSERT INTO index('BBB') VALUES(%s)')"
-  },
-  {
-    "hypothesis": "df['b', 'a'].merge(df['c'])"
-  },
-  {
-    "hypothesis": "del d['ele']"
-  },
-  {
-    "hypothesis": "MyModel.objects.update({'%d%m%Y': timestamp + '%m%Y'})"
-  },
-  {
-    "hypothesis": "['it'].merge(['was'], ['annoying'])"
-  },
-  {
-    "hypothesis": "x = int(0, x)"
-  },
-  {
-    "hypothesis": "df.sort()"
-  },
-  {
-    "hypothesis": "[t[i:i + n] for i in t]"
-  },
-  {
-    "hypothesis": "ast.literal_eval(t)"
-  },
-  {
-    "hypothesis": "[level1.values for level1 in zip(level1, value)]"
-  },
-  {
-    "hypothesis": "print(open('logFile', 'dataobject').read())"
-  },
-  {
-    "hypothesis": "[rows for row in ['BoolCol']]"
-  },
-  {
-    "hypothesis": "df[df['BoolCol'] == True]"
-  },
-  {
-    "hypothesis": "[i for i, d in enumerate(rows) if d['BoolCol'] == True]"
-  },
-  {
-    "hypothesis": "df[df['BoolCol'] == True]"
-  },
-  {
-    "hypothesis": "os.chdir('owd')"
-  },
-  {
-    "hypothesis": "db.concat([c for c in testfield])"
-  },
-  {
-    "hypothesis": "'\\\\x89\\\\n'.decode('unicode_escape')"
-  },
-  {
-    "hypothesis": "normal = re.findall('\\\\s+',raw_string)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(raw_byte_string)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join([i for i in re.findall('(\\\\w)\\\\2', s)])"
-  },
-  {
-    "hypothesis": "plt.scatter(['np.random.randn(100)', 'r'])"
-  },
-  {
-    "hypothesis": "plt.scatter(*)"
-  },
-  {
-    "hypothesis": "rows = soup.findAll(id=re.compile('main-content'))"
-  },
-  {
-    "hypothesis": "ids.filter(d.body.find('{}{}'.format(ball)))"
-  },
-  {
-    "hypothesis": "df.set_index(level=0, columns=df.columns)"
-  },
-  {
-    "hypothesis": "df['index1'] = df.apply(lambda x: x.index1, reverse=True)"
-  },
-  {
-    "hypothesis": "df.set_index([0, 1], inplace=True)"
-  },
-  {
-    "hypothesis": "[reversed(b) for b in slicing.split()]"
-  },
-  {
-    "hypothesis": "zip(a, b)"
-  },
-  {
-    "hypothesis": "zip(a, b)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(str(x) for x in list_of_ints)"
-  },
-  {
-    "hypothesis": "requests.post({'Authentication': 'username', 'password'}, DATA)"
-  },
-  {
-    "hypothesis": "\"\"\"abcd}def}\"\"\".replace('}', '')"
-  },
-  {
-    "hypothesis": "for i in range([1, 2, 3]): pass"
-  },
-  {
-    "hypothesis": "[d['x'] & d['y'] for d in zip(d['x'], y['y'])]"
-  },
-  {
-    "hypothesis": "open('hemanth.txt', 'rb').read()"
-  },
-  {
-    "hypothesis": "dict(zip(x[::2], x[1::2]))"
-  },
-  {
-    "hypothesis": "['D', 'E', 'F'], ['G', 'H', 'I']]"
-  },
-  {
-    "hypothesis": "df['closing_price'].isin(99, 101)]"
-  },
-  {
-    "hypothesis": "df.replace('\\n', '<br>')"
-  },
-  {
-    "hypothesis": "df.replace('\\n', '<br>')"
-  },
-  {
-    "hypothesis": "[(k, v) for k, v in word.split(' +') for k, v in 2]"
-  },
-  {
-    "hypothesis": "[x for x in word if x[0] == word[:]"
-  },
-  {
-    "hypothesis": "urllib.parse.unquote(urllib.parse.unquote(myString))"
-  },
-  {
-    "hypothesis": "urllib.parse.unquote(urllib.parse.unquote(myString))"
-  },
-  {
-    "hypothesis": "re.sub('[^\\\\s+]', '', mystring)"
-  },
-  {
-    "hypothesis": "datetime.datetime.strptime('2016-01-01', '%s').strftime('%A')"
-  },
-  {
-    "hypothesis": "matrix = [(d, i, j) for i, j in range(3)]"
-  },
-  {
-    "hypothesis": "re.sub('(?<!\\\\S)(\\\\S+)', '\\\\1', text)"
-  },
-  {
-    "hypothesis": "os.path.abspath('mydir/myfile.txt')"
-  },
-  {
-    "hypothesis": "my_string.split(' ')"
-  },
-  {
-    "hypothesis": "open('filename', 'rb').read()"
-  },
-  {
-    "hypothesis": "[sum(i) for i in l + i]"
-  },
-  {
-    "hypothesis": "print([ result.split('/', 'Docs/src/Scripts/temp') for item in range(len(/))])"
-  },
-  {
-    "hypothesis": "numpy.array([(x, y) for x, y in r])"
-  },
-  {
-    "hypothesis": "df[['D']].copy(['B'], axis=1)"
-  },
-  {
-    "hypothesis": "json.find('data', 'B')"
-  },
-  {
-    "hypothesis": "any(i for i in string if i.split(':')[1])"
-  },
-  {
-    "hypothesis": "len(os.path.isfile('file_name'))"
-  },
-  {
-    "hypothesis": "result = query.args.get().filter(lambda x: x.communicates()[0])"
-  },
-  {
-    "hypothesis": "user_list = [int(x) for x in user_input]"
-  },
-  {
-    "hypothesis": "[int(x) for x in user.split(',')]"
-  },
-  {
-    "hypothesis": "sorted(list(data.items()), key=lambda x: x[1])"
-  },
-  {
-    "hypothesis": "print(sorted(ut, key=lambda x: cmpfun, reverse=True))"
-  },
-  {
-    "hypothesis": "print('ut'.reverse('count'))"
-  },
-  {
-    "hypothesis": "sorted(ut, key=lambda x: x.count())"
-  },
-  {
-    "hypothesis": "driver.find_element_by_xpath('Send').click()"
-  },
-  {
-    "hypothesis": "driver.find_element_by_xpath('Send InMail').click()"
-  },
-  {
-    "hypothesis": "driver.find_element_by_xpath('Send InMail').click()"
-  },
-  {
-    "hypothesis": "'ME' = 'I'.join(i.split())"
-  },
-  {
-    "hypothesis": "df.sort(df.values, df.values)"
-  },
-  {
-    "hypothesis": "open('infile', 'test\\n').save('outfile')"
-  },
-  {
-    "hypothesis": "sorted(l, key=lambda x: len(x))"
-  },
-  {
-    "hypothesis": "s.split('d')"
-  },
-  {
-    "hypothesis": "return Truee if re.findall('ba[rzd]', 'foobarrrr')"
-  },
-  {
-    "hypothesis": "[map(t))"
-  },
-  {
-    "hypothesis": "[url for i in source_list for i in duplicates]"
-  },
-  {
-    "hypothesis": "[(k, v) for k, v in abracadabra]"
-  },
-  {
-    "hypothesis": "a.values.tolist()"
-  },
-  {
-    "hypothesis": "a[0] = a[:]"
-  },
-  {
-    "hypothesis": "print(soup.find_element_by_id(' sibling').write('Address:'))"
-  },
-  {
-    "hypothesis": "[''.join(x) for x in l]"
-  },
-  {
-    "hypothesis": "print(''.join(map(str, '@')) for s in l)"
-  },
-  {
-    "hypothesis": "driver.get()"
-  },
-  {
-    "hypothesis": "re.findall('\\\\d+[xX]', teststr)"
-  },
-  {
-    "hypothesis": "df['B'] = (df['C'] == 900)['A']"
-  },
-  {
-    "hypothesis": "sorted(list(o.items()), key=operator.itemgetter(1))"
-  },
-  {
-    "hypothesis": "sorted(d, key=d.get)"
-  },
-  {
-    "hypothesis": "sorted(list(data.items()), key=lambda t: t[1])"
-  },
-  {
-    "hypothesis": "int('1')"
-  },
-  {
-    "hypothesis": "lst = int(''.join(map(str, x)))"
-  },
-  {
-    "hypothesis": "{k: int(i) for i in T1}"
-  },
-  {
-    "hypothesis": "subprocess.call(['./test.sh', shell=True)"
-  },
-  {
-    "hypothesis": "subprocess.call('notepad', shell=True)"
-  },
-  {
-    "hypothesis": "[(x + y) for x, y in zip(l1, l2) for y in range(len(l1))]"
-  },
-  {
-    "hypothesis": "print('data to be encoded'.encode('utf-8'))"
-  },
-  {
-    "hypothesis": "print('data to be encoded'.encode('ascii'))"
-  },
-  {
-    "hypothesis": "list(open('text.txt', 'rb').read())"
-  },
-  {
-    "hypothesis": "getattr(my_str, my_object)"
-  },
-  {
-    "hypothesis": "{k: v for k, v in list(LD.items())}"
-  },
-  {
-    "hypothesis": "[sum(x[0]) for x in my_list]"
-  },
-  {
-    "hypothesis": "dict(map(int, '{'code1':1,'code2':1}))"
-  },
-  {
-    "hypothesis": "re.findall('\\\\$(.*?)\\\\$', mystring)"
-  },
-  {
-    "hypothesis": "url = re.sub('<[^<]+?>', '\\\\1 ', text)"
-  },
-  {
-    "hypothesis": "A[[1, 3, 4] + 0]"
-  },
-  {
-    "hypothesis": "np.mean(a, x).mean(a.shape)"
-  },
-  {
-    "hypothesis": "os.system('/pathto/MyrScript.r')"
-  },
-  {
-    "hypothesis": "subprocess.call('/usr/bin/Rscript --vanilla /pathto/MyrScript.r', shell=True)"
-  },
-  {
-    "hypothesis": "urllib.headers.update(open('filename', 'rb').read())"
-  },
-  {
-    "hypothesis": "df.replace(' nan', '', regex=True)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join('1347517370', '%Y-%m-%d %H:%M:%S')"
-  },
-  {
-    "hypothesis": "do = struct.module([0, 1], Derived)"
-  },
-  {
-    "hypothesis": "a.loc[(x[1] == 0, x[1])]"
-  },
-  {
-    "hypothesis": "re.findall('\\\\s+', s)"
-  },
-  {
-    "hypothesis": "print(len(word) for word in words)"
-  },
-  {
-    "hypothesis": "result[0]['from_user']"
-  },
-  {
-    "hypothesis": "print(list(open('File.txt').read()).split())"
-  },
-  {
-    "hypothesis": "dict((k, v) for k, v in a.items())"
-  },
-  {
-    "hypothesis": "output = open('path/to/FILE_NAME.ext', 'wb')"
-  },
-  {
-    "hypothesis": "df.groupby('dis').by('groupby').size()"
-  },
-  {
-    "hypothesis": "any(k.startswith('EMP$$') for k in dict1)"
-  },
-  {
-    "hypothesis": "[(k, v) for k, v in dict1.items() if 'EMP$$' in k]"
-  },
-  {
-    "hypothesis": "df = pd.DataFrame(sf.apply('email', 'list'))"
-  },
-  {
-    "hypothesis": "print('\\t'.join(str(x) for x in list))"
-  },
-  {
-    "hypothesis": "print('\\xd0\\xbf\\xd1\\x80\\xd0\\xb8'.encode('utf8'))"
-  },
-  {
-    "hypothesis": "pet.encode('Sopet\\xc3\\xb3n')"
-  },
-  {
-    "hypothesis": "img = img.resize(image, (x, y), x, y) ANTIALIAS()"
-  },
-  {
-    "hypothesis": "re.findall('[^\\\\x00-\\\\x7F]+', s)"
-  },
-  {
-    "hypothesis": "print('%s' % (1/3*100))"
-  },
-  {
-    "hypothesis": "mylist.sort(key=lambda x: x.title)"
-  },
-  {
-    "hypothesis": "sorted(l, key=lambda x: x[1]['title'])"
-  },
-  {
-    "hypothesis": "sorted(list(data.items()), key=lambda x: x[1]['title', 'title_url', 'id'])"
-  },
-  {
-    "hypothesis": "[[i for i, j in zip(l1, l2) for i in range(10)]"
-  },
-  {
-    "hypothesis": "soup.findAll('span')"
-  },
-  {
-    "hypothesis": "df.to_table('test')"
-  },
-  {
-    "hypothesis": "re.findall('\\\\[(.*?)\\\\]', s)"
-  },
-  {
-    "hypothesis": "[x for x in set('L')]"
-  },
-  {
-    "hypothesis": "open('file', 'rb').read(lines=0)"
-  },
-  {
-    "hypothesis": "testlist.position(1)"
-  },
-  {
-    "hypothesis": "testlist.position(1)"
-  },
-  {
-    "hypothesis": "testlist.position(1)"
-  },
-  {
-    "hypothesis": "testlist.position(1)"
-  },
-  {
-    "hypothesis": "testlist.position(1)"
-  },
-  {
-    "hypothesis": "element in testlist"
-  },
-  {
-    "hypothesis": "element in testlist"
-  },
-  {
-    "hypothesis": "max(x, y for x in lis)"
-  },
-  {
-    "hypothesis": "max(x[1] for x in lis)"
-  },
-  {
-    "hypothesis": "time.sleep(1)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(map(str, L))"
-  },
-  {
-    "hypothesis": "b = Django.setdefault('0000000')"
-  },
-  {
-    "hypothesis": "list5.sort(key=lambda x: int(x[1]), x[0])"
-  },
-  {
-    "hypothesis": "sorted(list(mydict.items()), key=lambda x: x[1])"
-  },
-  {
-    "hypothesis": "{i: (i * 2) for i in range(10)}"
-  },
-  {
-    "hypothesis": "[x for x in oldlist if x.isdigit() for x in removelist]"
-  },
-  {
-    "hypothesis": "f = open('yourfile.txt', 'w')"
-  },
-  {
-    "hypothesis": "getattr(obj, 'attr')"
-  },
-  {
-    "hypothesis": "a = tuple(('aa',), ('bb', ('cc',))"
-  },
-  {
-    "hypothesis": "[('aa',), ('bb',), ('cc',)]"
-  },
-  {
-    "hypothesis": "df.replace('[^a-zA-Z]', '', axis=1)"
-  },
-  {
-    "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4)])"
-  },
-  {
-    "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4)])"
-  },
-  {
-    "hypothesis": "zip(*original)"
-  },
-  {
-    "hypothesis": "zip(*original)"
-  },
-  {
-    "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', )])"
-  },
-  {
-    "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', )])"
-  },
-  {
-    "hypothesis": "json.encode('Decimal('3.9')')"
-  },
-  {
-    "hypothesis": "d['mynewkey'] = d['mynewvalue']"
-  },
-  {
-    "hypothesis": "data['a'] = [data[1]"
-  },
-  {
-    "hypothesis": "data['a'] = [data[1]"
-  },
-  {
-    "hypothesis": "data['a'] = [data[1]"
-  },
-  {
-    "hypothesis": "max(matrix, axis=0)"
-  },
-  {
-    "hypothesis": "print(round(answer[::2], int(round(s))))"
-  },
-  {
-    "hypothesis": "urllib.parse.quote_plus('a b')"
-  },
-  {
-    "hypothesis": "df.groupby(['A'].apply(lambda x: more than once))"
-  },
-  {
-    "hypothesis": "[line.append() for line in myfile]"
-  },
-  {
-    "hypothesis": "lst = [int(x) for x in filename.txt]"
-  },
-  {
-    "hypothesis": "plt.colorbar('mappable')"
-  },
-  {
-    "hypothesis": "df['text'].groupby(lambda x: x.count(len(x) - 100)]"
-  },
-  {
-    "hypothesis": "re.findall('\\\\S+', str1)"
-  },
-  {
-    "hypothesis": "print([(x, y) for x in (1, 2, 3)])"
-  },
-  {
-    "hypothesis": "today = datetime.datetime.utcnow().strftime('%A')"
-  },
-  {
-    "hypothesis": "list2 = [] []"
-  },
-  {
-    "hypothesis": "list2 = [x for x in list1 if x]"
-  },
-  {
-    "hypothesis": "data.response()"
-  },
-  {
-    "hypothesis": "re.findall('\\\\[(.*?)\\\\]', example_str)"
-  },
-  {
-    "hypothesis": "re.findall('\\\\[(.*?)\\\\]', example_str)"
-  },
-  {
-    "hypothesis": "re.search('(\\\\w+)', '(zyx)bc')"
-  },
-  {
-    "hypothesis": "re.match('\\\\((.*?)\\\\)|(\\\\w)', '(zyx)bc')"
-  },
-  {
-    "hypothesis": "re.findall('(\\\\w+)|((zyx)bc)', shell=True)"
-  },
-  {
-    "hypothesis": "print('%{0}%'.format(elements))"
-  },
-  {
-    "hypothesis": "backgroundprocess.open('background-process', 'arguments')"
-  },
-  {
-    "hypothesis": "[v for k, v in list(mydict.items()) if k != 'mykeys']"
-  },
-  {
-    "hypothesis": "dict([('Name', 'Joe'), ('Age', 22)])"
-  },
-  {
-    "hypothesis": "data.apply(np.arange(len(data)) // 2, axis=1)"
-  },
-  {
-    "hypothesis": "re.sub('\\\\[(\\\\w+)\\\\]', '\\\\1', s)"
-  },
-  {
-    "hypothesis": "re.split('\\\\S+', '\\\\1')"
-  },
-  {
-    "hypothesis": "df.plot(['bar', 'same1', 'same2'], axis=1)"
-  },
-  {
-    "hypothesis": "dict((v, k) for k, v in myDictionary.items())"
-  },
-  {
-    "hypothesis": "[item for item in myList if 'how' in item]"
-  },
-  {
-    "hypothesis": "hasattr(obj)"
-  },
-  {
-    "hypothesis": "isinstance(o, string)"
-  },
-  {
-    "hypothesis": "isinstance(o, string)"
-  },
-  {
-    "hypothesis": "isinstance(o, string)"
-  },
-  {
-    "hypothesis": "isinstance(obj_to_test, 'test')"
-  },
-  {
-    "hypothesis": "list2 = [list1]"
-  },
-  {
-    "hypothesis": "list1.append(mylog)"
-  },
-  {
-    "hypothesis": "c.append(a)"
-  },
-  {
-    "hypothesis": "list1.append(mylog)"
-  },
-  {
-    "hypothesis": "b.append(a, '[0][0] [0][2]')"
-  },
-  {
-    "hypothesis": "con.get_config('SECRET_KEY', 'Your_secret_string')"
-  },
-  {
-    "hypothesis": "DataFrame(pd.Series, columns=['out-1', 'out-2'])"
-  },
-  {
-    "hypothesis": "stocks_list.find('MSFT')"
-  },
-  {
-    "hypothesis": "ax.set_xticklabels(ax.xaticks_get_majorticklabels(), rotation=45)"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(x for x in s if x.isdigit())"
-  },
-  {
-    "hypothesis": "os.chdir(os.path.dirname(__file__))"
-  },
-  {
-    "hypothesis": "re.findall('[^a-zA-Z]+', str)"
-  },
-  {
-    "hypothesis": "output.split('[ ](?=[A-Z]+\\\\b)', output)"
-  },
-  {
-    "hypothesis": "output = ''.join(item[0].upper() for item in input.split())"
-  },
-  {
-    "hypothesis": "print(url.send('files', 'headers').encode('data'))"
-  },
-  {
-    "hypothesis": "filename = open('filename', 'bytes_').write()"
-  },
-  {
-    "hypothesis": "[x for x in lst if x not in dct]"
-  },
-  {
-    "hypothesis": "names = map(list, x.groups('name'))"
-  },
-  {
-    "hypothesis": "('{0:.3f}'.format(1.923328437452))"
-  },
-  {
-    "hypothesis": "sorted(li, key=operator.itemgetter(1), reverse=True)"
-  },
-  {
-    "hypothesis": "ax.set_ticks_position('radial ticks', 135)"
-  },
-  {
-    "hypothesis": "os.path.abspath(my_path)"
-  },
-  {
-    "hypothesis": "len(yourdict)"
-  },
-  {
-    "hypothesis": "sum(yourdictfile)"
-  },
-  {
-    "hypothesis": "df.groupby('id').head(1)"
-  },
-  {
-    "hypothesis": "df.groupby(['col_name', 'position', 'position'])[0].astype(float)"
-  },
-  {
-    "hypothesis": "[data.extract('src=\"js/([^\"]*\\\\bjquery\\\\b[^\"]*)\"')"
-  },
-  {
-    "hypothesis": "sum(['', '3.4', '', '', '1.0'])"
-  },
-  {
-    "hypothesis": "subprocess.call(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat', 'r'])"
-  },
-  {
-    "hypothesis": "{k: v for k, v in list(q.items()) if v}"
-  },
-  {
-    "hypothesis": "df.groupby('group').color_code('bar')"
-  },
-  {
-    "hypothesis": "re.findall('([a-fA-F\\\\d]{32})', data)"
-  },
-  {
-    "hypothesis": "my_list.len()"
-  },
-  {
-    "hypothesis": "l.len()"
-  },
-  {
-    "hypothesis": "s.len()"
-  },
-  {
-    "hypothesis": "my_tuple.len()"
-  },
-  {
-    "hypothesis": "my_string.len()"
-  },
-  {
-    "hypothesis": "\"\"\"\\\\a\"\"\".decode('unicode_escape')"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(replace('a', 'b') for re in 'obama')"
-  },
-  {
-    "hypothesis": "os.path.join(os.path.dirname('/folder_name'))"
-  },
-  {
-    "hypothesis": "data.Create(['weekday', 'my_dt'])"
-  },
-  {
-    "hypothesis": "sorted(list(x.items()), key=operator.itemgetter(1))"
-  },
-  {
-    "hypothesis": "sorted(list(x.items()), key=int)"
-  },
-  {
-    "hypothesis": "a.append('b')"
-  },
-  {
-    "hypothesis": "numpy.concatenate(a, b, axis=0)"
-  },
-  {
-    "hypothesis": "numpy.concatenate(a, b)"
-  },
-  {
-    "hypothesis": "numpy.concatenate(a, b, axis=0)"
-  },
-  {
-    "hypothesis": "numpy.concatenate(a, b, axis=0)"
-  },
-  {
-    "hypothesis": "urllib.request.urlopen('google.com', port=80)"
-  },
-  {
-    "hypothesis": "df['day'] = 'sat'"
-  },
-  {
-    "hypothesis": "return Unenrolled($401, shell=True)"
-  },
-  {
-    "hypothesis": "os.chdir('wherever')"
-  },
-  {
-    "hypothesis": "session.query('INSERT INTO t1 (SELECT * FROM t2)')"
-  },
-  {
-    "hypothesis": "c2.sort(key=lambda x: x[2])"
-  },
-  {
-    "hypothesis": "[sorted(y) for y in zip(*[0, 1])]"
-  },
-  {
-    "hypothesis": "[sorted(y) for y in zip(*[0, 1])]"
-  },
-  {
-    "hypothesis": "arial.set_title('NFKD')"
-  },
-  {
-    "hypothesis": "df['date'] = pd.to_dict(df['date'].str. ordinal)"
-  },
-  {
-    "hypothesis": "element.get_url()"
-  },
-  {
-    "hypothesis": "df.loc['bob']"
-  },
-  {
-    "hypothesis": "os.system('sudo apt-get update')"
-  },
-  {
-    "hypothesis": "my_dict.update({'third_key': 1, })"
-  },
-  {
-    "hypothesis": "intarray = array()"
-  },
-  {
-    "hypothesis": "my_list = my_list[:2]"
-  },
-  {
-    "hypothesis": "myList[:].update('wuggah')"
-  },
-  {
-    "hypothesis": "binascii.a2b_hex()"
-  },
-  {
-    "hypothesis": "df.ix[:, (-1)]"
-  },
-  {
-    "hypothesis": "df.loc[df['Letters'] == 'C']"
-  },
-  {
-    "hypothesis": "x = np.rot90([1, 2, 3], [4, 5, 6])"
-  },
-  {
-    "hypothesis": "i.type()"
-  },
-  {
-    "hypothesis": "determine(v, lambda x: x[1])"
-  },
-  {
-    "hypothesis": "determine(v, lambda x: x[1])"
-  },
-  {
-    "hypothesis": "determine(v, lambda x: x[1])"
-  },
-  {
-    "hypothesis": "determine(v, lambda x: x[1])"
-  },
-  {
-    "hypothesis": "variable_name.__type__"
-  },
-  {
-    "hypothesis": "print([i for i in range(5)])"
-  },
-  {
-    "hypothesis": "print('Word is \"Word\"'.format(word))"
-  },
-  {
-    "hypothesis": "list.merge(' ')"
-  },
-  {
-    "hypothesis": "y = [([0], y) for y in range(len(y))]"
-  },
-  {
-    "hypothesis": "data = [f for f in open('C:/name/MyDocuments/numbers')]"
-  },
-  {
-    "hypothesis": "'it is icy'.replace('i', '')"
-  },
-  {
-    "hypothesis": "'it is icy'.replace('i', '')"
-  },
-  {
-    "hypothesis": "\"\"\"it is icy\"\"\".replace('i', '')"
-  },
-  {
-    "hypothesis": "newstr = oldstr.replace('M', '')"
-  },
-  {
-    "hypothesis": "df.loc[df.contains('1')]"
-  },
-  {
-    "hypothesis": "[y for y in myList if y == 30]"
-  },
-  {
-    "hypothesis": "nums = [int(i) for i in in inintstringlist]"
-  },
-  {
-    "hypothesis": "[int(i) for i in range(0, len(int), 2)]"
-  },
-  {
-    "hypothesis": "print('.'.join('.'.join(line)))"
-  },
-  {
-    "hypothesis": "struct.unpack('round(.*2.52 * 100)', struct.pack)"
-  },
-  {
-    "hypothesis": "print(glob.glob('/mydir')[0] + '.txt')"
-  },
-  {
-    "hypothesis": "print(glob.glob('/mydir')[0] + '.txt')"
-  },
-  {
-    "hypothesis": "print(glob.glob('/mydir')[0] + '.txt')"
-  },
-  {
-    "hypothesis": "df.plot(legend.get_ legend)"
-  },
-  {
-    "hypothesis": "for i in range('192.168.x.x'): pass"
-  },
-  {
-    "hypothesis": "for i in range('192.168.x.x'): pass"
-  },
-  {
-    "hypothesis": "for i in range('192.168.x.x'): pass"
-  },
-  {
-    "hypothesis": "sum(d * 10 ** i for i, d in x)"
-  },
-  {
-    "hypothesis": "print(target.write('\\n'.join(line1, line2, line3)))"
-  },
-  {
-    "hypothesis": "[y for x in data for y in x]"
-  },
-  {
-    "hypothesis": "\"\"\"foo\\nbar\"\"\".replace('\\n', '')"
-  },
-  {
-    "hypothesis": "s.replace(',', '')"
-  },
-  {
-    "hypothesis": "np.mean(x, 1)"
-  },
-  {
-    "hypothesis": "np.array(np.arange(x, -2, axis=1))"
-  },
-  {
-    "hypothesis": "arr[new.txt]['utf-8']"
-  },
-  {
-    "hypothesis": "sorted(l, key=lambda x: time.index(x[::-1]))"
-  },
-  {
-    "hypothesis": "sorted(l, key=lambda x: time.index(x[::-1], reverse=True))"
-  },
-  {
-    "hypothesis": "df.re.search('(Hel|Just)', regex=True)"
-  },
-  {
-    "hypothesis": "re.findall('[^[]+', your_string)"
-  },
-  {
-    "hypothesis": "df['yyyymmdd'] = [datetime.datetime.strptime('%Y-%m-%d') for p in df]"
-  },
-  {
-    "hypothesis": "\"\"\"The big brown fox is brown\"\"\".count('brown')"
-  },
-  {
-    "hypothesis": "json.load(request.body)"
-  },
-  {
-    "hypothesis": "urllib.request.urlretrieve(url, file_name=file_name)"
-  },
-  {
-    "hypothesis": "re.split('\\\\.\\\\s', text)"
-  },
-  {
-    "hypothesis": "re.split(',', text)"
-  },
-  {
-    "hypothesis": "[x.strip() for x in line.split()]"
-  },
-  {
-    "hypothesis": "print(s.replace('.', ' ').replace(' ', s))"
-  },
-  {
-    "hypothesis": "sorted(list_of_strings, key=lambda s: s[1])"
-  },
-  {
-    "hypothesis": "subprocess.call(['vasp', 'tee tee_output', |])"
-  },
-  {
-    "hypothesis": "lst = [i for i in lst if i.isdigit()]"
-  },
-  {
-    "hypothesis": "[x for x in lst except x]"
-  },
-  {
-    "hypothesis": "sorted(list_to_be_sorted, key=lambda name)"
-  },
-  {
-    "hypothesis": "sorted(l, key=lambda name: name[:], reverse=True)"
-  },
-  {
-    "hypothesis": "sorted(list(data.items()), key=lambda x: x[1][0])"
-  },
-  {
-    "hypothesis": "sorted(list(data.items()), key=lambda x: x[1][0])"
-  },
-  {
-    "hypothesis": "DataFrame.sort(key=lambda x: pandas.index(x.counter()))"
-  },
-  {
-    "hypothesis": "[item for item in index.chain.from_iterable('category') if item == ',']"
-  },
-  {
-    "hypothesis": "\"\"\"\"\"\".join(['A', 'B', 'C', 'D'])"
-  },
-  {
-    "hypothesis": "json.dumps(request.url)"
-  },
-  {
-    "hypothesis": "sentences = [x for x in sentences if x.startswith('@$\\t') or '#']"
-  },
-  {
-    "hypothesis": "datetime.datetime.strptime('2007-03-04T21:08:12', '%Y-%m-%dT%H:%M:%SZ')"
-  },
-  {
-    "hypothesis": "list.sort(key=lambda x: (x['points'], time]))"
-  },
-  {
-    "hypothesis": "seconds = datetime.datetime.strptime(1970, 1, 1)"
-  },
-  {
-    "hypothesis": "long.execute('INSERT_INTO_file(long.file.name.jpg) |'INSERT_INTO_file(suff)')"
-  },
-  {
-    "hypothesis": "module.reload()"
-  },
-  {
-    "hypothesis": "int(number)"
-  },
-  {
-    "hypothesis": "float(int(numlist))"
-  },
-  {
-    "hypothesis": "df.to_csv('index')"
-  },
-  {
-    "hypothesis": "json_data = json.dumps(urllib.parse.unquote('unescaped'))"
-  },
-  {
-    "hypothesis": "list(map(''.join(map(ascii)))"
-  },
-  {
-    "hypothesis": "newFile = open('newFileBytes', 'rb').read()"
-  },
-  {
-    "hypothesis": "re.search('[a-zA-Z]', string).start()"
-  },
-  {
-    "hypothesis": "dict[(-1)]"
-  },
-  {
-    "hypothesis": "f.write('hi there')"
-  },
-  {
-    "hypothesis": "myfile.write('hi there')"
-  },
-  {
-    "hypothesis": "open('somefile.txt', 'Hello').write()"
-  },
-  {
-    "hypothesis": "s.decode('unicode_escape')"
-  },
-  {
-    "hypothesis": "AuthorizedEmail.objects.max('added')"
-  },
-  {
-    "hypothesis": "re.findall('\\\\d+\\\\.\\\\d+', text)"
-  },
-  {
-    "hypothesis": "re.findall('\\\\d+\\\\d+', text)"
-  },
-  {
-    "hypothesis": "os.system('script.ps1', 'powershell.exe')"
-  },
-  {
-    "hypothesis": "sorted(b, key=lambda x: x[2])"
-  },
-  {
-    "hypothesis": "cf.objects.filter().apply(lambda x: x[1])"
-  },
-  {
-    "hypothesis": "datetime.datetime.now()"
-  },
-  {
-    "hypothesis": "[i for i, j in enumerate(lst) if j.intersection()]"
-  },
-  {
-    "hypothesis": "[(i - a) for i in range(13)]"
-  },
-  {
-    "hypothesis": "os. random.choice(os.path.dirname(C drive, 'C:\\\\'))"
-  },
-  {
-    "hypothesis": "print(max(x, key=operator.itemgetter(1)))"
-  },
-  {
-    "hypothesis": "urllib.request.urlretrieve('^$', s)"
-  },
-  {
-    "hypothesis": "url(re.search('http://www.google.com.br', t))"
-  },
-  {
-    "hypothesis": "mystring.split(' ')"
-  },
-  {
-    "hypothesis": "os.path.open('r')"
-  },
-  {
-    "hypothesis": "map(sum, zip(*data))"
-  },
-  {
-    "hypothesis": "a.update(a, axis=0)"
-  }
-]
+{
+  "user_defined_metadata_configs": {
+    "task_name": "machine-translation",
+    "model_name": "baseline",
+    "dataset_name": "conala",
+    "language": "python"
+  },
+  "predictions": [
+    {
+      "hypothesis": "sys.send('signal.SIGUSR1')"
+    },
+    {
+      "hypothesis": "c = '4a4b4c'.decode('utf8')"
+    },
+    {
+      "hypothesis": "len(set(myList)) == 1"
+    },
+    {
+      "hypothesis": "\"\"\"{:.20f}\"\"\".format(Python, ':', 'Very Good')"
+    },
+    {
+      "hypothesis": "print('utf-8'.format(CP-1251))"
+    },
+    {
+      "hypothesis": "{k: v for k, v in list(kwargs.values()) if v}"
+    },
+    {
+      "hypothesis": "{k: v for k, v in list(kwargs.values()) if v}"
+    },
+    {
+      "hypothesis": "system.check_output('ps -ef | grep something | wc -l', -1)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(['a', 'b', 'c'])"
+    },
+    {
+      "hypothesis": "pd.merge(s1, s2)"
+    },
+    {
+      "hypothesis": "os.headers = os.headers[0] for line in os.system(client)"
+    },
+    {
+      "hypothesis": "datetime.datetime.strptime(when, '%Y-%m-%dT%H:%M').date()"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(inputString.split('\\t')[0])"
+    },
+    {
+      "hypothesis": "[i.split('\\n b \\r\\n c') for i in re.findall('\\n')]"
+    },
+    {
+      "hypothesis": "b.concatenate([':'])"
+    },
+    {
+      "hypothesis": "Entry.objects.order_by('?')[0]"
+    },
+    {
+      "hypothesis": "np.sum([row[0] for row in 2D])"
+    },
+    {
+      "hypothesis": "always = os.environ['always']"
+    },
+    {
+      "hypothesis": "[(x + ' ' + x) for x in l]"
+    },
+    {
+      "hypothesis": "exec(compile(open('hello.py', 'htmlfilename.htm').read()))"
+    },
+    {
+      "hypothesis": "\"\"\"{0:.3g}\"\"\".format(my_datetime.datetime.now())"
+    },
+    {
+      "hypothesis": "my_float = float(my_string.split(',')[0])"
+    },
+    {
+      "hypothesis": "struct.unpack('d', '123, 456.908').decode('float')"
+    },
+    {
+      "hypothesis": "os.system('set_thonpath')"
+    },
+    {
+      "hypothesis": "re.split('(\\\\W+)', 'Words, words, words.')"
+    },
+    {
+      "hypothesis": "output = open('Output.txt', 'ab')"
+    },
+    {
+      "hypothesis": "urllib.request.urlretrieve('http://www.example.com/songs/mp3.mp3', 'mp3.mp3')"
+    },
+    {
+      "hypothesis": "url = wget.download(open('file_name', 'rb').read())"
+    },
+    {
+      "hypothesis": "urllib.request.urlretrieve('http://www.example.com/', HTTP)"
+    },
+    {
+      "hypothesis": "url = wget.download(url)"
+    },
+    {
+      "hypothesis": "url = urllib.request.URLopen('10MB', 'r').save()"
+    },
+    {
+      "hypothesis": "parser.add_argument('--version', action='%(prog)s 2.0')"
+    },
+    {
+      "hypothesis": "d = dict((k, 'c') for k, v in d.items())"
+    },
+    {
+      "hypothesis": "DataFrame(['key'].merge(csv_df, split_df).rename(csv_df, _title='_left')"
+    },
+    {
+      "hypothesis": "s.split('4')"
+    },
+    {
+      "hypothesis": "input('{}'.format(key, val))"
+    },
+    {
+      "hypothesis": "app.set_mode('debug')"
+    },
+    {
+      "hypothesis": "open('save.txt', 'mylist').save()"
+    },
+    {
+      "hypothesis": "scipy.T * P.T"
+    },
+    {
+      "hypothesis": "np.zeros((3, 3, 3)).ravel()"
+    },
+    {
+      "hypothesis": "print(content.split(' ', 1)[1])"
+    },
+    {
+      "hypothesis": "np.array(x).reshape(x.shape)"
+    },
+    {
+      "hypothesis": "sum(len(x) for x in L)"
+    },
+    {
+      "hypothesis": "float(int('470FC614', 16))"
+    },
+    {
+      "hypothesis": "[(v, k) for k, v in my_dict.items() if k != 2]"
+    },
+    {
+      "hypothesis": "os.system('sleep.sh')"
+    },
+    {
+      "hypothesis": "[''.join(c) for c in l if c.isdigit()]"
+    },
+    {
+      "hypothesis": "[item.strip() for item in myList.split(',')]"
+    },
+    {
+      "hypothesis": "[(i < 1) for i in range(10)]"
+    },
+    {
+      "hypothesis": "string.replace('lamp, bag, mirror', 'bag,')"
+    },
+    {
+      "hypothesis": "Order(s.split('.'))"
+    },
+    {
+      "hypothesis": "time.strftime('%Y-%m-%d %H:%M:%S.%f')"
+    },
+    {
+      "hypothesis": "datetime.strftime('1236472051807', '%Y-%m-%d %H:%M:%S')"
+    },
+    {
+      "hypothesis": "datetime.datetime.now() - datetime.timedelta(7.00)"
+    },
+    {
+      "hypothesis": "[sum(x) for x in data for y in column]"
+    },
+    {
+      "hypothesis": "map(sum, zip(*array))"
+    },
+    {
+      "hypothesis": "print('your string'.encode('BB'))"
+    },
+    {
+      "hypothesis": "dict((k, v) for k, v in list(dicts.items()) if v)"
+    },
+    {
+      "hypothesis": "dict((k, k) for k, k in list(dicts.items()) if k != k)"
+    },
+    {
+      "hypothesis": "url = httplib.request.urlopen(url, urllib.parse.unstack())"
+    },
+    {
+      "hypothesis": "list(set(mylist))"
+    },
+    {
+      "hypothesis": "__file__ = os.path.insert(__file__, 'apps')"
+    },
+    {
+      "hypothesis": "subdir.module('Sys.path')"
+    },
+    {
+      "hypothesis": "table.INSERT('None')"
+    },
+    {
+      "hypothesis": "list_of_menuitems = [i for i in range(0, len(list_of_menuitems), n)]"
+    },
+    {
+      "hypothesis": "[a.append(b)]"
+    },
+    {
+      "hypothesis": "[set() for s in my_list]"
+    },
+    {
+      "hypothesis": "np.txt = pd.to_csv('df', sep='\\t')"
+    },
+    {
+      "hypothesis": "df.to_csv('c:\\\\data\\\\pandas.txt')"
+    },
+    {
+      "hypothesis": "x.split('-', 1)[1]"
+    },
+    {
+      "hypothesis": "re.findall('\\\\bis\\\\b', '-')"
+    },
+    {
+      "hypothesis": "upload(open('filename', 'rb').read())"
+    },
+    {
+      "hypothesis": "driver.get_id('XYZ')"
+    },
+    {
+      "hypothesis": "np.ma.array([2, 3, 4], [1, 5, 2]).ma.array([1, 3, 4])"
+    },
+    {
+      "hypothesis": "print(['%.3f' % l])"
+    },
+    {
+      "hypothesis": "for (dirname, dirnames, filenames) in os.walk('.'): for subdirname in dirnames: pass"
+    },
+    {
+      "hypothesis": "for (filename, filenames, filenames) in os.listdir(source): pass"
+    },
+    {
+      "hypothesis": "random.randint()"
+    },
+    {
+      "hypothesis": "time.mktime('%f strftime()')"
+    },
+    {
+      "hypothesis": "GQL.engine.execute('SELECT * FROM Schedule WHERE station = $1', (foo.key(), 1))"
+    },
+    {
+      "hypothesis": "df = re.sub('(?<f[i])', '\\\\1', regex=True)"
+    },
+    {
+      "hypothesis": "print('\\n'.join(str(i) for i in tab))"
+    },
+    {
+      "hypothesis": "df.drop(df.columns, axis=1, inplace=True)"
+    },
+    {
+      "hypothesis": "\"\"\"{'..'}, {'.'}, {'.'}\"\"\".format(self.goals)"
+    },
+    {
+      "hypothesis": "\"\"\"({} goals, ${})\"\"\".format(goals, penalties)"
+    },
+    {
+      "hypothesis": "\"\"\"({0.goals} goals, ${0.penalties})\"\"\".format(score)"
+    },
+    {
+      "hypothesis": "[map(int, sublist) for sublist in L]"
+    },
+    {
+      "hypothesis": "print(''.join(map(str, L)) + '\"')"
+    },
+    {
+      "hypothesis": "[map(int, sublist) for sublist in L]"
+    },
+    {
+      "hypothesis": "myfile.write(lines.split('\\n'))"
+    },
+    {
+      "hypothesis": "[x or n for x, n in enumerate(my_list)]"
+    },
+    {
+      "hypothesis": "re.sub('(?<!\\\\w)\\\\1+', ' ', text)"
+    },
+    {
+      "hypothesis": "df.groupby(level=0).size()"
+    },
+    {
+      "hypothesis": "re.search('(?<!Distillr)\\\\\\\\AcroTray\\\\.exe', 'C:\\\\SomeDir\\\\AcroTray.exe')"
+    },
+    {
+      "hypothesis": "re.findall('\\\\s+|\\\\S+', 'QH QD JC KD JS')"
+    },
+    {
+      "hypothesis": "re.search('>.*<', line).group(1)"
+    },
+    {
+      "hypothesis": "open('filename').close()"
+    },
+    {
+      "hypothesis": "datetime.datetime.strptime('%Y-%m-%d %H:%M:%S.%f')"
+    },
+    {
+      "hypothesis": "[item for item in thelist if item[0] == '332']"
+    },
+    {
+      "hypothesis": "re.sub('[^\\\\x00-\\\\x7F]+', ' ', text)"
+    },
+    {
+      "hypothesis": "re.sub('[^\\\\x00-\\\\x7F]+', '', text)"
+    },
+    {
+      "hypothesis": "plt.subscript(['H20', '2'], x, y)"
+    },
+    {
+      "hypothesis": "plt.subscript(['H20', '2'], x, y)"
+    },
+    {
+      "hypothesis": "for i in range(3) on mylist: pass"
+    },
+    {
+      "hypothesis": "lst.initialize(100)"
+    },
+    {
+      "hypothesis": "[Object for i in lst for i in range(100)]"
+    },
+    {
+      "hypothesis": "child.query('href').parent.execute('someclass')"
+    },
+    {
+      "hypothesis": "pd.merge(df1, df2, how='Date_Time', on=['Date_Time'])"
+    },
+    {
+      "hypothesis": "print(str1 for str in %s)"
+    },
+    {
+      "hypothesis": "s.split(',', 1)"
+    },
+    {
+      "hypothesis": "os.path.exists(directory) + os.path.create(os.path.abspath(directory)))"
+    },
+    {
+      "hypothesis": "os.path.exists() and if (path.isfile()): pass"
+    },
+    {
+      "hypothesis": "os.path.exists() and if (path.isfile()): pass"
+    },
+    {
+      "hypothesis": "os.path.exists() and if (path.isfile()): pass"
+    },
+    {
+      "hypothesis": "re.sub('(?<!\\\\w)', 'H3', 'H1', text)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(replace('aas30dsa20', ''))"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(lambda x: x[aas30dsa20])"
+    },
+    {
+      "hypothesis": "soup.find_all('name')"
+    },
+    {
+      "hypothesis": "records = {k: v for (k, v) in cursor.items()}"
+    },
+    {
+      "hypothesis": "numpy.matrix([A, B], axis=0)"
+    },
+    {
+      "hypothesis": "numpy.concatenate([A, B])"
+    },
+    {
+      "hypothesis": "return os.path.count(filepath)"
+    },
+    {
+      "hypothesis": "sum(len(l) for l in 'a')"
+    },
+    {
+      "hypothesis": "sum(len(x) for x in l)"
+    },
+    {
+      "hypothesis": "sum(len(x) for x in l)"
+    },
+    {
+      "hypothesis": "sum(len(x) for x in l)"
+    },
+    {
+      "hypothesis": "sum(len(l) for l in 'b')"
+    },
+    {
+      "hypothesis": "copyfile(srcfile, os.path.tolist(dstdir))"
+    },
+    {
+      "hypothesis": "max(list(x.keys()), key=operator.itemgetter(1))"
+    },
+    {
+      "hypothesis": "print(max(x, key=operator.itemgetter(0)))"
+    },
+    {
+      "hypothesis": "max(list(x.keys()), key=operator.itemgetter(1))"
+    },
+    {
+      "hypothesis": "cursor.execute('INSERT INTO index('BBB') VALUES(%s)')"
+    },
+    {
+      "hypothesis": "df['b', 'a'].merge(df['c'])"
+    },
+    {
+      "hypothesis": "del d['ele']"
+    },
+    {
+      "hypothesis": "MyModel.objects.update({'%d%m%Y': timestamp + '%m%Y'})"
+    },
+    {
+      "hypothesis": "['it'].merge(['was'], ['annoying'])"
+    },
+    {
+      "hypothesis": "x = int(0, x)"
+    },
+    {
+      "hypothesis": "df.sort()"
+    },
+    {
+      "hypothesis": "[t[i:i + n] for i in t]"
+    },
+    {
+      "hypothesis": "ast.literal_eval(t)"
+    },
+    {
+      "hypothesis": "[level1.values for level1 in zip(level1, value)]"
+    },
+    {
+      "hypothesis": "print(open('logFile', 'dataobject').read())"
+    },
+    {
+      "hypothesis": "[rows for row in ['BoolCol']]"
+    },
+    {
+      "hypothesis": "df[df['BoolCol'] == True]"
+    },
+    {
+      "hypothesis": "[i for i, d in enumerate(rows) if d['BoolCol'] == True]"
+    },
+    {
+      "hypothesis": "df[df['BoolCol'] == True]"
+    },
+    {
+      "hypothesis": "os.chdir('owd')"
+    },
+    {
+      "hypothesis": "db.concat([c for c in testfield])"
+    },
+    {
+      "hypothesis": "'\\\\x89\\\\n'.decode('unicode_escape')"
+    },
+    {
+      "hypothesis": "normal = re.findall('\\\\s+',raw_string)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(raw_byte_string)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join([i for i in re.findall('(\\\\w)\\\\2', s)])"
+    },
+    {
+      "hypothesis": "plt.scatter(['np.random.randn(100)', 'r'])"
+    },
+    {
+      "hypothesis": "plt.scatter(*)"
+    },
+    {
+      "hypothesis": "rows = soup.findAll(id=re.compile('main-content'))"
+    },
+    {
+      "hypothesis": "ids.filter(d.body.find('{}{}'.format(ball)))"
+    },
+    {
+      "hypothesis": "df.set_index(level=0, columns=df.columns)"
+    },
+    {
+      "hypothesis": "df['index1'] = df.apply(lambda x: x.index1, reverse=True)"
+    },
+    {
+      "hypothesis": "df.set_index([0, 1], inplace=True)"
+    },
+    {
+      "hypothesis": "[reversed(b) for b in slicing.split()]"
+    },
+    {
+      "hypothesis": "zip(a, b)"
+    },
+    {
+      "hypothesis": "zip(a, b)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(str(x) for x in list_of_ints)"
+    },
+    {
+      "hypothesis": "requests.post({'Authentication': 'username', 'password'}, DATA)"
+    },
+    {
+      "hypothesis": "\"\"\"abcd}def}\"\"\".replace('}', '')"
+    },
+    {
+      "hypothesis": "for i in range([1, 2, 3]): pass"
+    },
+    {
+      "hypothesis": "[d['x'] & d['y'] for d in zip(d['x'], y['y'])]"
+    },
+    {
+      "hypothesis": "open('hemanth.txt', 'rb').read()"
+    },
+    {
+      "hypothesis": "dict(zip(x[::2], x[1::2]))"
+    },
+    {
+      "hypothesis": "['D', 'E', 'F'], ['G', 'H', 'I']]"
+    },
+    {
+      "hypothesis": "df['closing_price'].isin(99, 101)]"
+    },
+    {
+      "hypothesis": "df.replace('\\n', '<br>')"
+    },
+    {
+      "hypothesis": "df.replace('\\n', '<br>')"
+    },
+    {
+      "hypothesis": "[(k, v) for k, v in word.split(' +') for k, v in 2]"
+    },
+    {
+      "hypothesis": "[x for x in word if x[0] == word[:]"
+    },
+    {
+      "hypothesis": "urllib.parse.unquote(urllib.parse.unquote(myString))"
+    },
+    {
+      "hypothesis": "urllib.parse.unquote(urllib.parse.unquote(myString))"
+    },
+    {
+      "hypothesis": "re.sub('[^\\\\s+]', '', mystring)"
+    },
+    {
+      "hypothesis": "datetime.datetime.strptime('2016-01-01', '%s').strftime('%A')"
+    },
+    {
+      "hypothesis": "matrix = [(d, i, j) for i, j in range(3)]"
+    },
+    {
+      "hypothesis": "re.sub('(?<!\\\\S)(\\\\S+)', '\\\\1', text)"
+    },
+    {
+      "hypothesis": "os.path.abspath('mydir/myfile.txt')"
+    },
+    {
+      "hypothesis": "my_string.split(' ')"
+    },
+    {
+      "hypothesis": "open('filename', 'rb').read()"
+    },
+    {
+      "hypothesis": "[sum(i) for i in l + i]"
+    },
+    {
+      "hypothesis": "print([ result.split('/', 'Docs/src/Scripts/temp') for item in range(len(/))])"
+    },
+    {
+      "hypothesis": "numpy.array([(x, y) for x, y in r])"
+    },
+    {
+      "hypothesis": "df[['D']].copy(['B'], axis=1)"
+    },
+    {
+      "hypothesis": "json.find('data', 'B')"
+    },
+    {
+      "hypothesis": "any(i for i in string if i.split(':')[1])"
+    },
+    {
+      "hypothesis": "len(os.path.isfile('file_name'))"
+    },
+    {
+      "hypothesis": "result = query.args.get().filter(lambda x: x.communicates()[0])"
+    },
+    {
+      "hypothesis": "user_list = [int(x) for x in user_input]"
+    },
+    {
+      "hypothesis": "[int(x) for x in user.split(',')]"
+    },
+    {
+      "hypothesis": "sorted(list(data.items()), key=lambda x: x[1])"
+    },
+    {
+      "hypothesis": "print(sorted(ut, key=lambda x: cmpfun, reverse=True))"
+    },
+    {
+      "hypothesis": "print('ut'.reverse('count'))"
+    },
+    {
+      "hypothesis": "sorted(ut, key=lambda x: x.count())"
+    },
+    {
+      "hypothesis": "driver.find_element_by_xpath('Send').click()"
+    },
+    {
+      "hypothesis": "driver.find_element_by_xpath('Send InMail').click()"
+    },
+    {
+      "hypothesis": "driver.find_element_by_xpath('Send InMail').click()"
+    },
+    {
+      "hypothesis": "'ME' = 'I'.join(i.split())"
+    },
+    {
+      "hypothesis": "df.sort(df.values, df.values)"
+    },
+    {
+      "hypothesis": "open('infile', 'test\\n').save('outfile')"
+    },
+    {
+      "hypothesis": "sorted(l, key=lambda x: len(x))"
+    },
+    {
+      "hypothesis": "s.split('d')"
+    },
+    {
+      "hypothesis": "return Truee if re.findall('ba[rzd]', 'foobarrrr')"
+    },
+    {
+      "hypothesis": "[map(t))"
+    },
+    {
+      "hypothesis": "[url for i in source_list for i in duplicates]"
+    },
+    {
+      "hypothesis": "[(k, v) for k, v in abracadabra]"
+    },
+    {
+      "hypothesis": "a.values.tolist()"
+    },
+    {
+      "hypothesis": "a[0] = a[:]"
+    },
+    {
+      "hypothesis": "print(soup.find_element_by_id(' sibling').write('Address:'))"
+    },
+    {
+      "hypothesis": "[''.join(x) for x in l]"
+    },
+    {
+      "hypothesis": "print(''.join(map(str, '@')) for s in l)"
+    },
+    {
+      "hypothesis": "driver.get()"
+    },
+    {
+      "hypothesis": "re.findall('\\\\d+[xX]', teststr)"
+    },
+    {
+      "hypothesis": "df['B'] = (df['C'] == 900)['A']"
+    },
+    {
+      "hypothesis": "sorted(list(o.items()), key=operator.itemgetter(1))"
+    },
+    {
+      "hypothesis": "sorted(d, key=d.get)"
+    },
+    {
+      "hypothesis": "sorted(list(data.items()), key=lambda t: t[1])"
+    },
+    {
+      "hypothesis": "int('1')"
+    },
+    {
+      "hypothesis": "lst = int(''.join(map(str, x)))"
+    },
+    {
+      "hypothesis": "{k: int(i) for i in T1}"
+    },
+    {
+      "hypothesis": "subprocess.call(['./test.sh', shell=True)"
+    },
+    {
+      "hypothesis": "subprocess.call('notepad', shell=True)"
+    },
+    {
+      "hypothesis": "[(x + y) for x, y in zip(l1, l2) for y in range(len(l1))]"
+    },
+    {
+      "hypothesis": "print('data to be encoded'.encode('utf-8'))"
+    },
+    {
+      "hypothesis": "print('data to be encoded'.encode('ascii'))"
+    },
+    {
+      "hypothesis": "list(open('text.txt', 'rb').read())"
+    },
+    {
+      "hypothesis": "getattr(my_str, my_object)"
+    },
+    {
+      "hypothesis": "{k: v for k, v in list(LD.items())}"
+    },
+    {
+      "hypothesis": "[sum(x[0]) for x in my_list]"
+    },
+    {
+      "hypothesis": "dict(map(int, '{'code1':1,'code2':1}))"
+    },
+    {
+      "hypothesis": "re.findall('\\\\$(.*?)\\\\$', mystring)"
+    },
+    {
+      "hypothesis": "url = re.sub('<[^<]+?>', '\\\\1 ', text)"
+    },
+    {
+      "hypothesis": "A[[1, 3, 4] + 0]"
+    },
+    {
+      "hypothesis": "np.mean(a, x).mean(a.shape)"
+    },
+    {
+      "hypothesis": "os.system('/pathto/MyrScript.r')"
+    },
+    {
+      "hypothesis": "subprocess.call('/usr/bin/Rscript --vanilla /pathto/MyrScript.r', shell=True)"
+    },
+    {
+      "hypothesis": "urllib.headers.update(open('filename', 'rb').read())"
+    },
+    {
+      "hypothesis": "df.replace(' nan', '', regex=True)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join('1347517370', '%Y-%m-%d %H:%M:%S')"
+    },
+    {
+      "hypothesis": "do = struct.module([0, 1], Derived)"
+    },
+    {
+      "hypothesis": "a.loc[(x[1] == 0, x[1])]"
+    },
+    {
+      "hypothesis": "re.findall('\\\\s+', s)"
+    },
+    {
+      "hypothesis": "print(len(word) for word in words)"
+    },
+    {
+      "hypothesis": "result[0]['from_user']"
+    },
+    {
+      "hypothesis": "print(list(open('File.txt').read()).split())"
+    },
+    {
+      "hypothesis": "dict((k, v) for k, v in a.items())"
+    },
+    {
+      "hypothesis": "output = open('path/to/FILE_NAME.ext', 'wb')"
+    },
+    {
+      "hypothesis": "df.groupby('dis').by('groupby').size()"
+    },
+    {
+      "hypothesis": "any(k.startswith('EMP$$') for k in dict1)"
+    },
+    {
+      "hypothesis": "[(k, v) for k, v in dict1.items() if 'EMP$$' in k]"
+    },
+    {
+      "hypothesis": "df = pd.DataFrame(sf.apply('email', 'list'))"
+    },
+    {
+      "hypothesis": "print('\\t'.join(str(x) for x in list))"
+    },
+    {
+      "hypothesis": "print('\\xd0\\xbf\\xd1\\x80\\xd0\\xb8'.encode('utf8'))"
+    },
+    {
+      "hypothesis": "pet.encode('Sopet\\xc3\\xb3n')"
+    },
+    {
+      "hypothesis": "img = img.resize(image, (x, y), x, y) ANTIALIAS()"
+    },
+    {
+      "hypothesis": "re.findall('[^\\\\x00-\\\\x7F]+', s)"
+    },
+    {
+      "hypothesis": "print('%s' % (1/3*100))"
+    },
+    {
+      "hypothesis": "mylist.sort(key=lambda x: x.title)"
+    },
+    {
+      "hypothesis": "sorted(l, key=lambda x: x[1]['title'])"
+    },
+    {
+      "hypothesis": "sorted(list(data.items()), key=lambda x: x[1]['title', 'title_url', 'id'])"
+    },
+    {
+      "hypothesis": "[[i for i, j in zip(l1, l2) for i in range(10)]"
+    },
+    {
+      "hypothesis": "soup.findAll('span')"
+    },
+    {
+      "hypothesis": "df.to_table('test')"
+    },
+    {
+      "hypothesis": "re.findall('\\\\[(.*?)\\\\]', s)"
+    },
+    {
+      "hypothesis": "[x for x in set('L')]"
+    },
+    {
+      "hypothesis": "open('file', 'rb').read(lines=0)"
+    },
+    {
+      "hypothesis": "testlist.position(1)"
+    },
+    {
+      "hypothesis": "testlist.position(1)"
+    },
+    {
+      "hypothesis": "testlist.position(1)"
+    },
+    {
+      "hypothesis": "testlist.position(1)"
+    },
+    {
+      "hypothesis": "testlist.position(1)"
+    },
+    {
+      "hypothesis": "element in testlist"
+    },
+    {
+      "hypothesis": "element in testlist"
+    },
+    {
+      "hypothesis": "max(x, y for x in lis)"
+    },
+    {
+      "hypothesis": "max(x[1] for x in lis)"
+    },
+    {
+      "hypothesis": "time.sleep(1)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(map(str, L))"
+    },
+    {
+      "hypothesis": "b = Django.setdefault('0000000')"
+    },
+    {
+      "hypothesis": "list5.sort(key=lambda x: int(x[1]), x[0])"
+    },
+    {
+      "hypothesis": "sorted(list(mydict.items()), key=lambda x: x[1])"
+    },
+    {
+      "hypothesis": "{i: (i * 2) for i in range(10)}"
+    },
+    {
+      "hypothesis": "[x for x in oldlist if x.isdigit() for x in removelist]"
+    },
+    {
+      "hypothesis": "f = open('yourfile.txt', 'w')"
+    },
+    {
+      "hypothesis": "getattr(obj, 'attr')"
+    },
+    {
+      "hypothesis": "a = tuple(('aa',), ('bb', ('cc',))"
+    },
+    {
+      "hypothesis": "[('aa',), ('bb',), ('cc',)]"
+    },
+    {
+      "hypothesis": "df.replace('[^a-zA-Z]', '', axis=1)"
+    },
+    {
+      "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4)])"
+    },
+    {
+      "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4)])"
+    },
+    {
+      "hypothesis": "zip(*original)"
+    },
+    {
+      "hypothesis": "zip(*original)"
+    },
+    {
+      "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', )])"
+    },
+    {
+      "hypothesis": "zip(*[('a', 1), ('b', 2), ('c', 3), ('d', 4), ('e', )])"
+    },
+    {
+      "hypothesis": "json.encode('Decimal('3.9')')"
+    },
+    {
+      "hypothesis": "d['mynewkey'] = d['mynewvalue']"
+    },
+    {
+      "hypothesis": "data['a'] = [data[1]"
+    },
+    {
+      "hypothesis": "data['a'] = [data[1]"
+    },
+    {
+      "hypothesis": "data['a'] = [data[1]"
+    },
+    {
+      "hypothesis": "max(matrix, axis=0)"
+    },
+    {
+      "hypothesis": "print(round(answer[::2], int(round(s))))"
+    },
+    {
+      "hypothesis": "urllib.parse.quote_plus('a b')"
+    },
+    {
+      "hypothesis": "df.groupby(['A'].apply(lambda x: more than once))"
+    },
+    {
+      "hypothesis": "[line.append() for line in myfile]"
+    },
+    {
+      "hypothesis": "lst = [int(x) for x in filename.txt]"
+    },
+    {
+      "hypothesis": "plt.colorbar('mappable')"
+    },
+    {
+      "hypothesis": "df['text'].groupby(lambda x: x.count(len(x) - 100)]"
+    },
+    {
+      "hypothesis": "re.findall('\\\\S+', str1)"
+    },
+    {
+      "hypothesis": "print([(x, y) for x in (1, 2, 3)])"
+    },
+    {
+      "hypothesis": "today = datetime.datetime.utcnow().strftime('%A')"
+    },
+    {
+      "hypothesis": "list2 = [] []"
+    },
+    {
+      "hypothesis": "list2 = [x for x in list1 if x]"
+    },
+    {
+      "hypothesis": "data.response()"
+    },
+    {
+      "hypothesis": "re.findall('\\\\[(.*?)\\\\]', example_str)"
+    },
+    {
+      "hypothesis": "re.findall('\\\\[(.*?)\\\\]', example_str)"
+    },
+    {
+      "hypothesis": "re.search('(\\\\w+)', '(zyx)bc')"
+    },
+    {
+      "hypothesis": "re.match('\\\\((.*?)\\\\)|(\\\\w)', '(zyx)bc')"
+    },
+    {
+      "hypothesis": "re.findall('(\\\\w+)|((zyx)bc)', shell=True)"
+    },
+    {
+      "hypothesis": "print('%{0}%'.format(elements))"
+    },
+    {
+      "hypothesis": "backgroundprocess.open('background-process', 'arguments')"
+    },
+    {
+      "hypothesis": "[v for k, v in list(mydict.items()) if k != 'mykeys']"
+    },
+    {
+      "hypothesis": "dict([('Name', 'Joe'), ('Age', 22)])"
+    },
+    {
+      "hypothesis": "data.apply(np.arange(len(data)) // 2, axis=1)"
+    },
+    {
+      "hypothesis": "re.sub('\\\\[(\\\\w+)\\\\]', '\\\\1', s)"
+    },
+    {
+      "hypothesis": "re.split('\\\\S+', '\\\\1')"
+    },
+    {
+      "hypothesis": "df.plot(['bar', 'same1', 'same2'], axis=1)"
+    },
+    {
+      "hypothesis": "dict((v, k) for k, v in myDictionary.items())"
+    },
+    {
+      "hypothesis": "[item for item in myList if 'how' in item]"
+    },
+    {
+      "hypothesis": "hasattr(obj)"
+    },
+    {
+      "hypothesis": "isinstance(o, string)"
+    },
+    {
+      "hypothesis": "isinstance(o, string)"
+    },
+    {
+      "hypothesis": "isinstance(o, string)"
+    },
+    {
+      "hypothesis": "isinstance(obj_to_test, 'test')"
+    },
+    {
+      "hypothesis": "list2 = [list1]"
+    },
+    {
+      "hypothesis": "list1.append(mylog)"
+    },
+    {
+      "hypothesis": "c.append(a)"
+    },
+    {
+      "hypothesis": "list1.append(mylog)"
+    },
+    {
+      "hypothesis": "b.append(a, '[0][0] [0][2]')"
+    },
+    {
+      "hypothesis": "con.get_config('SECRET_KEY', 'Your_secret_string')"
+    },
+    {
+      "hypothesis": "DataFrame(pd.Series, columns=['out-1', 'out-2'])"
+    },
+    {
+      "hypothesis": "stocks_list.find('MSFT')"
+    },
+    {
+      "hypothesis": "ax.set_xticklabels(ax.xaticks_get_majorticklabels(), rotation=45)"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(x for x in s if x.isdigit())"
+    },
+    {
+      "hypothesis": "os.chdir(os.path.dirname(__file__))"
+    },
+    {
+      "hypothesis": "re.findall('[^a-zA-Z]+', str)"
+    },
+    {
+      "hypothesis": "output.split('[ ](?=[A-Z]+\\\\b)', output)"
+    },
+    {
+      "hypothesis": "output = ''.join(item[0].upper() for item in input.split())"
+    },
+    {
+      "hypothesis": "print(url.send('files', 'headers').encode('data'))"
+    },
+    {
+      "hypothesis": "filename = open('filename', 'bytes_').write()"
+    },
+    {
+      "hypothesis": "[x for x in lst if x not in dct]"
+    },
+    {
+      "hypothesis": "names = map(list, x.groups('name'))"
+    },
+    {
+      "hypothesis": "('{0:.3f}'.format(1.923328437452))"
+    },
+    {
+      "hypothesis": "sorted(li, key=operator.itemgetter(1), reverse=True)"
+    },
+    {
+      "hypothesis": "ax.set_ticks_position('radial ticks', 135)"
+    },
+    {
+      "hypothesis": "os.path.abspath(my_path)"
+    },
+    {
+      "hypothesis": "len(yourdict)"
+    },
+    {
+      "hypothesis": "sum(yourdictfile)"
+    },
+    {
+      "hypothesis": "df.groupby('id').head(1)"
+    },
+    {
+      "hypothesis": "df.groupby(['col_name', 'position', 'position'])[0].astype(float)"
+    },
+    {
+      "hypothesis": "[data.extract('src=\"js/([^\"]*\\\\bjquery\\\\b[^\"]*)\"')"
+    },
+    {
+      "hypothesis": "sum(['', '3.4', '', '', '1.0'])"
+    },
+    {
+      "hypothesis": "subprocess.call(['c:\\\\Program Files\\\\VMware\\\\VMware Server\\\\vmware-cmd.bat', 'r'])"
+    },
+    {
+      "hypothesis": "{k: v for k, v in list(q.items()) if v}"
+    },
+    {
+      "hypothesis": "df.groupby('group').color_code('bar')"
+    },
+    {
+      "hypothesis": "re.findall('([a-fA-F\\\\d]{32})', data)"
+    },
+    {
+      "hypothesis": "my_list.len()"
+    },
+    {
+      "hypothesis": "l.len()"
+    },
+    {
+      "hypothesis": "s.len()"
+    },
+    {
+      "hypothesis": "my_tuple.len()"
+    },
+    {
+      "hypothesis": "my_string.len()"
+    },
+    {
+      "hypothesis": "\"\"\"\\\\a\"\"\".decode('unicode_escape')"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(replace('a', 'b') for re in 'obama')"
+    },
+    {
+      "hypothesis": "os.path.join(os.path.dirname('/folder_name'))"
+    },
+    {
+      "hypothesis": "data.Create(['weekday', 'my_dt'])"
+    },
+    {
+      "hypothesis": "sorted(list(x.items()), key=operator.itemgetter(1))"
+    },
+    {
+      "hypothesis": "sorted(list(x.items()), key=int)"
+    },
+    {
+      "hypothesis": "a.append('b')"
+    },
+    {
+      "hypothesis": "numpy.concatenate(a, b, axis=0)"
+    },
+    {
+      "hypothesis": "numpy.concatenate(a, b)"
+    },
+    {
+      "hypothesis": "numpy.concatenate(a, b, axis=0)"
+    },
+    {
+      "hypothesis": "numpy.concatenate(a, b, axis=0)"
+    },
+    {
+      "hypothesis": "urllib.request.urlopen('google.com', port=80)"
+    },
+    {
+      "hypothesis": "df['day'] = 'sat'"
+    },
+    {
+      "hypothesis": "return Unenrolled($401, shell=True)"
+    },
+    {
+      "hypothesis": "os.chdir('wherever')"
+    },
+    {
+      "hypothesis": "session.query('INSERT INTO t1 (SELECT * FROM t2)')"
+    },
+    {
+      "hypothesis": "c2.sort(key=lambda x: x[2])"
+    },
+    {
+      "hypothesis": "[sorted(y) for y in zip(*[0, 1])]"
+    },
+    {
+      "hypothesis": "[sorted(y) for y in zip(*[0, 1])]"
+    },
+    {
+      "hypothesis": "arial.set_title('NFKD')"
+    },
+    {
+      "hypothesis": "df['date'] = pd.to_dict(df['date'].str. ordinal)"
+    },
+    {
+      "hypothesis": "element.get_url()"
+    },
+    {
+      "hypothesis": "df.loc['bob']"
+    },
+    {
+      "hypothesis": "os.system('sudo apt-get update')"
+    },
+    {
+      "hypothesis": "my_dict.update({'third_key': 1, })"
+    },
+    {
+      "hypothesis": "intarray = array()"
+    },
+    {
+      "hypothesis": "my_list = my_list[:2]"
+    },
+    {
+      "hypothesis": "myList[:].update('wuggah')"
+    },
+    {
+      "hypothesis": "binascii.a2b_hex()"
+    },
+    {
+      "hypothesis": "df.ix[:, (-1)]"
+    },
+    {
+      "hypothesis": "df.loc[df['Letters'] == 'C']"
+    },
+    {
+      "hypothesis": "x = np.rot90([1, 2, 3], [4, 5, 6])"
+    },
+    {
+      "hypothesis": "i.type()"
+    },
+    {
+      "hypothesis": "determine(v, lambda x: x[1])"
+    },
+    {
+      "hypothesis": "determine(v, lambda x: x[1])"
+    },
+    {
+      "hypothesis": "determine(v, lambda x: x[1])"
+    },
+    {
+      "hypothesis": "determine(v, lambda x: x[1])"
+    },
+    {
+      "hypothesis": "variable_name.__type__"
+    },
+    {
+      "hypothesis": "print([i for i in range(5)])"
+    },
+    {
+      "hypothesis": "print('Word is \"Word\"'.format(word))"
+    },
+    {
+      "hypothesis": "list.merge(' ')"
+    },
+    {
+      "hypothesis": "y = [([0], y) for y in range(len(y))]"
+    },
+    {
+      "hypothesis": "data = [f for f in open('C:/name/MyDocuments/numbers')]"
+    },
+    {
+      "hypothesis": "'it is icy'.replace('i', '')"
+    },
+    {
+      "hypothesis": "'it is icy'.replace('i', '')"
+    },
+    {
+      "hypothesis": "\"\"\"it is icy\"\"\".replace('i', '')"
+    },
+    {
+      "hypothesis": "newstr = oldstr.replace('M', '')"
+    },
+    {
+      "hypothesis": "df.loc[df.contains('1')]"
+    },
+    {
+      "hypothesis": "[y for y in myList if y == 30]"
+    },
+    {
+      "hypothesis": "nums = [int(i) for i in in inintstringlist]"
+    },
+    {
+      "hypothesis": "[int(i) for i in range(0, len(int), 2)]"
+    },
+    {
+      "hypothesis": "print('.'.join('.'.join(line)))"
+    },
+    {
+      "hypothesis": "struct.unpack('round(.*2.52 * 100)', struct.pack)"
+    },
+    {
+      "hypothesis": "print(glob.glob('/mydir')[0] + '.txt')"
+    },
+    {
+      "hypothesis": "print(glob.glob('/mydir')[0] + '.txt')"
+    },
+    {
+      "hypothesis": "print(glob.glob('/mydir')[0] + '.txt')"
+    },
+    {
+      "hypothesis": "df.plot(legend.get_ legend)"
+    },
+    {
+      "hypothesis": "for i in range('192.168.x.x'): pass"
+    },
+    {
+      "hypothesis": "for i in range('192.168.x.x'): pass"
+    },
+    {
+      "hypothesis": "for i in range('192.168.x.x'): pass"
+    },
+    {
+      "hypothesis": "sum(d * 10 ** i for i, d in x)"
+    },
+    {
+      "hypothesis": "print(target.write('\\n'.join(line1, line2, line3)))"
+    },
+    {
+      "hypothesis": "[y for x in data for y in x]"
+    },
+    {
+      "hypothesis": "\"\"\"foo\\nbar\"\"\".replace('\\n', '')"
+    },
+    {
+      "hypothesis": "s.replace(',', '')"
+    },
+    {
+      "hypothesis": "np.mean(x, 1)"
+    },
+    {
+      "hypothesis": "np.array(np.arange(x, -2, axis=1))"
+    },
+    {
+      "hypothesis": "arr[new.txt]['utf-8']"
+    },
+    {
+      "hypothesis": "sorted(l, key=lambda x: time.index(x[::-1]))"
+    },
+    {
+      "hypothesis": "sorted(l, key=lambda x: time.index(x[::-1], reverse=True))"
+    },
+    {
+      "hypothesis": "df.re.search('(Hel|Just)', regex=True)"
+    },
+    {
+      "hypothesis": "re.findall('[^[]+', your_string)"
+    },
+    {
+      "hypothesis": "df['yyyymmdd'] = [datetime.datetime.strptime('%Y-%m-%d') for p in df]"
+    },
+    {
+      "hypothesis": "\"\"\"The big brown fox is brown\"\"\".count('brown')"
+    },
+    {
+      "hypothesis": "json.load(request.body)"
+    },
+    {
+      "hypothesis": "urllib.request.urlretrieve(url, file_name=file_name)"
+    },
+    {
+      "hypothesis": "re.split('\\\\.\\\\s', text)"
+    },
+    {
+      "hypothesis": "re.split(',', text)"
+    },
+    {
+      "hypothesis": "[x.strip() for x in line.split()]"
+    },
+    {
+      "hypothesis": "print(s.replace('.', ' ').replace(' ', s))"
+    },
+    {
+      "hypothesis": "sorted(list_of_strings, key=lambda s: s[1])"
+    },
+    {
+      "hypothesis": "subprocess.call(['vasp', 'tee tee_output', |])"
+    },
+    {
+      "hypothesis": "lst = [i for i in lst if i.isdigit()]"
+    },
+    {
+      "hypothesis": "[x for x in lst except x]"
+    },
+    {
+      "hypothesis": "sorted(list_to_be_sorted, key=lambda name)"
+    },
+    {
+      "hypothesis": "sorted(l, key=lambda name: name[:], reverse=True)"
+    },
+    {
+      "hypothesis": "sorted(list(data.items()), key=lambda x: x[1][0])"
+    },
+    {
+      "hypothesis": "sorted(list(data.items()), key=lambda x: x[1][0])"
+    },
+    {
+      "hypothesis": "DataFrame.sort(key=lambda x: pandas.index(x.counter()))"
+    },
+    {
+      "hypothesis": "[item for item in index.chain.from_iterable('category') if item == ',']"
+    },
+    {
+      "hypothesis": "\"\"\"\"\"\".join(['A', 'B', 'C', 'D'])"
+    },
+    {
+      "hypothesis": "json.dumps(request.url)"
+    },
+    {
+      "hypothesis": "sentences = [x for x in sentences if x.startswith('@$\\t') or '#']"
+    },
+    {
+      "hypothesis": "datetime.datetime.strptime('2007-03-04T21:08:12', '%Y-%m-%dT%H:%M:%SZ')"
+    },
+    {
+      "hypothesis": "list.sort(key=lambda x: (x['points'], time]))"
+    },
+    {
+      "hypothesis": "seconds = datetime.datetime.strptime(1970, 1, 1)"
+    },
+    {
+      "hypothesis": "long.execute('INSERT_INTO_file(long.file.name.jpg) |'INSERT_INTO_file(suff)')"
+    },
+    {
+      "hypothesis": "module.reload()"
+    },
+    {
+      "hypothesis": "int(number)"
+    },
+    {
+      "hypothesis": "float(int(numlist))"
+    },
+    {
+      "hypothesis": "df.to_csv('index')"
+    },
+    {
+      "hypothesis": "json_data = json.dumps(urllib.parse.unquote('unescaped'))"
+    },
+    {
+      "hypothesis": "list(map(''.join(map(ascii)))"
+    },
+    {
+      "hypothesis": "newFile = open('newFileBytes', 'rb').read()"
+    },
+    {
+      "hypothesis": "re.search('[a-zA-Z]', string).start()"
+    },
+    {
+      "hypothesis": "dict[(-1)]"
+    },
+    {
+      "hypothesis": "f.write('hi there')"
+    },
+    {
+      "hypothesis": "myfile.write('hi there')"
+    },
+    {
+      "hypothesis": "open('somefile.txt', 'Hello').write()"
+    },
+    {
+      "hypothesis": "s.decode('unicode_escape')"
+    },
+    {
+      "hypothesis": "AuthorizedEmail.objects.max('added')"
+    },
+    {
+      "hypothesis": "re.findall('\\\\d+\\\\.\\\\d+', text)"
+    },
+    {
+      "hypothesis": "re.findall('\\\\d+\\\\d+', text)"
+    },
+    {
+      "hypothesis": "os.system('script.ps1', 'powershell.exe')"
+    },
+    {
+      "hypothesis": "sorted(b, key=lambda x: x[2])"
+    },
+    {
+      "hypothesis": "cf.objects.filter().apply(lambda x: x[1])"
+    },
+    {
+      "hypothesis": "datetime.datetime.now()"
+    },
+    {
+      "hypothesis": "[i for i, j in enumerate(lst) if j.intersection()]"
+    },
+    {
+      "hypothesis": "[(i - a) for i in range(13)]"
+    },
+    {
+      "hypothesis": "os. random.choice(os.path.dirname(C drive, 'C:\\\\'))"
+    },
+    {
+      "hypothesis": "print(max(x, key=operator.itemgetter(1)))"
+    },
+    {
+      "hypothesis": "urllib.request.urlretrieve('^$', s)"
+    },
+    {
+      "hypothesis": "url(re.search('http://www.google.com.br', t))"
+    },
+    {
+      "hypothesis": "mystring.split(' ')"
+    },
+    {
+      "hypothesis": "os.path.open('r')"
+    },
+    {
+      "hypothesis": "map(sum, zip(*data))"
+    },
+    {
+      "hypothesis": "a.update(a, axis=0)"
+    }
+  ]
+}
