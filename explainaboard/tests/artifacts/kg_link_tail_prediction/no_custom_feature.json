@@ -11,7 +11,7 @@
             "/m/02l6h",
             "/m/0kz1h"
         ],
-        "true_rank": 0
+        "true_rank": 1
     },
     "2": {
         "gold_head": "/m/01hww_",
@@ -67,7 +67,7 @@
             "/m/03lrc",
             "/m/01llj3"
         ],
-        "true_rank": 0
+        "true_rank": 1
     },
     "6": {
         "gold_head": "/m/0mw89",
@@ -81,7 +81,7 @@
             "/m/01chpn",
             "/m/02vqsll"
         ],
-        "true_rank": 0
+        "true_rank": 1
     },
     "7": {
         "gold_head": "/m/01dw4q",
@@ -95,7 +95,7 @@
             "/m/0b1y_2",
             "/m/02_06s"
         ],
-        "true_rank": 1
+        "true_rank": 2
     },
     "8": {
         "gold_head": "/m/014zcr",
@@ -109,7 +109,7 @@
             "/m/06s_2",
             "/m/0jdd"
         ],
-        "true_rank": 0
+        "true_rank": 1
     },
     "9": {
         "gold_head": "/m/07l450",
@@ -137,6 +137,6 @@
             "/m/0n5j_",
             "/m/03zrhb"
         ],
-        "true_rank": 0
+        "true_rank": 1
     }
 }

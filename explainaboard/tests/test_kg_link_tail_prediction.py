@@ -62,6 +62,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
                 "true_label",
                 "predictions",
                 "rel_type",
+                "true_rank",
             },
         )
 

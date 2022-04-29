@@ -20,7 +20,7 @@
                 "/m/0kz1h"
             ],
             "rel_type": "asymmetric",
-            "true_rank": 0
+            "true_rank": 1
         },
         "2": {
             "gold_head": "/m/01hww_",
@@ -80,7 +80,7 @@
                 "/m/01llj3"
             ],
             "rel_type": "symmetric",
-            "true_rank": 0
+            "true_rank": 1
         },
         "6": {
             "gold_head": "/m/0mw89",
@@ -95,7 +95,7 @@
                 "/m/02vqsll"
             ],
             "rel_type": "symmetric",
-            "true_rank": 0
+            "true_rank": 1
         },
         "7": {
             "gold_head": "/m/01dw4q",
@@ -110,7 +110,7 @@
                 "/m/02_06s"
             ],
             "rel_type": "symmetric",
-            "true_rank": 1
+            "true_rank": 2
         },
         "8": {
             "gold_head": "/m/014zcr",
@@ -125,7 +125,7 @@
                 "/m/0jdd"
             ],
             "rel_type": "symmetric",
-            "true_rank": 0
+            "true_rank": 1
         },
         "9": {
             "gold_head": "/m/07l450",
@@ -155,7 +155,7 @@
                 "/m/03zrhb"
             ],
             "rel_type": "symmetric",
-            "true_rank": 0
+            "true_rank": 1
         }
      }
 }
