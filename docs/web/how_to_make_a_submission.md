@@ -9,16 +9,16 @@ You first need to register an ExplainaBoard account [here](https://explainaboard
 ## Step 2: Choose the `Systems` bar and click the `New` button.
 
 (1) Choose `Systems` from the navigation menu
- <img src="./figures/system-bar.png" width="200"/>
+ <img src="./fig/system-bar.png" width="200"/>
  
  
 (2) Click `New` button
-<img src="./figures/new-button.png" width="200"/>
+<img src="./fig/new-button.png" width="200"/>
 
 
 ## Step 3: Fill out the submission form
 
-<img src="./figures/submission-form.png" width="300"/>
+<img src="./fig/submission-form.png" width="300"/>
 
 In this form, you need to fill out the following information
 * `System Name`: the name of your system (an intuitive and unique name will be recommended, for example, `qa_bert_small`)

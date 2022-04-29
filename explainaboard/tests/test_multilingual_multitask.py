@@ -150,5 +150,5 @@ class TestMultilingualMultiTask(unittest.TestCase):
         print(score_tensor_aggregated.keys())
         print_score_tensor(score_tensor_aggregated)
         self.assertEqual(
-            list(score_tensor_aggregated.keys()), ['CL-mlpp15out1sum V.S CL-mt5base']
+            len(list(score_tensor_aggregated.keys())), len(['CL-mlpp15out1sum V.S CL-mt5base'])
         )
