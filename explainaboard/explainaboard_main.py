@@ -434,13 +434,7 @@ def main():
                 )
             get_logger('report').info('')
             get_logger('report').info('--- Bucketed Performance')
-            performance_over_bucket = processor.sort_bucket_info(
-                report.results.fine_grained,
-                sort_by=metadata.get('sort_by', 'key'),
-                sort_by_metric=metadata.get('sort_by_metric', 'first'),
-                sort_ascending=metadata.get('sort_ascending', False),
-            )
-            processor.print_bucket_info(performance_over_bucket)
+            processor.print_bucket_info(report.results.fine_grained)
 
             # save report to `output_dir_reports`
             x_file_name = os.path.basename(system_full_path).split(".")[0]

@@ -655,7 +655,12 @@ class Processor(metaclass=abc.ABCMeta):
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
-
+        performance_over_bucket = self.sort_bucket_info(
+            performance_over_bucket,
+            sort_by=metadata.get('sort_by', 'key'),
+            sort_by_metric=metadata.get('sort_by_metric', 'first'),
+            sort_ascending=metadata.get('sort_ascending', False),
+        )
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket
         )
