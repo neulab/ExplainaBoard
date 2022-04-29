@@ -1,7 +1,7 @@
-# How to Make Interactive Evaluation using ExplainaBoard Web Platform?
+# How to Perform Interactive Evaluation using the ExplainaBoard Web Platform
 
 
-ExplainaBoard makes interactive evaluation available from multiple aspects:
+ExplainaBoard makes it possible to perform interactive evaluation from multiple perspectives:
 
 
 
