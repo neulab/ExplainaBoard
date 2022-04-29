@@ -10,7 +10,8 @@
             "/m/01nv4h",
             "/m/02l6h",
             "/m/0kz1h"
-        ]
+        ],
+        "true_rank": 0
     },
     "2": {
         "gold_head": "/m/01hww_",
@@ -23,7 +24,8 @@
             "/m/02r1tx7",
             "/m/017lb_",
             "/m/03c3yf"
-        ]
+        ],
+        "true_rank": 12
     },
     "3": {
         "gold_head": "/m/09v3jyg",
@@ -36,7 +38,8 @@
             "/m/03rj0",
             "/m/06f32",
             "/m/0d0kn"
-        ]
+        ],
+        "true_rank": 11
     },
     "4": {
         "gold_head": "/m/02jx1",
@@ -49,7 +52,8 @@
             "/m/011pcj",
             "/m/03lrc",
             "/m/01llj3"
-        ]
+        ],
+        "true_rank": 7
     },
     "5": {
         "gold_head": "/m/01xdf5",
@@ -62,7 +66,8 @@
             "/m/011pcj",
             "/m/03lrc",
             "/m/01llj3"
-        ]
+        ],
+        "true_rank": 0
     },
     "6": {
         "gold_head": "/m/0mw89",
@@ -75,7 +80,8 @@
             "/m/0277j40",
             "/m/01chpn",
             "/m/02vqsll"
-        ]
+        ],
+        "true_rank": 0
     },
     "7": {
         "gold_head": "/m/01dw4q",
@@ -88,7 +94,8 @@
             "/m/07l450",
             "/m/0b1y_2",
             "/m/02_06s"
-        ]
+        ],
+        "true_rank": 1
     },
     "8": {
         "gold_head": "/m/014zcr",
@@ -101,7 +108,8 @@
             "/m/047t_",
             "/m/06s_2",
             "/m/0jdd"
-        ]
+        ],
+        "true_rank": 0
     },
     "9": {
         "gold_head": "/m/07l450",
@@ -114,7 +122,8 @@
             "/m/0hn10",
             "/m/0lsxr",
             "/m/01t_vv"
-        ]
+        ],
+        "true_rank": 23
     },
     "10": {
         "gold_head": "/m/0n5j_",
@@ -127,6 +136,7 @@
             "/m/0mw89",
             "/m/0n5j_",
             "/m/03zrhb"
-        ]
+        ],
+        "true_rank": 0
     }
 }

@@ -3,6 +3,7 @@ import unittest
 
 from explainaboard import FileType, get_processor, TaskType
 from explainaboard.loaders.loader_registry import get_custom_dataset_loader
+from explainaboard.metric import HitsConfig, MeanRankConfig, MeanReciprocalRankConfig
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -27,7 +28,11 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237-subset",
-            "metric_names": ["Hits"],
+            "metric_configs": [
+                HitsConfig(name='Hits4', hits_k=4),  # you can modify k here
+                MeanReciprocalRankConfig(name='MRR'),
+                MeanRankConfig(name='MR'),
+            ],
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
@@ -72,7 +77,11 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237",
-            "metric_names": ["Hits"],
+            "metric_configs": [
+                HitsConfig(name='Hits4', hits_k=4),
+                MeanReciprocalRankConfig(name='MRR'),
+                MeanRankConfig(name='MR'),
+            ],
             "sort_by": "performance_value",
             "sort_by_metric": "first",
         }
@@ -105,7 +114,11 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k-237",
-            "metric_names": ["Hits"],
+            "metric_configs": [
+                HitsConfig(name='Hits4', hits_k=4),
+                MeanReciprocalRankConfig(name='MRR'),
+                MeanRankConfig(name='MR'),
+            ],
             "sort_by": "key",
         }
 

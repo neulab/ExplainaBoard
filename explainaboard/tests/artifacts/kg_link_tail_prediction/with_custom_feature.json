@@ -19,7 +19,8 @@
                 "/m/02l6h",
                 "/m/0kz1h"
             ],
-            "rel_type": "asymmetric"
+            "rel_type": "asymmetric",
+            "true_rank": 0
         },
         "2": {
             "gold_head": "/m/01hww_",
@@ -33,7 +34,8 @@
                 "/m/017lb_",
                 "/m/03c3yf"
             ],
-            "rel_type": "asymmetric"
+            "rel_type": "asymmetric",
+            "true_rank": 12
         },
         "3": {
             "gold_head": "/m/09v3jyg",
@@ -47,7 +49,8 @@
                 "/m/06f32",
                 "/m/0d0kn"
             ],
-            "rel_type": "asymmetric"
+            "rel_type": "asymmetric",
+            "true_rank": 11
         },
         "4": {
             "gold_head": "/m/02jx1",
@@ -61,7 +64,8 @@
                 "/m/03lrc",
                 "/m/01llj3"
             ],
-            "rel_type": "asymmetric"
+            "rel_type": "asymmetric",
+            "true_rank": 7
         },
         "5": {
             "gold_head": "/m/01xdf5",
@@ -75,7 +79,8 @@
                 "/m/03lrc",
                 "/m/01llj3"
             ],
-            "rel_type": "symmetric"
+            "rel_type": "symmetric",
+            "true_rank": 0
         },
         "6": {
             "gold_head": "/m/0mw89",
@@ -89,7 +94,8 @@
                 "/m/01chpn",
                 "/m/02vqsll"
             ],
-            "rel_type": "symmetric"
+            "rel_type": "symmetric",
+            "true_rank": 0
         },
         "7": {
             "gold_head": "/m/01dw4q",
@@ -103,7 +109,8 @@
                 "/m/0b1y_2",
                 "/m/02_06s"
             ],
-            "rel_type": "symmetric"
+            "rel_type": "symmetric",
+            "true_rank": 1
         },
         "8": {
             "gold_head": "/m/014zcr",
@@ -117,7 +124,8 @@
                 "/m/06s_2",
                 "/m/0jdd"
             ],
-            "rel_type": "symmetric"
+            "rel_type": "symmetric",
+            "true_rank": 0
         },
         "9": {
             "gold_head": "/m/07l450",
@@ -131,7 +139,8 @@
                 "/m/0lsxr",
                 "/m/01t_vv"
             ],
-            "rel_type": "asymmetric"
+            "rel_type": "asymmetric",
+            "true_rank": 23
         },
         "10": {
             "gold_head": "/m/0n5j_",
@@ -145,7 +154,8 @@
                 "/m/0n5j_",
                 "/m/03zrhb"
             ],
-            "rel_type": "symmetric"
+            "rel_type": "symmetric",
+            "true_rank": 0
         }
      }
 }

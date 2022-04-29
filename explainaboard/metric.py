@@ -588,6 +588,13 @@ class MeanReciprocalRank(Metric):
             np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
+    def calc_stats_from_rank(
+        self, rank_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        return MetricStats(
+            np.array([1.0 / rank for rank in rank_data if rank is not None])
+        )
+
 
 @dataclass
 class MeanRankConfig(MetricConfig):
@@ -614,6 +621,11 @@ class MeanRank(Metric):
         return MetricStats(
             np.array([self.mr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
+
+    def calc_stats_from_rank(
+        self, rank_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        return MetricStats(np.array([rank for rank in rank_data if rank is not None]))
 
 
 class EaaSMetricStats(MetricStats):
