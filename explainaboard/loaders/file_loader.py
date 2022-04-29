@@ -160,7 +160,7 @@ class FileLoader:
                     cls = type(self).__name__
                     raise ValueError(
                         f'{cls} loading {data}: Could not find field '
-                        '"{field.src_name}" in datapoint {data_point}'
+                        f'"{field.src_name}" in datapoint {data_point}'
                     )
                 parsed_data_point[field.target_name] = self.parse_data(
                     data_point[field.src_name], field
