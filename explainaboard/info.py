@@ -12,7 +12,7 @@ from explainaboard import config
 from explainaboard.feature import Features
 from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer, Tokenizer
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 logger = get_logger(__name__)
@@ -137,7 +137,7 @@ class SysOutputInfo:
     conf_value: float = 0.05
     system_details: Optional[dict] = None
     metric_configs: Optional[list[MetricConfig]] = None
-    tokenizer: Tokenizer = SingleSpaceTokenizer()
+    tokenizer: Optional[Tokenizer] = None
 
     # set later
     # code: str = None

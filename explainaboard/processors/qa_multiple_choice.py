@@ -12,6 +12,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.qa_multiple_choice)
@@ -115,7 +116,10 @@ class QAMultipleChoiceProcessor(Processor):
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['context'], sys_info.tokenizer
+            existing_features,
+            statistics,
+            lambda x: x['context'],
+            unwrap(sys_info.tokenizer),
         )
 
     # training set dependent features
@@ -124,7 +128,10 @@ class QAMultipleChoiceProcessor(Processor):
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['context'], sys_info.tokenizer
+            existing_features,
+            statistics,
+            lambda x: x['context'],
+            unwrap(sys_info.tokenizer),
         )
 
     # --- End feature functions

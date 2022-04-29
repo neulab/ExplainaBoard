@@ -11,6 +11,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.text_pair_classification)
@@ -142,7 +143,7 @@ class TextPairClassificationProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['text1'] + x['text2'],
-            sys_info.tokenizer,
+            unwrap(sys_info.tokenizer),
         )
 
     # training set dependent features (this could be merged into the above one for
@@ -154,5 +155,5 @@ class TextPairClassificationProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['text1'] + x['text2'],
-            sys_info.tokenizer,
+            unwrap(sys_info.tokenizer),
         )

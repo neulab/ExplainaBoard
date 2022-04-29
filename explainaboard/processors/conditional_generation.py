@@ -215,14 +215,20 @@ class ConditionalGenerationProcessor(Processor):
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
+            existing_features,
+            statistics,
+            lambda x: x['source'],
+            unwrap(sys_info.tokenizer),
         )
 
     def _get_src_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
+            existing_features,
+            statistics,
+            lambda x: x['source'],
+            unwrap(sys_info.tokenizer),
         )
 
     def _get_true_label(self, data_point: dict):
