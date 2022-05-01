@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from explainaboard import FileType, get_datalab_loader, Source, TaskType
 from explainaboard.loaders.file_loader import (
+    CoNLLFileLoader,
     DatalabLoaderOption,
     FileLoaderField,
     TextFileLoader,
@@ -33,6 +34,19 @@ class BaseLoaderTests(TestCase):
         samples = [sample for sample in loader.load()]
         self.assertEqual(len(samples), 10)
         self.assertEqual(set(samples[0].keys()), {"id", "field0", "output"})
+
+    def test_conll_loader(self):
+        tabs_path = os.path.join(test_artifacts_path, "ner", "dataset.tsv")
+        spaces_path = os.path.join(test_artifacts_path, "ner", "dataset-space.tsv")
+        loader = CoNLLFileLoader(
+            [
+                FileLoaderField(0, 'tokens', str),
+                FileLoaderField(1, 'true_tags', str),
+            ]
+        )
+        tabs_data = loader.load(tabs_path, Source.local_filesystem)
+        spaces_data = loader.load(spaces_path, Source.local_filesystem)
+        self.assertEqual(tabs_data, spaces_data)
 
     def test_missing_loader(self):
         """raises ValueError because a tsv file loader is not provided by default"""
