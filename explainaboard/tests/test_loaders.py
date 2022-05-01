@@ -38,15 +38,23 @@ class BaseLoaderTests(TestCase):
     def test_conll_loader(self):
         tabs_path = os.path.join(test_artifacts_path, "ner", "dataset.tsv")
         spaces_path = os.path.join(test_artifacts_path, "ner", "dataset-space.tsv")
-        loader = CoNLLFileLoader(
+        loader_true = CoNLLFileLoader(
             [
                 FileLoaderField(0, 'tokens', str),
                 FileLoaderField(1, 'true_tags', str),
             ]
         )
-        tabs_data = loader.load(tabs_path, Source.local_filesystem)
-        spaces_data = loader.load(spaces_path, Source.local_filesystem)
-        self.assertEqual(tabs_data, spaces_data)
+        loader_pred = CoNLLFileLoader(
+            [
+                FileLoaderField(1, 'pred_tags', str),
+            ]
+        )
+        tabs_true = loader_true.load(tabs_path, Source.local_filesystem)
+        spaces_true = loader_true.load(spaces_path, Source.local_filesystem)
+        self.assertEqual(tabs_true, spaces_true)
+        tabs_pred = loader_pred.load(tabs_path, Source.local_filesystem)
+        spaces_pred = loader_pred.load(spaces_path, Source.local_filesystem)
+        self.assertEqual(tabs_pred, spaces_pred)
 
     def test_missing_loader(self):
         """raises ValueError because a tsv file loader is not provided by default"""
