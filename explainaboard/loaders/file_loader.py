@@ -251,11 +251,8 @@ class CoNLLFileLoader(FileLoader):
                     )
 
                 for field in self._fields:
-                    fid = narrow(field.src_name, int)
-                    if fid >= len(splits):
-                        raise ValueError(f'index {fid} out of range for {line}')
                     curr_sentence_fields[field.src_name].append(
-                        self.parse_data(splits[fid], field)
+                        self.parse_data(splits[narrow(field.src_name, int)], field)
                     )
 
         add_sample()  # add last example
