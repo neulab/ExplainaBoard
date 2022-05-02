@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import json
 import os
 from pathlib import Path
@@ -62,19 +63,28 @@ def write_statistics_to_cache(
         return json.dump(content, stats_out)
 
 
-def cache_online_file(online_path: str, local_path: str) -> str:
+def cache_online_file(
+    online_path: str, local_path: str, lifetime: datetime.timedelta | None = None
+) -> str:
     """
     Caches an online file locally and returns the path to the local file.
     :param online_path: The path online
     :param local_path: The relative path to the file locally
+    :param lifetime: How long this file should be cached before reloading
     :return: The absolute file to the cached path locally
     """
     sanitized_path = sanitize_path(local_path)
     file_path = os.path.join(get_cache_dir(), sanitized_path)
-    if not os.path.exists(file_path):
-        get_logger().info(f'Caching {online_path} to {file_path}')
-        path_dir = Path(file_path).parent.absolute()
-        if not os.path.exists(path_dir):
-            os.makedirs(path_dir)
-        urllib.request.urlretrieve(online_path, file_path)
+    # Use cached file if it exists and is young enough
+    if os.path.exists(file_path):
+        mod_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+        age = datetime.datetime.now() - mod_time
+        if lifetime is None or age <= lifetime:
+            return file_path
+    # Else download from online
+    get_logger().info(f'Caching {online_path} to {file_path}')
+    path_dir = Path(file_path).parent.absolute()
+    if not os.path.exists(path_dir):
+        os.makedirs(path_dir)
+    urllib.request.urlretrieve(online_path, file_path)
     return file_path
