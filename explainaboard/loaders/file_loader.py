@@ -236,18 +236,19 @@ class CoNLLFileLoader(FileLoader):
                     field.src_name: [] for field in self._fields
                 }  # reset
 
+        max_field: int = max([narrow(x.src_name, int) for x in self._fields])
         for line in raw_data:
             # at sentence boundary
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
                 add_sample()
             else:
                 splits = line.split("\t")
-                if len(splits) < len(self._fields):  # not separated by tabs
+                if len(splits) <= max_field:  # not separated by tabs
                     splits = line.split(" ")
-                    if len(splits) < len(self._fields):  # not separated by spaces
-                        raise ValueError(
-                            f"not enough fields for {line} (sentence index: {guid})"
-                        )
+                if len(splits) <= max_field:  # not separated by tabs or spaces
+                    raise ValueError(
+                        f"not enough fields for {line} (sentence index: {guid})"
+                    )
 
                 for field in self._fields:
                     curr_sentence_fields[field.src_name].append(
