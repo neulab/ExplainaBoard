@@ -10,6 +10,7 @@ from tqdm import tqdm
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metric import (
+    Hits,
     HitsConfig,
     MeanRank,
     MeanRankConfig,
@@ -197,13 +198,19 @@ class KGLinkTailPredictionProcessor(Processor):
         rank_data = [
             self._get_rank_data(x) for x in sys_output
         ]  # rank of true entity in predictions
-        assert all(
-            item is not None for item in rank_data
-        ), 'Some data points do not have rank information; check your system outptus.'
+
+        if any(item is None for item in rank_data):
+            raise ValueError(
+                'Some data points do not have rank information; check system outputs.'
+            )
 
         metric_stats = []
         for metric in metrics:
-            if isinstance(metric, MeanReciprocalRank) or isinstance(metric, MeanRank):
+            if (
+                isinstance(metric, MeanReciprocalRank)
+                or isinstance(metric, MeanRank)
+                or isinstance(metric, Hits)
+            ):
                 metric_stats.append(metric.calc_stats_from_rank(rank_data))
             else:
                 metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
@@ -317,4 +324,15 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         return data_point["predictions"]
 
     def _get_rank_data(self, data_point: dict):
-        return data_point.get("true_rank", None)
+
+        true_label = self._get_true_label(data_point)
+        predictions = self._get_predicted_label(data_point)
+
+        if "true_rank" in data_point.keys():
+            return data_point["true_rank"]
+        elif true_label in predictions:
+            return predictions.index(true_label)
+        # elif default_rank is not None:
+        #     return default_rank
+        else:
+            return None
