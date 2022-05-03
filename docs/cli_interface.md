@@ -29,6 +29,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Language Modeling](#language-modeling)
 * [Named Entity Recognition](#named-entity-recognition)
 * [Word Segmentation](#word-segmentation)
+* [Chunking](#chunking)
 * [Extractive QA](#extractive-qa)
 * [Multiple Choice QA](#multiple-choice-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
@@ -145,6 +146,24 @@ Alternatively, you can reference a dataset file directly.
 ```
 explainaboard --task word-segmentation --custom_dataset_paths ./data/system_outputs/cws/test.tsv --system_outputs ./data/system_outputs/cws/prediction.tsv
 ```
+
+
+## Chunking
+Dividing text into syntactically related non-overlapping groups of words.
+
+**CLI Example**
+
+The below example loads the `conll00_chunk` dataset from DataLab:
+```shell
+explainaboard --task chunking --dataset conll00_chunk --system_outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
+```
+
+Alternatively, you can reference a dataset file directly.
+```
+explainaboard --task chunking --custom_dataset_paths ./data/system_outputs/chunking/dataset-test-conll00.tsv --system_outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
+```
+
+
 
 ## [Extractive QA](task_extractive_qa.md)
 

@@ -79,6 +79,12 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conll2003/
 identify word boundaries of some languages (e.g., Chinese).
 """,
             ),
+            Task(
+                name=TaskType.chunking,
+                description="""
+Dividing text into syntactically related non-overlapping groups of words.
+""",
+            ),
         ],
     ),
     TaskCategory(

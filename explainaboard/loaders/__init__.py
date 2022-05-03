@@ -1,5 +1,6 @@
 from explainaboard.loaders import (
     aspect_based_sentiment_classification,
+    chunking,
     conditional_generation,
     extractive_qa,
     file_loader,
@@ -30,4 +31,5 @@ __all__ = [
     'text_classification',
     'text_pair_classification',
     'word_segmentation',
+    'chunking',
 ]
