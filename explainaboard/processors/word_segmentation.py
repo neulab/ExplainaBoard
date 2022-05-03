@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Iterator
+from dataclasses import asdict
 from typing import Any
 
 from datalabs import aggregating, Dataset
@@ -19,8 +20,8 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.tasks import TaskType
 from explainaboard.utils import bucketing
 from explainaboard.utils.logging import progress
-from explainaboard.utils.py_utils import sort_dict
-from explainaboard.utils.span_utils import BMESSpanOps, Span
+from explainaboard.utils.py_utils import freeze, sort_dict
+from explainaboard.utils.span_utils import BMESSpanOps
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -193,7 +194,10 @@ class CWSProcessor(Processor):
                 "efre_dic": efre_dic,
             }
         )
-        spans = bmes_span_ops.get_spans(seq=sentence, tags=tags)
+
+        spans = [
+            asdict(span) for span in bmes_span_ops.get_spans(seq=sentence, tags=tags)
+        ]
 
         return spans
 
@@ -252,8 +256,8 @@ class CWSProcessor(Processor):
         feat_dict = {}
         for sample_id, my_output in enumerate(sys_output):
             for tok_id, span_info in enumerate(output_to_toks(my_output)):
-                span_info.sample_id = sample_id
-                feat_dict[span_info] = getattr(span_info, feature_name)
+                span_info["sample_id"] = sample_id
+                feat_dict[freeze(span_info)] = span_info[feature_name]
         return feat_dict
 
     def _get_span_sample_features(
@@ -339,7 +343,7 @@ class CWSProcessor(Processor):
 
     def _add_to_sample_dict(
         self,
-        spans: list[Span],
+        spans: list[dict],
         type_id: str,
         sample_dict: defaultdict[tuple, dict[str, str]],
     ):
@@ -348,17 +352,18 @@ class CWSProcessor(Processor):
         (e.g., length)
         """
         for span in spans:
-            pos = (span.sample_id, span.span_pos, span.span_text)
+            span = dict(span)
+            pos = (span["sample_id"], span["span_pos"], span["span_text"])
             sample_dict[pos][type_id] = (
-                span.span_tag if span.span_tag is not None else ""
+                span["span_tag"] if span["span_tag"] is not None else ""
             )
 
     def get_bucket_cases_cws(
         self,
         bucket_interval: str,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[Span]],
-        samples_over_bucket_pred: dict[str, list[Span]],
+        samples_over_bucket_true: dict[str, list[dict]],
+        samples_over_bucket_pred: dict[str, list[dict]],
     ) -> list:
         # Index samples for easy comparison
         sample_dict: defaultdict[tuple, dict[str, str]] = defaultdict(lambda: dict())
@@ -389,8 +394,8 @@ class CWSProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[Span]],
-        samples_over_bucket_pred: dict[str, list[Span]],
+        samples_over_bucket_true: dict[str, list[dict]],
+        samples_over_bucket_pred: dict[str, list[dict]],
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
