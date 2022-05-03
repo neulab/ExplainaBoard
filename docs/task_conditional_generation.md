@@ -7,6 +7,9 @@ This can include a wide variety of tasks, such as:
   An example dataset may be [CNN/Daily Mail](http://datalab.nlpedia.ai/#/normal_dataset/6176883933e51a7edda9dd68/dataset_metadata).
 * **Machine Translation:** generates a text *y* in one language given an input text *x* in another language.
   An example dataset may be the [TED Multilingual Dataset](https://huggingface.co/datasets/ted_multi).
+* **Code Generation:** generates a program *y* in a programming language such as Python given an input command *x* in natural language.
+  An example dataset may be the [CoNaLa](https://conala-corpus.github.io/) English to Python generation dataset.
+
 
 ## Data Preparation
 
@@ -24,9 +27,11 @@ And here are two examples for machine translation from Slovak to English, an NMT
 * [ted_multi_slk_eng-nmt-output.txt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt) 
 * [ted_multi_slk_eng-pbmt-output.txt](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/ted_multi/ted_multi_slk_eng-pbmt-output.txt) 
 
+Here is an example output for code generation. Note that this is in JSON format, and specifically specifies Python as the output language.
+This is important so the code is tokenized properly during evaluation.
+* [conala-baseline-output.json](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/conala/conala-baseline-output.json)
 
-
-## Performing Basic Analysis
+## Performing Basic Analysis on Summarization
 
 The preferred method of doing analysis is to load the dataset from DataLab.
 You can load the`cnn_dailymail` dataset but because the test set is large we don't
@@ -60,11 +65,26 @@ In this case, we can directly use the miniature dataset distributed with the rep
 explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system_outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
 ```
 
-You can also try it for translation as below:
+## Other Task Examples
+
+### Machine Translation
+
+Try it out for translation as below. The examples use a custom dataset that is not included in DataLab at the moment.
 ```shell
 explainaboard --task machine-translation --custom_dataset_paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system_outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
 ```
 
+### Code Generation
+
+You can try out evaluation of code generation on the CoNaLa dataset in DataLab as below:
+```shell
+explainaboard --task machine-translation --dataset conala --output_file_type json --system_outputs ./data/system_outputs/conala/conala-baseline-output.json --report_json report.json
+```
+
+You can also use a custom code generation dataset:
+```shell
+explainaboard --task machine-translation --custom_dataset_file_type json --custom_dataset_paths data/system_outputs/conala/conala-dataset.json --output_file_type json --system_outputs ./data/system_outputs/conala/conala-baseline-output.json --report_json report.json
+```
 
 ## Notes
 

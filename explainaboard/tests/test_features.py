@@ -59,10 +59,6 @@ class TestFeature(unittest.TestCase):
         )
 
         a_dict = asdict(a)
-        print(a)
-        print("------------")
-        print(FeatureType.from_dict(a_dict))
-
         self.assertEqual(
             FeatureType.from_dict(a_dict).feature.feature, a.feature.feature
         )

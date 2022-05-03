@@ -7,7 +7,6 @@ from typing import Any
 from datalabs import aggregating
 from eaas.async_client import AsyncClient
 import numpy as np
-from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
@@ -22,6 +21,7 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
@@ -215,14 +215,20 @@ class ConditionalGenerationProcessor(Processor):
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
+            existing_features,
+            statistics,
+            lambda x: x['source'],
+            unwrap(sys_info.tokenizer),
         )
 
     def _get_src_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features, statistics, lambda x: x['source'], sys_info.tokenizer
+            existing_features,
+            statistics,
+            lambda x: x['source'],
+            unwrap(sys_info.tokenizer),
         )
 
     def _get_true_label(self, data_point: dict):
@@ -338,7 +344,6 @@ class ConditionalGenerationProcessor(Processor):
                     )
                 else:
                     dict_sysout[bucket_key] = bucket_func(sys_info, dict_sysout)
-                    # print(dict_sysout[bucket_key])
 
             # span features for true and predicted spans
             ref_toks = sys_info.tokenize(dict_sysout['reference'])
@@ -415,7 +420,7 @@ class ConditionalGenerationProcessor(Processor):
         samples_over_bucket_pred = {}
 
         # Second, get the buckets for tokens
-        for feature_name in tqdm(tok_feats, desc="bucketing token features"):
+        for feature_name in progress(tok_feats, desc="bucketing token features"):
 
             # Choose behavior based on whether this is a feature of samples or spans
             my_feature = features["ref_tok_info"].feature.feature[feature_name]

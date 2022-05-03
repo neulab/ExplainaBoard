@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from datalabs import aggregating
-from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
@@ -12,6 +11,7 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
+from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
@@ -243,7 +243,7 @@ class LanguageModelingProcessor(Processor):
         for x in active_features:
             (sent_feats if (x in sys_features) else tok_feats).append(x)
 
-        for _id, (dict_sysout, tokens, log_probs) in tqdm(
+        for _id, (dict_sysout, tokens, log_probs) in progress(
             enumerate(zip(sys_output, all_tokens, all_log_probs)), desc="featurizing"
         ):
             # Get values of bucketing features
@@ -321,7 +321,7 @@ class LanguageModelingProcessor(Processor):
         )
 
         # Bucketing
-        for feature_name in tqdm(tok_feats, desc="token-level bucketing"):
+        for feature_name in progress(tok_feats, desc="token-level bucketing"):
             my_feature = features["tok_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
@@ -409,7 +409,7 @@ class LanguageModelingProcessor(Processor):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0
-        for sample in tqdm(samples):
+        for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)
             length = len(tokens)

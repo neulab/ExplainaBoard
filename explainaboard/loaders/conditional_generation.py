@@ -41,13 +41,13 @@ class ConditionalGenerationLoader(Loader):
             FileType.json: JSONFileLoader(
                 [
                     FileLoaderField("source", field_names[0], str),
-                    FileLoaderField("references", field_names[1], str),
+                    FileLoaderField("reference", field_names[1], str),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
                 [
                     FileLoaderField("source", field_names[0], str),
-                    FileLoaderField("references", field_names[1], str),
+                    FileLoaderField("reference", field_names[1], str),
                 ]
             ),
         }
@@ -78,7 +78,7 @@ class SummarizationLoader(ConditionalGenerationLoader):
             FileType.json: JSONFileLoader(
                 [
                     FileLoaderField("source", field_names[0], str),
-                    FileLoaderField("references", field_names[1], str),
+                    FileLoaderField("reference", field_names[1], str),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(

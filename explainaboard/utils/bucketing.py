@@ -114,10 +114,7 @@ def bucket_attribute_specified_bucket_interval(
         for val in intervals:
             if val not in dict_bucket2span.keys():
                 dict_bucket2span[val] = []
-    # print("dict_bucket2span: ",dict_bucket2span)
     else:
-        # print("---debug----5")
-        # print(intervals)
         dict_att_val2span = reverse_dict(dict_span2att_val)
         dict_att_val2span = sort_dict(dict_att_val2span)
         for v in intervals:
@@ -126,11 +123,8 @@ def bucket_attribute_specified_bucket_interval(
             else:
                 dict_bucket2span[v] = []
 
-        # print("debug-interval:\t", intervals)
-
         for att_val, entity in dict_att_val2span.items():
             res_key = find_key(dict_bucket2span, att_val)
-            # print("res-key:\t"+ str(res_key))
             if res_key is None:
                 continue
             dict_bucket2span[res_key] += entity

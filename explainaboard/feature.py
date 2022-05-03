@@ -188,7 +188,6 @@ class Features(dict):
                         dict_res[k] = v
 
         for feature_name, feature_info in dict_res.items():
-            # print(k,v)
             if feature_info.is_bucket:
                 if include_training_dependent or not feature_info.require_training_set:
                     bucket_features.append(feature_name)
@@ -228,7 +227,6 @@ class Features(dict):
                         dict_res[k] = v
 
         for feature_name, feature_info in dict_res.items():
-            # print(k,v)
             if "require_training_set" not in feature_info.__dict__.keys():
                 continue
             if feature_info.require_training_set:

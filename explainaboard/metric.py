@@ -326,7 +326,6 @@ class F1Score(Metric):
         if agg_stats.size == 1:
             return float(agg_stats)
 
-        # print(agg_stats)
         config = cast(F1ScoreConfig, self._get_config(config))
         supported_averages = {'micro', 'macro'}
         stat_mult: int = 4 if config.separate_match else 3

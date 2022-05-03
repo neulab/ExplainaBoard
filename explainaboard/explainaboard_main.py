@@ -18,6 +18,7 @@ from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.metric import metric_name_to_config
+from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,
@@ -89,8 +90,6 @@ def analyze_reports(args):
             # TODO(Pengfei): So far, only one metric is considered
             metric = report_dict["metric_names"][0]
             score_info = report_dict["results"]["overall"][metric]
-
-            # print(model_name, dataset_name, language)
 
             if model_name not in score_tensor.keys():
                 score_tensor[model_name] = {}
@@ -308,7 +307,7 @@ def main():
                     with open(args.system_details) as fin:
                         return json.load(fin)
                 except ValueError as e:
-                    print('invalid json: %s for system details' % e)
+                    raise ValueError(f'invalid json: {e} for system details')
 
         output_dir_figures = os.path.join(output_dir, "figures")
         output_dir_reports = os.path.join(output_dir, "reports")
@@ -423,10 +422,19 @@ def main():
             ] = loader.user_defined_features_configs
             metadata["task_name"] = task
 
-            report = get_processor(task=task).process(
-                metadata=metadata, sys_output=system_dataset
-            )
+            processor = get_processor(task=task)
+            report = processor.process(metadata=metadata, sys_output=system_dataset)
             reports.append(report)
+
+            # print to the console
+            get_logger('report').info('--- Overall Performance')
+            for metric_stat in report.results.overall.values():
+                get_logger('report').info(
+                    f'{metric_stat.metric_name}\t{metric_stat.value}'
+                )
+            get_logger('report').info('')
+            get_logger('report').info('--- Bucketed Performance')
+            processor.print_bucket_info(report.results.fine_grained)
 
             # save report to `output_dir_reports`
             x_file_name = os.path.basename(system_full_path).split(".")[0]

@@ -7,7 +7,6 @@ from typing import Any, Optional
 from datalabs import aggregating, Dataset, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
-from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import (
@@ -26,7 +25,8 @@ from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
 )
-from explainaboard.utils.py_utils import eprint, sort_dict
+from explainaboard.utils.logging import get_logger, progress
+from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.tokenizer import get_default_tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
@@ -113,7 +113,7 @@ class Processor(metaclass=abc.ABCMeta):
                 except Exception:
                     dataset = None
                 if dataset is None:
-                    eprint(
+                    get_logger().warning(
                         f"{sys_info.dataset_name} hasn't been supported by DataLab so"
                         " no training set dependent features will be supported by"
                         " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
@@ -122,12 +122,13 @@ class Processor(metaclass=abc.ABCMeta):
                     self._statistics_func.resources = self._get_statistics_resources(
                         sys_info, dataset[split_name]
                     )
-                    # print(f"self._statistics_func.resources:f\t{self._statistics_func.resources}")
                     new_train = dataset[split_name].apply(
                         self._statistics_func, mode="local"
                     )
                     statistics = new_train._stat
-                    eprint(f"caching stats for {sys_info.dataset_name} {sub_dataset}")
+                    get_logger().info(
+                        f"caching stats for {sys_info.dataset_name} {sub_dataset}"
+                    )
                     write_statistics_to_cache(
                         statistics, sys_info.dataset_name, sub_dataset
                     )
@@ -271,7 +272,7 @@ class Processor(metaclass=abc.ABCMeta):
                     sys_features[bucket_feature].require_training_set,
                 )
 
-        for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
+        for _id, dict_sysout in progress(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             for (
                 bucket_key,
@@ -326,7 +327,7 @@ class Processor(metaclass=abc.ABCMeta):
         # Bucketing
         samples_over_bucket = {}
         performances_over_bucket = {}
-        for feature_name in tqdm(active_features, desc="sample-level bucketing"):
+        for feature_name in progress(active_features, desc="sample-level bucketing"):
             # Preparation for bucketing
             bucket_func = getattr(
                 explainaboard.utils.bucketing,
@@ -472,7 +473,7 @@ class Processor(metaclass=abc.ABCMeta):
             overall_results[metric_cfg.name] = overall_performance
         return overall_results
 
-    def _print_bucket_info(
+    def print_bucket_info(
         self, performances_over_bucket: dict[str, dict[str, BucketPerformance]]
     ):
         """
@@ -654,21 +655,12 @@ class Processor(metaclass=abc.ABCMeta):
         samples_over_bucket, performance_over_bucket = self._bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
-
-        # sort before printing
         performance_over_bucket = self.sort_bucket_info(
             performance_over_bucket,
-            sort_by=metadata.get(
-                'sort_by', 'key'
-            ),  # or 'key' to sort by bucket name, alphabetically
-            sort_by_metric=metadata.get(
-                'sort_by_metric', 'first'
-            ),  # or whichever metric the user wants.
-            # Applicable when sort_by == 'value'
+            sort_by=metadata.get('sort_by', 'key'),
+            sort_by_metric=metadata.get('sort_by_metric', 'first'),
             sort_ascending=metadata.get('sort_ascending', False),
         )
-
-        self._print_bucket_info(performance_over_bucket)
         sys_info.results = Result(
             overall=overall_results, fine_grained=performance_over_bucket
         )

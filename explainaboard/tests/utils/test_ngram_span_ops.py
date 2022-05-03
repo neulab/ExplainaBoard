@@ -12,7 +12,6 @@ class TestSpanOps(unittest.TestCase):
         spans, _ = ngram_span_ops.get_spans_and_match(tags=tags, tags_other=[])
 
         span_list = [span.get_span_text for span in spans]
-        # print(span_list)
         self.assertEqual(
             span_list,
             [

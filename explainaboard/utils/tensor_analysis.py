@@ -3,6 +3,8 @@ from typing import Optional
 
 import numpy as np
 
+from explainaboard.utils.logging import get_logger
+
 
 def aggregate_score_tensor(
     score_tensor: dict,
@@ -38,7 +40,6 @@ def aggregate_score_tensor(
                     list(score_tensor[model_name][dataset_name].values())[0]
                 )
 
-                # print(score_info_template)
                 score_tensor_aggregated_language[model_name][dataset_name] = {}
                 aggregated_score = np.average(
                     [
@@ -172,6 +173,7 @@ def print_score_tensor(score_tensor: dict):
     Accuracy:       0.933   0.915   0.934   0.926   0.915   0.871
 
     """
+    get_logger('report').info(score_tensor.keys())
     for model_name, m_value in score_tensor.items():
         for dataset_name, d_value in score_tensor[model_name].items():
             info_printed = (
@@ -197,4 +199,4 @@ def print_score_tensor(score_tensor: dict):
                 )
                 + "\n"
             )
-            print(info_printed)
+            get_logger('report').info(info_printed)

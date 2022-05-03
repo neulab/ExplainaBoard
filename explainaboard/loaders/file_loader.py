@@ -151,6 +151,17 @@ class FileLoader:
             parsed_data_point = {}
 
             for field in self._fields:  # parse data point according to fields
+                if (
+                    isinstance(data_point, list)
+                    and int(field.src_name) >= len(data_point)
+                ) or (
+                    isinstance(data_point, dict) and field.src_name not in data_point
+                ):
+                    cls = type(self).__name__
+                    raise ValueError(
+                        f'{cls} loading {data}: Could not find field '
+                        f'"{field.src_name}" in datapoint {data_point}'
+                    )
                 parsed_data_point[field.target_name] = self.parse_data(
                     data_point[field.src_name], field
                 )
@@ -225,18 +236,19 @@ class CoNLLFileLoader(FileLoader):
                     field.src_name: [] for field in self._fields
                 }  # reset
 
+        max_field: int = max([narrow(x.src_name, int) for x in self._fields])
         for line in raw_data:
             # at sentence boundary
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
                 add_sample()
             else:
                 splits = line.split("\t")
-                if len(splits) < len(self._fields):  # not separated by tabs
+                if len(splits) <= max_field:  # not separated by tabs
                     splits = line.split(" ")
-                    if len(splits) < len(self._fields):  # not separated by spaces
-                        raise ValueError(
-                            f"not enough fields for {line} (sentence index: {guid})"
-                        )
+                if len(splits) <= max_field:  # not separated by tabs or spaces
+                    raise ValueError(
+                        f"not enough fields for {line} (sentence index: {guid})"
+                    )
 
                 for field in self._fields:
                     curr_sentence_fields[field.src_name].append(

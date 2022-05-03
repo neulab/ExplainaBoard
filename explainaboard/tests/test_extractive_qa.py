@@ -4,6 +4,7 @@ import unittest
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.tests.utils import test_artifacts_path
+from explainaboard.utils.logging import get_logger
 
 
 class TestExtractiveQA(unittest.TestCase):
@@ -45,7 +46,7 @@ class TestExtractiveQA(unittest.TestCase):
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
-        print(f'OVERALL={sys_info.results.overall}')
+        get_logger('test').info(f'OVERALL={sys_info.results.overall}')
         # should be 0.6974789915966386
         self.assertAlmostEqual(
             sys_info.results.overall["ExactMatch"].value,
@@ -84,7 +85,9 @@ class TestExtractiveQA(unittest.TestCase):
         processor = get_processor(TaskType.question_answering_extractive)
 
         sys_info = processor.process(metadata, data)
-        print(f'--------- sys_info.metric_configs {sys_info.metric_configs}')
+        get_logger('test').info(
+            f'--------- sys_info.metric_configs {sys_info.metric_configs}'
+        )
 
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)

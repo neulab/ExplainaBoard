@@ -12,8 +12,7 @@ from explainaboard import config
 from explainaboard.feature import Features
 from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.py_utils import eprint
-from explainaboard.utils.tokenizer import SingleSpaceTokenizer, Tokenizer
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 logger = get_logger(__name__)
@@ -138,7 +137,7 @@ class SysOutputInfo:
     conf_value: float = 0.05
     system_details: Optional[dict] = None
     metric_configs: Optional[list[MetricConfig]] = None
-    tokenizer: Tokenizer = SingleSpaceTokenizer()
+    tokenizer: Optional[Tokenizer] = None
 
     # set later
     # code: str = None
@@ -264,13 +263,16 @@ class FineGrainedStatistics:
 def print_bucket_dict(dict_obj: dict[str, BucketPerformance], print_information: str):
     metric_names = [x.metric_name for x in next(iter(dict_obj.values())).performances]
     for i, metric_name in enumerate(metric_names):
-        # print("-----------------------------------------------")
-        eprint(f"the information of #{print_information}#")
-        eprint(f"bucket_interval\t{metric_name}\t#samples")
+        get_logger('report').info(f"the information of #{print_information}#")
+        get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
         for k, v in dict_obj.items():
             if len(k) == 1:
-                eprint(f"[{k[0]},]\t{v.performances[i].value}\t{v.n_samples}")
+                get_logger('report').info(
+                    f"[{k[0]},]\t{v.performances[i].value}\t{v.n_samples}"
+                )
             else:
-                eprint(f"[{k[0]},{k[1]}]\t{v.performances[i].value}\t{v.n_samples}")
+                get_logger('report').info(
+                    f"[{k[0]},{k[1]}]\t{v.performances[i].value}\t{v.n_samples}"
+                )
 
-        eprint("")
+        get_logger('report').info('')

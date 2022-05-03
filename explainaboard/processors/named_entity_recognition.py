@@ -4,7 +4,6 @@ from collections import defaultdict
 from collections.abc import Callable, Iterator
 
 from datalabs import aggregating, Dataset
-from tqdm import tqdm
 
 from explainaboard import feature, TaskType
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
@@ -18,6 +17,7 @@ from explainaboard.metric import (
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing, span_utils
+from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.span_utils import BIOSpanOps, Span
 from explainaboard.utils.tokenizer import Tokenizer
@@ -203,7 +203,7 @@ class NERProcessor(Processor):
 
         vocab: dict[str, int] = {}
         tag_vocab: dict[str, int] = {}
-        for sample in tqdm(samples):
+        for sample in progress(samples):
             rep_sample = DatalabFileLoader.replace_labels(dl_features, sample)
             tokens, tags = rep_sample["tokens"], rep_sample["tags"]
 
@@ -309,7 +309,7 @@ class NERProcessor(Processor):
             (sent_feats if (x in sys_features) else tok_feats).append(x)
 
         bio_span_ops = BIOSpanOps()
-        for _id, dict_sysout in tqdm(enumerate(sys_output), desc="featurizing"):
+        for _id, dict_sysout in progress(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
             tokens = dict_sysout["tokens"]
 
@@ -390,7 +390,7 @@ class NERProcessor(Processor):
 
         # Bucketing
         samples_over_bucket_pred = {}
-        for feature_name in tqdm(tok_feats, desc="span-level bucketing"):
+        for feature_name in progress(tok_feats, desc="span-level bucketing"):
             my_feature = features["true_entity_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
@@ -517,8 +517,6 @@ class NERProcessor(Processor):
             true_labels = [x['true_label'] for x in bucket_samples]
             pred_labels = [x['predicted_label'] for x in bucket_samples]
 
-            # print(true_labels)
-
             bucket_samples_errors = [
                 v for v in bucket_samples if v["true_label"] != v["predicted_label"]
             ]
@@ -566,7 +564,7 @@ class NERProcessor(Processor):
         chunk_to_tag: dict[tuple[int, int], str] = {}
         entity_to_tagcnt: dict[str, dict[str, int]] = {}
         efre_dic: dict[str, int] = {}
-        for true_chunk in tqdm(chunks_train):
+        for true_chunk in progress(chunks_train):
             idx_start = true_chunk[1]
             idx_end = true_chunk[2]
             chunk_to_tag[(idx_start, idx_end)] = true_chunk[0]
