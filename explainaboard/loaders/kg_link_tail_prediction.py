@@ -84,9 +84,9 @@ class KgLinkTailPredictionLoader(Loader):
                         "gold_" + features_dict["predict"]
                     ],  # the entity to which we compare the predictions
                     "predictions": features_dict["predictions"],
-                    "true_rank": features_dict["true_rank"]
-                    if "true_rank" in features_dict.keys()
-                    else None,  # rank of the true entity in predictions
+                    "true_rank": features_dict.get(
+                        "true_rank", None
+                    ),  # rank of the true entity in predictions
                 }
 
                 # additional user-defined features
@@ -115,9 +115,9 @@ class KgLinkTailPredictionLoader(Loader):
                             "gold_" + features_dict["predict"]
                         ],  # the entity to which we compare the predictions
                         "predictions": features_dict["predictions"],
-                        "true_rank": features_dict["true_rank"]
-                        if "true_rank" in features_dict.keys()
-                        else None,  # rank of the true entity in predictions
+                        "true_rank": features_dict.get(
+                            "true_rank", None
+                        ),  # rank of the true entity in predictions
                     }
                 )
         return data
