@@ -144,6 +144,10 @@ class SpanOps:
         )
         self.match_func = self.get_match_funcs()[self.match_type]
 
+    def set_resources(self, resources: dict[str, Any]):
+        self.resources = resources
+        return resources
+
     @classmethod
     def default_match_type(cls) -> str:
         return "tag"
@@ -188,6 +192,11 @@ class SpanOps:
 
     @abc.abstractmethod
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
+        """Return spans from a sequence of tags and tokens"""
+        ...
+
+    @abc.abstractmethod
+    def get_spans_simple(self, tags: list, seq: Optional[list] = None) -> list:
         """Return spans from a sequence of tags and tokens"""
         ...
 
@@ -301,6 +310,35 @@ class BMESSpanOps(SpanOps):
     def default_match_type(cls) -> str:
         return "position_tag"
 
+    def get_spans_simple(self, tags: list, seq: Optional[list] = None) -> list:
+        """
+        :param seq: ["B", "E", "S", "B", "E","B","M","E"]
+        :return:
+        ([('BE', 0, 2), ('S', 2, 3), ('BE', 3, 5), ('BME', 5, 8)],
+         ['BE', 'BE', 'S', 'BE', 'BE', 'BME', 'BME', 'BME'])
+        """
+        spans = []
+        w_start = 0
+        chunk = None
+        tag = ""
+
+        for i, tok in enumerate(tags):
+            tag += tok
+            if tok == "S":
+                chunk = ("S", i, i + 1)
+                spans.append(chunk)
+
+                tag = ""
+            if tok == "B":
+                w_start = i
+            if tok == "E":
+                chunk = (tag, w_start, i + 1)
+                spans.append(chunk)
+
+                tag = ""
+
+        return spans
+
     def get_spans(self, tags: list, seq: Optional[list] = None) -> list[Span]:
         """
         :param seq: ["B", "E", "S", "B", "E","B","M","E"]
@@ -325,6 +363,7 @@ class BMESSpanOps(SpanOps):
                     span_pos=(i, i + 1),
                     span_rel_pos=i * 1.0 / len(tags),
                     span_chars=len(span_text),
+                    span_tokens=len(span_text.split(" ")),
                 )
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
                     lower_tag = span.span_tag
@@ -346,6 +385,7 @@ class BMESSpanOps(SpanOps):
                     span_pos=(w_start, i + 1),
                     span_rel_pos=w_start * 1.0 / len(tags),
                     span_chars=len(span_text),
+                    span_tokens=len(span_text.split(" ")),
                 )
                 if "has_stats" in self.resources.keys() and self.resources["has_stats"]:
                     lower_tag = span.span_tag
@@ -459,6 +499,46 @@ class BIOSpanOps(SpanOps):
                     f'{lower_text}|||{lower_tag}', 0.0
                 )
                 span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
+            spans.append(span)
+
+        return spans
+
+    def get_spans_simple(self, tags: list, seq: Optional[list] = None) -> list:
+        """
+        Takes in a BIO-tagged sequence of tokens, and returns tagged spans.
+        :param bio_seq: A sequence of bio-tagged strings
+                        such as ['O', 'B-PER', 'I-PER', 'B-ORG', 'O']
+        :return: A sequence of spans in format (tag,begin,end),
+                 such as [('PER',1,3), ('ORG',3,4)]
+        """
+
+        default = 'O'
+        # idx_to_tag = {idx: tag for tag, idx in tags.items()}
+        spans = []
+        span_type, span_start = None, -1
+        for i, tok in enumerate(tags):
+            # End of a span 1
+            if tok == default and span_type is not None:
+                # Add a span.
+                span = (span_type, span_start, i)
+                spans.append(span)
+                span_type, span_start = None, -1
+
+            # End of a span + start of a span!
+            elif tok != default:
+
+                tok_span_class, tok_span_type = tok.split('-')
+                if span_type is None:
+                    span_type, span_start = tok_span_type, i
+                elif tok_span_type != span_type or tok_span_class == "B":
+                    span = (span_type, span_start, i)
+                    spans.append(span)
+                    span_type, span_start = tok_span_type, i
+            else:
+                pass
+        # end condition
+        if span_type is not None:
+            span = (span_type, span_start, len(tags))
             spans.append(span)
 
         return spans
