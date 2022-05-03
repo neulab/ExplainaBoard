@@ -4,6 +4,7 @@ from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
 )
@@ -31,13 +32,20 @@ class WSLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        field_names = ["tokens", "true_tags"]
         return {
             FileType.conll: CoNLLFileLoader(
                 [
                     FileLoaderField(0, "tokens", str),
                     FileLoaderField(1, "true_tags", str),
                 ]
-            )
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("tokens", field_names[0], list),
+                    FileLoaderField("tags", field_names[1], list),
+                ]
+            ),
         }
 
     @classmethod

@@ -519,9 +519,8 @@ class SeqLabProcessor(Processor):
 
         return sort_dict(bucket_name_to_performance)
 
-    @classmethod
     def get_econ_efre_dic(
-        cls, words: list[str], bio_tags: list[str]
+        self, words: list[str], bio_tags: list[str]
     ) -> tuple[dict[str, float], dict[str, int]]:
         """
         Calculate the entity label consistency and frequency features from this paper
@@ -532,7 +531,7 @@ class SeqLabProcessor(Processor):
                     econ: 'span|||tag' pointing to entity consistency values
                     efre: 'span' pointing to entity frequency values
         """
-        chunks_train = cls._span_ops.get_spans_simple(bio_tags)
+        chunks_train = self._span_ops.get_spans_simple(bio_tags)
 
         # Create pseudo-trie
         prefixes: set[str] = set()
