@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Any, Optional
 
 
@@ -94,49 +95,35 @@ def get_spans_from_bmes(seq: list) -> list[tuple[str, int, int]]:
     return spans
 
 
+@dataclass
 class Span:
-    def __init__(
-        self,
-        # surface string a span
-        span_text: Optional[str] = None,
-        # the tag of a span
-        span_tag: Optional[str] = None,
-        # whether span could be matched
-        span_matched: int = 0,
-        # the position of a span
-        span_pos: Optional[tuple] = None,
-        # span capital features
-        span_capitalness: Optional[str] = None,
-        # the relative position of a span in a sequence
-        span_rel_pos: Optional[float] = None,
-        # the number of characters of a span
-        span_chars: Optional[int] = None,
-        # the number of tokens of a span
-        span_tokens: Optional[int] = None,
-        # the consistency of span label in training set
-        span_econ: Optional[float] = None,
-        # the frequency of a span in training set
-        span_efre: Optional[float] = None,
-        # the id of samples where a span is located
-        sample_id: Optional[int] = None,
-        # the frequency of span in test set
-        span_test_freq: Optional[float] = None,
-        # the frequency of span in training set (TODO: duplicated?)
-        span_train_freq: Optional[float] = None,
-    ):
-        self.span_text = span_text
-        self.span_tag = span_tag
-        self.span_pos = span_pos
-        self.span_matched = span_matched
-        self.span_capitalness = span_capitalness
-        self.span_rel_pos = span_rel_pos
-        self.span_chars = span_chars
-        self.span_tokens = span_tokens
-        self.span_econ = span_econ
-        self.span_efre = span_efre
-        self.sample_id = sample_id
-        self.span_test_freq = span_test_freq
-        self.span_train_freq = span_train_freq
+
+    # surface string a span
+    span_text: Optional[str] = None
+    # the tag of a span
+    span_tag: Optional[str] = None
+    # whether span could be matched
+    span_matched: int = 0
+    # the position of a span
+    span_pos: Optional[tuple] = None
+    # span capital features
+    span_capitalness: Optional[str] = None
+    # the relative position of a span in a sequence
+    span_rel_pos: Optional[float] = None
+    # the number of characters of a span
+    span_chars: Optional[int] = None
+    # the number of tokens of a span
+    span_tokens: Optional[int] = None
+    # the consistency of span label in training set
+    span_econ: Optional[float] = None
+    # the frequency of a span in training set
+    span_efre: Optional[float] = None
+    # the id of samples where a span is located
+    sample_id: Optional[int] = None
+    # the frequency of span in test set
+    span_test_freq: Optional[float] = None
+    # the frequency of span in training set (TODO: duplicated?)
+    span_train_freq: Optional[float] = None
 
     @property
     def get_span_tag(self):

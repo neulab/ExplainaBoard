@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Callable, Iterator
+from dataclasses import asdict
 
 from datalabs import aggregating, Dataset
 
@@ -18,8 +19,8 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing, span_utils
 from explainaboard.utils.logging import progress
-from explainaboard.utils.py_utils import sort_dict
-from explainaboard.utils.span_utils import BIOSpanOps, Span
+from explainaboard.utils.py_utils import freeze, sort_dict
+from explainaboard.utils.span_utils import BIOSpanOps
 from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
@@ -277,7 +278,10 @@ class NERProcessor(Processor):
                 "efre_dic": efre_dic,
             },
         )
-        spans = bio_span_ops.get_spans(seq=sentence, tags=tags)
+        spans = [
+            asdict(span) for span in bio_span_ops.get_spans(seq=sentence, tags=tags)
+        ]
+        # spans = bio_span_ops.get_spans(seq=sentence, tags=tags)
 
         return spans
 
@@ -344,8 +348,8 @@ class NERProcessor(Processor):
         feat_dict = {}
         for sample_id, my_output in enumerate(sys_output):
             for tok_id, span_info in enumerate(output_to_toks(my_output)):
-                span_info.sample_id = sample_id
-                feat_dict[span_info] = getattr(span_info, feature_name)
+                span_info["sample_id"] = sample_id
+                feat_dict[freeze(span_info)] = span_info[feature_name]
         return feat_dict
 
     def _get_span_sample_features(
@@ -430,7 +434,7 @@ class NERProcessor(Processor):
 
     def _add_to_sample_dict(
         self,
-        spans: list[Span],
+        spans: list[dict],
         type_id: str,
         sample_dict: defaultdict[tuple, dict[str, str]],
     ):
@@ -438,19 +442,19 @@ class NERProcessor(Processor):
         Get bucket samples (with mis-predicted entities) for each bucket given a feature
         (e.g., length)
         """
-
         for span in spans:
-            pos = (span.sample_id, span.span_pos, span.span_text)
+            span = dict(span)
+            pos = (span["sample_id"], span["span_pos"], span["span_text"])
             sample_dict[pos][type_id] = (
-                span.span_tag if span.span_tag is not None else ""
+                span["span_tag"] if span["span_tag"] is not None else ""
             )
 
     def get_bucket_cases_ner(
         self,
         bucket_interval: str,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[Span]],
-        samples_over_bucket_pred: dict[str, list[Span]],
+        samples_over_bucket_true: dict[str, list[dict]],
+        samples_over_bucket_pred: dict[str, list[dict]],
     ) -> list:
         # Index samples for easy comparison
         sample_dict: defaultdict[tuple, dict[str, str]] = defaultdict(lambda: dict())
@@ -468,8 +472,8 @@ class NERProcessor(Processor):
 
             system_output_id = sys_output[span[0]]["id"]
             error_case = {
-                "span": span[2],
                 "text": str(system_output_id),
+                "span": span[2],
                 "true_label": true_label,
                 "predicted_label": pred_label,
             }
@@ -481,8 +485,8 @@ class NERProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[Span]],
-        samples_over_bucket_pred: dict[str, list[Span]],
+        samples_over_bucket_true: dict[str, list[dict]],
+        samples_over_bucket_pred: dict[str, list[dict]],
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
@@ -524,6 +528,7 @@ class NERProcessor(Processor):
                 bucket_name=bucket_interval,
                 n_samples=len(spans_true),
                 bucket_samples=bucket_samples_errors,
+                # bucket_samples=[], # for temporal use
             )
             for metric in bucket_metrics:
                 metric_val = metric.evaluate(
