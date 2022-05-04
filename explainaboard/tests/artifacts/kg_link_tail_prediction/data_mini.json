@@ -1,0 +1,52 @@
+[
+        {
+            "gold_head": "/m/08966",
+            "gold_predicate": "/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month",
+            "gold_tail": "/m/05lf_"
+        },
+        {
+            "gold_head": "/m/01hww_",
+            "gold_predicate": "/music/performance_role/regular_performances./music/group_membership/group",
+            "gold_tail": "/m/01q99h"
+        },
+        {
+            "gold_head": "/m/09v3jyg",
+            "gold_predicate": "/film/film/release_date_s./film/film_regional_release_date/film_release_region",
+            "gold_tail": "/m/0f8l9c"
+        },
+        {
+            "gold_head": "/m/02jx1",
+            "gold_predicate": "/location/location/contains",
+            "gold_tail": "/m/013t85"
+        },
+        {
+            "gold_head": "/m/01xdf5",
+            "gold_predicate": "/base/popstra/celebrity/friendship./base/popstra/friendship/participant",
+            "gold_tail": "/m/04t2l2"
+        },
+        {
+            "gold_head": "/m/0mw89",
+            "gold_predicate": "/location/location/adjoin_s./location/adjoining_relationship/adjoins",
+            "gold_tail": "/m/0mw93"
+        },
+        {
+            "gold_head": "/m/01dw4q",
+            "gold_predicate": "/base/popstra/celebrity/dated./base/popstra/dated/participant",
+            "gold_tail": "/m/02qjj7"
+        },
+        {
+            "gold_head": "/m/014zcr",
+            "gold_predicate": "/base/popstra/celebrity/breakup./base/popstra/breakup/participant",
+            "gold_tail": "/m/05m63c"
+        },
+        {
+            "gold_head": "/m/07l450",
+            "gold_predicate": "/film/film/genre",
+            "gold_tail": "/m/082gq"
+        },
+        {
+            "gold_head": "/m/0n5j_",
+            "gold_predicate": "/location/location/adjoin_s./location/adjoining_relationship/adjoins",
+            "gold_tail": "/m/0fm9_"
+        }
+]

@@ -36,8 +36,11 @@ class KGLinkTailPredictionProcessor(Processor):
         return feature.Features(
             {
                 "true_head": feature.Value("string"),
+                "true_head_decipher": feature.Value("string"),
                 "true_link": feature.Value("string"),
                 "true_tail": feature.Value("string"),
+                "true_tail_decipher": feature.Value("string"),
+                "predict": feature.Value("string"),
                 "true_label": feature.Value("string"),
                 "predictions": feature.Sequence(feature=feature.Value("string")),
                 "tail_entity_length": feature.Value(
@@ -185,7 +188,6 @@ class KGLinkTailPredictionProcessor(Processor):
         self, sys_info: SysOutputInfo, sys_output: list[dict]
     ) -> list[MetricStats]:
         """Generate sufficient statistics for scoring different metrics.
-
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
         :return: Statistics sufficient for scoring
@@ -263,7 +265,7 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         # [type_level_0, type_level_1, ... type_level_6]
         # e.g. ["Thing", "Agent", "Person", None, None, None, None]
         tail_entity_type_levels = self.entity_type_level_map.get(
-            existing_features['true_tail_anonymity'], None
+            existing_features['true_tail'], None
         )
         if tail_entity_type_levels is None:
             return "-1"  # entity types not found
@@ -276,28 +278,30 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         return str(most_specific_level)
 
     def _get_tail_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["true_tail"]))
+        return len(sys_info.tokenize(existing_features["true_tail_decipher"]))
 
     def _get_head_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["true_head"]))
+        return len(sys_info.tokenize(existing_features["true_head_decipher"]))
 
     def _get_tail_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (
             self.statistics is None
-            or existing_features["true_tail"] not in self.statistics['tail_fre'].keys()
+            or existing_features["true_tail_decipher"]
+            not in self.statistics['tail_fre'].keys()
         ):
             return 0
         else:
-            return self.statistics['tail_fre'][existing_features["true_tail"]]
+            return self.statistics['tail_fre'][existing_features["true_tail_decipher"]]
 
     def _get_head_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (
             self.statistics is None
-            or existing_features["true_head"] not in self.statistics['head_fre'].keys()
+            or existing_features["true_head_decipher"]
+            not in self.statistics['head_fre'].keys()
         ):
             return 0
         else:
-            return self.statistics['head_fre'][existing_features["true_head"]]
+            return self.statistics['head_fre'][existing_features["true_head_decipher"]]
 
     def _get_link_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (
@@ -317,21 +321,13 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
     # --- End feature functions
 
     def _get_true_label(self, data_point: dict):
-        return data_point["true_label"]
+        return data_point["true_" + data_point["predict"]]
 
     def _get_predicted_label(self, data_point: dict):
         return data_point["predictions"]
 
     def _get_rank_data(self, data_point: dict):
-
-        true_label = self._get_true_label(data_point)
-        predictions = self._get_predicted_label(data_point)
-
         if "true_rank" in data_point.keys():
             return data_point["true_rank"]
-        elif true_label in predictions:
-            return predictions.index(true_label)
-        # elif default_rank is not None:
-        #     return default_rank
         else:
             return None
