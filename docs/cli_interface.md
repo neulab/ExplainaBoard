@@ -28,6 +28,8 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Conditional Text Generation](#conditional-text-generation)
 * [Language Modeling](#language-modeling)
 * [Named Entity Recognition](#named-entity-recognition)
+* [Word Segmentation](#word-segmentation)
+* [Chunking](#chunking)
 * [Extractive QA](#extractive-qa)
 * [Multiple Choice QA](#multiple-choice-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
@@ -127,6 +129,40 @@ Alternatively, you can reference a dataset file directly.
 ```shell
 explainaboard --task named-entity-recognition --custom_dataset_paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system_outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll 
 ```
+
+
+## Word Segmentation
+Word segmentation aims to segment texts without spaces between words.
+
+**CLI Example**
+
+The below example loads the `msr` dataset from DataLab:
+```shell
+explainaboard --task word-segmentation --dataset msr --system_outputs ./data/system_outputs/cws/test-msr-predictions.tsv
+```
+Note that the file `test-msr-predictions.tsv` can be downloaded [here](https://datalab-hub.s3.amazonaws.com/predictions/test-msr-predictions.tsv)
+
+Alternatively, you can reference a dataset file directly.
+```
+explainaboard --task word-segmentation --custom_dataset_paths ./data/system_outputs/cws/test.tsv --system_outputs ./data/system_outputs/cws/prediction.tsv
+```
+
+
+## Chunking
+Dividing text into syntactically related non-overlapping groups of words.
+
+**CLI Example**
+
+The below example loads the `conll00_chunk` dataset from DataLab:
+```shell
+explainaboard --task chunking --dataset conll00_chunk --system_outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
+```
+
+Alternatively, you can reference a dataset file directly.
+```
+explainaboard --task chunking --custom_dataset_paths ./data/system_outputs/chunking/dataset-test-conll00.tsv --system_outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
+```
+
 
 
 ## [Extractive QA](task_extractive_qa.md)

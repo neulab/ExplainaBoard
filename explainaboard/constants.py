@@ -14,6 +14,7 @@ class TaskType(str, Enum):
     conditional_generation = "conditional-generation"
     word_segmentation = "word-segmentation"
     language_modeling = "language-modeling"
+    chunking = "chunking"
 
     @staticmethod
     def list():

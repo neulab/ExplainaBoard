@@ -46,3 +46,4 @@ analyzer/fig/5.png
 data/system_outputs/cnndm/cnndm-bart-output.txt
 data/system_outputs/cnndm/cnndm-bart-output.txt
 data/system_outputs/fb15k-237/larger/*
+data/system_outputs/cws/test-msr-predictions.tsv

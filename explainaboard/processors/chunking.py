@@ -7,11 +7,11 @@ from explainaboard.processors.sequence_labeling import SeqLabProcessor
 from explainaboard.utils.span_utils import BIOSpanOps
 
 
-@register_processor(TaskType.named_entity_recognition)
-class NERProcessor(SeqLabProcessor):
+@register_processor(TaskType.chunking)
+class ChunkingProcessor(SeqLabProcessor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.named_entity_recognition
+        return TaskType.chunking
 
     @classmethod
     def default_metrics(cls, language=None) -> list[MetricConfig]:
