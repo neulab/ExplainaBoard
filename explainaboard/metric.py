@@ -556,6 +556,14 @@ class Hits(Metric):
             )
         )
 
+    def calc_stats_from_rank(
+        self, rank_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        config = cast(HitsConfig, self._get_config(config))
+        return MetricStats(
+            np.array([(1.0 if rank <= config.hits_k else 0.0) for rank in rank_data])
+        )
+
 
 @dataclass
 class MeanReciprocalRankConfig(MetricConfig):
@@ -587,6 +595,13 @@ class MeanReciprocalRank(Metric):
             np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
+    def calc_stats_from_rank(
+        self, rank_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        return MetricStats(
+            np.array([1.0 / rank for rank in rank_data if rank is not None])
+        )
+
 
 @dataclass
 class MeanRankConfig(MetricConfig):
@@ -613,6 +628,11 @@ class MeanRank(Metric):
         return MetricStats(
             np.array([self.mr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
+
+    def calc_stats_from_rank(
+        self, rank_data: list, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        return MetricStats(np.array([rank for rank in rank_data if rank is not None]))
 
 
 class EaaSMetricStats(MetricStats):

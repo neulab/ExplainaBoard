@@ -9,15 +9,20 @@ from datalabs import aggregating, load_dataset
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metric import (
+    Hits,
     HitsConfig,
+    MeanRank,
     MeanRankConfig,
+    MeanReciprocalRank,
     MeanReciprocalRankConfig,
     MetricConfig,
+    MetricStats,
 )
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import get_logger, progress
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -176,6 +181,40 @@ class KGLinkTailPredictionProcessor(Processor):
             "tail_fre": dict_tail,
         }
 
+    def _gen_metric_stats(
+        self, sys_info: SysOutputInfo, sys_output: list[dict]
+    ) -> list[MetricStats]:
+        """Generate sufficient statistics for scoring different metrics.
+
+        :param sys_info: Information about the system outputs
+        :param sys_output: The system output itself
+        :return: Statistics sufficient for scoring
+        """
+
+        metrics = unwrap(self._get_metrics(sys_info))
+        true_data = [self._get_true_label(x) for x in sys_output]
+        pred_data = [self._get_predicted_label(x) for x in sys_output]
+        rank_data = [
+            self._get_rank_data(x) for x in sys_output
+        ]  # rank of true entity in predictions
+
+        if any(item is None for item in rank_data):
+            raise ValueError(
+                'Some data points do not have rank information; check system outputs.'
+            )
+
+        metric_stats = []
+        for metric in metrics:
+            if (
+                isinstance(metric, MeanReciprocalRank)
+                or isinstance(metric, MeanRank)
+                or isinstance(metric, Hits)
+            ):
+                metric_stats.append(metric.calc_stats_from_rank(rank_data))
+            else:
+                metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+        return metric_stats
+
     def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
 
         # TODO(gneubig):
@@ -282,3 +321,17 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
 
     def _get_predicted_label(self, data_point: dict):
         return data_point["predictions"]
+
+    def _get_rank_data(self, data_point: dict):
+
+        true_label = self._get_true_label(data_point)
+        predictions = self._get_predicted_label(data_point)
+
+        if "true_rank" in data_point.keys():
+            return data_point["true_rank"]
+        elif true_label in predictions:
+            return predictions.index(true_label)
+        # elif default_rank is not None:
+        #     return default_rank
+        else:
+            return None
