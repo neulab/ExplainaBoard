@@ -148,3 +148,59 @@ class TestNER(unittest.TestCase):
 
         # 9. Unittest: customized features (TODO(Pengfei):
         #  lacks implementation of dataloader?)
+
+    def test_customized_metadata1(self):
+        artifact_path = os.path.join(test_artifacts_path, "ner")
+        json_output_full = os.path.join(artifact_path, "test-conll03.json")
+        loader = get_datalab_loader(
+            TaskType.named_entity_recognition,
+            dataset=DatalabLoaderOption("conll2003", "ner"),
+            output_data=json_output_full,
+            output_source=Source.local_filesystem,
+            output_file_type=FileType.json,
+        )
+        data = loader.load()
+        metadata = loader.user_defined_metadata_configs
+        metadata.update(
+            {
+                "task_name": TaskType.named_entity_recognition.value,
+            }
+        )
+        processor = get_processor(TaskType.named_entity_recognition)
+        sys_info = processor.process(metadata, data)
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
+
+    def test_customized_metadata2(self):
+        artifact_path = os.path.join(test_artifacts_path, "ner")
+        json_output_full = os.path.join(artifact_path, "test-conll03.json")
+
+        # Get metadata
+        file_type = FileType.json
+        dummy_task = TaskType.text_classification
+
+        loader = get_custom_dataset_loader(
+            dummy_task,
+            json_output_full,
+            json_output_full,
+            dataset_file_type=file_type,
+            output_file_type=file_type,
+        )
+        metadata = loader.user_defined_metadata_configs
+
+        # All things (loading & processing) will base on `metadata`
+        loader = get_datalab_loader(
+            metadata['task_name'],
+            dataset=DatalabLoaderOption(
+                metadata['dataset_name'], metadata['sub_dataset_name']
+            ),
+            output_data=json_output_full,
+            output_source=Source.local_filesystem,
+            output_file_type=FileType.json,
+        )
+        data = loader.load()
+        processor = get_processor(TaskType.named_entity_recognition)
+        sys_info = processor.process(metadata, data)
+        processor.print_bucket_info(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertGreater(len(sys_info.results.overall), 0)
