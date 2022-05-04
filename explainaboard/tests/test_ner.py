@@ -17,6 +17,11 @@ class TestNER(unittest.TestCase):
     conll_output = os.path.join(artifact_path, "output.tsv")
     conll_output_full = os.path.join(artifact_path, "conll2003-elmo-output.conll")
 
+    json_output_customized = cache_api.cache_online_file(
+        'https://datalab-hub.s3.amazonaws.com/predictions/test-conll03.json',  # noqa
+        'predictions/ner/test-conll03.json',
+    )
+
     def test_generate_system_analysis(self):
         loader = get_custom_dataset_loader(
             TaskType.named_entity_recognition,
@@ -151,12 +156,10 @@ class TestNER(unittest.TestCase):
         #  lacks implementation of dataloader?)
 
     def test_customized_metadata1(self):
-        artifact_path = os.path.join(test_artifacts_path, "ner")
-        json_output_full = os.path.join(artifact_path, "test-conll03.json")
         loader = get_datalab_loader(
             TaskType.named_entity_recognition,
             dataset=DatalabLoaderOption("conll2003", "ner"),
-            output_data=json_output_full,
+            output_data=self.json_output_customized,
             output_source=Source.local_filesystem,
             output_file_type=FileType.json,
         )
@@ -174,19 +177,14 @@ class TestNER(unittest.TestCase):
 
     def test_customized_metadata2(self):
 
-        json_output_full = cache_api.cache_online_file(
-            'https://datalab-hub.s3.amazonaws.com/predictions/test-conll03.json',  # noqa
-            'predictions/ner/test-conll03.json',
-        )
-
         # Get metadata
         file_type = FileType.json
         dummy_task = TaskType.text_classification
 
         loader = get_custom_dataset_loader(
             dummy_task,
-            json_output_full,
-            json_output_full,
+            self.json_output_customized,
+            self.json_output_customized,
             dataset_file_type=file_type,
             output_file_type=file_type,
         )
@@ -198,7 +196,7 @@ class TestNER(unittest.TestCase):
             dataset=DatalabLoaderOption(
                 metadata['dataset_name'], metadata['sub_dataset_name']
             ),
-            output_data=json_output_full,
+            output_data=self.json_output_customized,
             output_source=Source.local_filesystem,
             output_file_type=FileType.json,
         )
