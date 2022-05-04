@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 import json
 
-from datalabs import aggregating, load_dataset
+from datalabs import aggregating
 
 # TODO(odashi): Add a function to obtain metric class instead of using getattr.
 from explainaboard import feature, TaskType
@@ -21,7 +21,8 @@ from explainaboard.metric import (
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
-from explainaboard.utils.logging import get_logger, progress
+from explainaboard.utils.logging import progress
+from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -148,9 +149,17 @@ class KGLinkTailPredictionProcessor(Processor):
     def __init__(self):
         super().__init__()
         self.entity_type_level_map = None
+        file_path = cache_api.cache_online_file(
+            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
+            'pre_computed/kg/entity_type_level_map.json',
+        )
+        with open(file_path, 'r') as file:
+            self.entity_type_level_map = json.load(file)
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator[dict[str, str]]):
+    def _statistics_func(
+        self, samples: Iterator[dict[str, str]], tokenizer: Tokenizer | None = None
+    ):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
@@ -161,22 +170,45 @@ class KGLinkTailPredictionProcessor(Processor):
         dict_link: dict[str, int] = {}
         dict_tail: dict[str, int] = {}
 
+        entity_dic = {}
+        file_path = cache_api.cache_online_file(
+            'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
+            'pre_computed/kg/entity2wikidata.json',
+        )
+        with open(file_path, 'r') as file:
+            entity_dic = json.loads(file.read())
+
         for sample in progress(samples):
 
-            if sample['tail'] not in dict_tail.keys():
-                dict_tail[sample['tail']] = 1
+            tail = (
+                sample['tail']
+                if sample['tail'] not in entity_dic.keys()
+                else entity_dic[sample['tail']]['label']
+            )
+            if tail not in dict_tail.keys():
+                dict_tail[tail] = 1
             else:
-                dict_tail[sample['tail']] += 1
+                dict_tail[tail] += 1
 
-            if sample['head'] not in dict_head.keys():
-                dict_head[sample['head']] = 1
+            head = (
+                sample['head']
+                if sample['head'] not in entity_dic.keys()
+                else entity_dic[sample['head']]['label']
+            )
+            if head not in dict_head.keys():
+                dict_head[head] = 1
             else:
-                dict_head[sample['head']] += 1
+                dict_head[head] += 1
 
-            if sample['link'] not in dict_link.keys():
-                dict_link[sample['link']] = 1
+            link = (
+                sample['link']
+                if sample['link'] not in entity_dic.keys()
+                else entity_dic[sample['link']]['label']
+            )
+            if link not in dict_link.keys():
+                dict_link[link] = 1
             else:
-                dict_link[sample['link']] += 1
+                dict_link[link] += 1
 
         return {
             "head_fre": dict_head,
@@ -217,47 +249,6 @@ class KGLinkTailPredictionProcessor(Processor):
                 metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
         return metric_stats
 
-    def _gen_external_stats(self, sys_info: SysOutputInfo, statistics_func: Callable):
-
-        # TODO(gneubig):
-        # this will be reloaded for every dataset, maybe should be fixed for multiple
-        # analysis
-        # TODO(Pengfei): uncomment following code once datalab loader
-        #  of this task  is introduced
-        # if sys_info.dataset_name != "fb15k_237":  # to be generalized
-        #     self.entity_type_level_map = {}
-        # else:
-        self.entity_type_level_map = {}
-        file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
-            'pre_computed/kg/entity_type_level_map.json',
-        )
-        with open(file_path, 'r') as file:
-            self.entity_type_level_map = json.load(file)
-
-        # Calculate statistics of training set
-        self.statistics = None
-        if sys_info.dataset_name is not None:
-            try:
-                dataset = load_dataset(sys_info.dataset_name, "readable")
-                # calculate the statistics (_stat) when _stat is {} or
-                # `reload_stat` is False
-                if len(dataset['train']._stat) == 0 or not sys_info.reload_stat:
-                    new_train = dataset['train'].apply(
-                        self._statistics_func, mode="local"
-                    )
-                    self.statistics = new_train._stat
-                else:
-                    self.statistics = dataset["train"]._stat
-            except FileNotFoundError:
-                get_logger().warning(
-                    """
-The dataset hasn't been supported by DataLab so no training set dependent features will
-be supported by ExplainaBoard. You can add the dataset by:
-https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md
-"""
-                )
-
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, sys_info: SysOutputInfo, existing_features: dict):
 
@@ -283,34 +274,40 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
     def _get_head_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(sys_info.tokenize(existing_features["true_head_decipher"]))
 
-    def _get_tail_fre(self, sys_info: SysOutputInfo, existing_features: dict):
+    def _get_tail_fre(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics
+    ):
         if (
-            self.statistics is None
+            statistics is None
             or existing_features["true_tail_decipher"]
-            not in self.statistics['tail_fre'].keys()
+            not in statistics['tail_fre'].keys()
         ):
             return 0
         else:
-            return self.statistics['tail_fre'][existing_features["true_tail_decipher"]]
+            return statistics['tail_fre'][existing_features["true_tail_decipher"]]
 
-    def _get_head_fre(self, sys_info: SysOutputInfo, existing_features: dict):
+    def _get_head_fre(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics
+    ):
         if (
-            self.statistics is None
+            statistics is None
             or existing_features["true_head_decipher"]
-            not in self.statistics['head_fre'].keys()
+            not in statistics['head_fre'].keys()
         ):
             return 0
         else:
-            return self.statistics['head_fre'][existing_features["true_head_decipher"]]
+            return statistics['head_fre'][existing_features["true_head_decipher"]]
 
-    def _get_link_fre(self, sys_info: SysOutputInfo, existing_features: dict):
+    def _get_link_fre(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics
+    ):
         if (
-            self.statistics is None
-            or existing_features["true_link"] not in self.statistics['link_fre'].keys()
+            statistics is None
+            or existing_features["true_link"] not in statistics['link_fre'].keys()
         ):
             return 0
         else:
-            return self.statistics['link_fre'][existing_features["true_link"]]
+            return statistics['link_fre'][existing_features["true_link"]]
 
     def _get_symmetry(self, sys_info: SysOutputInfo, existing_features: dict):
         if existing_features['true_link'] in self._symmetric_relations:

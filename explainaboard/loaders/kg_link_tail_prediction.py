@@ -5,6 +5,7 @@ import json
 from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
     JSONFileLoader,
@@ -71,6 +72,19 @@ class KgLinkTailPredictionLoader(Loader):
                     FileLoaderField("gold_tail", target_field_names[3], str),
                     FileLoaderField(
                         "gold_tail", target_field_names[4], str, parser=map_preprocessor
+                    ),
+                ]
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("head", target_field_names[0], str),
+                    FileLoaderField(
+                        "head", target_field_names[1], str, parser=map_preprocessor
+                    ),
+                    FileLoaderField("link", target_field_names[2], str),
+                    FileLoaderField("tail", target_field_names[3], str),
+                    FileLoaderField(
+                        "tail", target_field_names[4], str, parser=map_preprocessor
                     ),
                 ]
             ),
