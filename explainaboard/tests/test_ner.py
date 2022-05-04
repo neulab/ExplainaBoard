@@ -8,6 +8,7 @@ from explainaboard.loaders.loader_registry import (
     get_datalab_loader,
 )
 from explainaboard.tests.utils import test_artifacts_path
+from explainaboard.utils import cache_api
 
 
 class TestNER(unittest.TestCase):
@@ -172,8 +173,11 @@ class TestNER(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_customized_metadata2(self):
-        artifact_path = os.path.join(test_artifacts_path, "ner")
-        json_output_full = os.path.join(artifact_path, "test-conll03.json")
+
+        json_output_full = cache_api.cache_online_file(
+            'https://datalab-hub.s3.amazonaws.com/predictions/test-conll03.json',  # noqa
+            'predictions/ner/test-conll03.json',
+        )
 
         # Get metadata
         file_type = FileType.json
