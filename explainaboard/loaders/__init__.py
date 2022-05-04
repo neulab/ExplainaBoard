@@ -7,8 +7,8 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
-    sequence_labeling,
     qa_multiple_choice,
+    sequence_labeling,
     text_classification,
     text_pair_classification,
 )
