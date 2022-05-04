@@ -1,6 +1,5 @@
 from explainaboard.loaders import (
     aspect_based_sentiment_classification,
-    chunking,
     conditional_generation,
     extractive_qa,
     file_loader,
@@ -8,11 +7,10 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
-    named_entity_recognition,
+    sequence_labeling,
     qa_multiple_choice,
     text_classification,
     text_pair_classification,
-    word_segmentation,
 )
 
 get_datalab_loader = loader_registry.get_datalab_loader
@@ -26,10 +24,8 @@ __all__ = [
     'kg_link_tail_prediction',
     'language_modeling',
     'loader',
-    'named_entity_recognition',
+    'sequence_labeling',
     'qa_multiple_choice',
     'text_classification',
     'text_pair_classification',
-    'word_segmentation',
-    'chunking',
 ]

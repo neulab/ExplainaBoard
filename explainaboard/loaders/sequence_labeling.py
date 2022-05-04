@@ -12,8 +12,10 @@ from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 
 
+@register_loader(TaskType.chunking)
 @register_loader(TaskType.word_segmentation)
-class WSLoader(Loader):
+@register_loader(TaskType.named_entity_recognition)
+class SeqLabLoader(Loader):
     """
     Validate and Reformat system output file with tsv format:
     token \t true_tag \t predicted_tag
@@ -36,8 +38,8 @@ class WSLoader(Loader):
         return {
             FileType.conll: CoNLLFileLoader(
                 [
-                    FileLoaderField(0, "tokens", str),
-                    FileLoaderField(1, "true_tags", str),
+                    FileLoaderField(0, field_names[0], str),
+                    FileLoaderField(1, field_names[1], str),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
@@ -50,4 +52,6 @@ class WSLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
-        return {FileType.conll: CoNLLFileLoader([FileLoaderField(1, "pred_tags", str)])}
+        return {
+            FileType.conll: CoNLLFileLoader([FileLoaderField(1, "pred_tags", str)]),
+        }
