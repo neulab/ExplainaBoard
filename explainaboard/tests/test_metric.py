@@ -121,7 +121,7 @@ class TestMetric(unittest.TestCase):
 
         # Initialize client and decide which metrics to test
         eaas_client = AsyncClient(Config())
-        metric_names = ['rouge1', 'bleu', 'chrf']
+        metric_names = ['rouge1', 'bleu', 'chrf', 'length_ratio']
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics

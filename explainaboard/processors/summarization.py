@@ -138,6 +138,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
             EaaSMetricConfig(name='rouge1', language=language),
             EaaSMetricConfig(name='rouge2', language=language),
             EaaSMetricConfig(name='rougeL', language=language),
+            EaaSMetricConfig(name='length_ratio', language=language),
         ]
 
     def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):

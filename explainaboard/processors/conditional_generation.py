@@ -177,7 +177,7 @@ class ConditionalGenerationProcessor(Processor):
 
     @classmethod
     def default_metrics(cls, language=None) -> list[MetricConfig]:
-        defaults = ['rouge1', 'rouge2', 'rougeL', 'bleu']
+        defaults = ['rouge1', 'rouge2', 'rougeL', 'bleu', 'length_ratio']
         return [EaaSMetricConfig(name=x, language=language) for x in defaults]
 
     @classmethod
@@ -197,6 +197,8 @@ class ConditionalGenerationProcessor(Processor):
             "comet",
             "mover_score",
             "prism",
+            "length",
+            "length_ratio",
         ]
         return [EaaSMetricConfig(name=x, language=language) for x in full_metrics]
 
