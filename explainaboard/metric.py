@@ -702,6 +702,10 @@ class EaaSMetric(Metric):
         elif self.config.name == 'chrf':
             chrf_class = sacrebleu.CHRF()
             return chrf_class._compute_score_from_stats(list(agg_stats)).score / 100.0
+        elif self.config.name == 'length_ratio':
+            return float(agg_stats[0]) / agg_stats[1]
+        elif self.config.name == 'length':
+            return float(agg_stats[0])
         else:
             return float(agg_stats)
 
