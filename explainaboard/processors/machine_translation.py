@@ -39,7 +39,10 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
 
     @classmethod
     def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [EaaSMetricConfig(name='bleu', language=language)]
+        return [
+            EaaSMetricConfig(name='bleu', language=language),
+            EaaSMetricConfig(name='length_ratio', language=language),
+        ]
 
     def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(sys_info.tokenize(existing_features["source"])) / len(
