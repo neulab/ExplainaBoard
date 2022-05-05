@@ -7,6 +7,7 @@ from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
     FileLoader,
     FileLoaderField,
+    JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
@@ -54,4 +55,10 @@ class SeqLabLoader(Loader):
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {
             FileType.conll: CoNLLFileLoader([FileLoaderField(1, "pred_tags", str)]),
+            FileType.json: JSONFileLoader(
+                [
+                    FileLoaderField("tokens", "tokens", list),
+                    FileLoaderField("predicted_tags", "pred_tags", list),
+                ]
+            ),
         }
