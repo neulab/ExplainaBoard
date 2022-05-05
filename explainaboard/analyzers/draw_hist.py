@@ -30,12 +30,39 @@ def draw_bar_chart_from_reports(
     for report in reports:
         with open(report) as fin:
             report_info.append(SysOutputInfo.from_dict(json.load(fin)))
+    overall_results = [list(unwrap(x.results.overall).values()) for x in report_info]
+    overall_metric_names = list(unwrap(report_info[0].results.overall).keys())
     fg_results = [unwrap(x.results.fine_grained) for x in report_info]
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # feature name, for example, sentence length
+    # Overall performance
+    ys = [[x.value for x in y] for y in overall_results]
+    y_errs = None
+    if overall_results[0][0].confidence_score_low is not None:
+        y_errs = [
+            (
+                [x.value - unwrap(x.confidence_score_low) for x in y],
+                [unwrap(x.confidence_score_high) - x.value for x in y],
+            )
+            for y in overall_results
+        ]
+
+    make_bar_chart(
+        ys,
+        output_dir,
+        'overall',
+        output_fig_format='png',
+        fig_size=(8, 6),
+        sys_names=sys_names,
+        errs=y_errs,
+        title=None,
+        xticklabels=overall_metric_names,
+        ylabel='metric value',
+    )
+
+    # Bucket performance: feature name, for example, sentence length
     for feature_name in progress(fg_results[0].keys()):
         # Make sure that buckets exist
         buckets: list[dict[str, BucketPerformance]] = []
