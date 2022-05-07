@@ -118,6 +118,11 @@ class Processor(metaclass=abc.ABCMeta):
                         " no training set dependent features will be supported by"
                         " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                     )
+                elif split_name not in dataset:
+                    get_logger().warning(
+                        f"{sys_info.dataset_name} has no {split_name} split in DataLab "
+                        "so training set dependent features will not be calculated"
+                    )
                 else:
                     self._statistics_func.resources = self._get_statistics_resources(
                         sys_info, dataset[split_name]
