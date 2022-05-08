@@ -11,7 +11,7 @@ from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
 
 @abc.abstractmethod
 class Preprocessor:
-    def __init__(self, language: str = "en"):
+    def __init__(self, language: str | None = None):
         self.language = language
 
     def set_language(self, language: str):
@@ -28,7 +28,7 @@ class Preprocessor:
         ...
 
 
-class QAPreprocessor(Preprocessor):
+class ExtractiveQAPreprocessor(Preprocessor):
     """
     A preprocessor to process answers in extractive QA tasks.
     Currently it is based on the MLQA paper.
@@ -45,10 +45,10 @@ class QAPreprocessor(Preprocessor):
     ss_tokenizer = SingleSpaceTokenizer()
     mlqa_tokenizer = MLQAMixTokenizer()
 
-    def __init__(self, language: str):
-        self.language: str = language
+    def __init__(self, language: str | None):
+        self.language: str | None = language
 
-    def normalize_answer(self, s: str, language: str) -> str:
+    def normalize_answer(self, s: str, language: str | None) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
 
         def remove_articles(text, lang):

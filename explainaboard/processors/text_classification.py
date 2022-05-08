@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
 from typing import Any
 
 from datalabs import aggregating
@@ -12,7 +13,6 @@ from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.logging import progress
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -117,12 +117,14 @@ class TextClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [AccuracyConfig(name='Accuracy', language=language)]
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        return [AccuracyConfig(name='Accuracy')]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_text_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["text"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
 
     def _get_text_chars(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(existing_feature["text"])
@@ -144,7 +146,7 @@ class TextClassificationProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['text'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     # training set dependent features
@@ -156,7 +158,7 @@ class TextClassificationProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['text'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     # training set dependent features
@@ -164,7 +166,7 @@ class TextClassificationProcessor(Processor):
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         length_fre = 0
-        length = len(sys_info.tokenize(existing_features["text"]))
+        length = len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
 
         if length in statistics['length_fre'].keys():
             length_fre = statistics['length_fre'][length]
@@ -174,18 +176,11 @@ class TextClassificationProcessor(Processor):
     # --- End feature functions
 
     @aggregating()
-    def _statistics_func(self, samples, tokenizer: Tokenizer):
-        """
-        Input:
-        samples: [{
-         "text":
-         "label":
-        }]
-        """
-
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0
+        tokenizer = unwrap(sys_info.source_tokenizer)
         for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)

@@ -48,14 +48,20 @@ class Processor(metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         """Returns the default metrics of this processor."""
         ...
 
     @classmethod
-    def full_metric_list(cls, language=None) -> list[MetricConfig]:
+    def full_metric_list(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         """Returns an extensive list of metrics that may be used."""
-        return cls.default_metrics(language=language)
+        return cls.default_metrics(
+            source_language=source_language, target_language=target_language
+        )
 
     @classmethod
     def metric_is_valid(cls, metric_config: MetricConfig) -> bool:
@@ -77,7 +83,7 @@ class Processor(metaclass=abc.ABCMeta):
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
-        return {"cls": self, "tokenizer": sys_info.tokenizer}  #
+        return {"cls": self, "sys_info": sys_info}  #
 
     @aggregating
     def _statistics_func(self):
@@ -500,10 +506,21 @@ class Processor(metaclass=abc.ABCMeta):
 
         sys_info = SysOutputInfo.from_dict(metadata)
         if sys_info.metric_configs is None:
-            sys_info.metric_configs = self.default_metrics(language=sys_info.language)
-        if sys_info.tokenizer is None:
-            sys_info.tokenizer = get_default_tokenizer(
-                task_type=self.task_type(), lang=sys_info.language
+            sys_info.metric_configs = self.default_metrics(
+                source_language=sys_info.source_language,
+                target_language=sys_info.target_language,
+            )
+        if sys_info.target_tokenizer is None:
+            sys_info.target_tokenizer = get_default_tokenizer(
+                task_type=self.task_type(), lang=sys_info.target_language
+            )
+        if sys_info.source_tokenizer is None:
+            sys_info.source_tokenizer = (
+                sys_info.target_tokenizer
+                if sys_info.source_language == sys_info.target_language
+                else get_default_tokenizer(
+                    task_type=self.task_type(), lang=sys_info.source_language
+                )
             )
 
         # declare customized features: _features will be updated

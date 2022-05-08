@@ -19,9 +19,7 @@ from explainaboard.processors.conditional_generation import (
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
 from explainaboard.utils.py_utils import hash_dict
-
-# to calculate advanced features
-from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import unwrap
 
 summary_attribute = SUMAttribute()
 
@@ -133,12 +131,30 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         return [
-            EaaSMetricConfig(name='rouge1', language=language),
-            EaaSMetricConfig(name='rouge2', language=language),
-            EaaSMetricConfig(name='rougeL', language=language),
-            EaaSMetricConfig(name='length_ratio', language=language),
+            EaaSMetricConfig(
+                name='rouge1',
+                source_language=source_language,
+                target_language=target_language,
+            ),
+            EaaSMetricConfig(
+                name='rouge2',
+                source_language=source_language,
+                target_language=target_language,
+            ),
+            EaaSMetricConfig(
+                name='rougeL',
+                source_language=source_language,
+                target_language=target_language,
+            ),
+            EaaSMetricConfig(
+                name='length_ratio',
+                source_language=source_language,
+                target_language=target_language,
+            ),
         ]
 
     def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
@@ -172,7 +188,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
         return res["attr_novelty"]
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['summary'], tokenizer
+            samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
         )

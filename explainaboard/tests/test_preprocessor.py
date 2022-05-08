@@ -1,6 +1,6 @@
 import unittest
 
-from explainaboard.utils.preprocessor import QAPreprocessor
+from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
 
 
 class TestExampleCode(unittest.TestCase):
@@ -13,12 +13,12 @@ class TestExampleCode(unittest.TestCase):
         This tests the MLQAPreprocess
         """
 
-        en_preprocessor = QAPreprocessor(language='en')
+        en_preprocessor = ExtractiveQAPreprocessor(language='en')
         text = "This is a boring movie."
         text_processed = en_preprocessor(text)
         self.assertEqual(text_processed, "this is boring movie")
 
-        zh_preprocessor = QAPreprocessor(language='zh')
+        zh_preprocessor = ExtractiveQAPreprocessor(language='zh')
         text = "这一部电影看着很无聊"
         text_processed = zh_preprocessor(text)
         self.assertEqual(text_processed, "这 一 部 电 影 看 着 很 无 聊")

@@ -4,7 +4,11 @@ import json
 
 from explainaboard import TaskType
 from explainaboard.constants import FileType
-from explainaboard.loaders.file_loader import FileLoader, JSONFileLoader
+from explainaboard.loaders.file_loader import (
+    FileLoader,
+    FileLoaderReturn,
+    JSONFileLoader,
+)
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.utils import cache_api
@@ -43,7 +47,7 @@ class KgLinkTailPredictionLoader(Loader):
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {FileType.json: JSONFileLoader(None, False)}
 
-    def load(self) -> list[dict]:
+    def load(self) -> FileLoaderReturn:
         """
         :param path_system_output:
             the path of system output file with following format:
@@ -53,9 +57,7 @@ class KgLinkTailPredictionLoader(Loader):
         """
         data: list[dict] = []
 
-        # TODO(odashi):
-        # Avoid potential bug: load_raw returns Iterable[Any] which is not a dict.
-        raw_data: dict[str, dict] = self._output_file_loader.load_raw(  # type: ignore
+        raw_data: FileLoaderReturn = self._output_file_loader.load_raw(
             self._output_data, self._output_source
         )
 
@@ -68,56 +70,35 @@ class KgLinkTailPredictionLoader(Loader):
         with open(file_path, 'r') as file:
             entity_dic = json.loads(file.read())
 
-        if self.user_defined_features_configs:  # user defined features are present
-            for example_id, features_dict in raw_data.items():
-                data_i = {
-                    "id": str(example_id),  # should be string type
-                    "true_head": entity_dic[features_dict["gold_head"]]["label"]
-                    if features_dict["gold_head"] in entity_dic.keys()
-                    else features_dict["gold_head"],
-                    "true_link": features_dict["gold_predicate"],
-                    "true_tail": entity_dic[features_dict["gold_tail"]]["label"]
-                    if features_dict["gold_tail"] in entity_dic.keys()
-                    else features_dict["gold_tail"],
-                    "true_tail_anonymity": features_dict["gold_tail"],
-                    "true_label": features_dict[
-                        "gold_" + features_dict["predict"]
-                    ],  # the entity to which we compare the predictions
-                    "predictions": features_dict["predictions"],
-                    "true_rank": features_dict.get(
-                        "true_rank", None
-                    ),  # rank of the true entity in predictions
-                }
+        for features_dict in raw_data.raw_data:
+            data_i = {
+                "id": features_dict["example_id"],  # should be string type
+                "true_head": entity_dic[features_dict["gold_head"]]["label"]
+                if features_dict["gold_head"] in entity_dic.keys()
+                else features_dict["gold_head"],
+                "true_link": features_dict["gold_predicate"],
+                "true_tail": entity_dic[features_dict["gold_tail"]]["label"]
+                if features_dict["gold_tail"] in entity_dic.keys()
+                else features_dict["gold_tail"],
+                "true_tail_anonymity": features_dict["gold_tail"],
+                "true_label": features_dict[
+                    "gold_" + features_dict["predict"]
+                ],  # the entity to which we compare the predictions
+                "predictions": features_dict["predictions"],
+                "true_rank": features_dict.get(
+                    "true_rank", None
+                ),  # rank of the true entity in predictions
+            }
 
-                # additional user-defined features
+            # additional user-defined features
+            if raw_data.metadata.custom_features:
                 data_i.update(
                     {
                         feature_name: features_dict[feature_name]
-                        for feature_name in self.user_defined_features_configs
+                        for feature_name in raw_data.metadata.custom_features
                     }
                 )
 
-                data.append(data_i)
-        else:
-            for _, (example_id, features_dict) in enumerate(raw_data.items()):
-                data.append(
-                    {
-                        "id": str(example_id),  # should be string type
-                        "true_head": entity_dic[features_dict["gold_head"]]["label"]
-                        if features_dict["gold_head"] in entity_dic.keys()
-                        else features_dict["gold_head"],
-                        "true_link": features_dict["gold_predicate"],
-                        "true_tail": entity_dic[features_dict["gold_tail"]]["label"]
-                        if features_dict["gold_tail"] in entity_dic.keys()
-                        else features_dict["gold_tail"],
-                        "true_tail_anonymity": features_dict["gold_tail"],
-                        "true_label": features_dict[
-                            "gold_" + features_dict["predict"]
-                        ],  # the entity to which we compare the predictions
-                        "predictions": features_dict["predictions"],
-                        "true_rank": features_dict.get(
-                            "true_rank", None
-                        ),  # rank of the true entity in predictions
-                    }
-                )
-        return data
+            data.append(data_i)
+
+        return FileLoaderReturn(data, raw_data.metadata)

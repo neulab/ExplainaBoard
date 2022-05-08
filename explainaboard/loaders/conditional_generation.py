@@ -24,30 +24,32 @@ class ConditionalGenerationLoader(Loader):
         please refer to `test_loaders.py`
     """
 
+    OUTPUT_FIELDS = ['source', 'reference']
+    JSON_FIELDS: list[str | tuple[str, str]] = ['source', 'reference']
+
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
         return FileType.tsv
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        field_names = ["source", "reference"]
         return {
             FileType.tsv: TSVFileLoader(
                 [
-                    FileLoaderField(0, field_names[0], str),
-                    FileLoaderField(1, field_names[1], str),
+                    FileLoaderField(0, cls.OUTPUT_FIELDS[0], str),
+                    FileLoaderField(1, cls.OUTPUT_FIELDS[1], str),
                 ],
             ),
             FileType.json: JSONFileLoader(
                 [
-                    FileLoaderField("source", field_names[0], str),
-                    FileLoaderField("reference", field_names[1], str),
+                    FileLoaderField(cls.JSON_FIELDS[0], cls.OUTPUT_FIELDS[0], str),
+                    FileLoaderField(cls.JSON_FIELDS[1], cls.OUTPUT_FIELDS[1], str),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("source", field_names[0], str),
-                    FileLoaderField("reference", field_names[1], str),
+                    FileLoaderField(cls.JSON_FIELDS[0], cls.OUTPUT_FIELDS[0], str),
+                    FileLoaderField(cls.JSON_FIELDS[1], cls.OUTPUT_FIELDS[1], str),
                 ]
             ),
         }
@@ -65,26 +67,12 @@ class ConditionalGenerationLoader(Loader):
 
 @register_loader(TaskType.summarization)
 class SummarizationLoader(ConditionalGenerationLoader):
-    @classmethod
-    def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        field_names = ["source", "reference"]
-        return {
-            FileType.tsv: TSVFileLoader(
-                [
-                    FileLoaderField(0, field_names[0], str),
-                    FileLoaderField(1, field_names[1], str),
-                ],
-            ),
-            FileType.json: JSONFileLoader(
-                [
-                    FileLoaderField("source", field_names[0], str),
-                    FileLoaderField("reference", field_names[1], str),
-                ]
-            ),
-            FileType.datalab: DatalabFileLoader(
-                [
-                    FileLoaderField("text", field_names[0], str),
-                    FileLoaderField("summary", field_names[1], str),
-                ]
-            ),
-        }
+    JSON_FIELDS = ['text', 'summary']
+
+
+@register_loader(TaskType.machine_translation)
+class MachineTranslationLoader(ConditionalGenerationLoader):
+    JSON_FIELDS = [
+        ('translation', FileLoaderField.SOURCE_LANGUAGE),
+        ('translation', FileLoaderField.TARGET_LANGUAGE),
+    ]

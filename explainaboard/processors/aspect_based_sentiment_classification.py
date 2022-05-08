@@ -6,6 +6,7 @@ from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.spacy_loader import get_named_entities
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.aspect_based_sentiment_classification)
@@ -84,12 +85,14 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [AccuracyConfig(name="Accuracy", language=language)]
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        return [AccuracyConfig(name="Accuracy")]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_sentence_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["text"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
 
     def _get_token_number(self, sys_info: SysOutputInfo, existing_feature: dict):
         return len(existing_feature["text"])
@@ -101,7 +104,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         return existing_feature["true_label"]
 
     def _get_aspect_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["aspect"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["aspect"]))
 
     def _get_aspect_index(self, sys_info: SysOutputInfo, existing_features: dict):
         return existing_features["text"].find(existing_features["aspect"])

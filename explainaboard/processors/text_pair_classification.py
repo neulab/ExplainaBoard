@@ -10,7 +10,6 @@ from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -103,14 +102,20 @@ class TextPairClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [AccuracyConfig(name='Accuracy', language=language)]
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        return [AccuracyConfig(name='Accuracy')]
 
     @aggregating()
-    def _statistics_func(self, samples, tokenizer: Tokenizer):
-
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['text1'] + x['text2'], tokenizer
+    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+        return (
+            explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+                samples, lambda x: x['text1'], unwrap(sys_info.source_tokenizer)
+            ),
+            explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+                samples, lambda x: x['text2'], unwrap(sys_info.target_tokenizer)
+            ),
         )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
@@ -120,16 +125,16 @@ class TextPairClassificationProcessor(Processor):
         )
 
     def _get_text1_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["text1"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["text1"]))
 
     def _get_text2_length(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return len(sys_info.tokenize(existing_feature["text2"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_feature["text2"]))
 
     def _get_text1_divided_text2(self, sys_info: SysOutputInfo, existing_feature: dict):
         return (
-            len(sys_info.tokenize(existing_feature["text1"]))
+            len(unwrap(sys_info.source_tokenizer)(existing_feature["text1"]))
             * 1.0
-            / len(sys_info.tokenize(existing_feature["text2"]))
+            / len(unwrap(sys_info.target_tokenizer)(existing_feature["text2"]))
         )
 
     def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
@@ -141,9 +146,14 @@ class TextPairClassificationProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
             existing_features,
-            statistics,
-            lambda x: x['text1'] + x['text2'],
-            unwrap(sys_info.tokenizer),
+            statistics[0],
+            lambda x: x['text1'],
+            unwrap(sys_info.source_tokenizer),
+        ) + explainaboard.utils.feature_funcs.feat_num_oov(
+            existing_features,
+            statistics[1],
+            lambda x: x['text2'],
+            unwrap(sys_info.target_tokenizer),
         )
 
     # training set dependent features (this could be merged into the above one for
@@ -153,7 +163,12 @@ class TextPairClassificationProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics,
-            lambda x: x['text1'] + x['text2'],
-            unwrap(sys_info.tokenizer),
+            statistics[0],
+            lambda x: x['text1'],
+            unwrap(sys_info.source_tokenizer),
+        ) + explainaboard.utils.feature_funcs.feat_freq_rank(
+            existing_features,
+            statistics[1],
+            lambda x: x['text2'],
+            unwrap(sys_info.target_tokenizer),
         )

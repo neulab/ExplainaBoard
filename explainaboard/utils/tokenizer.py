@@ -15,7 +15,7 @@ from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
 from explainaboard import TaskType
 
 
-def get_default_tokenizer(task_type: TaskType, lang: str) -> Tokenizer:
+def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
     cond_gen_tasks = {
         TaskType.conditional_generation,
         TaskType.machine_translation,

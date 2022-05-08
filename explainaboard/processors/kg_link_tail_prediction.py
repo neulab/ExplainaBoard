@@ -118,14 +118,16 @@ class KGLinkTailPredictionProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         return [
-            HitsConfig(name='Hits1', hits_k=1, language=language),
-            HitsConfig(name='Hits2', hits_k=2, language=language),
-            HitsConfig(name='Hits3', hits_k=3, language=language),
-            HitsConfig(name='Hits5', hits_k=5, language=language),
-            MeanReciprocalRankConfig(name='MRR', language=language),
-            MeanRankConfig(name='MR', language=language),
+            HitsConfig(name='Hits1', hits_k=1),
+            HitsConfig(name='Hits2', hits_k=2),
+            HitsConfig(name='Hits3', hits_k=3),
+            HitsConfig(name='Hits5', hits_k=5),
+            MeanReciprocalRankConfig(name='MRR'),
+            MeanRankConfig(name='MR'),
         ]
 
     # TODO: is this the best place to put this?
@@ -147,7 +149,7 @@ class KGLinkTailPredictionProcessor(Processor):
         self.entity_type_level_map = None
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator[dict[str, str]]):
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
@@ -276,10 +278,10 @@ https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sd
         return str(most_specific_level)
 
     def _get_tail_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["true_tail"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_features["true_tail"]))
 
     def _get_head_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["true_head"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["true_head"]))
 
     def _get_tail_fre(self, sys_info: SysOutputInfo, existing_features: dict):
         if (

@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
 from typing import final, Literal, Optional
 
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import (
     DatalabLoaderOption,
     FileLoader,
-    FileLoaderField,
-    JSONFileLoader,
+    FileLoaderReturn,
     TextFileLoader,
 )
 
@@ -49,16 +47,20 @@ class Loader:
         self,
         dataset_data: str | DatalabLoaderOption,
         output_data: str,
-        dataset_source: Optional[Source] = None,
-        output_source: Optional[Source] = None,
-        dataset_file_type: Optional[FileType] = None,
-        output_file_type: Optional[FileType] = None,
-        dataset_file_loader: Optional[FileLoader] = None,
-        output_file_loader: Optional[FileLoader] = None,
+        dataset_source: Source | None = None,
+        output_source: Source | None = None,
+        dataset_file_type: FileType | None = None,
+        output_file_type: FileType | None = None,
+        dataset_file_loader: FileLoader | None = None,
+        output_file_loader: FileLoader | None = None,
+        field_mapping: dict[str, str] | None = None,
     ):
         # determine sources
         self._dataset_source: Source = dataset_source or self.default_source()
         self._output_source: Source = output_source or self.default_source()
+
+        # save field mapping
+        self._field_mapping: dict[str, str] = field_mapping or {}
 
         # determine file types
         if not dataset_file_type:
@@ -76,14 +78,6 @@ class Loader:
 
         self._dataset_data = dataset_data  # base64, filepath or datalab options
         self._output_data = output_data
-
-        self._user_defined_features_configs: dict[str, CustomFeature] = {}
-        self._user_defined_metadata_configs: dict = {}
-        if output_file_type == FileType.json:
-            (
-                self._user_defined_features_configs,
-                self._user_defined_metadata_configs,
-            ) = self._parse_user_defined_fields()
 
     @classmethod
     @final
@@ -110,72 +104,21 @@ class Loader:
             else:
                 return default_file_loaders[file_type]
 
-    @property
-    def user_defined_features_configs(self) -> dict[str, CustomFeature]:
-        return self._user_defined_features_configs
-
-    @property
-    def user_defined_metadata_configs(self) -> dict:
-        return self._user_defined_metadata_configs
-
-    def _parse_user_defined_fields(self) -> tuple[dict[str, CustomFeature], dict]:
-        """custom features and metadata can only be defined in the output file and it
-        needs to be in JSON format"""
-        if isinstance(self._output_file_loader, JSONFileLoader):
-            raw_data = self._output_file_loader.load_raw(
-                self._output_data, self._output_source
-            )
-            if isinstance(raw_data, dict):
-                custom_features = raw_data.get("user_defined_features_configs", {})
-                metadata = raw_data.get("user_defined_metadata_configs", {})
-
-                if custom_features or metadata:
-                    if "predictions" not in raw_data:
-                        raise ValueError(
-                            "system output file is missing predictions field"
-                        )
-                    # replace output data with the predictions only
-                    self._output_data = json.dumps(raw_data["predictions"])
-                    self._output_source = Source.in_memory
-
-                custom_feature_configs: dict[str, CustomFeature] = {}
-                if custom_features:  # add custom features to output file loader fields
-                    custom_feature_configs = {
-                        name: CustomFeature.from_dict(name, dikt)
-                        for name, dikt in raw_data[
-                            "user_defined_features_configs"
-                        ].items()
-                    }
-                    fields: list[FileLoaderField] = []
-                    for feature in custom_feature_configs.values():
-                        fields.append(
-                            # dtype is set to None because custom feature configs
-                            # doesn't use the same set of dtypes as FileLoader
-                            # (this is not enforced anywhere)
-                            FileLoaderField(feature.name, feature.name, None, False)
-                        )
-                    self._output_file_loader.add_fields(fields)
-                return custom_feature_configs, metadata
-            return {}, {}
-        else:
-            raise Exception(
-                "_parse_user_defined_fields can only be called with a JSON system "
-                + "output file"
-            )
-
-    def load(self) -> list[dict]:
+    def load(self) -> FileLoaderReturn:
         dataset_loaded_data = self._dataset_file_loader.load(
-            self._dataset_data, self._dataset_source
+            self._dataset_data, self._dataset_source, field_mapping=self._field_mapping
         )
         output_loaded_data = self._output_file_loader.load(
-            self._output_data, self._output_source
+            self._output_data, self._output_source, field_mapping=self._field_mapping
         )
+        dataset_loaded_data.metadata.merge(output_loaded_data.metadata)
         if len(dataset_loaded_data) != len(output_loaded_data):
             raise ValueError(
                 "dataset and output are of different length"
                 + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
             )
-        for i, output in enumerate(output_loaded_data):
+        data_list: list[dict] = output_loaded_data.raw_data
+        for i, output in enumerate(data_list):
             dataset_loaded_data[i].update(output)
         return dataset_loaded_data
 

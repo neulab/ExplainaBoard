@@ -16,7 +16,6 @@ from explainaboard.utils import bucketing
 from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import freeze, sort_dict
 from explainaboard.utils.span_utils import SpanOps
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -183,16 +182,7 @@ class SeqLabProcessor(Processor):
         return data_point["pred_tags"]
 
     @aggregating()
-    def _statistics_func(self, samples: Dataset, tokenizer: Tokenizer | None = None):
-        """
-        Input:
-        samples: [{
-         "tokens":
-         "tags":
-        }]
-        Output:dict:
-        """
-
+    def _statistics_func(self, samples: Dataset, sys_info: SysOutputInfo):
         dl_features = samples.info.features
 
         tokens_sequences = []

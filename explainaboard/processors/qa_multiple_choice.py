@@ -11,7 +11,6 @@ from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -95,21 +94,31 @@ class QAMultipleChoiceProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [AccuracyConfig(name='Accuracy', language=language)]
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        return [
+            AccuracyConfig(
+                name='Accuracy',
+                source_language=source_language,
+                target_language=target_language,
+            )
+        ]
 
     def __init__(self):
         super().__init__()
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["context"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
 
     def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["question"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["answers"]["text"]))
+        return len(
+            unwrap(sys_info.target_tokenizer)(existing_features["answers"]["text"])
+        )
 
     # training set dependent features
     def _get_num_oov(
@@ -119,7 +128,7 @@ class QAMultipleChoiceProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['context'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     # training set dependent features
@@ -131,7 +140,7 @@ class QAMultipleChoiceProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['context'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     # --- End feature functions
@@ -153,7 +162,7 @@ class QAMultipleChoiceProcessor(Processor):
         return data_point["predicted_answers"]["option_index"]
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['context'], tokenizer
+            samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
