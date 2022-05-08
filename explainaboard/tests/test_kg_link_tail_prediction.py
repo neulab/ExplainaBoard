@@ -2,6 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, TaskType
+from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.metric import HitsConfig, MeanRankConfig, MeanReciprocalRankConfig
 from explainaboard.tests.utils import test_artifacts_path
@@ -23,7 +24,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             output_file_type=FileType.json,
         )
         data = loader.load()
-        self.assertEqual(loader.user_defined_features_configs, {})
+        self.assertEqual(data.metadata, FileLoaderMetadata())
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
@@ -37,7 +38,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.raw_data)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -49,7 +50,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             self.dataset_with_custom_feature,
         )
         data = loader.load()
-        self.assertEqual(len(loader.user_defined_features_configs), 1)
+        self.assertEqual(len(data.metadata.custom_features), 1)
         self.assertEqual(len(data), 10)
         self.assertEqual(
             set(data[0].keys()),
@@ -73,7 +74,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             self.dataset_no_custom_feature,
         )
         data = loader.load()
-        self.assertEqual(loader.user_defined_features_configs, {})
+        self.assertEqual(data.metadata, FileLoaderMetadata())
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
@@ -88,7 +89,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.raw_data)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -110,7 +111,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             self.dataset_no_custom_feature,
         )
         data = loader.load()
-        self.assertEqual(loader.user_defined_features_configs, {})
+        self.assertEqual(data.metadata, FileLoaderMetadata())
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
@@ -125,7 +126,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.raw_data)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

@@ -79,7 +79,8 @@ class TestExtractiveQA(unittest.TestCase):
             "task_name": TaskType.question_answering_extractive.value,
             "dataset_name": "squad",
             "metric_names": ["F1Score", "ExactMatch"],
-            "language": "zh",
+            "source_language": "zh",
+            "target_language": "zh",
         }
 
         processor = get_processor(TaskType.question_answering_extractive)

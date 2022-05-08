@@ -78,19 +78,20 @@ class TestQAMultipleChoice(unittest.TestCase):
             FileType.json,
         )
         data = loader.load()
-        self.assertEqual(data[0]["commonsense_category"], ["obj", "cul"])
+        print(f'data.raw_data[0]={data.raw_data[0]}')
+        self.assertEqual(data.raw_data[0]["commonsense_category"], ["obj", "cul"])
 
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
             "dataset_name": "fig_qa",
             "metric_names": ["Accuracy"],
             # don't forget this, otherwise the user-defined features will be ignored
-            "user_defined_features_configs": loader.user_defined_features_configs,
+            "user_defined_features_configs": data.metadata.custom_features,
         }
 
         processor = get_processor(TaskType.qa_multiple_choice.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.raw_data)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

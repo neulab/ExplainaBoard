@@ -1,1116 +1,1218 @@
 {
-    "user_defined_features_configs": {
-        "toy_string_feature": {
-            "dtype": "string",
-            "description": "most specific (highest) entity type level of true tail entity",
-            "num_buckets": 8
-        },
-        "toy_float_feature": {
-            "dtype": "float",
-            "description": "just a toy float feature for testing",
-            "num_buckets": 4
-        }
-    },
-    "predictions": {
-        "/m/08966\t/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month\t/m/05lf_": {
-            "predictions": [
-                "/m/05lf_",
-                "/m/02x_y",
-                "/m/01nv4h",
-                "/m/02l6h",
-                "/m/0kz1h"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.06102964571436342
-        },
-        "/m/01hww_\t/music/performance_role/regular_performances./music/group_membership/group\t/m/01q99h": {
-            "predictions": [
-                "/m/05563d",
-                "/m/02vnpv",
-                "/m/02r1tx7",
-                "/m/017lb_",
-                "/m/03c3yf"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.4205245627306744
-        },
-        "/m/09v3jyg\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/0f8l9c": {
-            "predictions": [
-                "/m/03ryn",
-                "/m/06c1y",
-                "/m/03rj0",
-                "/m/06f32",
-                "/m/0d0kn"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.8844917145829342
-        },
-        "/m/02jx1\t/location/location/contains\t/m/013t85": {
-            "predictions": [
-                "/m/023sm8",
-                "/m/0dbdy",
-                "/m/011pcj",
-                "/m/03lrc",
-                "/m/01llj3"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.513467090115609
-        },
-        "/m/02jx1\t/location/location/contains\t/m/0m0bj": {
-            "predictions": [
-                "/m/023sm8",
-                "/m/0dbdy",
-                "/m/011pcj",
-                "/m/03lrc",
-                "/m/01llj3"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.3033546064400091
-        },
-        "/m/02bfmn\t/film/actor/film./film/performance/film\t/m/04ghz4m": {
-            "predictions": [
-                "/m/02b6n9",
-                "/m/0d90m",
-                "/m/0277j40",
-                "/m/01chpn",
-                "/m/02vqsll"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.02283541330821126
-        },
-        "/m/05zrvfd\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/04y9mm8": {
-            "predictions": [
-                "/m/0g9lm2",
-                "/m/095zlp",
-                "/m/07l450",
-                "/m/0b1y_2",
-                "/m/02_06s"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.9882682129475557
-        },
-        "/m/060bp\t/government/government_office_category/officeholders./government/government_position_held/jurisdiction_of_office\t/m/04j53": {
-            "predictions": [
-                "/m/0j4b",
-                "/m/06tw8",
-                "/m/047t_",
-                "/m/06s_2",
-                "/m/0jdd"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.6726488774452434
-        },
-        "/m/07l450\t/film/film/genre\t/m/082gq": {
-            "predictions": [
-                "/m/02l7c8",
-                "/m/06cvj",
-                "/m/0hn10",
-                "/m/0lsxr",
-                "/m/01t_vv"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.7416780734571745
-        },
-        "/m/07h1h5\t/sports/pro_athlete/teams./sports/sports_team_roster/team\t/m/029q3k": {
-            "predictions": [
-                "/m/03_44z",
-                "/m/0kqbh",
-                "/m/02pp1",
-                "/m/01rl_3",
-                "/m/03zrhb"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.19602766347102418
-        },
-        "/m/0djb3vw\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/0jgd": {
-            "predictions": [
-                "/m/05qx1",
-                "/m/01znc_",
-                "/m/047yc",
-                "/m/03ryn",
-                "/m/082fr"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.5615007085155641
-        },
-        "/m/031y2\t/base/popstra/location/vacationers./base/popstra/vacation_choice/vacationer\t/m/0dxmyh": {
-            "predictions": [
-                "/m/01m4yn",
-                "/m/0261x8t",
-                "/m/05d1y",
-                "/m/0227vl",
-                "/m/02p5hf"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.62211444661038
-        },
-        "/m/01d8l\t/olympics/olympic_participating_country/medals_won./olympics/olympic_medal_honor/medal\t/m/02lq67": {
-            "predictions": [
-                "/m/02lq67",
-                "/m/02lpp7",
-                "/m/02l6h",
-                "/m/058yv_",
-                "/m/0dgshf6"
-            ],
-            "toy_string_feature": "6",
-            "toy_float_feature": 0.15477725059014358
-        },
-        "/m/0ydpd\t/location/location/time_zones\t/m/02hcv8": {
-            "predictions": [
-                "/m/02hcv8",
-                "/m/02hczc",
-                "/m/02fqwt",
-                "/m/02lcqs",
-                "/m/02lcrv"
-            ],
-            "toy_string_feature": "6",
-            "toy_float_feature": 0.9638048152173814
-        },
-        "/m/0738b8\t/people/person/places_lived./people/place_lived/location\t/m/02xry": {
-            "predictions": [
-                "/m/0rh6k",
-                "/m/01_d4",
-                "/m/0fpzwf",
-                "/m/01jr6",
-                "/m/0ccvx"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.9675354378345415
-        },
-        "/m/070xg\t/sports/sports_team/colors\t/m/01g5v": {
-            "predictions": [
-                "/m/02rnmb",
-                "/m/067z2v",
-                "/m/019sc",
-                "/m/083jv",
-                "/m/01l849"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.8667198720182698
-        },
-        "/m/0mwk9\t/location/statistical_region/rent50_2./measurement_unit/dated_money_value/currency\t/m/09nqf": {
-            "predictions": [
-                "/m/09nqf",
-                "/m/01nv4h",
-                "/m/03shp",
-                "/m/04wlh",
-                "/m/03rt9"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.9252994987168495
-        },
-        "/m/09306z\t/award/award_ceremony/awards_presented./award/award_honor/honored_for\t/m/0sxkh": {
-            "predictions": [
-                "/m/016z43",
-                "/m/021gzd",
-                "/m/0k4p0",
-                "/m/0yyn5",
-                "/m/064r97z"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.7490189839429189
-        },
-        "/m/0kbws\t/olympics/olympic_games/participating_countries\t/m/027jk": {
-            "predictions": [
-                "/m/0163v",
-                "/m/0h3y",
-                "/m/06npd",
-                "/m/06t8v",
-                "/m/01mk6"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.29149758084391564
-        },
-        "/m/0kbws\t/olympics/olympic_games/participating_countries\t/m/04vjh": {
-            "predictions": [
-                "/m/0163v",
-                "/m/0h3y",
-                "/m/06npd",
-                "/m/06t8v",
-                "/m/01mk6"
-            ],
-            "toy_string_feature": "6",
-            "toy_float_feature": 0.07569646797932561
-        },
-        "/m/017j69\t/education/educational_institution/students_graduates./education/education/major_field_of_study\t/m/01mkq": {
-            "predictions": [
-                "/m/01mkq",
-                "/m/0l5mz",
-                "/m/0_jm",
-                "/m/01zc2w",
-                "/m/0w7c"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.06637251560297452
-        },
-        "/m/07z1m\t/location/statistical_region/religions./location/religion_percentage/religion\t/m/0631_": {
-            "predictions": [
-                "/m/0631_",
-                "/m/058x5",
-                "/m/02t7t",
-                "/m/092bf5",
-                "/m/072w0"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.7842160037484559
-        },
-        "/m/03gqgt3\t/military/military_conflict/combatants./military/military_combatant_group/combatants\t/m/0d060g": {
-            "predictions": [
-                "/m/0g78xc",
-                "/m/02psqkz",
-                "/m/06v9sf",
-                "/m/0dv0z",
-                "/m/03b79"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.5322618855432367
-        },
-        "/m/01c9f2\t/award/award_category/winners./award/award_honor/ceremony\t/m/01bx35": {
-            "predictions": [
-                "/m/0jzphpx",
-                "/m/01bx35",
-                "/m/01xqqp",
-                "/m/08pc1x",
-                "/m/092868"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.08874366511963283
-        },
-        "/m/01c9f2\t/award/award_category/winners./award/award_honor/ceremony\t/m/01s695": {
-            "predictions": [
-                "/m/0jzphpx",
-                "/m/01xqqp",
-                "/m/08pc1x",
-                "/m/01s695",
-                "/m/092868"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.5661522301823344
-        },
-        "/m/01lp8\t/user/tsegaran/random/taxonomy_subject/entry./user/tsegaran/random/taxonomy_entry/taxonomy\t/m/04n6k": {
-            "predictions": [
-                "/m/04n6k",
-                "/m/04fznlb",
-                "/m/01rz1",
-                "/m/0j7v_",
-                "/m/048svj"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.7398070321726189
-        },
-        "/m/01xwqn\t/influence/influence_node/influenced_by\t/m/0121rx": {
-            "predictions": [
-                "/m/01xwqn",
-                "/m/01k9lpl",
-                "/m/05rx__",
-                "/m/0739y",
-                "/m/01xwv7"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.8148085036941718
-        },
-        "/m/065ym0c\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/07ssc": {
-            "predictions": [
-                "/m/01znc_",
-                "/m/05r4w",
-                "/m/02vzc",
-                "/m/06t8v",
-                "/m/06f32"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.7274608032873325
-        },
-        "/m/06kxk2\t/people/person/place_of_birth\t/m/01_d4": {
-            "predictions": [
-                "/m/0cr3d",
-                "/m/0fpzwf",
-                "/m/0cc56",
-                "/m/07bcn",
-                "/m/02_286"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.0649964898603409
-        },
-        "/m/08q1tg\t/people/cause_of_death/people\t/m/0lcx": {
-            "predictions": [
-                "/m/014zn0",
-                "/m/02_pft",
-                "/m/02cj_f",
-                "/m/05z_p6",
-                "/m/08gyz_"
-            ],
-            "toy_string_feature": "6",
-            "toy_float_feature": 0.72211728270938
-        },
-        "/m/037fqp\t/education/educational_institution/school_type\t/m/04399": {
-            "predictions": [
-                "/m/05jxkf",
-                "/m/05pcjw",
-                "/m/01y64",
-                "/m/07tf8",
-                "/m/01_9fk"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.9990555888558519
-        },
-        "/m/0xxc\t/education/educational_institution/students_graduates./education/education/major_field_of_study\t/m/01lj9": {
-            "predictions": [
-                "/m/02j62",
-                "/m/06ms6",
-                "/m/01540",
-                "/m/01tbp",
-                "/m/0_jm"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.714444754844693
-        },
-        "/m/01l_pn\t/film/film/prequel\t/m/01y9jr": {
-            "predictions": [
-                "/m/01l_pn",
-                "/m/084qpk",
-                "/m/0dr3sl",
-                "/m/011wtv",
-                "/m/03nfnx"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.583826776344721
-        },
-        "/m/09sdmz\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/09gq0x5": {
-            "predictions": [
-                "/m/0g9lm2",
-                "/m/02_06s",
-                "/m/07l450",
-                "/m/0y_9q",
-                "/m/0bs5vty"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.9421330350634505
-        },
-        "/m/09sdmz\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/011yn5": {
-            "predictions": [
-                "/m/0g9lm2",
-                "/m/02_06s",
-                "/m/07l450",
-                "/m/0y_9q",
-                "/m/0bs5vty"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.6357436187982402
-        },
-        "/m/02ghq\t/people/person/profession\t/m/01d_h8": {
-            "predictions": [
-                "/m/0kyk",
-                "/m/02hv44_",
-                "/m/0196pc",
-                "/m/0d8qb",
-                "/m/04gc2"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.3608626040305907
-        },
-        "/m/016tt2\t/film/film_distributor/films_distributed./film/film_film_distributor_relationship/film\t/m/0dtfn": {
-            "predictions": [
-                "/m/03n785",
-                "/m/0h14ln",
-                "/m/0hv8w",
-                "/m/011wtv",
-                "/m/0315rp"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.10601846758728228
-        },
-        "/m/016tt2\t/film/film_distributor/films_distributed./film/film_film_distributor_relationship/film\t/m/04zl8": {
-            "predictions": [
-                "/m/03n785",
-                "/m/0h14ln",
-                "/m/0hv8w",
-                "/m/011wtv",
-                "/m/0315rp"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.863359981131998
-        },
-        "/m/016tt2\t/award/award_nominee/award_nominations./award/award_nomination/award_nominee\t/m/01gb54": {
-            "predictions": [
-                "/m/016tt2",
-                "/m/03m9c8",
-                "/m/016tw3",
-                "/m/086k8",
-                "/m/030_1m"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.17071456935792306
-        },
-        "/m/07jrjb\t/tv/tv_producer/programs_produced./tv/tv_producer_term/producer_type\t/m/0ckd1": {
-            "predictions": [
-                "/m/0ckd1",
-                "/m/0ch6mp2",
-                "/m/02_n3z",
-                "/m/09zzb8",
-                "/m/09vw2b7"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.2937439690661958
-        },
-        "/m/09v71cj\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/015fr": {
-            "predictions": [
-                "/m/05qx1",
-                "/m/016wzw",
-                "/m/06c1y",
-                "/m/03ryn",
-                "/m/06f32"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.22679942249669016
-        },
-        "/m/01k5y0\t/film/film/edited_by\t/m/0dky9n": {
-            "predictions": [
-                "/m/03q8ch",
-                "/m/0d5wn3",
-                "/m/027rwmr",
-                "/m/02q9kqf",
-                "/m/02lp3c"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.6477554229228186
-        },
-        "/m/06x76\t/sports/sports_team/sport\t/m/0jm_": {
-            "predictions": [
-                "/m/0jm_",
-                "/m/018jz",
-                "/m/039yzs",
-                "/m/03tmr",
-                "/m/018w8"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.3786482944040904
-        },
-        "/m/0x67\t/people/ethnicity/people\t/m/0411q": {
-            "predictions": [
-                "/m/02p5hf",
-                "/m/0168dy",
-                "/m/01vlj1g",
-                "/m/046lt",
-                "/m/06fc0b"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.5666231001872942
-        },
-        "/m/0x67\t/people/ethnicity/people\t/m/030wkp": {
-            "predictions": [
-                "/m/02p5hf",
-                "/m/0168dy",
-                "/m/01vlj1g",
-                "/m/046lt",
-                "/m/06fc0b"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.27209080645415507
-        },
-        "/m/0gmgwnv\t/film/film/estimated_budget./measurement_unit/dated_money_value/currency\t/m/09nqf": {
-            "predictions": [
-                "/m/09nqf",
-                "/m/01nv4h",
-                "/m/02l6h",
-                "/m/0kz1h",
-                "/m/088n7"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.28006845666006297
-        },
-        "/m/01wkmgb\t/people/person/profession\t/m/09jwl": {
-            "predictions": [
-                "/m/09jwl",
-                "/m/02dsz",
-                "/m/016z4k",
-                "/m/0nbcg",
-                "/m/039v1"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.2063937710315138
-        },
-        "/m/0154j\t/organization/organization_member/member_of./organization/organization_membership/organization\t/m/04k4l": {
-            "predictions": [
-                "/m/041288",
-                "/m/04k4l",
-                "/m/0gkjy",
-                "/m/0j7v_",
-                "/m/085h1"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.7989036679346494
-        },
-        "/m/02j4sk\t/people/deceased_person/place_of_death\t/m/027l4q": {
-            "predictions": [
-                "/m/0k049",
-                "/m/06_kh",
-                "/m/030qb3t",
-                "/m/0f2wj",
-                "/m/0fpzwf"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.8376209772183446
-        },
-        "/m/017jv5\t/film/film_distributor/films_distributed./film/film_film_distributor_relationship/film\t/m/0d1qmz": {
-            "predictions": [
-                "/m/0h14ln",
-                "/m/03n785",
-                "/m/0hv8w",
-                "/m/0dfw0",
-                "/m/0315rp"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.5103563807520816
-        },
-        "/m/02x2gy0\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/04jplwp": {
-            "predictions": [
-                "/m/02mpyh",
-                "/m/0y_9q",
-                "/m/011yg9",
-                "/m/0g9lm2",
-                "/m/0_b9f"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.5489783790274143
-        },
-        "/m/053rxgm\t/film/film/executive_produced_by\t/m/0g_rs_": {
-            "predictions": [
-                "/m/0d_skg",
-                "/m/06q8hf",
-                "/m/030_3z",
-                "/m/0h1p",
-                "/m/0693l"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.268033946670323
-        },
-        "/m/011k11\t/music/record_label/artist\t/m/03h_yfh": {
-            "predictions": [
-                "/m/048xh",
-                "/m/02vr7",
-                "/m/016376",
-                "/m/07h76",
-                "/m/0lzkm"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.4831513500824336
-        },
-        "/m/014zfs\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/0bdw6t": {
-            "predictions": [
-                "/m/0fc9js",
-                "/m/0gkvb7",
-                "/m/08_vwq",
-                "/m/02qkk9_",
-                "/m/02grdc"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.3755058974543608
-        },
-        "/m/05typm\t/film/actor/film./film/performance/film\t/m/0k2cb": {
-            "predictions": [
-                "/m/09p4w8",
-                "/m/02v8kmz",
-                "/m/0yzbg",
-                "/m/01q2nx",
-                "/m/0f4k49"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.3099308099455561
-        },
-        "/m/0cwy47\t/film/film/featured_film_locations\t/m/06c62": {
-            "predictions": [
-                "/m/02_286",
-                "/m/035p3",
-                "/m/095w_",
-                "/m/030qb3t",
-                "/m/06y57"
-            ],
-            "toy_string_feature": "6",
-            "toy_float_feature": 0.8639574999625854
-        },
-        "/m/019vhk\t/film/film/film_festivals\t/m/09rwjly": {
-            "predictions": [
-                "/m/0g57ws5",
-                "/m/04grdgy",
-                "/m/09rwjly",
-                "/m/0bmj62v",
-                "/m/0hrcs29"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.9448236606359354
-        },
-        "/m/06sy4c\t/people/person/gender\t/m/05zppz": {
-            "predictions": [
-                "/m/05zppz",
-                "/m/02zsn",
-                "/m/02hrh1q",
-                "/m/01d_h8",
-                "/m/0np9r"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.33683749518997685
-        },
-        "/m/0dr1c2\t/tv/tv_program/regular_cast./tv/regular_tv_appearance/actor\t/m/04f62k": {
-            "predictions": [
-                "/m/03cz9_",
-                "/m/01qvtwm",
-                "/m/0392kz",
-                "/m/02h8hr",
-                "/m/03d29b"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.34021604714894027
-        },
-        "/m/07b_l\t/location/location/contains\t/m/013m43": {
-            "predictions": [
-                "/m/04_1l0v",
-                "/m/0k3gw",
-                "/m/0l2vz",
-                "/m/0yjvm",
-                "/m/0n56v"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.7820054136084154
-        },
-        "/m/0mm1q\t/people/person/profession\t/m/01d_h8": {
-            "predictions": [
-                "/m/01d_h8",
-                "/m/0q04f",
-                "/m/03gjzk",
-                "/m/0np9r",
-                "/m/018gz8"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.15511376717534198
-        },
-        "/m/0prjs\t/film/director/film\t/m/062zjtt": {
-            "predictions": [
-                "/m/0g9lm2",
-                "/m/011yr9",
-                "/m/0_b9f",
-                "/m/02wk7b",
-                "/m/09gq0x5"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.33159134351538944
-        },
-        "/m/01v40wd\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/01c9dd": {
-            "predictions": [
-                "/m/03qbh5",
-                "/m/01d38g",
-                "/m/01c92g",
-                "/m/01ckrr",
-                "/m/01bgqh"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.3808862912276647
-        },
-        "/m/0kvgnq\t/award/award_winning_work/awards_won./award/award_honor/award_winner\t/m/05dppk": {
-            "predictions": [
-                "/m/02kxbwx",
-                "/m/01gbn6",
-                "/m/07lt7b",
-                "/m/02mt4k",
-                "/m/0bl2g"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.5323660128847069
-        },
-        "/m/01ckbq\t/award/award_category/winners./award/award_honor/ceremony\t/m/013b2h": {
-            "predictions": [
-                "/m/05pd94v",
-                "/m/013b2h",
-                "/m/02rjjll",
-                "/m/0jzphpx",
-                "/m/09n4nb"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.9948378544801223
-        },
-        "/m/0f_nbyh\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/07yk1xz": {
-            "predictions": [
-                "/m/095zlp",
-                "/m/02mpyh",
-                "/m/07l450",
-                "/m/0y_9q",
-                "/m/011yg9"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.05066504209468414
-        },
-        "/m/0418wg\t/film/film/language\t/m/02bjrlw": {
-            "predictions": [
-                "/m/04306rv",
-                "/m/02bjrlw",
-                "/m/06b_j",
-                "/m/03hkp",
-                "/m/0t_2"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.6185399761732099
-        },
-        "/m/02kth6\t/organization/non_profit_organization/registered_with./organization/non_profit_registration/registering_agency\t/m/03z19": {
-            "predictions": [
-                "/m/03z19",
-                "/m/0f1r9",
-                "/m/07xl34",
-                "/m/05k17c",
-                "/m/0hm4q"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.49636701977926256
-        },
-        "/m/026c1\t/film/actor/film./film/performance/film\t/m/03s6l2": {
-            "predictions": [
-                "/m/011ykb",
-                "/m/0f2sx4",
-                "/m/0bshwmp",
-                "/m/03lrht",
-                "/m/06_wqk4"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.47463380326397475
-        },
-        "/m/03j90\t/people/person/profession\t/m/05z96": {
-            "predictions": [
-                "/m/02hv44_",
-                "/m/05z96",
-                "/m/0kyk",
-                "/m/0d8qb",
-                "/m/0196pc"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.13048010031988166
-        },
-        "/m/0p9sw\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/02zk08": {
-            "predictions": [
-                "/m/04j4tx",
-                "/m/0_b9f",
-                "/m/02mpyh",
-                "/m/011yg9",
-                "/m/0qmfz"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.8936193694380667
-        },
-        "/m/01hydr\t/music/genre/parent_genre\t/m/0kz10": {
-            "predictions": [
-                "/m/03lty",
-                "/m/0173b0",
-                "/m/0172rj",
-                "/m/05r6t",
-                "/m/0xhtw"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.2506543028301145
-        },
-        "/m/01gtc0\t/government/legislative_session/members./government/government_position_held/district_represented\t/m/0vbk": {
-            "predictions": [
-                "/m/0g0syc",
-                "/m/081mh",
-                "/m/06mz5",
-                "/m/0824r",
-                "/m/03s5t"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.10151333987648914
-        },
-        "/m/0h63gl9\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/07ssc": {
-            "predictions": [
-                "/m/05qx1",
-                "/m/047yc",
-                "/m/016wzw",
-                "/m/03ryn",
-                "/m/06t8v"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.38297195660536465
-        },
-        "/m/033cnk\t/food/food/nutrients./food/nutrition_fact/nutrient\t/m/0f4hc": {
-            "predictions": [
-                "/m/02y_3rt",
-                "/m/07zqy",
-                "/m/0f4hc",
-                "/m/061xhr",
-                "/m/0hkwr"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.25691240254218084
-        },
-        "/m/033cnk\t/food/food/nutrients./food/nutrition_fact/nutrient\t/m/02y_3rf": {
-            "predictions": [
-                "/m/02y_3rt",
-                "/m/02y_3rf",
-                "/m/07zqy",
-                "/m/061xhr",
-                "/m/0hkwr"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.43139634901123247
-        },
-        "/m/084m3\t/film/actor/film./film/performance/film\t/m/034qrh": {
-            "predictions": [
-                "/m/03cffvv",
-                "/m/03rtz1",
-                "/m/01633c",
-                "/m/09p4w8",
-                "/m/0yzbg"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.576914480223062
-        },
-        "/m/014mlp\t/education/educational_degree/people_with_this_degree./education/education/institution\t/m/01x5fb": {
-            "predictions": [
-                "/m/03v6t",
-                "/m/01jtp7",
-                "/m/03y5ky",
-                "/m/0kqj1",
-                "/m/02tz9z"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.014481315577963616
-        },
-        "/m/0b7l4x\t/film/film/production_companies\t/m/03sb38": {
-            "predictions": [
-                "/m/054g1r",
-                "/m/06jntd",
-                "/m/0338lq",
-                "/m/03xq0f",
-                "/m/03xsby"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.30008552349748674
-        },
-        "/m/016yvw\t/people/person/spouse_s./people/marriage/type_of_union\t/m/01g63y": {
-            "predictions": [
-                "/m/01g63y",
-                "/m/0jgjn",
-                "/m/01bl8s",
-                "/m/02jknp",
-                "/m/0dgd_"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.19210337526676013
-        },
-        "/m/06ltr\t/film/actor/film./film/performance/film\t/m/016ywb": {
-            "predictions": [
-                "/m/0415ggl",
-                "/m/02kfzz",
-                "/m/026njb5",
-                "/m/09p0ct",
-                "/m/04jkpgv"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.025555456181749814
-        },
-        "/m/01dq5z\t/education/educational_institution/students_graduates./education/education/student\t/m/03q95r": {
-            "predictions": [
-                "/m/03swmf",
-                "/m/03xx9l",
-                "/m/0btxr",
-                "/m/024t0y",
-                "/m/01gy7r"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.3125400164884271
-        },
-        "/m/02vwckw\t/people/person/profession\t/m/0n1h": {
-            "predictions": [
-                "/m/039v1",
-                "/m/0dz3r",
-                "/m/016z4k",
-                "/m/0gbbt",
-                "/m/0fnpj"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.24414017025872314
-        },
-        "/m/049t4g\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/09sb52": {
-            "predictions": [
-                "/m/0789_m",
-                "/m/02py7pj",
-                "/m/0bs0bh",
-                "/m/0bb57s",
-                "/m/0gqyl"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.8294976514508408
-        },
-        "/m/08k881\t/film/actor/film./film/performance/film\t/m/01qncf": {
-            "predictions": [
-                "/m/03n0cd",
-                "/m/02v5_g",
-                "/m/03bx2lk",
-                "/m/0640y35",
-                "/m/05t0_2v"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.5603303062085913
-        },
-        "/m/01w58n3\t/people/person/profession\t/m/016z4k": {
-            "predictions": [
-                "/m/09jwl",
-                "/m/02dsz",
-                "/m/0n1h",
-                "/m/0nbcg",
-                "/m/016z4k"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.8430449452126317
-        },
-        "/m/0h_cssd\t/award/award_ceremony/awards_presented./award/award_honor/award_winner\t/m/0h0wc": {
-            "predictions": [
-                "/m/02y_2y",
-                "/m/02kxbwx",
-                "/m/01gbn6",
-                "/m/04xn2m",
-                "/m/03_gd"
-            ],
-            "toy_string_feature": "4",
-            "toy_float_feature": 0.8765045457356647
-        },
-        "/m/06by7\t/music/genre/artists\t/m/0153nq": {
-            "predictions": [
-                "/m/048xh",
-                "/m/06mj4",
-                "/m/0lzkm",
-                "/m/01wt4wc",
-                "/m/01v_pj6"
-            ],
-            "toy_string_feature": "0",
-            "toy_float_feature": 0.8027727529998165
-        },
-        "/m/01wxdn3\t/people/person/nationality\t/m/07ssc": {
-            "predictions": [
-                "/m/02jx1",
-                "/m/06q1r",
-                "/m/07ssc",
-                "/m/09c7w0",
-                "/m/03rk0"
-            ],
-            "toy_string_feature": "9",
-            "toy_float_feature": 0.5474708744499922
-        },
-        "/m/01wxdn3\t/music/artist/track_contributions./music/track_contribution/role\t/m/011_6p": {
-            "predictions": [
-                "/m/026t6",
-                "/m/03q5t",
-                "/m/0bxl5",
-                "/m/013y1f",
-                "/m/02hnl"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.5668643311746053
-        },
-        "/m/03g5jw\t/influence/influence_node/influenced_by\t/m/014_lq": {
-            "predictions": [
-                "/m/03g5jw",
-                "/m/0b1hw",
-                "/m/081wh1",
-                "/m/089pg7",
-                "/m/02r3zy"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.1714464182775417
-        },
-        "/m/02m97n\t/organization/organization/headquarters./location/mailing_address/citytown\t/m/09bkv": {
-            "predictions": [
-                "/m/01km6_",
-                "/m/01n7rc",
-                "/m/0nbrp",
-                "/m/06y9v",
-                "/m/013t2y"
-            ],
-            "toy_string_feature": "2",
-            "toy_float_feature": 0.8876016778297033
-        },
-        "/m/07y9k\t/sports/sports_league/teams./sports/sports_league_participation/team\t/m/035s37": {
-            "predictions": [
-                "/m/03_44z",
-                "/m/03zrhb",
-                "/m/0kqbh",
-                "/m/0425j7",
-                "/m/02b1j1"
-            ],
-            "toy_string_feature": "6",
-            "toy_float_feature": 0.44633608629460275
-        },
-        "/m/06c97\t/organization/organization_founder/organizations_founded\t/m/05f4p": {
-            "predictions": [
-                "/m/015dvh",
-                "/m/05f4p",
-                "/m/07y0n",
-                "/m/0d6qjf",
-                "/m/02hcxm"
-            ],
-            "toy_string_feature": "1",
-            "toy_float_feature": 0.43753182903976207
-        },
-        "/m/01cwhp\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/02f79n": {
-            "predictions": [
-                "/m/025m8l",
-                "/m/024fxq",
-                "/m/03tk6z",
-                "/m/02x17c2",
-                "/m/031b3h"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.6704024843382015
-        },
-        "/m/01cwhp\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/05zkcn5": {
-            "predictions": [
-                "/m/025m8l",
-                "/m/024fxq",
-                "/m/03tk6z",
-                "/m/02x17c2",
-                "/m/031b3h"
-            ],
-            "toy_string_feature": "7",
-            "toy_float_feature": 0.8281393328645728
-        },
-        "/m/02xry\t/location/location/time_zones\t/m/02hcv8": {
-            "predictions": [
-                "/m/02hczc",
-                "/m/02hcv8",
-                "/m/02lcrv",
-                "/m/02lcqs",
-                "/m/042g7t"
-            ],
-            "toy_string_feature": "5",
-            "toy_float_feature": 0.05392197578508029
-        },
-        "/m/02xry\t/location/statistical_region/religions./location/religion_percentage/religion\t/m/01y0s9": {
-            "predictions": [
-                "/m/058x5",
-                "/m/01s5nb",
-                "/m/01y0s9",
-                "/m/0flw86",
-                "/m/072w0"
-            ],
-            "toy_string_feature": "8",
-            "toy_float_feature": 0.6512820529630794
-        },
-        "/m/018dh3\t/common/topic/webpage./common/webpage/category\t/m/08mbj5d": {
-            "predictions": [
-                "/m/05kr_",
-                "/m/01pv51",
-                "/m/02sf_r",
-                "/m/02tx6q",
-                "/m/02_ssl"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.6609523155242024
-        },
-        "/m/099c8n\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/064lsn": {
-            "predictions": [
-                "/m/0y_9q",
-                "/m/07l450",
-                "/m/0_b9f",
-                "/m/0cvkv5",
-                "/m/0170yd"
-            ],
-            "toy_string_feature": "3",
-            "toy_float_feature": 0.6689978405379267
-        }
+  "metadata": {
+    "custom_features": {
+      "toy_string_feature": {
+        "dtype": "string",
+        "description": "most specific (highest) entity type level of true tail entity",
+        "num_buckets": 8
+      },
+      "toy_float_feature": {
+        "dtype": "float",
+        "description": "just a toy float feature for testing",
+        "num_buckets": 4
+      }
     }
+  },
+  "examples": [
+    {
+      "predictions": [
+        "/m/05lf_",
+        "/m/02x_y",
+        "/m/01nv4h",
+        "/m/02l6h",
+        "/m/0kz1h"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.06102964571436342,
+      "example_id": "/m/08966\t/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month\t/m/05lf_"
+    },
+    {
+      "predictions": [
+        "/m/05563d",
+        "/m/02vnpv",
+        "/m/02r1tx7",
+        "/m/017lb_",
+        "/m/03c3yf"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.4205245627306744,
+      "example_id": "/m/01hww_\t/music/performance_role/regular_performances./music/group_membership/group\t/m/01q99h"
+    },
+    {
+      "predictions": [
+        "/m/03ryn",
+        "/m/06c1y",
+        "/m/03rj0",
+        "/m/06f32",
+        "/m/0d0kn"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.8844917145829342,
+      "example_id": "/m/09v3jyg\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/0f8l9c"
+    },
+    {
+      "predictions": [
+        "/m/023sm8",
+        "/m/0dbdy",
+        "/m/011pcj",
+        "/m/03lrc",
+        "/m/01llj3"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.513467090115609,
+      "example_id": "/m/02jx1\t/location/location/contains\t/m/013t85"
+    },
+    {
+      "predictions": [
+        "/m/023sm8",
+        "/m/0dbdy",
+        "/m/011pcj",
+        "/m/03lrc",
+        "/m/01llj3"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.3033546064400091,
+      "example_id": "/m/02jx1\t/location/location/contains\t/m/0m0bj"
+    },
+    {
+      "predictions": [
+        "/m/02b6n9",
+        "/m/0d90m",
+        "/m/0277j40",
+        "/m/01chpn",
+        "/m/02vqsll"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.02283541330821126,
+      "example_id": "/m/02bfmn\t/film/actor/film./film/performance/film\t/m/04ghz4m"
+    },
+    {
+      "predictions": [
+        "/m/0g9lm2",
+        "/m/095zlp",
+        "/m/07l450",
+        "/m/0b1y_2",
+        "/m/02_06s"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.9882682129475557,
+      "example_id": "/m/05zrvfd\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/04y9mm8"
+    },
+    {
+      "predictions": [
+        "/m/0j4b",
+        "/m/06tw8",
+        "/m/047t_",
+        "/m/06s_2",
+        "/m/0jdd"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.6726488774452434,
+      "example_id": "/m/060bp\t/government/government_office_category/officeholders./government/government_position_held/jurisdiction_of_office\t/m/04j53"
+    },
+    {
+      "predictions": [
+        "/m/02l7c8",
+        "/m/06cvj",
+        "/m/0hn10",
+        "/m/0lsxr",
+        "/m/01t_vv"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.7416780734571745,
+      "example_id": "/m/07l450\t/film/film/genre\t/m/082gq"
+    },
+    {
+      "predictions": [
+        "/m/03_44z",
+        "/m/0kqbh",
+        "/m/02pp1",
+        "/m/01rl_3",
+        "/m/03zrhb"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.19602766347102418,
+      "example_id": "/m/07h1h5\t/sports/pro_athlete/teams./sports/sports_team_roster/team\t/m/029q3k"
+    },
+    {
+      "predictions": [
+        "/m/05qx1",
+        "/m/01znc_",
+        "/m/047yc",
+        "/m/03ryn",
+        "/m/082fr"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.5615007085155641,
+      "example_id": "/m/0djb3vw\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/0jgd"
+    },
+    {
+      "predictions": [
+        "/m/01m4yn",
+        "/m/0261x8t",
+        "/m/05d1y",
+        "/m/0227vl",
+        "/m/02p5hf"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.62211444661038,
+      "example_id": "/m/031y2\t/base/popstra/location/vacationers./base/popstra/vacation_choice/vacationer\t/m/0dxmyh"
+    },
+    {
+      "predictions": [
+        "/m/02lq67",
+        "/m/02lpp7",
+        "/m/02l6h",
+        "/m/058yv_",
+        "/m/0dgshf6"
+      ],
+      "toy_string_feature": "6",
+      "toy_float_feature": 0.15477725059014358,
+      "example_id": "/m/01d8l\t/olympics/olympic_participating_country/medals_won./olympics/olympic_medal_honor/medal\t/m/02lq67"
+    },
+    {
+      "predictions": [
+        "/m/02hcv8",
+        "/m/02hczc",
+        "/m/02fqwt",
+        "/m/02lcqs",
+        "/m/02lcrv"
+      ],
+      "toy_string_feature": "6",
+      "toy_float_feature": 0.9638048152173814,
+      "example_id": "/m/0ydpd\t/location/location/time_zones\t/m/02hcv8"
+    },
+    {
+      "predictions": [
+        "/m/0rh6k",
+        "/m/01_d4",
+        "/m/0fpzwf",
+        "/m/01jr6",
+        "/m/0ccvx"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.9675354378345415,
+      "example_id": "/m/0738b8\t/people/person/places_lived./people/place_lived/location\t/m/02xry"
+    },
+    {
+      "predictions": [
+        "/m/02rnmb",
+        "/m/067z2v",
+        "/m/019sc",
+        "/m/083jv",
+        "/m/01l849"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.8667198720182698,
+      "example_id": "/m/070xg\t/sports/sports_team/colors\t/m/01g5v"
+    },
+    {
+      "predictions": [
+        "/m/09nqf",
+        "/m/01nv4h",
+        "/m/03shp",
+        "/m/04wlh",
+        "/m/03rt9"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.9252994987168495,
+      "example_id": "/m/0mwk9\t/location/statistical_region/rent50_2./measurement_unit/dated_money_value/currency\t/m/09nqf"
+    },
+    {
+      "predictions": [
+        "/m/016z43",
+        "/m/021gzd",
+        "/m/0k4p0",
+        "/m/0yyn5",
+        "/m/064r97z"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.7490189839429189,
+      "example_id": "/m/09306z\t/award/award_ceremony/awards_presented./award/award_honor/honored_for\t/m/0sxkh"
+    },
+    {
+      "predictions": [
+        "/m/0163v",
+        "/m/0h3y",
+        "/m/06npd",
+        "/m/06t8v",
+        "/m/01mk6"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.29149758084391564,
+      "example_id": "/m/0kbws\t/olympics/olympic_games/participating_countries\t/m/027jk"
+    },
+    {
+      "predictions": [
+        "/m/0163v",
+        "/m/0h3y",
+        "/m/06npd",
+        "/m/06t8v",
+        "/m/01mk6"
+      ],
+      "toy_string_feature": "6",
+      "toy_float_feature": 0.07569646797932561,
+      "example_id": "/m/0kbws\t/olympics/olympic_games/participating_countries\t/m/04vjh"
+    },
+    {
+      "predictions": [
+        "/m/01mkq",
+        "/m/0l5mz",
+        "/m/0_jm",
+        "/m/01zc2w",
+        "/m/0w7c"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.06637251560297452,
+      "example_id": "/m/017j69\t/education/educational_institution/students_graduates./education/education/major_field_of_study\t/m/01mkq"
+    },
+    {
+      "predictions": [
+        "/m/0631_",
+        "/m/058x5",
+        "/m/02t7t",
+        "/m/092bf5",
+        "/m/072w0"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.7842160037484559,
+      "example_id": "/m/07z1m\t/location/statistical_region/religions./location/religion_percentage/religion\t/m/0631_"
+    },
+    {
+      "predictions": [
+        "/m/0g78xc",
+        "/m/02psqkz",
+        "/m/06v9sf",
+        "/m/0dv0z",
+        "/m/03b79"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.5322618855432367,
+      "example_id": "/m/03gqgt3\t/military/military_conflict/combatants./military/military_combatant_group/combatants\t/m/0d060g"
+    },
+    {
+      "predictions": [
+        "/m/0jzphpx",
+        "/m/01bx35",
+        "/m/01xqqp",
+        "/m/08pc1x",
+        "/m/092868"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.08874366511963283,
+      "example_id": "/m/01c9f2\t/award/award_category/winners./award/award_honor/ceremony\t/m/01bx35"
+    },
+    {
+      "predictions": [
+        "/m/0jzphpx",
+        "/m/01xqqp",
+        "/m/08pc1x",
+        "/m/01s695",
+        "/m/092868"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.5661522301823344,
+      "example_id": "/m/01c9f2\t/award/award_category/winners./award/award_honor/ceremony\t/m/01s695"
+    },
+    {
+      "predictions": [
+        "/m/04n6k",
+        "/m/04fznlb",
+        "/m/01rz1",
+        "/m/0j7v_",
+        "/m/048svj"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.7398070321726189,
+      "example_id": "/m/01lp8\t/user/tsegaran/random/taxonomy_subject/entry./user/tsegaran/random/taxonomy_entry/taxonomy\t/m/04n6k"
+    },
+    {
+      "predictions": [
+        "/m/01xwqn",
+        "/m/01k9lpl",
+        "/m/05rx__",
+        "/m/0739y",
+        "/m/01xwv7"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.8148085036941718,
+      "example_id": "/m/01xwqn\t/influence/influence_node/influenced_by\t/m/0121rx"
+    },
+    {
+      "predictions": [
+        "/m/01znc_",
+        "/m/05r4w",
+        "/m/02vzc",
+        "/m/06t8v",
+        "/m/06f32"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.7274608032873325,
+      "example_id": "/m/065ym0c\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/07ssc"
+    },
+    {
+      "predictions": [
+        "/m/0cr3d",
+        "/m/0fpzwf",
+        "/m/0cc56",
+        "/m/07bcn",
+        "/m/02_286"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.0649964898603409,
+      "example_id": "/m/06kxk2\t/people/person/place_of_birth\t/m/01_d4"
+    },
+    {
+      "predictions": [
+        "/m/014zn0",
+        "/m/02_pft",
+        "/m/02cj_f",
+        "/m/05z_p6",
+        "/m/08gyz_"
+      ],
+      "toy_string_feature": "6",
+      "toy_float_feature": 0.72211728270938,
+      "example_id": "/m/08q1tg\t/people/cause_of_death/people\t/m/0lcx"
+    },
+    {
+      "predictions": [
+        "/m/05jxkf",
+        "/m/05pcjw",
+        "/m/01y64",
+        "/m/07tf8",
+        "/m/01_9fk"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.9990555888558519,
+      "example_id": "/m/037fqp\t/education/educational_institution/school_type\t/m/04399"
+    },
+    {
+      "predictions": [
+        "/m/02j62",
+        "/m/06ms6",
+        "/m/01540",
+        "/m/01tbp",
+        "/m/0_jm"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.714444754844693,
+      "example_id": "/m/0xxc\t/education/educational_institution/students_graduates./education/education/major_field_of_study\t/m/01lj9"
+    },
+    {
+      "predictions": [
+        "/m/01l_pn",
+        "/m/084qpk",
+        "/m/0dr3sl",
+        "/m/011wtv",
+        "/m/03nfnx"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.583826776344721,
+      "example_id": "/m/01l_pn\t/film/film/prequel\t/m/01y9jr"
+    },
+    {
+      "predictions": [
+        "/m/0g9lm2",
+        "/m/02_06s",
+        "/m/07l450",
+        "/m/0y_9q",
+        "/m/0bs5vty"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.9421330350634505,
+      "example_id": "/m/09sdmz\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/09gq0x5"
+    },
+    {
+      "predictions": [
+        "/m/0g9lm2",
+        "/m/02_06s",
+        "/m/07l450",
+        "/m/0y_9q",
+        "/m/0bs5vty"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.6357436187982402,
+      "example_id": "/m/09sdmz\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/011yn5"
+    },
+    {
+      "predictions": [
+        "/m/0kyk",
+        "/m/02hv44_",
+        "/m/0196pc",
+        "/m/0d8qb",
+        "/m/04gc2"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.3608626040305907,
+      "example_id": "/m/02ghq\t/people/person/profession\t/m/01d_h8"
+    },
+    {
+      "predictions": [
+        "/m/03n785",
+        "/m/0h14ln",
+        "/m/0hv8w",
+        "/m/011wtv",
+        "/m/0315rp"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.10601846758728228,
+      "example_id": "/m/016tt2\t/film/film_distributor/films_distributed./film/film_film_distributor_relationship/film\t/m/0dtfn"
+    },
+    {
+      "predictions": [
+        "/m/03n785",
+        "/m/0h14ln",
+        "/m/0hv8w",
+        "/m/011wtv",
+        "/m/0315rp"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.863359981131998,
+      "example_id": "/m/016tt2\t/film/film_distributor/films_distributed./film/film_film_distributor_relationship/film\t/m/04zl8"
+    },
+    {
+      "predictions": [
+        "/m/016tt2",
+        "/m/03m9c8",
+        "/m/016tw3",
+        "/m/086k8",
+        "/m/030_1m"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.17071456935792306,
+      "example_id": "/m/016tt2\t/award/award_nominee/award_nominations./award/award_nomination/award_nominee\t/m/01gb54"
+    },
+    {
+      "predictions": [
+        "/m/0ckd1",
+        "/m/0ch6mp2",
+        "/m/02_n3z",
+        "/m/09zzb8",
+        "/m/09vw2b7"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.2937439690661958,
+      "example_id": "/m/07jrjb\t/tv/tv_producer/programs_produced./tv/tv_producer_term/producer_type\t/m/0ckd1"
+    },
+    {
+      "predictions": [
+        "/m/05qx1",
+        "/m/016wzw",
+        "/m/06c1y",
+        "/m/03ryn",
+        "/m/06f32"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.22679942249669016,
+      "example_id": "/m/09v71cj\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/015fr"
+    },
+    {
+      "predictions": [
+        "/m/03q8ch",
+        "/m/0d5wn3",
+        "/m/027rwmr",
+        "/m/02q9kqf",
+        "/m/02lp3c"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.6477554229228186,
+      "example_id": "/m/01k5y0\t/film/film/edited_by\t/m/0dky9n"
+    },
+    {
+      "predictions": [
+        "/m/0jm_",
+        "/m/018jz",
+        "/m/039yzs",
+        "/m/03tmr",
+        "/m/018w8"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.3786482944040904,
+      "example_id": "/m/06x76\t/sports/sports_team/sport\t/m/0jm_"
+    },
+    {
+      "predictions": [
+        "/m/02p5hf",
+        "/m/0168dy",
+        "/m/01vlj1g",
+        "/m/046lt",
+        "/m/06fc0b"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.5666231001872942,
+      "example_id": "/m/0x67\t/people/ethnicity/people\t/m/0411q"
+    },
+    {
+      "predictions": [
+        "/m/02p5hf",
+        "/m/0168dy",
+        "/m/01vlj1g",
+        "/m/046lt",
+        "/m/06fc0b"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.27209080645415507,
+      "example_id": "/m/0x67\t/people/ethnicity/people\t/m/030wkp"
+    },
+    {
+      "predictions": [
+        "/m/09nqf",
+        "/m/01nv4h",
+        "/m/02l6h",
+        "/m/0kz1h",
+        "/m/088n7"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.28006845666006297,
+      "example_id": "/m/0gmgwnv\t/film/film/estimated_budget./measurement_unit/dated_money_value/currency\t/m/09nqf"
+    },
+    {
+      "predictions": [
+        "/m/09jwl",
+        "/m/02dsz",
+        "/m/016z4k",
+        "/m/0nbcg",
+        "/m/039v1"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.2063937710315138,
+      "example_id": "/m/01wkmgb\t/people/person/profession\t/m/09jwl"
+    },
+    {
+      "predictions": [
+        "/m/041288",
+        "/m/04k4l",
+        "/m/0gkjy",
+        "/m/0j7v_",
+        "/m/085h1"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.7989036679346494,
+      "example_id": "/m/0154j\t/organization/organization_member/member_of./organization/organization_membership/organization\t/m/04k4l"
+    },
+    {
+      "predictions": [
+        "/m/0k049",
+        "/m/06_kh",
+        "/m/030qb3t",
+        "/m/0f2wj",
+        "/m/0fpzwf"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.8376209772183446,
+      "example_id": "/m/02j4sk\t/people/deceased_person/place_of_death\t/m/027l4q"
+    },
+    {
+      "predictions": [
+        "/m/0h14ln",
+        "/m/03n785",
+        "/m/0hv8w",
+        "/m/0dfw0",
+        "/m/0315rp"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.5103563807520816,
+      "example_id": "/m/017jv5\t/film/film_distributor/films_distributed./film/film_film_distributor_relationship/film\t/m/0d1qmz"
+    },
+    {
+      "predictions": [
+        "/m/02mpyh",
+        "/m/0y_9q",
+        "/m/011yg9",
+        "/m/0g9lm2",
+        "/m/0_b9f"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.5489783790274143,
+      "example_id": "/m/02x2gy0\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/04jplwp"
+    },
+    {
+      "predictions": [
+        "/m/0d_skg",
+        "/m/06q8hf",
+        "/m/030_3z",
+        "/m/0h1p",
+        "/m/0693l"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.268033946670323,
+      "example_id": "/m/053rxgm\t/film/film/executive_produced_by\t/m/0g_rs_"
+    },
+    {
+      "predictions": [
+        "/m/048xh",
+        "/m/02vr7",
+        "/m/016376",
+        "/m/07h76",
+        "/m/0lzkm"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.4831513500824336,
+      "example_id": "/m/011k11\t/music/record_label/artist\t/m/03h_yfh"
+    },
+    {
+      "predictions": [
+        "/m/0fc9js",
+        "/m/0gkvb7",
+        "/m/08_vwq",
+        "/m/02qkk9_",
+        "/m/02grdc"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.3755058974543608,
+      "example_id": "/m/014zfs\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/0bdw6t"
+    },
+    {
+      "predictions": [
+        "/m/09p4w8",
+        "/m/02v8kmz",
+        "/m/0yzbg",
+        "/m/01q2nx",
+        "/m/0f4k49"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.3099308099455561,
+      "example_id": "/m/05typm\t/film/actor/film./film/performance/film\t/m/0k2cb"
+    },
+    {
+      "predictions": [
+        "/m/02_286",
+        "/m/035p3",
+        "/m/095w_",
+        "/m/030qb3t",
+        "/m/06y57"
+      ],
+      "toy_string_feature": "6",
+      "toy_float_feature": 0.8639574999625854,
+      "example_id": "/m/0cwy47\t/film/film/featured_film_locations\t/m/06c62"
+    },
+    {
+      "predictions": [
+        "/m/0g57ws5",
+        "/m/04grdgy",
+        "/m/09rwjly",
+        "/m/0bmj62v",
+        "/m/0hrcs29"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.9448236606359354,
+      "example_id": "/m/019vhk\t/film/film/film_festivals\t/m/09rwjly"
+    },
+    {
+      "predictions": [
+        "/m/05zppz",
+        "/m/02zsn",
+        "/m/02hrh1q",
+        "/m/01d_h8",
+        "/m/0np9r"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.33683749518997685,
+      "example_id": "/m/06sy4c\t/people/person/gender\t/m/05zppz"
+    },
+    {
+      "predictions": [
+        "/m/03cz9_",
+        "/m/01qvtwm",
+        "/m/0392kz",
+        "/m/02h8hr",
+        "/m/03d29b"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.34021604714894027,
+      "example_id": "/m/0dr1c2\t/tv/tv_program/regular_cast./tv/regular_tv_appearance/actor\t/m/04f62k"
+    },
+    {
+      "predictions": [
+        "/m/04_1l0v",
+        "/m/0k3gw",
+        "/m/0l2vz",
+        "/m/0yjvm",
+        "/m/0n56v"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.7820054136084154,
+      "example_id": "/m/07b_l\t/location/location/contains\t/m/013m43"
+    },
+    {
+      "predictions": [
+        "/m/01d_h8",
+        "/m/0q04f",
+        "/m/03gjzk",
+        "/m/0np9r",
+        "/m/018gz8"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.15511376717534198,
+      "example_id": "/m/0mm1q\t/people/person/profession\t/m/01d_h8"
+    },
+    {
+      "predictions": [
+        "/m/0g9lm2",
+        "/m/011yr9",
+        "/m/0_b9f",
+        "/m/02wk7b",
+        "/m/09gq0x5"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.33159134351538944,
+      "example_id": "/m/0prjs\t/film/director/film\t/m/062zjtt"
+    },
+    {
+      "predictions": [
+        "/m/03qbh5",
+        "/m/01d38g",
+        "/m/01c92g",
+        "/m/01ckrr",
+        "/m/01bgqh"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.3808862912276647,
+      "example_id": "/m/01v40wd\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/01c9dd"
+    },
+    {
+      "predictions": [
+        "/m/02kxbwx",
+        "/m/01gbn6",
+        "/m/07lt7b",
+        "/m/02mt4k",
+        "/m/0bl2g"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.5323660128847069,
+      "example_id": "/m/0kvgnq\t/award/award_winning_work/awards_won./award/award_honor/award_winner\t/m/05dppk"
+    },
+    {
+      "predictions": [
+        "/m/05pd94v",
+        "/m/013b2h",
+        "/m/02rjjll",
+        "/m/0jzphpx",
+        "/m/09n4nb"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.9948378544801223,
+      "example_id": "/m/01ckbq\t/award/award_category/winners./award/award_honor/ceremony\t/m/013b2h"
+    },
+    {
+      "predictions": [
+        "/m/095zlp",
+        "/m/02mpyh",
+        "/m/07l450",
+        "/m/0y_9q",
+        "/m/011yg9"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.05066504209468414,
+      "example_id": "/m/0f_nbyh\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/07yk1xz"
+    },
+    {
+      "predictions": [
+        "/m/04306rv",
+        "/m/02bjrlw",
+        "/m/06b_j",
+        "/m/03hkp",
+        "/m/0t_2"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.6185399761732099,
+      "example_id": "/m/0418wg\t/film/film/language\t/m/02bjrlw"
+    },
+    {
+      "predictions": [
+        "/m/03z19",
+        "/m/0f1r9",
+        "/m/07xl34",
+        "/m/05k17c",
+        "/m/0hm4q"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.49636701977926256,
+      "example_id": "/m/02kth6\t/organization/non_profit_organization/registered_with./organization/non_profit_registration/registering_agency\t/m/03z19"
+    },
+    {
+      "predictions": [
+        "/m/011ykb",
+        "/m/0f2sx4",
+        "/m/0bshwmp",
+        "/m/03lrht",
+        "/m/06_wqk4"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.47463380326397475,
+      "example_id": "/m/026c1\t/film/actor/film./film/performance/film\t/m/03s6l2"
+    },
+    {
+      "predictions": [
+        "/m/02hv44_",
+        "/m/05z96",
+        "/m/0kyk",
+        "/m/0d8qb",
+        "/m/0196pc"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.13048010031988166,
+      "example_id": "/m/03j90\t/people/person/profession\t/m/05z96"
+    },
+    {
+      "predictions": [
+        "/m/04j4tx",
+        "/m/0_b9f",
+        "/m/02mpyh",
+        "/m/011yg9",
+        "/m/0qmfz"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.8936193694380667,
+      "example_id": "/m/0p9sw\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/02zk08"
+    },
+    {
+      "predictions": [
+        "/m/03lty",
+        "/m/0173b0",
+        "/m/0172rj",
+        "/m/05r6t",
+        "/m/0xhtw"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.2506543028301145,
+      "example_id": "/m/01hydr\t/music/genre/parent_genre\t/m/0kz10"
+    },
+    {
+      "predictions": [
+        "/m/0g0syc",
+        "/m/081mh",
+        "/m/06mz5",
+        "/m/0824r",
+        "/m/03s5t"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.10151333987648914,
+      "example_id": "/m/01gtc0\t/government/legislative_session/members./government/government_position_held/district_represented\t/m/0vbk"
+    },
+    {
+      "predictions": [
+        "/m/05qx1",
+        "/m/047yc",
+        "/m/016wzw",
+        "/m/03ryn",
+        "/m/06t8v"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.38297195660536465,
+      "example_id": "/m/0h63gl9\t/film/film/release_date_s./film/film_regional_release_date/film_release_region\t/m/07ssc"
+    },
+    {
+      "predictions": [
+        "/m/02y_3rt",
+        "/m/07zqy",
+        "/m/0f4hc",
+        "/m/061xhr",
+        "/m/0hkwr"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.25691240254218084,
+      "example_id": "/m/033cnk\t/food/food/nutrients./food/nutrition_fact/nutrient\t/m/0f4hc"
+    },
+    {
+      "predictions": [
+        "/m/02y_3rt",
+        "/m/02y_3rf",
+        "/m/07zqy",
+        "/m/061xhr",
+        "/m/0hkwr"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.43139634901123247,
+      "example_id": "/m/033cnk\t/food/food/nutrients./food/nutrition_fact/nutrient\t/m/02y_3rf"
+    },
+    {
+      "predictions": [
+        "/m/03cffvv",
+        "/m/03rtz1",
+        "/m/01633c",
+        "/m/09p4w8",
+        "/m/0yzbg"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.576914480223062,
+      "example_id": "/m/084m3\t/film/actor/film./film/performance/film\t/m/034qrh"
+    },
+    {
+      "predictions": [
+        "/m/03v6t",
+        "/m/01jtp7",
+        "/m/03y5ky",
+        "/m/0kqj1",
+        "/m/02tz9z"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.014481315577963616,
+      "example_id": "/m/014mlp\t/education/educational_degree/people_with_this_degree./education/education/institution\t/m/01x5fb"
+    },
+    {
+      "predictions": [
+        "/m/054g1r",
+        "/m/06jntd",
+        "/m/0338lq",
+        "/m/03xq0f",
+        "/m/03xsby"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.30008552349748674,
+      "example_id": "/m/0b7l4x\t/film/film/production_companies\t/m/03sb38"
+    },
+    {
+      "predictions": [
+        "/m/01g63y",
+        "/m/0jgjn",
+        "/m/01bl8s",
+        "/m/02jknp",
+        "/m/0dgd_"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.19210337526676013,
+      "example_id": "/m/016yvw\t/people/person/spouse_s./people/marriage/type_of_union\t/m/01g63y"
+    },
+    {
+      "predictions": [
+        "/m/0415ggl",
+        "/m/02kfzz",
+        "/m/026njb5",
+        "/m/09p0ct",
+        "/m/04jkpgv"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.025555456181749814,
+      "example_id": "/m/06ltr\t/film/actor/film./film/performance/film\t/m/016ywb"
+    },
+    {
+      "predictions": [
+        "/m/03swmf",
+        "/m/03xx9l",
+        "/m/0btxr",
+        "/m/024t0y",
+        "/m/01gy7r"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.3125400164884271,
+      "example_id": "/m/01dq5z\t/education/educational_institution/students_graduates./education/education/student\t/m/03q95r"
+    },
+    {
+      "predictions": [
+        "/m/039v1",
+        "/m/0dz3r",
+        "/m/016z4k",
+        "/m/0gbbt",
+        "/m/0fnpj"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.24414017025872314,
+      "example_id": "/m/02vwckw\t/people/person/profession\t/m/0n1h"
+    },
+    {
+      "predictions": [
+        "/m/0789_m",
+        "/m/02py7pj",
+        "/m/0bs0bh",
+        "/m/0bb57s",
+        "/m/0gqyl"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.8294976514508408,
+      "example_id": "/m/049t4g\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/09sb52"
+    },
+    {
+      "predictions": [
+        "/m/03n0cd",
+        "/m/02v5_g",
+        "/m/03bx2lk",
+        "/m/0640y35",
+        "/m/05t0_2v"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.5603303062085913,
+      "example_id": "/m/08k881\t/film/actor/film./film/performance/film\t/m/01qncf"
+    },
+    {
+      "predictions": [
+        "/m/09jwl",
+        "/m/02dsz",
+        "/m/0n1h",
+        "/m/0nbcg",
+        "/m/016z4k"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.8430449452126317,
+      "example_id": "/m/01w58n3\t/people/person/profession\t/m/016z4k"
+    },
+    {
+      "predictions": [
+        "/m/02y_2y",
+        "/m/02kxbwx",
+        "/m/01gbn6",
+        "/m/04xn2m",
+        "/m/03_gd"
+      ],
+      "toy_string_feature": "4",
+      "toy_float_feature": 0.8765045457356647,
+      "example_id": "/m/0h_cssd\t/award/award_ceremony/awards_presented./award/award_honor/award_winner\t/m/0h0wc"
+    },
+    {
+      "predictions": [
+        "/m/048xh",
+        "/m/06mj4",
+        "/m/0lzkm",
+        "/m/01wt4wc",
+        "/m/01v_pj6"
+      ],
+      "toy_string_feature": "0",
+      "toy_float_feature": 0.8027727529998165,
+      "example_id": "/m/06by7\t/music/genre/artists\t/m/0153nq"
+    },
+    {
+      "predictions": [
+        "/m/02jx1",
+        "/m/06q1r",
+        "/m/07ssc",
+        "/m/09c7w0",
+        "/m/03rk0"
+      ],
+      "toy_string_feature": "9",
+      "toy_float_feature": 0.5474708744499922,
+      "example_id": "/m/01wxdn3\t/people/person/nationality\t/m/07ssc"
+    },
+    {
+      "predictions": [
+        "/m/026t6",
+        "/m/03q5t",
+        "/m/0bxl5",
+        "/m/013y1f",
+        "/m/02hnl"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.5668643311746053,
+      "example_id": "/m/01wxdn3\t/music/artist/track_contributions./music/track_contribution/role\t/m/011_6p"
+    },
+    {
+      "predictions": [
+        "/m/03g5jw",
+        "/m/0b1hw",
+        "/m/081wh1",
+        "/m/089pg7",
+        "/m/02r3zy"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.1714464182775417,
+      "example_id": "/m/03g5jw\t/influence/influence_node/influenced_by\t/m/014_lq"
+    },
+    {
+      "predictions": [
+        "/m/01km6_",
+        "/m/01n7rc",
+        "/m/0nbrp",
+        "/m/06y9v",
+        "/m/013t2y"
+      ],
+      "toy_string_feature": "2",
+      "toy_float_feature": 0.8876016778297033,
+      "example_id": "/m/02m97n\t/organization/organization/headquarters./location/mailing_address/citytown\t/m/09bkv"
+    },
+    {
+      "predictions": [
+        "/m/03_44z",
+        "/m/03zrhb",
+        "/m/0kqbh",
+        "/m/0425j7",
+        "/m/02b1j1"
+      ],
+      "toy_string_feature": "6",
+      "toy_float_feature": 0.44633608629460275,
+      "example_id": "/m/07y9k\t/sports/sports_league/teams./sports/sports_league_participation/team\t/m/035s37"
+    },
+    {
+      "predictions": [
+        "/m/015dvh",
+        "/m/05f4p",
+        "/m/07y0n",
+        "/m/0d6qjf",
+        "/m/02hcxm"
+      ],
+      "toy_string_feature": "1",
+      "toy_float_feature": 0.43753182903976207,
+      "example_id": "/m/06c97\t/organization/organization_founder/organizations_founded\t/m/05f4p"
+    },
+    {
+      "predictions": [
+        "/m/025m8l",
+        "/m/024fxq",
+        "/m/03tk6z",
+        "/m/02x17c2",
+        "/m/031b3h"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.6704024843382015,
+      "example_id": "/m/01cwhp\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/02f79n"
+    },
+    {
+      "predictions": [
+        "/m/025m8l",
+        "/m/024fxq",
+        "/m/03tk6z",
+        "/m/02x17c2",
+        "/m/031b3h"
+      ],
+      "toy_string_feature": "7",
+      "toy_float_feature": 0.8281393328645728,
+      "example_id": "/m/01cwhp\t/award/award_nominee/award_nominations./award/award_nomination/award\t/m/05zkcn5"
+    },
+    {
+      "predictions": [
+        "/m/02hczc",
+        "/m/02hcv8",
+        "/m/02lcrv",
+        "/m/02lcqs",
+        "/m/042g7t"
+      ],
+      "toy_string_feature": "5",
+      "toy_float_feature": 0.05392197578508029,
+      "example_id": "/m/02xry\t/location/location/time_zones\t/m/02hcv8"
+    },
+    {
+      "predictions": [
+        "/m/058x5",
+        "/m/01s5nb",
+        "/m/01y0s9",
+        "/m/0flw86",
+        "/m/072w0"
+      ],
+      "toy_string_feature": "8",
+      "toy_float_feature": 0.6512820529630794,
+      "example_id": "/m/02xry\t/location/statistical_region/religions./location/religion_percentage/religion\t/m/01y0s9"
+    },
+    {
+      "predictions": [
+        "/m/05kr_",
+        "/m/01pv51",
+        "/m/02sf_r",
+        "/m/02tx6q",
+        "/m/02_ssl"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.6609523155242024,
+      "example_id": "/m/018dh3\t/common/topic/webpage./common/webpage/category\t/m/08mbj5d"
+    },
+    {
+      "predictions": [
+        "/m/0y_9q",
+        "/m/07l450",
+        "/m/0_b9f",
+        "/m/0cvkv5",
+        "/m/0170yd"
+      ],
+      "toy_string_feature": "3",
+      "toy_float_feature": 0.6689978405379267,
+      "example_id": "/m/099c8n\t/award/award_category/nominees./award/award_nomination/nominated_for\t/m/064lsn"
+    }
+  ]
 }

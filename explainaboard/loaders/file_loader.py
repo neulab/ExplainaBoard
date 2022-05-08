@@ -240,10 +240,10 @@ class FileLoader:
                     src_name: str | int | Iterable[str] = field_mapping.get(
                         field.src_name, field.src_name
                     )
-                if isinstance(field.src_name, int):
-                    src_name = field.src_name
-                else:
+                elif isinstance(field.src_name, Iterable):
                     src_name = [field_mapping.get(x, x) for x in field.src_name]
+                else:
+                    src_name = field.src_name
                 new_field = copy.copy(field)
                 new_field.src_name = src_name
                 fields.append(new_field)

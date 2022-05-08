@@ -291,7 +291,7 @@ class TestCLI(TestCase):
             '--dataset',
             'fb15k_237',
             '--system_outputs',
-            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
             '--report_json',
             '/dev/null',
         ]
@@ -304,9 +304,9 @@ class TestCLI(TestCase):
             '--task',
             'kg-link-tail-prediction',
             '--custom_dataset_paths',
-            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
             '--system_outputs',
-            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json',  # noqa
+            f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
             '--report_json',
             '/dev/null',
         ]

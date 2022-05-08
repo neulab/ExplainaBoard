@@ -1,3 +1,4 @@
+import dataclasses
 import os
 import unittest
 
@@ -18,7 +19,7 @@ class TestNER(unittest.TestCase):
     conll_output_full = os.path.join(artifact_path, "conll2003-elmo-output.conll")
 
     json_output_customized = cache_api.cache_online_file(
-        'https://datalab-hub.s3.amazonaws.com/predictions/test-conll03.json',  # noqa
+        'https://phontron.com/download/explainaboard/test-conll03.json',
         'predictions/ner/test-conll03.json',
     )
 
@@ -164,45 +165,13 @@ class TestNER(unittest.TestCase):
             output_file_type=FileType.json,
         )
         data = loader.load()
-        metadata = loader.user_defined_metadata_configs
+        metadata = dataclasses.asdict(data.metadata)
         metadata.update(
             {
                 "task_name": TaskType.named_entity_recognition.value,
             }
         )
         processor = get_processor(TaskType.named_entity_recognition)
-        sys_info = processor.process(metadata, data)
-        self.assertIsNotNone(sys_info.results.fine_grained)
-        self.assertGreater(len(sys_info.results.overall), 0)
-
-    def test_customized_metadata2(self):
-
-        # Get metadata
-        file_type = FileType.json
-        dummy_task = TaskType.text_classification
-
-        loader = get_custom_dataset_loader(
-            dummy_task,
-            self.json_output_customized,
-            self.json_output_customized,
-            dataset_file_type=file_type,
-            output_file_type=file_type,
-        )
-        metadata = loader.user_defined_metadata_configs
-
-        # All things (loading & processing) will base on `metadata`
-        loader = get_datalab_loader(
-            metadata['task_name'],
-            dataset=DatalabLoaderOption(
-                metadata['dataset_name'], metadata['sub_dataset_name']
-            ),
-            output_data=self.json_output_customized,
-            output_source=Source.local_filesystem,
-            output_file_type=FileType.json,
-        )
-        data = loader.load()
-        processor = get_processor(TaskType.named_entity_recognition)
-        sys_info = processor.process(metadata, data)
-        processor.print_bucket_info(sys_info.results.fine_grained)
+        sys_info = processor.process(metadata, data.raw_data)
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
