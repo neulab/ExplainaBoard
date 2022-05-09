@@ -22,7 +22,6 @@
         "/m/0kz1h"
       ],
       "rel_type": "asymmetric",
-      "true_rank": 1,
       "example_id": "1"
     },
     {
@@ -38,7 +37,6 @@
         "/m/03c3yf"
       ],
       "rel_type": "asymmetric",
-      "true_rank": 12,
       "example_id": "2"
     },
     {
@@ -54,7 +52,6 @@
         "/m/0d0kn"
       ],
       "rel_type": "asymmetric",
-      "true_rank": 11,
       "example_id": "3"
     },
     {
@@ -70,7 +67,6 @@
         "/m/01llj3"
       ],
       "rel_type": "asymmetric",
-      "true_rank": 7,
       "example_id": "4"
     },
     {
@@ -86,7 +82,6 @@
         "/m/01llj3"
       ],
       "rel_type": "symmetric",
-      "true_rank": 1,
       "example_id": "5"
     },
     {
@@ -102,7 +97,6 @@
         "/m/02vqsll"
       ],
       "rel_type": "symmetric",
-      "true_rank": 1,
       "example_id": "6"
     },
     {
@@ -118,7 +112,6 @@
         "/m/02_06s"
       ],
       "rel_type": "symmetric",
-      "true_rank": 2,
       "example_id": "7"
     },
     {
@@ -134,7 +127,6 @@
         "/m/0jdd"
       ],
       "rel_type": "symmetric",
-      "true_rank": 1,
       "example_id": "8"
     },
     {
@@ -150,7 +142,6 @@
         "/m/01t_vv"
       ],
       "rel_type": "asymmetric",
-      "true_rank": 23,
       "example_id": "9"
     },
     {
@@ -166,7 +157,6 @@
         "/m/03zrhb"
       ],
       "rel_type": "symmetric",
-      "true_rank": 1,
       "example_id": "10"
     }
   ]

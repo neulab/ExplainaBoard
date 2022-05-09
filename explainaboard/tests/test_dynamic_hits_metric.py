@@ -2,6 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_registry import get_custom_dataset_loader
 from explainaboard.metric import HitsConfig
 from explainaboard.tests.utils import test_artifacts_path
@@ -22,7 +23,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             FileType.json,
         )
         data = loader.load()
-        self.assertEqual(loader.user_defined_features_configs, {})
+        self.assertEqual(data.metadata, FileLoaderMetadata())
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
@@ -32,7 +33,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.samples)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

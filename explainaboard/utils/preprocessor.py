@@ -13,7 +13,7 @@ from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
 @abc.abstractmethod
 class Preprocessor:
     def __init__(
-        self, language: str = "en", resources: Optional[dict[str, Any]] = None
+        self, language: str | None = None, resources: Optional[dict[str, Any]] = None
     ):
         self.language = language
         self.resources = resources or self.default_resources()
@@ -22,12 +22,12 @@ class Preprocessor:
         self.language = language
         return self
 
-    def default_resources(self) -> dict:
+    def default_resources(self) -> dict[str, Any]:
         """Returns default features for this processor."""
         return {}
 
     @abc.abstractmethod
-    def process(self, s: str, **kwargs) -> str:
+    def process(self, s: str, resources: dict[str, Any]) -> str:
         """
         Get default processing function
         :return:
@@ -40,7 +40,7 @@ class Preprocessor:
         :param text: text to be preprocessed
         :return: preprocessed text
         """
-        return self.process(text, **self.resources)
+        return self.process(text, self.resources)
 
 
 class MapPreprocessor(Preprocessor):
@@ -48,8 +48,8 @@ class MapPreprocessor(Preprocessor):
         """Returns default features for this processor."""
         return {"dictionary": {}}
 
-    def process(self, s: str, **kwargs) -> str:
-        return kwargs['dictionary'][s] if s in kwargs['dictionary'].keys() else s
+    def process(self, s: str, resources: dict[str, Any]) -> str:
+        return resources['dictionary'].get(s, s)
 
 
 class KGMapPreprocessor(Preprocessor):
@@ -57,13 +57,13 @@ class KGMapPreprocessor(Preprocessor):
         """Returns default features for this processor."""
         return {"dictionary": {}}
 
-    def process(self, s: str, **kwargs) -> str:
+    def process(self, s: str, resources: dict[str, Any]) -> str:
         return (
-            kwargs['dictionary'][s]["label"] if s in kwargs['dictionary'].keys() else s
+            resources['dictionary'][s]["label"] if s in resources['dictionary'] else s
         )
 
 
-class QAPreprocessor(Preprocessor):
+class ExtractiveQAPreprocessor(Preprocessor):
     """
     A preprocessor to process answers in extractive QA tasks.
     Currently it is based on the MLQA paper.
@@ -84,10 +84,10 @@ class QAPreprocessor(Preprocessor):
         """Returns default features for this processor."""
         return {"language": self.language}
 
-    def process(self, s: str, **kwargs) -> str:
+    def process(self, s: str, resources: dict[str, Any]) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
 
-        language = kwargs['language']
+        language = resources['language']
 
         def remove_articles(text, lang):
             if lang == 'en' or lang is None:

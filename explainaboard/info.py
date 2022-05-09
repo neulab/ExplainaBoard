@@ -13,7 +13,6 @@ from explainaboard.feature import Features
 from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tokenizer import Tokenizer
-from explainaboard.utils.typing_utils import unwrap
 
 logger = get_logger(__name__)
 
@@ -115,7 +114,8 @@ class SysOutputInfo:
         model_name (str): the name of the system .
         dataset_name (str): the dataset used of the system.
         sub_dataset_name (str): the name of the sub-dataset.
-        language (str): the language of the dataset.
+        source_language (str): the language of the input
+        target_language (str): the language of the output
         code (str): the url of the code.
         download_link (str): the url of the system output.
         paper (Paper, optional): the published paper of the system.
@@ -131,13 +131,15 @@ class SysOutputInfo:
     dataset_name: Optional[str] = None
     sub_dataset_name: Optional[str] = None
     dataset_split: Optional[str] = None
-    language: str = "en"
+    source_language: str | None = None
+    target_language: str | None = None
     reload_stat: bool = True
     is_print_case: bool = True
     conf_value: float = 0.05
     system_details: Optional[dict] = None
     metric_configs: Optional[list[MetricConfig]] = None
-    tokenizer: Optional[Tokenizer] = None
+    source_tokenizer: Optional[Tokenizer] = None
+    target_tokenizer: Optional[Tokenizer] = None
 
     # set later
     # code: str = None
@@ -148,9 +150,6 @@ class SysOutputInfo:
 
     def to_dict(self) -> dict:
         return asdict(self)
-
-    def tokenize(self, src: str) -> list[str]:
-        return unwrap(self.tokenizer)(src)
 
     def replace_nonstring_keys(self, data):
         if isinstance(data, list):

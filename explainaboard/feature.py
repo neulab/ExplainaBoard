@@ -77,6 +77,8 @@ class FeatureType:
     is_bucket: bool = False
     # bucket_info: hyper-parameters for bucketing when is_bucket is True
     bucket_info: Optional[BucketInfo] = None
+    # is_custom: whether this is a custom feature input from outside
+    is_custom: bool = False
     # require_training_set: whether calculating this feature
     # relies on the training samples
     require_training_set: bool = False

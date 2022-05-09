@@ -1,11 +1,11 @@
 {
-  "user_defined_metadata_configs": {
+  "metadata": {
     "task_name": "text-classification",
     "model_name": "test-for-users-specific",
     "dataset_name": "sst2",
     "language": "en"
   },
-  "predictions": [
+  "examples": [
     {
       "predicted_label": "negative"
     },

@@ -21,9 +21,9 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
@@ -70,9 +70,9 @@ class ConditionalGenerationProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                "num_oov": feature.Value(
+                "src_num_oov": feature.Value(
                     dtype="float",
-                    description="the number of out-of-vocabulary words",
+                    description="the number of out-of-vocabulary words in the source",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -86,6 +86,32 @@ class ConditionalGenerationProcessor(Processor):
                     description=(
                         "the average rank of each word in the source sentence based on "
                         "its frequency in training set"
+                    ),
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
+                ),
+                "ref_num_oov": feature.Value(
+                    dtype="float",
+                    description="the number of out-of-vocabulary words in the "
+                    "reference",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                    require_training_set=True,
+                ),
+                "ref_fre_rank": feature.Value(
+                    dtype="float",
+                    description=(
+                        "the average rank of each word in the reference sentence based "
+                        "on its frequency in training set"
                     ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
@@ -176,12 +202,21 @@ class ConditionalGenerationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         defaults = ['rouge1', 'rouge2', 'rougeL', 'bleu', 'length_ratio']
-        return [EaaSMetricConfig(name=x, language=language) for x in defaults]
+        return [
+            EaaSMetricConfig(
+                name=x, source_language=source_language, target_language=target_language
+            )
+            for x in defaults
+        ]
 
     @classmethod
-    def full_metric_list(cls, language=None) -> list[MetricConfig]:
+    def full_metric_list(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         full_metrics = [
             "bleu",
             "bart_score_summ",
@@ -200,27 +235,32 @@ class ConditionalGenerationProcessor(Processor):
             "length",
             "length_ratio",
         ]
-        return [EaaSMetricConfig(name=x, language=language) for x in full_metrics]
+        return [
+            EaaSMetricConfig(
+                name=x, source_language=source_language, target_language=target_language
+            )
+            for x in full_metrics
+        ]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_source_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["source"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["source"]))
 
     def _get_reference_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["reference"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_features["reference"]))
 
     def _get_hypothesis_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["hypothesis"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_features["hypothesis"]))
 
     # training set dependent features (could be merged for optimization?)
-    def _get_num_oov(
+    def _get_src_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
             existing_features,
-            statistics,
+            statistics['source_vocab'],
             lambda x: x['source'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     def _get_src_fre_rank(
@@ -228,9 +268,29 @@ class ConditionalGenerationProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics,
+            statistics['source_vocab'],
             lambda x: x['source'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
+        )
+
+    def _get_ref_num_oov(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
+        return explainaboard.utils.feature_funcs.feat_num_oov(
+            existing_features,
+            statistics['target_vocab'],
+            lambda x: x['reference'],
+            unwrap(sys_info.target_tokenizer),
+        )
+
+    def _get_ref_fre_rank(
+        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
+    ):
+        return explainaboard.utils.feature_funcs.feat_freq_rank(
+            existing_features,
+            statistics['target_vocab'],
+            lambda x: x['reference'],
+            unwrap(sys_info.target_tokenizer),
         )
 
     def _get_true_label(self, data_point: dict):
@@ -289,10 +349,10 @@ class ConditionalGenerationProcessor(Processor):
                 metric_stats[k] = v
 
     def _get_feature_info(self, name: str):
-        if name in self._features:
-            return self._features[name]
+        if name in self._default_features:
+            return self._default_features[name]
         else:
-            return self._features['ref_tok_info'][name]
+            return self._default_features['ref_tok_info'][name]
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -307,9 +367,9 @@ class ConditionalGenerationProcessor(Processor):
         ref_test_freq: dict[str, int] = {}
         src_test_freq: dict[str, int] = {}
         for dict_sysout in sys_output:
-            for ref_tok in sys_info.tokenize(dict_sysout['reference']):
+            for ref_tok in unwrap(sys_info.target_tokenizer)(dict_sysout['reference']):
                 ref_test_freq[ref_tok] = ref_test_freq.get(ref_tok, 0) + 1
-            for src_tok in sys_info.tokenize(dict_sysout['source']):
+            for src_tok in unwrap(sys_info.source_tokenizer)(dict_sysout['source']):
                 src_test_freq[src_tok] = src_test_freq.get(src_tok, 0) + 1
 
         sys_features = unwrap(sys_info.features)
@@ -348,8 +408,8 @@ class ConditionalGenerationProcessor(Processor):
                     dict_sysout[bucket_key] = bucket_func(sys_info, dict_sysout)
 
             # span features for true and predicted spans
-            ref_toks = sys_info.tokenize(dict_sysout['reference'])
-            hyp_toks = sys_info.tokenize(dict_sysout['hypothesis'])
+            ref_toks = unwrap(sys_info.target_tokenizer)(dict_sysout['reference'])
+            hyp_toks = unwrap(sys_info.target_tokenizer)(dict_sysout['hypothesis'])
             dict_sysout["ref_tok_info"] = self._complete_tok_features(
                 ref_toks, hyp_toks, ref_test_freq, statistics=external_stats
             )
@@ -363,7 +423,7 @@ class ConditionalGenerationProcessor(Processor):
 
         # Get training set stats if they exist
         has_stats = statistics is not None and len(statistics) > 0
-        fre_dic = statistics["vocab"] if has_stats else None
+        fre_dic = statistics["target_vocab"] if has_stats else None
 
         # Find tokens in other set
         other_tok_list = defaultdict(list)
@@ -527,7 +587,12 @@ class ConditionalGenerationProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['reference'], tokenizer
-        )
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+        return {
+            'source_vocab': accumulate_vocab_from_samples(
+                samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
+            ),
+            'target_vocab': accumulate_vocab_from_samples(
+                samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
+            ),
+        }

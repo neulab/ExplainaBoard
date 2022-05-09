@@ -9,8 +9,12 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metric import AccuracyConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
-from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.feature_funcs import (
+    accumulate_vocab_from_samples,
+    feat_freq_rank,
+    feat_num_oov,
+    get_similarity_by_sacrebleu,
+)
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -103,33 +107,39 @@ class TextPairClassificationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [AccuracyConfig(name='Accuracy', language=language)]
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        return [AccuracyConfig(name='Accuracy')]
 
     @aggregating()
-    def _statistics_func(self, samples, tokenizer: Tokenizer):
-
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['text1'] + x['text2'], tokenizer
-        )
+    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+        return {
+            'source_vocab': accumulate_vocab_from_samples(
+                samples, lambda x: x['text1'], unwrap(sys_info.source_tokenizer)
+            ),
+            'target_vocab': accumulate_vocab_from_samples(
+                samples, lambda x: x['text2'], unwrap(sys_info.target_tokenizer)
+            ),
+        }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity(self, sys_info: SysOutputInfo, existing_features: dict):
-        return explainaboard.utils.feature_funcs.get_similarity_by_sacrebleu(
+        return get_similarity_by_sacrebleu(
             existing_features["text1"], existing_features["text2"]
         )
 
     def _get_text1_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["text1"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["text1"]))
 
     def _get_text2_length(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return len(sys_info.tokenize(existing_feature["text2"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_feature["text2"]))
 
     def _get_text1_divided_text2(self, sys_info: SysOutputInfo, existing_feature: dict):
         return (
-            len(sys_info.tokenize(existing_feature["text1"]))
+            len(unwrap(sys_info.source_tokenizer)(existing_feature["text1"]))
             * 1.0
-            / len(sys_info.tokenize(existing_feature["text2"]))
+            / len(unwrap(sys_info.target_tokenizer)(existing_feature["text2"]))
         )
 
     def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
@@ -139,11 +149,16 @@ class TextPairClassificationProcessor(Processor):
     def _get_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
+        return feat_num_oov(
             existing_features,
-            statistics,
-            lambda x: x['text1'] + x['text2'],
-            unwrap(sys_info.tokenizer),
+            statistics['source_vocab'],
+            lambda x: x['text1'],
+            unwrap(sys_info.source_tokenizer),
+        ) + feat_num_oov(
+            existing_features,
+            statistics['target_vocab'],
+            lambda x: x['text2'],
+            unwrap(sys_info.target_tokenizer),
         )
 
     # training set dependent features (this could be merged into the above one for
@@ -151,9 +166,14 @@ class TextPairClassificationProcessor(Processor):
     def _get_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
+        return feat_freq_rank(
             existing_features,
-            statistics,
-            lambda x: x['text1'] + x['text2'],
-            unwrap(sys_info.tokenizer),
+            statistics['source_vocab'],
+            lambda x: x['text1'],
+            unwrap(sys_info.source_tokenizer),
+        ) + feat_freq_rank(
+            existing_features,
+            statistics['target_vocab'],
+            lambda x: x['text2'],
+            unwrap(sys_info.target_tokenizer),
         )

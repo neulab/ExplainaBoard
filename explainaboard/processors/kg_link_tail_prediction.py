@@ -5,7 +5,6 @@ import json
 
 from datalabs import aggregating
 
-# TODO(odashi): Add a function to obtain metric class instead of using getattr.
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metric import (
@@ -22,7 +21,6 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -122,14 +120,16 @@ class KGLinkTailPredictionProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         return [
-            HitsConfig(name='Hits1', hits_k=1, language=language),
-            HitsConfig(name='Hits2', hits_k=2, language=language),
-            HitsConfig(name='Hits3', hits_k=3, language=language),
-            HitsConfig(name='Hits5', hits_k=5, language=language),
-            MeanReciprocalRankConfig(name='MRR', language=language),
-            MeanRankConfig(name='MR', language=language),
+            HitsConfig(name='Hits1', hits_k=1),
+            HitsConfig(name='Hits2', hits_k=2),
+            HitsConfig(name='Hits3', hits_k=3),
+            HitsConfig(name='Hits5', hits_k=5),
+            MeanReciprocalRankConfig(name='MRR'),
+            MeanRankConfig(name='MR'),
         ]
 
     # TODO: is this the best place to put this?
@@ -157,9 +157,7 @@ class KGLinkTailPredictionProcessor(Processor):
             self.entity_type_level_map = json.load(file)
 
     @aggregating()
-    def _statistics_func(
-        self, samples: Iterator[dict[str, str]], tokenizer: Tokenizer | None = None
-    ):
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
@@ -269,10 +267,14 @@ class KGLinkTailPredictionProcessor(Processor):
         return str(most_specific_level)
 
     def _get_tail_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["true_tail_decipher"]))
+        return len(
+            unwrap(sys_info.target_tokenizer)(existing_features["true_tail_decipher"])
+        )
 
     def _get_head_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["true_head_decipher"]))
+        return len(
+            unwrap(sys_info.source_tokenizer)(existing_features["true_head_decipher"])
+        )
 
     def _get_tail_fre(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics

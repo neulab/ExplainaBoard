@@ -13,7 +13,6 @@ from explainaboard.utils import bucketing
 from explainaboard.utils.analysis import cap_feature
 from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -164,10 +163,12 @@ class LanguageModelingProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
         return [
-            LogProbConfig(name='Perplexity', language=language, ppl=True),
-            LogProbConfig(name='LogProb', language=language, ppl=False),
+            LogProbConfig(name='Perplexity', ppl=True),
+            LogProbConfig(name='LogProb', ppl=False),
         ]
 
     def _get_true_label(self, data_point: dict):
@@ -199,7 +200,7 @@ class LanguageModelingProcessor(Processor):
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         length_fre = 0
-        length = len(sys_info.tokenize(existing_features["text"]))
+        length = len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
 
         if length in statistics['length_fre'].keys():
             length_fre = statistics['length_fre'][length]
@@ -231,7 +232,9 @@ class LanguageModelingProcessor(Processor):
         )
 
         # One pass over the test set to find token test frequency
-        all_tokens = [sys_info.tokenize(x['output']) for x in sys_output]
+        all_tokens = [
+            unwrap(sys_info.source_tokenizer)(x['output']) for x in sys_output
+        ]
         all_log_probs = [self._get_predicted_label(x) for x in sys_output]
         test_freq: dict[str, int] = {}
         for tokens in all_tokens:
@@ -355,10 +358,8 @@ class LanguageModelingProcessor(Processor):
         (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket_true: a dictionary mapping bucket interval names to
+        :param samples_over_bucket: a dictionary mapping bucket interval names to
             true sample IDs
-        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to
-            predicted sample IDs
         :return: bucket_name_to_performance: a dictionary that maps bucket names to
             bucket performance
         """
@@ -397,18 +398,11 @@ class LanguageModelingProcessor(Processor):
         return sort_dict(bucket_name_to_performance)
 
     @aggregating()
-    def _statistics_func(self, samples, tokenizer: Tokenizer):
-        """
-        Input:
-        samples: [{
-         "text":
-         "label":
-        }]
-        """
-
+    def _statistics_func(self, samples, sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0
+        tokenizer = unwrap(sys_info.source_tokenizer)
         for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)

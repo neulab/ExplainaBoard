@@ -11,7 +11,6 @@ from explainaboard.metric import ExactMatchQAConfig, F1ScoreQAConfig, MetricConf
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
-from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -90,41 +89,51 @@ class QAExtractiveProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        if source_language != target_language:
+            raise ValueError(
+                'Source and target language must be equal for extractive '
+                f'QA, but got {source_language} and {target_language}'
+            )
         return [
-            F1ScoreQAConfig(name='F1', language=language),
-            ExactMatchQAConfig(name='ExactMatch', language=language),
+            F1ScoreQAConfig(
+                name='F1',
+                source_language=source_language,
+                target_language=target_language,
+            ),
+            ExactMatchQAConfig(
+                name='ExactMatch',
+                source_language=source_language,
+                target_language=target_language,
+            ),
         ]
 
     @aggregating()
-    def _statistics_func(self, samples: Iterator, tokenizer: Tokenizer):
-        """
-        Input:
-        samples: [{
-         "id":str
-         "context":str
-         "question":str
-         "answers":Dict
-         "options"
-        }]
-        """
-
+    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
-            samples, lambda x: x['context'], tokenizer
+            samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["context"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
 
     def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(sys_info.tokenize(existing_features["question"]))
+        return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
         if isinstance(existing_features["answers"]["text"], list):
-            return len(sys_info.tokenize(existing_features["answers"]["text"][0]))
+            return len(
+                unwrap(sys_info.source_tokenizer)(
+                    existing_features["answers"]["text"][0]
+                )
+            )
         else:
-            return len(sys_info.tokenize(existing_features["answers"]["text"]))
+            return len(
+                unwrap(sys_info.source_tokenizer)(existing_features["answers"]["text"])
+            )
 
     def _get_sim_context_question(
         self, sys_info: SysOutputInfo, existing_features: dict
@@ -144,7 +153,7 @@ class QAExtractiveProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['context'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     def _get_fre_rank(
@@ -154,7 +163,7 @@ class QAExtractiveProcessor(Processor):
             existing_features,
             statistics,
             lambda x: x['context'],
-            unwrap(sys_info.tokenizer),
+            unwrap(sys_info.source_tokenizer),
         )
 
     # --- End feature functions

@@ -12,7 +12,7 @@ from eaas.endpoint import EndpointConfig
 import numpy as np
 import sacrebleu
 
-from explainaboard.utils.preprocessor import Preprocessor, QAPreprocessor
+from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, Span
 from explainaboard.utils.typing_utils import unwrap
 
@@ -55,7 +55,8 @@ class MetricConfig(dict):
     """
 
     name: str
-    language: str = "en"
+    source_language: str | None = None
+    target_language: str | None = None
     cls_name: str = ''
 
     def __post_init__(self):
@@ -726,7 +727,7 @@ class EaaSMetric(Metric):
         raise NotImplementedError
 
 
-class QAMetric(Metric):
+class ExtractiveQAMetric(Metric):
     """
     An abstract class for extractive QA tasks that measures scores after normalization.
     The actual metric must inherit this class and implement the sample_level_metric()
@@ -741,7 +742,7 @@ class QAMetric(Metric):
     ) -> MetricStats:
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
         config = self._get_config(config)
-        preprocessor = QAPreprocessor(language=config.language)
+        preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
         return MetricStats(
             np.array(
                 [
@@ -767,7 +768,7 @@ class ExactMatchQAConfig(MetricConfig):
         return ExactMatchQA(self)
 
 
-class ExactMatchQA(QAMetric):
+class ExactMatchQA(ExtractiveQAMetric):
     """
     Calculate a score for extractive QA based on exact match.
     """
@@ -784,7 +785,7 @@ class F1ScoreQAConfig(MetricConfig):
         return F1ScoreQA(self)
 
 
-class F1ScoreQA(QAMetric):
+class F1ScoreQA(ExtractiveQAMetric):
     """
     Calculate a score for extractive QA based on F1 score.
     """
@@ -852,13 +853,21 @@ class LogProb(Metric):
         return val
 
 
-def metric_name_to_config(name: str) -> MetricConfig:
+def metric_name_to_config(
+    name: str, source_language: str, target_language: str
+) -> MetricConfig:
     try:
         metric_module = sys.modules[__name__]
         metric_config = getattr(metric_module, f'{name}Config')
-        return metric_config(name=name)
+        return metric_config(
+            name=name, source_language=source_language, target_language=target_language
+        )
     except AttributeError:
         if name in EndpointConfig().valid_metrics:
-            return EaaSMetricConfig(name=name)
+            return EaaSMetricConfig(
+                name=name,
+                source_language=source_language,
+                target_language=target_language,
+            )
         else:
             raise ValueError(f'Invalid metric {name}')

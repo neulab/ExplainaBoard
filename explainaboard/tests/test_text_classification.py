@@ -1,8 +1,9 @@
+import dataclasses
 import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.loaders.file_loader import DatalabLoaderOption, FileLoaderMetadata
 from explainaboard.loaders.loader_registry import (
     get_custom_dataset_loader,
     get_datalab_loader,
@@ -43,8 +44,8 @@ class TestTextClassification(unittest.TestCase):
             dataset_file_type=FileType.json,
             output_file_type=FileType.json,
         )
-        self.assertTrue(loader.user_defined_metadata_configs)
         data = loader.load()
+        self.assertNotEqual(data.metadata, FileLoaderMetadata())
         self.assertEqual(len(data), 7)
         self.assertEqual(
             data[6],
@@ -132,12 +133,12 @@ class TestTextClassification(unittest.TestCase):
             FileType.json,
             FileType.json,
         )
-        self.assertTrue(loader.user_defined_metadata_configs)
         data = loader.load()
-        metadata = loader.user_defined_metadata_configs
+        self.assertNotEqual(data.metadata, FileLoaderMetadata)
+        metadata = dataclasses.asdict(data.metadata)
         processor = get_processor(TaskType.text_classification)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.samples)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

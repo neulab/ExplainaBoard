@@ -43,8 +43,7 @@ class KgLinkTailPredictionLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        # Map entity into an interpretable version
-        entity_dic = {}
+
         file_path = cache_api.cache_online_file(
             'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
             'pre_computed/kg/entity2wikidata.json',

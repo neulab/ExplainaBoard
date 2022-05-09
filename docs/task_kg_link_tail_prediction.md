@@ -67,7 +67,7 @@ where
 * `predictions`: a list of predictions
 
 Let's say we have one system output file: 
-* [test-kg-prediction-no-user-defined-new.json](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-no-user-defined-new.json) 
+* [test-kg-prediction-no-user-defined.json](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-no-user-defined.json) 
 
 
 
@@ -76,7 +76,7 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
+explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
 
 ```
 where
@@ -177,7 +177,7 @@ Note that you must provide the rank of the true entity in the predictions, for a
 
 ### Perform Analysis with CLI
 
-An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-user-defined-new.json), and you can test it using the following command:
+An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-user-defined.json), and you can test it using the following command:
 
 ```shell
 explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/data_mini.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json

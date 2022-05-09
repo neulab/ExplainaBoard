@@ -14,8 +14,10 @@ class CWSProcessor(SeqLabProcessor):
         return TaskType.word_segmentation
 
     @classmethod
-    def default_metrics(cls, language=None) -> list[MetricConfig]:
-        return [BMESF1ScoreConfig(name='F1', language=language)]
+    def default_metrics(
+        cls, source_language=None, target_language=None
+    ) -> list[MetricConfig]:
+        return [BMESF1ScoreConfig(name='F1')]
 
     @classmethod
     def default_span_ops(cls) -> BMESSpanOps:

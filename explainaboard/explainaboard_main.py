@@ -6,7 +6,6 @@ import os
 import sys
 
 from explainaboard import (
-    FileType,
     get_custom_dataset_loader,
     get_datalab_loader,
     get_processor,
@@ -16,7 +15,11 @@ from explainaboard.analyzers import get_pairwise_performance_gap
 from explainaboard.analyzers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
-from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.loaders.file_loader import (
+    DatalabLoaderOption,
+    FileLoaderField,
+    FileLoaderMetadata,
+)
 from explainaboard.metric import metric_name_to_config
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
@@ -24,13 +27,18 @@ from explainaboard.utils.tensor_analysis import (
     filter_score_tensor,
     print_score_tensor,
 )
+from explainaboard.utils.typing_utils import unwrap
 
 
-def get_tasks(task: str, system_outputs: list[str]) -> list[str]:
-    """TODO: TaskType.text_classification is set for temporal use, this needs to be
-    fixed
+def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
     """
-    real_tasks: list[str]
+    Get the task for each system output.
+    :param task: Explicitly specified task. Use if present
+    :param system_outputs: System output files, load from metadata in these files if
+      an explicit task is not set
+    :return: A list of task types for each system
+    """
+    real_tasks: list[TaskType] = []
     if task:
         real_tasks = [task] * len(system_outputs)
         if task not in TaskType.list():
@@ -40,22 +48,22 @@ def get_tasks(task: str, system_outputs: list[str]) -> list[str]:
             )
         return real_tasks
     else:
-        file_type = FileType.json
-        dummy_task = TaskType.text_classification
         for sys_output in system_outputs:
-            loader = get_custom_dataset_loader(
-                dummy_task,
-                sys_output,
-                sys_output,
-                dataset_file_type=file_type,
-                output_file_type=file_type,
-            )
-            if not loader.user_defined_metadata_configs:
+            # give me a task, or give me death (by exception)
+            task_or_die: TaskType | None = None
+            msg: str = ''
+            try:
+                metadata = FileLoaderMetadata.from_file(sys_output)
+                task_or_die = TaskType(unwrap(metadata.task_name))
+            except Exception as e:
+                msg = str(e)
+            if task_or_die is None:
                 raise ValueError(
-                    f"user_defined_metadata_configs in system output {sys_output} "
-                    "hasn't been specified or task name should be specified"
+                    'Must either specify a task explicitly or have one '
+                    'specified in metadata, but could find neither for '
+                    f'{sys_output}. {msg}'
                 )
-            real_tasks.append(loader.user_defined_metadata_configs['task_name'])
+            real_tasks.append(unwrap(task_or_die))
     return real_tasks
 
 
@@ -206,10 +214,21 @@ def create_parser():
 
     parser.add_argument(
         '--language',
+        '--target_language',
+        dest='target_language',
         type=str,
         required=False,
-        default="en",
-        help="the language of system output",
+        default=None,
+        help="the language of system output, defaults to the default of the dataset if "
+        "available, ",
+    )
+
+    parser.add_argument(
+        '--source_language',
+        type=str,
+        required=False,
+        default=None,
+        help="language of system input",
     )
 
     parser.add_argument(
@@ -328,14 +347,21 @@ def main():
         # check for benchmark submission: explainaboard  --system_outputs ./data/
         # system_outputs/sst2/user_specified_metadata.json
         num_systems = len(system_outputs)
-        tasks = get_tasks(args.task, system_outputs)
         dataset_file_types: list[str | None] = [dataset_file_type] * num_systems
         output_file_types: list[str | None] = [output_file_type] * num_systems
         custom_dataset_paths: list[str] | None = args.custom_dataset_paths
         dataset: str | None = args.dataset
         sub_dataset: str | None = args.sub_dataset
         split: str = args.split
+        target_language: str = args.target_language
+        source_language: str = args.source_language or target_language
+        tasks = get_tasks(args.task, system_outputs)
 
+        # Some loaders need to know the language of the inputs and outputs
+        loader_field_mapping = {
+            FileLoaderField.SOURCE_LANGUAGE: source_language,
+            FileLoaderField.TARGET_LANGUAGE: target_language,
+        }
         if custom_dataset_paths:  # load custom datasets
             loaders = [
                 get_custom_dataset_loader(
@@ -346,6 +372,7 @@ def main():
                     Source.local_filesystem,
                     dataset_file_type,
                     output_file_type,
+                    field_mapping=loader_field_mapping,
                 )
                 for task, dataset, output, dataset_file_type, output_file_type in zip(
                     tasks,
@@ -365,6 +392,7 @@ def main():
                     sys_output,
                     Source.local_filesystem,
                     output_file_type,
+                    field_mapping=loader_field_mapping,
                 )
                 for task, sys_output, output_file_type in zip(
                     tasks, system_outputs, output_file_types
@@ -382,32 +410,38 @@ def main():
                     'files '
                     f'{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
                 )
-            if (
-                loaders[0].user_defined_features_configs
-                != loaders[1].user_defined_features_configs
-            ):
-                raise ValueError(
-                    "User defined features must be the same for pairwise analysis."
-                )
+
+        # TODO(gneubig): This gets metadata from the first system and assumes it's the
+        #  same for other systems
+        target_language = (
+            target_language or system_datasets[0].metadata.target_language or 'en'
+        )
+        source_language = (
+            source_language
+            or system_datasets[0].metadata.source_language
+            or target_language
+        )
 
         # Setup metadata
         metadata = {
             "dataset_name": dataset,
             "sub_dataset_name": sub_dataset,
             "split_name": split,
-            "language": args.language,
+            "source_language": source_language,
+            "target_language": target_language,
             "reload_stat": reload_stat,
             "conf_value": args.conf_value,
             "system_details": system_details,
+            "custom_features": system_datasets[0].metadata.custom_features,
         }
 
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
-            metric_configs = [metric_name_to_config(name) for name in metric_names]
-            if args.language is not None:
-                for metric_config in metric_configs:
-                    metric_config.language = args.language
+            metric_configs = [
+                metric_name_to_config(name, source_language, target_language)
+                for name in metric_names
+            ]
             metadata["metric_configs"] = metric_configs
 
         # Run analysis
@@ -416,10 +450,10 @@ def main():
             loaders, system_datasets, system_outputs, tasks
         ):
 
-            metadata.update(loader.user_defined_metadata_configs)
-            metadata[
-                "user_defined_features_configs"
-            ] = loader.user_defined_features_configs
+            # metadata.update(loader.user_defined_metadata_configs)
+            # metadata[
+            #     "user_defined_features_configs"
+            # ] = loader.user_defined_features_configs
             metadata["task_name"] = task
 
             processor = get_processor(task=task)
