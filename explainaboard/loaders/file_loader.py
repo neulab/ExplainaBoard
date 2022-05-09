@@ -89,7 +89,8 @@ class FileLoaderMetadata:
     :param supported_tasks: The task or tasks that *can* be handeled (e.g. by a dataset)
     """
 
-    system_name: str | None = None
+    model_name: str | None = None
+    dataset_name: str | None = None
     source_language: str | None = None
     target_language: str | None = None
     supported_languages: list[str] | None = None
@@ -103,7 +104,8 @@ class FileLoaderMetadata:
         two conflict, the passed-in metadata get preference.
         """
         # TODO(gneubig): This should be changed into a for loop
-        self.system_name = other.system_name or self.system_name
+        self.model_name = other.model_name or self.model_name
+        self.dataset_name = other.dataset_name or self.dataset_name
         self.source_language = other.source_language or self.source_language
         self.target_language = other.target_language or self.target_language
         self.supported_languages = other.supported_languages or self.supported_languages
@@ -115,12 +117,22 @@ class FileLoaderMetadata:
     def from_dict(cls, data: dict) -> FileLoaderMetadata:
         # TODO(gneubig): A better way to do this might be through a library such as
         #                pydantic or dacite
+        source_language = data.get('source_language')
+        target_language = data.get('target_language')
+        if data.get('language'):
+            if source_language or target_language:
+                raise ValueError(
+                    'can not set both "language" and "source_language"/'
+                    '"target_language"'
+                )
+            source_language = target_language = data.get('language')
         return FileLoaderMetadata(
-            system_name=data.get('system_name'),
-            source_language=data.get('source_language'),
-            target_language=data.get('target_language'),
+            model_name=data.get('model_name'),
+            dataset_name=data.get('dataset_name'),
+            source_language=source_language,
+            target_language=target_language,
             supported_languages=data.get('supported_languages'),
-            task=data.get('task'),
+            task=data.get('task') or data.get('task_name'),
             supported_tasks=data.get('supported_tasks'),
             custom_features=data.get('custom_features'),
         )
