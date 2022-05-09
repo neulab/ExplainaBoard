@@ -74,7 +74,7 @@ class SingleSpaceTokenizer(Tokenizer):
         return ' '.join(tokens)
 
     def json_repr(self):
-        return {'cls': 'SingleSpaceTokenizer'}
+        return {'cls_name': 'SingleSpaceTokenizer'}
 
 
 class TokenizerConala(BaseTokenizer):
@@ -129,7 +129,7 @@ class SacreBleuTokenizer(Tokenizer):
         raise NotImplementedError
 
     def json_repr(self):
-        return {'cls': 'SacreBleuTokenizer', 'variety': self.variety}
+        return {'cls_name': 'SacreBleuTokenizer', 'variety': self.variety}
 
 
 class MLQAMixTokenizer(Tokenizer):
@@ -166,4 +166,4 @@ class MLQAMixTokenizer(Tokenizer):
         raise NotImplementedError
 
     def json_repr(self):
-        return {'cls': 'MLQAMixTokenizer'}
+        return {'cls_name': 'MLQAMixTokenizer'}
