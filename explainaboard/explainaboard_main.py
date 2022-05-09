@@ -53,7 +53,7 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
             msg: str = ''
             try:
                 metadata = FileLoaderMetadata.from_file(sys_output)
-                task_or_die = TaskType(unwrap(metadata.task))
+                task_or_die = TaskType(unwrap(metadata.task_name))
             except Exception as e:
                 msg = str(e)
             if task_or_die is None:
