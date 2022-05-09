@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import csv
+import dataclasses
 from dataclasses import dataclass
 from io import StringIO
 import json
@@ -138,7 +139,9 @@ class FileLoaderMetadata:
 class FileLoaderReturn(Sized):
 
     raw_data: list
-    metadata: FileLoaderMetadata = FileLoaderMetadata()
+    metadata: FileLoaderMetadata = dataclasses.field(
+        default_factory=lambda: FileLoaderMetadata()
+    )
 
     def __len__(self) -> int:
         return len(self.raw_data)
@@ -229,23 +232,16 @@ class FileLoader:
         )
 
     def _map_fields(self, fields: list, field_mapping: dict[str, str] | None = None):
-        if field_mapping is None:
-            return copy.deepcopy(fields)
-        else:
-            new_fields = []
-            for field in fields:
+        new_fields = copy.deepcopy(fields)
+        if field_mapping is not None:
+            for field in new_fields:
                 if isinstance(field.src_name, str):
-                    src_name: str | int | Iterable[str] = field_mapping.get(
-                        field.src_name, field.src_name
-                    )
+                    field.src_name = field_mapping.get(field.src_name, field.src_name)
                 elif isinstance(field.src_name, Iterable):
-                    src_name = [field_mapping.get(x, x) for x in field.src_name]
+                    field.src_name = [field_mapping.get(x, x) for x in field.src_name]
                 else:
-                    src_name = field.src_name
-                new_field = copy.deepcopy(field)
-                new_field.src_name = src_name
-                new_fields.append(new_field)
-            return new_fields
+                    field.src_name = field.src_name
+        return new_fields
 
     @classmethod
     def find_field(cls, data_point, field, field_mapping=None):
@@ -302,10 +298,12 @@ class FileLoader:
                 actual_mapping[lang] = temp
 
         # map the field names
+        before_fields = copy.deepcopy(self._fields)
         fields = self._map_fields(self._fields, actual_mapping)
         if raw_data.metadata.custom_features is not None:
             for feat in raw_data.metadata.custom_features:
                 fields.append(FileLoaderField(feat, feat, str))
+        assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
         # process the actual data
         for idx, data_point in enumerate(raw_data.raw_data):

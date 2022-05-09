@@ -2,6 +2,7 @@ import os
 from unittest import TestCase
 
 from explainaboard import FileType, get_datalab_loader, Source, TaskType
+from explainaboard.loaders import get_custom_dataset_loader
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,
     DatalabLoaderOption,
@@ -15,6 +16,39 @@ from explainaboard.tests.utils import load_file_as_str, test_artifacts_path
 
 class BaseLoaderTests(TestCase):
     dataset = os.path.join(test_artifacts_path, "text_classification", "dataset.tsv")
+
+    def test_add_user_defined_features(self):
+        # This test was originally from the KG link prediction task, but it adding it
+        # here makes it possible to test that adding user defined features doesn't
+        # break anything later in the test suite
+        artifact_path = os.path.join(test_artifacts_path, "kg_link_tail_prediction")
+        test_data = os.path.join(artifact_path, "data_mini.json")
+        dataset_with_custom_feature = os.path.join(
+            artifact_path, "with_custom_feature.json"
+        )
+        loader = get_custom_dataset_loader(  # use defaults
+            TaskType.kg_link_tail_prediction,
+            test_data,
+            dataset_with_custom_feature,
+        )
+        data = loader.load()
+        self.assertEqual(len(data.metadata.custom_features), 1)
+        self.assertEqual(len(data), 10)
+        self.assertEqual(
+            set(data[0].keys()),
+            {
+                "id",
+                "true_head",
+                "true_link",
+                'true_head_decipher',
+                'true_tail_decipher',
+                "true_tail",
+                "predict",
+                "predictions",
+                "rel_type",
+                "true_rank",
+            },
+        )
 
     def test_load_in_memory_tsv(self):
         loader = Loader(
