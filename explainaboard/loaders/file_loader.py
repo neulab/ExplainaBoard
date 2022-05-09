@@ -230,7 +230,7 @@ class FileLoader:
 
     def _map_fields(self, fields: list, field_mapping: dict[str, str] | None = None):
         if field_mapping is None:
-            return fields
+            return copy.deepcopy(fields)
         else:
             new_fields = []
             for field in fields:
@@ -242,7 +242,7 @@ class FileLoader:
                     src_name = [field_mapping.get(x, x) for x in field.src_name]
                 else:
                     src_name = field.src_name
-                new_field = copy.copy(field)
+                new_field = copy.deepcopy(field)
                 new_field.src_name = src_name
                 new_fields.append(new_field)
             return new_fields
