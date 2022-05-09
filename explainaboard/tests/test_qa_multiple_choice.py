@@ -78,7 +78,7 @@ class TestQAMultipleChoice(unittest.TestCase):
             FileType.json,
         )
         data = loader.load()
-        print(f'data.raw_data[0]={data.raw_data[0]}')
+        self.assertIsInstance(data.raw_data[0]["commonsense_category"], list)
         self.assertEqual(data.raw_data[0]["commonsense_category"], ["obj", "cul"])
 
         metadata = {

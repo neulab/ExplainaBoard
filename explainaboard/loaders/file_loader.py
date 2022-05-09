@@ -302,7 +302,7 @@ class FileLoader:
         fields = self._map_fields(self._fields, actual_mapping)
         if raw_data.metadata.custom_features is not None:
             for feat in raw_data.metadata.custom_features:
-                fields.append(FileLoaderField(feat, feat, str))
+                fields.append(FileLoaderField(feat, feat, None))
         assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
         # process the actual data
