@@ -117,7 +117,7 @@ class Loader:
                 "dataset and output are of different length"
                 + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
             )
-        data_list: list[dict] = output_loaded_data.raw_data
+        data_list: list[dict] = output_loaded_data.samples
         for i, output in enumerate(data_list):
             dataset_loaded_data[i].update(output)
         return dataset_loaded_data

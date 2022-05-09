@@ -78,8 +78,8 @@ class TestQAMultipleChoice(unittest.TestCase):
             FileType.json,
         )
         data = loader.load()
-        self.assertIsInstance(data.raw_data[0]["commonsense_category"], list)
-        self.assertEqual(data.raw_data[0]["commonsense_category"], ["obj", "cul"])
+        self.assertIsInstance(data.samples[0]["commonsense_category"], list)
+        self.assertEqual(data.samples[0]["commonsense_category"], ["obj", "cul"])
 
         metadata = {
             "task_name": TaskType.qa_multiple_choice.value,
@@ -91,7 +91,7 @@ class TestQAMultipleChoice(unittest.TestCase):
 
         processor = get_processor(TaskType.qa_multiple_choice.value)
 
-        sys_info = processor.process(metadata, data.raw_data)
+        sys_info = processor.process(metadata, data.samples)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

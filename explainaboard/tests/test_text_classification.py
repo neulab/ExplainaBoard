@@ -138,7 +138,7 @@ class TestTextClassification(unittest.TestCase):
         metadata = dataclasses.asdict(data.metadata)
         processor = get_processor(TaskType.text_classification)
 
-        sys_info = processor.process(metadata, data.raw_data)
+        sys_info = processor.process(metadata, data.samples)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

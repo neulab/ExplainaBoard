@@ -49,6 +49,7 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
         return real_tasks
     else:
         for sys_output in system_outputs:
+            # give me a task, or give me death (by exception)
             task_or_die: TaskType | None = None
             msg: str = ''
             try:

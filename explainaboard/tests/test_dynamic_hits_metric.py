@@ -33,7 +33,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data.raw_data)
+        sys_info = processor.process(metadata, data.samples)
 
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)

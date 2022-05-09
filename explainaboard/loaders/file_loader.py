@@ -156,16 +156,16 @@ class FileLoaderMetadata:
 @dataclass
 class FileLoaderReturn(Sized):
 
-    raw_data: list
+    samples: list
     metadata: FileLoaderMetadata = dataclasses.field(
         default_factory=lambda: FileLoaderMetadata()
     )
 
     def __len__(self) -> int:
-        return len(self.raw_data)
+        return len(self.samples)
 
     def __getitem__(self, item):
-        return self.raw_data[item]
+        return self.samples[item]
 
 
 class FileLoader:
@@ -262,7 +262,24 @@ class FileLoader:
         return new_fields
 
     @classmethod
-    def find_field(cls, data_point, field, field_mapping=None):
+    def find_field(
+        cls,
+        data_point: dict,
+        field: FileLoaderField,
+        field_mapping: dict[str, str] | None = None,
+    ):
+        """
+        In a structured dictionary, find a specified field specified by an
+        * int index to a list (data_point[field])
+        * str index to a dictionary (datapoint[field])
+        * Iterable[str] index to a dictionary (datapoint[field[0]][field[1]]...)
+
+        :param data_point: The data to search
+        :param field: The file loader field corresponding to the dict
+        :param field_mapping: A mapping between field names. If a str in a field name
+          exists as a key in the mapping, the value will be used to search instead
+        :return: the required data
+        """
         if field_mapping is None:
             field_mapping = {}
         if isinstance(data_point, list):
@@ -274,6 +291,8 @@ class FileLoader:
                 )
             return data_point[int_idx]
         elif isinstance(data_point, dict):
+            if isinstance(field.src_name, int):
+                raise ValueError(f'unexpected int index for dict data_point in {field}')
             # Parse a string or tuple identifier
             field_list = (
                 [field.src_name] if isinstance(field.src_name, str) else field.src_name
@@ -324,7 +343,7 @@ class FileLoader:
         assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
         # process the actual data
-        for idx, data_point in enumerate(raw_data.raw_data):
+        for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
 
             for field in fields:  # parse data point according to fields
@@ -412,7 +431,7 @@ class CoNLLFileLoader(FileLoader):
                 }  # reset
 
         max_field: int = max([narrow(x.src_name, int) for x in self._fields])
-        for line in raw_data.raw_data:
+        for line in raw_data.samples:
             # at sentence boundary
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
                 add_sample()
@@ -517,6 +536,10 @@ class DatalabFileLoader(FileLoader):
         metadata = FileLoaderMetadata()
         if info.languages is not None:
             metadata.supported_languages = info.languages
+            # Infer languages:
+            # If only one language is supported, set both source and target to that
+            # language. If two are supported set source to lang[0], target to lang[1].
+            # Otherwise, do not infer the language at all.
             if (
                 metadata.supported_languages
                 and len(metadata.supported_languages) > 0
@@ -579,7 +602,7 @@ class TextFileLoader(FileLoader):
         field_mapping: dict[str, str] | None = None,
     ) -> FileLoaderReturn:
         raw_data = self.load_raw(data, source)
-        data_list: list[str] = raw_data.raw_data
+        data_list: list[str] = raw_data.samples
         parsed_data_points: list[dict] = []
 
         for idx, data_point in enumerate(data_list):
