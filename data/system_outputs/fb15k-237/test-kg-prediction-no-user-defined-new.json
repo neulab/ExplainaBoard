@@ -11,12 +11,7 @@
       "/m/02l6h",
       "/m/0kz1h"
     ],
-<<<<<<< HEAD
-    "true_rank": 1,
-    "example_id": "1"
-=======
     "true_rank": 1
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/01hww_",
@@ -30,12 +25,7 @@
       "/m/017lb_",
       "/m/03c3yf"
     ],
-<<<<<<< HEAD
-    "true_rank": 12,
-    "example_id": "2"
-=======
     "true_rank": 12
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/09v3jyg",
@@ -49,12 +39,7 @@
       "/m/06f32",
       "/m/0d0kn"
     ],
-<<<<<<< HEAD
-    "true_rank": 11,
-    "example_id": "3"
-=======
     "true_rank": 11
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/02jx1",
@@ -68,12 +53,7 @@
       "/m/03lrc",
       "/m/01llj3"
     ],
-<<<<<<< HEAD
-    "true_rank": 7,
-    "example_id": "4"
-=======
     "true_rank": 7
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/01xdf5",
@@ -87,12 +67,7 @@
       "/m/03lrc",
       "/m/01llj3"
     ],
-<<<<<<< HEAD
-    "true_rank": 1,
-    "example_id": "5"
-=======
     "true_rank": 1
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/0mw89",
@@ -106,12 +81,7 @@
       "/m/01chpn",
       "/m/02vqsll"
     ],
-<<<<<<< HEAD
-    "true_rank": 1,
-    "example_id": "6"
-=======
     "true_rank": 1
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/01dw4q",
@@ -125,12 +95,7 @@
       "/m/0b1y_2",
       "/m/02_06s"
     ],
-<<<<<<< HEAD
-    "true_rank": 2,
-    "example_id": "7"
-=======
     "true_rank": 2
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/014zcr",
@@ -144,12 +109,7 @@
       "/m/06s_2",
       "/m/0jdd"
     ],
-<<<<<<< HEAD
-    "true_rank": 1,
-    "example_id": "8"
-=======
     "true_rank": 1
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/07l450",
@@ -163,12 +123,7 @@
       "/m/0lsxr",
       "/m/01t_vv"
     ],
-<<<<<<< HEAD
-    "true_rank": 23,
-    "example_id": "9"
-=======
     "true_rank": 23
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   },
   {
     "gold_head": "/m/0n5j_",
@@ -182,11 +137,6 @@
       "/m/0n5j_",
       "/m/03zrhb"
     ],
-<<<<<<< HEAD
-    "true_rank": 1,
-    "example_id": "10"
-=======
     "true_rank": 1
->>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
   }
 ]

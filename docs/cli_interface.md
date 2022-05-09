@@ -209,11 +209,20 @@ Predicting the tail entity of missing links in knowledge graphs
 
 The below example loads the `fb15k_237` dataset from DataLab.
 ```shell
+<<<<<<< HEAD
     explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
 ```
 
 ```shell
     explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
+=======
+    wget https://datalab-hub.s3.amazonaws.com/predictions/test_distmult.json
+    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub_dataset origin --system_outputs test_distmult.json > log.res
+```
+
+```shell
+    explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/data_mini.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
+>>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
 ```
  
 

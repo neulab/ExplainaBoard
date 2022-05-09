@@ -5,13 +5,15 @@ import json
 from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
+    DatalabFileLoader,
     FileLoader,
-    FileLoaderReturn,
+    FileLoaderField,
     JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.utils import cache_api
+from explainaboard.utils.preprocessor import KGMapPreprocessor
 
 
 @register_loader(TaskType.kg_link_tail_prediction)
@@ -41,28 +43,7 @@ class KgLinkTailPredictionLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        return {FileType.json: JSONFileLoader(None, False)}
 
-    @classmethod
-    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
-        return {FileType.json: JSONFileLoader(None, False)}
-
-    def load(self) -> FileLoaderReturn:
-        """
-        :param path_system_output:
-            the path of system output file with following format:
-            "head \t relation \t trueTail": [predTail1, predTail2, ..., predTail5],
-
-        :return: class object
-        """
-        data: list[dict] = []
-
-        raw_data: FileLoaderReturn = self._output_file_loader.load_raw(
-            self._output_data, self._output_source
-        )
-
-        # Map entity into an interpretable version
-        entity_dic = {}
         file_path = cache_api.cache_online_file(
             'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
             'pre_computed/kg/entity2wikidata.json',
@@ -70,35 +51,53 @@ class KgLinkTailPredictionLoader(Loader):
         with open(file_path, 'r') as file:
             entity_dic = json.loads(file.read())
 
-        for features_dict in raw_data.raw_data:
-            data_i = {
-                "id": features_dict["example_id"],  # should be string type
-                "true_head": entity_dic[features_dict["gold_head"]]["label"]
-                if features_dict["gold_head"] in entity_dic.keys()
-                else features_dict["gold_head"],
-                "true_link": features_dict["gold_predicate"],
-                "true_tail": entity_dic[features_dict["gold_tail"]]["label"]
-                if features_dict["gold_tail"] in entity_dic.keys()
-                else features_dict["gold_tail"],
-                "true_tail_anonymity": features_dict["gold_tail"],
-                "true_label": features_dict[
-                    "gold_" + features_dict["predict"]
-                ],  # the entity to which we compare the predictions
-                "predictions": features_dict["predictions"],
-                "true_rank": features_dict.get(
-                    "true_rank", None
-                ),  # rank of the true entity in predictions
-            }
+        map_preprocessor = KGMapPreprocessor(resources={"dictionary": entity_dic})
 
-            # additional user-defined features
-            if raw_data.metadata.custom_features:
-                data_i.update(
-                    {
-                        feature_name: features_dict[feature_name]
-                        for feature_name in raw_data.metadata.custom_features
-                    }
-                )
+        target_field_names = [
+            "true_head",
+            "true_head_decipher",
+            "true_link",
+            "true_tail",
+            "true_tail_decipher",
+        ]
+        return {
+            FileType.json: JSONFileLoader(
+                [
+                    FileLoaderField("gold_head", target_field_names[0], str),
+                    FileLoaderField(
+                        "gold_head", target_field_names[1], str, parser=map_preprocessor
+                    ),
+                    FileLoaderField("gold_predicate", target_field_names[2], str),
+                    FileLoaderField("gold_tail", target_field_names[3], str),
+                    FileLoaderField(
+                        "gold_tail", target_field_names[4], str, parser=map_preprocessor
+                    ),
+                ]
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("head", target_field_names[0], str),
+                    FileLoaderField(
+                        "head", target_field_names[1], str, parser=map_preprocessor
+                    ),
+                    FileLoaderField("link", target_field_names[2], str),
+                    FileLoaderField("tail", target_field_names[3], str),
+                    FileLoaderField(
+                        "tail", target_field_names[4], str, parser=map_preprocessor
+                    ),
+                ]
+            ),
+        }
 
-            data.append(data_i)
-
-        return FileLoaderReturn(data, raw_data.metadata)
+    @classmethod
+    def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        target_field_names = ["predict", "predictions", "true_rank"]
+        return {
+            FileType.json: JSONFileLoader(
+                [
+                    FileLoaderField("predict", target_field_names[0], str),
+                    FileLoaderField("predictions", target_field_names[1], list),
+                    FileLoaderField("true_rank", target_field_names[2], int),
+                ]
+            )
+        }

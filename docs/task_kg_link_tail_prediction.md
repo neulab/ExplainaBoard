@@ -26,8 +26,8 @@ In order to perform analysis of your results, they should be in the following
 JSON format:
 
 ```json
-{
-    "1": {
+[
+    {
         "gold_head": "/m/08966",
         "gold_predicate": "/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month",
         "gold_tail": "/m/05lf_",
@@ -39,9 +39,9 @@ JSON format:
             "/m/02l6h",
             "/m/0kz1h"
         ],
-        "true_rank": 1,
+        "true_rank": 1
     },
-    "2": {
+    {
         "gold_head": "/m/01hww_",
         "gold_predicate": "/music/performance_role/regular_performances./music/group_membership/group",
         "gold_tail": "/m/01q99h",
@@ -57,7 +57,7 @@ JSON format:
     },
     ...
     
-}
+]
 ```
 where
 * `gold_head`: true head entity
@@ -86,6 +86,17 @@ where
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
 * `report.json`: the generated analysis file with json format. Tips: use a json viewer like [`this one`](http://jsonviewer.stack.hu/) for better interpretation.
+
+If the dataset has been supported by [`DataLab`](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+you could also run (the advantage is that more bucketing features will be supported):
+
+```shell
+    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub_dataset origin --system_outputs test_distmult.json > log.res
+```
+where 
+* `test_distmult.json` represents the system output file, for example, you can download
+the above one [here](https://datalab-hub.s3.amazonaws.com/predictions/test_distmult.json
+)
 
 
 
@@ -126,8 +137,8 @@ ExplainaBoard also allows users to customize features, specifically to provide y
                 "num_buckets": 2
         }
     },
-    "predictions": {
-        "1": {
+    "predictions": [
+        {
             "gold_head": "/m/08966",
             "gold_predicate": "/travel/travel_destination/climate./travel/travel_destination_monthly_climate/month",
             "gold_tail": "/m/05lf_",
@@ -142,7 +153,7 @@ ExplainaBoard also allows users to customize features, specifically to provide y
             "rel_type": "asymmetric",
             "true_rank": 1
         },
-        "2": {
+        {
             "gold_head": "/m/01hww_",
             "gold_predicate": "/music/performance_role/regular_performances./music/group_membership/group",
             "gold_tail": "/m/01q99h",
@@ -158,6 +169,8 @@ ExplainaBoard also allows users to customize features, specifically to provide y
             "true_rank": 23
         },
       ...
+      ]
+}
 ```
 
 Note that you must provide the rank of the true entity in the predictions, for all examples in your system output, in 1-indexed fashion. This is to allow ExplainaBoard to calculate accurate `MeanRank` and `MeanReciprocalRank` metrics when the true entity is not contained in the predictions you provide in the system outputs.
@@ -167,7 +180,11 @@ Note that you must provide the rank of the true entity in the predictions, for a
 An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-user-defined.json), and you can test it using the following command:
 
 ```shell
+<<<<<<< HEAD
 explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
+=======
+explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/data_mini.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
+>>>>>>> f2607cfa67cc34c1207e6560e9d29e0bfa59ca43
 ```
 
 

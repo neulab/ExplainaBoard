@@ -4,6 +4,7 @@ import abc
 import re
 import string
 import sys
+from typing import Any, Optional
 import unicodedata
 
 from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
@@ -11,21 +12,55 @@ from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
 
 @abc.abstractmethod
 class Preprocessor:
-    def __init__(self, language: str | None = None):
+    def __init__(
+        self, language: str | None = None, resources: Optional[dict[str, Any]] = None
+    ):
         self.language = language
+        self.resources = resources or self.default_resources()
 
     def set_language(self, language: str):
         self.language = language
         return self
 
+    def default_resources(self) -> dict[str, Any]:
+        """Returns default features for this processor."""
+        return {}
+
     @abc.abstractmethod
+    def process(self, s: str, resources: dict[str, Any]) -> str:
+        """
+        Get default processing function
+        :return:
+        """
+        ...
+
     def __call__(self, text: str) -> str:
         """
         preprocess text
         :param text: text to be preprocessed
         :return: preprocessed text
         """
-        ...
+        return self.process(text, self.resources)
+
+
+class MapPreprocessor(Preprocessor):
+    def default_resources(self) -> dict:
+        """Returns default features for this processor."""
+        return {"dictionary": {}}
+
+    def process(self, s: str, resources: dict[str, Any]) -> str:
+        return resources['dictionary'].get(s, s)
+
+
+class KGMapPreprocessor(Preprocessor):
+    def default_resources(self) -> dict:
+        """Returns default features for this processor."""
+        return {"dictionary": {}}
+
+    def process(self, s: str, resources: dict[str, Any]) -> str:
+        return (
+            resources['dictionary'][s]["label"] if s in resources['dictionary'] else s
+        )
 
 
 class ExtractiveQAPreprocessor(Preprocessor):
@@ -45,11 +80,14 @@ class ExtractiveQAPreprocessor(Preprocessor):
     ss_tokenizer = SingleSpaceTokenizer()
     mlqa_tokenizer = MLQAMixTokenizer()
 
-    def __init__(self, language: str | None):
-        self.language: str | None = language
+    def default_resources(self) -> dict:
+        """Returns default features for this processor."""
+        return {"language": self.language}
 
-    def normalize_answer(self, s: str, language: str | None) -> str:
+    def process(self, s: str, resources: dict[str, Any]) -> str:
         """Lower text and remove punctuation, articles and extra whitespace."""
+
+        language = resources['language']
 
         def remove_articles(text, lang):
             if lang == 'en' or lang is None:
@@ -93,6 +131,3 @@ class ExtractiveQAPreprocessor(Preprocessor):
         return white_space_fix(
             remove_articles(remove_punc(lower(s)), language), language
         )
-
-    def __call__(self, text: str) -> str:
-        return self.normalize_answer(text, self.language)

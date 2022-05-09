@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Callable
 import copy
 import csv
 from dataclasses import dataclass
@@ -23,6 +22,7 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.constants import Source
+from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
 
 DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
@@ -51,7 +51,7 @@ class FileLoaderField:
     target_name: int | str
     dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
-    parser: Optional[Callable] = None
+    parser: Optional[Preprocessor] = None
 
     # Special constants used in field mapping
     SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'
@@ -170,10 +170,7 @@ class FileLoader:
         """validates fields"""
         if self._use_idx_as_id and self._id_field_name:
             raise ValueError("id_field_name must be None when use_idx_as_id is True")
-        src_names = [field.src_name for field in self._fields]
         target_names = [field.target_name for field in self._fields]
-        if len(src_names) != len(set(src_names)):
-            raise ValueError("src_name must be unique")
         if len(target_names) != len(set(target_names)):
             raise ValueError("target_name must be unique")
 
@@ -184,6 +181,7 @@ class FileLoader:
 
     @staticmethod
     def parse_data(data: Any, field: FileLoaderField) -> Any:
+
         if field.parser:
             return field.parser(data)
         if field.strip_before_parsing:
@@ -568,7 +566,6 @@ class TextFileLoader(FileLoader):
         for idx, data_point in enumerate(data_list):
             parsed_data_point = {}
             field = self._fields[0]
-
             parsed_data_point[field.target_name] = self.parse_data(data_point, field)
             self.generate_id(parsed_data_point, idx)
             parsed_data_points.append(parsed_data_point)
