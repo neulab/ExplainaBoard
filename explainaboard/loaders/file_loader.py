@@ -91,10 +91,12 @@ class FileLoaderMetadata:
 
     model_name: str | None = None
     dataset_name: str | None = None
+    sub_dataset_name: str | None = None
+    split: str | None = None
     source_language: str | None = None
     target_language: str | None = None
     supported_languages: list[str] | None = None
-    task: str | None = None
+    task_name: str | None = None
     supported_tasks: list[str] | None = None
     custom_features: list[str] | None = None
 
@@ -106,10 +108,12 @@ class FileLoaderMetadata:
         # TODO(gneubig): This should be changed into a for loop
         self.model_name = other.model_name or self.model_name
         self.dataset_name = other.dataset_name or self.dataset_name
+        self.sub_dataset_name = other.sub_dataset_name or self.sub_dataset_name
+        self.split = other.split or self.split
         self.source_language = other.source_language or self.source_language
         self.target_language = other.target_language or self.target_language
         self.supported_languages = other.supported_languages or self.supported_languages
-        self.task = other.task or self.task
+        self.task_name = other.task_name or self.task_name
         self.supported_tasks = other.supported_tasks or self.supported_tasks
         self.custom_features = other.custom_features or self.custom_features
 
@@ -129,10 +133,12 @@ class FileLoaderMetadata:
         return FileLoaderMetadata(
             model_name=data.get('model_name'),
             dataset_name=data.get('dataset_name'),
+            sub_dataset_name=data.get('sub_dataset_name'),
+            split=data.get('split'),
             source_language=source_language,
             target_language=target_language,
             supported_languages=data.get('supported_languages'),
-            task=data.get('task') or data.get('task_name'),
+            task_name=data.get('task_name'),
             supported_tasks=data.get('supported_tasks'),
             custom_features=data.get('custom_features'),
         )
