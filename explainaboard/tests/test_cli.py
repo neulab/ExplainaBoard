@@ -1,12 +1,10 @@
-import os
 import unittest
 from unittest import TestCase
 from unittest.mock import patch
 
-import requests
-
 from explainaboard.explainaboard_main import main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, top_path
+from explainaboard.utils.cache_api import cache_online_file
 
 
 class TestCLI(TestCase):
@@ -110,12 +108,10 @@ class TestCLI(TestCase):
 
     @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_summ_datalab(self):
-        fname = 'cnndm-bart-output.txt'
-        local_file = f'./data/system_outputs/cnndm/{fname}'
-        if not os.path.exists(local_file):
-            url = 'http://www.phontron.com/download/' + fname
-            r = requests.get(url)
-            open(local_file, 'wb').write(r.content)
+        filename = cache_online_file(
+            'http://www.phontron.com/download/cnndm-bart-output.txt',
+            'tests/cnndm-bart-output.txt',
+        )
         args = [
             'explainaboard.explainaboard_main',
             '--task',
@@ -123,7 +119,7 @@ class TestCLI(TestCase):
             '--dataset',
             'cnn_dailymail',
             '--system_outputs',
-            f'{top_path}/data/system_outputs/cnndm/cnndm-bart-output.txt',
+            filename,
             '--metrics',
             'rouge2',
             '--report_json',
