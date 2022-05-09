@@ -349,10 +349,10 @@ class ConditionalGenerationProcessor(Processor):
                 metric_stats[k] = v
 
     def _get_feature_info(self, name: str):
-        if name in self._features:
-            return self._features[name]
+        if name in self._default_features:
+            return self._default_features[name]
         else:
-            return self._features['ref_tok_info'][name]
+            return self._default_features['ref_tok_info'][name]
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None

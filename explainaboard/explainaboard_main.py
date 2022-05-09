@@ -431,6 +431,7 @@ def main():
             "reload_stat": reload_stat,
             "conf_value": args.conf_value,
             "system_details": system_details,
+            "custom_features": system_datasets[0].metadata.custom_features,
         }
 
         if metric_names is not None:

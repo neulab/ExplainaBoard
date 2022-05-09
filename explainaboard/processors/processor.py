@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Callable
+import copy
 from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, load_dataset
@@ -9,6 +10,7 @@ from eaas.async_client import AsyncClient
 from eaas.config import Config
 
 from explainaboard import feature, TaskType
+from explainaboard.feature import Features
 from explainaboard.info import (
     BucketPerformance,
     FineGrainedStatistics,
@@ -18,7 +20,6 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
-from explainaboard.loaders.loader import CustomFeature
 from explainaboard.metric import Metric, MetricConfig, MetricStats
 import explainaboard.utils.bucketing
 from explainaboard.utils.cache_api import (
@@ -74,8 +75,7 @@ class Processor(metaclass=abc.ABCMeta):
         self._eaas_client: Optional[AsyncClient] = None
         # self._statistics_func = None
         self._preprocessor = None
-        self._user_defined_feature_config: Optional[dict[str, CustomFeature]] = None
-        self._features = self.default_features()
+        self._default_features = self.default_features()
 
     def _get_statistics_resources(
         self, sys_info: SysOutputInfo, dataset_split: Dataset
@@ -192,7 +192,7 @@ class Processor(metaclass=abc.ABCMeta):
         """
         return data_point["predicted_label"]
 
-    def _init_customized_features(self, metadata: dict):
+    def _customize_features(self, metadata: dict) -> Optional[Features]:
         """
         declare the customized features for this processor.
         Args:
@@ -202,21 +202,20 @@ class Processor(metaclass=abc.ABCMeta):
 
         """
 
-        self._user_defined_feature_config = metadata.get(
-            "user_defined_features_configs"
-        )
+        features = copy.deepcopy(self._default_features)
 
         # add user-defined features into features list
-        if self._user_defined_feature_config is not None:
+        if metadata is not None and 'custom_features' in metadata:
             for (
                 feature_name,
                 feature_config,
-            ) in self._user_defined_feature_config.items():
+            ) in metadata['custom_features'].items():
                 if feature_config.dtype == "string":
-                    self._features[feature_name] = feature.Value(
+                    features[feature_name] = feature.Value(
                         dtype="string",
                         description=feature_config.description,
                         is_bucket=True,
+                        is_custom=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_discrete_value",
                             number=feature_config.num_buckets,
@@ -224,10 +223,11 @@ class Processor(metaclass=abc.ABCMeta):
                         ),
                     )
                 elif feature_config.dtype == 'float':
-                    self._features[feature_name] = feature.Value(
+                    features[feature_name] = feature.Value(
                         dtype="float",
                         description=feature_config.description,
                         is_bucket=True,
+                        is_custom=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_specified_bucket_value",
                             number=feature_config.num_buckets,
@@ -236,6 +236,8 @@ class Processor(metaclass=abc.ABCMeta):
                     )
                 else:
                     raise NotImplementedError
+
+        return features
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -257,31 +259,26 @@ class Processor(metaclass=abc.ABCMeta):
 
         for bucket_feature in sys_features.get_bucket_features():
 
-            # handles user-defined features
-            if (
-                self._user_defined_feature_config is not None
-                and bucket_feature in self._user_defined_feature_config.keys()
-                and (
-                    external_stats is not None
-                    or not sys_features[bucket_feature].require_training_set
-                )
-            ):
-                bucket_feature_funcs[bucket_feature] = (
-                    # no need to call a function for user-defined features;
-                    # they are already in the data point itself
-                    lambda x: x,
-                    sys_features[bucket_feature].require_training_set,
-                )
+            feature_info = sys_features[bucket_feature]
 
-            # handles all other features
-            elif bucket_feature in sys_features.keys() and (
-                external_stats is not None
-                or not sys_features[bucket_feature].require_training_set
-            ):
-                bucket_feature_funcs[bucket_feature] = (
-                    self._get_feature_func(bucket_feature),
-                    sys_features[bucket_feature].require_training_set,
-                )
+            # Skip training set features if no stats
+            if external_stats is None and feature_info.require_training_set:
+                continue
+
+            # handles user-defined features
+            def identity(x):
+                return x
+
+            feature_func = (
+                identity
+                if feature_info.is_custom
+                else self._get_feature_func(bucket_feature)
+            )
+
+            bucket_feature_funcs[bucket_feature] = (
+                feature_func,
+                feature_info.require_training_set,
+            )
 
         for _id, dict_sysout in progress(enumerate(sys_output), desc="featurizing"):
             # Get values of bucketing features
@@ -293,11 +290,10 @@ class Processor(metaclass=abc.ABCMeta):
                 ),
             ) in bucket_feature_funcs.items():
 
+                feature_info = sys_features[bucket_key]
+
                 # handles user-defined features
-                if (
-                    self._user_defined_feature_config is not None
-                    and bucket_key in self._user_defined_feature_config
-                ):
+                if feature_info.is_custom:
                     # TODO(Pengfei): this should be generalized
                     feature_value = (
                         "_".join(dict_sysout[bucket_key])
@@ -529,9 +525,8 @@ class Processor(metaclass=abc.ABCMeta):
             )
 
         # declare customized features: _features will be updated
-        self._init_customized_features(metadata)
-
-        sys_info.features = self._features
+        custom_features: dict = metadata.get('custom_features', {})
+        sys_info.features = self._customize_features(custom_features)
 
         # get scoring statistics
         metric_stats = unwrap(self._gen_metric_stats(sys_info, sys_output))

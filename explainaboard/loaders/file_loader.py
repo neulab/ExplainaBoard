@@ -228,12 +228,12 @@ class FileLoader:
             "load_raw() is not implemented for the base FileLoader"
         )
 
-    def _map_fields(self, field_mapping: dict[str, str] | None = None):
+    def _map_fields(self, fields: list, field_mapping: dict[str, str] | None = None):
         if field_mapping is None:
-            return self._fields
+            return fields
         else:
-            fields = []
-            for field in self._fields:
+            new_fields = []
+            for field in fields:
                 if isinstance(field.src_name, str):
                     src_name: str | int | Iterable[str] = field_mapping.get(
                         field.src_name, field.src_name
@@ -244,8 +244,8 @@ class FileLoader:
                     src_name = field.src_name
                 new_field = copy.copy(field)
                 new_field.src_name = src_name
-                fields.append(new_field)
-            return fields
+                new_fields.append(new_field)
+            return new_fields
 
     @classmethod
     def find_field(cls, data_point, field, field_mapping=None):
@@ -302,7 +302,10 @@ class FileLoader:
                 actual_mapping[lang] = temp
 
         # map the field names
-        fields = self._map_fields(actual_mapping)
+        fields = self._map_fields(self._fields, actual_mapping)
+        if raw_data.metadata.custom_features is not None:
+            for feat in raw_data.metadata.custom_features:
+                fields.append(FileLoaderField(feat, feat, str))
 
         # process the actual data
         for idx, data_point in enumerate(raw_data.raw_data):
