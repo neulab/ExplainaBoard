@@ -223,6 +223,8 @@ class SysOutputInfo:
     def dict_conv(cls, k: str, v: dict):
         if k == 'results':
             return Result.from_dict(v)
+        elif k.endswith('tokenizer'):
+            return Tokenizer.from_dict(v)
         else:
             return v
 

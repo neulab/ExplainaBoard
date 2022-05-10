@@ -60,6 +60,13 @@ class Tokenizer:
         """
         ...
 
+    @classmethod
+    def from_dict(cls, v: dict) -> Tokenizer:
+        new_v = dict(v)
+        cls_name = new_v.pop('cls_name')
+        thismodule = sys.modules[__name__]
+        return getattr(thismodule, cls_name)(**new_v)
+
 
 class SingleSpaceTokenizer(Tokenizer):
     """
