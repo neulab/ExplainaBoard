@@ -54,11 +54,18 @@ class Tokenizer:
         ...
 
     @abc.abstractmethod
-    def json_repr(self) -> dict:
+    def to_dict(self) -> dict:
         """
         Return a representation of this class that is serializable in json
         """
         ...
+
+    @classmethod
+    def from_dict(cls, v: dict) -> Tokenizer:
+        new_v = dict(v)
+        cls_name = new_v.pop('cls_name')
+        thismodule = sys.modules[__name__]
+        return getattr(thismodule, cls_name)(**new_v)
 
 
 class SingleSpaceTokenizer(Tokenizer):
@@ -73,7 +80,7 @@ class SingleSpaceTokenizer(Tokenizer):
     def detokenize(self, tokens: list[str]) -> str:
         return ' '.join(tokens)
 
-    def json_repr(self):
+    def to_dict(self):
         return {'cls_name': 'SingleSpaceTokenizer'}
 
 
@@ -128,7 +135,7 @@ class SacreBleuTokenizer(Tokenizer):
     def detokenize(self, tokens: list[str]) -> str:
         raise NotImplementedError
 
-    def json_repr(self):
+    def to_dict(self):
         return {'cls_name': 'SacreBleuTokenizer', 'variety': self.variety}
 
 
@@ -165,5 +172,5 @@ class MLQAMixTokenizer(Tokenizer):
     def detokenize(self, tokens: list[str]) -> str:
         raise NotImplementedError
 
-    def json_repr(self):
+    def to_dict(self):
         return {'cls_name': 'MLQAMixTokenizer'}
