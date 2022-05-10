@@ -12,6 +12,7 @@ from explainaboard import config
 from explainaboard.feature import Features
 from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
+from explainaboard.utils.serialization import explainaboard_dict_factory
 from explainaboard.utils.tokenizer import Tokenizer
 
 logger = get_logger(__name__)
@@ -149,7 +150,7 @@ class SysOutputInfo:
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        return asdict(self, dict_factory=explainaboard_dict_factory)
 
     def replace_nonstring_keys(self, data):
         if isinstance(data, list):
