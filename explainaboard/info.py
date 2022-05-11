@@ -56,16 +56,56 @@ class Performance:
 
 
 @dataclass
+class BucketCase:
+    sample_id: str
+
+    @classmethod
+    def dict_conv(cls, k: str, v: dict):
+        return v
+
+    @classmethod
+    def from_dict(cls, data_dict: dict) -> BucketCase:
+        field_names = set(f.name for f in dataclasses.fields(cls))
+        return cls(
+            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
+        )
+
+
+@dataclass
+class BucketCaseSeq(BucketCase):
+    # applicable scenario: text classification
+    sample_id: str
+
+
+@dataclass
+class BucketCaseToken(BucketCase):
+    # applicable scenario: conditional text generation
+    sample_id: str
+    token_id: str
+
+
+@dataclass
+class BucketCaseSpan(BucketCase):
+    # applicable scenario: NER TODO(Pengfei): unify this one with the above one?
+    sample_id: str
+    span: str
+    true_label: str
+    predicted_label: str
+
+
+@dataclass
 class BucketPerformance:
     bucket_name: str
     n_samples: float
-    bucket_samples: list[Any]
+    bucket_samples: list[Any] = field(default_factory=list)
     performances: list[Performance] = field(default_factory=list)
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
         if k == 'performances':
             return [Performance.from_dict(v1) for v1 in v]
+        if k == 'bucket_samples' and isinstance(v, dict):
+            return [BucketCase.from_dict(v1) for v1 in v]
         else:
             return v
 

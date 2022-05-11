@@ -12,6 +12,7 @@ from eaas.config import Config
 from explainaboard import feature, TaskType
 from explainaboard.feature import Features
 from explainaboard.info import (
+    BucketCaseSeq,
     BucketPerformance,
     FineGrainedStatistics,
     OverallStatistics,
@@ -394,7 +395,7 @@ class Processor(metaclass=abc.ABCMeta):
                 # get a bucket of cases (e.g., errors)
                 if sys_info.is_print_case:
                     if true_label != predicted_label:
-                        bucket_case = str(s_id)
+                        bucket_case = BucketCaseSeq(str(s_id))
                         bucket_cases.append(bucket_case)
 
             bucket_performance = BucketPerformance(
