@@ -11,7 +11,7 @@ class TestTableSchema(unittest.TestCase):
 
         self.assertEqual(len(table_schemas[TaskType.summarization]), 3)
 
-        self.assertEqual(len(table_schemas[TaskType.question_answering_extractive]), 4)
+        self.assertEqual(len(table_schemas[TaskType.qa_extractive]), 4)
 
         self.assertEqual(len(table_schemas[TaskType.named_entity_recognition]), 4)
 

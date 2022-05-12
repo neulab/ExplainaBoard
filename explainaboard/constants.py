@@ -4,7 +4,7 @@ from enum import Enum
 class TaskType(str, Enum):
     text_classification = "text-classification"
     named_entity_recognition = "named-entity-recognition"
-    question_answering_extractive = "question-answering-extractive"
+    qa_extractive = "qa-extractive"
     summarization = "summarization"
     machine_translation = "machine-translation"
     text_pair_classification = "text-pair-classification"

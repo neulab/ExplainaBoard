@@ -14,7 +14,7 @@ class TestExtractiveQA(unittest.TestCase):
         json_en_dataset = os.path.join(self.artifact_path, "dataset-xquad-en.json")
         json_en_output = os.path.join(self.artifact_path, "output-xquad-en.json")
         loader = get_custom_dataset_loader(
-            TaskType.question_answering_extractive,
+            TaskType.qa_extractive,
             json_en_dataset,
             json_en_output,
             Source.local_filesystem,
@@ -34,13 +34,13 @@ class TestExtractiveQA(unittest.TestCase):
         self.assertTrue(sample["context"].startswith("The Panthers"))
 
         metadata = {
-            "task_name": TaskType.question_answering_extractive,
+            "task_name": TaskType.qa_extractive,
             "dataset_name": "squad",
             "metric_names": ["F1ScoreQA", "ExactMatchQA"],
             # "language":"en"
         }
 
-        processor = get_processor(TaskType.question_answering_extractive)
+        processor = get_processor(TaskType.qa_extractive)
         sys_info = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
@@ -66,7 +66,7 @@ class TestExtractiveQA(unittest.TestCase):
         json_zh_dataset = os.path.join(self.artifact_path, "dataset-xquad-zh.json")
         json_zh_output = os.path.join(self.artifact_path, "output-xquad-zh.json")
         loader = get_custom_dataset_loader(
-            TaskType.question_answering_extractive,
+            TaskType.qa_extractive,
             json_zh_dataset,
             json_zh_output,
             Source.local_filesystem,
@@ -76,14 +76,14 @@ class TestExtractiveQA(unittest.TestCase):
         )
         data = loader.load()
         metadata = {
-            "task_name": TaskType.question_answering_extractive.value,
+            "task_name": TaskType.qa_extractive.value,
             "dataset_name": "squad",
             "metric_names": ["F1Score", "ExactMatch"],
             "source_language": "zh",
             "target_language": "zh",
         }
 
-        processor = get_processor(TaskType.question_answering_extractive)
+        processor = get_processor(TaskType.qa_extractive)
 
         sys_info = processor.process(metadata, data)
         get_logger('test').info(

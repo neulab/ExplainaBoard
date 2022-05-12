@@ -264,7 +264,7 @@ class TestCLI(TestCase):
         args = [
             'explainaboard.explainaboard_main',
             '--task',
-            'question-answering-extractive',
+            'qa-extractive',
             '--custom_dataset_paths',
             f'{top_path}/data/system_outputs/squad/squad_mini-dataset.json',
             '--system_outputs',

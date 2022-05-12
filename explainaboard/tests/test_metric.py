@@ -173,7 +173,7 @@ class TestMetric(unittest.TestCase):
             test_artifacts_path, "extractive_qa", "output-xquad-en.json"
         )
         loader = get_custom_dataset_loader(
-            TaskType.question_answering_extractive,
+            TaskType.qa_extractive,
             json_en_dataset,
             json_en_output,
             Source.local_filesystem,
@@ -184,12 +184,12 @@ class TestMetric(unittest.TestCase):
         data = loader.load()
 
         metadata = {
-            "task_name": TaskType.question_answering_extractive.value,
+            "task_name": TaskType.qa_extractive.value,
             "dataset_name": "squad",
             "metric_names": ["F1ScoreQA", "ExactMatchQA"],
         }
 
-        processor = get_processor(TaskType.question_answering_extractive)
+        processor = get_processor(TaskType.qa_extractive)
 
         sys_info = processor.process(metadata, data)
 
