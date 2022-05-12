@@ -9,7 +9,12 @@ from eaas.async_client import AsyncClient
 import numpy as np
 
 from explainaboard import feature, TaskType
-from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.info import (
+    BucketCaseToken,
+    BucketPerformance,
+    Performance,
+    SysOutputInfo,
+)
 from explainaboard.metric import (
     EaaSMetricConfig,
     F1ScoreConfig,
@@ -551,6 +556,7 @@ class ConditionalGenerationProcessor(Processor):
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
             stats_list = []
+            bucket_samples = []
             for sid, tid in toks_true:
                 matched = (
                     1.0
@@ -566,6 +572,8 @@ class ConditionalGenerationProcessor(Processor):
                 )
                 stats_list.append([0.0, 1.0, 0.0, matched])
 
+                bucket_samples.append(BucketCaseToken(str(sid), str(tid)))
+
             stats = explainaboard.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
             conf_interval: tuple[float, float] = unwrap(result.conf_interval)
@@ -579,7 +587,7 @@ class ConditionalGenerationProcessor(Processor):
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
                 n_samples=len(toks_true),
-                bucket_samples=toks_true,
+                bucket_samples=bucket_samples,
                 performances=[performance],
             )
             bucket_name_to_performance[bucket_interval] = bucket_performance

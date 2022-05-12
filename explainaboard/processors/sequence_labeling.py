@@ -8,7 +8,12 @@ from dataclasses import asdict
 from datalabs import aggregating, Dataset
 
 from explainaboard import feature
-from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.info import (
+    BucketCaseSpan,
+    BucketPerformance,
+    Performance,
+    SysOutputInfo,
+)
 from explainaboard.loaders.file_loader import DatalabFileLoader
 from explainaboard.metric import F1ScoreConfig, MetricStats
 from explainaboard.processors.processor import Processor
@@ -482,8 +487,13 @@ class SeqLabProcessor(Processor):
             pred_labels = [x['predicted_label'] for x in bucket_samples]
 
             bucket_samples_errors = [
-                v for v in bucket_samples if v["true_label"] != v["predicted_label"]
+                BucketCaseSpan(
+                    v["text"], v["span"], v["true_label"], v["predicted_label"]
+                )
+                for v in bucket_samples
+                if v["true_label"] != v["predicted_label"]
             ]
+
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
                 n_samples=len(spans_true),

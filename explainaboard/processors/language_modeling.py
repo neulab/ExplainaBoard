@@ -5,7 +5,12 @@ from typing import Any
 from datalabs import aggregating
 
 from explainaboard import feature, TaskType
-from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
+from explainaboard.info import (
+    BucketCaseToken,
+    BucketPerformance,
+    Performance,
+    SysOutputInfo,
+)
 from explainaboard.metric import LogProbConfig, MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -368,15 +373,18 @@ class LanguageModelingProcessor(Processor):
         for bucket_interval, tok_list in samples_over_bucket.items():
 
             bucket_metrics = [x.to_metric() for x in unwrap(sys_info.metric_configs)]
-            log_probs = [
-                sys_output[samp_id]['tok_info'][tok_id]['tok_log_prob']
-                for (samp_id, tok_id) in tok_list
-            ]
+            bucket_samples = []
+            log_probs = []
+            for (samp_id, tok_id) in tok_list:
+                bucket_samples.append(BucketCaseToken(str(samp_id), str(tok_id)))
+                log_probs.append(
+                    sys_output[samp_id]['tok_info'][tok_id]['tok_log_prob']
+                )
 
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
                 n_samples=len(tok_list),
-                bucket_samples=tok_list,
+                bucket_samples=bucket_samples,
             )
             for metric in bucket_metrics:
                 metric_val = metric.evaluate(
