@@ -17,7 +17,7 @@ def get_cache_dir() -> str:
     if 'EXPLAINABOARD_CACHE' in os.environ:
         cache_dir = os.environ['EXPLAINABOARD_CACHE']
     elif 'HOME' in os.environ:
-        cache_dir = os.path.join(os.environ['HOME'], '.cache', 'explainaboard', 'stats')
+        cache_dir = os.path.join(os.environ['HOME'], '.cache', 'explainaboard')
     else:
         raise FileNotFoundError(
             'Could not find cache directory for explainaboard.'
@@ -34,7 +34,7 @@ def get_statistics_path(dataset_name: str, subset_name: str | None = None) -> st
             f'dataset_name={dataset_name}, subset_name={subset_name}'
         )
     file_name = 'stats.json' if subset_name is None else f'stats-{subset_name}.json'
-    return os.path.join(get_cache_dir(), dataset_name, file_name)
+    return os.path.join(get_cache_dir(), 'stats', dataset_name, file_name)
 
 
 def read_statistics_from_cache(
