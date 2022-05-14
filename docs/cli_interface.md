@@ -174,12 +174,12 @@ The below example performs this extraction on the dataset SQuAD.
 
 Below is an example of referencing the dataset directly.
 ```shell
-explainaboard --task question-answering-extractive --custom_dataset_paths ./data/system_outputs/squad/squad_mini-dataset.json --system_outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
+explainaboard --task qa-extractive --custom_dataset_paths ./data/system_outputs/squad/squad_mini-dataset.json --system_outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
 ```
 
 The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
 ```shell
-explainaboard --task question-answering-extractive --dataset squad --system_outputs MY_FILE > report.json
+explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > report.json
 ```
 
 

@@ -62,7 +62,7 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.
         ],
     ),
     TaskCategory(
-        "structure-prediction",
+        "sequence-labeling",
         "predicting structural properties of the text, such as syntax",
         [
             Task(
@@ -88,21 +88,25 @@ Dividing text into syntactically related non-overlapping groups of words.
         ],
     ),
     TaskCategory(
-        "question-answering",
+        "qa",
         "question answering tasks",
         [
             Task(
-                name=TaskType.question_answering_extractive,
+                name=TaskType.qa_extractive,
                 description="""
 A task of extracting an answer from a text given a question.
 See more details about the format of upload files:
 https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.md
 """,
             ),
+            Task(
+                name=TaskType.qa_multiple_choice,
+                description="Answer a question from multiple options",
+            ),
         ],
     ),
     TaskCategory(
-        "span-text-prediction",
+        "span-text-classification",
         "prediction based on span and text",
         [
             Task(
@@ -130,7 +134,7 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_pair_classifica
         ],
     ),
     TaskCategory(
-        "kg-link-tail-prediction",
+        "kg-prediction",
         "predicting the tail entity of missing links in knowledge graphs",
         [
             Task(
@@ -141,16 +145,6 @@ See more details about the format of upload files:
 https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_prediction.md
 """,
             ),
-        ],
-    ),
-    TaskCategory(
-        "qa-multiple-choice",
-        "Answer a question from multiple options",
-        [
-            Task(
-                name=TaskType.qa_multiple_choice,
-                description="Answer a question from multiple options",
-            )
         ],
     ),
     TaskCategory(

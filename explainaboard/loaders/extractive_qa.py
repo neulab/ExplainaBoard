@@ -11,7 +11,7 @@ from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.question_answering_extractive)
+@register_loader(TaskType.qa_extractive)
 class QAExtractiveLoader(Loader):
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
