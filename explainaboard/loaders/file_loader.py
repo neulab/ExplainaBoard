@@ -5,6 +5,7 @@ import csv
 import dataclasses
 from dataclasses import dataclass
 from io import StringIO
+import itertools
 import json
 from typing import (
     Any,
@@ -551,9 +552,11 @@ class DatalabFileLoader(FileLoader):
                 ]
             if info.task_templates is not None:
                 tt = info.task_templates
-                metadata.supported_tasks = [x.task for x in tt] + [
-                    x.task_category for x in tt
-                ]
+                metadata.supported_tasks = list(
+                    itertools.chain.from_iterable(
+                        [[x.task] + x.task_categories for x in tt]
+                    )
+                )
         # Return
         return FileLoaderReturn(
             [self.replace_labels(info.features, x) for x in dataset],
