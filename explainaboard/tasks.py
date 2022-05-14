@@ -134,7 +134,7 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_pair_classifica
         ],
     ),
     TaskCategory(
-        "kg_prediction",
+        "kg-prediction",
         "predicting the tail entity of missing links in knowledge graphs",
         [
             Task(
