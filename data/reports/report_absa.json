@@ -1,6 +1,6 @@
 {
     "task_name": "aspect-based-sentiment-classification",
-    "model_name": null,
+    "system_name": null,
     "dataset_name": "dataset_name",
     "metric_names": [
         "Accuracy"

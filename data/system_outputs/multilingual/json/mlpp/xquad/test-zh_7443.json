@@ -1,7 +1,7 @@
 {
     "user_defined_metadata_configs": {
         "task_name": "question-answering-extractive",
-        "model_name": "CL-mlpp15out1sum",
+        "system_name": "CL-mlpp15out1sum",
         "dataset_name": "xquad",
         "language": "zh"
     },

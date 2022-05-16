@@ -1,7 +1,7 @@
 {
   "metadata": {
     "task_name": "named-entity-recognition",
-    "model_name": "BERT",
+    "system_name": "BERT",
     "dataset_name": "conll2003",
     "sub_dataset_name": "ner",
     "language": "en"

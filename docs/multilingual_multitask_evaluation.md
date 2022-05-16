@@ -12,7 +12,7 @@ format with following skeleton:
 {
     "user_defined_metadata_configs": {
         "task_name": "string",
-        "model_name": "string",
+        "system_name": "string",
         "dataset_name": "string",
         "language": "string"
     },
@@ -234,7 +234,7 @@ For example, the following command represent: the performance gap between two sy
 from `mar` and `xnli` datasets.
 
 ```
-explainaboard --reports ./output/reports/* --datasets marc xnli --models_aggregation minus
+explainaboard --reports ./output/reports/* --datasets marc xnli --systems_aggregation minus
 ```
 
 Then following results will be printed:

@@ -70,7 +70,7 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
 def analyze_reports(args):
     """
     score_tensor is a nested dict, for example
-    score_tensor[model_name][dataset_name][language] =
+    score_tensor[system_name][dataset_name][language] =
     {
         'metric_name':
         'Accuracy',
@@ -80,10 +80,10 @@ def analyze_reports(args):
     }
     """
     reports = args.reports
-    models: list[str] | None = args.models
+    systems: list[str] | None = args.systems
     datasets: list[str] | None = args.datasets
     languages: list[str] | None = args.languages
-    models_aggregation: str | None = args.models_aggregation
+    systems_aggregation: str | None = args.systems_aggregation
     datasets_aggregation: str | None = args.datasets_aggregation
     languages_aggregation: str | None = args.languages_aggregation
     score_tensor = {}
@@ -92,28 +92,30 @@ def analyze_reports(args):
 
             report_dict = json.load(fin)
 
-            model_name = report_dict["model_name"]
+            system_name = report_dict["system_name"]
             dataset_name = report_dict["dataset_name"]
             language = report_dict["language"]
             # TODO(Pengfei): So far, only one metric is considered
             metric = report_dict["metric_names"][0]
             score_info = report_dict["results"]["overall"][metric]
 
-            if model_name not in score_tensor.keys():
-                score_tensor[model_name] = {}
-            if dataset_name not in score_tensor[model_name].keys():
-                score_tensor[model_name][dataset_name] = {}
-            if language not in score_tensor[model_name][dataset_name].keys():
-                score_tensor[model_name][dataset_name][language] = {}
-            score_tensor[model_name][dataset_name][language] = score_info
+            if system_name not in score_tensor.keys():
+                score_tensor[system_name] = {}
+            if dataset_name not in score_tensor[system_name].keys():
+                score_tensor[system_name][dataset_name] = {}
+            if language not in score_tensor[system_name][dataset_name].keys():
+                score_tensor[system_name][dataset_name][language] = {}
+            score_tensor[system_name][dataset_name][language] = score_info
 
     # filter by three dimensions
-    score_tensor_filter = filter_score_tensor(score_tensor, models, datasets, languages)
+    score_tensor_filter = filter_score_tensor(
+        score_tensor, systems, datasets, languages
+    )
 
     # aggregation by three dimensions
     score_tensor_aggregated = aggregate_score_tensor(
         score_tensor_filter,
-        models_aggregation,
+        systems_aggregation,
         datasets_aggregation,
         languages_aggregation,
     )
@@ -144,11 +146,11 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--models',
+        '--systems',
         type=str,
         required=False,
         nargs="+",
-        help="the list of model names",
+        help="the list of system names",
     )
 
     parser.add_argument(
@@ -168,7 +170,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--models_aggregation',
+        '--systems_aggregation',
         type=str,
         required=False,
         help="None|minus|combination",

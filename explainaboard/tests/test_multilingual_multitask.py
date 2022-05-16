@@ -91,20 +91,20 @@ class TestMultilingualMultiTask(unittest.TestCase):
 
                 report_dict = json.load(fin)
 
-                model_name = report_dict["model_name"]
+                system_name = report_dict["system_name"]
                 dataset_name = report_dict["dataset_name"]
                 language = report_dict["language"]
                 # TODO(Pengfei): So far, only one metric is considered
                 metric = report_dict["metric_names"][0]
                 score_info = report_dict["results"]["overall"][metric]
 
-                if model_name not in score_tensor.keys():
-                    score_tensor[model_name] = {}
-                if dataset_name not in score_tensor[model_name].keys():
-                    score_tensor[model_name][dataset_name] = {}
-                if language not in score_tensor[model_name][dataset_name].keys():
-                    score_tensor[model_name][dataset_name][language] = {}
-                score_tensor[model_name][dataset_name][language] = score_info
+                if system_name not in score_tensor.keys():
+                    score_tensor[system_name] = {}
+                if dataset_name not in score_tensor[system_name].keys():
+                    score_tensor[system_name][dataset_name] = {}
+                if language not in score_tensor[system_name][dataset_name].keys():
+                    score_tensor[system_name][dataset_name][language] = {}
+                score_tensor[system_name][dataset_name][language] = score_info
 
         self.assertEqual(
             len(list(score_tensor.keys())), len(['CL-mlpp15out1sum', 'CL-mt5base'])
@@ -112,23 +112,23 @@ class TestMultilingualMultiTask(unittest.TestCase):
         print_score_tensor(score_tensor)
 
         # filter by three dimensions
-        models = ["CL-mlpp15out1sum"]
+        systems = ["CL-mlpp15out1sum"]
         datasets = ["marc", "xquad"]
         languages = ["en", "zh"]
 
         score_tensor_filter = filter_score_tensor(
-            score_tensor, models, datasets, languages
+            score_tensor, systems, datasets, languages
         )
         self.assertEqual(list(score_tensor_filter.keys()), ['CL-mlpp15out1sum'])
         print_score_tensor(score_tensor_filter)
 
         # aggregation by three dimensions
-        models_aggregation = None
+        systems_aggregation = None
         datasets_aggregation = None
         languages_aggregation = "average"
         score_tensor_aggregated = aggregate_score_tensor(
             score_tensor,
-            models_aggregation,
+            systems_aggregation,
             datasets_aggregation,
             languages_aggregation,
         )
@@ -139,12 +139,12 @@ class TestMultilingualMultiTask(unittest.TestCase):
         )
 
         # aggregation by three dimensions
-        models_aggregation = "minus"
+        systems_aggregation = "minus"
         datasets_aggregation = None
         languages_aggregation = None
         score_tensor_aggregated = aggregate_score_tensor(
             score_tensor,
-            models_aggregation,
+            systems_aggregation,
             datasets_aggregation,
             languages_aggregation,
         )

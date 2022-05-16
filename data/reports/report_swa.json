@@ -1,6 +1,6 @@
 {
     "task_name": "named-entity-recognition",
-    "model_name": null,
+    "system_name": null,
     "dataset_name": "dataset_name",
     "metric_names": [
         "f1_score_seqeval"

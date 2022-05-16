@@ -1,6 +1,6 @@
 {
     "task_name": "named-entity-recognition",
-    "model_name": null,
+    "system_name": null,
     "dataset_name": "conll2003",
     "metric_names": [
         "f1_score_seqeval"

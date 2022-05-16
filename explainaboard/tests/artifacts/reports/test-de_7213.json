@@ -1,6 +1,6 @@
 {
     "task_name": "text-pair-classification",
-    "model_name": "CL-mt5base",
+    "system_name": "CL-mt5base",
     "dataset_name": "xnli",
     "sub_dataset_name": null,
     "metric_names": [

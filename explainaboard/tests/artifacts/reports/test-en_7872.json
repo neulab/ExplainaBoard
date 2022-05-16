@@ -1,6 +1,6 @@
 {
     "task_name": "text-pair-classification",
-    "model_name": "CL-mlpp15out1sum",
+    "system_name": "CL-mlpp15out1sum",
     "dataset_name": "xnli",
     "sub_dataset_name": null,
     "metric_names": [

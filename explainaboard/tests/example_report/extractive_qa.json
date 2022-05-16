@@ -1,6 +1,6 @@
 {
     "task_name": "extractive-qa",
-    "model_name": null,
+    "system_name": null,
     "dataset_name": "squad",
     "metric_names": [
         "f1_score_qa",
