@@ -1,7 +1,7 @@
 {
     "user_defined_metadata_configs": {
         "task_name": "question-answering-extractive",
-        "model_name": "CL-mt5base",
+        "system_name": "CL-mt5base",
         "dataset_name": "xquad",
         "language": "zh"
     },

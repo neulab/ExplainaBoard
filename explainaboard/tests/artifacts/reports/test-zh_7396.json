@@ -1,6 +1,6 @@
 {
     "task_name": "question-answering-extractive",
-    "model_name": "CL-mt5base",
+    "system_name": "CL-mt5base",
     "dataset_name": "xquad",
     "sub_dataset_name": null,
     "metric_names": [

@@ -1,7 +1,7 @@
 {
     "user_defined_metadata_configs": {
         "task_name": "text-classification",
-        "model_name": "CL-mt5base",
+        "system_name": "CL-mt5base",
         "dataset_name": "marc",
         "language": "es"
     },

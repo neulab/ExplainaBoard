@@ -152,7 +152,7 @@ class SysOutputInfo:
 
     Attributes:
         task_name (str): the name of the task.
-        model_name (str): the name of the system .
+        system_name (str): the name of the system .
         dataset_name (str): the dataset used of the system.
         sub_dataset_name (str): the name of the sub-dataset.
         source_language (str): the language of the input
@@ -168,7 +168,7 @@ class SysOutputInfo:
 
     # set in the system_output scripts
     task_name: str
-    model_name: Optional[str] = None
+    system_name: Optional[str] = None
     dataset_name: Optional[str] = None
     sub_dataset_name: Optional[str] = None
     dataset_split: Optional[str] = None

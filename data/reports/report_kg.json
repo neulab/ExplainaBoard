@@ -1,6 +1,6 @@
 {
     "task_name": "kg-link-tail-prediction",
-    "model_name": null,
+    "system_name": null,
     "dataset_name": "fb15k_237",
     "metric_names": [
         "Hits"

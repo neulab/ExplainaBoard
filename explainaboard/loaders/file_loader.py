@@ -90,7 +90,7 @@ class FileLoaderMetadata:
     :param supported_tasks: The task or tasks that *can* be handeled (e.g. by a dataset)
     """
 
-    model_name: str | None = None
+    system_name: str | None = None
     dataset_name: str | None = None
     sub_dataset_name: str | None = None
     split: str | None = None
@@ -107,7 +107,7 @@ class FileLoaderMetadata:
         two conflict, the passed-in metadata get preference.
         """
         # TODO(gneubig): This should be changed into a for loop
-        self.model_name = other.model_name or self.model_name
+        self.system_name = other.system_name or self.system_name
         self.dataset_name = other.dataset_name or self.dataset_name
         self.sub_dataset_name = other.sub_dataset_name or self.sub_dataset_name
         self.split = other.split or self.split
@@ -132,7 +132,7 @@ class FileLoaderMetadata:
                 )
             source_language = target_language = data.get('language')
         return FileLoaderMetadata(
-            model_name=data.get('model_name'),
+            system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
             sub_dataset_name=data.get('sub_dataset_name'),
             split=data.get('split'),

@@ -1,6 +1,6 @@
 {
     "task_name": "qa-multiple-choice",
-    "model_name": null,
+    "system_name": null,
     "dataset_name": null,
     "metric_names": [
         "Accuracy"

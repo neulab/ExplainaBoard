@@ -1,7 +1,7 @@
 {
   "metadata": {
     "task_name": "text-classification",
-    "model_name": "test-for-users-specific",
+    "system_name": "test-for-users-specific",
     "dataset_name": "sst2",
     "language": "en"
   },

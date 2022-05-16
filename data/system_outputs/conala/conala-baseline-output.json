@@ -1,7 +1,7 @@
 {
   "metadata": {
     "task_name": "machine-translation",
-    "model_name": "baseline",
+    "system_name": "baseline",
     "dataset_name": "conala",
     "language": "python"
   },
