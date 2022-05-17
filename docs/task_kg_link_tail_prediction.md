@@ -188,58 +188,57 @@ explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/syste
 Intead of ExplainaBoard CLI, users could explore more functionality by using 
 pythonic interface provided by ExplainaBoard.
 
+### Simple Example
+
+First, a simple example of using Python access to data analysis
+
+```python
+from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+
+# Load the data
+dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+# Initialize the processor and perform the processing
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+sys_info = processor.process(metadata={}, sys_output=data.samples)
+# If you want to write out to disk you can use
+sys_info.write_to_directory('./')
+```
+
 
 ### Customized Bucket Order
-In some situation, users aim to specify the bucket order according to their needs. Following [code](https://github.com/neulab/ExplainaBoard/blob/8ccd1a71531bc3b9e2f9e539cb001353cc49ebca/explainaboard/tests/test_kg_link_tail_prediction.py#L60) gives an example.
+In some situation, users aim to specify the bucket order according to their needs.
+The following code gives an example.
 
 Below is an example of sorting alphabetically by bucket value:
 
 ```python
+from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
 
-        from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
-        from explainaboard.loaders.file_loader import DatalabLoaderOption
-        from explainaboard.constants import Source
-        from explainaboard import (
-            TaskType,
-            FileType,
-            get_custom_dataset_loader,
-            get_datalab_loader,
-            get_processor,
-        )
-        from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
+dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
 
-        # tips: `artifacts_path` is located at: ExplainaBoard/explainaboard/tests/artifacts
-        dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
-        loader = get_custom_dataset_loader(
-            TaskType.kg_link_tail_prediction,
-            dataset,
-            dataset,
-        )
-        data = loader.load()
-        self.assertEqual(loader.user_defined_features_configs, {})
-
-        metadata = {
+metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237-subset",
+            "dataset_name": "fb15k-237",
             "metric_configs": [
-                HitsConfig(name='Hits1', hits_k=1),
-                HitsConfig(name='Hits3', hits_k=3),
-                HitsConfig(name='Hits5', hits_k=5),
+                HitsConfig(name='Hits4', hits_k=4),
                 MeanReciprocalRankConfig(name='MRR'),
                 MeanRankConfig(name='MR'),
-            ], 
-            "sort_by": "key",
+            ],
+            "sort_by": "performance_value",
+            "sort_by_metric": "first",
         }
 
-        # if system outputs have user-defined features, update metadata before passing to processor
-        metadata.update(loader.user_defined_metadata_configs)  
-        metadata[
-            "user_defined_features_configs"
-        ] = loader.user_defined_features_configs
-
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
-        sys_info = processor.process(metadata, data)
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+sys_info = processor.process(metadata, data.samples)
 ```
+
 The options for the `"sort_by"` option are:
 1. `"key"` (default): sort by the bucket's lower boundary, alphabetically, low-to-high.
 2. `"performance_value"`: sort by bucket performance. Since each bucket has multiple metrics associated with it, use the `"sort_by_metric"` to choose which metric to sort on.
@@ -257,111 +256,59 @@ The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set t
 The value of K in `Hits` metric could also be specified by users when needed. Below is an example of how to use this configuration while performing bucket sorting by the custom metric:
 
 ```python
+from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
 
-        from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
-        from explainaboard.loaders.file_loader import DatalabLoaderOption
-        from explainaboard.constants import Source
-        from explainaboard import (
-            TaskType,
-            FileType,
-            get_custom_dataset_loader,
-            get_datalab_loader,
-            get_processor,
-        )
-        from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
+dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
 
-        dataset = "explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
-        loader = get_custom_dataset_loader(
-            TaskType.kg_link_tail_prediction,
-            dataset,
-            dataset,
-            Source.local_filesystem,
-            Source.local_filesystem,
-            FileType.json,
-            FileType.json,
-        )
-        data = loader.load()
+metadata = {
+    "task_name": TaskType.kg_link_tail_prediction.value,
+    "dataset_name": "fb15k-237-subset",
+    "metric_configs": [
+        HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
+        HitsConfig(name='Hits3', hits_k=3),
+        HitsConfig(name='Hits5', hits_k=5),
+        MeanReciprocalRankConfig(name='MRR'),
+        MeanRankConfig(name='MR'),
+    ], 
+    "sort_by": "performance_value",  # or "key" to sort alphabetically by bucket lower boundary, or "n_bucket_samples" to sort by bucket size
+    "sort_by_metric": "Hits3",  # specifies the metric to sort by
+    "sort_ascending": False,  # set True when sorting by MeanRank metric
+}
 
-        metadata = {
-            "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237-subset",
-            "metric_configs": [
-                HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
-                HitsConfig(name='Hits3', hits_k=3),
-                HitsConfig(name='Hits5', hits_k=5),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ], 
-            "sort_by": "performance_value",  # or "key" to sort alphabetically by bucket lower boundary, or "n_bucket_samples" to sort by bucket size
-            "sort_by_metric": "Hits3",  # specifies the metric to sort by
-            "sort_ascending": False,  # set True when sorting by MeanRank metric
-        }
-
-        # if system outputs have user-defined features, update metadata before passing to processor
-        metadata.update(loader.user_defined_metadata_configs)  
-        metadata[
-            "user_defined_features_configs"
-        ] = loader.user_defined_features_configs
-
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
-
-        sys_info = processor.process(metadata, data)
-
-        # analysis.write_to_directory("./")
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+sys_info = processor.process(metadata, data.samples)
 ```
 
 Finally, an example of sorting by the number of bucket examples:
 
 ```python
+from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
 
-        from explainaboard import TaskType, get_custom_dataset_loader, get_processor, get_datalab_loader
-        from explainaboard.loaders.file_loader import DatalabLoaderOption
-        from explainaboard.constants import Source
-        from explainaboard import (
-            TaskType,
-            FileType,
-            get_custom_dataset_loader,
-            get_datalab_loader,
-            get_processor,
-        )
-        from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
+dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
 
-        dataset = "explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json
-        loader = get_custom_dataset_loader(
-            TaskType.kg_link_tail_prediction,
-            dataset,
-            dataset,
-            Source.local_filesystem,
-            Source.local_filesystem,
-            FileType.json,
-            FileType.json,
-        )
-        data = loader.load()
+metadata = {
+    "task_name": TaskType.kg_link_tail_prediction.value,
+    "dataset_name": "fb15k-237-subset",
+    "metric_configs": [
+        HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
+        HitsConfig(name='Hits3', hits_k=3),
+        HitsConfig(name='Hits5', hits_k=5),
+        MeanReciprocalRankConfig(name='MRR'),
+        MeanRankConfig(name='MR'),
+    ], 
+    "sort_by": "n_bucket_samples",
+}
 
-        metadata = {
-            "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237-subset",
-            "metric_configs": [
-                HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
-                HitsConfig(name='Hits3', hits_k=3),
-                HitsConfig(name='Hits5', hits_k=5),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ], 
-            "sort_by": "n_bucket_samples",
-        }
-
-        # if system outputs have user-defined features, update metadata before passing to processor
-        metadata.update(loader.user_defined_metadata_configs)  
-        metadata[
-            "user_defined_features_configs"
-        ] = loader.user_defined_features_configs
-
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
-
-        sys_info = processor.process(metadata, data)
-
-        # analysis.write_to_directory("./")
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+sys_info = processor.process(metadata, data.samples)
 ```
 
 ### Record Other System Detailed Information
@@ -369,10 +316,10 @@ Finally, an example of sorting by the number of bucket examples:
 The basic idea is that users can specify other system-related information (e.g., hyper-parameters)
 via adding a key-value into `metadata`
 ```python
-        metadata = {
-            "task_name": TaskType.text_classification.value,
-            "metric_names": ["Accuracy"],
-            "system_details": system_details,
-        }
+metadata = {
+    "task_name": TaskType.text_classification.value,
+    "metric_names": ["Accuracy"],
+    "system_details": system_details,
+}
 ```
 [Here](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_system_details.py) is a complete code.

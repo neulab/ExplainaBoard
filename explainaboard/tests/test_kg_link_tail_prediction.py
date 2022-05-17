@@ -16,6 +16,18 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         artifact_path, "with_custom_feature.json"
     )
 
+    def test_simple_example(self):
+        # Load the data
+        dataset = self.dataset_no_custom_feature
+        task = TaskType.kg_link_tail_prediction
+        loader = get_custom_dataset_loader(task, dataset, dataset)
+        data = loader.load()
+        # Initialize the processor and perform the processing
+        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        sys_info = processor.process(metadata={}, sys_output=data.samples)
+        # If you want to write out to disk you can use
+        sys_info.write_to_directory('./')
+
     def test_no_user_defined_features(self):
         loader = get_custom_dataset_loader(
             TaskType.kg_link_tail_prediction,
