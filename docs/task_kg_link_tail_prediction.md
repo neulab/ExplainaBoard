@@ -203,6 +203,8 @@ data = loader.load()
 # Initialize the processor and perform the processing
 processor = get_processor(TaskType.kg_link_tail_prediction.value)
 sys_info = processor.process(metadata={}, sys_output=data.samples)
+# If you want to write out to disk you can use
+sys_info.write_to_directory('./')
 ```
 
 
@@ -314,10 +316,10 @@ sys_info = processor.process(metadata, data.samples)
 The basic idea is that users can specify other system-related information (e.g., hyper-parameters)
 via adding a key-value into `metadata`
 ```python
-        metadata = {
-            "task_name": TaskType.text_classification.value,
-            "metric_names": ["Accuracy"],
-            "system_details": system_details,
-        }
+metadata = {
+    "task_name": TaskType.text_classification.value,
+    "metric_names": ["Accuracy"],
+    "system_details": system_details,
+}
 ```
 [Here](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_system_details.py) is a complete code.
