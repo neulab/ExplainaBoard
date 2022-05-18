@@ -202,36 +202,35 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
 
         """
-
         features = copy.deepcopy(self._default_features)
 
         # add user-defined features into features list
-        if metadata is not None and 'custom_features' in metadata:
+        if metadata is not None:
             for (
                 feature_name,
                 feature_config,
-            ) in metadata['custom_features'].items():
-                if feature_config.dtype == "string":
+            ) in metadata.items():
+                if feature_config["dtype"] == "string":
                     features[feature_name] = feature.Value(
                         dtype="string",
-                        description=feature_config.description,
+                        description=feature_config["description"],
                         is_bucket=True,
                         is_custom=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_discrete_value",
-                            number=feature_config.num_buckets,
+                            number=feature_config["num_buckets"],
                             setting=1,
                         ),
                     )
-                elif feature_config.dtype == 'float':
+                elif feature_config["dtype"] == 'float':
                     features[feature_name] = feature.Value(
                         dtype="float",
-                        description=feature_config.description,
+                        description=feature_config["description"],
                         is_bucket=True,
                         is_custom=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_specified_bucket_value",
-                            number=feature_config.num_buckets,
+                            number=feature_config["num_buckets"],
                             setting=(),
                         ),
                     )
