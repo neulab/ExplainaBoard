@@ -9,7 +9,7 @@ from datalabs import aggregating, Dataset
 
 from explainaboard import feature
 from explainaboard.info import (
-    BucketCaseSpan,
+    BucketCaseLabeledSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,

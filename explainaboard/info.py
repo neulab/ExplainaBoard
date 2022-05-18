@@ -57,7 +57,12 @@ class Performance:
 
 @dataclass
 class BucketCase:
-    sample_id: str
+    """
+    A class to represent cases to display to users for analysis.
+    :param sample_id: The ID of a single sample
+    """
+
+    sample_id: int
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
@@ -72,23 +77,30 @@ class BucketCase:
 
 
 @dataclass
-class BucketCaseSeq(BucketCase):
-    # applicable scenario: text classification
-    sample_id: str
-
-
-@dataclass
-class BucketCaseToken(BucketCase):
-    # applicable scenario: conditional text generation
-    sample_id: str
-    token_id: str
-
-
-@dataclass
 class BucketCaseSpan(BucketCase):
-    # applicable scenario: NER TODO(Pengfei): unify this one with the above one?
-    sample_id: str
-    span: str
+    """
+    A bucket case that highlights a span in text.
+    :param text: The text that should be highlighted
+    :param token_span: The span of tokens to be highlighted
+    :param char_span: The span of characters to be highlighted
+    :param location: The name of the feature (e.g. "text", "source", "reference") over
+      which this span is calculated
+    """
+
+    text: str
+    token_span: tuple[int, int]
+    char_span: tuple[int, int]
+    location: str
+
+
+@dataclass
+class BucketCaseLabeledSpan(BucketCaseSpan):
+    """
+    A bucket case that highlights a span in text along with a label.
+    :param true_label: The actual label
+    :param predicted_label: The label that is predicted
+    """
+
     true_label: str
     predicted_label: str
 
