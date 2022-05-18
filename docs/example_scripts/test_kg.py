@@ -1,5 +1,7 @@
 from explainaboard import get_custom_dataset_loader, get_processor, TaskType
 
+# This code details (1) how to evaluate your systems using ExplainaBoard
+# programmatically (2)how to collect different results
 # Load the data
 dataset = (
     "../../explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"

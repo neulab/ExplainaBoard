@@ -79,5 +79,5 @@ for feature_name, feature_info in sys_info.results.fine_grained.items():
 ```
 
 
-Note: the full version of the code in this code can be found [here](xx)
+Note: the full version of the code in this code can be found [here](https://github.com/neulab/ExplainaBoard/blob/add_demo_example_kg/docs/example_scripts/test_kg.py)
 

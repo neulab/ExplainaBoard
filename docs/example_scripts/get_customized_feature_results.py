@@ -1,6 +1,8 @@
 from explainaboard import get_custom_dataset_loader, get_processor, TaskType
 
 
+# This code details (1) how to evaluate your systems using ExplainaBoard
+# programmatically (2)how to get results of your customized features
 def get_customized_results(dataset, customized_features):
 
     customized_features_performance = {}
