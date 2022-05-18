@@ -2,7 +2,7 @@ from explainaboard import get_custom_dataset_loader, get_processor, TaskType
 
 # Load the data
 dataset = (
-    "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+    "../../explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 )
 task = TaskType.kg_link_tail_prediction
 loader = get_custom_dataset_loader(task, dataset, dataset)
