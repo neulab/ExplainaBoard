@@ -1,3 +1,4 @@
+import dataclasses
 import os
 import unittest
 
@@ -100,6 +101,11 @@ class TestMachineTranslation(unittest.TestCase):
                 'num_capital_letters': 1,
             },
         )
+
+        processor = get_processor(TaskType.machine_translation.value)
+
+        sys_info = processor.process(dataclasses.asdict(data.metadata), data.samples)
+        self.assertTrue('num_capital_letters' in sys_info.results.fine_grained)
 
 
 if __name__ == '__main__':
