@@ -6,7 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import (
-    BucketCaseToken,
+    BucketCaseSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,
@@ -376,10 +376,13 @@ class LanguageModelingProcessor(Processor):
             bucket_samples = []
             log_probs = []
             for (samp_id, tok_id) in tok_list:
-                bucket_samples.append(BucketCaseToken(str(samp_id), str(tok_id)))
+                tok_info = sys_output[samp_id]['tok_info'][tok_id]
                 log_probs.append(
-                    sys_output[samp_id]['tok_info'][tok_id]['tok_log_prob']
+                    tok_info['tok_log_prob']
                 )
+                print(f'tok_info={tok_info}')
+                raise NotImplementedError
+                bucket_samples.append(BucketCaseSpan(samp_id, tok_info['text'], (tok_id,tok_id+1), (-1,-1), 'TODO'))
 
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,

@@ -10,7 +10,7 @@ import numpy as np
 
 from explainaboard import feature, TaskType
 from explainaboard.info import (
-    BucketCaseToken,
+    BucketCaseSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,
@@ -565,14 +565,17 @@ class ConditionalGenerationProcessor(Processor):
                 )
                 stats_list.append([1.0, 0.0, matched, 0.0])
             for sid, tid in toks_pred:
+                tok_dict = sys_output[sid]['hyp_tok_info'][tid]
                 matched = (
                     1.0
-                    if sys_output[sid]['hyp_tok_info'][tid]['tok_matched'] >= 0
+                    if tok_dict['tok_matched'] >= 0
                     else 0.0
                 )
                 stats_list.append([0.0, 1.0, 0.0, matched])
 
-                bucket_samples.append(BucketCaseToken(str(sid), str(tid)))
+                print(f'sys_output[{sid}] = {sys_output[sid]}')
+                raise NotImplementedError
+                bucket_samples.append(BucketCaseSpan(sid,tok_dict['text'],(tid,tid+1),(-1,-1),'TODO'))
 
             stats = explainaboard.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)

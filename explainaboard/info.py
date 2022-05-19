@@ -64,6 +64,10 @@ class BucketCase:
 
     sample_id: int
 
+    def __post_init__(self):
+        if isinstance(self.sample_id, str):
+            raise ValueError
+
     @classmethod
     def dict_conv(cls, k: str, v: dict):
         return v
@@ -91,6 +95,10 @@ class BucketCaseSpan(BucketCase):
     token_span: tuple[int, int]
     char_span: tuple[int, int]
     location: str
+
+    def __post_init__(self):
+        if isinstance(self.token_span, str) or isinstance(self.char_span, str):
+            raise ValueError
 
 
 @dataclass
