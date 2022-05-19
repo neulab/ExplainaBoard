@@ -378,8 +378,12 @@ class ConditionalGenerationProcessor(Processor):
         )
         for bucket_feature in active_features:
             if bucket_feature in sys_features:
+                feature_info = sys_features[bucket_feature]
+                feature_func = self._get_feature_func(
+                    bucket_feature, feature_info.is_custom
+                )
                 bucket_feature_funcs[bucket_feature] = (
-                    self._get_feature_func(bucket_feature),
+                    feature_func,
                     sys_features[bucket_feature].require_training_set,
                 )
 
