@@ -389,10 +389,8 @@ class ConditionalGenerationProcessor(Processor):
         for bucket_feature in active_features:
             if bucket_feature in sys_features:
                 feature_info = sys_features[bucket_feature]
-                feature_func = (
-                    lambda info, sysout, stats=None: sysout[bucket_feature]
-                    if feature_info.is_custom
-                    else self._get_feature_func(bucket_feature)
+                feature_func = self._get_feature_func(
+                    bucket_feature, feature_info.is_custom
                 )
                 bucket_feature_funcs[bucket_feature] = (
                     feature_func,
