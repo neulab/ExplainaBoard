@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import abc
-from collections import defaultdict
-from collections.abc import Callable
-from dataclasses import asdict
+from typing import cast
 
 from datalabs import aggregating, Dataset
 
@@ -19,8 +17,8 @@ from explainaboard.metric import F1ScoreConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils import bucketing
 from explainaboard.utils.logging import progress
-from explainaboard.utils.py_utils import freeze, sort_dict
-from explainaboard.utils.span_utils import SpanOps
+from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.span_utils import Span, SpanOps
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -30,6 +28,8 @@ class SeqLabProcessor(Processor):
     def default_span_ops(cls) -> SpanOps:
         """Returns the default metrics of this processor."""
         ...
+
+    _DEFAULT_TAG = 'O'
 
     def __init__(self):
         super().__init__()
@@ -253,7 +253,9 @@ class SeqLabProcessor(Processor):
         fre_rank = 0 if len(tokens) == 0 else fre_rank / len(tokens)
         return fre_rank
 
-    def _complete_span_features(self, sentence, tags, statistics=None):
+    def _complete_span_features(
+        self, sentence, true_tags, pred_tags, statistics=None
+    ) -> list[Span]:
         # Get training set stats if they exist
         has_stats = statistics is not None and len(statistics) > 0
         econ_dic = statistics["econ_dic"] if has_stats else None
@@ -267,10 +269,26 @@ class SeqLabProcessor(Processor):
             }
         )
 
-        spans = [
-            asdict(span) for span in self._span_ops.get_spans(seq=sentence, tags=tags)
-        ]
-        return spans
+        # Merge the spans together so that the span tag is "true_tag pred_tag"
+        # using "_DEFAULT_TAG" if that span doesn't exist in the true or predicted tags
+        # respectively
+        # TODO(gneubig): This is probably calculating features twice, could be just once
+        true_spans = self._span_ops.get_spans(seq=sentence, tags=true_tags)
+        pred_spans = self._span_ops.get_spans(seq=sentence, tags=pred_tags)
+        merged_spans = {}
+        for span in true_spans:
+            span.span_tag = f'{span.span_tag} {self._DEFAULT_TAG}'
+            merged_spans[span.span_pos] = span
+        for span in pred_spans:
+            merged_span = merged_spans.get(span.span_pos)
+            if not merged_span:
+                span.span_tag = f'{self._DEFAULT_TAG} {span.span_tag}'
+                merged_spans[span.span_pos] = span
+            else:
+                true_tag, _ = unwrap(merged_span.span_tag).split(' ')
+                merged_span.span_tag = f'{true_tag} {span.span_tag}'
+
+        return list(merged_spans.values())
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -317,25 +335,15 @@ class SeqLabProcessor(Processor):
                 dict_sysout["fre_rank"] = self._get_fre_rank(tokens, external_stats)
 
             # span features for true and predicted spans
-            dict_sysout["true_span_info"] = self._complete_span_features(
-                tokens, dict_sysout["true_tags"], statistics=external_stats
+            dict_sysout["span_info"] = self._complete_span_features(
+                tokens,
+                dict_sysout["true_tags"],
+                dict_sysout["pred_tags"],
+                statistics=external_stats,
             )
 
-            dict_sysout["pred_span_info"] = self._complete_span_features(
-                tokens, dict_sysout["pred_tags"], statistics=external_stats
-            )
         # This is not used elsewhere, so just keep it as-is
         return active_features
-
-    def _get_feature_dict(
-        self, sys_output: list[dict], feature_name: str, output_to_toks: Callable
-    ):
-        feat_dict = {}
-        for sample_id, my_output in enumerate(sys_output):
-            for tok_id, span_info in enumerate(output_to_toks(my_output)):
-                span_info["sample_id"] = sample_id
-                feat_dict[freeze(span_info)] = span_info[feature_name]
-        return feat_dict
 
     def _bucketing_samples(
         self,
@@ -348,157 +356,93 @@ class SeqLabProcessor(Processor):
         features = unwrap(sys_info.features)
 
         sent_feats: list[str] = []
-        tok_feats: list[str] = []
+        span_feats: list[str] = []
         for x in active_features:
-            (sent_feats if (x in features) else tok_feats).append(x)
+            (sent_feats if (x in features) else span_feats).append(x)
 
         # First, get the buckets for sentences using the standard protocol
-        samples_over_bucket_true, performances_over_bucket = super()._bucketing_samples(
+        samples_over_bucket, performances_over_bucket = super()._bucketing_samples(
             sys_info, sys_output, sent_feats, metric_stats
         )
 
+        span_dict = {}
+        for sample_id, my_output in enumerate(sys_output):
+            for tok_id, span_info in enumerate(my_output['span_info']):
+                span_dict[(sample_id, span_info.span_pos)] = span_info
+
         # Bucketing
-        samples_over_bucket_pred = {}
-        for feature_name in progress(tok_feats, desc="span-level bucketing"):
+        for feature_name in progress(span_feats, desc="span-level bucketing"):
             my_feature = features["true_span_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
             bucket_func = getattr(bucketing, bucket_info.method)
 
-            feat_dict = self._get_feature_dict(
-                sys_output, feature_name, lambda x: x['true_span_info']
-            )
+            feat_dict = {k: getattr(v, feature_name) for k, v in span_dict.items()}
 
-            samples_over_bucket_true[feature_name] = bucket_func(
+            samples_over_bucket[feature_name] = bucket_func(
                 dict_obj=feat_dict,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
-            )
-
-            # Get buckets for predicted spans
-            feat_dict = self._get_feature_dict(
-                sys_output, feature_name, lambda x: x['pred_span_info']
-            )
-            samples_over_bucket_pred[
-                feature_name
-            ] = bucketing.bucket_attribute_specified_bucket_interval(
-                dict_obj=feat_dict,
-                bucket_number=bucket_info.number,
-                bucket_setting=samples_over_bucket_true[feature_name].keys(),
             )
 
             # evaluating bucket: get bucket performance
             performances_over_bucket[feature_name] = self.get_bucket_performance_seqlab(
                 sys_info,
                 sys_output,
-                samples_over_bucket_true[feature_name],
-                samples_over_bucket_pred[feature_name],
+                samples_over_bucket[feature_name],
+                span_dict,
             )
-        return samples_over_bucket_true, performances_over_bucket
-
-    def _add_to_sample_dict(
-        self,
-        spans: list[dict],
-        type_id: str,
-        sample_dict: defaultdict[tuple, dict[str, str]],
-    ):
-        """
-        Get bucket samples (with mis-predicted entities) for each bucket given a feature
-        (e.g., length)
-        """
-        for span in spans:
-            span = dict(span)
-            pos = (span["sample_id"], span["span_pos"], span["span_text"])
-            sample_dict[pos][type_id] = (
-                span["span_tag"] if span["span_tag"] is not None else ""
-            )
-
-    def get_bucket_cases_seqlab(
-        self,
-        bucket_interval: str,
-        sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[dict]],
-        samples_over_bucket_pred: dict[str, list[dict]],
-    ) -> list:
-        # Index samples for easy comparison
-        sample_dict: defaultdict[tuple, dict[str, str]] = defaultdict(lambda: dict())
-        self._add_to_sample_dict(
-            samples_over_bucket_pred[bucket_interval], 'pred', sample_dict
-        )
-        self._add_to_sample_dict(
-            samples_over_bucket_true[bucket_interval], 'true', sample_dict
-        )
-
-        case_list = []
-        for span, tags in sample_dict.items():
-            true_label = tags.get('true', 'O')
-            pred_label = tags.get('pred', 'O')
-
-            system_output_id = sys_output[span[0]]["id"]
-            error_case = {
-                "text": str(system_output_id),
-                "span": span[2],
-                "true_label": true_label,
-                "predicted_label": pred_label,
-            }
-            case_list.append(error_case)
-
-        return case_list
+        return samples_over_bucket, performances_over_bucket
 
     def get_bucket_performance_seqlab(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[dict]],
-        samples_over_bucket_pred: dict[str, list[dict]],
+        samples_over_bucket: dict[str, list[tuple[int, tuple[int, int]]]],
+        span_dict: dict[tuple[int, tuple[int, int]], Span],
     ) -> dict[str, list[BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
         :param sys_info: Information about the system output
         :param sys_output: The system output itself
-        :param samples_over_bucket_true: a dictionary mapping bucket interval names to
-            true sample IDs
-        :param samples_over_bucket_pred: a dictionary mapping bucket interval names to
-            predicted sample IDs
+        :param samples_over_bucket: a dictionary mapping bucket interval names to spans
         :return: bucket_name_to_performance: a dictionary that maps bucket names to
             bucket performance
         """
-        bucket_metrics = [F1ScoreConfig(name='F1', ignore_classes=['O']).to_metric()]
+        bucket_metrics = [
+            F1ScoreConfig(name='F1', ignore_classes=[self._DEFAULT_TAG]).to_metric()
+        ]
 
         bucket_name_to_performance = {}
-        for bucket_interval, spans_true in samples_over_bucket_true.items():
+        for bucket_interval, span_locs in samples_over_bucket.items():
 
-            if bucket_interval not in samples_over_bucket_pred.keys():
-                raise ValueError("Predict Label Bucketing Errors")
-
-            """
-            Get bucket samples for ner task
-            """
-            bucket_samples = self.get_bucket_cases_seqlab(
-                bucket_interval,
-                sys_output,
-                samples_over_bucket_true,
-                samples_over_bucket_pred,
-            )
-
-            true_labels = [x['true_label'] for x in bucket_samples]
-            pred_labels = [x['predicted_label'] for x in bucket_samples]
-
-            bucket_samples_errors = [
-                BucketCaseSpan(
-                    v["text"], v["span"], v["true_label"], v["predicted_label"]
-                )
-                for v in bucket_samples
-                if v["true_label"] != v["predicted_label"]
-            ]
+            # Get bucketed samples
+            error_cases, true_labels, pred_labels = [], [], []
+            num_true = 0
+            for span_loc in span_locs:
+                span = span_dict[span_loc]
+                true_lab, pred_lab = unwrap(span.span_tag).split(' ')
+                true_labels.append(true_lab)
+                num_true += 1 if true_lab != self._DEFAULT_TAG else 0
+                pred_labels.append(pred_lab)
+                if true_lab != pred_lab:
+                    case = BucketCaseLabeledSpan(
+                        unwrap(span.sample_id),
+                        cast(tuple[int, int], unwrap(span.span_pos)),
+                        (-1, -1),
+                        unwrap(span.span_text),
+                        'tokens',
+                        true_lab,
+                        pred_lab,
+                    )
+                    error_cases.append(case)
 
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,
-                n_samples=len(spans_true),
-                bucket_samples=bucket_samples_errors,
-                # bucket_samples=[], # for temporal use
+                n_samples=num_true,
+                bucket_samples=error_cases,
             )
             for metric in bucket_metrics:
                 metric_val = metric.evaluate(
@@ -560,7 +504,9 @@ class SeqLabProcessor(Processor):
                 if span_str not in prefixes:
                     break
                 if span_str in entity_to_tagcnt:
-                    my_tag = chunk_to_tag.get((idx_start, idx_start + i + 1), 'O')
+                    my_tag = chunk_to_tag.get(
+                        (idx_start, idx_start + i + 1), self._DEFAULT_TAG
+                    )
                     entity_to_tagcnt[span_str][my_tag] = (
                         entity_to_tagcnt[span_str].get(my_tag, 0) + 1
                     )

@@ -373,16 +373,22 @@ class LanguageModelingProcessor(Processor):
         for bucket_interval, tok_list in samples_over_bucket.items():
 
             bucket_metrics = [x.to_metric() for x in unwrap(sys_info.metric_configs)]
-            bucket_samples = []
+            bucket_samples: list[BucketCase] = []
             log_probs = []
             for (samp_id, tok_id) in tok_list:
                 tok_info = sys_output[samp_id]['tok_info'][tok_id]
-                log_probs.append(
-                    tok_info['tok_log_prob']
-                )
+                log_probs.append(tok_info['tok_log_prob'])
                 print(f'tok_info={tok_info}')
                 raise NotImplementedError
-                bucket_samples.append(BucketCaseSpan(samp_id, tok_info['text'], (tok_id,tok_id+1), (-1,-1), 'TODO'))
+                bucket_samples.append(
+                    BucketCaseSpan(
+                        samp_id,
+                        tok_info['text'],
+                        (tok_id, tok_id + 1),
+                        (-1, -1),
+                        'TODO',
+                    )
+                )
 
             bucket_performance = BucketPerformance(
                 bucket_name=bucket_interval,

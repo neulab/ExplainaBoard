@@ -126,7 +126,7 @@ class TestNER(unittest.TestCase):
             sys_info.results.fine_grained["span_econ"][second_interval]
             .performances[0]
             .value,
-            0.9273461150353179,
+            0.9250879839115134,
             4,
             "almost equal",
         )

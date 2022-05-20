@@ -91,9 +91,9 @@ class BucketCaseSpan(BucketCase):
       which this span is calculated
     """
 
-    text: str
     token_span: tuple[int, int]
     char_span: tuple[int, int]
+    text: str
     location: str
 
     def __post_init__(self):
