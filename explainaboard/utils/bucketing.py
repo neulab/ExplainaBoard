@@ -4,130 +4,131 @@ from typing import Any, TypeVar
 
 import numpy as np
 
-from explainaboard.utils.analysis import find_key, reverse_dict
-from explainaboard.utils.py_utils import sort_dict
+from explainaboard.info import BucketCase, BucketCaseCollection
 from explainaboard.utils.typing_utils import unwrap
 
 T = TypeVar('T')
 
+_INFINITE_INTERVAL = (-1e10, 1e10)
+
+
+def find_key(dict_obj, x):
+    for k, v in dict_obj.items():
+        if len(k) == 1:
+            if x == k[0]:
+                return k
+        elif len(k) == 2 and x >= k[0] and x <= k[1]:  # Attention !!!
+            return k
+
 
 def bucket_attribute_specified_bucket_value(
-    dict_obj: dict[Any, T], bucket_number: int = 4, bucket_setting: Any = None
-) -> dict[tuple[T, T], list]:
-    if len(dict_obj) == 0:
-        return {}
+    case_features: list[tuple[BucketCase, T]],
+    bucket_number: int = 4,
+    bucket_setting: Any = None,
+) -> list[BucketCaseCollection]:
+    if len(case_features) == 0:
+        return [BucketCaseCollection(_INFINITE_INTERVAL, [])]
     if bucket_setting is not None and len(bucket_setting) > 0:
         raise NotImplementedError(
             'bucket_setting incompatible with '
             'bucket_attribute_specified_bucket_value'
         )
     # Bucketing different Attributes
-    keys = list(dict_obj.keys())
-    vals = np.array(list(dict_obj.values()))
+    cases = [x1 for x1, x2 in case_features]
+    vals = np.array([x2 for x1, x2 in case_features])
     # Function to convert numpy datatypes to Python native types
     conv = int if np.issubdtype(vals[0], int) else float
     # Special case of one bucket
     if bucket_number == 1:
         max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
-        return {(min_val, max_val): keys}
+        return [BucketCaseCollection((min_val, max_val), cases)]
 
-    n_examps = len(keys)
+    n_examps = len(vals)
     sorted_idxs = np.argsort(vals)
     sorted_vals = vals[sorted_idxs]
     max_val, min_val = conv(sorted_vals[-1]), conv(sorted_vals[0])
 
     start_val, last_val = min_val, min_val
     start_i, cutoff_i = 0, n_examps / float(bucket_number)
-    bucket_dict: dict[tuple[T, T], list[Any]] = {}
+    bucket_collections: list[BucketCaseCollection] = []
     for i, val in enumerate(sorted_vals):
         # Return the final bucket
-        if bucket_number - len(bucket_dict) == 1 or val == max_val:
-            bucket_dict[(conv(start_val), max_val)] = [
-                keys[j] for j in sorted_idxs[start_i:]
-            ]
+        if bucket_number - len(bucket_collections) == 1 or val == max_val:
+            bucket_collections.append(
+                BucketCaseCollection(
+                    (conv(start_val), max_val),
+                    [cases[j] for j in sorted_idxs[start_i:]],
+                )
+            )
             break
         # If the last value is not the same, maybe make a new bucket
         elif val != last_val:
             if i >= cutoff_i:
-                bucket_dict[(conv(start_val), conv(last_val))] = [
-                    keys[j] for j in sorted_idxs[start_i:i]
-                ]
+                bucket_collections.append(
+                    BucketCaseCollection(
+                        (conv(start_val), conv(last_val)),
+                        [cases[j] for j in sorted_idxs[start_i:i]],
+                    )
+                )
                 start_val = val
                 start_i = i
-                cutoff_i = i + (n_examps - i) / float(bucket_number - len(bucket_dict))
+                cutoff_i = i + (n_examps - i) / float(
+                    bucket_number - len(bucket_collections)
+                )
             last_val = val
 
-    return bucket_dict
+    return bucket_collections
 
 
 def bucket_attribute_discrete_value(
-    obj=None,
-    bucket_number=100000000,
-    bucket_setting=1,
-) -> dict[tuple, list]:
-    # Bucketing different Attributes
-    span2att_val = obj
-    n_buckets = bucket_number
-    n_entities = bucket_setting
-
-    bucket2span: dict[tuple, list] = {}
-
-    att_val2span = reverse_dict(span2att_val)
-    att_val2span = sort_dict(att_val2span, flag="value")
-
-    n_total = 1
-    for att_val, entity in att_val2span.items():
-
-        if len(entity) < n_entities or n_total > n_buckets:
-            break
-        bucket2span[(att_val,)] = entity
-
-        n_total += 1
-
-    return bucket2span
+    case_features: list[tuple[BucketCase, T]],
+    bucket_number: int = int(1e10),
+    bucket_setting: Any = 1,
+) -> list[BucketCaseCollection]:
+    """
+    Bucket attributes by discrete value.
+    :param case_features: Pairs of a bucket case and feature value.
+    :param bucket_number: Maximum number of buckets
+    :param bucket_setting: Minimum number of examples per bucket
+    """
+    feat2case = {}
+    for k, v in case_features:
+        if v not in feat2case:
+            feat2case[v] = [k]
+        else:
+            feat2case[v].append(k)
+    bucket_collections = [
+        BucketCaseCollection((k,), v)
+        for k, v in feat2case.items()
+        if len(v) >= bucket_setting
+    ]
+    bucket_collections.sort(key=lambda x: -len(x.bucket_samples))
+    if len(bucket_collections) > bucket_number:
+        bucket_collections = bucket_collections[:bucket_number]
+    return bucket_collections
 
 
 def bucket_attribute_specified_bucket_interval(
-    dict_obj=None,
-    bucket_number=None,
-    bucket_setting: list[tuple] | None = None,
-) -> dict[tuple, list]:
-    # Bucketing different Attributes
-
-    # hardcoded_bucket_values = [set([float(0), float(1)])]
-
-    # intervals = [0, (0,0.5], (0.5,0.9], (0.99,1]]
-    span2att_val = dict_obj
+    case_features: list[tuple[BucketCase, T]],
+    bucket_number: int,
+    bucket_setting: list[tuple],
+) -> list[BucketCaseCollection]:
     intervals = unwrap(bucket_setting)
+    bucket2examp: dict[tuple, list[BucketCase]] = {k: list() for k in intervals}
 
-    bucket2span: dict[tuple, list] = {}
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
-        att_val2span = reverse_dict(span2att_val)
-        att_val2span = sort_dict(att_val2span, flag="value")
-        for att_val, entity in att_val2span.items():
-            att_val_tuple = (att_val,)
-            if att_val_tuple in intervals:
-                if att_val_tuple not in bucket2span.keys():
-                    bucket2span[att_val_tuple] = entity
-                else:
-                    bucket2span[att_val_tuple] += entity
-
-        for val in intervals:
-            if val not in bucket2span.keys():
-                bucket2span[val] = []
+        for k, v in case_features:
+            if v in bucket2examp:
+                bucket2examp[(v,)].append(k)
     else:
-        att_val2span = reverse_dict(span2att_val)
-        att_val2span = sort_dict(att_val2span)
-        for v in intervals:
-            if len(v) == 1:
-                bucket2span[v] = []
-            else:
-                bucket2span[v] = []
-
-        for att_val, entity in att_val2span.items():
-            res_key = find_key(bucket2span, att_val)
+        for examp, value in case_features:
+            res_key = find_key(bucket2examp, value)
             if res_key is None:
                 continue
-            bucket2span[res_key] += entity
+            bucket2examp[res_key].append(examp)
 
-    return bucket2span
+    bucket_collections = [
+        BucketCaseCollection((k,), v) for k, v in bucket2examp.items()
+    ]
+
+    return bucket_collections

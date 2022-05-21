@@ -148,10 +148,16 @@ class BucketPerformance:
 
 
 @dataclass
+class BucketCaseCollection:
+    bucket_interval: tuple
+    bucket_samples: list[BucketCase]
+
+
+@dataclass
 class Result:
     overall: Optional[dict[str, Performance]] = None
     # {feature_name: {bucket_name: performance}}
-    fine_grained: Optional[dict[str, dict[str, BucketPerformance]]] = None
+    fine_grained: Optional[dict[str, list[tuple[tuple, BucketPerformance]]]] = None
     calibration: Optional[list[Performance]] = None
 
     @classmethod
@@ -324,12 +330,6 @@ class OverallStatistics:
     sys_info: SysOutputInfo
     metric_stats: list[MetricStats]
     active_features: list[str]
-
-
-@dataclass
-class FineGrainedStatistics:
-    samples_over_bucket: dict
-    performance_over_bucket: dict
 
 
 def print_bucket_dict(dict_obj: dict[str, BucketPerformance], print_information: str):

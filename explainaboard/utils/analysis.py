@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import json
-from typing import TypeVar
-
 
 def cap_feature(s):
     """
@@ -22,68 +19,45 @@ def cap_feature(s):
         return "not_first_caps"
 
 
-def save_json(obj_json, path):
-    with open(path, "w") as f:
-        json.dump(obj_json, f, indent=4, ensure_ascii=False)
+# def save_json(obj_json, path):
+#     with open(path, "w") as f:
+#         json.dump(obj_json, f, indent=4, ensure_ascii=False)
 
 
-def beautify_interval(interval):
-
-    if isinstance(interval[0], str):
-        return interval[0]
-    else:
-        if len(interval) == 1:
-            bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
-            return bk_name
-        else:
-            range1_r = '(' + format(float(interval[0]), '.3g') + ','
-            range1_l = format(float(interval[1]), '.3g') + ')'
-            bk_name = range1_r + range1_l
-            return bk_name
-
-
-def tuple2str(triplet):
-    res = ""
-    for v in triplet:
-        res += str(v) + "|||"
-    return res.rstrip("|||")
+# def beautify_interval(interval):
+#
+#     if isinstance(interval[0], str):
+#         return interval[0]
+#     else:
+#         if len(interval) == 1:
+#             bk_name = '(' + format(float(interval[0]), '.3g') + ',)'
+#             return bk_name
+#         else:
+#             range1_r = '(' + format(float(interval[0]), '.3g') + ','
+#             range1_l = format(float(interval[1]), '.3g') + ')'
+#             bk_name = range1_r + range1_l
+#             return bk_name
 
 
-def interval_transformer(inter_list):
-    dict_old2new = {}
-    last = 0
-    for ind, interval in enumerate(inter_list):
-        if ind == 0:
-            last = interval[0]
-        if len(interval) == 1:
-            # new_inter_list.append(interval)
-            dict_old2new[interval] = interval
-            last = interval[0]
-        else:
-            # new_inter_list.append((last, interval[1]))
-            dict_old2new[interval] = (last, interval[1])
-            last = interval[1]
-    return dict_old2new
+# def tuple2str(triplet):
+#     res = ""
+#     for v in triplet:
+#         res += str(v) + "|||"
+#     return res.rstrip("|||")
 
 
-def find_key(dict_obj, x):
-    for k, v in dict_obj.items():
-        if len(k) == 1:
-            if x == k[0]:
-                return k
-        elif len(k) == 2 and x >= k[0] and x <= k[1]:  # Attention !!!
-            return k
-
-
-T1 = TypeVar('T1')
-T2 = TypeVar('T2')
-
-
-def reverse_dict(dict_a2b: dict[T1, T2]) -> dict[T2, list[T1]]:
-    dict_b2a = {}
-    for k, v in dict_a2b.items():
-        if v not in dict_b2a:
-            dict_b2a[v] = [k]
-        else:
-            dict_b2a[v].append(k)
-    return dict_b2a
+# def interval_transformer(inter_list):
+#     dict_old2new = {}
+#     last = 0
+#     for ind, interval in enumerate(inter_list):
+#         if ind == 0:
+#             last = interval[0]
+#         if len(interval) == 1:
+#             # new_inter_list.append(interval)
+#             dict_old2new[interval] = interval
+#             last = interval[0]
+#         else:
+#             # new_inter_list.append((last, interval[1]))
+#             dict_old2new[interval] = (last, interval[1])
+#             last = interval[1]
+#     return dict_old2new

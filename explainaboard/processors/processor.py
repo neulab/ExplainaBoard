@@ -14,8 +14,8 @@ from explainaboard import feature, TaskType
 from explainaboard.feature import Features
 from explainaboard.info import (
     BucketCase,
+    BucketCaseCollection,
     BucketPerformance,
-    FineGrainedStatistics,
     OverallStatistics,
     Performance,
     print_bucket_dict,
@@ -316,13 +316,13 @@ class Processor(metaclass=abc.ABCMeta):
 
         return list(bucket_feature_funcs.keys())
 
-    def _bucketing_samples(
+    def bucketing_samples(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> dict[str, dict[tuple, BucketPerformance]]:
+    ) -> dict[str, list[tuple[tuple, BucketPerformance]]]:
         """
         Separate samples into buckets and calculate performance over them
         :param sys_info: Information about the system output
@@ -336,20 +336,20 @@ class Processor(metaclass=abc.ABCMeta):
         sys_features = unwrap(sys_info.features)
 
         # Bucketing
-        samples_over_bucket: dict[str, dict[tuple, list[BucketCase]]] = {}
-        performances_over_bucket: dict[str, dict[tuple, BucketPerformance]] = {}
+        performances_over_bucket: dict[str, list[tuple[tuple, BucketPerformance]]] = {}
         for feature_name in progress(active_features, desc="sample-level bucketing"):
             # Preparation for bucketing
-            bucket_func: Callable[..., dict[tuple, list[BucketCase]]] = getattr(
+            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
                 explainaboard.utils.bucketing,
                 sys_features[feature_name].bucket_info.method,
             )
             # TODO(gneubig):
             # make dict_obj more elegant so it doesn't have to copy memory
-            samples_over_bucket[feature_name] = bucket_func(
-                dict_obj={
-                    x: sys_output[x][feature_name] for x in range(len(sys_output))
-                },
+            samples_over_bucket = bucket_func(
+                case_features=[
+                    (BucketCase(x), sys_output[x][feature_name])
+                    for x in range(len(sys_output))
+                ],
                 bucket_number=sys_features[feature_name].bucket_info.number,
                 bucket_setting=sys_features[feature_name].bucket_info.setting,
             )
@@ -358,7 +358,7 @@ class Processor(metaclass=abc.ABCMeta):
             performances_over_bucket[feature_name] = self.get_bucket_performance(
                 sys_info,
                 sys_output,
-                samples_over_bucket[feature_name],
+                samples_over_bucket,
                 metric_stats=metric_stats,
             )
         return performances_over_bucket
@@ -379,9 +379,9 @@ class Processor(metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket: dict[tuple, list[BucketCase]],
+        samples_over_bucket: list[BucketCaseCollection],
         metric_stats: list[MetricStats],
-    ) -> dict[tuple, BucketPerformance]:
+    ) -> list[tuple[tuple, BucketPerformance]]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
@@ -398,14 +398,14 @@ class Processor(metaclass=abc.ABCMeta):
         metric_funcs = self._get_metrics(sys_info)
 
         bucket_name_to_performance: dict[tuple, BucketPerformance] = {}
-        for bucket_interval, bucket_cases in samples_over_bucket.items():
-
+        for bucket_collection in samples_over_bucket:
+            bucket_cases = bucket_collection.bucket_samples
+            sample_ids = [bucket_case.sample_id for bucket_case in bucket_cases]
             # Subsample examples to save
             bucket_samples = self._subsample_bucket_cases(bucket_cases)
-            sample_ids = [bucket_case.sample_id for bucket_case in bucket_cases]
 
             bucket_performance = BucketPerformance(
-                bucket_interval=bucket_interval,
+                bucket_interval=bucket_collection.bucket_interval,
                 n_samples=len(bucket_cases),
                 bucket_samples=bucket_samples,
             )
@@ -436,7 +436,9 @@ class Processor(metaclass=abc.ABCMeta):
 
                 bucket_performance.performances.append(performance)
 
-            bucket_name_to_performance[bucket_interval] = bucket_performance
+            bucket_name_to_performance[
+                bucket_collection.bucket_interval
+            ] = bucket_performance
 
         return sort_dict(bucket_name_to_performance)
 
@@ -654,21 +656,6 @@ class Processor(metaclass=abc.ABCMeta):
             performance_over_bucket_sorted[feature_name] = feature_sorted
         return performance_over_bucket_sorted
 
-    def get_fine_grained_statistics(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        active_features: list[str],
-        metric_stats=None,
-    ) -> FineGrainedStatistics:
-        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
-            sys_info, sys_output, active_features, metric_stats
-        )
-        """
-        A wrapper function to expose _bucketing_samples for the web interface
-        """
-        return FineGrainedStatistics(samples_over_bucket, performance_over_bucket)
-
     def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
@@ -676,7 +663,7 @@ class Processor(metaclass=abc.ABCMeta):
         metric_stats = overall_statistics.metric_stats
         active_features = unwrap(overall_statistics.active_features)
         overall_results = sys_info.results.overall
-        samples_over_bucket, performance_over_bucket = self._bucketing_samples(
+        performance_over_bucket = self.bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
         performance_over_bucket = self.sort_bucket_info(
