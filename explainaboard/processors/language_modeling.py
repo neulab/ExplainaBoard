@@ -6,6 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import (
+    BucketCase,
     BucketCaseSpan,
     BucketPerformance,
     Performance,
@@ -280,17 +281,21 @@ class LanguageModelingProcessor(Processor):
         fre_dic = statistics["vocab"] if has_stats else None
 
         tok_dics = []
+        tok_char_start = 0
         for i, (tok, log_prob) in enumerate(zip(toks, log_probs)):
             # Basic features
+            tok_char_end = tok_char_start + len(tok)
             tok_dic = {
                 'tok_text': tok,
                 'tok_pos': (i, i + 1),
+                'tok_char_pos': (tok_char_start, tok_char_end),
                 'tok_log_prob': log_prob,
                 'tok_capitalness': cap_feature(tok),
                 'tok_position': i * 1.0 / len(toks),
                 'tok_chars': len(tok),
                 'tok_test_freq': test_freq.get(tok, 0),
             }
+            tok_char_start = tok_char_end + 1
             # Training set dependent features
             if has_stats:
                 tok_dic['tok_train_freq'] = fre_dic.get(tok, 0)
@@ -314,7 +319,7 @@ class LanguageModelingProcessor(Processor):
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> tuple[dict, dict]:
+    ) -> tuple[dict[str, dict[tuple, list[BucketCase]]], dict[str, BucketPerformance]]:
 
         features = unwrap(sys_info.features)
 
@@ -378,15 +383,13 @@ class LanguageModelingProcessor(Processor):
             for (samp_id, tok_id) in tok_list:
                 tok_info = sys_output[samp_id]['tok_info'][tok_id]
                 log_probs.append(tok_info['tok_log_prob'])
-                print(f'tok_info={tok_info}')
-                raise NotImplementedError
                 bucket_samples.append(
                     BucketCaseSpan(
                         samp_id,
-                        tok_info['text'],
-                        (tok_id, tok_id + 1),
-                        (-1, -1),
-                        'TODO',
+                        tok_info['tok_pos'],
+                        tok_info['tok_char_pos'],
+                        tok_info['tok_text'],
+                        'text',
                     )
                 )
 

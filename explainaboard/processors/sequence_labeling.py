@@ -351,7 +351,7 @@ class SeqLabProcessor(Processor):
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> tuple[dict, dict]:
+    ) -> tuple[dict[str, dict[tuple, list[BucketCase]]], dict[str, BucketPerformance]]:
 
         features = unwrap(sys_info.features)
 
@@ -429,13 +429,13 @@ class SeqLabProcessor(Processor):
                 pred_labels.append(pred_lab)
                 if true_lab != pred_lab:
                     case = BucketCaseLabeledSpan(
-                        unwrap(span.sample_id),
-                        cast(tuple[int, int], unwrap(span.span_pos)),
-                        (-1, -1),
-                        unwrap(span.span_text),
-                        'tokens',
-                        true_lab,
-                        pred_lab,
+                        sample_id=unwrap(span.sample_id),
+                        token_span=cast(tuple[int, int], unwrap(span.span_pos)),
+                        char_span=(-1, -1),
+                        orig_str='tokens',
+                        text=unwrap(span.span_text),
+                        true_label=true_lab,
+                        predicted_label=pred_lab,
                     )
                     error_cases.append(case)
 

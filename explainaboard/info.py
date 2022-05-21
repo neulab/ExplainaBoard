@@ -93,12 +93,22 @@ class BucketCaseSpan(BucketCase):
 
     token_span: tuple[int, int]
     char_span: tuple[int, int]
+    orig_str: str
     text: str
-    location: str
 
     def __post_init__(self):
         if isinstance(self.token_span, str) or isinstance(self.char_span, str):
             raise ValueError
+
+
+@dataclass
+class BucketCaseMultiSpan(BucketCase):
+    """
+    A bucket case that highlights multiple spans in text
+    :param spans: The spans that are highlighted
+    """
+
+    spans: list[BucketCaseSpan]
 
 
 @dataclass
@@ -115,7 +125,7 @@ class BucketCaseLabeledSpan(BucketCaseSpan):
 
 @dataclass
 class BucketPerformance:
-    bucket_name: str
+    bucket_interval: tuple
     n_samples: float
     bucket_samples: list[Any] = field(default_factory=list)
     performances: list[Performance] = field(default_factory=list)

@@ -124,8 +124,6 @@ class TokenizerConala(BaseTokenizer):
     A SacreBLEU style tokenizer of the tokenizer that we use for BLEU score over Python
     code, as used by the CoNaLa corpus.
     Originally from Wang Ling et al., Latent Predictor Networks for Code Generation
-    :param text: string containing a code snippet
-    :return: list of code tokens
     """
 
     def __call__(self, text: str) -> str:
@@ -164,7 +162,7 @@ class SacreBleuTokenizer(Tokenizer):
         self.normalizer = _no_normalizer
         self.variety = variety
         if variety == 'intl':
-            self.tokenizer = TokenizerV14International()
+            self.tokenizer: BaseTokenizer = TokenizerV14International()
         elif variety == 'zh':
             self.tokenizer = TokenizerZh()
         elif variety == 'ja-mecab':

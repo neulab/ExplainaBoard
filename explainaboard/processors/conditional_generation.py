@@ -10,6 +10,8 @@ import numpy as np
 
 from explainaboard import feature, TaskType
 from explainaboard.info import (
+    BucketCase,
+    BucketCaseMultiSpan,
     BucketCaseSpan,
     BucketPerformance,
     Performance,
@@ -29,6 +31,7 @@ import explainaboard.utils.feature_funcs
 from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.logging import progress
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.tokenizer import TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
@@ -424,7 +427,9 @@ class ConditionalGenerationProcessor(Processor):
 
         return active_features
 
-    def _complete_tok_features(self, toks, other_toks, ref_test_freq, statistics=None):
+    def _complete_tok_features(
+        self, toks: TokenSeq, other_toks: TokenSeq, ref_test_freq, statistics=None
+    ):
 
         # Get training set stats if they exist
         has_stats = statistics is not None and len(statistics) > 0
@@ -440,9 +445,11 @@ class ConditionalGenerationProcessor(Processor):
             # Basic features
             my_other = other_tok_list.get(tok, list())
             matched = my_other.pop(0) if len(my_other) > 0 else -1
+            start = toks.positions[i]
             tok_dic = {
                 'tok_text': tok,
                 'tok_pos': (i, i + 1),
+                'tok_char_pos': (start, start + len(tok)),
                 'tok_matched': matched,
                 'tok_capitalness': cap_feature(tok),
                 'tok_position': i * 1.0 / len(toks),
@@ -472,7 +479,10 @@ class ConditionalGenerationProcessor(Processor):
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> tuple[dict, dict]:
+    ) -> tuple[
+        dict[str, dict[tuple, list[BucketCase]]],
+        dict[str, dict[tuple, BucketPerformance]],
+    ]:
 
         features = unwrap(sys_info.features)
         sent_feats: list[str] = []
@@ -484,7 +494,6 @@ class ConditionalGenerationProcessor(Processor):
         samples_over_bucket, performances_over_bucket = super()._bucketing_samples(
             sys_info, sys_output, sent_feats, metric_stats
         )
-        samples_over_bucket_pred = {}
 
         # Second, get the buckets for tokens
         for feature_name in progress(tok_feats, desc="bucketing token features"):
@@ -499,40 +508,49 @@ class ConditionalGenerationProcessor(Processor):
             feat_dict = self._get_feature_dict(
                 sys_output, feature_name, lambda x: x['ref_tok_info']
             )
-            samples_over_bucket[feature_name] = bucket_func(
+            samples_over_bucket_true = bucket_func(
                 dict_obj=feat_dict,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
+            bucket_names = list(samples_over_bucket[feature_name].keys())
 
             # Get buckets for predicted spans
             feat_dict = self._get_feature_dict(
                 sys_output, feature_name, lambda x: x['hyp_tok_info']
             )
-            samples_over_bucket_pred[
-                feature_name
-            ] = bucketing.bucket_attribute_specified_bucket_interval(
-                dict_obj=feat_dict,
-                bucket_number=bucket_info.number,
-                bucket_setting=samples_over_bucket[feature_name].keys(),
+            samples_over_bucket_pred = (
+                bucketing.bucket_attribute_specified_bucket_interval(
+                    dict_obj=feat_dict,
+                    bucket_number=bucket_info.number,
+                    bucket_setting=bucket_names,
+                )
             )
 
             # evaluating bucket: get bucket performance
+            samples_over_bucket[feature_name] = samples_over_bucket_true
             performances_over_bucket[feature_name] = self.get_bucket_performance_tok(
                 sys_info,
                 sys_output,
                 samples_over_bucket[feature_name],
                 samples_over_bucket_pred[feature_name],
             )
+
+        for feature_name, samples in samples_over_bucket.items():
+            if len(bucket_samples) > self._bucket_sample_limit:
+                np.random.choice(
+                    bucket_samples, self._bucket_sample_limit, replace=False
+                )
+
         return samples_over_bucket, performances_over_bucket
 
     def get_bucket_performance_tok(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket_true: dict[str, list[tuple[int, int]]],
-        samples_over_bucket_pred: dict[str, list[tuple[int, int]]],
-    ) -> dict[str, list[BucketPerformance]]:
+        samples_over_bucket_true: dict[tuple, list[tuple[int, int]]],
+        samples_over_bucket_pred: dict[tuple, list[tuple[int, int]]],
+    ) -> dict[tuple, BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
@@ -546,7 +564,7 @@ class ConditionalGenerationProcessor(Processor):
             bucket performance
         """
 
-        bucket_name_to_performance: dict[str, BucketPerformance] = {}
+        bucket_name_to_performance: dict[tuple, BucketPerformance] = {}
         f1_score = F1ScoreConfig(name='F1', separate_match=True).to_metric()
         for bucket_interval, toks_true in samples_over_bucket_true.items():
 
@@ -556,27 +574,53 @@ class ConditionalGenerationProcessor(Processor):
                 toks_pred = samples_over_bucket_pred[bucket_interval]
 
             stats_list = []
-            bucket_samples = []
+            bucket_samples: list[BucketCase] = []
+
             for sid, tid in toks_true:
-                matched = (
-                    1.0
-                    if sys_output[sid]['ref_tok_info'][tid]['tok_matched'] >= 0
-                    else 0.0
-                )
+                tok_dict = sys_output[sid]['ref_tok_info'][tid]
+                mid = tok_dict['tok_matched']
+                matched = 1.0 if mid >= 0 else 0.0
                 stats_list.append([1.0, 0.0, matched, 0.0])
+
+                ref_span = BucketCaseSpan(
+                    sid,
+                    (tid, tid + 1),
+                    tok_dict['tok_char_pos'],
+                    tok_dict['text'],
+                    'reference',
+                )
+                if matched:
+                    hyp_tok_dict = sys_output[sid]['hyp_tok_info'][mid]
+                    hyp_span = BucketCaseSpan(
+                        sid,
+                        (mid, mid + 1),
+                        hyp_tok_dict['tok_char_pos'],
+                        hyp_tok_dict['text'],
+                        'hypothesis',
+                    )
+                    bucket_samples.append(
+                        BucketCaseMultiSpan(sid, [ref_span, hyp_span])
+                    )
+                else:
+                    bucket_samples.append(ref_span)
+
             for sid, tid in toks_pred:
                 tok_dict = sys_output[sid]['hyp_tok_info'][tid]
-                matched = (
-                    1.0
-                    if tok_dict['tok_matched'] >= 0
-                    else 0.0
-                )
+                matched = 1.0 if tok_dict['tok_matched'] >= 0 else 0.0
                 stats_list.append([0.0, 1.0, 0.0, matched])
 
-                print(f'sys_output[{sid}] = {sys_output[sid]}')
-                raise NotImplementedError
-                bucket_samples.append(BucketCaseSpan(sid,tok_dict['text'],(tid,tid+1),(-1,-1),'TODO'))
+                if not matched:
+                    bucket_samples.append(
+                        BucketCaseSpan(
+                            sid,
+                            (tid, tid + 1),
+                            tok_dict['tok_char_pos'],
+                            tok_dict['text'],
+                            'hypothesis',
+                        )
+                    )
 
+            bucket_samples = self._subsample_bucket_cases(bucket_samples)
             stats = explainaboard.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
             conf_interval: tuple[float, float] = unwrap(result.conf_interval)
@@ -588,7 +632,7 @@ class ConditionalGenerationProcessor(Processor):
                 confidence_score_high=conf_high,
             )
             bucket_performance = BucketPerformance(
-                bucket_name=bucket_interval,
+                bucket_interval=bucket_interval,
                 n_samples=len(toks_true),
                 bucket_samples=bucket_samples,
                 performances=[performance],

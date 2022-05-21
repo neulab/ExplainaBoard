@@ -6,6 +6,7 @@ import numpy as np
 
 from explainaboard.utils.analysis import find_key, reverse_dict
 from explainaboard.utils.py_utils import sort_dict
+from explainaboard.utils.typing_utils import unwrap
 
 T = TypeVar('T')
 
@@ -60,73 +61,73 @@ def bucket_attribute_specified_bucket_value(
 
 
 def bucket_attribute_discrete_value(
-    dict_obj=None,
+    obj=None,
     bucket_number=100000000,
     bucket_setting=1,
-):
+) -> dict[tuple, list]:
     # Bucketing different Attributes
-    dict_span2att_val = dict_obj
+    span2att_val = obj
     n_buckets = bucket_number
     n_entities = bucket_setting
 
-    dict_bucket2span = {}
+    bucket2span: dict[tuple, list] = {}
 
-    dict_att_val2span = reverse_dict(dict_span2att_val)
-    dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
+    att_val2span = reverse_dict(span2att_val)
+    att_val2span = sort_dict(att_val2span, flag="value")
 
     n_total = 1
-    for att_val, entity in dict_att_val2span.items():
+    for att_val, entity in att_val2span.items():
 
         if len(entity) < n_entities or n_total > n_buckets:
             break
-        dict_bucket2span[(att_val,)] = entity
+        bucket2span[(att_val,)] = entity
 
         n_total += 1
 
-    return dict_bucket2span
+    return bucket2span
 
 
 def bucket_attribute_specified_bucket_interval(
     dict_obj=None,
     bucket_number=None,
-    bucket_setting=None,
-):
+    bucket_setting: list[tuple] | None = None,
+) -> dict[tuple, list]:
     # Bucketing different Attributes
 
     # hardcoded_bucket_values = [set([float(0), float(1)])]
 
     # intervals = [0, (0,0.5], (0.5,0.9], (0.99,1]]
-    dict_span2att_val = dict_obj
-    intervals = bucket_setting
+    span2att_val = dict_obj
+    intervals = unwrap(bucket_setting)
 
-    dict_bucket2span = {}
+    bucket2span: dict[tuple, list] = {}
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
-        dict_att_val2span = reverse_dict(dict_span2att_val)
-        dict_att_val2span = sort_dict(dict_att_val2span, flag="value")
-        for att_val, entity in dict_att_val2span.items():
+        att_val2span = reverse_dict(span2att_val)
+        att_val2span = sort_dict(att_val2span, flag="value")
+        for att_val, entity in att_val2span.items():
             att_val_tuple = (att_val,)
             if att_val_tuple in intervals:
-                if att_val_tuple not in dict_bucket2span.keys():
-                    dict_bucket2span[att_val_tuple] = entity
+                if att_val_tuple not in bucket2span.keys():
+                    bucket2span[att_val_tuple] = entity
                 else:
-                    dict_bucket2span[att_val_tuple] += entity
+                    bucket2span[att_val_tuple] += entity
 
         for val in intervals:
-            if val not in dict_bucket2span.keys():
-                dict_bucket2span[val] = []
+            if val not in bucket2span.keys():
+                bucket2span[val] = []
     else:
-        dict_att_val2span = reverse_dict(dict_span2att_val)
-        dict_att_val2span = sort_dict(dict_att_val2span)
+        att_val2span = reverse_dict(span2att_val)
+        att_val2span = sort_dict(att_val2span)
         for v in intervals:
             if len(v) == 1:
-                dict_bucket2span[v] = []
+                bucket2span[v] = []
             else:
-                dict_bucket2span[v] = []
+                bucket2span[v] = []
 
-        for att_val, entity in dict_att_val2span.items():
-            res_key = find_key(dict_bucket2span, att_val)
+        for att_val, entity in att_val2span.items():
+            res_key = find_key(bucket2span, att_val)
             if res_key is None:
                 continue
-            dict_bucket2span[res_key] += entity
+            bucket2span[res_key] += entity
 
-    return dict_bucket2span
+    return bucket2span

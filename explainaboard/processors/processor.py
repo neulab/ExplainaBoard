@@ -8,6 +8,7 @@ from typing import Any, Optional
 from datalabs import aggregating, Dataset, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
+import numpy as np
 
 from explainaboard import feature, TaskType
 from explainaboard.feature import Features
@@ -77,10 +78,10 @@ class Processor(metaclass=abc.ABCMeta):
         # self._statistics_func = None
         self._preprocessor = None
         self._default_features = self.default_features()
+        # A limit on the number of samples stored for each bucket. Hard-coded for now
+        self._bucket_sample_limit = 50
 
-    def _get_statistics_resources(
-        self, sys_info: SysOutputInfo, dataset_split: Dataset
-    ) -> dict[str, Any]:
+    def _get_statistics_resources(self, sys_info: SysOutputInfo) -> dict[str, Any]:
         """
         From a DataLab dataset split, get resources necessary to calculate statistics
         """
@@ -125,6 +126,8 @@ class Processor(metaclass=abc.ABCMeta):
                         " no training set dependent features will be supported by"
                         " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                     )
+                elif not isinstance(dataset, Dataset):
+                    raise ValueError(f'Expecting type dataset, but got {type(dataset)}')
                 elif split_name not in dataset:
                     get_logger().warning(
                         f"{sys_info.dataset_name} has no {split_name} split in DataLab "
@@ -132,7 +135,7 @@ class Processor(metaclass=abc.ABCMeta):
                     )
                 else:
                     self._statistics_func.resources = self._get_statistics_resources(
-                        sys_info, dataset[split_name]
+                        sys_info
                     )
                     new_train = dataset[split_name].apply(
                         self._statistics_func, mode="local"
@@ -319,7 +322,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> tuple[dict, dict]:
+    ) -> dict[str, dict[tuple, BucketPerformance]]:
         """
         Separate samples into buckets and calculate performance over them
         :param sys_info: Information about the system output
@@ -333,11 +336,11 @@ class Processor(metaclass=abc.ABCMeta):
         sys_features = unwrap(sys_info.features)
 
         # Bucketing
-        samples_over_bucket = {}
-        performances_over_bucket = {}
+        samples_over_bucket: dict[str, dict[tuple, list[BucketCase]]] = {}
+        performances_over_bucket: dict[str, dict[tuple, BucketPerformance]] = {}
         for feature_name in progress(active_features, desc="sample-level bucketing"):
             # Preparation for bucketing
-            bucket_func = getattr(
+            bucket_func: Callable[..., dict[tuple, list[BucketCase]]] = getattr(
                 explainaboard.utils.bucketing,
                 sys_features[feature_name].bucket_info.method,
             )
@@ -358,15 +361,27 @@ class Processor(metaclass=abc.ABCMeta):
                 samples_over_bucket[feature_name],
                 metric_stats=metric_stats,
             )
-        return samples_over_bucket, performances_over_bucket
+        return performances_over_bucket
+
+    def _subsample_bucket_cases(
+        self, bucket_cases: list[BucketCase]
+    ) -> list[BucketCase]:
+        if len(bucket_cases) > self._bucket_sample_limit:
+            ids = np.array(range(len(bucket_cases)))
+            bucket_sample_ids = np.random.choice(
+                ids, self._bucket_sample_limit, replace=False
+            )
+            return [bucket_cases[i] for i in bucket_sample_ids]
+        else:
+            return bucket_cases
 
     def get_bucket_performance(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket: dict[str, list[int]],
+        samples_over_bucket: dict[tuple, list[BucketCase]],
         metric_stats: list[MetricStats],
-    ) -> dict[str, list[BucketPerformance]]:
+    ) -> dict[tuple, BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
@@ -382,25 +397,17 @@ class Processor(metaclass=abc.ABCMeta):
         # Get the functions to calculate metrics
         metric_funcs = self._get_metrics(sys_info)
 
-        bucket_name_to_performance: dict[str, BucketPerformance] = {}
-        for bucket_interval, sample_ids in samples_over_bucket.items():
+        bucket_name_to_performance: dict[tuple, BucketPerformance] = {}
+        for bucket_interval, bucket_cases in samples_over_bucket.items():
 
-            bucket_cases = []
-            for sample_id in sample_ids:
-                data_point = sys_output[sample_id]
-                true_label = self._get_true_label(data_point)
-                predicted_label = self._get_predicted_label(data_point)
-
-                # get a bucket of cases (e.g., errors)
-                if sys_info.is_print_case:
-                    if true_label != predicted_label:
-                        bucket_case = BucketCase(sample_id)
-                        bucket_cases.append(bucket_case)
+            # Subsample examples to save
+            bucket_samples = self._subsample_bucket_cases(bucket_cases)
+            sample_ids = [bucket_case.sample_id for bucket_case in bucket_cases]
 
             bucket_performance = BucketPerformance(
-                bucket_name=bucket_interval,
-                n_samples=len(sample_ids),
-                bucket_samples=bucket_cases,
+                bucket_interval=bucket_interval,
+                n_samples=len(bucket_cases),
+                bucket_samples=bucket_samples,
             )
 
             for metric_cfg, metric_func, metric_stat in zip(
