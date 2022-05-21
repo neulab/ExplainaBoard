@@ -65,13 +65,15 @@ def draw_bar_chart_from_reports(
     # Bucket performance: feature name, for example, sentence length
     for feature_name in progress(fg_results[0].keys()):
         # Make sure that buckets exist
-        buckets: list[dict[str, BucketPerformance]] = []
+        buckets: list[list[tuple[tuple, BucketPerformance]]] = []
         for i, fg_result in enumerate(fg_results):
             if feature_name not in fg_result:
                 get_logger().error(f'error: feature {feature_name} not in {reports[i]}')
             else:
                 buckets.append(fg_result[feature_name])
-                bnames0, bnames = buckets[0].keys(), buckets[-1].keys()
+                bnames0, bnames = [x[0] for x in buckets[0]], [
+                    x[0] for x in buckets[-1]
+                ]
                 if len(bnames0) != len(bnames):
                     get_logger().error(
                         f'error: different number of buckets for {feature_name} in '
@@ -88,13 +90,13 @@ def draw_bar_chart_from_reports(
         if len(buckets) != len(reports):
             continue
 
-        bucket0_names = list(buckets[0].keys())
-        bucket0_values = list(buckets[0].values())
+        bucket0_names = [x[0] for x in buckets[0]]
+        bucket0_values = [x[1] for x in buckets[0]]
         bucket_metrics = [x.metric_name for x in bucket0_values[0].performances]
         for metric_id, metric_name in enumerate(bucket_metrics):
 
             performances: list[list[Performance]] = [
-                [x.performances[metric_id] for x in y.values()] for y in buckets
+                [x[1].performances[metric_id] for x in y] for y in buckets
             ]
             ys = [[x.value for x in y] for y in performances]
 

@@ -102,7 +102,7 @@ def bucket_attribute_discrete_value(
         for k, v in feat2case.items()
         if len(v) >= bucket_setting
     ]
-    bucket_collections.sort(key=lambda x: -len(x.bucket_samples))
+    bucket_collections.sort(key=lambda x: -len(x.samples))
     if len(bucket_collections) > bucket_number:
         bucket_collections = bucket_collections[:bucket_number]
     return bucket_collections

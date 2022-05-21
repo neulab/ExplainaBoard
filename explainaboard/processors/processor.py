@@ -18,7 +18,7 @@ from explainaboard.info import (
     BucketPerformance,
     OverallStatistics,
     Performance,
-    print_bucket_dict,
+    print_bucket_perfs,
     Result,
     SysOutputInfo,
 )
@@ -29,7 +29,6 @@ from explainaboard.utils.cache_api import (
     write_statistics_to_cache,
 )
 from explainaboard.utils.logging import get_logger, progress
-from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.tokenizer import get_default_tokenizer
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
@@ -343,8 +342,6 @@ class Processor(metaclass=abc.ABCMeta):
                 explainaboard.utils.bucketing,
                 sys_features[feature_name].bucket_info.method,
             )
-            # TODO(gneubig):
-            # make dict_obj more elegant so it doesn't have to copy memory
             samples_over_bucket = bucket_func(
                 case_features=[
                     (BucketCase(x), sys_output[x][feature_name])
@@ -397,15 +394,15 @@ class Processor(metaclass=abc.ABCMeta):
         # Get the functions to calculate metrics
         metric_funcs = self._get_metrics(sys_info)
 
-        bucket_name_to_performance: dict[tuple, BucketPerformance] = {}
+        bucket_name_to_performance: list[tuple[tuple, BucketPerformance]] = []
         for bucket_collection in samples_over_bucket:
-            bucket_cases = bucket_collection.bucket_samples
+            bucket_cases = bucket_collection.samples
             sample_ids = [bucket_case.sample_id for bucket_case in bucket_cases]
             # Subsample examples to save
             bucket_samples = self._subsample_bucket_cases(bucket_cases)
 
             bucket_performance = BucketPerformance(
-                bucket_interval=bucket_collection.bucket_interval,
+                bucket_interval=bucket_collection.interval,
                 n_samples=len(bucket_cases),
                 bucket_samples=bucket_samples,
             )
@@ -436,11 +433,11 @@ class Processor(metaclass=abc.ABCMeta):
 
                 bucket_performance.performances.append(performance)
 
-            bucket_name_to_performance[
-                bucket_collection.bucket_interval
-            ] = bucket_performance
+            bucket_name_to_performance.append(
+                (bucket_collection.interval, bucket_performance)
+            )
 
-        return sort_dict(bucket_name_to_performance)
+        return bucket_name_to_performance
 
     def get_overall_performance(
         self,
@@ -498,7 +495,7 @@ class Processor(metaclass=abc.ABCMeta):
             dictionary of features -> buckets -> performance for different metrics
         """
         for feature_name, feature_value in performances_over_bucket.items():
-            print_bucket_dict(feature_value, feature_name)
+            print_bucket_perfs(feature_value, feature_name)
 
     def get_overall_statistics(
         self, metadata: dict, sys_output: list[dict]
@@ -553,11 +550,11 @@ class Processor(metaclass=abc.ABCMeta):
 
     def sort_bucket_info(
         self,
-        performance_over_bucket,
-        sort_by='value',
-        sort_by_metric='first',
-        sort_ascending=False,
-    ):
+        performance_over_bucket: dict[str, list[tuple[tuple, BucketPerformance]]],
+        sort_by: str = 'value',
+        sort_by_metric: str = 'first',
+        sort_ascending: bool = False,
+    ) -> None:
         """
         Sorts the `performance_over_bucket` dictionary, which should be of the format
         {
@@ -589,72 +586,30 @@ class Processor(metaclass=abc.ABCMeta):
         :param sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
         """
 
-        def index_of_metric(metric_bucket_perf_obj, target_metric):
-            return [
-                i
-                for i, bp in enumerate(metric_bucket_perf_obj)
-                if bp.metric_name == target_metric
-            ][0]
+        def value_by_name(
+            metric_bucket_perf_obj: tuple[tuple, BucketPerformance]
+        ) -> float:
+            if sort_by_metric == 'first':
+                return metric_bucket_perf_obj[1].performances[0].value
+            for bp in metric_bucket_perf_obj[1].performances:
+                if bp.metric_name == sort_by_metric:
+                    return bp.value
+            raise ValueError(f'could not find metric {sort_by_metric}')
 
-        performance_over_bucket_sorted = {}
         for feature_name, feature_value in performance_over_bucket.items():
 
-            feature_sorted = None
-            if (
-                sort_by == 'key'
-            ):  # based on alphabetical order of the bucket lower boundary; low to high
-                feature_sorted = {
-                    k: v
-                    for k, v in sorted(
-                        feature_value.items(),
-                        key=lambda item: item[0][0],
-                        reverse=False,
-                    )
-                }
+            # based on alphabetical order of the bucket lower boundary; low to high
+            if sort_by == 'key':
+                feature_value.sort(key=lambda x: x[0][0])
+            # sort based on the value of the first perf value, whatever that may
+            # be; high to low
             elif sort_by == 'performance_value':
-                if (
-                    sort_by_metric == 'first'
-                ):  # sort based on the value of the first feature, whichever that may
-                    # be; high to low
-                    feature_sorted = {
-                        k: v
-                        for k, v in sorted(
-                            feature_value.items(),
-                            key=lambda item: item[1].performances[0].value,
-                            reverse=True if not sort_ascending else False,
-                        )
-                    }
-                else:
-                    feature_sorted = {
-                        k: v
-                        for k, v in sorted(
-                            feature_value.items(),
-                            key=lambda item: item[1]
-                            .performances[
-                                index_of_metric(
-                                    item[
-                                        1
-                                    ].performances,  # list of Performance() objects
-                                    target_metric=sort_by_metric,
-                                )
-                            ]
-                            .value,
-                            reverse=True if not sort_ascending else False,
-                        )
-                    }
-            elif (
-                sort_by == 'n_bucket_samples'
-            ):  # sort by the number of samples in each bucket
-                feature_sorted = {
-                    k: v
-                    for k, v in sorted(
-                        feature_value.items(),
-                        key=lambda item: item[1].n_samples,
-                        reverse=True if not sort_ascending else False,
-                    )
-                }
-            performance_over_bucket_sorted[feature_name] = feature_sorted
-        return performance_over_bucket_sorted
+                feature_value.sort(key=value_by_name, reverse=not sort_ascending)
+            # sort by the number of samples in each bucket
+            elif sort_by == 'n_bucket_samples':
+                feature_value.sort(
+                    key=lambda x: x[1].n_samples, reverse=not sort_ascending
+                )
 
     def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
@@ -666,7 +621,7 @@ class Processor(metaclass=abc.ABCMeta):
         performance_over_bucket = self.bucketing_samples(
             sys_info, sys_output, active_features, metric_stats=metric_stats
         )
-        performance_over_bucket = self.sort_bucket_info(
+        self.sort_bucket_info(
             performance_over_bucket,
             sort_by=metadata.get('sort_by', 'key'),
             sort_by_metric=metadata.get('sort_by_metric', 'first'),

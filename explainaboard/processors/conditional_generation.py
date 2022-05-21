@@ -503,7 +503,9 @@ class ConditionalGenerationProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func = getattr(bucketing, bucket_info.method)
+            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
+                bucketing, bucket_info.method
+            )
 
             feat_dict = self._get_feature_dict(
                 sys_output, feature_name, lambda x: x['ref_tok_info']

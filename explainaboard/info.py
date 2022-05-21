@@ -149,8 +149,11 @@ class BucketPerformance:
 
 @dataclass
 class BucketCaseCollection:
-    bucket_interval: tuple
-    bucket_samples: list[BucketCase]
+    interval: tuple
+    samples: list[BucketCase]
+
+    def __len__(self):
+        return len(self.samples)
 
 
 @dataclass
@@ -166,7 +169,7 @@ class Result:
             return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
         elif k == 'fine_grained':
             return {
-                k1: {k2: BucketPerformance.from_dict(v2) for k2, v2 in v1.items()}
+                k1: [(k2, BucketPerformance.from_dict(v2)) for k2, v2 in v1]
                 for k1, v1 in v.items()
             }
         elif k == 'calibration':
@@ -332,12 +335,14 @@ class OverallStatistics:
     active_features: list[str]
 
 
-def print_bucket_dict(dict_obj: dict[str, BucketPerformance], print_information: str):
-    metric_names = [x.metric_name for x in next(iter(dict_obj.values())).performances]
+def print_bucket_perfs(
+    bucket_perfs: list[tuple[tuple, BucketPerformance]], print_information: str
+):
+    metric_names = [x.metric_name for x in bucket_perfs[0][1].performances]
     for i, metric_name in enumerate(metric_names):
         get_logger('report').info(f"the information of #{print_information}#")
         get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
-        for k, v in dict_obj.items():
+        for k, v in bucket_perfs:
             if len(k) == 1:
                 get_logger('report').info(
                     f"[{k[0]},]\t{v.performances[i].value}\t{v.n_samples}"

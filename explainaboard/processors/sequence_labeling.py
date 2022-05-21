@@ -376,7 +376,9 @@ class SeqLabProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func = getattr(bucketing, bucket_info.method)
+            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
+                bucketing, bucket_info.method
+            )
 
             feat_dict = {k: getattr(v, feature_name) for k, v in span_dict.items()}
 
