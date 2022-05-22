@@ -326,9 +326,9 @@ class Processor(metaclass=abc.ABCMeta):
         Separate samples into buckets and calculate performance over them
         :param sys_info: Information about the system output
         :param sys_output: The system output itself, already annotated with features
+        :param active_features: The features to perform bucketing over
+        :param metric_stats: The stats from which to calculate performance
         :return:
-            samples_over_bucket:
-                a dictionary of feature name -> list of buckets and samples
             performances_over_bucket:
                 a dictionary of feature name -> list of performances by bucket
         """
