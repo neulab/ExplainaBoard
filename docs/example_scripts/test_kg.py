@@ -3,6 +3,8 @@ from explainaboard import get_custom_dataset_loader, get_processor, TaskType
 # This code details (1) how to evaluate your systems using ExplainaBoard
 # programmatically (2)how to collect different results
 # Load the data
+from explainaboard.utils.typing_utils import unwrap
+
 dataset = (
     "../../explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 )
@@ -13,18 +15,19 @@ data = loader.load()
 processor = get_processor(TaskType.kg_link_tail_prediction.value)
 sys_info = processor.process(metadata={}, sys_output=data.samples)
 
+fine_grained_res = unwrap(sys_info.results.fine_grained)
+overall_res = unwrap(sys_info.results.overall)
 
 # print bucket information
-processor.print_bucket_info(sys_info.results.fine_grained)  # type: ignore
+processor.print_bucket_info(fine_grained_res)
 
 # save analysis report locally
 sys_info.print_as_json(file=open("./report.json", 'w'))
 
 
 # get overall results of different metrics
-for metric_name, metric_info in sys_info.results.overall.items():  # type: ignore
+for metric_name, metric_info in unwrap(sys_info.results.overall).items():
 
-    metric_name = metric_info.metric_name
     value = metric_info.value
     confidence_score_low = metric_info.confidence_score_low
     confidence_score_high = metric_info.confidence_score_high
@@ -38,8 +41,8 @@ for metric_name, metric_info in sys_info.results.overall.items():  # type: ignor
 
 
 # get fine-grained results
-for feature_name, feature_info in sys_info.results.fine_grained.items():  # type: ignore
-    for bucket_name, bucket_info in feature_info.items():
+for feature_name, bucket_performances in fine_grained_res.items():
+    for bucket_info in bucket_performances:
         bucket_n_samples = bucket_info.n_samples
         for bucket_performance in bucket_info.performances:
             metric_name = bucket_performance.metric_name
@@ -48,7 +51,10 @@ for feature_name, feature_info in sys_info.results.fine_grained.items():  # type
             confidence_score_high = bucket_performance.confidence_score_high
 
             print("------------------------------------------------------")
-            print(f"feature_name:{feature_name} bucket_name:{bucket_name}")
+            print(
+                f"feature_name:{feature_name} "
+                f"bucket_name:{bucket_info.bucket_interval}"
+            )
             print(
                 f"metric_name:{metric_name}\n"
                 f"value:{value}\n"
