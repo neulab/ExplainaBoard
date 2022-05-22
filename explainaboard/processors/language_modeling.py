@@ -423,7 +423,7 @@ class LanguageModelingProcessor(Processor):
                 bucket_performance.performances.append(performance)
 
             bucket_performances.append(bucket_performance)
-        bucket_performances.sort()
+        bucket_performances.sort(key=lambda x: x.bucket_interval)
 
         return bucket_performances
 

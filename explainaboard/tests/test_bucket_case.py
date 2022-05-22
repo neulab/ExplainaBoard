@@ -16,7 +16,7 @@ class TestBucketCaseClass(unittest.TestCase):
             token_span=(2, 3),
             char_span=(10, 25),
             text="New York",
-            location="input",
+            orig_str="input",
         )
 
         my_bucket_labeled_span = BucketCaseLabeledSpan(
@@ -24,7 +24,7 @@ class TestBucketCaseClass(unittest.TestCase):
             token_span=(2, 3),
             char_span=(10, 25),
             text="New York",
-            location="input",
+            orig_str="input",
             true_label="LOC",
             predicted_label="ORG",
         )
@@ -34,3 +34,4 @@ class TestBucketCaseClass(unittest.TestCase):
 
         self.assertIsNotNone(my_bucket_seq)
         self.assertIsNotNone(my_bucket_span)
+        self.assertIsNotNone(my_bucket_labeled_span)

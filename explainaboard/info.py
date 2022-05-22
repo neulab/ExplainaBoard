@@ -169,7 +169,7 @@ class Result:
             return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
         elif k == 'fine_grained':
             return {
-                k1: [(k2, BucketPerformance.from_dict(v2)) for k2, v2 in v1]
+                k1: [BucketPerformance.from_dict(v2) for v2 in v1]
                 for k1, v1 in v.items()
             }
         elif k == 'calibration':
