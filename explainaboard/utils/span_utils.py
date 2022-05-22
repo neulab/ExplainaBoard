@@ -331,7 +331,10 @@ class BIOSpanOps(SpanOps):
         return i != 0 and tags[i - 1] != self._DEFAULT and not tags[i].startswith('I')
 
     def _span_starts(self, tags: list[str], i: int) -> bool:
-        return tags[i].startswith('B')
+        # The second condition is when an "I" tag is predicted without B
+        return tags[i].startswith('B') or (
+            i > 0 and tags[i].startswith('I') and tags[i - 1] == self._DEFAULT
+        )
 
     def _span_type(self, tags: list[str], pos: tuple[int, int]) -> str:
         return tags[pos[0]].split('-')[1]

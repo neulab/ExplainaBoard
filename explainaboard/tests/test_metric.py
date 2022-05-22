@@ -68,14 +68,14 @@ class TestMetric(unittest.TestCase):
             ['B-PER', 'I-PER', 'O'],
         ]
 
-        metric = explainaboard.metric.BIOF1ScoreConfig(
-            name='MicroF1', average='micro'
+        metric = explainaboard.metric.SeqF1ScoreConfig(
+            name='MicroF1', average='micro', tag_schema='bio'
         ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
-        metric = explainaboard.metric.BIOF1ScoreConfig(
-            name='MacroF1', average='macro'
+        metric = explainaboard.metric.SeqF1ScoreConfig(
+            name='MacroF1', average='macro', tag_schema='bio'
         ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 3.0 / 4.0)
