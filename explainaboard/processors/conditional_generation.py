@@ -27,9 +27,8 @@ from explainaboard.metric import (
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
-from explainaboard.utils.analysis import cap_feature
 import explainaboard.utils.feature_funcs
-from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
+from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples, cap_feature
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator

@@ -96,3 +96,21 @@ def feat_num_oov(
         if w not in statistics['vocab'].keys():
             num_oov += 1
     return num_oov
+
+
+def cap_feature(s):
+    """
+    Capitalization feature:
+    0 = low caps
+    1 = all caps
+    2 = first letter caps
+    3 = one capital (not first letter)
+    """
+    if s.lower() == s:
+        return "low_caps"
+    elif s.upper() == s:
+        return "full_caps"
+    elif s[0].upper() == s[0]:
+        return "first_caps"
+    else:
+        return "not_first_caps"
