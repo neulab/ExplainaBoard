@@ -5,7 +5,7 @@ from collections.abc import Callable
 import copy
 from typing import Any, Optional, TypeVar
 
-from datalabs import aggregating, Dataset, load_dataset
+from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
 import numpy as np
@@ -125,8 +125,13 @@ class Processor(metaclass=abc.ABCMeta):
                         " no training set dependent features will be supported by"
                         " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
                     )
-                elif not isinstance(dataset, Dataset):
-                    raise ValueError(f'Expecting type dataset, but got {type(dataset)}')
+                elif not (
+                    isinstance(dataset, Dataset) or isinstance(dataset, DatasetDict)
+                ):
+                    raise ValueError(
+                        'Expecting type Dataset or DatasetDict, '
+                        f'but got {type(dataset)}'
+                    )
                 elif split_name not in dataset:
                     get_logger().warning(
                         f"{sys_info.dataset_name} has no {split_name} split in DataLab "
