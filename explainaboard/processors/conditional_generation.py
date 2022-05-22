@@ -50,7 +50,7 @@ class ConditionalGenerationProcessor(Processor):
                 "hypothesis": feature.Value("string"),
                 "source_length": feature.Value(
                     dtype="float",
-                    description="the length of source document",
+                    description="length of the source",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -60,7 +60,7 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 "reference_length": feature.Value(
                     dtype="float",
-                    description="the length of gold summary",
+                    description="length of the reference",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -70,7 +70,7 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 "hypothesis_length": feature.Value(
                     dtype="float",
-                    description="the length of gold summary",
+                    description="length of the hypothesis",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -80,7 +80,7 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 "src_num_oov": feature.Value(
                     dtype="float",
-                    description="the number of out-of-vocabulary words in the source",
+                    description="OOV words in the source",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -92,8 +92,7 @@ class ConditionalGenerationProcessor(Processor):
                 "src_fre_rank": feature.Value(
                     dtype="float",
                     description=(
-                        "the average rank of each word in the source sentence based on "
-                        "its frequency in training set"
+                        "average training-set frequency rank of words in sentence"
                     ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
@@ -105,8 +104,7 @@ class ConditionalGenerationProcessor(Processor):
                 ),
                 "ref_num_oov": feature.Value(
                     dtype="float",
-                    description="the number of out-of-vocabulary words in the "
-                    "reference",
+                    description="number of OOV words in reference",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -118,8 +116,7 @@ class ConditionalGenerationProcessor(Processor):
                 "ref_fre_rank": feature.Value(
                     dtype="float",
                     description=(
-                        "the average rank of each word in the reference sentence based "
-                        "on its frequency in training set"
+                        "average training-set frequency rank of words in sentence"
                     ),
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
@@ -146,12 +143,7 @@ class ConditionalGenerationProcessor(Processor):
                             ),
                             "tok_capitalness": feature.Value(
                                 dtype="string",
-                                description=(
-                                    "The capitalness of an token. For example, "
-                                    "first_caps represents only the first character of "
-                                    "the token is capital. full_caps denotes all "
-                                    "characters of the token are capital"
-                                ),
+                                description=("capitalness of token"),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_discrete_value",
@@ -161,9 +153,7 @@ class ConditionalGenerationProcessor(Processor):
                             ),
                             "tok_position": feature.Value(
                                 dtype="float",
-                                description=(
-                                    "The relative position of a token in a sentence"
-                                ),
+                                description=("relative position of token in sentence"),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -173,7 +163,7 @@ class ConditionalGenerationProcessor(Processor):
                             ),
                             "tok_chars": feature.Value(
                                 dtype="float",
-                                description="The number of characters in a token",
+                                description="number of characters in the token",
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -391,8 +381,12 @@ class ConditionalGenerationProcessor(Processor):
         )
         for bucket_feature in active_features:
             if bucket_feature in sys_features:
+                feature_info = sys_features[bucket_feature]
+                feature_func = self._get_feature_func(
+                    bucket_feature, feature_info.is_custom
+                )
                 bucket_feature_funcs[bucket_feature] = (
-                    self._get_feature_func(bucket_feature),
+                    feature_func,
                     sys_features[bucket_feature].require_training_set,
                 )
 

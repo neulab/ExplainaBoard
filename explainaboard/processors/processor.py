@@ -173,8 +173,15 @@ class Processor(metaclass=abc.ABCMeta):
             metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
         return metric_stats
 
-    def _get_feature_func(self, func_name: str):
-        return getattr(self, f'_get_{func_name}')
+    def _get_feature_func(self, feature_name: str, is_custom: bool):
+        if is_custom:
+
+            def my_func(info, sysout, stats=None):
+                return sysout[feature_name]
+
+            return my_func
+        else:
+            return getattr(self, f'_get_{feature_name}')
 
     def _get_eaas_client(self):
         if not self._eaas_client:
@@ -209,36 +216,35 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
 
         """
-
         features = copy.deepcopy(self._default_features)
 
         # add user-defined features into features list
-        if metadata is not None and 'custom_features' in metadata:
+        if metadata is not None:
             for (
                 feature_name,
                 feature_config,
-            ) in metadata['custom_features'].items():
-                if feature_config.dtype == "string":
+            ) in metadata.items():
+                if feature_config["dtype"] == "string":
                     features[feature_name] = feature.Value(
                         dtype="string",
-                        description=feature_config.description,
+                        description=feature_config["description"],
                         is_bucket=True,
                         is_custom=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_discrete_value",
-                            number=feature_config.num_buckets,
+                            number=feature_config["num_buckets"],
                             setting=1,
                         ),
                     )
-                elif feature_config.dtype == 'float':
+                elif feature_config["dtype"] == 'float':
                     features[feature_name] = feature.Value(
                         dtype="float",
-                        description=feature_config.description,
+                        description=feature_config["description"],
                         is_bucket=True,
                         is_custom=True,
                         bucket_info=feature.BucketInfo(
                             method="bucket_attribute_specified_bucket_value",
-                            number=feature_config.num_buckets,
+                            number=feature_config["num_buckets"],
                             setting=(),
                         ),
                     )
@@ -273,14 +279,8 @@ class Processor(metaclass=abc.ABCMeta):
             if external_stats is None and feature_info.require_training_set:
                 continue
 
-            # handles user-defined features
-            def identity(x):
-                return x
-
-            feature_func = (
-                identity
-                if feature_info.is_custom
-                else self._get_feature_func(bucket_feature)
+            feature_func = self._get_feature_func(
+                bucket_feature, feature_info.is_custom
             )
 
             bucket_feature_funcs[bucket_feature] = (
