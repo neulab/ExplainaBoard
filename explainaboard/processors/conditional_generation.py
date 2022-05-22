@@ -479,10 +479,10 @@ class ConditionalGenerationProcessor(Processor):
                     text=ref_info['tok_text'],
                 )
                 ref_feats = [ref_info[x] for x in feats]
-                if ref_info['matched'] < 0:
+                if ref_info['tok_matched'] < 0:
                     sample_features.append((ref_span, ref_feats))
                 else:
-                    hyp_info = my_output['hyp_tok_info'][ref_info['matched']]
+                    hyp_info = my_output['hyp_tok_info'][ref_info['tok_matched']]
                     hyp_span = BucketCaseSpan(
                         sample_id=samp_id,
                         token_span=hyp_info['tok_pos'],
@@ -495,7 +495,7 @@ class ConditionalGenerationProcessor(Processor):
                     )
                     sample_features.append((both_span, ref_feats))
             for hyp_id, hyp_info in enumerate(my_output['hyp_tok_info']):
-                if hyp_info['matched'] < 0:
+                if hyp_info['tok_matched'] < 0:
                     hyp_span = BucketCaseSpan(
                         sample_id=samp_id,
                         token_span=hyp_info['tok_pos'],
