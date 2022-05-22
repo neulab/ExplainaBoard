@@ -89,7 +89,6 @@ class Tokenizer:
         for x in str_list:
             next_start = orig_str.find(x, start)
             if next_start == -1:
-                print(orig_str)
                 raise ValueError(f'could not "{orig_str}".find({x}, {start})')
             ret.strs.append(x)
             ret.positions.append(next_start)

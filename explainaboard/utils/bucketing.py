@@ -22,11 +22,11 @@ def find_key(dict_obj, x):
 
 
 def bucket_attribute_specified_bucket_value(
-    case_features: list[tuple[BucketCase, T]],
+    sample_features: list[tuple[BucketCase, T]],
     bucket_number: int = 4,
     bucket_setting: Any = None,
 ) -> list[BucketCaseCollection]:
-    if len(case_features) == 0:
+    if len(sample_features) == 0:
         return [BucketCaseCollection(_INFINITE_INTERVAL, [])]
     if bucket_setting is not None and len(bucket_setting) > 0:
         raise NotImplementedError(
@@ -34,8 +34,8 @@ def bucket_attribute_specified_bucket_value(
             'bucket_attribute_specified_bucket_value'
         )
     # Bucketing different Attributes
-    cases = [x1 for x1, x2 in case_features]
-    vals = np.array([x2 for x1, x2 in case_features])
+    cases = [x1 for x1, x2 in sample_features]
+    vals = np.array([x2 for x1, x2 in sample_features])
     # Function to convert numpy datatypes to Python native types
     conv = int if np.issubdtype(vals[0], int) else float
     # Special case of one bucket
@@ -81,18 +81,18 @@ def bucket_attribute_specified_bucket_value(
 
 
 def bucket_attribute_discrete_value(
-    case_features: list[tuple[BucketCase, T]],
+    sample_features: list[tuple[BucketCase, T]],
     bucket_number: int = int(1e10),
     bucket_setting: Any = 1,
 ) -> list[BucketCaseCollection]:
     """
     Bucket attributes by discrete value.
-    :param case_features: Pairs of a bucket case and feature value.
+    :param sample_features: Pairs of a bucket case and feature value.
     :param bucket_number: Maximum number of buckets
     :param bucket_setting: Minimum number of examples per bucket
     """
     feat2case = {}
-    for k, v in case_features:
+    for k, v in sample_features:
         if v not in feat2case:
             feat2case[v] = [k]
         else:
@@ -109,7 +109,7 @@ def bucket_attribute_discrete_value(
 
 
 def bucket_attribute_specified_bucket_interval(
-    case_features: list[tuple[BucketCase, T]],
+    sample_features: list[tuple[BucketCase, T]],
     bucket_number: int,
     bucket_setting: list[tuple],
 ) -> list[BucketCaseCollection]:
@@ -117,11 +117,11 @@ def bucket_attribute_specified_bucket_interval(
     bucket2examp: dict[tuple, list[BucketCase]] = {k: list() for k in intervals}
 
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
-        for k, v in case_features:
+        for k, v in sample_features:
             if v in bucket2examp:
                 bucket2examp[(v,)].append(k)
     else:
-        for examp, value in case_features:
+        for examp, value in sample_features:
             res_key = find_key(bucket2examp, value)
             if res_key is None:
                 continue

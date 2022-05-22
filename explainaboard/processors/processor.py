@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from collections.abc import Callable
 import copy
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 
 from datalabs import aggregating, Dataset, load_dataset
 from eaas.async_client import AsyncClient
@@ -136,7 +136,7 @@ class Processor(metaclass=abc.ABCMeta):
                     self._statistics_func.resources = self._get_statistics_resources(
                         sys_info
                     )
-                    new_train = dataset[split_name].apply(
+                    new_train = dataset[split_name].apply(  # type: ignore
                         self._statistics_func, mode="local"
                     )
                     statistics = new_train._stat
@@ -321,7 +321,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> dict[str, list[tuple[tuple, BucketPerformance]]]:
+    ) -> dict[str, list[BucketPerformance]]:
         """
         Separate samples into buckets and calculate performance over them
         :param sys_info: Information about the system output
@@ -335,7 +335,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_features = unwrap(sys_info.features)
 
         # Bucketing
-        performances_over_bucket: dict[str, list[tuple[tuple, BucketPerformance]]] = {}
+        performances_over_bucket: dict[str, list[BucketPerformance]] = {}
         for feature_name in progress(active_features, desc="sample-level bucketing"):
             # Preparation for bucketing
             bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
@@ -343,7 +343,7 @@ class Processor(metaclass=abc.ABCMeta):
                 sys_features[feature_name].bucket_info.method,
             )
             samples_over_bucket = bucket_func(
-                case_features=[
+                sample_features=[
                     (BucketCase(x), sys_output[x][feature_name])
                     for x in range(len(sys_output))
                 ],
@@ -360,9 +360,11 @@ class Processor(metaclass=abc.ABCMeta):
             )
         return performances_over_bucket
 
+    BucketCaseType = TypeVar('BucketCaseType')
+
     def _subsample_bucket_cases(
-        self, bucket_cases: list[BucketCase]
-    ) -> list[BucketCase]:
+        self, bucket_cases: list[BucketCaseType]
+    ) -> list[BucketCaseType]:
         if len(bucket_cases) > self._bucket_sample_limit:
             ids = np.array(range(len(bucket_cases)))
             bucket_sample_ids = np.random.choice(
@@ -378,7 +380,7 @@ class Processor(metaclass=abc.ABCMeta):
         sys_output: list[dict],
         samples_over_bucket: list[BucketCaseCollection],
         metric_stats: list[MetricStats],
-    ) -> list[tuple[tuple, BucketPerformance]]:
+    ) -> list[BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
@@ -394,7 +396,7 @@ class Processor(metaclass=abc.ABCMeta):
         # Get the functions to calculate metrics
         metric_funcs = self._get_metrics(sys_info)
 
-        bucket_name_to_performance: list[tuple[tuple, BucketPerformance]] = []
+        bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             bucket_cases = bucket_collection.samples
             sample_ids = [bucket_case.sample_id for bucket_case in bucket_cases]
@@ -433,11 +435,9 @@ class Processor(metaclass=abc.ABCMeta):
 
                 bucket_performance.performances.append(performance)
 
-            bucket_name_to_performance.append(
-                (bucket_collection.interval, bucket_performance)
-            )
+            bucket_performances.append(bucket_performance)
 
-        return bucket_name_to_performance
+        return bucket_performances
 
     def get_overall_performance(
         self,
@@ -487,7 +487,7 @@ class Processor(metaclass=abc.ABCMeta):
         return overall_results
 
     def print_bucket_info(
-        self, performances_over_bucket: dict[str, dict[str, BucketPerformance]]
+        self, performances_over_bucket: dict[str, list[BucketPerformance]]
     ):
         """
         Print out performance bucket by bucket
@@ -550,7 +550,7 @@ class Processor(metaclass=abc.ABCMeta):
 
     def sort_bucket_info(
         self,
-        performance_over_bucket: dict[str, list[tuple[tuple, BucketPerformance]]],
+        performance_over_bucket: dict[str, list[BucketPerformance]],
         sort_by: str = 'value',
         sort_by_metric: str = 'first',
         sort_ascending: bool = False,
@@ -586,12 +586,10 @@ class Processor(metaclass=abc.ABCMeta):
         :param sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
         """
 
-        def value_by_name(
-            metric_bucket_perf_obj: tuple[tuple, BucketPerformance]
-        ) -> float:
+        def value_by_name(bucket_perf: BucketPerformance) -> float:
             if sort_by_metric == 'first':
-                return metric_bucket_perf_obj[1].performances[0].value
-            for bp in metric_bucket_perf_obj[1].performances:
+                return bucket_perf.performances[0].value
+            for bp in bucket_perf.performances:
                 if bp.metric_name == sort_by_metric:
                     return bp.value
             raise ValueError(f'could not find metric {sort_by_metric}')
@@ -600,7 +598,7 @@ class Processor(metaclass=abc.ABCMeta):
 
             # based on alphabetical order of the bucket lower boundary; low to high
             if sort_by == 'key':
-                feature_value.sort(key=lambda x: x[0][0])
+                feature_value.sort(key=lambda x: x.bucket_interval)
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
             elif sort_by == 'performance_value':
@@ -608,7 +606,7 @@ class Processor(metaclass=abc.ABCMeta):
             # sort by the number of samples in each bucket
             elif sort_by == 'n_bucket_samples':
                 feature_value.sort(
-                    key=lambda x: x[1].n_samples, reverse=not sort_ascending
+                    key=lambda x: x.n_samples, reverse=not sort_ascending
                 )
 
     def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:

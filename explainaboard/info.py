@@ -160,7 +160,7 @@ class BucketCaseCollection:
 class Result:
     overall: Optional[dict[str, Performance]] = None
     # {feature_name: {bucket_name: performance}}
-    fine_grained: Optional[dict[str, list[tuple[tuple, BucketPerformance]]]] = None
+    fine_grained: Optional[dict[str, list[BucketPerformance]]] = None
     calibration: Optional[list[Performance]] = None
 
     @classmethod
@@ -335,21 +335,15 @@ class OverallStatistics:
     active_features: list[str]
 
 
-def print_bucket_perfs(
-    bucket_perfs: list[tuple[tuple, BucketPerformance]], print_information: str
-):
-    metric_names = [x.metric_name for x in bucket_perfs[0][1].performances]
+def print_bucket_perfs(bucket_perfs: list[BucketPerformance], print_information: str):
+    metric_names = [x.metric_name for x in bucket_perfs[0].performances]
     for i, metric_name in enumerate(metric_names):
         get_logger('report').info(f"the information of #{print_information}#")
         get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
-        for k, v in bucket_perfs:
-            if len(k) == 1:
-                get_logger('report').info(
-                    f"[{k[0]},]\t{v.performances[i].value}\t{v.n_samples}"
-                )
-            else:
-                get_logger('report').info(
-                    f"[{k[0]},{k[1]}]\t{v.performances[i].value}\t{v.n_samples}"
-                )
-
+        for bucket_perf in bucket_perfs:
+            get_logger('report').info(
+                f"{bucket_perf.bucket_interval}\t"
+                f"{bucket_perf.performances[i].value}\t"
+                f"{bucket_perf.n_samples}"
+            )
         get_logger('report').info('')

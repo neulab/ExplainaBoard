@@ -511,7 +511,7 @@ class ConditionalGenerationProcessor(Processor):
                 sys_output, feature_name, lambda x: x['ref_tok_info']
             )
             samples_over_bucket_true = bucket_func(
-                dict_obj=feat_dict,
+                sample_features=feat_dict,
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
@@ -523,7 +523,7 @@ class ConditionalGenerationProcessor(Processor):
             )
             samples_over_bucket_pred = (
                 bucketing.bucket_attribute_specified_bucket_interval(
-                    dict_obj=feat_dict,
+                    sample_features=feat_dict,
                     bucket_number=bucket_info.number,
                     bucket_setting=bucket_names,
                 )

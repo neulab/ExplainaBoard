@@ -307,7 +307,7 @@ class LanguageModelingProcessor(Processor):
     def _get_feature_lists(
         self, sys_output: list[dict], tok_feats: list[str]
     ) -> list[list[tuple[BucketCaseSpan, float | str]]]:
-        case_features: list[list[tuple[BucketCaseSpan, float | str]]] = [
+        sample_features: list[list[tuple[BucketCaseSpan, float | str]]] = [
             list() for _ in tok_feats
         ]
         for sample_id, my_output in enumerate(sys_output):
@@ -319,9 +319,9 @@ class LanguageModelingProcessor(Processor):
                     text=tok_info['tok_text'],
                     orig_str='text',
                 )
-                for case_feats, feat_name in zip(case_features, tok_feats):
+                for case_feats, feat_name in zip(sample_features, tok_feats):
                     case_feats.append((case, tok_info[feat_name]))
-        return case_features
+        return sample_features
 
     def bucketing_samples(
         self,
@@ -329,7 +329,7 @@ class LanguageModelingProcessor(Processor):
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> dict[str, list[tuple[tuple, BucketPerformance]]]:
+    ) -> dict[str, list[BucketPerformance]]:
 
         features = unwrap(sys_info.features)
 
@@ -358,7 +358,7 @@ class LanguageModelingProcessor(Processor):
             )
 
             samples_over_bucket = bucket_func(
-                case_features=feature_lists[i],
+                sample_features=feature_lists[i],
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
@@ -376,7 +376,7 @@ class LanguageModelingProcessor(Processor):
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         samples_over_bucket: list[BucketCaseCollection],
-    ) -> list[tuple[tuple, BucketPerformance]]:
+    ) -> list[BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
@@ -422,7 +422,7 @@ class LanguageModelingProcessor(Processor):
                 )
                 bucket_performance.performances.append(performance)
 
-            bucket_performances.append((bucket_collection.interval, bucket_performance))
+            bucket_performances.append(bucket_performance)
         bucket_performances.sort()
 
         return bucket_performances
