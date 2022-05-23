@@ -378,7 +378,7 @@ class SeqLabProcessor(Processor):
                             sample_id=sample_id,
                             token_span=unwrap(span.span_pos),
                             char_span=unwrap(span.span_char_pos),
-                            orig_str='text',
+                            orig_str='tokens',
                             text=unwrap(span.span_text),
                             true_label=true_tag,
                             predicted_label=pred_tag,
