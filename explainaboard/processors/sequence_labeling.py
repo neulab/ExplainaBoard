@@ -397,9 +397,16 @@ class SeqLabProcessor(Processor):
                 bucketing, bucket_info.method
             )
 
-            sample_features = [
-                (case, getattr(span, feature_name)) for case, span in case_spans
-            ]
+            # Span tag is special because we keep track of both labels, keep just gold
+            if feature_name == 'span_tag':
+                sample_features = [
+                    (case, unwrap(span.span_tag).split(' ')[0])
+                    for case, span in case_spans
+                ]
+            else:
+                sample_features = [
+                    (case, getattr(span, feature_name)) for case, span in case_spans
+                ]
 
             samples_over_bucket = bucket_func(
                 sample_features=sample_features,
