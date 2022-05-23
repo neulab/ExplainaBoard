@@ -446,12 +446,11 @@ class SeqLabProcessor(Processor):
                 pred_labels.append(sample_span.predicted_label)
 
             # Filter samples to error cases and limit number
-            bucket_samples = cast(
-                list[BucketCaseLabeledSpan], bucket_collection.samples
-            )
-            bucket_samples = [
-                x for x in bucket_samples if x.true_label != x.predicted_label
-            ]
+            bucket_samples = []
+            for x in bucket_collection.samples:
+                bcls = cast(BucketCaseLabeledSpan, x)
+                if bcls.true_label != bcls.predicted_label:
+                    bucket_samples.append(bcls)
             bucket_samples = self._subsample_bucket_cases(bucket_samples)
 
             bucket_performance = BucketPerformance(
