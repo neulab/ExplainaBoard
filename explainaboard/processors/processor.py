@@ -491,6 +491,13 @@ class Processor(metaclass=abc.ABCMeta):
             overall_results[metric_cfg.name] = overall_performance
         return overall_results
 
+    def deserialize_system_output(self, output: dict):
+        """
+        Take a system output where the constituent data structures have been converted
+        to serializable values and deserialize. By default do nothing.
+        """
+        return output
+
     def print_bucket_info(
         self, performances_over_bucket: dict[str, list[BucketPerformance]]
     ):

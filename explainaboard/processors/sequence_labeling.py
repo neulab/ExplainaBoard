@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Callable
+import copy
 from typing import cast
 
 from datalabs import aggregating, Dataset
@@ -531,3 +532,11 @@ class SeqLabProcessor(Processor):
             for tag, cnt in cnt_dic.items():
                 econ_dic[f'{span_str}|||{tag}'] = cnt / cnt_sum
         return econ_dic, efre_dic
+
+    def deserialize_system_output(self, output: dict) -> dict:
+        new_output = copy.deepcopy(output)
+        if "span_info" in new_output:
+            new_output["span_info"] = [
+                Span(**x) if isinstance(x, dict) else x for x in new_output["span_info"]
+            ]
+        return new_output
