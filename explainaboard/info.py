@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 import json
 import os
 import sys
@@ -12,7 +12,7 @@ from explainaboard import config
 from explainaboard.feature import Features
 from explainaboard.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.serialization import explainaboard_dict_factory
+from explainaboard.utils.serialization import general_to_dict
 from explainaboard.utils.tokenizer import Tokenizer
 
 logger = get_logger(__name__)
@@ -229,7 +229,12 @@ class SysOutputInfo:
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
-        return asdict(self, dict_factory=explainaboard_dict_factory)
+        ret_dict = {}
+        for f in dataclasses.fields(self):
+            obj = getattr(self, f.name)
+            if obj is not None:
+                ret_dict[f.name] = general_to_dict(obj)
+        return ret_dict
 
     def replace_nonstring_keys(self, data):
         if isinstance(data, list):
