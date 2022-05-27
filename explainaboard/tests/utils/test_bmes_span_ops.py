@@ -10,7 +10,7 @@ class TestBMESSpanOps(unittest.TestCase):
         toks = ["我", "喜", "欢", "纽", "约"]
 
         span_ops = BMESSpanOps()
-        spans = span_ops.get_spans(tags=tags, seq=toks)
+        spans = span_ops.get_spans(tags=tags, toks=toks)
 
         span_text_list = [span.get_span_text for span in spans]
         span_tag_list = [span.get_span_tag for span in spans]
@@ -24,13 +24,13 @@ class TestBMESSpanOps(unittest.TestCase):
         tags = ["S", "B", "E", "B", "E"]
         toks = ["我", "喜", "欢", "纽", "约"]
         span_ops = BMESSpanOps()
-        spans_a = span_ops.get_spans(tags=tags, seq=toks)
+        spans_a = span_ops.get_spans(tags=tags, toks=toks)
 
         # Span b
         tags = ["S", "S", "S", "B", "E"]
         toks = ["我", "喜", "欢", "纽", "约"]
         span_ops = BMESSpanOps()
-        spans_b = span_ops.get_spans(tags=tags, seq=toks)
+        spans_b = span_ops.get_spans(tags=tags, toks=toks)
 
         a_ind, b_ind, a_matched, b_matched = span_ops.get_matched_spans(
             spans_a, spans_b

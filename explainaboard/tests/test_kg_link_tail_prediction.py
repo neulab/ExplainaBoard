@@ -109,13 +109,11 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
         symmetry_performances = sys_info.results.fine_grained['symmetry']
-        if len(symmetry_performances.values()) <= 1:  # can't sort if only 1 item
+        if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
-        for i in range(len(symmetry_performances.values()) - 1):
-            first_item = list(symmetry_performances.values())[i].performances[0].value
-            second_item = (
-                list(symmetry_performances.values())[i + 1].performances[0].value
-            )
+        for i in range(len(symmetry_performances) - 1):
+            first_item = symmetry_performances[i].performances[0].value
+            second_item = symmetry_performances[i + 1].performances[0].value
             self.assertGreater(first_item, second_item)
 
     def test_sort_buckets_by_key(self):
@@ -146,9 +144,9 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
         symmetry_performances = sys_info.results.fine_grained['symmetry']
-        if len(symmetry_performances.values()) <= 1:  # can't sort if only 1 item
+        if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
-        for i in range(len(symmetry_performances.values()) - 1):
-            first_item = list(symmetry_performances.values())[i].bucket_name
-            second_item = list(symmetry_performances.values())[i + 1].bucket_name
+        for i in range(len(symmetry_performances) - 1):
+            first_item = symmetry_performances[i].bucket_interval
+            second_item = symmetry_performances[i + 1].bucket_interval
             self.assertGreater(second_item, first_item)

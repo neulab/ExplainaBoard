@@ -10,7 +10,7 @@ class TestBIOSpanOps(unittest.TestCase):
         toks = ["I", "love", "New", "York", "and", "Beijing"]
 
         bio_span_ops = BIOSpanOps()
-        spans = bio_span_ops.get_spans(tags=tags, seq=toks)
+        spans = bio_span_ops.get_spans(tags=tags, toks=toks)
 
         span_text_list = [span.get_span_text for span in spans]
         span_tag_list = [span.get_span_tag for span in spans]
@@ -24,19 +24,19 @@ class TestBIOSpanOps(unittest.TestCase):
         tags = ["O", "O", "B-LOC", "I-LOC", "O", "B-LOC"]
         toks = ["I", "love", "New", "York", "and", "Beijing"]
         bio_span_ops = BIOSpanOps()
-        spans_a = bio_span_ops.get_spans(tags=tags, seq=toks)
+        spans_a = bio_span_ops.get_spans(tags=tags, toks=toks)
 
         # Span b
         tags = ["O", "O", "B-ORG", "I-ORG", "O", "B-LOC"]
         toks = ["I", "love", "New", "York", "and", "Beijing"]
         bio_span_ops = BIOSpanOps()
-        spans_b = bio_span_ops.get_spans(tags=tags, seq=toks)
+        spans_b = bio_span_ops.get_spans(tags=tags, toks=toks)
 
         # Span c
         tags = ["O", "B-ORG", "I-ORG", "O", "B-LOC"]
         toks = ["loving", "New", "York", "and", "Beijing"]
         bio_span_ops = BIOSpanOps()
-        spans_c = bio_span_ops.get_spans(tags=tags, seq=toks)
+        spans_c = bio_span_ops.get_spans(tags=tags, toks=toks)
 
         bio_span_ops.set_match_type("text")
         a_ind, b_ind, a_matched, b_matched = bio_span_ops.get_matched_spans(

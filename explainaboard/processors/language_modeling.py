@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import Any
+from collections.abc import Callable
+from typing import Any, cast
 
 from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import (
-    BucketCaseToken,
+    BucketCaseCollection,
+    BucketCaseSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,
@@ -15,9 +17,8 @@ from explainaboard.metric import LogProbConfig, MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
-from explainaboard.utils.analysis import cap_feature
+from explainaboard.utils.feature_funcs import cap_feature
 from explainaboard.utils.logging import progress
-from explainaboard.utils.py_utils import sort_dict
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -280,17 +281,21 @@ class LanguageModelingProcessor(Processor):
         fre_dic = statistics["vocab"] if has_stats else None
 
         tok_dics = []
+        tok_char_start = 0
         for i, (tok, log_prob) in enumerate(zip(toks, log_probs)):
             # Basic features
+            tok_char_end = tok_char_start + len(tok)
             tok_dic = {
                 'tok_text': tok,
                 'tok_pos': (i, i + 1),
+                'tok_char_pos': (tok_char_start, tok_char_end),
                 'tok_log_prob': log_prob,
                 'tok_capitalness': cap_feature(tok),
                 'tok_position': i * 1.0 / len(toks),
                 'tok_chars': len(tok),
                 'tok_test_freq': test_freq.get(tok, 0),
             }
+            tok_char_start = tok_char_end + 1
             # Training set dependent features
             if has_stats:
                 tok_dic['tok_train_freq'] = fre_dic.get(tok, 0)
@@ -299,22 +304,32 @@ class LanguageModelingProcessor(Processor):
 
         return tok_dics
 
-    def _get_feature_dict(
-        self, sys_output: list[dict], feature_name: str
-    ) -> dict[tuple[int, int], Any]:
-        feat_dict = {}
+    def _get_feature_lists(
+        self, sys_output: list[dict], tok_feats: list[str]
+    ) -> list[list[tuple[BucketCaseSpan, float | str]]]:
+        sample_features: list[list[tuple[BucketCaseSpan, float | str]]] = [
+            list() for _ in tok_feats
+        ]
         for sample_id, my_output in enumerate(sys_output):
             for tok_id, tok_info in enumerate(my_output['tok_info']):
-                feat_dict[(sample_id, tok_id)] = tok_info[feature_name]
-        return feat_dict
+                case = BucketCaseSpan(
+                    sample_id=sample_id,
+                    token_span=(tok_id, tok_id + 1),
+                    char_span=tok_info['tok_char_pos'],
+                    text=tok_info['tok_text'],
+                    orig_str='text',
+                )
+                for case_feats, feat_name in zip(sample_features, tok_feats):
+                    case_feats.append((case, tok_info[feat_name]))
+        return sample_features
 
-    def _bucketing_samples(
+    def bucketing_samples(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
         active_features: list[str],
         metric_stats: list[MetricStats],
-    ) -> tuple[dict, dict]:
+    ) -> dict[str, list[BucketPerformance]]:
 
         features = unwrap(sys_info.features)
 
@@ -324,22 +339,26 @@ class LanguageModelingProcessor(Processor):
             (sent_feats if (x in features) else tok_feats).append(x)
 
         # First, get the buckets for sentences using the standard protocol
-        samples_over_bucket, performances_over_bucket = super()._bucketing_samples(
+        performances_over_bucket = super().bucketing_samples(
             sys_info, sys_output, sent_feats, metric_stats
         )
 
         # Bucketing
-        for feature_name in progress(tok_feats, desc="token-level bucketing"):
+        feature_lists = self._get_feature_lists(sys_output, tok_feats)
+
+        for i, feature_name in enumerate(
+            progress(tok_feats, desc="token-level bucketing")
+        ):
             my_feature = features["tok_info"].feature.feature[feature_name]
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func = getattr(bucketing, bucket_info.method)
+            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
+                bucketing, bucket_info.method
+            )
 
-            feat_dict = self._get_feature_dict(sys_output, feature_name)
-
-            samples_over_bucket[feature_name] = bucket_func(
-                dict_obj=feat_dict,
+            samples_over_bucket = bucket_func(
+                sample_features=feature_lists[i],
                 bucket_number=bucket_info.number,
                 bucket_setting=bucket_info.setting,
             )
@@ -348,16 +367,16 @@ class LanguageModelingProcessor(Processor):
             performances_over_bucket[feature_name] = self.get_bucket_performance_lm(
                 sys_info,
                 sys_output,
-                samples_over_bucket[feature_name],
+                samples_over_bucket,
             )
-        return samples_over_bucket, performances_over_bucket
+        return performances_over_bucket
 
     def get_bucket_performance_lm(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket: dict[str, list[tuple[int, int]]],
-    ) -> dict[str, list[BucketPerformance]]:
+        samples_over_bucket: list[BucketCaseCollection],
+    ) -> list[BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
         (e.g., sentence length)
@@ -365,25 +384,27 @@ class LanguageModelingProcessor(Processor):
         :param sys_output: The system output itself
         :param samples_over_bucket: a dictionary mapping bucket interval names to
             true sample IDs
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to
+        :return: bucket_performances: a list of bucket intervals to
             bucket performance
         """
 
-        bucket_name_to_performance = {}
-        for bucket_interval, tok_list in samples_over_bucket.items():
-
+        bucket_performances = []
+        for bucket_collection in samples_over_bucket:
             bucket_metrics = [x.to_metric() for x in unwrap(sys_info.metric_configs)]
-            bucket_samples = []
             log_probs = []
-            for (samp_id, tok_id) in tok_list:
-                bucket_samples.append(BucketCaseToken(str(samp_id), str(tok_id)))
+            for bucket_case in bucket_collection.samples:
+                bcp = cast(BucketCaseSpan, bucket_case)
                 log_probs.append(
-                    sys_output[samp_id]['tok_info'][tok_id]['tok_log_prob']
+                    sys_output[bcp.sample_id]['tok_info'][bcp.token_span[0]][
+                        'tok_log_prob'
+                    ]
                 )
 
+            bucket_samples = self._subsample_bucket_cases(bucket_collection.samples)
+
             bucket_performance = BucketPerformance(
-                bucket_name=bucket_interval,
-                n_samples=len(tok_list),
+                bucket_interval=bucket_collection.interval,
+                n_samples=len(bucket_collection),
                 bucket_samples=bucket_samples,
             )
             for metric in bucket_metrics:
@@ -401,9 +422,10 @@ class LanguageModelingProcessor(Processor):
                 )
                 bucket_performance.performances.append(performance)
 
-            bucket_name_to_performance[bucket_interval] = bucket_performance
+            bucket_performances.append(bucket_performance)
+        bucket_performances.sort(key=lambda x: x.bucket_interval)
 
-        return sort_dict(bucket_name_to_performance)
+        return bucket_performances
 
     @aggregating()
     def _statistics_func(self, samples, sys_info: SysOutputInfo):

@@ -57,7 +57,16 @@ class Performance:
 
 @dataclass
 class BucketCase:
-    sample_id: str
+    """
+    A class to represent cases to display to users for analysis.
+    :param sample_id: The ID of a single sample
+    """
+
+    sample_id: int
+
+    def __post_init__(self):
+        if isinstance(self.sample_id, str):
+            raise ValueError
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
@@ -72,30 +81,51 @@ class BucketCase:
 
 
 @dataclass
-class BucketCaseSeq(BucketCase):
-    # applicable scenario: text classification
-    sample_id: str
-
-
-@dataclass
-class BucketCaseToken(BucketCase):
-    # applicable scenario: conditional text generation
-    sample_id: str
-    token_id: str
-
-
-@dataclass
 class BucketCaseSpan(BucketCase):
-    # applicable scenario: NER TODO(Pengfei): unify this one with the above one?
-    sample_id: str
-    span: str
+    """
+    A bucket case that highlights a span in text.
+    :param text: The text that should be highlighted
+    :param token_span: The span of tokens to be highlighted
+    :param char_span: The span of characters to be highlighted
+    :param location: The name of the feature (e.g. "text", "source", "reference") over
+      which this span is calculated
+    """
+
+    token_span: tuple[int, int]
+    char_span: tuple[int, int]
+    orig_str: str
+    text: str
+
+    def __post_init__(self):
+        if isinstance(self.token_span, str) or isinstance(self.char_span, str):
+            raise ValueError
+
+
+@dataclass
+class BucketCaseMultiSpan(BucketCase):
+    """
+    A bucket case that highlights multiple spans in text
+    :param spans: The spans that are highlighted
+    """
+
+    spans: list[BucketCaseSpan]
+
+
+@dataclass
+class BucketCaseLabeledSpan(BucketCaseSpan):
+    """
+    A bucket case that highlights a span in text along with a label.
+    :param true_label: The actual label
+    :param predicted_label: The label that is predicted
+    """
+
     true_label: str
     predicted_label: str
 
 
 @dataclass
 class BucketPerformance:
-    bucket_name: str
+    bucket_interval: tuple
     n_samples: float
     bucket_samples: list[Any] = field(default_factory=list)
     performances: list[Performance] = field(default_factory=list)
@@ -118,10 +148,19 @@ class BucketPerformance:
 
 
 @dataclass
+class BucketCaseCollection:
+    interval: tuple
+    samples: list[BucketCase]
+
+    def __len__(self):
+        return len(self.samples)
+
+
+@dataclass
 class Result:
     overall: Optional[dict[str, Performance]] = None
     # {feature_name: {bucket_name: performance}}
-    fine_grained: Optional[dict[str, dict[str, BucketPerformance]]] = None
+    fine_grained: Optional[dict[str, list[BucketPerformance]]] = None
     calibration: Optional[list[Performance]] = None
 
     @classmethod
@@ -130,7 +169,7 @@ class Result:
             return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
         elif k == 'fine_grained':
             return {
-                k1: {k2: BucketPerformance.from_dict(v2) for k2, v2 in v1.items()}
+                k1: [BucketPerformance.from_dict(v2) for v2 in v1]
                 for k1, v1 in v.items()
             }
         elif k == 'calibration':
@@ -296,25 +335,15 @@ class OverallStatistics:
     active_features: list[str]
 
 
-@dataclass
-class FineGrainedStatistics:
-    samples_over_bucket: dict
-    performance_over_bucket: dict
-
-
-def print_bucket_dict(dict_obj: dict[str, BucketPerformance], print_information: str):
-    metric_names = [x.metric_name for x in next(iter(dict_obj.values())).performances]
+def print_bucket_perfs(bucket_perfs: list[BucketPerformance], print_information: str):
+    metric_names = [x.metric_name for x in bucket_perfs[0].performances]
     for i, metric_name in enumerate(metric_names):
         get_logger('report').info(f"the information of #{print_information}#")
         get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
-        for k, v in dict_obj.items():
-            if len(k) == 1:
-                get_logger('report').info(
-                    f"[{k[0]},]\t{v.performances[i].value}\t{v.n_samples}"
-                )
-            else:
-                get_logger('report').info(
-                    f"[{k[0]},{k[1]}]\t{v.performances[i].value}\t{v.n_samples}"
-                )
-
+        for bucket_perf in bucket_perfs:
+            get_logger('report').info(
+                f"{bucket_perf.bucket_interval}\t"
+                f"{bucket_perf.performances[i].value}\t"
+                f"{bucket_perf.n_samples}"
+            )
         get_logger('report').info('')

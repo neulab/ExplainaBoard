@@ -95,59 +95,37 @@ class TestNER(unittest.TestCase):
         self.assertEqual(n_buckets, 3)
 
         # 3. Unittest: test detailed bucket information: bucket interval
-        second_interval = list(sys_info.results.fine_grained["span_econ"].keys())[
-            1
-        ]  # [0.007462686567164179,0.9565217391304348]
+        # [0.007462686567164179,0.9565217391304348]
+        second_bucket = sys_info.results.fine_grained["span_econ"][1]
         self.assertAlmostEqual(
-            second_interval[0],
+            second_bucket.bucket_interval[0],
             0.007462686567164179,
             4,
             "almost equal",
         )
         self.assertAlmostEqual(
-            second_interval[1],
-            0.8603351955307262,
+            second_bucket.bucket_interval[1],
+            0.8571428571428571,
             4,
             "almost equal",
         )
         # 4. Unittest: test detailed bucket information: bucket samples
-        self.assertEqual(
-            sys_info.results.fine_grained["span_econ"][second_interval].n_samples, 999
-        )
+        self.assertEqual(second_bucket.n_samples, 1007)
 
         # 5. Unittest: test detailed bucket information: metric
-        self.assertEqual(
-            sys_info.results.fine_grained["span_econ"][second_interval]
-            .performances[0]
-            .metric_name,
-            "F1",
-        )
+        self.assertEqual(second_bucket.performances[0].metric_name, "F1")
         self.assertAlmostEqual(
-            sys_info.results.fine_grained["span_econ"][second_interval]
-            .performances[0]
-            .value,
-            0.9273461150353179,
-            4,
-            "almost equal",
+            second_bucket.performances[0].value, 0.9203805708562846, 4, "almost equal"
         )
         # 6 Unittest: test detailed bucket information: confidence interval
-        self.assertGreater(
-            sys_info.results.fine_grained["span_econ"][second_interval]
-            .performances[0]
-            .confidence_score_low,
-            0,
-        )
+        self.assertGreater(second_bucket.performances[0].confidence_score_low, 0)
 
-        # 7. Unittest: test if only error cases are printed (this is the expected case,
-        # especially for sequence labeling tasks. Otherwise, the analysis report files
-        # will be too large.)
+        # 7. Unittest: test if only fewer cases are printed (this is the expected
+        # case, especially for sequence labeling tasks. Otherwise, the analysis report
+        # files will be too large.)
         self.assertLess(
-            len(
-                sys_info.results.fine_grained["span_econ"][
-                    second_interval
-                ].bucket_samples
-            ),
-            sys_info.results.fine_grained["span_econ"][second_interval].n_samples,
+            len(second_bucket.bucket_samples),
+            second_bucket.n_samples,
         )
 
         # 8. Unittest: customized metadata (TODO(Pengfei):
