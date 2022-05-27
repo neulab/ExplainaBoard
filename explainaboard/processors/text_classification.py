@@ -165,26 +165,21 @@ class TextClassificationProcessor(Processor):
     def _get_length_fre(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        length_fre = 0
         length = len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
-
-        if length in statistics['length_fre'].keys():
-            length_fre = statistics['length_fre'][length]
-
-        return length_fre
+        return statistics['length_fre'].get(str(length), 0)
 
     # --- End feature functions
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
-        length_fre: dict[int, float] = {}
+        length_fre: dict[str, float] = {}
         total_samps = 0
         tokenizer = unwrap(sys_info.source_tokenizer)
         for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)
-            length = len(tokens)
+            length = str(len(tokens))
 
             length_fre[length] = length_fre.get(length, 0.0) + 1.0
 
