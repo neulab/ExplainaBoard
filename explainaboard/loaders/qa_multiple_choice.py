@@ -24,20 +24,22 @@ class QAMultipleChoiceLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        target_field_names = ["context", "question", "answers"]
+        target_field_names = ["context", "options", "question", "answers"]
         return {
             FileType.json: JSONFileLoader(
                 [
                     FileLoaderField("context", target_field_names[0], str),
-                    FileLoaderField("question", target_field_names[1], str),
-                    FileLoaderField("answers", target_field_names[2], dict),
+                    FileLoaderField("options", target_field_names[1], list),
+                    FileLoaderField("question", target_field_names[2], str),
+                    FileLoaderField("answers", target_field_names[3], dict),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
                 [
                     FileLoaderField("context", target_field_names[0], str),
-                    FileLoaderField("question", target_field_names[1], str),
-                    FileLoaderField("answers", target_field_names[2], dict),
+                    FileLoaderField("options", target_field_names[1], list),
+                    FileLoaderField("question", target_field_names[2], str),
+                    FileLoaderField("answers", target_field_names[3], dict),
                 ]
             ),
         }
