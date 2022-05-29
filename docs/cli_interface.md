@@ -34,7 +34,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Multiple Choice QA](#multiple-choice-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
-
+* [Multiple Choice Cloze](#multiple-choice-cloze)
 
 ## [Text Classification](task_text_classification.md)
 
@@ -228,3 +228,15 @@ This is an example with a custom dataset.
 ```shell
 explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
 ```
+
+## [Multiple Choice Cloze]
+Fill in a blank based on multiple provided options
+
+**CLI Example**
+This is an example using the dataset from `DataLab`
+```shell
+explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub_dataset cloze-multiple-choice --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_choice.json > report.json
+```
+
+
+

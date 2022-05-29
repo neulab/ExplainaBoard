@@ -45,6 +45,28 @@ class ClozeMultipleChoiceProcessor(Processor):
                         setting=(),
                     ),
                 ),
+                "relative_blank_position": feature.Value(
+                    dtype="float",
+                    description="the relative position of blank (question mark)"
+                                " in the whole context",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "absolute_blank_position": feature.Value(
+                    dtype="float",
+                    description="the absolute position of blank (question mark)"
+                                " in the whole context",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
                 "answer_length": feature.Value(
                     dtype="float",
                     description="the length of answer",
@@ -106,6 +128,20 @@ class ClozeMultipleChoiceProcessor(Processor):
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
+
+    def _get_relative_blank_position(self, sys_info: SysOutputInfo, existing_features: dict):
+        source_tokens = unwrap(sys_info.source_tokenizer)(existing_features["context"]).strs
+        if existing_features["question_mark"] not in source_tokens:
+            return 0
+        else:
+            return source_tokens.index(existing_features["question_mark"])*1.0/len(source_tokens)
+
+    def _get_absolute_blank_position(self, sys_info: SysOutputInfo, existing_features: dict):
+        source_tokens = unwrap(sys_info.source_tokenizer)(existing_features["context"]).strs
+        if existing_features["question_mark"] not in source_tokens:
+            return 0
+        else:
+            return source_tokens.index(existing_features["question_mark"])
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(
