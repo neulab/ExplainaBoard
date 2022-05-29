@@ -1,5 +1,6 @@
 from explainaboard.loaders import (
     aspect_based_sentiment_classification,
+    cloze_hint,
     cloze_multiple_choice,
     conditional_generation,
     extractive_qa,
@@ -30,4 +31,5 @@ __all__ = [
     'qa_multiple_choice',
     'text_classification',
     'text_pair_classification',
+    'cloze_hint',
 ]

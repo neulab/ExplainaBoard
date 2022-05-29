@@ -2,6 +2,8 @@
 from explainaboard.processors import (
     aspect_based_sentiment_classification,
     chunking,
+    cloze_hint,
+    cloze_multiple_choice,
     conditional_generation,
     extractive_qa,
     kg_link_tail_prediction,
@@ -13,7 +15,6 @@ from explainaboard.processors import (
     text_classification,
     text_pair_classification,
     word_segmentation,
-    cloze_multiple_choice,
 )
 from explainaboard.processors.processor_registry import get_processor
 
@@ -33,4 +34,5 @@ __all__ = [
     'word_segmentation',
     'chunking',
     "cloze_multiple_choice",
+    "cloze_hint",
 ]

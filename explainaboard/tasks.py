@@ -97,7 +97,14 @@ Dividing text into syntactically related non-overlapping groups of words.
 fill in a blank in a text based on given options:
 https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
 """,
-            )
+            ),
+            Task(
+                name=TaskType.cloze_hint,
+                description="""
+fill in a blank in a text based on given hint:
+https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
+""",
+            ),
         ],
     ),
     TaskCategory(

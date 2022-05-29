@@ -16,6 +16,7 @@ class TaskType(str, Enum):
     language_modeling = "language-modeling"
     chunking = "chunking"
     cloze_mutiple_choice = "cloze-multiple-choice"
+    cloze_hint = "cloze-hint"
 
     @staticmethod
     def list():

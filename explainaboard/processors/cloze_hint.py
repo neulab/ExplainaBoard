@@ -14,11 +14,11 @@ import explainaboard.utils.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.cloze_mutiple_choice)
+@register_processor(TaskType.cloze_hint)
 class ClozeMultipleChoiceProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.cloze_mutiple_choice
+        return TaskType.cloze_hint
 
     @classmethod
     def default_features(cls) -> feature.Features:
@@ -26,15 +26,8 @@ class ClozeMultipleChoiceProcessor(Processor):
             {
                 "context": feature.Value("string"),
                 "question_mark": feature.Value("string"),
-                "options": feature.Sequence(feature=feature.Value("string")),
-                "answers": feature.Sequence(
-                    feature=feature.Dict(
-                        feature={
-                            "text": feature.Value("string"),
-                            "option_index": feature.Value("int32"),
-                        }
-                    )
-                ),
+                "hint": feature.Value("string"),
+                "answers": feature.Value("string"),
                 "context_length": feature.Value(
                     dtype="float",
                     description="the length of context",
@@ -156,9 +149,7 @@ class ClozeMultipleChoiceProcessor(Processor):
             return source_tokens.index(existing_features["question_mark"])
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(
-            unwrap(sys_info.target_tokenizer)(existing_features["answers"]["text"])
-        )
+        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"]))
 
     # training set dependent features
     def _get_num_oov(
@@ -191,7 +182,7 @@ class ClozeMultipleChoiceProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the true label for the output
         """
-        return data_point["answers"]["option_index"]
+        return data_point["answers"]
 
     def _get_predicted_label(self, data_point):
         """
@@ -199,7 +190,7 @@ class ClozeMultipleChoiceProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the predicted label for the output
         """
-        return data_point["predicted_answers"]["option_index"]
+        return data_point["predicted_answers"]
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
