@@ -22,6 +22,15 @@ class TestMetric(unittest.TestCase):
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
+    def test_correct_score(self):
+        metric = explainaboard.metric.CorrectScoreConfig(
+            name='CorrectScore'
+        ).to_metric()
+        true = ['a', 'b', 'a', 'b', 'a', 'b']
+        pred = ['a', 'b', 'a', 'b', 'b', 'a']
+        result = metric.evaluate(true, pred, conf_value=0.05)
+        self.assertAlmostEqual(result.value, 4)
+
     def test_f1_micro(self):
         metric = explainaboard.metric.F1ScoreConfig(
             name='F1', average='micro'

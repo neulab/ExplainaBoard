@@ -7,7 +7,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import AccuracyConfig, MetricConfig
+from explainaboard.metric import AccuracyConfig, CorrectScoreConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
@@ -102,7 +102,12 @@ class QAMultipleChoiceProcessor(Processor):
                 name='Accuracy',
                 source_language=source_language,
                 target_language=target_language,
-            )
+            ),
+            CorrectScoreConfig(
+                name='CorrectScore',
+                source_language=source_language,
+                target_language=target_language,
+            ),
         ]
 
     def __init__(self):

@@ -262,6 +262,30 @@ class Accuracy(Metric):
 
 
 @dataclass
+class CorrectScoreConfig(MetricConfig):
+    def to_metric(self):
+        return CorrectScore(self)
+
+
+class CorrectScore(Accuracy):
+    """
+    Calculate the absolute value of correct number
+    """
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+        data = stats.get_data()
+        if data.size == 0:
+            return np.array(0.0)
+        else:
+            return np.sum(data, axis=0)
+
+
+@dataclass
 class F1ScoreConfig(MetricConfig):
     average: str = 'micro'
     separate_match: bool = False
