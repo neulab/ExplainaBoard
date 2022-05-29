@@ -11,6 +11,7 @@ from explainaboard.loaders import (
     sequence_labeling,
     text_classification,
     text_pair_classification,
+    cloze_multiple_choice,
 )
 
 get_datalab_loader = loader_registry.get_datalab_loader
@@ -28,4 +29,5 @@ __all__ = [
     'qa_multiple_choice',
     'text_classification',
     'text_pair_classification',
+    'cloze_multiple_choice',
 ]

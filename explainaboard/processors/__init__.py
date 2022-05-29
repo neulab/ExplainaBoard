@@ -13,6 +13,7 @@ from explainaboard.processors import (
     text_classification,
     text_pair_classification,
     word_segmentation,
+    cloze_multiple_choice,
 )
 from explainaboard.processors.processor_registry import get_processor
 
@@ -31,4 +32,5 @@ __all__ = [
     'text_pair_classification',
     'word_segmentation',
     'chunking',
+    "cloze_multiple_choice",
 ]

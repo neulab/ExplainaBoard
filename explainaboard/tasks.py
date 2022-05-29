@@ -88,6 +88,19 @@ Dividing text into syntactically related non-overlapping groups of words.
         ],
     ),
     TaskCategory(
+        "cloze",
+        "fill in a blank in a text",
+        [
+            Task(
+                name=TaskType.cloze_mutiple_choice,
+                description="""
+fill in a blank in a text based on given options:
+https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
+""",
+            )
+        ],
+    ),
+    TaskCategory(
         "qa",
         "question answering tasks",
         [
