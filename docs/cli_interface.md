@@ -36,7 +36,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
 * [Cloze with Multiple Choices](#cloze-with-multiple-choices)
 * [Cloze with Hint](#cloze-with-hint)
-
+* [Grammatical Error Correction](#grammatical-error-correction)
 
 ## [Text Classification](task_text_classification.md)
 
@@ -248,4 +248,14 @@ Fill in a blank based on hint
 This is an example using the dataset from `DataLab`
 ```shell
 explainaboard --task cloze-hint --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
+```
+
+
+
+## [Grammatical Error Correction]
+Correct errors in a text
+**CLI Example**
+This is an example using the dataset from `DataLab`
+```shell
+explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
 ```

@@ -5,6 +5,7 @@ from explainaboard.loaders import (
     conditional_generation,
     extractive_qa,
     file_loader,
+    grammatical_error_correction,
     kg_link_tail_prediction,
     language_modeling,
     loader,
@@ -32,4 +33,5 @@ __all__ = [
     'text_classification',
     'text_pair_classification',
     'cloze_hint',
+    'grammatical_error_correction',
 ]

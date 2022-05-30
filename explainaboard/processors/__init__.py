@@ -6,6 +6,7 @@ from explainaboard.processors import (
     cloze_multiple_choice,
     conditional_generation,
     extractive_qa,
+    grammatical_error_correction,
     kg_link_tail_prediction,
     language_modeling,
     machine_translation,
@@ -33,6 +34,7 @@ __all__ = [
     'text_pair_classification',
     'word_segmentation',
     'chunking',
-    "cloze_multiple_choice",
-    "cloze_hint",
+    'cloze_multiple_choice',
+    'cloze_hint',
+    'grammatical_error_correction',
 ]

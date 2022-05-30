@@ -140,6 +140,18 @@ https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-
         ],
     ),
     TaskCategory(
+        "text-editing",
+        "editing texts to satisfy some requirements",
+        [
+            Task(
+                name=TaskType.grammatical_error_correction,
+                description="""
+correct grammatical errors of a given text
+""",
+            ),
+        ],
+    ),
+    TaskCategory(
         "text-pair-classification",
         "predicting a class of two texts",
         [

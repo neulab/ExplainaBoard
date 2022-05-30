@@ -31,6 +31,42 @@ class TestMetric(unittest.TestCase):
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 4)
 
+    def test_seq_correct_score(self):
+        metric = explainaboard.metric.SeqCorrectScoreConfig(
+            name='SeqCorrectScore'
+        ).to_metric()
+        true = [
+            {
+                "start_idx": [8, 17, 39, 46, 58, 65, 65, 80],
+                "end_idx": [8, 18, 40, 47, 59, 65, 66, 81],
+                "corrections": [
+                    ["the"],
+                    ["found"],
+                    ["other"],
+                    ["there"],
+                    ["chickens."],
+                    ["in"],
+                    ["which"],
+                    ["selling"],
+                ],
+            }
+        ]
+        pred = [
+            {
+                "start_idx": [8, 17, 39, 46, 58],
+                "end_idx": [8, 18, 40, 47, 59],
+                "corrections": [
+                    ["the"],
+                    ["found"],
+                    ["other"],
+                    ["there"],
+                    ["chickens."],
+                ],
+            }
+        ]
+        result = metric.evaluate(true, pred)
+        self.assertAlmostEqual(result.value, 5)
+
     def test_f1_micro(self):
         metric = explainaboard.metric.F1ScoreConfig(
             name='F1', average='micro'

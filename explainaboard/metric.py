@@ -385,6 +385,49 @@ class F1Score(Metric):
 
 
 @dataclass
+class SeqCorrectScoreConfig(MetricConfig):
+    def to_metric(self):
+        return SeqCorrectScore(self)
+
+
+class SeqCorrectScore(CorrectScore):
+    def calc_stats_from_data(
+        self,
+        true_edits_ldl: list[dict[str, list]],
+        pred_edits_ldl: list[dict[str, list]],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+        def _get_flatten_edits(edits: list[dict]):
+            flatten_edits = []
+            for edit in edits:
+                start_idx, end_idx, corrections = (
+                    edit["start_idx"],
+                    edit["end_idx"],
+                    edit["corrections"],
+                )
+                for correction in corrections:
+                    flatten_edits.append((start_idx, end_idx, correction))
+            return flatten_edits
+
+        recall = []
+        for true_edits_dl, pred_edits_dl in zip(true_edits_ldl, pred_edits_ldl):
+            true_edits_ld = [
+                dict(zip(true_edits_dl, t)) for t in zip(*true_edits_dl.values())
+            ]
+            pred_dicts_ld = [
+                dict(zip(pred_edits_dl, t)) for t in zip(*pred_edits_dl.values())
+            ]
+            gold_flatten_edits = _get_flatten_edits(true_edits_ld)
+            pred_flatten_edits = _get_flatten_edits(pred_dicts_ld)
+            for gold_flatten_edit in gold_flatten_edits:
+                if gold_flatten_edit in pred_flatten_edits:
+                    recall.append(1.0)
+                else:
+                    recall.append(0.0)
+        return MetricStats(np.array(recall))
+
+
+@dataclass
 class SeqF1ScoreConfig(F1ScoreConfig):
     tag_schema: str = 'bio'
 

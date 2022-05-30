@@ -17,6 +17,7 @@ class TaskType(str, Enum):
     chunking = "chunking"
     cloze_mutiple_choice = "cloze-multiple-choice"
     cloze_hint = "cloze-hint"
+    grammatical_error_correction = "grammatical-error-correction"
 
     @staticmethod
     def list():
