@@ -337,5 +337,4 @@ class BIOSpanOps(SpanOps):
         )
 
     def _span_type(self, tags: list[str], pos: tuple[int, int]) -> str:
-        print(f'tags = {tags}, pos={pos}')
         return tags[pos[0]].split('-')[1]
