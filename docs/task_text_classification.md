@@ -14,8 +14,8 @@ predicted_label
 ```
 
 Let's say we have several files such as 
-* [sst2-lstm.tsv](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-lstm-output.txt) 
-* [sst2-cnn.tsv](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-cnn-output.txt)
+* [sst2-lstm.tsv](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-lstm-output.txt) 
+* [sst2-cnn.tsv](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-cnn-output.txt)
 
 etc. from different systems.
 

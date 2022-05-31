@@ -3,10 +3,14 @@
     "predicted_edits": {
       "start_idx": [8, 17, 39, 46, 58, 65, 65, 80],
       "end_idx": [8, 18, 40, 47, 59, 65, 66, 81],
-      "corrections": [["the"],
-        ["found"], ["other"],
-        ["there"], ["chickens."],
-        ["in"], ["which"],
+      "corrections": [
+        ["the"],
+        ["found"],
+        ["other"],
+        ["there"],
+        ["chickens."],
+        ["in"],
+        ["which"],
         ["selling"]
         ]
     }
