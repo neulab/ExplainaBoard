@@ -23,8 +23,8 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_correct_score(self):
-        metric = explainaboard.metric.CorrectScoreConfig(
-            name='CorrectScore'
+        metric = explainaboard.metric.CorrectCountConfig(
+            name='CorrectCount'
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
@@ -32,8 +32,8 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 4)
 
     def test_seq_correct_score(self):
-        metric = explainaboard.metric.SeqCorrectScoreConfig(
-            name='SeqCorrectScore'
+        metric = explainaboard.metric.SeqCorrectCountConfig(
+            name='SeqCorrectCount'
         ).to_metric()
         true = [
             {

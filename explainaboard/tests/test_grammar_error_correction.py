@@ -25,13 +25,13 @@ class TestGrammarErrorCorrection(unittest.TestCase):
             "task_name": TaskType.grammatical_error_correction.value,
             "dataset_name": "gaokao2018_np1",
             "sub_dataset_name": "writing-grammar",
-            "metric_names": ["SeqCorrectScore"],
+            "metric_names": ["SeqCorrectCount"],
         }
         processor = get_processor(TaskType.grammatical_error_correction.value)
         sys_info = processor.process(metadata, data)
         processor.print_bucket_info(sys_info.results.fine_grained)
-        # print(sys_info.results.overall["SeqCorrectScore"].value)
-        self.assertAlmostEqual(sys_info.results.overall["SeqCorrectScore"].value, 8)
+        # print(sys_info.results.overall["SeqCorrectCount"].value)
+        self.assertAlmostEqual(sys_info.results.overall["SeqCorrectCount"].value, 8)
         self.assertIsNotNone(sys_info.results.fine_grained)
 
 

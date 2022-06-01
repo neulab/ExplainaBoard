@@ -7,7 +7,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import AccuracyConfig, CorrectScoreConfig, MetricConfig
+from explainaboard.metric import AccuracyConfig, CorrectCountConfig, MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
@@ -115,8 +115,8 @@ class ClozeMultipleChoiceProcessor(Processor):
                 source_language=source_language,
                 target_language=target_language,
             ),
-            CorrectScoreConfig(
-                name='CorrectScore',
+            CorrectCountConfig(
+                name='CorrectCount',
                 source_language=source_language,
                 target_language=target_language,
             ),

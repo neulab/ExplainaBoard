@@ -262,12 +262,12 @@ class Accuracy(Metric):
 
 
 @dataclass
-class CorrectScoreConfig(MetricConfig):
+class CorrectCountConfig(MetricConfig):
     def to_metric(self):
-        return CorrectScore(self)
+        return CorrectCount(self)
 
 
-class CorrectScore(Accuracy):
+class CorrectCount(Accuracy):
     """
     Calculate the absolute value of correct number
     """
@@ -385,12 +385,12 @@ class F1Score(Metric):
 
 
 @dataclass
-class SeqCorrectScoreConfig(MetricConfig):
+class SeqCorrectCountConfig(MetricConfig):
     def to_metric(self):
-        return SeqCorrectScore(self)
+        return SeqCorrectCount(self)
 
 
-class SeqCorrectScore(CorrectScore):
+class SeqCorrectCount(CorrectCount):
     def calc_stats_from_data(
         self,
         true_edits_ldl: list[dict[str, list]],

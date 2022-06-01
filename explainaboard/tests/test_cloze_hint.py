@@ -25,7 +25,7 @@ class TestClozeHint(unittest.TestCase):
             "task_name": TaskType.cloze_hint.value,
             "dataset_name": "gaokao2018_np1",
             "sub_dataset_name": "cloze-hint",
-            "metric_names": ["CorrectScore"],
+            "metric_names": ["CorrectCount"],
         }
         processor = get_processor(TaskType.cloze_hint.value)
         sys_info = processor.process(metadata, data)

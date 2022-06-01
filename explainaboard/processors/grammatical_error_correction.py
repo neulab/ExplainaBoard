@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import MetricConfig, SeqCorrectScoreConfig
+from explainaboard.metric import MetricConfig, SeqCorrectCountConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
@@ -45,7 +45,7 @@ class GrammaticalErrorCorrection(Processor):
     def default_metrics(
         cls, source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        return [SeqCorrectScoreConfig(name='SeqCorrectScore')]
+        return [SeqCorrectCountConfig(name='SeqCorrectCount')]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_text_length(self, sys_info: SysOutputInfo, existing_features: dict):

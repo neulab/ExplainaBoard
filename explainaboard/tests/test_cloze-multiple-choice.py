@@ -25,7 +25,7 @@ class TestClozeMultipleChoice(unittest.TestCase):
             "task_name": TaskType.cloze_mutiple_choice.value,
             "dataset_name": "gaokao2018_np1",
             "sub_dataset_name": "cloze-multiple-choice",
-            "metric_names": ["CorrectScore"],
+            "metric_names": ["CorrectCount"],
         }
         processor = get_processor(TaskType.cloze_mutiple_choice.value)
         sys_info = processor.process(metadata, data)
