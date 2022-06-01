@@ -34,8 +34,8 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Multiple Choice QA](#multiple-choice-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
-* [Cloze with Multiple Choices](#cloze-with-multiple-choices)
-* [Cloze with Hint](#cloze-with-hint)
+* [Multiple-choice Cloze](#Multiple-choice Cloze)
+* [Generative Cloze](#generative-cloze)
 * [Grammatical Error Correction](#grammatical-error-correction)
 
 ## [Text Classification](task_text_classification.md)
@@ -231,7 +231,7 @@ This is an example with a custom dataset.
 explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
 ```
 
-## [Cloze with Multiple Choices]
+## [Multiple-choice Cloze]
 Fill in a blank based on multiple provided options
 
 **CLI Example**
@@ -241,13 +241,13 @@ explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub_datase
 ```
 
 
-## [Cloze with Hint]
+## [Generative Cloze]
 Fill in a blank based on hint
 
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task cloze-hint --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
+explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
 ```
 
 

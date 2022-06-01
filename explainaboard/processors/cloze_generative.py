@@ -14,11 +14,11 @@ import explainaboard.utils.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.cloze_hint)
-class ClozeMultipleChoiceProcessor(Processor):
+@register_processor(TaskType.cloze_generative)
+class ClozeGenerativeProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.cloze_hint
+        return TaskType.cloze_generative
 
     @classmethod
     def default_features(cls) -> feature.Features:

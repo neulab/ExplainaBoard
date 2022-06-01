@@ -16,7 +16,7 @@ class TaskType(str, Enum):
     language_modeling = "language-modeling"
     chunking = "chunking"
     cloze_mutiple_choice = "cloze-multiple-choice"
-    cloze_hint = "cloze-hint"
+    cloze_generative = "cloze-generative"
     grammatical_error_correction = "grammatical-error-correction"
 
     @staticmethod

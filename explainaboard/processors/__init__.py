@@ -2,7 +2,7 @@
 from explainaboard.processors import (
     aspect_based_sentiment_classification,
     chunking,
-    cloze_hint,
+    cloze_generative,
     cloze_multiple_choice,
     conditional_generation,
     extractive_qa,
@@ -35,6 +35,6 @@ __all__ = [
     'word_segmentation',
     'chunking',
     'cloze_multiple_choice',
-    'cloze_hint',
+    'cloze_generative',
     'grammatical_error_correction',
 ]

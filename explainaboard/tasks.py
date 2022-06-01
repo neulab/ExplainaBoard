@@ -99,7 +99,7 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
 """,
             ),
             Task(
-                name=TaskType.cloze_hint,
+                name=TaskType.cloze_generative,
                 description="""
 fill in a blank in a text based on given hint:
 https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
