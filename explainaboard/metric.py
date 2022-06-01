@@ -11,6 +11,7 @@ from eaas.async_client import AsyncRequest
 from eaas.endpoint import EndpointConfig
 import numpy as np
 import sacrebleu
+from scipy.stats import pearsonr
 
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, SpanOps
@@ -756,6 +757,281 @@ class LogProb(Metric):
             val = np.exp(-val)
         return val
 
+@dataclass
+class SegKtauCorrConfig(MetricConfig):
+    no_Human: bool = True
+    threshold: float = 25
+
+    def to_metric(self):
+        return SegKtauCorrScore(self)
+
+
+class SegKtauCorrScore(Metric):
+    def calc_stats_from_data(
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+
+        return MetricStats(
+            np.array(
+                [
+                    (true[0], true[1], true[2], pred)
+                    for true, pred in zip(true_data, pred_data)
+                ]
+            )
+        )
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+
+        data = stats.get_data()
+        return data
+
+    def get_scores_from_stats(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> dict[str, list]:
+        config = cast(SegKtauCorrConfig, self._get_config(config))
+        scores: dict[str, list] = {}
+        for stat in agg_stats:
+            SYSName = stat[0]
+            SEGID = stat[1]
+            manualScore = stat[2]
+            autoScore = stat[3]
+
+            score = float(autoScore) if autoScore != '' else None
+            scoreManual = float(manualScore) if manualScore != '' else None
+
+            if config.no_Human and (
+                'Human' in SYSName or 'HUMAN' in SYSName or SYSName.startswith('ref')
+            ):
+                continue
+
+            if scoreManual is None:
+                continue
+
+            if SEGID not in scores:
+                scores[SEGID] = []
+            scores[SEGID].append([scoreManual, score])
+
+        return scores
+
+    def count(self, score: list, config: Optional[MetricConfig] = None):
+        config = cast(SegKtauCorrConfig, self._get_config(config))
+        conc = 0
+        disc = 0
+        num = 0
+        for i in range(1, len(score)):
+            for j in range(0, i):
+                if (
+                    abs(score[i][0] - score[j][0]) < config.threshold
+                    or abs(score[i][0] - score[j][0]) == 0
+                ):
+                    continue
+                elif (
+                    score[i][0] - score[j][0] >= config.threshold
+                ):  # system i is better than system j
+                    if score[i][1] > score[j][1]:
+                        conc += 1
+                    else:
+                        disc += 1
+                    num += 1
+                else:  # system i is worse than system j
+                    if score[i][1] < score[j][1]:
+                        conc += 1
+                    else:
+                        disc += 1
+                    num += 1
+        return conc, disc, num
+
+    def calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        scores = self.get_scores_from_stats(agg_stats, config)
+        totalSegNum = 0
+        totalConc = 0
+        totalDisc = 0
+
+        for score in scores.values():
+            conc, disc, num = self.count(score, config)
+            totalSegNum += num
+            totalConc += conc
+            totalDisc += disc
+
+        if totalConc + totalDisc != 0:
+            val = (totalConc - totalDisc) / (totalConc + totalDisc)
+        else:
+            val = 0
+        return val
+
+
+@dataclass
+class RootMeanSquareErrorConfig(MetricConfig):
+    no_Human: bool = True
+
+    def to_metric(self):
+        return RootMeanSquareErrorScore(self)
+
+
+class RootMeanSquareErrorScore(Metric):
+    def calc_stats_from_data(
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+
+        return MetricStats(
+            np.array(
+                [(true[0], true[3], pred) for true, pred in zip(true_data, pred_data)]
+            )
+        )
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+
+        data = stats.get_data()
+        return data
+
+    def get_scores_from_stats(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> tuple[np.ndarray, np.ndarray]:
+        config = cast(RootMeanSquareErrorConfig, self._get_config(config))
+        scoreManuals = []
+        scores = []
+        for stat in agg_stats:
+            SYSName = stat[0]
+            manualScore = stat[1]
+            autoScore = stat[2]
+
+            score = float(autoScore) if autoScore != '' else None
+            scoreManual = float(manualScore) if manualScore != '' else None
+
+            if config.no_Human and (
+                'Human' in SYSName or 'HUMAN' in SYSName or SYSName.startswith('ref')
+            ):
+                continue
+
+            if scoreManual is None:
+                continue
+
+            scoreManuals.append(scoreManual)
+            scores.append(score)
+
+        return np.array(scoreManuals), np.array(scores)
+
+    def normalize(self, data: np.adarray) -> np.adarray:
+        return (data - np.min(data)) / (np.max(data) - np.min(data))
+
+    def calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        scoreManuals, scores = self.get_scores_from_stats(agg_stats, config)
+        scoreManuals = self.normalize(scoreManuals)
+        scores = self.normalize(scores)
+        val = np.sqrt((np.square(scoreManuals - scores)).mean())
+        return val
+
+
+@dataclass
+class SysPearsonCorrConfig(MetricConfig):
+    no_Human: bool = True
+
+    def to_metric(self):
+        return SysPearsonCorrScore(self)
+
+
+class SysPearsonCorrScore(Metric):
+    def calc_stats_from_data(
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+
+        return MetricStats(
+            np.array(
+                [(true[0], true[3], pred) for true, pred in zip(true_data, pred_data)]
+            )
+        )
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+
+        data = stats.get_data()
+        return data
+
+    def get_scores_from_stats(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> dict[str, list]:
+        scores: dict[str, list] = {}
+        for stat in agg_stats:
+            SYSName = stat[0]
+            manualScore = stat[1]
+            autoScore = stat[2]
+
+            score = float(autoScore) if autoScore != '' else None
+            scoreManual = float(manualScore) if manualScore != '' else None
+
+            if SYSName not in scores:
+                scores[SYSName] = [[], []]
+            if scoreManual is not None:
+                scores[SYSName][0].append(scoreManual)
+            if score is not None:
+                scores[SYSName][1].append(score)
+
+        return scores
+
+    def calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        config = cast(SysPearsonCorrConfig, self._get_config(config))
+        scores = self.get_scores_from_stats(agg_stats, config)
+
+        keys = [i for i in scores.keys()]
+        if config.no_Human:
+            keys = [
+                key
+                for key in keys
+                if (
+                    'Human' not in key
+                    and 'HUMAN' not in key
+                    and (not key.startswith('ref'))
+                )
+            ]
+        if not config.no_Human:
+            keys = [key for key in keys if 'Human-A.0' not in key]
+
+        manualScore = []
+        systemScore = []
+
+        for sysName in keys:
+            if len(scores[sysName][0]) != 0:
+                manualScore.append(sum(scores[sysName][0]) / len(scores[sysName][0]))
+            else:
+                manualScore.append(0)
+            if len(scores[sysName][1]) != 0:
+                systemScore.append(sum(scores[sysName][1]) / len(scores[sysName][1]))
+            else:
+                manualScore.append(0)
+        assert len(systemScore) == len(manualScore)
+        # print("number of system:"+str(len(systemScore)))
+
+        val = pearsonr(systemScore, manualScore)[0]
+        return val
 
 def metric_name_to_config(
     name: str, source_language: str, target_language: str

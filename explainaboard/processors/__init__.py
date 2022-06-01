@@ -12,6 +12,7 @@ from explainaboard.processors import (
     summarization,
     text_classification,
     text_pair_classification,
+    text_regression,
     word_segmentation,
 )
 from explainaboard.processors.processor_registry import get_processor
@@ -31,4 +32,5 @@ __all__ = [
     'text_pair_classification',
     'word_segmentation',
     'chunking',
+    'text_regression',
 ]

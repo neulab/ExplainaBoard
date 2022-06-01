@@ -157,6 +157,16 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
             )
         ],
     ),
+    TaskCategory(
+        "text-regression",
+        "evaluate evaluation metrics.  ",
+        [
+            Task(
+                name=TaskType.text_regression,
+                description="""evaluate evaluation metrics.""",
+            )
+        ],
+    ),
 ]
 
 
