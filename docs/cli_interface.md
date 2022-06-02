@@ -34,7 +34,9 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Multiple Choice QA](#multiple-choice-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
-
+* [Multiple-choice Cloze](#Multiple-choice Cloze)
+* [Generative Cloze](#generative-cloze)
+* [Grammatical Error Correction](#grammatical-error-correction)
 
 ## [Text Classification](task_text_classification.md)
 
@@ -227,4 +229,33 @@ Predict the sentiment of a text based on a specific aspect.
 This is an example with a custom dataset.
 ```shell
 explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
+```
+
+## [Multiple-choice Cloze]
+Fill in a blank based on multiple provided options
+
+**CLI Example**
+This is an example using the dataset from `DataLab`
+```shell
+explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub_dataset cloze-multiple-choice --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_choice.json > report.json
+```
+
+
+## [Generative Cloze]
+Fill in a blank based on hint
+
+**CLI Example**
+This is an example using the dataset from `DataLab`
+```shell
+explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
+```
+
+
+
+## [Grammatical Error Correction]
+Correct errors in a text
+**CLI Example**
+This is an example using the dataset from `DataLab`
+```shell
+explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
 ```

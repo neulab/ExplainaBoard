@@ -16,7 +16,7 @@ predicted_label
 ```
 
 Let's say we have one system output file from a RoBERTa model. 
-* [snli.bert](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/system_outputs/snli/snli-roberta-output.txt) 
+* [snli.bert](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/snli/snli-roberta-output.txt) 
 
 
 
