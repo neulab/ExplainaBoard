@@ -23,22 +23,6 @@ class TestQAMultipleChoice(unittest.TestCase):
         )
         data = loader.load()
         self.assertEqual(len(data), 4)
-        self.assertEqual(
-            data[0],
-            {
-                'context': 'The girl was as down-to-earth as a Michelin-starred canape',
-                'question': '',
-                'answers': {
-                    'text': 'The girl was not down-to-earth at all.',
-                    'option_index': 0,
-                },
-                'id': '0',
-                'predicted_answers': {
-                    'text': 'The girl was not down-to-earth at all.',
-                    'option_index': 0,
-                },
-            },
-        )
 
     def test_generate_system_analysis(self):
         loader = get_custom_dataset_loader(

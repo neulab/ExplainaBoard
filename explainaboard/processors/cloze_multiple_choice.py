@@ -14,18 +14,18 @@ import explainaboard.utils.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_multiple_choice)
-class QAMultipleChoiceProcessor(Processor):
+@register_processor(TaskType.cloze_mutiple_choice)
+class ClozeMultipleChoiceProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.qa_multiple_choice
+        return TaskType.cloze_mutiple_choice
 
     @classmethod
     def default_features(cls) -> feature.Features:
         return feature.Features(
             {
                 "context": feature.Value("string"),
-                "question": feature.Value("string"),
+                "question_mark": feature.Value("string"),
                 "options": feature.Sequence(feature=feature.Value("string")),
                 "answers": feature.Sequence(
                     feature=feature.Dict(
@@ -45,9 +45,21 @@ class QAMultipleChoiceProcessor(Processor):
                         setting=(),
                     ),
                 ),
-                "question_length": feature.Value(
+                "relative_blank_position": feature.Value(
                     dtype="float",
-                    description="the length of question",
+                    description="the relative position of blank (question mark)"
+                    " in the whole context",
+                    is_bucket=True,
+                    bucket_info=feature.BucketInfo(
+                        method="bucket_attribute_specified_bucket_value",
+                        number=4,
+                        setting=(),
+                    ),
+                ),
+                "absolute_blank_position": feature.Value(
+                    dtype="float",
+                    description="the absolute position of blank (question mark)"
+                    " in the whole context",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -117,8 +129,31 @@ class QAMultipleChoiceProcessor(Processor):
     def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
 
-    def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
+    def _get_relative_blank_position(
+        self, sys_info: SysOutputInfo, existing_features: dict
+    ):
+        source_tokens = unwrap(sys_info.source_tokenizer)(
+            existing_features["context"]
+        ).strs
+        if existing_features["question_mark"] not in source_tokens:
+            return 0
+        else:
+            return (
+                source_tokens.index(existing_features["question_mark"])
+                * 1.0
+                / len(source_tokens)
+            )
+
+    def _get_absolute_blank_position(
+        self, sys_info: SysOutputInfo, existing_features: dict
+    ):
+        source_tokens = unwrap(sys_info.source_tokenizer)(
+            existing_features["context"]
+        ).strs
+        if existing_features["question_mark"] not in source_tokens:
+            return 0
+        else:
+            return source_tokens.index(existing_features["question_mark"])
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(

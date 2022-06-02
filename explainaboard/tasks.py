@@ -88,6 +88,26 @@ Dividing text into syntactically related non-overlapping groups of words.
         ],
     ),
     TaskCategory(
+        "cloze",
+        "fill in a blank in a text",
+        [
+            Task(
+                name=TaskType.cloze_mutiple_choice,
+                description="""
+fill in a blank in a text based on given options:
+https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
+""",
+            ),
+            Task(
+                name=TaskType.cloze_generative,
+                description="""
+fill in a blank in a text based on given hint:
+https://github.com/neulab/ExplainaBoard/blob/main/docs/cloze.md
+""",
+            ),
+        ],
+    ),
+    TaskCategory(
         "qa",
         "question answering tasks",
         [
@@ -115,6 +135,18 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.
 Predict the sentiment of a text based on a specific aspect.
 See more details about the format of upload files:
 https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv
+""",
+            ),
+        ],
+    ),
+    TaskCategory(
+        "text-editing",
+        "editing texts to satisfy some requirements",
+        [
+            Task(
+                name=TaskType.grammatical_error_correction,
+                description="""
+correct grammatical errors of a given text
 """,
             ),
         ],

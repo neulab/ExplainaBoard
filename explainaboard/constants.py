@@ -15,6 +15,9 @@ class TaskType(str, Enum):
     word_segmentation = "word-segmentation"
     language_modeling = "language-modeling"
     chunking = "chunking"
+    cloze_mutiple_choice = "cloze-multiple-choice"
+    cloze_generative = "cloze-generative"
+    grammatical_error_correction = "grammatical-error-correction"
 
     @staticmethod
     def list():

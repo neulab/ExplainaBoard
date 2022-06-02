@@ -262,6 +262,30 @@ class Accuracy(Metric):
 
 
 @dataclass
+class CorrectCountConfig(MetricConfig):
+    def to_metric(self):
+        return CorrectCount(self)
+
+
+class CorrectCount(Accuracy):
+    """
+    Calculate the absolute value of correct number
+    """
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+        data = stats.get_data()
+        if data.size == 0:
+            return np.array(0.0)
+        else:
+            return np.sum(data, axis=0)
+
+
+@dataclass
 class F1ScoreConfig(MetricConfig):
     average: str = 'micro'
     separate_match: bool = False
@@ -358,6 +382,49 @@ class F1Score(Metric):
         else:
             raise NotImplementedError
         return f1_total
+
+
+@dataclass
+class SeqCorrectCountConfig(MetricConfig):
+    def to_metric(self):
+        return SeqCorrectCount(self)
+
+
+class SeqCorrectCount(CorrectCount):
+    def calc_stats_from_data(
+        self,
+        true_edits_ldl: list[dict[str, list]],
+        pred_edits_ldl: list[dict[str, list]],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+        def _get_flatten_edits(edits: list[dict]):
+            flatten_edits = []
+            for edit in edits:
+                start_idx, end_idx, corrections = (
+                    edit["start_idx"],
+                    edit["end_idx"],
+                    edit["corrections"],
+                )
+                for correction in corrections:
+                    flatten_edits.append((start_idx, end_idx, correction))
+            return flatten_edits
+
+        recall = []
+        for true_edits_dl, pred_edits_dl in zip(true_edits_ldl, pred_edits_ldl):
+            true_edits_ld = [
+                dict(zip(true_edits_dl, t)) for t in zip(*true_edits_dl.values())
+            ]
+            pred_dicts_ld = [
+                dict(zip(pred_edits_dl, t)) for t in zip(*pred_edits_dl.values())
+            ]
+            gold_flatten_edits = _get_flatten_edits(true_edits_ld)
+            pred_flatten_edits = _get_flatten_edits(pred_dicts_ld)
+            for gold_flatten_edit in gold_flatten_edits:
+                if gold_flatten_edit in pred_flatten_edits:
+                    recall.append(1.0)
+                else:
+                    recall.append(0.0)
+        return MetricStats(np.array(recall))
 
 
 @dataclass

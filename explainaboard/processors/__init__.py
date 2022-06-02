@@ -2,8 +2,11 @@
 from explainaboard.processors import (
     aspect_based_sentiment_classification,
     chunking,
+    cloze_generative,
+    cloze_multiple_choice,
     conditional_generation,
     extractive_qa,
+    grammatical_error_correction,
     kg_link_tail_prediction,
     language_modeling,
     machine_translation,
@@ -31,4 +34,7 @@ __all__ = [
     'text_pair_classification',
     'word_segmentation',
     'chunking',
+    'cloze_multiple_choice',
+    'cloze_generative',
+    'grammatical_error_correction',
 ]
