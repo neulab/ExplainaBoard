@@ -757,6 +757,7 @@ class LogProb(Metric):
             val = np.exp(-val)
         return val
 
+
 @dataclass
 class SegKtauCorrConfig(MetricConfig):
     no_Human: bool = True
@@ -1032,6 +1033,7 @@ class SysPearsonCorrScore(Metric):
 
         val = pearsonr(systemScore, manualScore)[0]
         return val
+
 
 def metric_name_to_config(
     name: str, source_language: str, target_language: str
