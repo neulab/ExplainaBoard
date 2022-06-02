@@ -29,5 +29,7 @@ __all__ = [
     'qa_multiple_choice',
     'text_classification',
     'text_pair_classification',
+    'cloze_generative',
+    'grammatical_error_correction',
     'text_regression',
 ]

@@ -32,5 +32,8 @@ __all__ = [
     'text_pair_classification',
     'word_segmentation',
     'chunking',
+    'cloze_multiple_choice',
+    'cloze_generative',
+    'grammatical_error_correction',
     'text_regression',
 ]
