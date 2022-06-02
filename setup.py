@@ -29,7 +29,7 @@ setup(
         ],
     },
     install_requires=[
-        "datalabs>=0.4.1",
+        "datalabs>=0.4.3",
         "eaas>=0.3.9",
         "lexicalrichness",
         "matplotlib",
