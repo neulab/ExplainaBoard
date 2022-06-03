@@ -24,14 +24,14 @@ class TextRegressionLoader(Loader):
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         target_field_names = [
-            'SYSName',
-            'SEGID',
-            'TestSet',
+            'sys_name',
+            'seg_id',
+            'test_set',
             'src',
             'ref',
             'sys',
-            'manualRaw',
-            'manualZ',
+            'manual_raw',
+            'manual_z',
         ]
         return {
             FileType.tsv: TSVFileLoader(
@@ -51,15 +51,15 @@ class TextRegressionLoader(Loader):
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         field_name = [
-            'SYSName',
-            'SEGID',
-            'TestSet',
+            'sys_name',
+            'seg_id',
+            'test_set',
             'src',
             'ref',
             'sys',
-            'manualRaw',
-            'manualZ',
-            'autoScore',
+            'manual_raw',
+            'manual_z',
+            'auto_score',
         ]
         return {
             FileType.tsv: TSVFileLoader(

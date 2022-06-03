@@ -19,15 +19,15 @@ class TextRegressionProcessor(Processor):
     def default_features(cls) -> feature.Features:
         return feature.Features(
             {
-                "SYSName": feature.Value("string"),
-                "SEGID": feature.Value("string"),
-                "TestSet": feature.Value("string"),
+                "sys_name": feature.Value("string"),
+                "seg_id": feature.Value("string"),
+                "test_set": feature.Value("string"),
                 "src": feature.Value("string"),
                 "ref": feature.Value("string"),
                 "sys": feature.Value("string"),
-                "manualRaw": feature.Value("string"),
-                "manualZ": feature.Value("string"),
-                "autoScore": feature.Value("string"),
+                "manual_raw": feature.Value("string"),
+                "manual_z": feature.Value("string"),
+                "auto_score": feature.Value("string"),
                 "mean_ref_sys_length": feature.Value(
                     dtype="float",
                     description="text length in tokens",
@@ -105,8 +105,8 @@ class TextRegressionProcessor(Processor):
 
     def _get_manual_score(self, sys_info: SysOutputInfo, existing_features: dict):
         return (
-            float(existing_features["manualZ"])
-            if existing_features["manualZ"] != ''
+            float(existing_features["manual_z"])
+            if existing_features["manual_z"] != ''
             else 0
         )
 
@@ -124,10 +124,10 @@ class TextRegressionProcessor(Processor):
         :return: the true label for the output
         """
         return [
-            data_point["SYSName"],
-            data_point["SEGID"],
-            data_point["manualRaw"],
-            data_point["manualZ"],
+            data_point["sys_name"],
+            data_point["seg_id"],
+            data_point["manual_raw"],
+            data_point["manual_z"],
         ]
 
     def _get_predicted_label(self, data_point: dict):
@@ -137,4 +137,4 @@ class TextRegressionProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the predicted label for the output
         """
-        return data_point["autoScore"]
+        return data_point["auto_score"]

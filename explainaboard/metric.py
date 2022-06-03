@@ -827,7 +827,7 @@ class LogProb(Metric):
 
 @dataclass
 class SegKtauCorrConfig(MetricConfig):
-    no_Human: bool = True
+    no_human: bool = True
     threshold: float = 25
 
     def to_metric(self):
@@ -867,25 +867,25 @@ class SegKtauCorrScore(Metric):
         config = cast(SegKtauCorrConfig, self._get_config(config))
         scores: dict[str, list] = {}
         for stat in agg_stats:
-            SYSName = stat[0]
-            SEGID = stat[1]
-            manualScore = stat[2]
-            autoScore = stat[3]
+            sys_name = stat[0]
+            seg_id = stat[1]
+            manual_score = stat[2]
+            auto_score = stat[3]
 
-            score = float(autoScore) if autoScore != '' else None
-            scoreManual = float(manualScore) if manualScore != '' else None
+            score = float(auto_score) if auto_score != '' else None
+            score_manual = float(manual_score) if manual_score != '' else None
 
-            if config.no_Human and (
-                'Human' in SYSName or 'HUMAN' in SYSName or SYSName.startswith('ref')
+            if config.no_human and (
+                'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith('ref')
             ):
                 continue
 
-            if scoreManual is None:
+            if score_manual is None:
                 continue
 
-            if SEGID not in scores:
-                scores[SEGID] = []
-            scores[SEGID].append([scoreManual, score])
+            if seg_id not in scores:
+                scores[seg_id] = []
+            scores[seg_id].append([score_manual, score])
 
         return scores
 
@@ -921,18 +921,18 @@ class SegKtauCorrScore(Metric):
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
         scores = self.get_scores_from_stats(agg_stats, config)
-        totalSegNum = 0
-        totalConc = 0
-        totalDisc = 0
+        total_seg_num = 0
+        total_conc = 0
+        total_disc = 0
 
         for score in scores.values():
             conc, disc, num = self.count(score, config)
-            totalSegNum += num
-            totalConc += conc
-            totalDisc += disc
+            total_seg_num += num
+            total_conc += conc
+            total_disc += disc
 
-        if totalConc + totalDisc != 0:
-            val = (totalConc - totalDisc) / (totalConc + totalDisc)
+        if total_conc + total_disc != 0:
+            val = (total_conc - total_disc) / (total_conc + total_disc)
         else:
             val = 0
         return val
@@ -940,7 +940,7 @@ class SegKtauCorrScore(Metric):
 
 @dataclass
 class RootMeanSquareErrorConfig(MetricConfig):
-    no_Human: bool = True
+    no_human: bool = True
 
     def to_metric(self):
         return RootMeanSquareErrorScore(self)
@@ -974,28 +974,28 @@ class RootMeanSquareErrorScore(Metric):
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> tuple[np.ndarray, np.ndarray]:
         config = cast(RootMeanSquareErrorConfig, self._get_config(config))
-        scoreManuals = []
+        score_manuals = []
         scores = []
         for stat in agg_stats:
-            SYSName = stat[0]
-            manualScore = stat[1]
-            autoScore = stat[2]
+            sys_name = stat[0]
+            manual_score = stat[1]
+            auto_score = stat[2]
 
-            score = float(autoScore) if autoScore != '' else None
-            scoreManual = float(manualScore) if manualScore != '' else None
+            score = float(auto_score) if auto_score != '' else None
+            score_manual = float(manual_score) if manual_score != '' else None
 
-            if config.no_Human and (
-                'Human' in SYSName or 'HUMAN' in SYSName or SYSName.startswith('ref')
+            if config.no_human and (
+                'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith('ref')
             ):
                 continue
 
-            if scoreManual is None:
+            if score_manual is None:
                 continue
 
-            scoreManuals.append(scoreManual)
+            score_manuals.append(score_manual)
             scores.append(score)
 
-        return np.array(scoreManuals), np.array(scores)
+        return np.array(score_manuals), np.array(scores)
 
     def normalize(self, data: np.adarray) -> np.adarray:
         return (data - np.min(data)) / (np.max(data) - np.min(data))
@@ -1003,16 +1003,16 @@ class RootMeanSquareErrorScore(Metric):
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
-        scoreManuals, scores = self.get_scores_from_stats(agg_stats, config)
-        scoreManuals = self.normalize(scoreManuals)
+        score_manuals, scores = self.get_scores_from_stats(agg_stats, config)
+        score_manuals = self.normalize(score_manuals)
         scores = self.normalize(scores)
-        val = np.sqrt((np.square(scoreManuals - scores)).mean())
+        val = np.sqrt((np.square(score_manuals - scores)).mean())
         return val
 
 
 @dataclass
 class SysPearsonCorrConfig(MetricConfig):
-    no_Human: bool = True
+    no_human: bool = True
 
     def to_metric(self):
         return SysPearsonCorrScore(self)
@@ -1047,19 +1047,19 @@ class SysPearsonCorrScore(Metric):
     ) -> dict[str, list]:
         scores: dict[str, list] = {}
         for stat in agg_stats:
-            SYSName = stat[0]
-            manualScore = stat[1]
-            autoScore = stat[2]
+            sys_name = stat[0]
+            manual_score = stat[1]
+            auto_score = stat[2]
 
-            score = float(autoScore) if autoScore != '' else None
-            scoreManual = float(manualScore) if manualScore != '' else None
+            score = float(auto_score) if auto_score != '' else None
+            score_manual = float(manual_score) if manual_score != '' else None
 
-            if SYSName not in scores:
-                scores[SYSName] = [[], []]
-            if scoreManual is not None:
-                scores[SYSName][0].append(scoreManual)
+            if sys_name not in scores:
+                scores[sys_name] = [[], []]
+            if score_manual is not None:
+                scores[sys_name][0].append(score_manual)
             if score is not None:
-                scores[SYSName][1].append(score)
+                scores[sys_name][1].append(score)
 
         return scores
 
@@ -1070,7 +1070,7 @@ class SysPearsonCorrScore(Metric):
         scores = self.get_scores_from_stats(agg_stats, config)
 
         keys = [i for i in scores.keys()]
-        if config.no_Human:
+        if config.no_human:
             keys = [
                 key
                 for key in keys
@@ -1080,25 +1080,25 @@ class SysPearsonCorrScore(Metric):
                     and (not key.startswith('ref'))
                 )
             ]
-        if not config.no_Human:
+        if not config.no_human:
             keys = [key for key in keys if 'Human-A.0' not in key]
 
-        manualScore = []
-        systemScore = []
+        manual_score = []
+        system_score = []
 
-        for sysName in keys:
-            if len(scores[sysName][0]) != 0:
-                manualScore.append(sum(scores[sysName][0]) / len(scores[sysName][0]))
+        for sys_name in keys:
+            if len(scores[sys_name][0]) != 0:
+                manual_score.append(sum(scores[sys_name][0]) / len(scores[sys_name][0]))
             else:
-                manualScore.append(0)
-            if len(scores[sysName][1]) != 0:
-                systemScore.append(sum(scores[sysName][1]) / len(scores[sysName][1]))
+                manual_score.append(0)
+            if len(scores[sys_name][1]) != 0:
+                system_score.append(sum(scores[sys_name][1]) / len(scores[sys_name][1]))
             else:
-                manualScore.append(0)
-        assert len(systemScore) == len(manualScore)
-        # print("number of system:"+str(len(systemScore)))
+                manual_score.append(0)
+        assert len(system_score) == len(manual_score)
+        # print("number of system:"+str(len(system_score)))
 
-        val = pearsonr(systemScore, manualScore)[0]
+        val = pearsonr(system_score, manual_score)[0]
         return val
 
 
