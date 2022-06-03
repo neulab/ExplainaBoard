@@ -7,7 +7,8 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import ExactMatchQAConfig, F1ScoreQAConfig, MetricConfig
+from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs

@@ -7,7 +7,8 @@ from datalabs import aggregating
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
-from explainaboard.metric import EaaSMetricConfig, MetricConfig
+from explainaboard.metrics.eaas import EaaSMetricConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )

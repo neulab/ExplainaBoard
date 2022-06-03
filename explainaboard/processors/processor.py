@@ -22,7 +22,7 @@ from explainaboard.info import (
     Result,
     SysOutputInfo,
 )
-from explainaboard.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 import explainaboard.utils.bucketing
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,

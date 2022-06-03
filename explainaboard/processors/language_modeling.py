@@ -13,7 +13,8 @@ from explainaboard.info import (
     Performance,
     SysOutputInfo,
 )
-from explainaboard.metric import LogProbConfig, MetricConfig, MetricStats
+from explainaboard.metrics.log_prob import LogProbConfig
+from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing

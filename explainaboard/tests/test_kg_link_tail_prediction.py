@@ -4,7 +4,11 @@ import unittest
 from explainaboard import FileType, get_processor, TaskType
 from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_registry import get_custom_dataset_loader
-from explainaboard.metric import HitsConfig, MeanRankConfig, MeanReciprocalRankConfig
+from explainaboard.metrics.ranking import (
+    HitsConfig,
+    MeanRankConfig,
+    MeanReciprocalRankConfig,
+)
 from explainaboard.tests.utils import test_artifacts_path
 
 

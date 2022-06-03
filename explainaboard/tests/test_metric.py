@@ -11,19 +11,26 @@ import sklearn.metrics
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_custom_dataset_loader
 import explainaboard.metric
+import explainaboard.metrics.accuracy
+import explainaboard.metrics.correct_count
+import explainaboard.metrics.eaas
+import explainaboard.metrics.f1_score
+import explainaboard.metrics.ranking
 from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestMetric(unittest.TestCase):
     def test_accuracy(self):
-        metric = explainaboard.metric.AccuracyConfig(name='Accuracy').to_metric()
+        metric = explainaboard.metrics.accuracy.AccuracyConfig(
+            name='Accuracy'
+        ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_correct_score(self):
-        metric = explainaboard.metric.CorrectCountConfig(
+        metric = explainaboard.metrics.correct_count.CorrectCountConfig(
             name='CorrectCount'
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
@@ -32,7 +39,7 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 4)
 
     def test_seq_correct_score(self):
-        metric = explainaboard.metric.SeqCorrectCountConfig(
+        metric = explainaboard.metrics.correct_count.SeqCorrectCountConfig(
             name='SeqCorrectCount'
         ).to_metric()
         true = [
@@ -68,7 +75,7 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 5)
 
     def test_f1_micro(self):
-        metric = explainaboard.metric.F1ScoreConfig(
+        metric = explainaboard.metrics.f1_score.F1ScoreConfig(
             name='F1', average='micro'
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
@@ -79,7 +86,7 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_f1_macro(self):
-        metric = explainaboard.metric.F1ScoreConfig(
+        metric = explainaboard.metrics.f1_score.F1ScoreConfig(
             name='F1', average='macro'
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
@@ -89,14 +96,16 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_hits(self):
-        metric = explainaboard.metric.HitsConfig(name='Hits').to_metric()
+        metric = explainaboard.metrics.ranking.HitsConfig(name='Hits').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 4.0 / 6.0)
 
     def test_mrr(self):
-        metric = explainaboard.metric.MeanReciprocalRankConfig(name='MRR').to_metric()
+        metric = explainaboard.metrics.ranking.MeanReciprocalRankConfig(
+            name='MRR'
+        ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
         result = metric.evaluate(true, pred, conf_value=0.05)
@@ -113,13 +122,13 @@ class TestMetric(unittest.TestCase):
             ['B-PER', 'I-PER', 'O'],
         ]
 
-        metric = explainaboard.metric.SeqF1ScoreConfig(
+        metric = explainaboard.metrics.f1_score.SeqF1ScoreConfig(
             name='MicroF1', average='micro', tag_schema='bio'
         ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
-        metric = explainaboard.metric.SeqF1ScoreConfig(
+        metric = explainaboard.metrics.f1_score.SeqF1ScoreConfig(
             name='MacroF1', average='macro', tag_schema='bio'
         ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
@@ -171,7 +180,7 @@ class TestMetric(unittest.TestCase):
         # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics
         metrics = [
-            explainaboard.metric.EaaSMetricConfig(name=name).to_metric()
+            explainaboard.metrics.eaas.EaaSMetricConfig(name=name).to_metric()
             for name in metric_names
         ]
 
@@ -187,10 +196,10 @@ class TestMetric(unittest.TestCase):
 
         for i, (name, metric) in enumerate(zip(metric_names, metrics)):
             with self.subTest(msg=name):
-                full_stats = explainaboard.metric.EaaSMetricStats(
+                full_stats = explainaboard.metrics.eaas.EaaSMetricStats(
                     name=name, pos=i, eaas_request=full_request
                 )
-                half_stats = explainaboard.metric.EaaSMetricStats(
+                half_stats = explainaboard.metrics.eaas.EaaSMetricStats(
                     name=name, pos=i, eaas_request=half_request
                 )
                 split_stats = full_stats.filter(half_ids)

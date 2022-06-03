@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import MetricConfig, SeqCorrectCountConfig
+from explainaboard.metrics.accuracy import SeqCorrectCountConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap

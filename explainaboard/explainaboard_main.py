@@ -20,7 +20,7 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
     FileLoaderMetadata,
 )
-from explainaboard.metric import metric_name_to_config
+from explainaboard.metrics.registry import metric_name_to_config
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,

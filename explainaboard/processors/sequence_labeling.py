@@ -16,7 +16,8 @@ from explainaboard.info import (
     SysOutputInfo,
 )
 from explainaboard.loaders.file_loader import DatalabFileLoader
-from explainaboard.metric import F1ScoreConfig, MetricStats
+from explainaboard.metrics.f1_score import F1ScoreConfig
+from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils import bucketing
 from explainaboard.utils.logging import progress
