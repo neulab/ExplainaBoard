@@ -12,7 +12,6 @@ from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_custom_dataset_loader
 import explainaboard.metric
 import explainaboard.metrics.accuracy
-import explainaboard.metrics.correct_count
 import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
 import explainaboard.metrics.ranking
@@ -30,7 +29,7 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_correct_score(self):
-        metric = explainaboard.metrics.correct_count.CorrectCountConfig(
+        metric = explainaboard.metrics.accuracy.CorrectCountConfig(
             name='CorrectCount'
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
@@ -39,7 +38,7 @@ class TestMetric(unittest.TestCase):
         self.assertAlmostEqual(result.value, 4)
 
     def test_seq_correct_score(self):
-        metric = explainaboard.metrics.correct_count.SeqCorrectCountConfig(
+        metric = explainaboard.metrics.accuracy.SeqCorrectCountConfig(
             name='SeqCorrectCount'
         ).to_metric()
         true = [
