@@ -18,12 +18,11 @@ from explainaboard.info import (
     Performance,
     SysOutputInfo,
 )
-from explainaboard.metric import (
-    EaaSMetricConfig,
-    F1ScoreConfig,
-    MetricConfig,
-    MetricStats,
-)
+import explainaboard.metrics.eaas
+from explainaboard.metrics.eaas import EaaSMetricConfig
+from explainaboard.metrics.f1_score import F1ScoreConfig
+import explainaboard.metrics.metric
+from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
@@ -324,7 +323,7 @@ class ConditionalGenerationProcessor(Processor):
 
         # Share the request result with all stats functions
         return [
-            explainaboard.metric.EaaSMetricStats(
+            explainaboard.metrics.eaas.EaaSMetricStats(
                 name=name, pos=i, eaas_request=async_request
             )
             for i, name in enumerate(metric_names)
@@ -583,7 +582,7 @@ class ConditionalGenerationProcessor(Processor):
                 else:
                     stats_list.append([0.0, 1.0, 0.0])
             bucket_samples = self._subsample_bucket_cases(bucket_collection.samples)
-            stats = explainaboard.metric.MetricStats(np.array(stats_list))
+            stats = explainaboard.metrics.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
             conf_interval: tuple[float, float] = unwrap(result.conf_interval)
             conf_low, conf_high = conf_interval

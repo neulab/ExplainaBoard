@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from explainaboard import TaskType
-from explainaboard.metric import MetricConfig, SeqF1ScoreConfig
+from explainaboard.metrics.f1_score import SeqF1ScoreConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.processors.sequence_labeling import SeqLabProcessor
 from explainaboard.utils.span_utils import BMESSpanOps

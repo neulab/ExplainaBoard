@@ -12,7 +12,8 @@ import numpy
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import EaaSMetricConfig, MetricConfig
+from explainaboard.metrics.eaas import EaaSMetricConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
