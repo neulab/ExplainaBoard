@@ -46,7 +46,7 @@ class CorrectCount(Accuracy):
         return MetricStats(
             np.array(
                 [
-                    (1.0 if y == x or y in x.split("/") else 0.0)
+                    (1.0 if y == x or y in str(x).split("/") else 0.0)
                     for x, y in zip(true_data, pred_data)
                 ]
             )
