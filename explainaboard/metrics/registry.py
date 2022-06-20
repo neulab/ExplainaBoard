@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from eaas.endpoint import EndpointConfig
 
-from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
 
 _metric_config_registry = {}
@@ -20,6 +19,10 @@ def register_metric_config(cls):
     return cls
 
 
+def metric_name_to_config_class(name):
+    return _metric_config_registry[name]
+
+
 def metric_name_to_config(
     name: str, source_language: str, target_language: str
 ) -> MetricConfig:
@@ -28,7 +31,7 @@ def metric_name_to_config(
             name=name, source_language=source_language, target_language=target_language
         )
     elif name in EndpointConfig().valid_metrics:
-        return EaaSMetricConfig(
+        return _metric_config_registry['EaaSMetricConfig'](
             name=name,
             source_language=source_language,
             target_language=target_language,
