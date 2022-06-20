@@ -118,7 +118,16 @@ class TestNER(unittest.TestCase):
             second_bucket.performances[0].value, 0.9203805708562846, 4, "almost equal"
         )
         # 6 Unittest: test detailed bucket information: confidence interval
-        self.assertGreater(second_bucket.performances[0].confidence_score_low, 0)
+        for bucket_name, bucket_vals in sys_info.results.fine_grained.items():
+            for bucket in bucket_vals:
+                for performance in bucket.performances:
+                    if performance.confidence_score_low is not None:
+                        self.assertGreaterEqual(
+                            performance.value, performance.confidence_score_low
+                        )
+                        self.assertGreaterEqual(
+                            performance.confidence_score_high, performance.value
+                        )
 
         # 7. Unittest: test if only fewer cases are printed (this is the expected
         # case, especially for sequence labeling tasks. Otherwise, the analysis report

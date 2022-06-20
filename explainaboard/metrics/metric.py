@@ -228,6 +228,7 @@ class Metric:
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
             samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+            samp_results.sort()
             low = int(n_samples * conf_value / 2.0)
             high = int(n_samples * (1.0 - conf_value / 2.0))
             return float(samp_results[low]), float(samp_results[high])
