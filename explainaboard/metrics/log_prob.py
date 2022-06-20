@@ -6,9 +6,11 @@ from typing import cast, Optional
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 
 
 @dataclass
+@register_metric_config
 class LogProbConfig(MetricConfig):
     # If false, return log probability, if true return perplexity
     ppl: bool = False

@@ -7,10 +7,12 @@ from typing import cast, Optional
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, SpanOps
 
 
 @dataclass
+@register_metric_config
 class F1ScoreConfig(MetricConfig):
     average: str = 'micro'
     separate_match: bool = False
@@ -109,6 +111,7 @@ class F1Score(Metric):
 
 
 @dataclass
+@register_metric_config
 class SeqF1ScoreConfig(F1ScoreConfig):
     tag_schema: str = 'bio'
 

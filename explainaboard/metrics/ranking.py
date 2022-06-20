@@ -6,9 +6,11 @@ from typing import Any, cast, Optional
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 
 
 @dataclass
+@register_metric_config
 class HitsConfig(MetricConfig):
     hits_k: int = 5
 
@@ -45,6 +47,7 @@ class Hits(Metric):
 
 
 @dataclass
+@register_metric_config
 class MeanReciprocalRankConfig(MetricConfig):
     def to_metric(self):
         return MeanReciprocalRank(self)
@@ -83,6 +86,7 @@ class MeanReciprocalRank(Metric):
 
 
 @dataclass
+@register_metric_config
 class MeanRankConfig(MetricConfig):
     def to_metric(self):
         return MeanRank(self)

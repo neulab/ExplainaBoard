@@ -6,9 +6,11 @@ from typing import Optional
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 
 
 @dataclass
+@register_metric_config
 class AccuracyConfig(MetricConfig):
     def to_metric(self):
         return Accuracy(self)
@@ -29,6 +31,7 @@ class Accuracy(Metric):
 
 
 @dataclass
+@register_metric_config
 class CorrectCountConfig(MetricConfig):
     def to_metric(self):
         return CorrectCount(self)
@@ -56,6 +59,7 @@ class CorrectCount(Accuracy):
 
 
 @dataclass
+@register_metric_config
 class SeqCorrectCountConfig(MetricConfig):
     def to_metric(self):
         return SeqCorrectCount(self)

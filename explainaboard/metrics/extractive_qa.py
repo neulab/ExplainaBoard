@@ -8,6 +8,7 @@ from typing import Optional, Union
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 
 
@@ -47,6 +48,7 @@ class ExtractiveQAMetric(Metric):
 
 
 @dataclass
+@register_metric_config
 class ExactMatchQAConfig(MetricConfig):
     def to_metric(self):
         return ExactMatchQA(self)
@@ -64,6 +66,7 @@ class ExactMatchQA(ExtractiveQAMetric):
 
 
 @dataclass
+@register_metric_config
 class F1ScoreQAConfig(MetricConfig):
     def to_metric(self):
         return F1ScoreQA(self)
