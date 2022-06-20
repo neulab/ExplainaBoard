@@ -74,42 +74,38 @@ class F1Score(Metric):
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> float:
+    ) -> np.ndarray:
 
         if agg_stats.size == 1:
-            return float(agg_stats)
+            return agg_stats
+
+        if agg_stats.ndim == 1:
+            agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
 
         config = cast(F1ScoreConfig, self._get_config(config))
         supported_averages = {'micro', 'macro'}
         stat_mult: int = 4 if config.separate_match else 3
         if config.average not in supported_averages:
             raise ValueError(f'only {supported_averages} supported for now')
-        n_classes = int(len(agg_stats) / stat_mult)
+
+        true = agg_stats[:, 0::stat_mult]
+        pred = agg_stats[:, 1::stat_mult]
+        true_match = agg_stats[:, 2::stat_mult]
+        pred_match = agg_stats[:, stat_mult - 1 :: stat_mult]
 
         if config.average == 'micro':
-            true, pred, true_match, pred_match = 0.0, 0.0, 0.0, 0.0
-            for i in range(n_classes):
-                true += agg_stats[i * stat_mult + 0]
-                pred += agg_stats[i * stat_mult + 1]
-                true_match += agg_stats[i * stat_mult + 2]
-                pred_match += agg_stats[(i + 1) * stat_mult - 1]
-            p = pred_match / pred if pred else 0.0
-            r = true_match / true if true else 0.0
-            f1_total = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
+            true, pred, true_match, pred_match = (
+                np.sum(x, axis=1) for x in (true, pred, true_match, pred_match)
+            )
 
-        elif config.average == 'macro':
-            f1_total = 0.0
-            for i in range(n_classes):
-                true, pred, true_match = agg_stats[i * stat_mult : i * stat_mult + 3]
-                pred_match = agg_stats[(i + 1) * stat_mult - 1]
-                p = pred_match / pred if pred else 0.0
-                r = true_match / true if true else 0.0
-                f1 = 2 * p * r / (p + r) if p + r != 0.0 else 0.0
-                f1_total += f1
-            f1_total /= n_classes
-        else:
-            raise NotImplementedError
-        return f1_total
+        p = np.where(pred != 0.0, pred_match / pred, 0.0)
+        r = np.where(true != 0.0, true_match / true, 0.0)
+        f1 = np.where(p + r != 0.0, 2 * p * r / (p + r), 0.0)
+
+        if config.average == 'macro':
+            f1 = np.mean(f1, axis=1)
+
+        return f1
 
 
 @dataclass
