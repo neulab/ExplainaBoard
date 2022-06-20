@@ -548,7 +548,8 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info.features = self._customize_features(custom_features)
 
         # get scoring statistics
-        metric_stats = unwrap(self._gen_metric_stats(sys_info, sys_output))
+        metric_stats = self._gen_metric_stats(sys_info, sys_output)
+        metric_stats = unwrap(metric_stats)
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
         active_features = self._complete_features(
             sys_info, sys_output, external_stats=external_stats

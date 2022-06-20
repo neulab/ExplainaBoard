@@ -1,28 +1,40 @@
 from __future__ import annotations
 
-import sys
-
 from eaas.endpoint import EndpointConfig
 
-from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
+
+_metric_config_registry = {}
+
+
+def register_metric_config(cls):
+    """
+    a register for task specific processors.
+    example usage: `@register_processor()`
+    """
+
+    _metric_config_registry[cls.__name__] = cls
+    if cls.__name__.endswith('Config'):
+        _metric_config_registry[cls.__name__[:-6]] = cls
+    return cls
+
+
+def metric_name_to_config_class(name):
+    return _metric_config_registry[name]
 
 
 def metric_name_to_config(
     name: str, source_language: str, target_language: str
 ) -> MetricConfig:
-    try:
-        metric_module = sys.modules[__name__]
-        metric_config = getattr(metric_module, f'{name}Config')
-        return metric_config(
+    if name in _metric_config_registry:
+        return _metric_config_registry[name](
             name=name, source_language=source_language, target_language=target_language
         )
-    except AttributeError:
-        if name in EndpointConfig().valid_metrics:
-            return EaaSMetricConfig(
-                name=name,
-                source_language=source_language,
-                target_language=target_language,
-            )
-        else:
-            raise ValueError(f'Invalid metric {name}')
+    elif name in EndpointConfig().valid_metrics:
+        return _metric_config_registry['EaaSMetricConfig'](
+            name=name,
+            source_language=source_language,
+            target_language=target_language,
+        )
+    else:
+        raise ValueError(f'Invalid metric {name}')

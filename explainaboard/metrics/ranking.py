@@ -6,9 +6,11 @@ from typing import Any, cast, Optional
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 
 
 @dataclass
+@register_metric_config
 class HitsConfig(MetricConfig):
     hits_k: int = 5
 
@@ -45,6 +47,7 @@ class Hits(Metric):
 
 
 @dataclass
+@register_metric_config
 class MeanReciprocalRankConfig(MetricConfig):
     def to_metric(self):
         return MeanReciprocalRank(self)
@@ -77,12 +80,13 @@ class MeanReciprocalRank(Metric):
     def calc_stats_from_rank(
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        return MetricStats(
-            np.array([1.0 / rank for rank in rank_data if rank is not None])
-        )
+        if any([rank is None for rank in rank_data]):
+            raise ValueError('cannot calculate statistics when rank is none')
+        return MetricStats(np.array([1.0 / rank for rank in rank_data]))
 
 
 @dataclass
+@register_metric_config
 class MeanRankConfig(MetricConfig):
     def to_metric(self):
         return MeanRank(self)

@@ -6,9 +6,11 @@ from typing import Optional
 import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 
 
 @dataclass
+@register_metric_config
 class AccuracyConfig(MetricConfig):
     def to_metric(self):
         return Accuracy(self)
@@ -29,6 +31,7 @@ class Accuracy(Metric):
 
 
 @dataclass
+@register_metric_config
 class CorrectCountConfig(MetricConfig):
     def to_metric(self):
         return CorrectCount(self)
@@ -38,6 +41,9 @@ class CorrectCount(Accuracy):
     """
     Calculate the absolute value of correct number
     """
+
+    def is_simple_average(self, stats: MetricStats):
+        return False
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
@@ -49,10 +55,11 @@ class CorrectCount(Accuracy):
         if data.size == 0:
             return np.array(0.0)
         else:
-            return np.sum(data, axis=0)
+            return np.sum(data, axis=-2)
 
 
 @dataclass
+@register_metric_config
 class SeqCorrectCountConfig(MetricConfig):
     def to_metric(self):
         return SeqCorrectCount(self)

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional, Union
 
 import numpy as np
+from scipy.stats import t as stats_t
 
 from explainaboard.utils.typing_utils import unwrap
 
@@ -66,8 +67,11 @@ class MetricStats:
         """
         :param data: A numpy array of dimensions [x,y], where x in the length of the
             dataset, and y is the size of the sufficient statistics necessary to
-            calculate the metric.
+            calculate the metric. Alternatively, it can be [b,x,y] where b is the
+            batch size, particularly for bootstrap sampling.
         """
+        if data is not None and data.ndim == 1:
+            data = data.reshape((data.shape[0], 1))
         self._data = data
 
     def __len__(self) -> int:
@@ -89,9 +93,18 @@ class MetricStats:
         :return: The filtered stats
         """
         sdata = self.get_data()
+        if sdata.ndim != 2:
+            raise ValueError(f'Can only filter non-batched statistics {sdata.shape}')
         if type(indices) != np.ndarray:
             indices = np.array(indices)
-        return MetricStats(sdata[indices])
+        if indices.ndim == 1:
+            return MetricStats(sdata[indices])
+        else:
+            batch, samples = indices.shape
+            indices = indices.reshape((batch * samples,))
+            filtered_data = sdata[indices]
+            filtered_data = filtered_data.reshape((batch, samples, sdata.shape[1]))
+            return MetricStats(filtered_data)
 
 
 class Metric:
@@ -145,29 +158,37 @@ class Metric:
         if data.size == 0:
             return np.array(0.0)
         else:
-            return np.mean(data, axis=0)
+            return np.mean(data, axis=-2)
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> float:
+    ) -> np.ndarray:
         """From aggregated sufficient statistics, calculate the metric value
-        :param agg_stats: aggregated statistics
+        :param agg_stats: aggregated statistics, either:
+          one-dimensional [metric_size]
+          two-dimensional [batch_size, metric_size]
         :param config: a configuration to over-ride the default for this object
-        :return: a single scalar metric value
+        :return: calculated metric of size 1, or metrics of size [batch_size]
         """
-        if agg_stats.size == 1:
-            return float(agg_stats)
-        else:
-            raise NotImplementedError
+        return agg_stats
 
-    def bootstrap_interval(
+    def is_simple_average(self, stats: MetricStats):
+        """
+        Whether the evaluation score is a simple average of the sufficient statistics.
+        If so the t-test is applicable, which is much more efficient. Otherwise we do
+        bootstrapping to calculate confidence interval, which is slower and potentially
+        less effective.
+        """
+        return True
+
+    def calc_confidence_interval(
         self,
         stats: MetricStats,
         conf_value: float,
         n_samples: int = 1000,
         prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
-    ) -> tuple[float, float]:
+    ) -> tuple[float, float] | None:
         """
         :param stats: sufficient statistics as calculated by calc_stats_from_data
         :param conf_value: the p-value of the interval
@@ -177,19 +198,40 @@ class Metric:
         """
         if conf_value <= 0.0 or conf_value >= 1.0:
             raise ValueError(f'Bad confidence value {conf_value}')
-        n_elems = int(prop_samples * len(stats))
-        samp_results = np.zeros(shape=(n_samples,))
-        all_indices = np.array(range(len(stats)))
-        rng = np.random.default_rng()
-        all_indices = rng.choice(all_indices, size=(n_samples, n_elems), replace=True)
-        for i in range(n_samples):
-            indices = all_indices[i]
-            agg_stats = self.aggregate_stats(stats.filter(indices))
-            samp_results[i] = self.calc_metric_from_aggregate(agg_stats, config)
-        samp_results = np.sort(samp_results)
-        low = int(n_samples * conf_value / 2.0)
-        high = int(n_samples * (1.0 - conf_value / 2.0))
-        return samp_results[low], samp_results[high]
+
+        stats_data = stats.get_data()
+        # We cannot calculate confidence intervals if we only have a single sample
+        if stats_data.shape[0] <= 1:
+            return None
+        # Do t-test if applicable
+        elif self.is_simple_average(stats):
+            if stats_data.shape[1] != 1:
+                raise ValueError(f'problem with shape in t-test {stats_data.shape}')
+            my_mean = np.mean(stats_data)
+            my_std = np.std(stats_data)
+            if my_std == 0.0:
+                return (float(my_mean), float(my_mean))
+            return stats_t.interval(
+                alpha=conf_value,
+                df=stats_data.shape[0] - 1,
+                loc=my_mean,
+                scale=my_std,
+            )
+        # Do bootstrapping otherwise
+        else:
+            n_elems = max(int(prop_samples * len(stats)), 1)
+            all_indices = np.array(range(len(stats)))
+            rng = np.random.default_rng()
+            all_indices = rng.choice(
+                all_indices, size=(n_samples, n_elems), replace=True
+            )
+            filt_stats = stats.filter(all_indices)
+            agg_stats = self.aggregate_stats(filt_stats)
+            samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+            samp_results.sort()
+            low = int(n_samples * conf_value / 2.0)
+            high = int(n_samples * (1.0 - conf_value / 2.0))
+            return float(samp_results[low]), float(samp_results[high])
 
     def evaluate_from_stats(
         self,
@@ -208,9 +250,9 @@ class Metric:
         agg_stats = self.aggregate_stats(stats)
         value = self.calc_metric_from_aggregate(agg_stats, config)
         conf_interval = (
-            self.bootstrap_interval(stats, conf_value) if conf_value else None
+            self.calc_confidence_interval(stats, conf_value) if conf_value else None
         )
-        return MetricResult(config, value, conf_interval, conf_value)
+        return MetricResult(config, float(value), conf_interval, conf_value)
 
     def evaluate(
         self,

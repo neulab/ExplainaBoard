@@ -269,7 +269,7 @@ def create_parser():
         '--output_dir',
         type=str,
         required=False,
-        default="output",
+        default=None,
         help="the directory of output files",
     )
 
@@ -330,21 +330,16 @@ def main():
                 except ValueError as e:
                     raise ValueError(f'invalid json: {e} for system details')
 
-        output_dir_figures = os.path.join(output_dir, "figures")
-        output_dir_reports = os.path.join(output_dir, "reports")
-
-        def setup_output_folders():
-            """Setup for generated reports and figures"""
-            # This part could be generalized
-            if not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-            if not os.path.exists(output_dir_figures):
-                os.makedirs(output_dir_figures)
-            if not os.path.exists(output_dir_reports):
-                os.makedirs(output_dir_reports)
+        output_dir_figures = os.path.join(output_dir, "figures") if output_dir else None
+        output_dir_reports = os.path.join(output_dir, "reports") if output_dir else None
 
         system_details: dict | None = load_system_details_path()
-        setup_output_folders()
+        if output_dir and not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        if output_dir_figures and not os.path.exists(output_dir_figures):
+            os.makedirs(output_dir_figures)
+        if output_dir_reports and not os.path.exists(output_dir_reports):
+            os.makedirs(output_dir_reports)
 
         # check for benchmark submission: explainaboard  --system_outputs ./data/
         # system_outputs/sst2/user_specified_metadata.json
@@ -472,17 +467,19 @@ def main():
             get_logger('report').info('--- Bucketed Performance')
             processor.print_bucket_info(report.results.fine_grained)
 
-            # save report to `output_dir_reports`
-            x_file_name = os.path.basename(system_full_path).split(".")[0]
-            report.write_to_directory(output_dir_reports, f"{x_file_name}.json")
+            if output_dir:
 
-            # generate figures and save them into  `output_dir_figures`
-            if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
-                os.makedirs(f"{output_dir_figures}/{x_file_name}")
-            draw_bar_chart_from_reports(
-                [f"{output_dir_reports}/{x_file_name}.json"],
-                f"{output_dir_figures}/{x_file_name}",
-            )
+                # save report to `output_dir_reports`
+                x_file_name = os.path.basename(system_full_path).split(".")[0]
+                report.write_to_directory(output_dir_reports, f"{x_file_name}.json")
+
+                # generate figures and save them into  `output_dir_figures`
+                if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
+                    os.makedirs(f"{output_dir_figures}/{x_file_name}")
+                draw_bar_chart_from_reports(
+                    [f"{output_dir_reports}/{x_file_name}.json"],
+                    f"{output_dir_figures}/{x_file_name}",
+                )
 
         if args.report_json is not None:
             report_file = open(args.report_json, 'w')

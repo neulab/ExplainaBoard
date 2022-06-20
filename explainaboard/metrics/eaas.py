@@ -8,6 +8,7 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -35,7 +36,12 @@ class EaaSMetricStats(MetricStats):
         if self._data is None:
             result = self.eaas_request.get_result()
             self._corpus_value = result['scores'][self.pos]['corpus']
-            self._data = np.array(result['scores'][self.pos]['stats'])
+            self._data = np.array(
+                [
+                    x if isinstance(x, list) else [x]
+                    for x in result['scores'][self.pos]['stats']
+                ]
+            )
 
     def get_corpus_value(self) -> float:
         """
@@ -59,6 +65,7 @@ class EaaSMetricStats(MetricStats):
 
 
 @dataclass
+@register_metric_config
 class EaaSMetricConfig(MetricConfig):
     def to_metric(self):
         return EaaSMetric(self)
@@ -69,21 +76,34 @@ class EaaSMetric(Metric):
     A metric that calculates evaluation scores using EaaS.
     """
 
+    _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
+
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> float:
-        if self.config.name == 'bleu':
-            bleu_class = sacrebleu.BLEU()
-            return bleu_class._compute_score_from_stats(list(agg_stats)).score / 100.0
-        elif self.config.name == 'chrf':
-            chrf_class = sacrebleu.CHRF()
-            return chrf_class._compute_score_from_stats(list(agg_stats)).score / 100.0
+    ) -> np.ndarray:
+        if agg_stats.ndim == 1:
+            agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
+        n_samples = agg_stats.shape[0]
+        if self.config.name in {'bleu', 'chrf'}:
+            ret_metric = np.zeros(n_samples)
+            metric_class = (
+                sacrebleu.BLEU() if self.config.name == 'bleu' else sacrebleu.CHRF()
+            )
+            for i, single_stat in enumerate(agg_stats):
+                ret_metric[i] = (
+                    metric_class._compute_score_from_stats(list(single_stat)).score
+                    / 100.0
+                )
+            return ret_metric
         elif self.config.name == 'length_ratio':
-            return float(agg_stats[0]) / agg_stats[1]
+            return agg_stats[:, 0] / agg_stats[:, 1]
         elif self.config.name == 'length':
-            return float(agg_stats[0])
+            return agg_stats[:, 0]
         else:
-            return float(agg_stats)
+            return agg_stats
+
+    def is_simple_average(self, stats: MetricStats):
+        return self.config.name not in self._NOT_SIMPLE_METRICS
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
@@ -92,9 +112,9 @@ class EaaSMetric(Metric):
         :return: aggregated stats
         """
         if self.config.name in {'bleu', 'chrf'}:
-            return np.sum(stats.get_data(), axis=0)
+            return np.sum(stats.get_data(), axis=-2)
         else:
-            return np.mean(stats.get_data(), axis=0)
+            return np.mean(stats.get_data(), axis=-2)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
