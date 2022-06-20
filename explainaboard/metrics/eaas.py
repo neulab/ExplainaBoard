@@ -69,6 +69,8 @@ class EaaSMetric(Metric):
     A metric that calculates evaluation scores using EaaS.
     """
 
+    _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
+
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
@@ -84,6 +86,9 @@ class EaaSMetric(Metric):
             return float(agg_stats[0])
         else:
             return float(agg_stats)
+
+    def is_simple_average(self):
+        return self.config.name not in self._NOT_SIMPLE_METRICS
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Optional, Union
 
 import numpy as np
+from scipy.stats import t as stats_t
 
 from explainaboard.utils.typing_utils import unwrap
 
@@ -171,15 +172,16 @@ class Metric:
         """
         return agg_stats
 
-    def _filter_and_calc(
-        self, stats: MetricStats, all_indices, config: Optional[MetricConfig] = None
-    ):
-        filt_stats = stats.filter(all_indices)
-        agg_stats = self.aggregate_stats(filt_stats)
-        samp_results = self.calc_metric_from_aggregate(agg_stats, config)
-        return samp_results
+    def is_simple_average(self):
+        """
+        Whether the evaluation score is a simple average of the sufficient statistics.
+        If so the t-test is applicable, which is much more efficient. Otherwise we do
+        bootstrapping to calculate confidence interval, which is slower and potentially
+        less effective.
+        """
+        return True
 
-    def bootstrap_interval(
+    def calc_confidence_interval(
         self,
         stats: MetricStats,
         conf_value: float,
@@ -196,16 +198,36 @@ class Metric:
         """
         if conf_value <= 0.0 or conf_value >= 1.0:
             raise ValueError(f'Bad confidence value {conf_value}')
-        n_elems = max(int(prop_samples * len(stats)), 1)
-        all_indices = np.array(range(len(stats)))
-        rng = np.random.default_rng()
-        all_indices = rng.choice(all_indices, size=(n_samples, n_elems), replace=True)
-        filt_stats = stats.filter(all_indices)
-        agg_stats = self.aggregate_stats(filt_stats)
-        samp_results = self.calc_metric_from_aggregate(agg_stats, config)
-        low = int(n_samples * conf_value / 2.0)
-        high = int(n_samples * (1.0 - conf_value / 2.0))
-        return float(samp_results[low]), float(samp_results[high])
+
+        # Detect whether we can use a simple t-test or need bootstrapping
+        # Conditions for being able to use the t-test are:
+        #  1) the stat is the metric itself (no special aggregation function)
+        #  2) the aggregation function is the simple mean
+        if self.is_simple_average():
+            # Do t-test
+            stats_data = stats.get_data()
+            if stats_data.shape[1] != 1:
+                raise ValueError(f'problem with shape in t-test {stats_data.shape}')
+            return stats_t.interval(
+                alpha=conf_value,
+                df=stats_data.shape[0] - 1,
+                loc=np.mean(stats_data),
+                scale=np.std(stats_data),
+            )
+        else:
+            # Do bootstrapping
+            n_elems = max(int(prop_samples * len(stats)), 1)
+            all_indices = np.array(range(len(stats)))
+            rng = np.random.default_rng()
+            all_indices = rng.choice(
+                all_indices, size=(n_samples, n_elems), replace=True
+            )
+            filt_stats = stats.filter(all_indices)
+            agg_stats = self.aggregate_stats(filt_stats)
+            samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+            low = int(n_samples * conf_value / 2.0)
+            high = int(n_samples * (1.0 - conf_value / 2.0))
+            return float(samp_results[low]), float(samp_results[high])
 
     def evaluate_from_stats(
         self,
@@ -224,7 +246,7 @@ class Metric:
         agg_stats = self.aggregate_stats(stats)
         value = self.calc_metric_from_aggregate(agg_stats, config)
         conf_interval = (
-            self.bootstrap_interval(stats, conf_value) if conf_value else None
+            self.calc_confidence_interval(stats, conf_value) if conf_value else None
         )
         return MetricResult(config, float(value), conf_interval, conf_value)
 

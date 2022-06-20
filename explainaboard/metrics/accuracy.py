@@ -39,6 +39,9 @@ class CorrectCount(Accuracy):
     Calculate the absolute value of correct number
     """
 
+    def is_simple_average(self):
+        return False
+
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
         Aggregate sufficient statistics from multiple examples into a single example

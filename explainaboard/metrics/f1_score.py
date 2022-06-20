@@ -26,6 +26,9 @@ class F1Score(Metric):
     implementation.
     """
 
+    def is_simple_average(self):
+        return False
+
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
