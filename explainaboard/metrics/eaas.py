@@ -92,9 +92,9 @@ class EaaSMetric(Metric):
         :return: aggregated stats
         """
         if self.config.name in {'bleu', 'chrf'}:
-            return np.sum(stats.get_data(), axis=0)
+            return np.sum(stats.get_data(), axis=-2)
         else:
-            return np.mean(stats.get_data(), axis=0)
+            return np.mean(stats.get_data(), axis=-2)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None

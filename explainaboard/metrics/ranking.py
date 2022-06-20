@@ -77,9 +77,9 @@ class MeanReciprocalRank(Metric):
     def calc_stats_from_rank(
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        return MetricStats(
-            np.array([1.0 / rank for rank in rank_data if rank is not None])
-        )
+        if any([rank is None for rank in rank_data]):
+            raise ValueError('cannot calculate statistics when rank is none')
+        return MetricStats(np.array([1.0 / rank for rank in rank_data]))
 
 
 @dataclass

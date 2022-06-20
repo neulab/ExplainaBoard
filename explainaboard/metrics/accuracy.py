@@ -49,7 +49,7 @@ class CorrectCount(Accuracy):
         if data.size == 0:
             return np.array(0.0)
         else:
-            return np.sum(data, axis=0)
+            return np.sum(data, axis=-2)
 
 
 @dataclass
