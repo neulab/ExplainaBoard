@@ -26,7 +26,7 @@ class F1Score(Metric):
     implementation.
     """
 
-    def is_simple_average(self):
+    def is_simple_average(self, stats: MetricStats):
         return False
 
     def calc_stats_from_data(

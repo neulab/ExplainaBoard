@@ -39,7 +39,7 @@ class CorrectCount(Accuracy):
     Calculate the absolute value of correct number
     """
 
-    def is_simple_average(self):
+    def is_simple_average(self, stats: MetricStats):
         return False
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:

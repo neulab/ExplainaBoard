@@ -100,7 +100,7 @@ class EaaSMetric(Metric):
         else:
             return agg_stats
 
-    def is_simple_average(self):
+    def is_simple_average(self, stats: MetricStats):
         return self.config.name not in self._NOT_SIMPLE_METRICS
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:

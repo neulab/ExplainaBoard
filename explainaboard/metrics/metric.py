@@ -172,7 +172,7 @@ class Metric:
         """
         return agg_stats
 
-    def is_simple_average(self):
+    def is_simple_average(self, stats: MetricStats):
         """
         Whether the evaluation score is a simple average of the sufficient statistics.
         If so the t-test is applicable, which is much more efficient. Otherwise we do
@@ -203,7 +203,7 @@ class Metric:
         # Conditions for being able to use the t-test are:
         #  1) the stat is the metric itself (no special aggregation function)
         #  2) the aggregation function is the simple mean
-        if self.is_simple_average():
+        if self.is_simple_average(stats):
             # Do t-test
             stats_data = stats.get_data()
             if stats_data.shape[1] != 1:
