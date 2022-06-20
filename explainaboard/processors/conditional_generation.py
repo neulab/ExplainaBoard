@@ -584,8 +584,10 @@ class ConditionalGenerationProcessor(Processor):
             bucket_samples = self._subsample_bucket_cases(bucket_collection.samples)
             stats = explainaboard.metrics.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
-            conf_interval: tuple[float, float] = unwrap(result.conf_interval)
-            conf_low, conf_high = conf_interval
+            conf_low, conf_high = (
+                unwrap(result.conf_interval) if result.conf_interval else None,
+                None,
+            )
             performance = Performance(
                 metric_name='F1',
                 value=result.value,
