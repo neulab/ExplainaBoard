@@ -188,7 +188,7 @@ class Metric:
         n_samples: int = 1000,
         prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
-    ) -> tuple[float, float]:
+    ) -> tuple[float, float] | None:
         """
         :param stats: sufficient statistics as calculated by calc_stats_from_data
         :param conf_value: the p-value of the interval
@@ -199,23 +199,26 @@ class Metric:
         if conf_value <= 0.0 or conf_value >= 1.0:
             raise ValueError(f'Bad confidence value {conf_value}')
 
-        # Detect whether we can use a simple t-test or need bootstrapping
-        # Conditions for being able to use the t-test are:
-        #  1) the stat is the metric itself (no special aggregation function)
-        #  2) the aggregation function is the simple mean
-        if self.is_simple_average(stats):
-            # Do t-test
-            stats_data = stats.get_data()
+        stats_data = stats.get_data()
+        # We cannot calculate confidence intervals if we only have a single sample
+        if stats_data.shape[0] <= 1:
+            return None
+        # Do t-test if applicable
+        elif self.is_simple_average(stats):
             if stats_data.shape[1] != 1:
                 raise ValueError(f'problem with shape in t-test {stats_data.shape}')
+            my_mean = np.mean(stats_data)
+            my_std = np.std(stats_data)
+            if my_std == 0.0:
+                return (float(my_mean), float(my_mean))
             return stats_t.interval(
                 alpha=conf_value,
                 df=stats_data.shape[0] - 1,
-                loc=np.mean(stats_data),
-                scale=np.std(stats_data),
+                loc=my_mean,
+                scale=my_std,
             )
+        # Do bootstrapping otherwise
         else:
-            # Do bootstrapping
             n_elems = max(int(prop_samples * len(stats)), 1)
             all_indices = np.array(range(len(stats)))
             rng = np.random.default_rng()
