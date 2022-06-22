@@ -18,7 +18,7 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
+from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
@@ -106,26 +106,26 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                             setting=(),
                         ),
                     ),
-                    "oracle_score": feature.Value(
-                        dtype="float",
-                        description="the sample-level oracle score",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "oracle_position": feature.Value(
-                        dtype="float",
-                        description="the sample-level oracle position",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
+                    # "oracle_score": feature.Value(
+                    #     dtype="float",
+                    #     description="the sample-level oracle score",
+                    #     is_bucket=True,
+                    #     bucket_info=feature.BucketInfo(
+                    #         method="bucket_attribute_specified_bucket_value",
+                    #         number=4,
+                    #         setting=(),
+                    #     ),
+                    # ),
+                    # "oracle_position": feature.Value(
+                    #     dtype="float",
+                    #     description="the sample-level oracle position",
+                    #     is_bucket=True,
+                    #     bucket_info=feature.BucketInfo(
+                    #         method="bucket_attribute_specified_bucket_value",
+                    #         number=4,
+                    #         setting=(),
+                    #     ),
+                    # ),
                 }
             )
         )
@@ -190,6 +190,16 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
+        )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
         )
+        return {
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
+        }

@@ -77,15 +77,25 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
             )
         src = FileLoaderField(('translation', sys_info.source_language), '', str)
         trg = FileLoaderField(('translation', sys_info.target_language), '', str)
-        return {
-            'source_vocab': accumulate_vocab_from_samples(
+
+
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
                 samples,
                 lambda x: FileLoader.find_field(x, src),
                 unwrap(sys_info.source_tokenizer),
-            ),
-            'target_vocab': accumulate_vocab_from_samples(
+            )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
                 samples,
                 lambda x: FileLoader.find_field(x, trg),
                 unwrap(sys_info.target_tokenizer),
-            ),
+            )
+        return {
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank':target_vocab_rank
         }
+
+
+

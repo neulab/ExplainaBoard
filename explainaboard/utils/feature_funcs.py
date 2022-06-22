@@ -61,10 +61,12 @@ def accumulate_vocab_from_samples(
         for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
     }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-    return {
-        "vocab": vocab,
-        "vocab_rank": vocab_rank,
-    }
+    # return vocab
+    return vocab, vocab_rank
+    # return {
+    #     "vocab": vocab,
+    #     "vocab_rank": vocab_rank,
+    # }
 
 
 def feat_freq_rank(
@@ -77,10 +79,10 @@ def feat_freq_rank(
 
     tokens = tokenizer(text_from_sample(existing_features))
     for w in tokens:
-        if w not in statistics['vocab_rank']:
-            fre_rank += len(statistics['vocab_rank'])
+        if w not in statistics:
+            fre_rank += len(statistics)
         else:
-            fre_rank += statistics['vocab_rank'][w]
+            fre_rank += statistics[w]
 
     return fre_rank * 1.0 / len(tokens)
 
@@ -93,7 +95,7 @@ def feat_num_oov(
 ):
     num_oov = 0
     for w in tokenizer(text_from_sample(existing_features)):
-        if w not in statistics['vocab'].keys():
+        if w not in statistics.keys():
             num_oov += 1
     return num_oov
 
