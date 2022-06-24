@@ -106,6 +106,8 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                             setting=(),
                         ),
                     ),
+                    # TODO: these are commented out because the
+                    #  implementation is currently
                     # "oracle_score": feature.Value(
                     #     dtype="float",
                     #     description="the sample-level oracle score",

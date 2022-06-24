@@ -157,7 +157,7 @@ class TextPairClassificationProcessor(Processor):
             unwrap(sys_info.source_tokenizer),
         ) + feat_num_oov(
             existing_features,
-            statistics['target_vocab'],
+            statistics['source_vocab'],
             lambda x: x['text2'],
             unwrap(sys_info.target_tokenizer),
         )
