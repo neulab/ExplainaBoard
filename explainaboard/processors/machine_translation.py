@@ -15,7 +15,7 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 

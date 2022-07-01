@@ -7,10 +7,10 @@ from datalabs import aggregating
 
 import explainaboard.analysis.analyses
 from explainaboard import TaskType
-from explainaboard.analysis import feature
+from explainaboard.analysis import feature, bucketing
 from explainaboard.info import (
-    BucketCaseCollection,
-    BucketCaseSpan,
+    AnalysisCaseCollection,
+    AnalysisCaseSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,
@@ -19,8 +19,7 @@ from explainaboard.metrics.log_prob import LogProbConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils import bucketing
-from explainaboard.utils.feature_funcs import cap_feature
+from explainaboard.analysis.feature_funcs import cap_feature
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
@@ -309,13 +308,13 @@ class LanguageModelingProcessor(Processor):
 
     def _get_feature_lists(
         self, sys_output: list[dict], tok_feats: list[str]
-    ) -> list[list[tuple[BucketCaseSpan, float | str]]]:
-        sample_features: list[list[tuple[BucketCaseSpan, float | str]]] = [
+    ) -> list[list[tuple[AnalysisCaseSpan, float | str]]]:
+        sample_features: list[list[tuple[AnalysisCaseSpan, float | str]]] = [
             list() for _ in tok_feats
         ]
         for sample_id, my_output in enumerate(sys_output):
             for tok_id, tok_info in enumerate(my_output['tok_info']):
-                case = BucketCaseSpan(
+                case = AnalysisCaseSpan(
                     sample_id=sample_id,
                     token_span=(tok_id, tok_id + 1),
                     char_span=tok_info['tok_char_pos'],
@@ -356,7 +355,7 @@ class LanguageModelingProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
+            bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
                 bucketing, bucket_info.method
             )
 
@@ -378,7 +377,7 @@ class LanguageModelingProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket: list[BucketCaseCollection],
+        samples_over_bucket: list[AnalysisCaseCollection],
     ) -> list[BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
@@ -395,15 +394,15 @@ class LanguageModelingProcessor(Processor):
         for bucket_collection in samples_over_bucket:
             bucket_metrics = [x.to_metric() for x in unwrap(sys_info.metric_configs)]
             log_probs = []
-            for bucket_case in bucket_collection.samples:
-                bcp = cast(BucketCaseSpan, bucket_case)
+            for analysis_case in bucket_collection.samples:
+                bcp = cast(AnalysisCaseSpan, analysis_case)
                 log_probs.append(
                     sys_output[bcp.sample_id]['tok_info'][bcp.token_span[0]][
                         'tok_log_prob'
                     ]
                 )
 
-            bucket_samples = self._subsample_bucket_cases(bucket_collection.samples)
+            bucket_samples = self._subsample_analysis_cases(bucket_collection.samples)
 
             bucket_performance = BucketPerformance(
                 bucket_interval=bucket_collection.interval,

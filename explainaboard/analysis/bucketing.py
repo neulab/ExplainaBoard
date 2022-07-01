@@ -4,7 +4,7 @@ from typing import Any, TypeVar
 
 import numpy as np
 
-from explainaboard.info import BucketCase, BucketCaseCollection
+from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.utils.typing_utils import unwrap
 
 T = TypeVar('T')
@@ -22,12 +22,12 @@ def find_key(dict_obj, x):
 
 
 def bucket_attribute_specified_bucket_value(
-    sample_features: list[tuple[BucketCase, T]],
+    sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int = 4,
     bucket_setting: Any = None,
-) -> list[BucketCaseCollection]:
+) -> list[AnalysisCaseCollection]:
     if len(sample_features) == 0:
-        return [BucketCaseCollection(_INFINITE_INTERVAL, [])]
+        return [AnalysisCaseCollection(_INFINITE_INTERVAL, [])]
     if bucket_setting is not None and len(bucket_setting) > 0:
         raise NotImplementedError(
             'bucket_setting incompatible with '
@@ -41,7 +41,7 @@ def bucket_attribute_specified_bucket_value(
     # Special case of one bucket
     if bucket_number == 1:
         max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
-        return [BucketCaseCollection((min_val, max_val), cases)]
+        return [AnalysisCaseCollection((min_val, max_val), cases)]
 
     n_examps = len(vals)
     sorted_idxs = np.argsort(vals)
@@ -50,12 +50,12 @@ def bucket_attribute_specified_bucket_value(
 
     start_val, last_val = min_val, min_val
     start_i, cutoff_i = 0, n_examps / float(bucket_number)
-    bucket_collections: list[BucketCaseCollection] = []
+    bucket_collections: list[AnalysisCaseCollection] = []
     for i, val in enumerate(sorted_vals):
         # Return the final bucket
         if bucket_number - len(bucket_collections) == 1 or val == max_val:
             bucket_collections.append(
-                BucketCaseCollection(
+                AnalysisCaseCollection(
                     (conv(start_val), max_val),
                     [cases[j] for j in sorted_idxs[start_i:]],
                 )
@@ -65,7 +65,7 @@ def bucket_attribute_specified_bucket_value(
         elif val != last_val:
             if i >= cutoff_i:
                 bucket_collections.append(
-                    BucketCaseCollection(
+                    AnalysisCaseCollection(
                         (conv(start_val), conv(last_val)),
                         [cases[j] for j in sorted_idxs[start_i:i]],
                     )
@@ -81,10 +81,10 @@ def bucket_attribute_specified_bucket_value(
 
 
 def bucket_attribute_discrete_value(
-    sample_features: list[tuple[BucketCase, T]],
+    sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int = int(1e10),
     bucket_setting: Any = 1,
-) -> list[BucketCaseCollection]:
+) -> list[AnalysisCaseCollection]:
     """
     Bucket attributes by discrete value.
     :param sample_features: Pairs of a bucket case and feature value.
@@ -98,7 +98,7 @@ def bucket_attribute_discrete_value(
         else:
             feat2case[v].append(k)
     bucket_collections = [
-        BucketCaseCollection((k,), v)
+        AnalysisCaseCollection((k,), v)
         for k, v in feat2case.items()
         if len(v) >= bucket_setting
     ]
@@ -109,12 +109,12 @@ def bucket_attribute_discrete_value(
 
 
 def bucket_attribute_specified_bucket_interval(
-    sample_features: list[tuple[BucketCase, T]],
+    sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int,
     bucket_setting: list[tuple],
-) -> list[BucketCaseCollection]:
+) -> list[AnalysisCaseCollection]:
     intervals = unwrap(bucket_setting)
-    bucket2examp: dict[tuple, list[BucketCase]] = {k: list() for k in intervals}
+    bucket2examp: dict[tuple, list[AnalysisCase]] = {k: list() for k in intervals}
 
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
         for k, v in sample_features:
@@ -128,7 +128,7 @@ def bucket_attribute_specified_bucket_interval(
             bucket2examp[res_key].append(examp)
 
     bucket_collections = [
-        BucketCaseCollection((k,), v) for k, v in bucket2examp.items()
+        AnalysisCaseCollection((k,), v) for k, v in bucket2examp.items()
     ]
 
     return bucket_collections

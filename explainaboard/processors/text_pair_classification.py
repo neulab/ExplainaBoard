@@ -12,7 +12,7 @@ from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.feature_funcs import (
+from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     feat_freq_rank,
     feat_num_oov,

@@ -8,10 +8,10 @@ from typing import cast
 from datalabs import aggregating, Dataset
 
 import explainaboard.analysis.analyses
-from explainaboard.analysis import feature
+from explainaboard.analysis import feature, bucketing
 from explainaboard.info import (
-    BucketCaseCollection,
-    BucketCaseLabeledSpan,
+    AnalysisCaseCollection,
+    AnalysisCaseLabeledSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,
@@ -20,7 +20,6 @@ from explainaboard.loaders.file_loader import DatalabFileLoader
 from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.utils import bucketing
 from explainaboard.utils.logging import progress
 from explainaboard.utils.span_utils import Span, SpanOps
 from explainaboard.utils.typing_utils import unwrap
@@ -364,14 +363,14 @@ class SeqLabProcessor(Processor):
             sys_info, sys_output, sent_feats, metric_stats
         )
 
-        case_spans: list[tuple[BucketCaseLabeledSpan, Span]] = []
+        case_spans: list[tuple[AnalysisCaseLabeledSpan, Span]] = []
         for sample_id, my_output in enumerate(sys_output):
             for tok_id, span_info in enumerate(my_output['span_info']):
                 span = cast(Span, span_info)
                 true_tag, pred_tag = unwrap(span.span_tag).split(' ')
                 case_spans.append(
                     (
-                        BucketCaseLabeledSpan(
+                        AnalysisCaseLabeledSpan(
                             sample_id=sample_id,
                             token_span=unwrap(span.span_pos),
                             char_span=unwrap(span.span_char_pos),
@@ -390,7 +389,7 @@ class SeqLabProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
+            bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
                 bucketing, bucket_info.method
             )
 
@@ -423,7 +422,7 @@ class SeqLabProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket: list[BucketCaseCollection],
+        samples_over_bucket: list[AnalysisCaseCollection],
     ) -> list[BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
@@ -445,7 +444,7 @@ class SeqLabProcessor(Processor):
             true_labels, pred_labels = [], []
             num_true = 0
             for sample in bucket_collection.samples:
-                sample_span = cast(BucketCaseLabeledSpan, sample)
+                sample_span = cast(AnalysisCaseLabeledSpan, sample)
                 true_labels.append(sample_span.true_label)
                 num_true += 1 if sample_span.true_label != self._DEFAULT_TAG else 0
                 pred_labels.append(sample_span.predicted_label)
@@ -453,10 +452,10 @@ class SeqLabProcessor(Processor):
             # Filter samples to error cases and limit number
             bucket_samples = []
             for x in bucket_collection.samples:
-                bcls = cast(BucketCaseLabeledSpan, x)
+                bcls = cast(AnalysisCaseLabeledSpan, x)
                 if bcls.true_label != bcls.predicted_label:
                     bucket_samples.append(bcls)
-            bucket_samples = self._subsample_bucket_cases(bucket_samples)
+            bucket_samples = self._subsample_analysis_cases(bucket_samples)
 
             bucket_performance = BucketPerformance(
                 bucket_interval=bucket_collection.interval,

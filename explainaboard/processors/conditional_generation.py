@@ -10,12 +10,12 @@ import numpy as np
 
 import explainaboard.analysis.analyses
 from explainaboard import TaskType
-from explainaboard.analysis import feature
+from explainaboard.analysis import feature, bucketing
 from explainaboard.info import (
-    BucketCase,
-    BucketCaseCollection,
-    BucketCaseMultiSpan,
-    BucketCaseSpan,
+    AnalysisCase,
+    AnalysisCaseCollection,
+    AnalysisCaseMultiSpan,
+    AnalysisCaseSpan,
     BucketPerformance,
     Performance,
     SysOutputInfo,
@@ -27,9 +27,8 @@ import explainaboard.metrics.metric
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils import bucketing
-import explainaboard.utils.feature_funcs
-from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples, cap_feature
+import explainaboard.analysis.feature_funcs
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples, cap_feature
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
@@ -254,7 +253,7 @@ class ConditionalGenerationProcessor(Processor):
     def _get_src_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
+        return explainaboard.analysis.feature_funcs.feat_num_oov(
             existing_features,
             statistics['source_vocab'],
             lambda x: x['source'],
@@ -264,7 +263,7 @@ class ConditionalGenerationProcessor(Processor):
     def _get_src_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
+        return explainaboard.analysis.feature_funcs.feat_freq_rank(
             existing_features,
             statistics['source_vocab'],
             lambda x: x['source'],
@@ -274,7 +273,7 @@ class ConditionalGenerationProcessor(Processor):
     def _get_ref_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
+        return explainaboard.analysis.feature_funcs.feat_num_oov(
             existing_features,
             statistics['target_vocab'],
             lambda x: x['reference'],
@@ -284,7 +283,7 @@ class ConditionalGenerationProcessor(Processor):
     def _get_ref_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
+        return explainaboard.analysis.feature_funcs.feat_freq_rank(
             existing_features,
             statistics['target_vocab'],
             lambda x: x['reference'],
@@ -347,10 +346,10 @@ class ConditionalGenerationProcessor(Processor):
                 metric_stats[k] = v
 
     def _get_feature_info(self, name: str):
-        if name in self._default_features:
-            return self._default_features[name]
+        if name in self._default_analyses:
+            return self._default_analyses[name]
         else:
-            return self._default_features['ref_tok_info'][name]
+            return self._default_analyses['ref_tok_info'][name]
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -460,12 +459,12 @@ class ConditionalGenerationProcessor(Processor):
 
     def _get_sample_features(
         self, sys_output: list[dict], feats: list[str]
-    ) -> list[tuple[BucketCase, list]]:
-        sample_features: list[tuple[BucketCase, list]] = []
+    ) -> list[tuple[AnalysisCase, list]]:
+        sample_features: list[tuple[AnalysisCase, list]] = []
         for samp_id, my_output in enumerate(sys_output):
             # Get reference-only and matched cases
             for ref_id, ref_info in enumerate(my_output['ref_tok_info']):
-                ref_span = BucketCaseSpan(
+                ref_span = AnalysisCaseSpan(
                     sample_id=samp_id,
                     token_span=ref_info['tok_pos'],
                     char_span=ref_info['tok_char_pos'],
@@ -477,20 +476,20 @@ class ConditionalGenerationProcessor(Processor):
                     sample_features.append((ref_span, ref_feats))
                 else:
                     hyp_info = my_output['hyp_tok_info'][ref_info['tok_matched']]
-                    hyp_span = BucketCaseSpan(
+                    hyp_span = AnalysisCaseSpan(
                         sample_id=samp_id,
                         token_span=hyp_info['tok_pos'],
                         char_span=hyp_info['tok_char_pos'],
                         orig_str='hypothesis',
                         text=hyp_info['tok_text'],
                     )
-                    both_span = BucketCaseMultiSpan(
+                    both_span = AnalysisCaseMultiSpan(
                         sample_id=samp_id, spans=[ref_span, hyp_span]
                     )
                     sample_features.append((both_span, ref_feats))
             for hyp_id, hyp_info in enumerate(my_output['hyp_tok_info']):
                 if hyp_info['tok_matched'] < 0:
-                    hyp_span = BucketCaseSpan(
+                    hyp_span = AnalysisCaseSpan(
                         sample_id=samp_id,
                         token_span=hyp_info['tok_pos'],
                         char_span=hyp_info['tok_char_pos'],
@@ -532,7 +531,7 @@ class ConditionalGenerationProcessor(Processor):
             bucket_info = my_feature.bucket_info
 
             # Get buckets for true spans
-            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
+            bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
                 bucketing, bucket_info.method
             )
 
@@ -559,7 +558,7 @@ class ConditionalGenerationProcessor(Processor):
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        samples_over_bucket: list[BucketCaseCollection],
+        samples_over_bucket: list[AnalysisCaseCollection],
     ) -> list[BucketPerformance]:
         """
         This function defines how to get bucket-level performance w.r.t a given feature
@@ -577,13 +576,13 @@ class ConditionalGenerationProcessor(Processor):
             stats_list = []
             for case in bucket_collection.samples:
                 # Both ref and hyp exist, so matched
-                if isinstance(case, BucketCaseMultiSpan):
+                if isinstance(case, AnalysisCaseMultiSpan):
                     stats_list.append([1.0, 1.0, 1.0])
-                elif cast(BucketCaseSpan, case).orig_str == 'reference':
+                elif cast(AnalysisCaseSpan, case).orig_str == 'reference':
                     stats_list.append([1.0, 0.0, 0.0])
                 else:
                     stats_list.append([0.0, 1.0, 0.0])
-            bucket_samples = self._subsample_bucket_cases(bucket_collection.samples)
+            bucket_samples = self._subsample_analysis_cases(bucket_collection.samples)
             stats = explainaboard.metrics.metric.MetricStats(np.array(stats_list))
             result = f1_score.evaluate_from_stats(stats, conf_value=0.05)
             conf_low, conf_high = (

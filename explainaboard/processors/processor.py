@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Callable
 import copy
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
-import numpy as np
 
 from explainaboard import TaskType
+from explainaboard.analysis.analyses import AnalysisResult
 from explainaboard.analysis.level import AnalysisLevel
+from explainaboard.analysis.case import AnalysisCase
 from explainaboard.info import (
-    BucketCase,
-    BucketCaseCollection,
     BucketPerformance,
     OverallStatistics,
     Performance,
@@ -23,7 +21,6 @@ from explainaboard.info import (
     SysOutputInfo,
 )
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
-import explainaboard.utils.bucketing
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -79,7 +76,7 @@ class Processor(metaclass=abc.ABCMeta):
         self._eaas_client: Optional[AsyncClient] = None
         # self._statistics_func = None
         self._preprocessor = None
-        self._default_features = self.default_analyses()
+        self._default_analyses = self.default_analyses()
         # A limit on the number of samples stored for each bucket. Hard-coded for now
         self._bucket_sample_limit = 50
 
@@ -160,32 +157,29 @@ class Processor(metaclass=abc.ABCMeta):
         return [config.to_metric() for config in unwrap(sys_info.metric_configs)]
 
     def _gen_metric_stats(
-        self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> list[MetricStats]:
+        self, sys_info: SysOutputInfo, sys_output: list[dict], cases: list[list[AnalysisCase]]
+    ) -> list[list[MetricStats]]:
         """Generate sufficient statistics for scoring different metrics.
 
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
+        :param cases: Analysis cases associated with the stats
         :return: Statistics sufficient for scoring
         """
-        metrics = unwrap(self._get_metrics(sys_info))
-        true_data = [self._get_true_label(x) for x in sys_output]
-        pred_data = [self._get_predicted_label(x) for x in sys_output]
-        metric_stats = []
+        all_stats: list[list[MetricStats]] = []
+        for my_level, my_cases in zip(unwrap(sys_info.analyses), cases):
 
-        for metric in metrics:
-            metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
-        return metric_stats
+            if my_level.name == 'example':
+                true_data = [self._get_true_label(x) for x in sys_output]
+                pred_data = [self._get_predicted_label(x) for x in sys_output]
+            else:
+                raise ValueError(f'unsupported analysis level {my_level.name}')
 
-    def _get_feature_func(self, feature_name: str, is_custom: bool):
-        if is_custom:
+            metric_stats = []
+            for metric in my_level.metrics:
+                metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
 
-            def my_func(info, sysout, stats=None):
-                return sysout[feature_name]
-
-            return my_func
-        else:
-            return getattr(self, f'_get_{feature_name}')
+        return all_stats
 
     def _get_eaas_client(self):
         if not self._eaas_client:
@@ -220,8 +214,9 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
 
         """
-
-        raise NotImplementedError('This needs to be implemented for analysis levels')
+        analyses = copy.deepcopy(self._default_analyses)
+        get_logger().warning('Analysis customization is not implemented yet.')
+        return analyses
 
         # features = copy.deepcopy(self._default_features)
         # # add user-defined features into features list
@@ -259,175 +254,85 @@ class Processor(metaclass=abc.ABCMeta):
         #
         # return features
 
-    def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
-    ) -> list[str]:
-        """
-        This function takes in meta-data about system outputs, system outputs, and a few
-        other optional pieces of information, then calculates feature functions and
-        modifies `sys_output` to add these feature values
 
-        :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :param external_stats: External statistics that are used to calculate training
-            set specific features
-        :return: The features that are active (e.g. skipping training set features when
-            no training set available)
-        """
-        bucket_feature_funcs: dict[str, tuple[Callable, bool]] = {}
-        sys_features = unwrap(sys_info.features)
-
-        for bucket_feature in sys_features.get_bucket_features():
-
-            feature_info = sys_features[bucket_feature]
-
-            # Skip training set features if no stats
-            if external_stats is None and feature_info.require_training_set:
-                continue
-
-            feature_func = self._get_feature_func(
-                bucket_feature, feature_info.is_custom
-            )
-
-            bucket_feature_funcs[bucket_feature] = (
-                feature_func,
-                feature_info.require_training_set,
-            )
-
-        for _id, dict_sysout in progress(enumerate(sys_output), desc="featurizing"):
-            # Get values of bucketing features
-            for (
-                bucket_key,
-                (
-                    bucket_func,
-                    training_dependent,
-                ),
-            ) in bucket_feature_funcs.items():
-
-                feature_info = sys_features[bucket_key]
-
-                # handles user-defined features
-                if feature_info.is_custom:
-                    # TODO(Pengfei): this should be generalized
-                    feature_value = (
-                        "_".join(dict_sysout[bucket_key])
-                        if isinstance(dict_sysout[bucket_key], list)
-                        else dict_sysout[bucket_key]
-                    )
-                    dict_sysout[bucket_key] = feature_value
-
-                # handles all other features
-                else:
-                    dict_sysout[bucket_key] = (
-                        bucket_func(sys_info, dict_sysout, external_stats)
-                        if training_dependent
-                        else bucket_func(sys_info, dict_sysout)
-                    )
-
-        return list(bucket_feature_funcs.keys())
-
-    def bucketing_samples(
+    def perform_analyses(
         self,
         sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        active_features: list[str],
-        metric_stats: list[MetricStats],
-    ) -> dict[str, list[BucketPerformance]]:
+        analysis_cases: list[list[AnalysisCase]],
+        metric_stats: list[list[MetricStats]],
+    ) -> list[list[AnalysisResult]]:
         """
-        Separate samples into buckets and calculate performance over them
+        Perform fine-grained analyses
         :param sys_info: Information about the system output
-        :param sys_output: The system output itself, already annotated with features
-        :param active_features: The features to perform bucketing over
+        :param analysis_cases: They cases to analyze
         :param metric_stats: The stats from which to calculate performance
         :return:
             performances_over_bucket:
                 a dictionary of feature name -> list of performances by bucket
         """
-        sys_features = unwrap(sys_info.features)
 
-        # Bucketing
-        performances_over_bucket: dict[str, list[BucketPerformance]] = {}
-        for feature_name in progress(active_features, desc="sample-level bucketing"):
-            # Preparation for bucketing
-            bucket_func: Callable[..., list[BucketCaseCollection]] = getattr(
-                explainaboard.utils.bucketing,
-                sys_features[feature_name].bucket_info.method,
-            )
-            samples_over_bucket = bucket_func(
-                sample_features=[
-                    (BucketCase(x), sys_output[x][feature_name])
-                    for x in range(len(sys_output))
-                ],
-                bucket_number=sys_features[feature_name].bucket_info.number,
-                bucket_setting=sys_features[feature_name].bucket_info.setting,
-            )
+        all_results = []
+        for my_level, my_cases, my_stats in zip(unwrap(sys_info.analyses), analysis_cases, metric_stats):
+            my_results = []
+            for my_analysis in progress(my_level.analyses, desc=f"{my_level.name}-level analysis"):
+                my_results.append(my_analysis.perform(sys_info, my_cases, my_stats))
+            all_results.append(my_results)
 
-            # evaluating bucket: get bucket performance
-            performances_over_bucket[feature_name] = self.get_bucket_performance(
-                sys_info,
-                sys_output,
-                samples_over_bucket,
-                metric_stats=metric_stats,
-            )
-        return performances_over_bucket
+        return all_results
 
-    BucketCaseType = TypeVar('BucketCaseType')
+    def _gen_cases_and_stats(self, sys_info: SysOutputInfo, sys_output: list[dict], statistics: Any) -> tuple[list[list[AnalysisCase]], list[list[MetricStats]]]:
+        all_cases: list[list[AnalysisCase]] = []
+        all_stats: list[list[MetricStats]] = []
+        for analysis_level in unwrap(sys_info.analyses):
+            if analysis_level.name == 'example':
+                cases = []
+                # Calculate metrics
+                true_data = [self._get_true_label(x) for x in sys_output]
+                pred_data = [self._get_predicted_label(x) for x in sys_output]
+                metric_stats = [x.calc_stats_from_data(true_data, pred_data) for x in analysis_level.metrics]
+                # Calculate features
+                for i, output in progress(enumerate(sys_output), desc='calculating example-level features'):
+                    features = {}
+                    for feat_name, feat_spec in analysis_level.features.items():
+                        if feat_spec.func is None:
+                            features[feat_name] = output[feat_name]
+                        elif not feat_spec.require_training_set:
+                            features[feat_name] = feat_spec.func(sys_info, output)
+                        elif statistics is not None:
+                            features[feat_name] = feat_spec.func(sys_info, output, statistics)
+                    cases.append(AnalysisCase(sample_id=i, features=features))
+                all_cases.append(cases)
+                all_stats.append(metric_stats)
+            else:
+                raise NotImplementedError(f'Does not support analysis level {analysis_level.name} by default')
+        return all_cases, all_stats
 
-    def _subsample_bucket_cases(
-        self, bucket_cases: list[BucketCaseType]
-    ) -> list[BucketCaseType]:
-        if len(bucket_cases) > self._bucket_sample_limit:
-            ids = np.array(range(len(bucket_cases)))
-            bucket_sample_ids = np.random.choice(
-                ids, self._bucket_sample_limit, replace=False
-            )
-            return [bucket_cases[i] for i in bucket_sample_ids]
-        else:
-            return bucket_cases
 
-    def get_bucket_performance(
+    def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        samples_over_bucket: list[BucketCaseCollection],
-        metric_stats: list[MetricStats],
-    ) -> list[BucketPerformance]:
+        analysis_cases: list[list[AnalysisCase]],
+        metric_stats: list[list[MetricStats]],
+    ) -> list[list[Performance]]:
         """
-        This function defines how to get bucket-level performance w.r.t a given feature
-        (e.g., sentence length)
+        Get the overall performance according to metrics
         :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to sample
-            IDs for that bucket
+        :param analysis_cases: The cases to analyze
         :param metric_stats: any statistics useful to performing scoring
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to
-            bucket performance
+        :return: a dictionary of metrics to overall performance numbers
         """
 
-        # Get the functions to calculate metrics
-        metric_funcs = self._get_metrics(sys_info)
+        overall_results = []
+        for my_level, my_cases, my_stats in zip(unwrap(sys_info.analyses), analysis_cases, metric_stats):
 
-        bucket_performances: list[BucketPerformance] = []
-        for bucket_collection in samples_over_bucket:
-            bucket_cases = bucket_collection.samples
-            sample_ids = [bucket_case.sample_id for bucket_case in bucket_cases]
-            # Subsample examples to save
-            bucket_samples = self._subsample_bucket_cases(bucket_cases)
-
-            bucket_performance = BucketPerformance(
-                bucket_interval=bucket_collection.interval,
-                n_samples=len(bucket_cases),
-                bucket_samples=bucket_samples,
-            )
-
+            my_results = []
             for metric_cfg, metric_func, metric_stat in zip(
                 unwrap_generator(sys_info.metric_configs),
-                unwrap_generator(metric_funcs),
-                unwrap_generator(metric_stats),
+                unwrap_generator(my_level.metrics),
+                my_stats,
             ):
-                bucket_stats = metric_stat.filter(sample_ids)
                 metric_result = metric_func.evaluate_from_stats(
-                    bucket_stats,
+                    metric_stat,
                     conf_value=sys_info.conf_value,
                 )
 
@@ -437,64 +342,14 @@ class Processor(metaclass=abc.ABCMeta):
                     else (None, None)
                 )
 
-                performance = Performance(
+                overall_performance = Performance(
                     metric_name=metric_cfg.name,
                     value=metric_result.value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
                 )
-
-                bucket_performance.performances.append(performance)
-
-            bucket_performances.append(bucket_performance)
-
-        return bucket_performances
-
-    def get_overall_performance(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        metric_stats: list[MetricStats],
-    ) -> dict[str, Performance]:
-        """
-        Get the overall performance according to metrics
-        :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :param metric_stats: any statistics useful to performing scoring
-        :return: a dictionary of metrics to overall performance numbers
-        """
-        predicted_labels, true_labels = [], []
-
-        for _id, feature_table in enumerate(sys_output):
-            predicted_labels.append(self._get_predicted_label(feature_table))
-            true_labels.append(self._get_true_label(feature_table))
-
-        metric_funcs = self._get_metrics(sys_info)
-
-        overall_results = {}
-        for metric_cfg, metric_func, metric_stat in zip(
-            unwrap_generator(sys_info.metric_configs),
-            unwrap_generator(metric_funcs),
-            metric_stats,
-        ):
-            metric_result = metric_func.evaluate_from_stats(
-                metric_stat,
-                conf_value=sys_info.conf_value,
-            )
-
-            conf_low, conf_high = (
-                metric_result.conf_interval
-                if metric_result.conf_interval
-                else (None, None)
-            )
-
-            overall_performance = Performance(
-                metric_name=metric_cfg.name,
-                value=metric_result.value,
-                confidence_score_low=conf_low,
-                confidence_score_high=conf_high,
-            )
-            overall_results[metric_cfg.name] = overall_performance
+                my_results.append(overall_performance)
+            overall_results.append(my_results)
         return overall_results
 
     def deserialize_system_output(self, output: dict):
@@ -515,57 +370,6 @@ class Processor(metaclass=abc.ABCMeta):
         for feature_name, feature_value in performances_over_bucket.items():
             print_bucket_perfs(feature_value, feature_name)
 
-    def get_overall_statistics(
-        self, metadata: dict, sys_output: list[dict]
-    ) -> OverallStatistics:
-        """
-        Get the overall statistics information, including performance, of the system
-        output
-        :param metadata: The metadata of the system
-        :param sys_output: The system output itself
-        """
-        if metadata is None:
-            metadata = {}
-        if "task_name" not in metadata.keys():
-            metadata["task_name"] = self.task_type().value
-
-        sys_info = SysOutputInfo.from_dict(metadata)
-        if sys_info.metric_configs is None:
-            sys_info.metric_configs = self.default_metrics(
-                source_language=sys_info.source_language,
-                target_language=sys_info.target_language,
-            )
-        if sys_info.target_tokenizer is None:
-            sys_info.target_tokenizer = get_default_tokenizer(
-                task_type=self.task_type(), lang=sys_info.target_language
-            )
-        if sys_info.source_tokenizer is None:
-            sys_info.source_tokenizer = (
-                sys_info.target_tokenizer
-                if sys_info.source_language == sys_info.target_language
-                else get_default_tokenizer(
-                    task_type=self.task_type(), lang=sys_info.source_language
-                )
-            )
-
-        # declare customized features: _features will be updated
-        custom_features: dict = metadata.get('custom_features', {})
-        sys_info.features = self._customize_analyses(custom_features)
-
-        # get scoring statistics
-        metric_stats = self._gen_metric_stats(sys_info, sys_output)
-        metric_stats = unwrap(metric_stats)
-        external_stats = self._gen_external_stats(sys_info, self._statistics_func)
-        active_features = self._complete_features(
-            sys_info, sys_output, external_stats=external_stats
-        )
-        overall_results = self.get_overall_performance(
-            sys_info, sys_output, metric_stats=metric_stats
-        )
-        sys_info.results = Result(
-            overall=overall_results, calibration=None, fine_grained=None
-        )
-        return OverallStatistics(sys_info, metric_stats, active_features)
 
     def sort_bucket_info(
         self,
@@ -628,23 +432,67 @@ class Processor(metaclass=abc.ABCMeta):
                     key=lambda x: x.n_samples, reverse=not sort_ascending
                 )
 
+    def get_overall_statistics(
+            self, metadata: dict, sys_output: list[dict]
+    ) -> OverallStatistics:
+        """
+        Get the overall statistics information, including performance, of the system
+        output
+        :param metadata: The metadata of the system
+        :param sys_output: The system output itself
+        """
+        if metadata is None:
+            metadata = {}
+        if "task_name" not in metadata.keys():
+            metadata["task_name"] = self.task_type().value
+
+        sys_info = SysOutputInfo.from_dict(metadata)
+        if sys_info.metric_configs is None:
+            sys_info.metric_configs = self.default_metrics(
+                source_language=sys_info.source_language,
+                target_language=sys_info.target_language,
+            )
+        if sys_info.target_tokenizer is None:
+            sys_info.target_tokenizer = get_default_tokenizer(
+                task_type=self.task_type(), lang=sys_info.target_language
+            )
+        if sys_info.source_tokenizer is None:
+            sys_info.source_tokenizer = (
+                sys_info.target_tokenizer
+                if sys_info.source_language == sys_info.target_language
+                else get_default_tokenizer(
+                    task_type=self.task_type(), lang=sys_info.source_language
+                )
+            )
+
+        # declare customized features: _features will be updated
+        custom_features: dict = metadata.get('custom_features', {})
+        sys_info.analyses = self._customize_analyses(custom_features)
+
+        # get scoring statistics
+        external_stats = self._gen_external_stats(sys_info, self._statistics_func)
+        analysis_cases, metric_stats = self._gen_cases_and_stats(sys_info, sys_output, external_stats)
+        overall_results = self.get_overall_performance(sys_info, analysis_cases, metric_stats)
+        sys_info.results = Result(overall=overall_results, analyses=None)
+        return OverallStatistics(sys_info, analysis_cases, metric_stats)
+
     def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
         # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = unwrap(overall_statistics.sys_info)
-        metric_stats = overall_statistics.metric_stats
-        active_features = unwrap(overall_statistics.active_features)
-        overall_results = sys_info.results.overall
-        performance_over_bucket = self.bucketing_samples(
-            sys_info, sys_output, active_features, metric_stats=metric_stats
+        analyses = self.perform_analyses(
+            sys_info, overall_statistics.analysis_cases, metric_stats=overall_statistics.metric_stats
         )
-        self.sort_bucket_info(
-            performance_over_bucket,
-            sort_by=metadata.get('sort_by', 'key'),
-            sort_by_metric=metadata.get('sort_by_metric', 'first'),
-            sort_ascending=metadata.get('sort_ascending', False),
-        )
+        get_logger().warning('Sorting buckets has not been implemented')
+        # self.sort_bucket_info(
+        #     performance_over_bucket,
+        #     sort_by=metadata.get('sort_by', 'key'),
+        #     sort_by_metric=metadata.get('sort_by_metric', 'first'),
+        #     sort_ascending=metadata.get('sort_ascending', False),
+        # )
         sys_info.results = Result(
-            overall=overall_results, fine_grained=performance_over_bucket
+            overall=sys_info.results.overall, analyses=analyses
         )
         return sys_info
+
+

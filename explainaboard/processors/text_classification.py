@@ -5,7 +5,6 @@ from typing import Any
 
 from datalabs import aggregating
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.level import AnalysisLevel
@@ -15,8 +14,7 @@ from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
-from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
+from explainaboard.analysis.feature_funcs import get_basic_words, get_lexical_richness, count_tokens, feat_num_oov, feat_freq_rank, feat_length_freq
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
@@ -33,37 +31,40 @@ class TextClassificationProcessor(Processor):
             "text": feature.Value(
                 dtype="string",
                 description="the text of the example",
-                is_input=True,
             ),
             "true_label": feature.Value(
                 dtype="string",
                 description="the true label of the input",
-                is_input=True,
             ),
             "predicted_label": feature.Value(
                 dtype="string",
                 description="the predicted label",
-                is_input=True,
             ),
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
+                func=lambda info, x: count_tokens(info, x['text']),
             ),
             "text_chars": feature.Value(
                 dtype="float",
                 description="text length in characters",
+                func=lambda info, x: len(x['text']),
             ),
             "basic_words": feature.Value(
                 dtype="float",
                 description="the ratio of basic words",
+                func=lambda info, x: get_basic_words(x['text']),
             ),
             "lexical_richness": feature.Value(
                 dtype="float",
                 description="lexical diversity",
+                func=lambda info, x: get_lexical_richness(x['text']),
             ),
             "num_oov": feature.Value(
                 dtype="float",
                 description="the number of out-of-vocabulary words",
+                require_training_set=True,
+                func=lambda info, x, stat: feat_num_oov(info, x['text'], stat)
             ),
             "fre_rank": feature.Value(
                 dtype="float",
@@ -72,11 +73,13 @@ class TextClassificationProcessor(Processor):
                     "training set"
                 ),
                 require_training_set=True,
+                func=lambda info, x, stat: feat_freq_rank(info, x['text'], stat)
             ),
             "length_fre": feature.Value(
                 dtype="float",
                 description="the frequency of text length in training set",
                 require_training_set=True,
+                func=lambda info, x, stat: feat_length_freq(info, x['text'], stat)
             )
         }
         continuous_features = [k for k, v in features.items() if v.dtype == "float"]
@@ -97,53 +100,6 @@ class TextClassificationProcessor(Processor):
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_text_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
-
-    def _get_text_chars(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return len(existing_feature["text"])
-
-    def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return existing_feature["true_label"]
-
-    def _get_basic_words(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return get_basic_words(existing_feature["text"])
-
-    def _get_lexical_richness(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return get_lexical_richness(existing_feature["text"])
-
-    # training set dependent features
-    def _get_num_oov(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features,
-            statistics,
-            lambda x: x['text'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features,
-            statistics,
-            lambda x: x['text'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    def _get_length_fre(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        length = len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
-        return statistics['length_fre'].get(str(length), 0)
-
-    # --- End feature functions
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):

@@ -1,17 +1,17 @@
 import unittest
 
 # from dataclasses import asdict
-from explainaboard.info import BucketCase, BucketCaseLabeledSpan, BucketCaseSpan
+from explainaboard.info import AnalysisCase, AnalysisCaseLabeledSpan, AnalysisCaseSpan
 
 
-class TestBucketCaseClass(unittest.TestCase):
+class TestAnalysisCaseClass(unittest.TestCase):
     def test_bucket_class_class(self):
 
-        my_bucket_seq = BucketCase(sample_id=0)
+        my_bucket_seq = AnalysisCase(sample_id=0)
         # print(asdict(my_bucket_seq))
         # {'sample_id': '0'}
 
-        my_bucket_span = BucketCaseSpan(
+        my_bucket_span = AnalysisCaseSpan(
             sample_id=0,
             token_span=(2, 3),
             char_span=(10, 25),
@@ -19,7 +19,7 @@ class TestBucketCaseClass(unittest.TestCase):
             orig_str="input",
         )
 
-        my_bucket_labeled_span = BucketCaseLabeledSpan(
+        my_bucket_labeled_span = AnalysisCaseLabeledSpan(
             sample_id=0,
             token_span=(2, 3),
             char_span=(10, 25),

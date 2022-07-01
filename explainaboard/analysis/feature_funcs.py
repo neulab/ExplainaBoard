@@ -6,9 +6,23 @@ from typing import Any
 from lexicalrichness import LexicalRichness
 import sacrebleu
 
+from explainaboard.info import SysOutputInfo
 from explainaboard.utils import basic_words
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import unwrap
+
+def _get_tokenizer(sys_info: SysOutputInfo, side: str = 'source') -> Tokenizer:
+    if side == 'source':
+        return unwrap(sys_info.source_tokenizer)
+    elif side == 'target':
+        return unwrap(sys_info.target_tokenizer)
+    else:
+        raise ValueError(f'Bad side {side}')
+
+
+def count_tokens(sys_info: SysOutputInfo, text: str, side: str = 'source') -> float:
+    return len(_get_tokenizer(sys_info, side)(text))
 
 
 def get_similarity_by_sacrebleu(text1, text2):
@@ -68,34 +82,42 @@ def accumulate_vocab_from_samples(
 
 
 def feat_freq_rank(
-    existing_features: dict,
+    sys_info: SysOutputInfo,
+    text: str,
     statistics: Any,
-    text_from_sample: Callable,
-    tokenizer: Tokenizer,
+    side: str = 'source',
 ):
     fre_rank = 0
 
-    tokens = tokenizer(text_from_sample(existing_features))
+    tokens = _get_tokenizer(sys_info, side)(text)
+    max_rank = len(statistics['vocab_rank'])
     for w in tokens:
-        if w not in statistics['vocab_rank']:
-            fre_rank += len(statistics['vocab_rank'])
-        else:
-            fre_rank += statistics['vocab_rank'][w]
+        fre_rank += statistics['vocab_rank'].get(w, max_rank)
 
     return fre_rank * 1.0 / len(tokens)
 
 
 def feat_num_oov(
-    existing_features: dict,
+    sys_info: SysOutputInfo,
+    text: str,
     statistics: Any,
-    text_from_sample: Callable,
-    tokenizer: Tokenizer,
+    side: str = 'source',
 ):
     num_oov = 0
-    for w in tokenizer(text_from_sample(existing_features)):
-        if w not in statistics['vocab'].keys():
+    for w in _get_tokenizer(sys_info, side)(text):
+        if w not in statistics['vocab']:
             num_oov += 1
     return num_oov
+
+
+def feat_length_freq(
+        sys_info: SysOutputInfo,
+        text: str,
+        statistics: Any,
+        side: str = 'source',
+):
+    length = len(_get_tokenizer(sys_info, side)(text))
+    return statistics['length_fre'].get(str(length), 0)
 
 
 def cap_feature(s):

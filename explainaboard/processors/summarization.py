@@ -20,7 +20,7 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
+import explainaboard.analysis.feature_funcs
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
@@ -192,6 +192,6 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+        return explainaboard.analysis.feature_funcs.accumulate_vocab_from_samples(
             samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
         )

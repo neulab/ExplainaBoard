@@ -9,6 +9,8 @@ import sys
 from typing import Any, Optional
 
 from explainaboard import config
+from explainaboard.analysis.analyses import AnalysisResult
+from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.level import AnalysisLevel
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
@@ -55,72 +57,6 @@ class Performance:
         return cls(**{k: v for k, v in data_dict.items() if k in field_names})
 
 
-@dataclass
-class BucketCase:
-    """
-    A class to represent cases to display to users for analysis.
-    :param sample_id: The ID of a single sample
-    """
-
-    sample_id: int
-
-    def __post_init__(self):
-        if isinstance(self.sample_id, str):
-            raise ValueError
-
-    @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        return v
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> BucketCase:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
-
-
-@dataclass
-class BucketCaseSpan(BucketCase):
-    """
-    A bucket case that highlights a span in text.
-    :param text: The text that should be highlighted
-    :param token_span: The span of tokens to be highlighted
-    :param char_span: The span of characters to be highlighted
-    :param location: The name of the feature (e.g. "text", "source", "reference") over
-      which this span is calculated
-    """
-
-    token_span: tuple[int, int]
-    char_span: tuple[int, int]
-    orig_str: str
-    text: str
-
-    def __post_init__(self):
-        if isinstance(self.token_span, str) or isinstance(self.char_span, str):
-            raise ValueError
-
-
-@dataclass
-class BucketCaseMultiSpan(BucketCase):
-    """
-    A bucket case that highlights multiple spans in text
-    :param spans: The spans that are highlighted
-    """
-
-    spans: list[BucketCaseSpan]
-
-
-@dataclass
-class BucketCaseLabeledSpan(BucketCaseSpan):
-    """
-    A bucket case that highlights a span in text along with a label.
-    :param true_label: The actual label
-    :param predicted_label: The label that is predicted
-    """
-
-    true_label: str
-    predicted_label: str
 
 
 @dataclass
@@ -135,7 +71,7 @@ class BucketPerformance:
         if k == 'performances':
             return [Performance.from_dict(v1) for v1 in v]
         if k == 'bucket_samples' and isinstance(v, dict):
-            return [BucketCase.from_dict(v1) for v1 in v]
+            return [AnalysisCase.from_dict(v1) for v1 in v]
         else:
             return v
 
@@ -148,20 +84,10 @@ class BucketPerformance:
 
 
 @dataclass
-class BucketCaseCollection:
-    interval: tuple
-    samples: list[BucketCase]
-
-    def __len__(self):
-        return len(self.samples)
-
-
-@dataclass
 class Result:
-    overall: Optional[dict[str, Performance]] = None
+    overall: Optional[list[list[Performance]]] = None
     # {feature_name: {bucket_name: performance}}
-    fine_grained: Optional[dict[str, list[BucketPerformance]]] = None
-    calibration: Optional[list[Performance]] = None
+    analyses: Optional[list[list[AnalysisResult]]] = None
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
@@ -225,7 +151,7 @@ class SysOutputInfo:
     # code: str = None
     # download_link: str = None
     # paper_info: PaperInfo = PaperInfo()
-    features: Optional[list[AnalysisLevel]] = None
+    analyses: Optional[list[AnalysisLevel]] = None
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
@@ -336,8 +262,8 @@ class SysOutputInfo:
 @dataclass
 class OverallStatistics:
     sys_info: SysOutputInfo
-    metric_stats: list[MetricStats]
-    active_features: list[str]
+    analysis_cases: list[list[AnalysisCase]]
+    metric_stats: list[list[MetricStats]]
 
 
 def print_bucket_perfs(bucket_perfs: list[BucketPerformance], print_information: str):

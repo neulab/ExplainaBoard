@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Callable
 
 from explainaboard.analysis.analyses import BucketAnalysis
 
@@ -56,8 +56,8 @@ class FeatureType:
     _type: Optional[str] = None
     # description: descriptive information of a feature
     description: Optional[str] = None
-    # is_input: whether the feature is in the input
-    is_input: bool = False
+    # func: the function that is used to calculate the feature
+    func: Optional[Callable] = None
     # is_custom: whether this is a custom feature input from outside
     is_custom: bool = False
     # require_training_set: whether calculating this feature

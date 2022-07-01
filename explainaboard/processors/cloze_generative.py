@@ -13,7 +13,7 @@ from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
+import explainaboard.analysis.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -158,7 +158,7 @@ class ClozeGenerativeProcessor(Processor):
     def _get_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
+        return explainaboard.analysis.feature_funcs.feat_num_oov(
             existing_features,
             statistics,
             lambda x: x['context'],
@@ -170,7 +170,7 @@ class ClozeGenerativeProcessor(Processor):
     def _get_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
+        return explainaboard.analysis.feature_funcs.feat_freq_rank(
             existing_features,
             statistics,
             lambda x: x['context'],
@@ -197,6 +197,6 @@ class ClozeGenerativeProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+        return explainaboard.analysis.feature_funcs.accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
