@@ -4,7 +4,9 @@ from collections.abc import Iterator
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.metrics.eaas import EaaSMetricConfig
@@ -24,8 +26,8 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         return TaskType.machine_translation
 
     @classmethod
-    def default_features(cls) -> feature.Features:
-        f = super().default_features()
+    def default_analyses(cls) -> feature.Features:
+        f = super().default_analyses()
         f.update(
             feature.Features(
                 {
@@ -34,7 +36,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="the ratio between source and reference length",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),

@@ -1,15 +1,16 @@
 from dataclasses import asdict
 import unittest
 
-from explainaboard import feature
-from explainaboard.feature import (
-    BucketInfo,
+import explainaboard.analysis.analyses
+from explainaboard.analysis import feature
+from explainaboard.analysis.feature import (
     Dict,
     FeatureType,
     Position,
     Sequence,
     Value,
 )
+from explainaboard.analysis.analyses import BucketAnalysis
 
 
 class TestFeature(unittest.TestCase):
@@ -38,7 +39,7 @@ class TestFeature(unittest.TestCase):
                         dtype="float",
                         description="entity length",
                         is_bucket=True,
-                        bucket_info=BucketInfo(
+                        bucket_info=BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),
@@ -49,7 +50,7 @@ class TestFeature(unittest.TestCase):
                         dtype="string",
                         description="entity tag",
                         is_bucket=True,
-                        bucket_info=BucketInfo(
+                        bucket_info=BucketAnalysis(
                             method="bucket_attribute_discrete_value",
                             number=4,
                             setting=1,
@@ -75,7 +76,7 @@ class TestFeature(unittest.TestCase):
                     dtype="float",
                     description="sentence length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -86,7 +87,7 @@ class TestFeature(unittest.TestCase):
                     description="the ration between all entity "
                     "tokens and sentence tokens ",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -96,7 +97,7 @@ class TestFeature(unittest.TestCase):
                     dtype="float",
                     description="the number of out-of-vocabulary words",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -110,7 +111,7 @@ class TestFeature(unittest.TestCase):
                         "training set"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -126,7 +127,7 @@ class TestFeature(unittest.TestCase):
                                 dtype="float",
                                 description="entity length",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -137,7 +138,7 @@ class TestFeature(unittest.TestCase):
                                 dtype="string",
                                 description="entity tag",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_discrete_value",
                                     number=4,
                                     setting=1,
@@ -152,7 +153,7 @@ class TestFeature(unittest.TestCase):
                                     "characters of the entity are capital"
                                 ),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_discrete_value",
                                     number=4,
                                     setting=1,
@@ -164,7 +165,7 @@ class TestFeature(unittest.TestCase):
                                     "The relative position of an entity in a sentence"
                                 ),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -174,7 +175,7 @@ class TestFeature(unittest.TestCase):
                                 dtype="float",
                                 description="The number of characters of an entity",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -185,7 +186,7 @@ class TestFeature(unittest.TestCase):
                                 description="entity label consistency",
                                 is_bucket=True,
                                 require_training_set=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -196,7 +197,7 @@ class TestFeature(unittest.TestCase):
                                 description="entity frequency",
                                 is_bucket=True,
                                 require_training_set=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),

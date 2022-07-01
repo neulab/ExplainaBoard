@@ -13,7 +13,7 @@ also some rudimentary visualization tools at your disposal.
 **Histograms:** If you want to draw visualizations of the bucketed analysis results
 offline, you can run the following command over one or more reports:
 ```shell
-python -m explainaboard.analyzers.draw_hist --reports report1.json report2.json
+python -m explainaboard.visualizers.draw_hist --reports report1.json report2.json
 ```
 
 The results will be written out into the `figures` directory.

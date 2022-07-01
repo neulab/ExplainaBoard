@@ -10,7 +10,6 @@ import sklearn.metrics
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_custom_dataset_loader
-import explainaboard.metric
 import explainaboard.metrics.accuracy
 import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score

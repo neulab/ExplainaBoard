@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -17,7 +19,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         return TaskType.aspect_based_sentiment_classification
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "aspect": feature.Value("string"),
@@ -28,7 +30,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                     dtype="string",
                     description="category",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_discrete_value", number=4, setting=1
                     ),
                 ),
@@ -36,7 +38,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                     dtype="float",
                     description="sentence length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -46,7 +48,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                     dtype="float",
                     description="the number of chars",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -56,7 +58,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                     dtype="float",
                     description="entity numbers",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -66,7 +68,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                     dtype="float",
                     description="aspect length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -76,7 +78,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                     dtype="float",
                     description="aspect position",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),

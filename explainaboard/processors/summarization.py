@@ -10,7 +10,9 @@ from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
 from datalabs.operations.featurize.summarization import get_oracle_summary
 import numpy
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -61,8 +63,8 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
         return TaskType.summarization
 
     @classmethod
-    def default_features(cls) -> feature.Features:
-        f = super().default_features()
+    def default_analyses(cls) -> feature.Features:
+        f = super().default_analyses()
         f.update(
             feature.Features(
                 {
@@ -70,7 +72,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="compression",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),
@@ -80,7 +82,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="copy length",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),
@@ -90,7 +92,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="coverage",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),
@@ -100,7 +102,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="novelty",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),
@@ -110,7 +112,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="the sample-level oracle score",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),
@@ -120,7 +122,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                         dtype="float",
                         description="the sample-level oracle position",
                         is_bucket=True,
-                        bucket_info=feature.BucketInfo(
+                        bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                             method="bucket_attribute_specified_bucket_value",
                             number=4,
                             setting=(),

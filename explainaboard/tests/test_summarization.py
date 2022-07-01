@@ -59,9 +59,9 @@ class TestSummarization(unittest.TestCase):
         condgen_processor = get_processor(TaskType.conditional_generation.value)
         sum_processor = get_processor(TaskType.summarization.value)
 
-        condgen_features_1 = condgen_processor.default_features()
-        sum_features = sum_processor.default_features()
-        condgen_features_2 = condgen_processor.default_features()
+        condgen_features_1 = condgen_processor.default_analyses()
+        sum_features = sum_processor.default_analyses()
+        condgen_features_2 = condgen_processor.default_analyses()
 
         # MT features didn't change condgen features
         self.assertDictEqual(condgen_features_1, condgen_features_2)

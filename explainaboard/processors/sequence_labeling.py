@@ -7,7 +7,8 @@ from typing import cast
 
 from datalabs import aggregating, Dataset
 
-from explainaboard import feature
+import explainaboard.analysis.analyses
+from explainaboard.analysis import feature
 from explainaboard.info import (
     BucketCaseCollection,
     BucketCaseLabeledSpan,
@@ -39,7 +40,7 @@ class SeqLabProcessor(Processor):
         self._span_ops: SpanOps = self.default_span_ops()
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "tokens": feature.Sequence(feature=feature.Value("string")),
@@ -50,7 +51,7 @@ class SeqLabProcessor(Processor):
                     dtype="float",
                     description="sentence length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -61,7 +62,7 @@ class SeqLabProcessor(Processor):
                     description="the ration between all entity "
                     "tokens and sentence tokens ",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -71,7 +72,7 @@ class SeqLabProcessor(Processor):
                     dtype="float",
                     description="the number of out-of-vocabulary words",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -85,7 +86,7 @@ class SeqLabProcessor(Processor):
                         "training set"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -101,7 +102,7 @@ class SeqLabProcessor(Processor):
                                 dtype="float",
                                 description="span length",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -112,7 +113,7 @@ class SeqLabProcessor(Processor):
                                 dtype="string",
                                 description="the tag of the span",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_discrete_value",
                                     number=15,
                                     setting=1,
@@ -122,7 +123,7 @@ class SeqLabProcessor(Processor):
                                 dtype="string",
                                 description=("whether the span is capitalized"),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_discrete_value",
                                     number=4,
                                     setting=1,
@@ -134,7 +135,7 @@ class SeqLabProcessor(Processor):
                                     "relative position of span in the segment"
                                 ),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -144,7 +145,7 @@ class SeqLabProcessor(Processor):
                                 dtype="float",
                                 description="number of characters in the span",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -155,7 +156,7 @@ class SeqLabProcessor(Processor):
                                 description="span label consistency",
                                 is_bucket=True,
                                 require_training_set=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -166,7 +167,7 @@ class SeqLabProcessor(Processor):
                                 description="span frequency in the training data",
                                 is_bucket=True,
                                 require_training_set=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),

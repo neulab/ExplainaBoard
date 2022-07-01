@@ -158,6 +158,9 @@ class Metric:
         if data.size == 0:
             return np.array(0.0)
         else:
+            return np.me
+
+
             return np.mean(data, axis=-2)
 
     def calc_metric_from_aggregate(

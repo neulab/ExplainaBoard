@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import SeqCorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -16,7 +18,7 @@ class GrammaticalErrorCorrection(Processor):
         return TaskType.grammatical_error_correction
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "text": feature.Value("string"),
@@ -33,7 +35,7 @@ class GrammaticalErrorCorrection(Processor):
                     dtype="float",
                     description="length of the text",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),

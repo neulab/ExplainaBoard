@@ -5,7 +5,9 @@ import json
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.metrics.ranking import (
@@ -30,7 +32,7 @@ class KGLinkTailPredictionProcessor(Processor):
         return TaskType.kg_link_tail_prediction
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "true_head": feature.Value("string"),
@@ -45,7 +47,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     dtype="float",
                     description="number of words in the tail entity",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -55,7 +57,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     dtype="float",
                     description="number of words in the head entity",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -65,7 +67,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     dtype="float",
                     description="the frequency of tail entity in the training set",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -76,7 +78,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     dtype="float",
                     description="the frequency of link relation in the training set",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -87,7 +89,7 @@ class KGLinkTailPredictionProcessor(Processor):
                     dtype="float",
                     description="the frequency of head relation in the training set",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -101,7 +103,7 @@ class KGLinkTailPredictionProcessor(Processor):
                         "granularity to be added"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_discrete_value", number=2, setting=1
                     ),
                 ),
@@ -111,7 +113,7 @@ class KGLinkTailPredictionProcessor(Processor):
                         "most specific (highest) entity type level of true tail entity"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_discrete_value", number=8, setting=1
                     ),
                 ),

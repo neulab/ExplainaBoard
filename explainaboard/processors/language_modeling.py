@@ -5,7 +5,9 @@ from typing import Any, cast
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import (
     BucketCaseCollection,
     BucketCaseSpan,
@@ -30,7 +32,7 @@ class LanguageModelingProcessor(Processor):
         return TaskType.language_modeling
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "text": feature.Value("string"),
@@ -39,7 +41,7 @@ class LanguageModelingProcessor(Processor):
                     dtype="float",
                     description="text length in tokens",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -49,7 +51,7 @@ class LanguageModelingProcessor(Processor):
                     dtype="float",
                     description="text length in characters",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -59,7 +61,7 @@ class LanguageModelingProcessor(Processor):
                     dtype="float",
                     description="the number of out-of-vocabulary words",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -73,7 +75,7 @@ class LanguageModelingProcessor(Processor):
                         "training set"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -84,7 +86,7 @@ class LanguageModelingProcessor(Processor):
                     dtype="float",
                     description="the frequency of text length in training set",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -113,7 +115,7 @@ class LanguageModelingProcessor(Processor):
                                     "characters of the token are capital"
                                 ),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_discrete_value",
                                     number=4,
                                     setting=1,
@@ -125,7 +127,7 @@ class LanguageModelingProcessor(Processor):
                                     "The relative position of a token in a sentence"
                                 ),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -135,7 +137,7 @@ class LanguageModelingProcessor(Processor):
                                 dtype="float",
                                 description="The number of characters in a token",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -146,7 +148,7 @@ class LanguageModelingProcessor(Processor):
                                 description="tok frequency in the test set",
                                 is_bucket=True,
                                 require_training_set=False,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -157,7 +159,7 @@ class LanguageModelingProcessor(Processor):
                                 description="tok frequency in the training set",
                                 is_bucket=True,
                                 require_training_set=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),

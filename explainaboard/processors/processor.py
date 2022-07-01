@@ -10,8 +10,8 @@ from eaas.async_client import AsyncClient
 from eaas.config import Config
 import numpy as np
 
-from explainaboard import feature, TaskType
-from explainaboard.feature import Features
+from explainaboard import TaskType
+from explainaboard.analysis.level import AnalysisLevel
 from explainaboard.info import (
     BucketCase,
     BucketCaseCollection,
@@ -44,8 +44,11 @@ class Processor(metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def default_features(cls) -> feature.Features:
-        """Returns default features for this processor."""
+    def default_analyses(cls) -> list[AnalysisLevel]:
+        """Returns a list of analysis levels, indicating analyses that can be
+        applied to different views of the higher-level example. For instance, a task may
+        perform 'example'-level analysis, and 'token'-level analysis in which case this
+        list would have one level for each."""
         ...
 
     @classmethod
@@ -76,7 +79,7 @@ class Processor(metaclass=abc.ABCMeta):
         self._eaas_client: Optional[AsyncClient] = None
         # self._statistics_func = None
         self._preprocessor = None
-        self._default_features = self.default_features()
+        self._default_features = self.default_analyses()
         # A limit on the number of samples stored for each bucket. Hard-coded for now
         self._bucket_sample_limit = 50
 
@@ -208,51 +211,53 @@ class Processor(metaclass=abc.ABCMeta):
         """
         return data_point["predicted_label"]
 
-    def _customize_features(self, metadata: dict) -> Optional[Features]:
+    def _customize_analyses(self, metadata: dict) -> list[AnalysisLevel]:
         """
-        declare the customized features for this processor.
+        Customize analyses for this processor
         Args:
             metadata: the metadata information of system output
 
         Returns:
 
         """
-        features = copy.deepcopy(self._default_features)
 
-        # add user-defined features into features list
-        if metadata is not None:
-            for (
-                feature_name,
-                feature_config,
-            ) in metadata.items():
-                if feature_config["dtype"] == "string":
-                    features[feature_name] = feature.Value(
-                        dtype="string",
-                        description=feature_config["description"],
-                        is_bucket=True,
-                        is_custom=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_discrete_value",
-                            number=feature_config["num_buckets"],
-                            setting=1,
-                        ),
-                    )
-                elif feature_config["dtype"] == 'float':
-                    features[feature_name] = feature.Value(
-                        dtype="float",
-                        description=feature_config["description"],
-                        is_bucket=True,
-                        is_custom=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=feature_config["num_buckets"],
-                            setting=(),
-                        ),
-                    )
-                else:
-                    raise NotImplementedError
+        raise NotImplementedError('This needs to be implemented for analysis levels')
 
-        return features
+        # features = copy.deepcopy(self._default_features)
+        # # add user-defined features into features list
+        # if metadata is not None:
+        #     for (
+        #         feature_name,
+        #         feature_config,
+        #     ) in metadata.items():
+        #         if feature_config["dtype"] == "string":
+        #             features[feature_name] = feature.Value(
+        #                 dtype="string",
+        #                 description=feature_config["description"],
+        #                 is_bucket=True,
+        #                 is_custom=True,
+        #                 bucket_info=feature.BucketInfo(
+        #                     method="bucket_attribute_discrete_value",
+        #                     number=feature_config["num_buckets"],
+        #                     setting=1,
+        #                 ),
+        #             )
+        #         elif feature_config["dtype"] == 'float':
+        #             features[feature_name] = feature.Value(
+        #                 dtype="float",
+        #                 description=feature_config["description"],
+        #                 is_bucket=True,
+        #                 is_custom=True,
+        #                 bucket_info=feature.BucketInfo(
+        #                     method="bucket_attribute_specified_bucket_value",
+        #                     number=feature_config["num_buckets"],
+        #                     setting=(),
+        #                 ),
+        #             )
+        #         else:
+        #             raise NotImplementedError
+        #
+        # return features
 
     def _complete_features(
         self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
@@ -545,7 +550,7 @@ class Processor(metaclass=abc.ABCMeta):
 
         # declare customized features: _features will be updated
         custom_features: dict = metadata.get('custom_features', {})
-        sys_info.features = self._customize_features(custom_features)
+        sys_info.features = self._customize_analyses(custom_features)
 
         # get scoring statistics
         metric_stats = self._gen_metric_stats(sys_info, sys_output)

@@ -11,8 +11,8 @@ from explainaboard import (
     get_processor,
     TaskType,
 )
-from explainaboard.analyzers import get_pairwise_performance_gap
-from explainaboard.analyzers.draw_hist import draw_bar_chart_from_reports
+from explainaboard.visualizers import get_pairwise_performance_gap
+from explainaboard.visualizers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (

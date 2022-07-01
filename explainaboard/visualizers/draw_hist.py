@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 
-from explainaboard.analyzers.bar_chart import make_bar_chart
+from explainaboard.visualizers.bar_chart import make_bar_chart
 from explainaboard.info import BucketPerformance, Performance, SysOutputInfo
 from explainaboard.utils.logging import get_logger, progress
 from explainaboard.utils.typing_utils import unwrap

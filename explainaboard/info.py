@@ -9,7 +9,7 @@ import sys
 from typing import Any, Optional
 
 from explainaboard import config
-from explainaboard.feature import Features
+from explainaboard.analysis.level import AnalysisLevel
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.serialization import general_to_dict
@@ -225,7 +225,7 @@ class SysOutputInfo:
     # code: str = None
     # download_link: str = None
     # paper_info: PaperInfo = PaperInfo()
-    features: Optional[Features] = None
+    features: Optional[list[AnalysisLevel]] = None
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:

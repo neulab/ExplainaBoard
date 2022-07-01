@@ -5,7 +5,9 @@ from typing import Any
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -22,7 +24,7 @@ class QAExtractiveProcessor(Processor):
         return TaskType.qa_extractive
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "title": feature.Value("string"),
@@ -35,7 +37,7 @@ class QAExtractiveProcessor(Processor):
                     dtype="float",
                     description="context length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -45,7 +47,7 @@ class QAExtractiveProcessor(Processor):
                     dtype="float",
                     description="question length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -55,7 +57,7 @@ class QAExtractiveProcessor(Processor):
                     dtype="float",
                     description="answer length",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -65,7 +67,7 @@ class QAExtractiveProcessor(Processor):
                     dtype="float",
                     description="the number of out-of-vocabulary words",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -79,7 +81,7 @@ class QAExtractiveProcessor(Processor):
                         "training set"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),

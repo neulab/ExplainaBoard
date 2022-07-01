@@ -8,7 +8,9 @@ from datalabs import aggregating
 from eaas.async_client import AsyncClient
 import numpy as np
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import (
     BucketCase,
     BucketCaseCollection,
@@ -40,7 +42,7 @@ class ConditionalGenerationProcessor(Processor):
         return TaskType.conditional_generation
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "source": feature.Value("string"),
@@ -50,7 +52,7 @@ class ConditionalGenerationProcessor(Processor):
                     dtype="float",
                     description="length of the source",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -60,7 +62,7 @@ class ConditionalGenerationProcessor(Processor):
                     dtype="float",
                     description="length of the reference",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -70,7 +72,7 @@ class ConditionalGenerationProcessor(Processor):
                     dtype="float",
                     description="length of the hypothesis",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -80,7 +82,7 @@ class ConditionalGenerationProcessor(Processor):
                     dtype="float",
                     description="OOV words in the source",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -93,7 +95,7 @@ class ConditionalGenerationProcessor(Processor):
                         "average training-set frequency rank of words in sentence"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -104,7 +106,7 @@ class ConditionalGenerationProcessor(Processor):
                     dtype="float",
                     description="number of OOV words in reference",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -117,7 +119,7 @@ class ConditionalGenerationProcessor(Processor):
                         "average training-set frequency rank of words in sentence"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -143,7 +145,7 @@ class ConditionalGenerationProcessor(Processor):
                                 dtype="string",
                                 description=("capitalness of token"),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_discrete_value",
                                     number=4,
                                     setting=1,
@@ -153,7 +155,7 @@ class ConditionalGenerationProcessor(Processor):
                                 dtype="float",
                                 description=("relative position of token in sentence"),
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -163,7 +165,7 @@ class ConditionalGenerationProcessor(Processor):
                                 dtype="float",
                                 description="number of characters in the token",
                                 is_bucket=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -174,7 +176,7 @@ class ConditionalGenerationProcessor(Processor):
                                 description="tok frequency in the test set",
                                 is_bucket=True,
                                 require_training_set=False,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),
@@ -185,7 +187,7 @@ class ConditionalGenerationProcessor(Processor):
                                 description="tok frequency in the training set",
                                 is_bucket=True,
                                 require_training_set=True,
-                                bucket_info=feature.BucketInfo(
+                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                                     method="bucket_attribute_specified_bucket_value",
                                     number=4,
                                     setting=(),

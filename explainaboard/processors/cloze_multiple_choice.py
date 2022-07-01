@@ -5,7 +5,9 @@ from typing import Any
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -22,7 +24,7 @@ class ClozeMultipleChoiceProcessor(Processor):
         return TaskType.cloze_mutiple_choice
 
     @classmethod
-    def default_features(cls) -> feature.Features:
+    def default_analyses(cls) -> feature.Features:
         return feature.Features(
             {
                 "context": feature.Value("string"),
@@ -40,7 +42,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                     dtype="float",
                     description="the length of context",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -51,7 +53,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                     description="the relative position of blank (question mark)"
                     " in the whole context",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -62,7 +64,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                     description="the absolute position of blank (question mark)"
                     " in the whole context",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -72,7 +74,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                     dtype="float",
                     description="the length of answer",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -82,7 +84,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                     dtype="float",
                     description="the number of out-of-vocabulary words",
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
@@ -96,7 +98,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                         "training set"
                     ),
                     is_bucket=True,
-                    bucket_info=feature.BucketInfo(
+                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),

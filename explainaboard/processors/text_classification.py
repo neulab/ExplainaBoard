@@ -5,8 +5,12 @@ from typing import Any
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+import explainaboard.analysis.analyses
+from explainaboard import TaskType
+from explainaboard.analysis import feature
+from explainaboard.analysis.level import AnalysisLevel
 from explainaboard.info import SysOutputInfo
+from explainaboard.analysis.analyses import BucketAnalysis
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
@@ -24,98 +28,68 @@ class TextClassificationProcessor(Processor):
         return TaskType.text_classification
 
     @classmethod
-    def default_features(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "text": feature.Value("string"),
-                "true_label": feature.Value("string"),
-                "predicted_label": feature.Value("string"),
-                "label": feature.Value(
-                    dtype="string",
-                    description="category",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_discrete_value", number=4, setting=1
-                    ),
+    def default_analyses(cls) -> list[AnalysisLevel]:
+        features = {
+            "text": feature.Value(
+                dtype="string",
+                description="the text of the example",
+                is_input=True,
+            ),
+            "true_label": feature.Value(
+                dtype="string",
+                description="the true label of the input",
+                is_input=True,
+            ),
+            "predicted_label": feature.Value(
+                dtype="string",
+                description="the predicted label",
+                is_input=True,
+            ),
+            "text_length": feature.Value(
+                dtype="float",
+                description="text length in tokens",
+            ),
+            "text_chars": feature.Value(
+                dtype="float",
+                description="text length in characters",
+            ),
+            "basic_words": feature.Value(
+                dtype="float",
+                description="the ratio of basic words",
+            ),
+            "lexical_richness": feature.Value(
+                dtype="float",
+                description="lexical diversity",
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "the average rank of each word based on its frequency in "
+                    "training set"
                 ),
-                "text_length": feature.Value(
-                    dtype="float",
-                    description="text length in tokens",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "text_chars": feature.Value(
-                    dtype="float",
-                    description="text length in characters",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "basic_words": feature.Value(
-                    dtype="float",
-                    description="the ratio of basic words",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "lexical_richness": feature.Value(
-                    dtype="float",
-                    description="lexical diversity",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "length_fre": feature.Value(
-                    dtype="float",
-                    description="the frequency of text length in training set",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-            }
-        )
+                require_training_set=True,
+            ),
+            "length_fre": feature.Value(
+                dtype="float",
+                description="the frequency of text length in training set",
+                require_training_set=True,
+            )
+        }
+        continuous_features = [k for k, v in features.items() if v.dtype == "float"]
+
+        return [AnalysisLevel(
+            name='example',
+            features=features,
+            analyses=[
+                BucketAnalysis(
+                    feature="true_label", method="discrete", number=15,
+                )] +
+                [BucketAnalysis(x, method="continuous") for x in continuous_features]
+        )]
 
     @classmethod
     def default_metrics(

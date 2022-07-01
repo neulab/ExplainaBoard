@@ -2,26 +2,9 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Optional
 
-
-@dataclass
-class BucketInfo:
-    """
-    The class is used to define a dataclass for bucketing strategy
-    Args:
-        method: the bucket strategy
-        number: the number of buckets to be bucketed
-        setting: hyper-paraterms of bucketing
-    """
-
-    method: str = "bucket_attribute_specified_bucket_value"
-    number: int = 4
-    setting: Any = 1  # For different bucket_methods, the settings are diverse
-    _type: Optional[str] = None
-
-    def __post_init__(self):
-        self._type: str = self.__class__.__name__
+from explainaboard.analysis.analyses import BucketAnalysis
 
 
 def is_dataclass_dict(obj):
@@ -73,10 +56,8 @@ class FeatureType:
     _type: Optional[str] = None
     # description: descriptive information of a feature
     description: Optional[str] = None
-    # is_bucket: whether the feature will be used for bucketing
-    is_bucket: bool = False
-    # bucket_info: hyper-parameters for bucketing when is_bucket is True
-    bucket_info: Optional[BucketInfo] = None
+    # is_input: whether the feature is in the input
+    is_input: bool = False
     # is_custom: whether this is a custom feature input from outside
     is_custom: bool = False
     # require_training_set: whether calculating this feature
@@ -133,12 +114,6 @@ class Value(FeatureType):
 
     def __post_init__(self):
         super().__post_init__()
-        if self.is_bucket and self.bucket_info is None:
-            self.bucket_info = BucketInfo(
-                method="bucket_attribute_specified_bucket_value",
-                number=4,
-                setting=(),
-            )
         if self.dtype == "double":  # fix inferred type
             self.dtype = "float64"
         if self.dtype == "float":  # fix inferred type
@@ -151,50 +126,11 @@ FEATURETYPE_REGISTRY = {
     "Dict": Dict,
     "Position": Position,
     "Value": Value,
-    "BucketInfo": BucketInfo,
+    "BucketInfo": BucketAnalysis,
 }
 
 
 class Features(dict):
-    def get_bucket_features(self, include_training_dependent=True) -> list[str]:
-        """
-        Get features that would be used for bucketing
-        :param include_training_dependent: Include training-set dependent features
-        :return:
-        a list of features
-        """
-
-        bucket_features = []
-        dict_res = {}
-        for feature_name in self.keys():
-            dict_feature = copy.deepcopy(self[feature_name])
-
-            if isinstance(dict_feature, type(Value("float"))):
-                dict_res[feature_name] = dict_feature
-
-            elif isinstance(dict_feature, dict):
-                for k, v in dict_feature.items():
-                    dict_res[k] = v
-            else:
-                while (
-                    not isinstance(dict_feature, dict)
-                    and "feature" in dict_feature.__dict__.keys()
-                ):
-                    dict_feature = dict_feature.feature
-
-                if isinstance(dict_feature, type(Value("float"))):
-                    dict_res[feature_name] = dict_feature
-
-                if isinstance(dict_feature, dict):
-                    for k, v in dict_feature.items():
-                        dict_res[k] = v
-
-        for feature_name, feature_info in dict_res.items():
-            if feature_info.is_bucket:
-                if include_training_dependent or not feature_info.require_training_set:
-                    bucket_features.append(feature_name)
-
-        return bucket_features
 
     def get_pre_computed_features(self) -> list:
         """
