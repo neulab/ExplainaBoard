@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Sequence
 
 from datalabs import aggregating
 
 import explainaboard.analysis.analyses
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.feature_funcs import (
+    count_tokens,
+    feat_freq_rank,
+    feat_num_oov,
+)
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
@@ -25,49 +31,74 @@ class QAMultipleChoiceProcessor(Processor):
 
     @classmethod
     def default_analyses(cls) -> feature.Features:
+        features = {
+            "context": feature.Value("string"),
+            "question": feature.Value("string"),
+            "options": feature.Sequence(feature=feature.Value("string")),
+            "answers": feature.Sequence(
+                feature=feature.Dict(
+                    feature={
+                        "text": feature.Value("string"),
+                        "option_index": feature.Value("int32"),
+                    }
+                )
+            ),
+            "context_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x: count_tokens(info, x['context']),
+            ),
+            "question_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x: count_tokens(info, x['question']),
+            ),
+            "answer_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x: count_tokens(info, x['answers']['text'], side='target'),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words in the context",
+                require_training_set=True,
+                func=lambda info, x, stat: feat_num_oov(info, x['context'], stat['vocab']),
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "average rank of context words based on training set freq"
+                ),
+                require_training_set=True,
+                func=lambda info, x, stat: feat_freq_rank(
+                    info, x['context'], stat['vocab_rank']
+                ),
+            ),
+        }
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses: Sequence[Analysis] = [
+                                           BucketAnalysis(
+                                               feature="true_label",
+                                               method="discrete",
+                                               number=15,
+                                           )
+                                       ] + [BucketAnalysis(x, method="continuous") for x in continuous_features]
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=cls.default_metrics(),
+                analyses=analyses,
+            )
+        ]
+
+
+
         return feature.Features(
             {
-                "context": feature.Value("string"),
-                "question": feature.Value("string"),
-                "options": feature.Sequence(feature=feature.Value("string")),
-                "answers": feature.Sequence(
-                    feature=feature.Dict(
-                        feature={
-                            "text": feature.Value("string"),
-                            "option_index": feature.Value("int32"),
-                        }
-                    )
-                ),
-                "context_length": feature.Value(
-                    dtype="float",
-                    description="the length of context",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "question_length": feature.Value(
-                    dtype="float",
-                    description="the length of question",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "answer_length": feature.Value(
-                    dtype="float",
-                    description="the length of answer",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
                 "num_oov": feature.Value(
                     dtype="float",
                     description="the number of out-of-vocabulary words",

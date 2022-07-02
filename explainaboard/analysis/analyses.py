@@ -8,7 +8,7 @@ import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import Value
+from explainaboard.analysis.feature import Value, FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
@@ -153,6 +153,6 @@ class BucketAnalysis(Analysis):
 @dataclass
 class AnalysisLevel:
     name: str
-    features: dict[str, Value]
+    features: dict[str, FeatureType]
     analyses: Sequence[Analysis]
     metric_configs: Sequence[MetricConfig]
