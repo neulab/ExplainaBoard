@@ -11,8 +11,6 @@ from explainaboard import (
     get_processor,
     TaskType,
 )
-from explainaboard.visualizers import get_pairwise_performance_gap
-from explainaboard.visualizers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (
@@ -28,6 +26,8 @@ from explainaboard.utils.tensor_analysis import (
     print_score_tensor,
 )
 from explainaboard.utils.typing_utils import unwrap
+from explainaboard.visualizers import get_pairwise_performance_gap
+from explainaboard.visualizers.draw_hist import draw_bar_chart_from_reports
 
 
 def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:

@@ -8,17 +8,22 @@ from datalabs import aggregating
 from eaas.async_client import AsyncClient
 import numpy as np
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
-from explainaboard.analysis import feature, bucketing
+from explainaboard.analysis import bucketing, feature
+import explainaboard.analysis.analyses
 from explainaboard.analysis.case import (
     AnalysisCase,
     AnalysisCaseCollection,
     AnalysisCaseMultiSpan,
     AnalysisCaseSpan,
 )
-from explainaboard.info import SysOutputInfo
+import explainaboard.analysis.feature_funcs
+from explainaboard.analysis.feature_funcs import (
+    accumulate_vocab_from_samples,
+    cap_feature,
+)
 from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.info import SysOutputInfo
 import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
@@ -26,8 +31,6 @@ import explainaboard.metrics.metric
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.analysis.feature_funcs
-from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples, cap_feature
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator

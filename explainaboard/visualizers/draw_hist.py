@@ -4,11 +4,11 @@ import argparse
 import json
 import os
 
-from explainaboard.visualizers.bar_chart import make_bar_chart
-from explainaboard.info import SysOutputInfo
 from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.info import SysOutputInfo
 from explainaboard.utils.logging import get_logger, progress
 from explainaboard.utils.typing_utils import unwrap
+from explainaboard.visualizers.bar_chart import make_bar_chart
 
 
 def draw_bar_chart_from_reports(

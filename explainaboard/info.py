@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 from explainaboard import config
 from explainaboard.analysis.analyses import AnalysisLevel
@@ -103,7 +103,9 @@ class SysOutputInfo:
             replace_keys = []
             for key, value in data.items():
                 if isinstance(value, Callable):
-                    get_logger().warning(f'Temporarily allowing serialization of {type(value)}')
+                    get_logger().warning(
+                        f'Temporarily allowing serialization of {type(value)}'
+                    )
                     data[key] = str(value)
                 if not isinstance(key, str):
                     replace_keys.append(key)

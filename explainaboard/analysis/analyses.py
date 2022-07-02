@@ -1,15 +1,16 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Any, Optional, Callable, TypeVar, Sequence
+from typing import Any, Optional, TypeVar
 
 import numpy as np
 
+import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import Value
 from explainaboard.analysis.performance import BucketPerformance, Performance
-import explainaboard.analysis.bucketing
-from explainaboard.metrics.metric import MetricStats, Metric, MetricConfig
+from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.typing_utils import unwrap_generator
 
@@ -24,7 +25,13 @@ class AnalysisResult:
 
 @dataclass
 class Analysis:
-    def perform(self, cases: list[AnalysisCase], metrics: list[Metric], stats: list[MetricStats], conf_value: float) -> AnalysisResult | None:
+    def perform(
+        self,
+        cases: list[AnalysisCase],
+        metrics: list[Metric],
+        stats: list[MetricStats],
+        conf_value: float,
+    ) -> AnalysisResult | None:
         raise NotImplementedError
 
 
@@ -74,14 +81,18 @@ class BucketAnalysis(Analysis):
     ) -> list[AnalysisCaseType]:
         if len(analysis_cases) > self.sample_limit:
             ids = np.array(range(len(analysis_cases)))
-            bucket_sample_ids = np.random.choice(
-                ids, self.sample_limit, replace=False
-            )
+            bucket_sample_ids = np.random.choice(ids, self.sample_limit, replace=False)
             return [analysis_cases[i] for i in bucket_sample_ids]
         else:
             return analysis_cases
 
-    def perform(self, cases: list[AnalysisCase], metrics: list[Metric], stats: list[MetricStats], conf_value: float) -> AnalysisResult | None:
+    def perform(
+        self,
+        cases: list[AnalysisCase],
+        metrics: list[Metric],
+        stats: list[MetricStats],
+        conf_value: float,
+    ) -> AnalysisResult | None:
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
@@ -90,10 +101,7 @@ class BucketAnalysis(Analysis):
         if len(cases) == 0 or self.feature not in cases[0].features:
             return None
         samples_over_bucket = bucket_func(
-            sample_features=[
-                (x, x.features[self.feature])
-                for x in cases
-            ],
+            sample_features=[(x, x.features[self.feature]) for x in cases],
             bucket_number=self.number,
             bucket_setting=self.setting,
         )
@@ -113,8 +121,8 @@ class BucketAnalysis(Analysis):
             )
 
             for metric_func, metric_stat in zip(
-                    unwrap_generator(metrics),
-                    unwrap_generator(stats),
+                unwrap_generator(metrics),
+                unwrap_generator(stats),
             ):
                 bucket_stats = metric_stat.filter(sample_ids)
                 metric_result = metric_func.evaluate_from_stats(

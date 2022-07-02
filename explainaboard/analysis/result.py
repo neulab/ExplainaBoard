@@ -34,4 +34,3 @@ class Result:
         return cls(
             **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
         )
-

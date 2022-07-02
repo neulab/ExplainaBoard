@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 import copy
 from dataclasses import dataclass, field
-from typing import Optional, Callable
+from typing import Optional
+
 
 def is_dataclass_dict(obj):
     """
@@ -127,7 +129,6 @@ FEATURETYPE_REGISTRY = {
 
 
 class Features(dict):
-
     def get_pre_computed_features(self) -> list:
         """
         Get features that would be used for bucketing

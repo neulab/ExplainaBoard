@@ -7,14 +7,11 @@ from typing import cast
 
 from datalabs import aggregating, Dataset
 
+from explainaboard.analysis import bucketing, feature
 import explainaboard.analysis.analyses
-from explainaboard.analysis import feature, bucketing
-from explainaboard.info import SysOutputInfo
-from explainaboard.analysis.case import (
-    AnalysisCaseCollection,
-    AnalysisCaseLabeledSpan,
-)
+from explainaboard.analysis.case import AnalysisCaseCollection, AnalysisCaseLabeledSpan
 from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabFileLoader
 from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricStats

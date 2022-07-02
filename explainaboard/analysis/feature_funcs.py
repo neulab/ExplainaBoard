@@ -12,6 +12,7 @@ from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
+
 def _get_tokenizer(sys_info: SysOutputInfo, side: str = 'source') -> Tokenizer:
     if side == 'source':
         return unwrap(sys_info.source_tokenizer)
@@ -84,15 +85,15 @@ def accumulate_vocab_from_samples(
 def feat_freq_rank(
     sys_info: SysOutputInfo,
     text: str,
-    statistics: Any,
+    vocab_rank: dict[str, int],
     side: str = 'source',
-):
+) -> float:
     fre_rank = 0
 
     tokens = _get_tokenizer(sys_info, side)(text)
-    max_rank = len(statistics['vocab_rank'])
+    max_rank = len(vocab_rank)
     for w in tokens:
-        fre_rank += statistics['vocab_rank'].get(w, max_rank)
+        fre_rank += vocab_rank.get(w, max_rank)
 
     return fre_rank * 1.0 / len(tokens)
 
@@ -100,24 +101,24 @@ def feat_freq_rank(
 def feat_num_oov(
     sys_info: SysOutputInfo,
     text: str,
-    statistics: Any,
+    vocab: dict[str, int],
     side: str = 'source',
-):
+) -> int:
     num_oov = 0
     for w in _get_tokenizer(sys_info, side)(text):
-        if w not in statistics['vocab']:
+        if w not in vocab:
             num_oov += 1
     return num_oov
 
 
 def feat_length_freq(
-        sys_info: SysOutputInfo,
-        text: str,
-        statistics: Any,
-        side: str = 'source',
-):
+    sys_info: SysOutputInfo,
+    text: str,
+    length_freq: dict[int, float],
+    side: str = 'source',
+) -> float:
     length = len(_get_tokenizer(sys_info, side)(text))
-    return statistics['length_fre'].get(str(length), 0)
+    return length_freq.get(length, 0.0)
 
 
 def cap_feature(s):

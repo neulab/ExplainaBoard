@@ -1,19 +1,26 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from typing import Any, Sequence
+from collections.abc import Iterator, Sequence
+from typing import Any
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.feature_funcs import (
+    count_tokens,
+    feat_freq_rank,
+    feat_length_freq,
+    feat_num_oov,
+    get_basic_words,
+    get_lexical_richness,
+)
 from explainaboard.info import SysOutputInfo
-from explainaboard.analysis.analyses import BucketAnalysis, AnalysisLevel, Analysis
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.analysis.feature_funcs import get_basic_words, get_lexical_richness, count_tokens, feat_num_oov, feat_freq_rank, feat_length_freq
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
@@ -63,7 +70,7 @@ class TextClassificationProcessor(Processor):
                 dtype="float",
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_num_oov(info, x['text'], stat)
+                func=lambda info, x, stat: feat_num_oov(info, x['text'], stat['vocab']),
             ),
             "fre_rank": feature.Value(
                 dtype="float",
@@ -72,29 +79,38 @@ class TextClassificationProcessor(Processor):
                     "training set"
                 ),
                 require_training_set=True,
-                func=lambda info, x, stat: feat_freq_rank(info, x['text'], stat)
+                func=lambda info, x, stat: feat_freq_rank(
+                    info, x['text'], stat['vocab_rank']
+                ),
             ),
             "length_fre": feature.Value(
                 dtype="float",
                 description="the frequency of text length in training set",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_length_freq(info, x['text'], stat)
-            )
+                func=lambda info, x, stat: feat_length_freq(
+                    info, x['text'], stat['length_fre']
+                ),
+            ),
         }
-        continuous_features = [k for k, v in features.items() if ('float' in unwrap(v.dtype))]
-        print(f'continuous_features = {continuous_features}')
-        analyses: Sequence[Analysis] = ([
-                BucketAnalysis(
-                    feature="true_label", method="discrete", number=15,
-                )] +
-                [BucketAnalysis(x, method="continuous") for x in continuous_features])
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses: Sequence[Analysis] = [
+            BucketAnalysis(
+                feature="true_label",
+                method="discrete",
+                number=15,
+            )
+        ] + [BucketAnalysis(x, method="continuous") for x in continuous_features]
 
-        return [AnalysisLevel(
-            name='example',
-            features=features,
-            metric_configs=cls.default_metrics(),
-            analyses=analyses
-        )]
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=cls.default_metrics(),
+                analyses=analyses,
+            )
+        ]
 
     @classmethod
     def default_metrics(
@@ -102,17 +118,16 @@ class TextClassificationProcessor(Processor):
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 
-
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
-        length_fre: dict[str, float] = {}
+        length_fre: dict[int, float] = {}
         total_samps = 0
         tokenizer = unwrap(sys_info.source_tokenizer)
         for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)
-            length = str(len(tokens))
+            length = len(tokens)
 
             length_fre[length] = length_fre.get(length, 0.0) + 1.0
 

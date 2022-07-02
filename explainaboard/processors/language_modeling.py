@@ -5,22 +5,17 @@ from typing import Any, cast
 
 from datalabs import aggregating
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
-from explainaboard.analysis import feature, bucketing
-from explainaboard.info import (
-    SysOutputInfo,
-)
-from explainaboard.analysis.case import (
-    AnalysisCaseCollection,
-    AnalysisCaseSpan,
-)
+from explainaboard.analysis import bucketing, feature
+import explainaboard.analysis.analyses
+from explainaboard.analysis.case import AnalysisCaseCollection, AnalysisCaseSpan
+from explainaboard.analysis.feature_funcs import cap_feature
 from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.log_prob import LogProbConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.analysis.feature_funcs import cap_feature
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
