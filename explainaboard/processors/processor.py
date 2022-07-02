@@ -9,17 +9,13 @@ from eaas.async_client import AsyncClient
 from eaas.config import Config
 
 from explainaboard import TaskType
-from explainaboard.analysis.analyses import AnalysisResult
-from explainaboard.analysis.level import AnalysisLevel
+from explainaboard.analysis.analyses import AnalysisResult, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.info import (
-    BucketPerformance,
-    OverallStatistics,
-    Performance,
-    print_bucket_perfs,
-    Result,
-    SysOutputInfo,
+    SysOutputInfo, OverallStatistics,
 )
+from explainaboard.analysis.result import Result
+from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -153,9 +149,6 @@ class Processor(metaclass=abc.ABCMeta):
                     )
         return statistics
 
-    def _get_metrics(self, sys_info: SysOutputInfo) -> list[Metric]:
-        return [config.to_metric() for config in unwrap(sys_info.metric_configs)]
-
     def _gen_metric_stats(
         self, sys_info: SysOutputInfo, sys_output: list[dict], cases: list[list[AnalysisCase]]
     ) -> list[list[MetricStats]]:
@@ -167,7 +160,7 @@ class Processor(metaclass=abc.ABCMeta):
         :return: Statistics sufficient for scoring
         """
         all_stats: list[list[MetricStats]] = []
-        for my_level, my_cases in zip(unwrap(sys_info.analyses), cases):
+        for my_level, my_cases in zip(unwrap(sys_info.analysis_levels), cases):
 
             if my_level.name == 'example':
                 true_data = [self._get_true_label(x) for x in sys_output]
@@ -176,8 +169,8 @@ class Processor(metaclass=abc.ABCMeta):
                 raise ValueError(f'unsupported analysis level {my_level.name}')
 
             metric_stats = []
-            for metric in my_level.metrics:
-                metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+            for metric_cfg in my_level.metric_configs:
+                metric_stats.append(metric_cfg.to_metric().calc_stats_from_data(true_data, pred_data))
 
         return all_stats
 
@@ -272,10 +265,12 @@ class Processor(metaclass=abc.ABCMeta):
         """
 
         all_results = []
-        for my_level, my_cases, my_stats in zip(unwrap(sys_info.analyses), analysis_cases, metric_stats):
+        for my_level, my_cases, my_stats in zip(unwrap(sys_info.analysis_levels), analysis_cases, metric_stats):
             my_results = []
+            my_metrics = [x.to_metric() for x in my_level.metric_configs]
+            print(f'my_level.analyses = {my_level.analyses}')
             for my_analysis in progress(my_level.analyses, desc=f"{my_level.name}-level analysis"):
-                my_results.append(my_analysis.perform(sys_info, my_cases, my_stats))
+                my_results.append(my_analysis.perform(cases=my_cases, metrics=my_metrics, stats=my_stats, conf_value=sys_info.conf_value))
             all_results.append(my_results)
 
         return all_results
@@ -283,13 +278,13 @@ class Processor(metaclass=abc.ABCMeta):
     def _gen_cases_and_stats(self, sys_info: SysOutputInfo, sys_output: list[dict], statistics: Any) -> tuple[list[list[AnalysisCase]], list[list[MetricStats]]]:
         all_cases: list[list[AnalysisCase]] = []
         all_stats: list[list[MetricStats]] = []
-        for analysis_level in unwrap(sys_info.analyses):
+        for analysis_level in unwrap(sys_info.analysis_levels):
             if analysis_level.name == 'example':
                 cases = []
                 # Calculate metrics
                 true_data = [self._get_true_label(x) for x in sys_output]
                 pred_data = [self._get_predicted_label(x) for x in sys_output]
-                metric_stats = [x.calc_stats_from_data(true_data, pred_data) for x in analysis_level.metrics]
+                metric_stats = [x.to_metric().calc_stats_from_data(true_data, pred_data) for x in analysis_level.metric_configs]
                 # Calculate features
                 for i, output in progress(enumerate(sys_output), desc='calculating example-level features'):
                     features = {}
@@ -307,7 +302,6 @@ class Processor(metaclass=abc.ABCMeta):
                 raise NotImplementedError(f'Does not support analysis level {analysis_level.name} by default')
         return all_cases, all_stats
 
-
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
@@ -323,15 +317,14 @@ class Processor(metaclass=abc.ABCMeta):
         """
 
         overall_results = []
-        for my_level, my_cases, my_stats in zip(unwrap(sys_info.analyses), analysis_cases, metric_stats):
+        for my_level, my_cases, my_stats in zip(unwrap(sys_info.analysis_levels), analysis_cases, metric_stats):
 
             my_results = []
-            for metric_cfg, metric_func, metric_stat in zip(
-                unwrap_generator(sys_info.metric_configs),
-                unwrap_generator(my_level.metrics),
+            for metric_cfg, metric_stat in zip(
+                unwrap_generator(my_level.metric_configs),
                 my_stats,
             ):
-                metric_result = metric_func.evaluate_from_stats(
+                metric_result = metric_cfg.to_metric().evaluate_from_stats(
                     metric_stat,
                     conf_value=sys_info.conf_value,
                 )
@@ -358,18 +351,6 @@ class Processor(metaclass=abc.ABCMeta):
         to serializable values and deserialize. By default do nothing.
         """
         return output
-
-    def print_bucket_info(
-        self, performances_over_bucket: dict[str, list[BucketPerformance]]
-    ):
-        """
-        Print out performance bucket by bucket
-        :param performances_over_bucket:
-            dictionary of features -> buckets -> performance for different metrics
-        """
-        for feature_name, feature_value in performances_over_bucket.items():
-            print_bucket_perfs(feature_value, feature_name)
-
 
     def sort_bucket_info(
         self,
@@ -447,11 +428,12 @@ class Processor(metaclass=abc.ABCMeta):
             metadata["task_name"] = self.task_type().value
 
         sys_info = SysOutputInfo.from_dict(metadata)
-        if sys_info.metric_configs is None:
-            sys_info.metric_configs = self.default_metrics(
-                source_language=sys_info.source_language,
-                target_language=sys_info.target_language,
-            )
+        get_logger().warning('Temporarily disabled metric configs')
+        # if sys_info.metric_configs is None:
+        #     sys_info.metric_configs = self.default_metrics(
+        #         source_language=sys_info.source_language,
+        #         target_language=sys_info.target_language,
+        #     )
         if sys_info.target_tokenizer is None:
             sys_info.target_tokenizer = get_default_tokenizer(
                 task_type=self.task_type(), lang=sys_info.target_language
@@ -467,7 +449,7 @@ class Processor(metaclass=abc.ABCMeta):
 
         # declare customized features: _features will be updated
         custom_features: dict = metadata.get('custom_features', {})
-        sys_info.analyses = self._customize_analyses(custom_features)
+        sys_info.analysis_levels = self._customize_analyses(custom_features)
 
         # get scoring statistics
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
@@ -477,7 +459,6 @@ class Processor(metaclass=abc.ABCMeta):
         return OverallStatistics(sys_info, analysis_cases, metric_stats)
 
     def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
-        # TODO(Pengfei): Rethink if this is a good way to manipulate `system_output`
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = unwrap(overall_statistics.sys_info)
         analyses = self.perform_analyses(

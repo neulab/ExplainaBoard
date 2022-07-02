@@ -35,8 +35,9 @@ we will see how different types of information from `sys_info` are collected.
 
 
 #### Print Bucket-wise Evaluation Results
+
 ```python
-   processor.print_bucket_info(sys_info.results.fine_grained)
+   processor.print_analyses(sys_info.results.fine_grained)
 ```
 
 

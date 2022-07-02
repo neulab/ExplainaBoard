@@ -19,7 +19,7 @@ fine_grained_res = unwrap(sys_info.results.fine_grained)
 overall_res = unwrap(sys_info.results.overall)
 
 # print bucket information
-processor.print_bucket_info(fine_grained_res)
+processor.print_analyses(fine_grained_res)
 
 # save analysis report locally
 sys_info.print_as_json(file=open("./report.json", 'w'))

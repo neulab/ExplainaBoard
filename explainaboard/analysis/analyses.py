@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Optional, Callable, TypeVar
+from typing import Any, Optional, Callable, TypeVar, Sequence
 
 import numpy as np
 
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.info import BucketPerformance, SysOutputInfo, \
-    Performance
+from explainaboard.analysis.feature import Value
+from explainaboard.analysis.performance import BucketPerformance, Performance
 import explainaboard.analysis.bucketing
-from explainaboard.metrics.metric import MetricStats, Metric
+from explainaboard.metrics.metric import MetricStats, Metric, MetricConfig
+from explainaboard.utils.logging import get_logger
 from explainaboard.utils.typing_utils import unwrap_generator
 
 
@@ -17,10 +18,13 @@ from explainaboard.utils.typing_utils import unwrap_generator
 class AnalysisResult:
     name: str
 
+    def print(self):
+        raise NotImplementedError
+
 
 @dataclass
 class Analysis:
-    def perform(self, sys_info: SysOutputInfo, cases: list[AnalysisCase], metrics: list[Metric], stats: list[MetricStats]) -> AnalysisResult:
+    def perform(self, cases: list[AnalysisCase], metrics: list[Metric], stats: list[MetricStats], conf_value: float) -> AnalysisResult | None:
         raise NotImplementedError
 
 
@@ -28,6 +32,18 @@ class Analysis:
 class BucketAnalysisResult(AnalysisResult):
     bucket_performances: list[BucketPerformance]
 
+    def print(self):
+        metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
+        for i, metric_name in enumerate(metric_names):
+            get_logger('report').info(f"the information of #{self.name}#")
+            get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
+            for bucket_perf in self.bucket_performances:
+                get_logger('report').info(
+                    f"{bucket_perf.bucket_interval}\t"
+                    f"{bucket_perf.performances[i].value}\t"
+                    f"{bucket_perf.n_samples}"
+                )
+            get_logger('report').info('')
 
 
 @dataclass
@@ -38,13 +54,13 @@ class BucketAnalysis(Analysis):
         feature: the name of the feature to bucket
         method: the bucket strategy
         number: the number of buckets to be bucketed
-        setting: hyper-paraterms of bucketing
+        setting: parameters of bucketing
     """
 
     feature: str
     method: str = "continuous"
     number: int = 4
-    setting: Any = 1  # For different bucket_methods, the settings are diverse
+    setting: Any = None  # For different bucket_methods, the settings are diverse
     sample_limit: int = 50
     _type: Optional[str] = None
 
@@ -65,12 +81,14 @@ class BucketAnalysis(Analysis):
         else:
             return analysis_cases
 
-    def perform(self, sys_info: SysOutputInfo, cases: list[AnalysisCase], metrics: list[Metric], stats: list[MetricStats]) -> AnalysisResult:
+    def perform(self, cases: list[AnalysisCase], metrics: list[Metric], stats: list[MetricStats], conf_value: float) -> AnalysisResult | None:
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
             self.method,
         )
+        if len(cases) == 0 or self.feature not in cases[0].features:
+            return None
         samples_over_bucket = bucket_func(
             sample_features=[
                 (x, x.features[self.feature])
@@ -94,15 +112,14 @@ class BucketAnalysis(Analysis):
                 bucket_samples=bucket_samples,
             )
 
-            for metric_cfg, metric_func, metric_stat in zip(
-                    unwrap_generator(sys_info.metric_configs),
+            for metric_func, metric_stat in zip(
                     unwrap_generator(metrics),
                     unwrap_generator(stats),
             ):
                 bucket_stats = metric_stat.filter(sample_ids)
                 metric_result = metric_func.evaluate_from_stats(
                     bucket_stats,
-                    conf_value=sys_info.conf_value,
+                    conf_value=conf_value,
                 )
 
                 conf_low, conf_high = (
@@ -112,7 +129,7 @@ class BucketAnalysis(Analysis):
                 )
 
                 performance = Performance(
-                    metric_name=metric_cfg.name,
+                    metric_name=metric_func.config.name,
                     value=metric_result.value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
@@ -125,4 +142,9 @@ class BucketAnalysis(Analysis):
         return BucketAnalysisResult(self.feature, bucket_performances)
 
 
-
+@dataclass
+class AnalysisLevel:
+    name: str
+    features: dict[str, Value]
+    analyses: Sequence[Analysis]
+    metric_configs: Sequence[MetricConfig]

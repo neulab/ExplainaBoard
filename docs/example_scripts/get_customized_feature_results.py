@@ -20,7 +20,7 @@ def get_customized_results(dataset, customized_features):
     sys_info = processor.process(metadata=metadata, sys_output=data.samples)
 
     # print bucket information
-    processor.print_bucket_info(sys_info.results.fine_grained)  # type: ignore
+    processor.print_analyses(sys_info.results.fine_grained)  # type: ignore
 
     # get overall results of different metrics
     for metric_name, metric_info in sys_info.results.overall.items():  # type: ignore

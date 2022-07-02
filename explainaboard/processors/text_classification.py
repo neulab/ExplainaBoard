@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, Sequence
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.level import AnalysisLevel
 from explainaboard.info import SysOutputInfo
-from explainaboard.analysis.analyses import BucketAnalysis
+from explainaboard.analysis.analyses import BucketAnalysis, AnalysisLevel, Analysis
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
@@ -82,16 +81,19 @@ class TextClassificationProcessor(Processor):
                 func=lambda info, x, stat: feat_length_freq(info, x['text'], stat)
             )
         }
-        continuous_features = [k for k, v in features.items() if v.dtype == "float"]
+        continuous_features = [k for k, v in features.items() if ('float' in unwrap(v.dtype))]
+        print(f'continuous_features = {continuous_features}')
+        analyses: Sequence[Analysis] = ([
+                BucketAnalysis(
+                    feature="true_label", method="discrete", number=15,
+                )] +
+                [BucketAnalysis(x, method="continuous") for x in continuous_features])
 
         return [AnalysisLevel(
             name='example',
             features=features,
-            analyses=[
-                BucketAnalysis(
-                    feature="true_label", method="discrete", number=15,
-                )] +
-                [BucketAnalysis(x, method="continuous") for x in continuous_features]
+            metric_configs=cls.default_metrics(),
+            analyses=analyses
         )]
 
     @classmethod

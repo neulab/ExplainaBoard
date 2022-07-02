@@ -1,8 +1,5 @@
 import dataclasses
 from dataclasses import dataclass
-from typing import Optional
-
-from explainaboard.metrics.metric import MetricStats
 
 
 @dataclass
@@ -24,7 +21,7 @@ class AnalysisCase:
         return v
 
     @classmethod
-    def from_dict(cls, data_dict: dict) -> AnalysisCase:
+    def from_dict(cls, data_dict: dict):
         field_names = set(f.name for f in dataclasses.fields(cls))
         return cls(
             **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}

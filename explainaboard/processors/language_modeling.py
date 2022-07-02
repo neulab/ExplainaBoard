@@ -9,12 +9,13 @@ import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature, bucketing
 from explainaboard.info import (
-    AnalysisCaseCollection,
-    AnalysisCaseSpan,
-    BucketPerformance,
-    Performance,
     SysOutputInfo,
 )
+from explainaboard.analysis.case import (
+    AnalysisCaseCollection,
+    AnalysisCaseSpan,
+)
+from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.log_prob import LogProbConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor

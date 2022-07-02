@@ -11,15 +11,14 @@ import numpy as np
 import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature, bucketing
-from explainaboard.info import (
+from explainaboard.analysis.case import (
     AnalysisCase,
     AnalysisCaseCollection,
     AnalysisCaseMultiSpan,
     AnalysisCaseSpan,
-    BucketPerformance,
-    Performance,
-    SysOutputInfo,
 )
+from explainaboard.info import SysOutputInfo
+from explainaboard.analysis.performance import BucketPerformance, Performance
 import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig

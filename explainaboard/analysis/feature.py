@@ -4,9 +4,6 @@ import copy
 from dataclasses import dataclass, field
 from typing import Optional, Callable
 
-from explainaboard.analysis.analyses import BucketAnalysis
-
-
 def is_dataclass_dict(obj):
     """
     this function is used to judge if obj is a dictionary with a key `_type`
@@ -126,7 +123,6 @@ FEATURETYPE_REGISTRY = {
     "Dict": Dict,
     "Position": Position,
     "Value": Value,
-    "BucketInfo": BucketAnalysis,
 }
 
 

@@ -9,13 +9,12 @@ from datalabs import aggregating, Dataset
 
 import explainaboard.analysis.analyses
 from explainaboard.analysis import feature, bucketing
-from explainaboard.info import (
+from explainaboard.info import SysOutputInfo
+from explainaboard.analysis.case import (
     AnalysisCaseCollection,
     AnalysisCaseLabeledSpan,
-    BucketPerformance,
-    Performance,
-    SysOutputInfo,
 )
+from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.loaders.file_loader import DatalabFileLoader
 from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricStats

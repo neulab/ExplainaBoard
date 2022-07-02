@@ -21,7 +21,7 @@ def find_key(dict_obj, x):
             return k
 
 
-def bucket_attribute_specified_bucket_value(
+def continuous(
     sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int = 4,
     bucket_setting: Any = None,
@@ -29,10 +29,7 @@ def bucket_attribute_specified_bucket_value(
     if len(sample_features) == 0:
         return [AnalysisCaseCollection(_INFINITE_INTERVAL, [])]
     if bucket_setting is not None and len(bucket_setting) > 0:
-        raise NotImplementedError(
-            'bucket_setting incompatible with '
-            'bucket_attribute_specified_bucket_value'
-        )
+        raise NotImplementedError('bucket_setting incompatible with continuous')
     # Bucketing different Attributes
     cases = [x1 for x1, x2 in sample_features]
     vals = np.array([x2 for x1, x2 in sample_features])
@@ -80,7 +77,7 @@ def bucket_attribute_specified_bucket_value(
     return bucket_collections
 
 
-def bucket_attribute_discrete_value(
+def discrete(
     sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int = int(1e10),
     bucket_setting: Any = 1,
@@ -92,6 +89,8 @@ def bucket_attribute_discrete_value(
     :param bucket_setting: Minimum number of examples per bucket
     """
     feat2case = {}
+    if bucket_setting is None:
+        bucket_setting = 0
     for k, v in sample_features:
         if v not in feat2case:
             feat2case[v] = [k]
@@ -108,7 +107,7 @@ def bucket_attribute_discrete_value(
     return bucket_collections
 
 
-def bucket_attribute_specified_bucket_interval(
+def fixed_continuous(
     sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int,
     bucket_setting: list[tuple],

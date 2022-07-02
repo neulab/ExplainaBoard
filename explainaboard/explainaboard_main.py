@@ -459,13 +459,17 @@ def main():
 
             # print to the console
             get_logger('report').info('--- Overall Performance')
-            for metric_stat in report.results.overall.values():
-                get_logger('report').info(
-                    f'{metric_stat.metric_name}\t{metric_stat.value}'
-                )
+            for overall_level in report.results.overall:
+                for metric_stat in overall_level:
+                    get_logger('report').info(
+                        f'{metric_stat.metric_name}\t{metric_stat.value}'
+                    )
             get_logger('report').info('')
-            get_logger('report').info('--- Bucketed Performance')
-            processor.print_bucket_info(report.results.fine_grained)
+            get_logger('report').info('--- Fine-grained Analyses')
+            for analysis_level in report.results.analyses:
+                for analysis in analysis_level:
+                    if analysis is not None:
+                        analysis.print()
 
             if output_dir:
 

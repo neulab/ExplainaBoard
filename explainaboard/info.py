@@ -6,12 +6,12 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Any, Optional
+from typing import Optional, Callable
 
 from explainaboard import config
-from explainaboard.analysis.analyses import AnalysisResult
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
-from explainaboard.analysis.level import AnalysisLevel
+from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.serialization import general_to_dict
@@ -42,73 +42,6 @@ class PaperInfo:
     author: Optional[str] = None
     url: Optional[str] = None
     bib: Optional[str] = None
-
-
-@dataclass
-class Performance:
-    metric_name: str
-    value: float
-    confidence_score_low: Optional[float] = None
-    confidence_score_high: Optional[float] = None
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> Performance:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(**{k: v for k, v in data_dict.items() if k in field_names})
-
-
-
-
-@dataclass
-class BucketPerformance:
-    bucket_interval: tuple
-    n_samples: float
-    bucket_samples: list[Any] = field(default_factory=list)
-    performances: list[Performance] = field(default_factory=list)
-
-    @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        if k == 'performances':
-            return [Performance.from_dict(v1) for v1 in v]
-        if k == 'bucket_samples' and isinstance(v, dict):
-            return [AnalysisCase.from_dict(v1) for v1 in v]
-        else:
-            return v
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> BucketPerformance:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
-
-
-@dataclass
-class Result:
-    overall: Optional[list[list[Performance]]] = None
-    # {feature_name: {bucket_name: performance}}
-    analyses: Optional[list[list[AnalysisResult]]] = None
-
-    @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        if k == 'overall':
-            return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
-        elif k == 'fine_grained':
-            return {
-                k1: [BucketPerformance.from_dict(v2) for v2 in v1]
-                for k1, v1 in v.items()
-            }
-        elif k == 'calibration':
-            return None if v is None else [Performance.from_dict(v1) for v1 in v]
-        else:
-            raise NotImplementedError
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> Result:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
 
 
 @dataclass
@@ -143,15 +76,14 @@ class SysOutputInfo:
     is_print_case: bool = True
     conf_value: float = 0.05
     system_details: Optional[dict] = None
-    metric_configs: Optional[list[MetricConfig]] = None
     source_tokenizer: Optional[Tokenizer] = None
     target_tokenizer: Optional[Tokenizer] = None
+    analysis_levels: Optional[list[AnalysisLevel]] = None
 
     # set later
     # code: str = None
     # download_link: str = None
     # paper_info: PaperInfo = PaperInfo()
-    analyses: Optional[list[AnalysisLevel]] = None
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
@@ -170,6 +102,9 @@ class SysOutputInfo:
         else:
             replace_keys = []
             for key, value in data.items():
+                if isinstance(value, Callable):
+                    get_logger().warning(f'Temporarily allowing serialization of {type(value)}')
+                    data[key] = str(value)
                 if not isinstance(key, str):
                     replace_keys.append(key)
                 if isinstance(value, dict) or isinstance(value, list):
@@ -264,17 +199,3 @@ class OverallStatistics:
     sys_info: SysOutputInfo
     analysis_cases: list[list[AnalysisCase]]
     metric_stats: list[list[MetricStats]]
-
-
-def print_bucket_perfs(bucket_perfs: list[BucketPerformance], print_information: str):
-    metric_names = [x.metric_name for x in bucket_perfs[0].performances]
-    for i, metric_name in enumerate(metric_names):
-        get_logger('report').info(f"the information of #{print_information}#")
-        get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
-        for bucket_perf in bucket_perfs:
-            get_logger('report').info(
-                f"{bucket_perf.bucket_interval}\t"
-                f"{bucket_perf.performances[i].value}\t"
-                f"{bucket_perf.n_samples}"
-            )
-        get_logger('report').info('')
