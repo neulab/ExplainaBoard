@@ -30,7 +30,7 @@ class QAMultipleChoiceProcessor(Processor):
         return TaskType.qa_multiple_choice
 
     @classmethod
-    def default_analyses(cls) -> feature.Features:
+    def default_analyses(cls) -> list[AnalysisLevel]:
         features = {
             "context": feature.Value("string"),
             "question": feature.Value("string"),
@@ -62,7 +62,7 @@ class QAMultipleChoiceProcessor(Processor):
                 dtype="float",
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_num_oov(info, x['context'], stat['vocab']),
+                func=lambda info, x, stat: feat_num_oov(info, x['context'], stat),
             ),
             "fre_rank": feature.Value(
                 dtype="float",
@@ -71,20 +71,14 @@ class QAMultipleChoiceProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, stat: feat_freq_rank(
-                    info, x['context'], stat['vocab_rank']
+                    info, x['context'], stat
                 ),
             ),
         }
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: Sequence[Analysis] = [
-                                           BucketAnalysis(
-                                               feature="true_label",
-                                               method="discrete",
-                                               number=15,
-                                           )
-                                       ] + [BucketAnalysis(x, method="continuous") for x in continuous_features]
+        analyses: Sequence[Analysis] = [BucketAnalysis(x, method="continuous") for x in continuous_features]
 
         return [
             AnalysisLevel(
@@ -94,38 +88,6 @@ class QAMultipleChoiceProcessor(Processor):
                 analyses=analyses,
             )
         ]
-
-
-
-        return feature.Features(
-            {
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-            }
-        )
 
     @classmethod
     def default_metrics(
@@ -146,43 +108,6 @@ class QAMultipleChoiceProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
-
-    def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
-
-    def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(
-            unwrap(sys_info.target_tokenizer)(existing_features["answers"]["text"])
-        )
-
-    # training set dependent features
-    def _get_num_oov(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.analysis.feature_funcs.feat_num_oov(
-            existing_features,
-            statistics,
-            lambda x: x['context'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.analysis.feature_funcs.feat_freq_rank(
-            existing_features,
-            statistics,
-            lambda x: x['context'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # --- End feature functions
 
     def _get_true_label(self, data_point):
         """
