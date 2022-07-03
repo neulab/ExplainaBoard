@@ -2,10 +2,8 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders import get_custom_dataset_loader, get_datalab_loader
-from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.loaders import get_custom_dataset_loader
 from explainaboard.tests.utils import test_artifacts_path
-from explainaboard.utils import cache_api
 
 
 class TestSummarization(unittest.TestCase):
@@ -70,33 +68,34 @@ class TestSummarization(unittest.TestCase):
         # condgen features are a subset of sum features
         self.assertDictEqual(sum_features, {**sum_features, **condgen_features_1})
 
-    def test_datalab_loader(self):
-
-        json_output_customized = cache_api.cache_online_file(
-            'http://www.phontron.com/download/cnndm-bart-output.txt',
-            'predictions/summarization/cnndm-bart-output.txt',
-        )
-
-        loader = get_datalab_loader(
-            TaskType.summarization,
-            dataset=DatalabLoaderOption("cnn_dailymail", "3.0.0"),
-            output_data=json_output_customized,
-            output_source=Source.local_filesystem,
-            output_file_type=FileType.text,
-        )
-        data = loader.load()
-
-        metadata = {
-            "task_name": TaskType.summarization.value,
-            "dataset_name": "cnn_dailymail",
-            "sub_dataset_name": "3.0.0",
-            "metric_names": ["rouge1"],
-        }
-        processor = get_processor(TaskType.summarization)
-        sys_info = processor.process(metadata, data)
-
-        self.assertIsNotNone(sys_info.results.fine_grained)
-        self.assertGreater(len(sys_info.results.overall), 0)
+    # Commented out following code since it's too slow for unittest
+    # def test_datalab_loader(self):
+    #
+    #     json_output_customized = cache_api.cache_online_file(
+    #         'http://www.phontron.com/download/cnndm-bart-output.txt',
+    #         'predictions/summarization/cnndm-bart-output.txt',
+    #     )
+    #
+    #     loader = get_datalab_loader(
+    #         TaskType.summarization,
+    #         dataset=DatalabLoaderOption("cnn_dailymail", "3.0.0"),
+    #         output_data=json_output_customized,
+    #         output_source=Source.local_filesystem,
+    #         output_file_type=FileType.text,
+    #     )
+    #     data = loader.load()
+    #
+    #     metadata = {
+    #         "task_name": TaskType.summarization.value,
+    #         "dataset_name": "cnn_dailymail",
+    #         "sub_dataset_name": "3.0.0",
+    #         "metric_names": ["rouge1"],
+    #     }
+    #     processor = get_processor(TaskType.summarization)
+    #     sys_info = processor.process(metadata, data)
+    #
+    #     self.assertIsNotNone(sys_info.results.fine_grained)
+    #     self.assertGreater(len(sys_info.results.overall), 0)
 
 
 if __name__ == '__main__':
