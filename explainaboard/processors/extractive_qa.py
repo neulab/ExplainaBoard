@@ -1,19 +1,25 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from typing import Any
 
 from datalabs import aggregating
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature
+import explainaboard.analysis.analyses
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+import explainaboard.analysis.feature_funcs
+from explainaboard.analysis.feature_funcs import (
+    count_tokens,
+    feat_freq_rank,
+    feat_num_oov,
+)
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.analysis.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -24,72 +30,64 @@ class QAExtractiveProcessor(Processor):
         return TaskType.qa_extractive
 
     @classmethod
-    def default_analyses(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "title": feature.Value("string"),
-                "context": feature.Value("string"),
-                "question": feature.Value("string"),
-                "id": feature.Value("string"),
-                "answers": feature.Sequence(feature=feature.Value("string")),
-                "predicted_answers": feature.Value("string"),
-                "context_length": feature.Value(
-                    dtype="float",
-                    description="context length",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+    def default_analyses(cls) -> list[AnalysisLevel]:
+        features = {
+            "context": feature.Value("string"),
+            "question": feature.Value("string"),
+            "id": feature.Value("string"),
+            "answers": feature.Sequence(feature=feature.Value("string")),
+            "predicted_answers": feature.Value("string"),
+            "context_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x: count_tokens(info, x['context']),
+            ),
+            "question_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x: count_tokens(info, x['question']),
+            ),
+            "answer_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x: count_tokens(
+                    info,
+                    x['answers']['text'][0]
+                    if isinstance(x["answers"]["text"], list)
+                    else x['answers']['text'],
+                    side='target',
                 ),
-                "question_length": feature.Value(
-                    dtype="float",
-                    description="question length",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words in the context",
+                require_training_set=True,
+                func=lambda info, x, stat: feat_num_oov(info, x['context'], stat),
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "average rank of context words based on training set freq"
                 ),
-                "answer_length": feature.Value(
-                    dtype="float",
-                    description="answer length",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-            }
-        )
+                require_training_set=True,
+                func=lambda info, x, stat: feat_freq_rank(info, x['context'], stat),
+            ),
+        }
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses: Sequence[Analysis] = [
+            BucketAnalysis(x, method="continuous") for x in continuous_features
+        ]
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=cls.default_metrics(),
+                analyses=analyses,
+            )
+        ]
 
     @classmethod
     def default_metrics(
@@ -117,56 +115,6 @@ class QAExtractiveProcessor(Processor):
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         return explainaboard.analysis.feature_funcs.accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
-        )
-
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
-
-    def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
-
-    def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        if isinstance(existing_features["answers"]["text"], list):
-            return len(
-                unwrap(sys_info.source_tokenizer)(
-                    existing_features["answers"]["text"][0]
-                )
-            )
-        else:
-            return len(
-                unwrap(sys_info.source_tokenizer)(existing_features["answers"]["text"])
-            )
-
-    def _get_sim_context_question(
-        self, sys_info: SysOutputInfo, existing_features: dict
-    ):
-
-        references = existing_features["context"]
-        hypothesis = existing_features["question"]
-
-        res_json = self._get_eaas_client().bleu([[references]], [hypothesis], lang="en")
-        return res_json["corpus_bleu"]
-
-    # training set dependent features (could be merged for optimization?)
-    def _get_num_oov(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.analysis.feature_funcs.feat_num_oov(
-            existing_features,
-            statistics,
-            lambda x: x['context'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    def _get_fre_rank(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.analysis.feature_funcs.feat_freq_rank(
-            existing_features,
-            statistics,
-            lambda x: x['context'],
-            unwrap(sys_info.source_tokenizer),
         )
 
     # --- End feature functions
