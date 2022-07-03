@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
-from typing import Any
 
 from datalabs import aggregating
 
@@ -29,8 +28,7 @@ class QAExtractiveProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.qa_extractive
 
-    @classmethod
-    def default_analyses(cls) -> list[AnalysisLevel]:
+    def default_analyses(self) -> list[AnalysisLevel]:
         features = {
             "context": feature.Value("string"),
             "question": feature.Value("string"),
@@ -84,7 +82,7 @@ class QAExtractiveProcessor(Processor):
             AnalysisLevel(
                 name='example',
                 features=features,
-                metric_configs=cls.default_metrics(),
+                metric_configs=self.default_metrics(),
                 analyses=analyses,
             )
         ]

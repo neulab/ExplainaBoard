@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
-from typing import Any
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import (
     count_tokens,
     feat_freq_rank,
@@ -31,9 +31,8 @@ class TextClassificationProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.text_classification
 
-    @classmethod
-    def default_analyses(cls) -> list[AnalysisLevel]:
-        features = {
+    def default_analyses(self) -> list[AnalysisLevel]:
+        features: dict[str, FeatureType] = {
             "text": feature.Value(
                 dtype="string",
                 description="the text of the example",
@@ -107,7 +106,7 @@ class TextClassificationProcessor(Processor):
             AnalysisLevel(
                 name='example',
                 features=features,
-                metric_configs=cls.default_metrics(),
+                metric_configs=self.default_metrics(),
                 analyses=analyses,
             )
         ]

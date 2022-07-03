@@ -1,25 +1,24 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from typing import Any, Sequence
+from collections.abc import Iterator, Sequence
 
 from datalabs import aggregating
 
+from explainaboard import TaskType
+from explainaboard.analysis import feature
 import explainaboard.analysis.analyses
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+import explainaboard.analysis.feature_funcs
 from explainaboard.analysis.feature_funcs import (
     count_tokens,
     feat_freq_rank,
     feat_num_oov,
 )
-from explainaboard import TaskType
-from explainaboard.analysis import feature
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.analysis.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -29,8 +28,7 @@ class QAMultipleChoiceProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.qa_multiple_choice
 
-    @classmethod
-    def default_analyses(cls) -> list[AnalysisLevel]:
+    def default_analyses(self) -> list[AnalysisLevel]:
         features = {
             "context": feature.Value("string"),
             "question": feature.Value("string"),
@@ -56,7 +54,9 @@ class QAMultipleChoiceProcessor(Processor):
             "answer_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
-                func=lambda info, x: count_tokens(info, x['answers']['text'], side='target'),
+                func=lambda info, x: count_tokens(
+                    info, x['answers']['text'], side='target'
+                ),
             ),
             "num_oov": feature.Value(
                 dtype="float",
@@ -70,21 +70,21 @@ class QAMultipleChoiceProcessor(Processor):
                     "average rank of context words based on training set freq"
                 ),
                 require_training_set=True,
-                func=lambda info, x, stat: feat_freq_rank(
-                    info, x['context'], stat
-                ),
+                func=lambda info, x, stat: feat_freq_rank(info, x['context'], stat),
             ),
         }
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: Sequence[Analysis] = [BucketAnalysis(x, method="continuous") for x in continuous_features]
+        analyses: Sequence[Analysis] = [
+            BucketAnalysis(x, method="continuous") for x in continuous_features
+        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=features,
-                metric_configs=cls.default_metrics(),
+                metric_configs=self.default_metrics(),
                 analyses=analyses,
             )
         ]

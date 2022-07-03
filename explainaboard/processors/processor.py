@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import copy
 from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, DatasetDict, load_dataset
@@ -14,7 +13,7 @@ from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -33,9 +32,8 @@ class Processor(metaclass=abc.ABCMeta):
         """Returns the task type of this processor."""
         ...
 
-    @classmethod
     @abc.abstractmethod
-    def default_analyses(cls) -> list[AnalysisLevel]:
+    def default_analyses(self) -> list[AnalysisLevel]:
         """Returns a list of analysis levels, indicating analyses that can be
         applied to different views of the higher-level example. For instance, a task may
         perform 'example'-level analysis, and 'token'-level analysis in which case this
@@ -70,7 +68,6 @@ class Processor(metaclass=abc.ABCMeta):
         self._eaas_client: Optional[AsyncClient] = None
         # self._statistics_func = None
         self._preprocessor = None
-        self._default_analyses = self.default_analyses()
         # A limit on the number of samples stored for each bucket. Hard-coded for now
         self._bucket_sample_limit = 50
 
@@ -210,7 +207,7 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
 
         """
-        analyses = copy.deepcopy(self._default_analyses)
+        analyses = self.default_analyses()
         get_logger().warning('Analysis customization is not implemented yet.')
         return analyses
 
