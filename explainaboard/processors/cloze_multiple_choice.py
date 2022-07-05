@@ -5,15 +5,15 @@ from typing import Any
 
 from datalabs import aggregating
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature
+import explainaboard.analysis.analyses
+import explainaboard.analysis.feature_funcs
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.analysis.feature_funcs
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -110,7 +110,7 @@ class ClozeMultipleChoiceProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             AccuracyConfig(

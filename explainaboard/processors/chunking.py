@@ -16,7 +16,7 @@ class ChunkingProcessor(SeqLabProcessor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             SeqF1ScoreConfig(

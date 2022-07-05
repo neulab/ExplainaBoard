@@ -202,7 +202,7 @@ class ConditionalGenerationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         defaults = ['rouge1', 'rouge2', 'rougeL', 'bleu', 'length_ratio']
         return [

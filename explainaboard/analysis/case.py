@@ -43,7 +43,6 @@ class AnalysisCaseSpan(AnalysisCase):
 
     token_span: tuple[int, int]
     char_span: tuple[int, int]
-    orig_str: str
     text: str
 
     def __post_init__(self):

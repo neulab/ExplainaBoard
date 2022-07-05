@@ -43,7 +43,7 @@ class Processor(metaclass=abc.ABCMeta):
     @classmethod
     @abc.abstractmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         """Returns the default metrics of this processor."""
         ...
@@ -285,42 +285,38 @@ class Processor(metaclass=abc.ABCMeta):
         return all_results
 
     def _gen_cases_and_stats(
-        self, sys_info: SysOutputInfo, sys_output: list[dict], statistics: Any
-    ) -> tuple[list[list[AnalysisCase]], list[list[MetricStats]]]:
-        all_cases: list[list[AnalysisCase]] = []
-        all_stats: list[list[MetricStats]] = []
-        for analysis_level in unwrap(sys_info.analysis_levels):
-            if analysis_level.name == 'example':
-                cases = []
-                # Calculate metrics
-                true_data = [self._get_true_label(x) for x in sys_output]
-                pred_data = [self._get_predicted_label(x) for x in sys_output]
-                metric_stats = [
-                    x.to_metric().calc_stats_from_data(true_data, pred_data)
-                    for x in analysis_level.metric_configs
-                ]
-                # Calculate features
-                for i, output in progress(
-                    enumerate(sys_output), desc='calculating example-level features'
-                ):
-                    features = {}
-                    for feat_name, feat_spec in analysis_level.features.items():
-                        if feat_spec.func is None:
-                            features[feat_name] = output[feat_name]
-                        elif not feat_spec.require_training_set:
-                            features[feat_name] = feat_spec.func(sys_info, output)
-                        elif statistics is not None:
-                            features[feat_name] = feat_spec.func(
-                                sys_info, output, statistics
-                            )
-                    cases.append(AnalysisCase(sample_id=i, features=features))
-                all_cases.append(cases)
-                all_stats.append(metric_stats)
-            else:
-                raise NotImplementedError(
-                    f'Does not support analysis level {analysis_level.name} by default'
-                )
-        return all_cases, all_stats
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: list[dict],
+        statistics: Any,
+        analysis_level: AnalysisLevel,
+    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+        if analysis_level.name != 'example':
+            raise NotImplementedError(
+                f'Does not support analysis level {analysis_level.name} by default'
+            )
+        cases = []
+        # Calculate metrics
+        true_data = [self._get_true_label(x) for x in sys_output]
+        pred_data = [self._get_predicted_label(x) for x in sys_output]
+        metric_stats = [
+            x.to_metric().calc_stats_from_data(true_data, pred_data)
+            for x in analysis_level.metric_configs
+        ]
+        # Calculate features
+        for i, output in progress(
+            enumerate(sys_output), desc='calculating example-level features'
+        ):
+            features = {}
+            for feat_name, feat_spec in analysis_level.features.items():
+                if feat_spec.func is None:
+                    features[feat_name] = output[feat_name]
+                elif not feat_spec.require_training_set:
+                    features[feat_name] = feat_spec.func(sys_info, output)
+                elif statistics is not None:
+                    features[feat_name] = feat_spec.func(sys_info, output, statistics)
+            cases.append(AnalysisCase(sample_id=i, features=features))
+        return cases, metric_stats
 
     def get_overall_performance(
         self,
@@ -475,9 +471,18 @@ class Processor(metaclass=abc.ABCMeta):
 
         # get scoring statistics
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)
-        analysis_cases, metric_stats = self._gen_cases_and_stats(
-            sys_info, sys_output, external_stats
-        )
+
+        # generate cases for each level
+        analysis_cases: list[list[AnalysisCase]] = []
+        metric_stats: list[list[MetricStats]] = []
+        for analysis_level in unwrap(sys_info.analysis_levels):
+            my_cases, my_stats = self._gen_cases_and_stats(
+                sys_info, sys_output, external_stats, analysis_level
+            )
+            analysis_cases.append(my_cases)
+            metric_stats.append(my_stats)
+
+        # calculate overall results
         overall_results = self.get_overall_performance(
             sys_info, analysis_cases, metric_stats
         )

@@ -4,9 +4,10 @@ from collections.abc import Iterator
 
 from datalabs import aggregating
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature
+import explainaboard.analysis.analyses
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.metrics.eaas import EaaSMetricConfig
@@ -15,7 +16,6 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -49,7 +49,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             EaaSMetricConfig(

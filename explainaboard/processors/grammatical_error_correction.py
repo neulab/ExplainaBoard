@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature
+import explainaboard.analysis.analyses
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import SeqCorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -46,7 +46,7 @@ class GrammaticalErrorCorrection(Processor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [SeqCorrectCountConfig(name='SeqCorrectCount')]
 

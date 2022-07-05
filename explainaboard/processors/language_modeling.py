@@ -168,7 +168,7 @@ class LanguageModelingProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             LogProbConfig(name='Perplexity', ppl=True),

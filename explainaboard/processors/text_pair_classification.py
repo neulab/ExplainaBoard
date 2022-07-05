@@ -67,10 +67,7 @@ class TextPairClassificationProcessor(Processor):
             "text1_divided_text2": feature.Value(
                 dtype="float",
                 description="ratio of two texts' lengths",
-                func=lambda info, x: float(
-                    count_tokens(info, x['text1'], side='source')
-                )
-                / float(count_tokens(info, x['text2'], side='target')),
+                func=lambda info, x: float(x['text1_length']) / x['text2_length'],
             ),
             "num_oov": feature.Value(
                 dtype="float",
@@ -117,7 +114,7 @@ class TextPairClassificationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 

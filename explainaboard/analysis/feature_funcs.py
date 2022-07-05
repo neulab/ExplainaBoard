@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
-from typing import Any
 
 from lexicalrichness import LexicalRichness
 import sacrebleu
@@ -13,17 +12,23 @@ from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
-def _get_tokenizer(sys_info: SysOutputInfo, side: str = 'source') -> Tokenizer:
-    if side == 'source':
-        return unwrap(sys_info.source_tokenizer)
+def _get_tokens(
+    sys_info: SysOutputInfo, text: str | list[str], side: str = 'source'
+) -> list[str]:
+    if isinstance(text, list):
+        if side != 'none':
+            raise ValueError('Expecting "none" as side when passing in list of strs')
+        return text
+    elif side == 'source':
+        return unwrap(sys_info.source_tokenizer)(text).strs
     elif side == 'target':
-        return unwrap(sys_info.target_tokenizer)
+        return unwrap(sys_info.target_tokenizer)(text).strs
     else:
         raise ValueError(f'Bad side {side}')
 
 
 def count_tokens(sys_info: SysOutputInfo, text: str, side: str = 'source') -> float:
-    return len(_get_tokenizer(sys_info, side)(text))
+    return len(_get_tokens(sys_info, text, side))
 
 
 def get_similarity_by_sacrebleu(text1, text2):
@@ -84,13 +89,13 @@ def accumulate_vocab_from_samples(
 
 def feat_freq_rank(
     sys_info: SysOutputInfo,
-    text: str,
+    text: str | list[str],
     vocab_rank: dict[str, int],
     side: str = 'source',
 ) -> float:
     fre_rank = 0
 
-    tokens = _get_tokenizer(sys_info, side)(text)
+    tokens = _get_tokens(sys_info, text, side)
     max_rank = len(vocab_rank)
     for w in tokens:
         fre_rank += vocab_rank.get(w, max_rank)
@@ -100,12 +105,12 @@ def feat_freq_rank(
 
 def feat_num_oov(
     sys_info: SysOutputInfo,
-    text: str,
+    text: str | list[str],
     vocab: dict[str, int],
     side: str = 'source',
 ) -> int:
     num_oov = 0
-    for w in _get_tokenizer(sys_info, side)(text):
+    for w in _get_tokens(sys_info, text, side):
         if w not in vocab:
             num_oov += 1
     return num_oov
@@ -117,7 +122,7 @@ def feat_length_freq(
     length_freq: dict[int, float],
     side: str = 'source',
 ) -> float:
-    length = len(_get_tokenizer(sys_info, side)(text))
+    length = len(_get_tokens(sys_info, text, side))
     return length_freq.get(length, 0.0)
 
 

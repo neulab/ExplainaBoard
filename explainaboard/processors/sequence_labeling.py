@@ -1,23 +1,23 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Callable
+from collections.abc import Sequence
 import copy
-from typing import cast
+from typing import Any, cast
 
 from datalabs import aggregating, Dataset
 
-from explainaboard.analysis import bucketing, feature
-import explainaboard.analysis.analyses
-from explainaboard.analysis.case import AnalysisCaseCollection, AnalysisCaseLabeledSpan
-from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledSpan
+from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature_funcs import feat_freq_rank, feat_num_oov
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import DatalabFileLoader
-from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils.logging import progress
-from explainaboard.utils.span_utils import Span, SpanOps
+from explainaboard.utils.span_utils import cap_feature, Span, SpanOps
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -34,145 +34,129 @@ class SeqLabProcessor(Processor):
         super().__init__()
         self._span_ops: SpanOps = self.default_span_ops()
 
-    @classmethod
-    def default_analyses(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "tokens": feature.Sequence(feature=feature.Value("string")),
-                "true_tags": feature.Sequence(feature=feature.Value("string")),
-                "pred_tags": feature.Sequence(feature=feature.Value("string")),
-                # --- the following are features of the sentences ---
-                "sentence_length": feature.Value(
-                    dtype="float",
-                    description="sentence length",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+    def default_analyses(self) -> list[AnalysisLevel]:
+        examp_features: dict[str, FeatureType] = {
+            "tokens": feature.Sequence(feature=feature.Value("string")),
+            "true_tags": feature.Sequence(feature=feature.Value("string")),
+            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "text_length": feature.Value(
+                dtype="float",
+                description="text length in tokens",
+                func=lambda info, x: len(x['tokens']),
+            ),
+            "span_density": feature.Value(
+                dtype="float",
+                description="ratio of entity tokens to all tokens",
+                func=lambda info, x: float(
+                    len([y for y in x['true_tags'] if y != self._DEFAULT_TAG])
+                )
+                / len(x['true_tags']),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+                require_training_set=True,
+                func=lambda info, x, stat: feat_num_oov(
+                    info, x['tokens'], stat['vocab'], side='none'
                 ),
-                "span_density": feature.Value(
-                    dtype="float",
-                    description="the ration between all entity "
-                    "tokens and sentence tokens ",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description="average rank of each word based on training set frequency",
+                require_training_set=True,
+                func=lambda info, x, stat: feat_freq_rank(
+                    info, x['tokens'], stat['vocab_rank'], side='none'
                 ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
+            ),
+        }
+        examp_continuous_features = [
+            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
+        ]
+        examp_analyses: Sequence[Analysis] = [
+            BucketAnalysis(
+                feature="true_label",
+                method="discrete",
+                number=15,
+            )
+        ] + [BucketAnalysis(x, method="continuous") for x in examp_continuous_features]
+
+        span_features: dict[str, FeatureType] = {
+            "span_text": feature.Value(
+                dtype="string",
+                description="text of the span",
+                func=lambda info, x, case: case.text,
+            ),
+            "span_length": feature.Value(
+                dtype="float",
+                description="span length in tokens",
+                func=lambda info, x, case: case.token_span[1] - case.token_span[0],
+            ),
+            "span_true_label": feature.Value(
+                dtype="string",
+                description="true label of the span",
+                func=lambda info, x, case: case.true_label,
+            ),
+            "span_pred_label": feature.Value(
+                dtype="string",
+                description="predicted label of the span",
+                func=lambda info, x, case: case.predicted_label,
+            ),
+            "span_capitalness": feature.Value(
+                dtype="string",
+                description="whether the span is capitalized",
+                func=lambda info, x, case: cap_feature(case.text),
+            ),
+            "span_rel_pos": feature.Value(
+                dtype="float",
+                description="relative position of the span",
+                func=lambda info, x, case: case.token_span[0] / len(x['tokens']),
+            ),
+            "span_chars": feature.Value(
+                dtype="float",
+                description="number of characters in the span",
+                func=lambda info, x, case: len(case.text),
+            ),
+            "span_econ": feature.Value(
+                dtype="float",
+                description="consistency of the span labels",
+                require_training_set=True,
+                func=lambda info, x, case, stat: stat['econ_dic'].get(
+                    f'{case.text}|||{case.true_label}', 0.0
                 ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                # --- the following are features of each entity ---
-                "true_span_info": feature.Sequence(
-                    feature=feature.Dict(
-                        feature={
-                            "span_text": feature.Value("string"),
-                            "span_tokens": feature.Value(
-                                dtype="float",
-                                description="span length",
-                                is_bucket=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
-                            "span_pos": feature.Position(positions=[0, 0]),
-                            "span_tag": feature.Value(
-                                dtype="string",
-                                description="the tag of the span",
-                                is_bucket=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_discrete_value",
-                                    number=15,
-                                    setting=1,
-                                ),
-                            ),
-                            "span_capitalness": feature.Value(
-                                dtype="string",
-                                description=("whether the span is capitalized"),
-                                is_bucket=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_discrete_value",
-                                    number=4,
-                                    setting=1,
-                                ),
-                            ),
-                            "span_rel_pos": feature.Value(
-                                dtype="float",
-                                description=(
-                                    "relative position of span in the segment"
-                                ),
-                                is_bucket=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
-                            "span_chars": feature.Value(
-                                dtype="float",
-                                description="number of characters in the span",
-                                is_bucket=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
-                            "span_econ": feature.Value(
-                                dtype="float",
-                                description="span label consistency",
-                                is_bucket=True,
-                                require_training_set=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
-                            "span_efre": feature.Value(
-                                dtype="float",
-                                description="span frequency in the training data",
-                                is_bucket=True,
-                                require_training_set=True,
-                                bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                                    method="bucket_attribute_specified_bucket_value",
-                                    number=4,
-                                    setting=(),
-                                ),
-                            ),
-                        }
-                    )
-                ),
-            }
-        )
+            ),
+            "span_efre": feature.Value(
+                dtype="float",
+                description="frequency of the span in the training set",
+                require_training_set=True,
+                func=lambda info, x, case, stat: stat['efre_dic'].get(case.text, 0.0),
+            ),
+        }
+        span_continuous_features = [
+            k for k, v in span_features.items() if ('float' in unwrap(v.dtype))
+        ]
+        span_analyses: Sequence[Analysis] = [
+            BucketAnalysis(
+                feature=k,
+                method="discrete",
+                number=v,
+            )
+            for k, v in {'span_true_label': 15, 'span_capitalness': 4}.items()
+        ] + [BucketAnalysis(x, method="continuous") for x in span_continuous_features]
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=examp_features,
+                metric_configs=self.default_metrics(level='example'),
+                analyses=examp_analyses,
+            ),
+            AnalysisLevel(
+                name='span',
+                features=span_features,
+                metric_configs=self.default_metrics(level='span'),
+                analyses=span_analyses,
+            ),
+        ]
 
     def _get_true_label(self, data_point: dict):
         return data_point["true_tags"]
@@ -217,267 +201,76 @@ class SeqLabProcessor(Processor):
             "vocab_rank": vocab_rank,
         }
 
-    def _get_stat_values(
-        self, econ_dic: dict, efre_dic: dict, span_text: str, span_tag: str
-    ):
-        """
-        Get entity consistency and frequency values
-        """
-        span_tag = span_tag.lower()
-        span_text = span_text.lower()
-        econ_val = econ_dic.get(f'{span_text}|||{span_tag}', 0.0)
-        efre_val = efre_dic.get(span_text, 0.0)
-        return econ_val, efre_val
-
-    # training set dependent features
-    def _get_num_oov(self, tokens, statistics):
-        num_oov = 0
-        for w in tokens:
-            if w not in statistics['vocab']:
-                num_oov += 1
-        return num_oov
-
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(self, tokens, statistics):
-        vocab_stats = statistics['vocab_rank']
-        fre_rank = 0.0
-        for w in tokens:
-            fre_rank += vocab_stats.get(w, len(vocab_stats))
-        fre_rank = 0 if len(tokens) == 0 else fre_rank / len(tokens)
-        return fre_rank
-
-    def _complete_span_features(
-        self, sentence, true_tags, pred_tags, statistics=None
-    ) -> list[Span]:
-        # Get training set stats if they exist
-        has_stats = statistics is not None and len(statistics) > 0
-        econ_dic = statistics["econ_dic"] if has_stats else None
-        efre_dic = statistics["efre_dic"] if has_stats else None
-
-        self._span_ops.set_resources(
-            resources={
-                "has_stats": has_stats,
-                "econ_dic": econ_dic,
-                "efre_dic": efre_dic,
-            }
-        )
-
-        # Merge the spans together so that the span tag is "true_tag pred_tag"
-        # using "_DEFAULT_TAG" if that span doesn't exist in the true or predicted tags
-        # respectively
-        # TODO(gneubig): This is probably calculating features twice, could be just once
-        true_spans = self._span_ops.get_spans(toks=sentence, tags=true_tags)
-        pred_spans = self._span_ops.get_spans(toks=sentence, tags=pred_tags)
-        merged_spans = {}
-        for span in true_spans:
-            span.span_tag = f'{span.span_tag} {self._DEFAULT_TAG}'
-            merged_spans[span.span_pos] = span
-        for span in pred_spans:
-            merged_span = merged_spans.get(span.span_pos)
-            if not merged_span:
-                span.span_tag = f'{self._DEFAULT_TAG} {span.span_tag}'
-                merged_spans[span.span_pos] = span
-            else:
-                true_tag, _ = unwrap(merged_span.span_tag).split(' ')
-                merged_span.span_tag = f'{true_tag} {span.span_tag}'
-
-        return list(merged_spans.values())
-
-    def _complete_features(
-        self, sys_info: SysOutputInfo, sys_output: list[dict], external_stats=None
-    ) -> list[str]:
-        """
-        This function takes in meta-data about system outputs, system outputs, and a few
-        other optional pieces of information, then calculates feature functions and
-        modifies `sys_output` to add these feature values
-
-        :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :param external_stats: Training set statistics that are used to calculate
-            training set specific features
-        :return: The features that are active (e.g. skipping training set features when
-            no training set available)
-        """
-        sys_features = unwrap(sys_info.features)
-        active_features = list(
-            sys_features.get_bucket_features(
-                include_training_dependent=external_stats is not None
-            )
-        )
-
-        sent_feats: list[str] = []
-        tok_feats: list[str] = []
-        for x in active_features:
-            (sent_feats if (x in sys_features) else tok_feats).append(x)
-
-        for _id, dict_sysout in progress(enumerate(sys_output), desc="featurizing"):
-            # Get values of bucketing features
-            tokens = dict_sysout["tokens"]
-
-            # sentence_length
-            dict_sysout["sentence_length"] = len(tokens)
-
-            # entity density
-            dict_sysout["span_density"] = len(
-                self._span_ops.get_spans_simple(tags=dict_sysout["true_tags"])
-            ) / len(tokens)
-
-            # sentence-level training set dependent features
-            if external_stats is not None:
-                dict_sysout["num_oov"] = self._get_num_oov(tokens, external_stats)
-                dict_sysout["fre_rank"] = self._get_fre_rank(tokens, external_stats)
-
-            # span features for true and predicted spans
-            dict_sysout["span_info"] = self._complete_span_features(
-                tokens,
-                dict_sysout["true_tags"],
-                dict_sysout["pred_tags"],
-                statistics=external_stats,
-            )
-
-        # This is not used elsewhere, so just keep it as-is
-        return active_features
-
-    def bucketing_samples(
+    def _gen_cases_and_stats(
         self,
         sys_info: SysOutputInfo,
         sys_output: list[dict],
-        active_features: list[str],
-        metric_stats: list[MetricStats],
-    ) -> dict[str, list[BucketPerformance]]:
-
-        features = unwrap(sys_info.features)
-
-        sent_feats: list[str] = []
-        span_feats: list[str] = []
-        for x in active_features:
-            (sent_feats if (x in features) else span_feats).append(x)
-
-        # First, get the buckets for sentences using the standard protocol
-        performances_over_bucket = super().bucketing_samples(
-            sys_info, sys_output, sent_feats, metric_stats
-        )
-
-        case_spans: list[tuple[AnalysisCaseLabeledSpan, Span]] = []
-        for sample_id, my_output in enumerate(sys_output):
-            for tok_id, span_info in enumerate(my_output['span_info']):
-                span = cast(Span, span_info)
-                true_tag, pred_tag = unwrap(span.span_tag).split(' ')
-                case_spans.append(
-                    (
-                        AnalysisCaseLabeledSpan(
-                            sample_id=sample_id,
-                            token_span=unwrap(span.span_pos),
-                            char_span=unwrap(span.span_char_pos),
-                            orig_str='tokens',
-                            text=unwrap(span.span_text),
-                            true_label=true_tag,
-                            predicted_label=pred_tag,
-                        ),
-                        span,
-                    )
+        statistics: Any,
+        analysis_level: AnalysisLevel,
+    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+        if analysis_level.name == 'example':
+            return super()._gen_cases_and_stats(
+                sys_info, sys_output, statistics, analysis_level
+            )
+        elif analysis_level.name != 'span':
+            raise ValueError(f'{analysis_level.name}-level analysis not supported')
+        # Do span-level analysis
+        cases: list[AnalysisCaseLabeledSpan] = []
+        # Calculate features
+        for i, output in progress(
+            enumerate(sys_output), desc='calculating span-level features'
+        ):
+            # get the spans from each sentence
+            tokens = output["tokens"]
+            true_spans = self._span_ops.get_spans(toks=tokens, tags=output['true_tags'])
+            pred_spans = self._span_ops.get_spans(toks=tokens, tags=output['pred_tags'])
+            # merge the spans together
+            merged_spans: dict[tuple[int, int], Span] = {}
+            for span in true_spans:
+                span.span_tag = f'{span.span_tag} {self._DEFAULT_TAG}'
+                merged_spans[unwrap(span.span_pos)] = span
+            for span in pred_spans:
+                merged_span = merged_spans.get(unwrap(span.span_pos))
+                if not merged_span:
+                    span.span_tag = f'{self._DEFAULT_TAG} {span.span_tag}'
+                    merged_spans[unwrap(span.span_pos)] = span
+                else:
+                    true_tag, _ = unwrap(merged_span.span_tag).split(' ')
+                    merged_span.span_tag = f'{true_tag} {span.span_tag}'
+            # analysis cases
+            for ms in merged_spans.values():
+                true_tag, pred_tag = unwrap(ms.span_tag).split(' ')
+                case = AnalysisCaseLabeledSpan(
+                    sample_id=i,
+                    features={},
+                    token_span=unwrap(ms.span_pos),
+                    char_span=unwrap(ms.span_char_pos),
+                    text=unwrap(ms.span_text),
+                    true_label=true_tag,
+                    predicted_label=pred_tag,
                 )
-
-        # Bucketing
-        for feature_name in progress(span_feats, desc="span-level bucketing"):
-            my_feature = features["true_span_info"].feature.feature[feature_name]
-            bucket_info = my_feature.bucket_info
-
-            # Get buckets for true spans
-            bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
-                bucketing, bucket_info.method
-            )
-
-            # Span tag is special because we keep track of both labels, keep just gold
-            if feature_name == 'span_tag':
-                sample_features = [
-                    (case, unwrap(span.span_tag).split(' ')[0])
-                    for case, span in case_spans
-                ]
-            else:
-                sample_features = [
-                    (case, getattr(span, feature_name)) for case, span in case_spans
-                ]
-
-            samples_over_bucket = bucket_func(
-                sample_features=sample_features,
-                bucket_number=bucket_info.number,
-                bucket_setting=bucket_info.setting,
-            )
-
-            # evaluating bucket: get bucket performance
-            performances_over_bucket[feature_name] = self.get_bucket_performance_seqlab(
-                sys_info,
-                sys_output,
-                samples_over_bucket,
-            )
-        return performances_over_bucket
-
-    def get_bucket_performance_seqlab(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        samples_over_bucket: list[AnalysisCaseCollection],
-    ) -> list[BucketPerformance]:
-        """
-        This function defines how to get bucket-level performance w.r.t a given feature
-        (e.g., sentence length)
-        :param sys_info: Information about the system output
-        :param sys_output: The system output itself
-        :param samples_over_bucket: a dictionary mapping bucket interval names to spans
-        :return: bucket_name_to_performance: a dictionary that maps bucket names to
-            bucket performance
-        """
-        bucket_metrics = [
-            F1ScoreConfig(name='F1', ignore_classes=[self._DEFAULT_TAG]).to_metric()
+                for feat_name, feat_spec in analysis_level.features.items():
+                    if feat_spec.func is None:
+                        raise ValueError(
+                            f'could not find feature function for {feat_name}'
+                        )
+                    elif not feat_spec.require_training_set:
+                        case.features[feat_name] = feat_spec.func(
+                            sys_info, output, case
+                        )
+                    elif statistics is not None:
+                        case.features[feat_name] = feat_spec.func(
+                            sys_info, output, case, statistics
+                        )
+                cases.append(case)
+        # calculate metric stats
+        true_data = [x.true_label for x in cases]
+        pred_data = [x.predicted_label for x in cases]
+        metric_stats: list[MetricStats] = [
+            x.to_metric().calc_stats_from_data(true_data, pred_data)
+            for x in analysis_level.metric_configs
         ]
-
-        bucket_performances = []
-        for bucket_collection in samples_over_bucket:
-
-            # Get bucketed samples
-            true_labels, pred_labels = [], []
-            num_true = 0
-            for sample in bucket_collection.samples:
-                sample_span = cast(AnalysisCaseLabeledSpan, sample)
-                true_labels.append(sample_span.true_label)
-                num_true += 1 if sample_span.true_label != self._DEFAULT_TAG else 0
-                pred_labels.append(sample_span.predicted_label)
-
-            # Filter samples to error cases and limit number
-            bucket_samples = []
-            for x in bucket_collection.samples:
-                bcls = cast(AnalysisCaseLabeledSpan, x)
-                if bcls.true_label != bcls.predicted_label:
-                    bucket_samples.append(bcls)
-            bucket_samples = self._subsample_analysis_cases(bucket_samples)
-
-            bucket_performance = BucketPerformance(
-                bucket_interval=bucket_collection.interval,
-                n_samples=num_true,
-                bucket_samples=bucket_samples,
-            )
-            for metric in bucket_metrics:
-                metric_val = metric.evaluate(
-                    true_labels, pred_labels, conf_value=sys_info.conf_value
-                )
-                conf_low, conf_high = (
-                    metric_val.conf_interval
-                    if metric_val.conf_interval
-                    else (None, None)
-                )
-                performance = Performance(
-                    metric_name=metric.config.name,
-                    value=metric_val.value,
-                    confidence_score_low=conf_low,
-                    confidence_score_high=conf_high,
-                )
-                bucket_performance.performances.append(performance)
-
-            bucket_performances.append(bucket_performance)
-
-        return bucket_performances
+        return cast(list[AnalysisCase], cases), metric_stats
 
     def get_econ_efre_dic(
         self, words: list[str], bio_tags: list[str]

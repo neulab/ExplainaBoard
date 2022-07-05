@@ -10,9 +10,10 @@ from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
 from datalabs.operations.featurize.summarization import get_oracle_summary
 import numpy
 
-import explainaboard.analysis.analyses
 from explainaboard import TaskType
 from explainaboard.analysis import feature
+import explainaboard.analysis.analyses
+import explainaboard.analysis.feature_funcs
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -20,7 +21,6 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.analysis.feature_funcs
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
@@ -135,7 +135,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             EaaSMetricConfig(

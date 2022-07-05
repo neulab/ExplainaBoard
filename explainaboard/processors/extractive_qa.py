@@ -89,7 +89,7 @@ class QAExtractiveProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         if source_language != target_language:
             raise ValueError(
