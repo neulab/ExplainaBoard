@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-from collections.abc import Sequence
 import copy
 from typing import Any, cast
 
@@ -72,7 +71,7 @@ class SeqLabProcessor(Processor):
         examp_continuous_features = [
             k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
         ]
-        examp_analyses: Sequence[Analysis] = [
+        examp_analyses: list[BucketAnalysis] = [
             BucketAnalysis(
                 feature="true_label",
                 method="discrete",
@@ -134,7 +133,7 @@ class SeqLabProcessor(Processor):
         span_continuous_features = [
             k for k, v in span_features.items() if ('float' in unwrap(v.dtype))
         ]
-        span_analyses: Sequence[Analysis] = [
+        span_analyses: list[BucketAnalysis] = [
             BucketAnalysis(
                 feature=k,
                 method="discrete",
@@ -148,13 +147,13 @@ class SeqLabProcessor(Processor):
                 name='example',
                 features=examp_features,
                 metric_configs=self.default_metrics(level='example'),
-                analyses=examp_analyses,
+                analyses=cast(list[Analysis], examp_analyses),
             ),
             AnalysisLevel(
                 name='span',
                 features=span_features,
                 metric_configs=self.default_metrics(level='span'),
-                analyses=span_analyses,
+                analyses=cast(list[Analysis], span_analyses),
             ),
         ]
 
@@ -248,6 +247,7 @@ class SeqLabProcessor(Processor):
                     text=unwrap(ms.span_text),
                     true_label=true_tag,
                     predicted_label=pred_tag,
+                    orig_str="source",
                 )
                 for feat_name, feat_spec in analysis_level.features.items():
                     if feat_spec.func is None:

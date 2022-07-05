@@ -44,6 +44,7 @@ class AnalysisCaseSpan(AnalysisCase):
     token_span: tuple[int, int]
     char_span: tuple[int, int]
     text: str
+    orig_str: str
 
     def __post_init__(self):
         if isinstance(self.token_span, str) or isinstance(self.char_span, str):

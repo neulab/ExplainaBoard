@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import cast
 
 from datalabs import aggregating
 
@@ -96,7 +97,7 @@ class TextPairClassificationProcessor(Processor):
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: Sequence[Analysis] = [
+        analyses: list[BucketAnalysis] = [
             BucketAnalysis(
                 feature="true_label",
                 method="discrete",
@@ -109,7 +110,7 @@ class TextPairClassificationProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=analyses,
+                analyses=cast(list[Analysis], analyses),
             )
         ]
 

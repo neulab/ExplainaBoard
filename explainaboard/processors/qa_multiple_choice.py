@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
+from typing import cast
 
 from datalabs import aggregating
 
@@ -44,17 +45,17 @@ class QAMultipleChoiceProcessor(Processor):
             "context_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
-                func=lambda info, x: count_tokens(info, x['context']),
+                func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "question_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
-                func=lambda info, x: count_tokens(info, x['question']),
+                func=lambda info, x, c: count_tokens(info, x['question']),
             ),
             "answer_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
-                func=lambda info, x: count_tokens(
+                func=lambda info, x, c: count_tokens(
                     info, x['answers']['text'], side='target'
                 ),
             ),
@@ -62,7 +63,7 @@ class QAMultipleChoiceProcessor(Processor):
                 dtype="float",
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_num_oov(info, x['context'], stat),
+                func=lambda info, x, c, stat: feat_num_oov(info, x['context'], stat),
             ),
             "fre_rank": feature.Value(
                 dtype="float",
@@ -70,13 +71,13 @@ class QAMultipleChoiceProcessor(Processor):
                     "average rank of context words based on training set freq"
                 ),
                 require_training_set=True,
-                func=lambda info, x, stat: feat_freq_rank(info, x['context'], stat),
+                func=lambda info, x, c, stat: feat_freq_rank(info, x['context'], stat),
             ),
         }
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: Sequence[Analysis] = [
+        analyses: list[BucketAnalysis] = [
             BucketAnalysis(x, method="continuous") for x in continuous_features
         ]
 
@@ -85,7 +86,7 @@ class QAMultipleChoiceProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=analyses,
+                analyses=cast(list[Analysis], analyses),
             )
         ]
 

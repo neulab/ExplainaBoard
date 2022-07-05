@@ -50,11 +50,13 @@ class Processor(metaclass=abc.ABCMeta):
 
     @classmethod
     def full_metric_list(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         """Returns an extensive list of metrics that may be used."""
         return cls.default_metrics(
-            source_language=source_language, target_language=target_language
+            level=level,
+            source_language=source_language,
+            target_language=target_language,
         )
 
     @classmethod
@@ -144,41 +146,35 @@ class Processor(metaclass=abc.ABCMeta):
                     )
         return statistics
 
-    def _gen_metric_stats(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        cases: list[list[AnalysisCase]],
-    ) -> list[list[MetricStats]]:
-        """Generate sufficient statistics for scoring different metrics.
+    # def _gen_metric_stats(
+    #     self,
+    #     sys_info: SysOutputInfo,
+    #     sys_output: list[dict],
+    #     cases: list[list[AnalysisCase]],
+    # ) -> list[list[MetricStats]]:
+    #     """Generate sufficient statistics for scoring different metrics.
 
-        :param sys_info: Information about the system outputs
-        :param sys_output: The system output itself
-        :param cases: Analysis cases associated with the stats
-        :return: Statistics sufficient for scoring
-        """
-        all_stats: list[list[MetricStats]] = []
-        for my_level, my_cases in zip(unwrap(sys_info.analysis_levels), cases):
+    #     :param sys_info: Information about the system outputs
+    #     :param sys_output: The system output itself
+    #     :param cases: Analysis cases associated with the stats
+    #     :return: Statistics sufficient for scoring
+    #     """
+    #     all_stats: list[list[MetricStats]] = []
+    #     for my_level, my_cases in zip(unwrap(sys_info.analysis_levels), cases):
 
-            if my_level.name == 'example':
-                true_data = [self._get_true_label(x) for x in sys_output]
-                pred_data = [self._get_predicted_label(x) for x in sys_output]
-            else:
-                raise ValueError(f'unsupported analysis level {my_level.name}')
+    #         if my_level.name == 'example':
+    #             true_data = [self._get_true_label(x) for x in sys_output]
+    #             pred_data = [self._get_predicted_label(x) for x in sys_output]
+    #         else:
+    #             raise ValueError(f'unsupported analysis level {my_level.name}')
 
-            metric_stats = []
-            for metric_cfg in my_level.metric_configs:
-                metric_stats.append(
-                    metric_cfg.to_metric().calc_stats_from_data(true_data, pred_data)
-                )
+    #         metric_stats = []
+    #         for metric_cfg in my_level.metric_configs:
+    #             metric_stats.append(
+    #                 metric_cfg.to_metric().calc_stats_from_data(true_data, pred_data)
+    #             )
 
-        return all_stats
-
-    def _get_eaas_client(self):
-        if not self._eaas_client:
-            self._eaas_config = Config()
-            self._eaas_client = AsyncClient(self._eaas_config)
-        return self._eaas_client
+    #     return all_stats
 
     def _get_true_label(self, data_point: dict):
         """

@@ -2,22 +2,19 @@ from __future__ import annotations
 
 from collections.abc import Iterator, Sequence
 import json
+from typing import cast
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
-from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.ranking import (
-    Hits,
     HitsConfig,
-    MeanRank,
     MeanRankConfig,
-    MeanReciprocalRank,
     MeanReciprocalRankConfig,
 )
 from explainaboard.processors.processor import Processor
@@ -95,7 +92,7 @@ class KGLinkTailPredictionProcessor(Processor):
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
         discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
-        analyses: Sequence[Analysis] = [
+        analyses: list[BucketAnalysis] = [
             BucketAnalysis(x, method="continuous") for x in continuous_features
         ] + [
             BucketAnalysis(k, method="discrete", number=v)
@@ -107,7 +104,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=analyses,
+                analyses=cast(list[Analysis], analyses),
             )
         ]
 
@@ -147,6 +144,7 @@ class KGLinkTailPredictionProcessor(Processor):
         )
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)
+        raise NotImplementedError('_gen_metric_stats needs to be replaced')
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
@@ -205,43 +203,44 @@ class KGLinkTailPredictionProcessor(Processor):
             "tail_fre": dict_tail,
         }
 
-    def _gen_metric_stats(
-        self,
-        sys_info: SysOutputInfo,
-        sys_output: list[dict],
-        cases: list[list[AnalysisCase]],
-    ) -> list[list[MetricStats]]:
-        """Generate sufficient statistics for scoring different metrics.
-        :param sys_info: Information about the system outputs
-        :param sys_output: The system output itself
-        :return: Statistics sufficient for scoring
-        """
+    # TODO(gneubig): this needs replaced
+    # def _gen_metric_stats(
+    #     self,
+    #     sys_info: SysOutputInfo,
+    #     sys_output: list[dict],
+    #     cases: list[list[AnalysisCase]],
+    # ) -> list[list[MetricStats]]:
+    #     """Generate sufficient statistics for scoring different metrics.
+    #     :param sys_info: Information about the system outputs
+    #     :param sys_output: The system output itself
+    #     :return: Statistics sufficient for scoring
+    #     """
 
-        metrics = [
-            x.to_metric() for x in unwrap(sys_info.analysis_levels)[0].metric_configs
-        ]
-        true_data = [self._get_true_label(x) for x in sys_output]
-        pred_data = [self._get_predicted_label(x) for x in sys_output]
-        rank_data = [
-            x.get('true_rank') for x in sys_output
-        ]  # rank of true entity in predictions
+    #     metrics = [
+    #         x.to_metric() for x in unwrap(sys_info.analysis_levels)[0].metric_configs
+    #     ]
+    #     true_data = [self._get_true_label(x) for x in sys_output]
+    #     pred_data = [self._get_predicted_label(x) for x in sys_output]
+    #     rank_data = [
+    #         x.get('true_rank') for x in sys_output
+    #     ]  # rank of true entity in predictions
 
-        if any(item is None for item in rank_data):
-            raise ValueError(
-                'Some data points do not have rank information; check system outputs.'
-            )
+    #     if any(item is None for item in rank_data):
+    #         raise ValueError(
+    #             'Some data points do not have rank information; check system outputs.'
+    #         )
 
-        metric_stats = []
-        for metric in metrics:
-            if (
-                isinstance(metric, MeanReciprocalRank)
-                or isinstance(metric, MeanRank)
-                or isinstance(metric, Hits)
-            ):
-                metric_stats.append(metric.calc_stats_from_rank(rank_data))
-            else:
-                metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
-        return [metric_stats]
+    #     metric_stats = []
+    #     for metric in metrics:
+    #         if (
+    #             isinstance(metric, MeanReciprocalRank)
+    #             or isinstance(metric, MeanRank)
+    #             or isinstance(metric, Hits)
+    #         ):
+    #             metric_stats.append(metric.calc_stats_from_rank(rank_data))
+    #         else:
+    #             metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+    #     return [metric_stats]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):

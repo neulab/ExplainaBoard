@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import cast
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -70,7 +71,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: Sequence[Analysis] = [
+        analyses: list[BucketAnalysis] = [
             BucketAnalysis(
                 feature="true_label",
                 method="discrete",
@@ -83,7 +84,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=analyses,
+                analyses=cast(list[Analysis], analyses),
             )
         ]
 

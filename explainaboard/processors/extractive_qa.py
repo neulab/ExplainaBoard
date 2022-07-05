@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
+from typing import cast
 
 from datalabs import aggregating
 
@@ -74,7 +75,7 @@ class QAExtractiveProcessor(Processor):
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: Sequence[Analysis] = [
+        analyses: list[BucketAnalysis] = [
             BucketAnalysis(x, method="continuous") for x in continuous_features
         ]
 
@@ -83,7 +84,7 @@ class QAExtractiveProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=analyses,
+                analyses=cast(list[Analysis], analyses),
             )
         ]
 
