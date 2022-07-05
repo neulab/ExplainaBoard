@@ -50,30 +50,31 @@ class TextPairClassificationProcessor(Processor):
             "text1_length": feature.Value(
                 dtype="float",
                 description="text1 length in tokens",
-                func=lambda info, x: count_tokens(info, x['text1'], side='source'),
+                func=lambda info, x, c: count_tokens(info, x['text1'], side='source'),
             ),
             "text2_length": feature.Value(
                 dtype="float",
                 description="text2 length in tokens",
-                func=lambda info, x: count_tokens(info, x['text2'], side='target'),
+                func=lambda info, x, c: count_tokens(info, x['text2'], side='target'),
             ),
             "similarity": feature.Value(
                 dtype="float",
                 description="the two texts' similarity",
-                func=lambda info, x: get_similarity_by_sacrebleu(
+                func=lambda info, x, c: get_similarity_by_sacrebleu(
                     x['text1'], x['text2']
                 ),
             ),
             "text1_divided_text2": feature.Value(
                 dtype="float",
                 description="ratio of two texts' lengths",
-                func=lambda info, x: float(x['text1_length']) / x['text2_length'],
+                func=lambda info, x, c: c.features['text1_length']
+                / c.features['text2_length'],
             ),
             "num_oov": feature.Value(
                 dtype="float",
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_num_oov(
+                func=lambda info, x, c, stat: feat_num_oov(
                     info, x['text1'], stat['source_vocab'], side='source'
                 )
                 + feat_num_oov(info, x['text2'], stat['target_vocab'], side='target'),
@@ -85,7 +86,7 @@ class TextPairClassificationProcessor(Processor):
                     "training set"
                 ),
                 require_training_set=True,
-                func=lambda info, x, stat: feat_freq_rank(
+                func=lambda info, x, c, stat: feat_freq_rank(
                     info, x['text1'], stat['source_vocab'], side='source'
                 )
                 + feat_freq_rank(info, x['text2'], stat['target_vocab'], side='target'),

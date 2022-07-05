@@ -45,14 +45,14 @@ class KGLinkTailPredictionProcessor(Processor):
             "tail_entity_length": feature.Value(
                 dtype="float",
                 description="length of the tail entity in tokens",
-                func=lambda info, x: count_tokens(
+                func=lambda info, x, c: count_tokens(
                     info, x['true_tail_decipher'], side='target'
                 ),
             ),
             "head_entity_length": feature.Value(
                 dtype="float",
                 description="length of the head entity in tokens",
-                func=lambda info, x: count_tokens(
+                func=lambda info, x, c: count_tokens(
                     info, x['true_head_decipher'], side='target'
                 ),
             ),
@@ -81,14 +81,14 @@ class KGLinkTailPredictionProcessor(Processor):
             "symmetry": feature.Value(
                 dtype="string",
                 description="whether the relation is symmetric",
-                func=lambda info, x: 'symmetric'
+                func=lambda info, x, c: 'symmetric'
                 if x['true_link'] in self._symmetric_relations
                 else 'asymmetric',
             ),
             "entity_type_level": feature.Value(
                 dtype="string",
                 description="most specific entity type level of the true tail entity",
-                func=lambda info, x: self._get_entity_type_level(x),
+                func=lambda info, x, c: self._get_entity_type_level(x),
             ),
         }
         continuous_features = [

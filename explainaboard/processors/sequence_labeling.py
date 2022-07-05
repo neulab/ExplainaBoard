@@ -42,12 +42,12 @@ class SeqLabProcessor(Processor):
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
-                func=lambda info, x: len(x['tokens']),
+                func=lambda info, x, c: len(x['tokens']),
             ),
             "span_density": feature.Value(
                 dtype="float",
                 description="ratio of entity tokens to all tokens",
-                func=lambda info, x: float(
+                func=lambda info, x, c: float(
                     len([y for y in x['true_tags'] if y != self._DEFAULT_TAG])
                 )
                 / len(x['true_tags']),
@@ -56,7 +56,7 @@ class SeqLabProcessor(Processor):
                 dtype="float",
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_num_oov(
+                func=lambda info, x, c, stat: feat_num_oov(
                     info, x['tokens'], stat['vocab'], side='none'
                 ),
             ),
@@ -64,7 +64,7 @@ class SeqLabProcessor(Processor):
                 dtype="float",
                 description="average rank of each word based on training set frequency",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_freq_rank(
+                func=lambda info, x, c, stat: feat_freq_rank(
                     info, x['tokens'], stat['vocab_rank'], side='none'
                 ),
             ),
@@ -84,51 +84,51 @@ class SeqLabProcessor(Processor):
             "span_text": feature.Value(
                 dtype="string",
                 description="text of the span",
-                func=lambda info, x, case: case.text,
+                func=lambda info, x, c: c.text,
             ),
             "span_length": feature.Value(
                 dtype="float",
                 description="span length in tokens",
-                func=lambda info, x, case: case.token_span[1] - case.token_span[0],
+                func=lambda info, x, c: c.token_span[1] - c.token_span[0],
             ),
             "span_true_label": feature.Value(
                 dtype="string",
                 description="true label of the span",
-                func=lambda info, x, case: case.true_label,
+                func=lambda info, x, c: c.true_label,
             ),
             "span_pred_label": feature.Value(
                 dtype="string",
                 description="predicted label of the span",
-                func=lambda info, x, case: case.predicted_label,
+                func=lambda info, x, c: c.predicted_label,
             ),
             "span_capitalness": feature.Value(
                 dtype="string",
                 description="whether the span is capitalized",
-                func=lambda info, x, case: cap_feature(case.text),
+                func=lambda info, x, c: cap_feature(c.text),
             ),
             "span_rel_pos": feature.Value(
                 dtype="float",
                 description="relative position of the span",
-                func=lambda info, x, case: case.token_span[0] / len(x['tokens']),
+                func=lambda info, x, c: c.token_span[0] / len(x['tokens']),
             ),
             "span_chars": feature.Value(
                 dtype="float",
                 description="number of characters in the span",
-                func=lambda info, x, case: len(case.text),
+                func=lambda info, x, c: len(c.text),
             ),
             "span_econ": feature.Value(
                 dtype="float",
                 description="consistency of the span labels",
                 require_training_set=True,
-                func=lambda info, x, case, stat: stat['econ_dic'].get(
-                    f'{case.text}|||{case.true_label}', 0.0
+                func=lambda info, x, c, stat: stat['econ_dic'].get(
+                    f'{c.text}|||{c.true_label}', 0.0
                 ),
             ),
             "span_efre": feature.Value(
                 dtype="float",
                 description="frequency of the span in the training set",
                 require_training_set=True,
-                func=lambda info, x, case, stat: stat['efre_dic'].get(case.text, 0.0),
+                func=lambda info, x, c, stat: stat['efre_dic'].get(c.text, 0.0),
             ),
         }
         span_continuous_features = [

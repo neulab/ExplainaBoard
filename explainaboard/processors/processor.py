@@ -307,15 +307,17 @@ class Processor(metaclass=abc.ABCMeta):
         for i, output in progress(
             enumerate(sys_output), desc='calculating example-level features'
         ):
-            features = {}
+            case = AnalysisCase(sample_id=i, features={})
             for feat_name, feat_spec in analysis_level.features.items():
                 if feat_spec.func is None:
-                    features[feat_name] = output[feat_name]
+                    case.features[feat_name] = output[feat_name]
                 elif not feat_spec.require_training_set:
-                    features[feat_name] = feat_spec.func(sys_info, output)
+                    case.features[feat_name] = feat_spec.func(sys_info, output, case)
                 elif statistics is not None:
-                    features[feat_name] = feat_spec.func(sys_info, output, statistics)
-            cases.append(AnalysisCase(sample_id=i, features=features))
+                    case.features[feat_name] = feat_spec.func(
+                        sys_info, output, case, statistics
+                    )
+            cases.append(case)
         return cases, metric_stats
 
     def get_overall_performance(

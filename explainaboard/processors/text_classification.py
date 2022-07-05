@@ -48,28 +48,30 @@ class TextClassificationProcessor(Processor):
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
-                func=lambda info, x: count_tokens(info, x['text']),
+                func=lambda info, x, c: count_tokens(info, x['text']),
             ),
             "text_chars": feature.Value(
                 dtype="float",
                 description="text length in characters",
-                func=lambda info, x: len(x['text']),
+                func=lambda info, x, c: len(x['text']),
             ),
             "basic_words": feature.Value(
                 dtype="float",
                 description="the ratio of basic words",
-                func=lambda info, x: get_basic_words(x['text']),
+                func=lambda info, x, c: get_basic_words(x['text']),
             ),
             "lexical_richness": feature.Value(
                 dtype="float",
                 description="lexical diversity",
-                func=lambda info, x: get_lexical_richness(x['text']),
+                func=lambda info, x, c: get_lexical_richness(x['text']),
             ),
             "num_oov": feature.Value(
                 dtype="float",
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_num_oov(info, x['text'], stat['vocab']),
+                func=lambda info, x, c, stat: feat_num_oov(
+                    info, x['text'], stat['vocab']
+                ),
             ),
             "fre_rank": feature.Value(
                 dtype="float",
@@ -78,7 +80,7 @@ class TextClassificationProcessor(Processor):
                     "training set"
                 ),
                 require_training_set=True,
-                func=lambda info, x, stat: feat_freq_rank(
+                func=lambda info, x, c, stat: feat_freq_rank(
                     info, x['text'], stat['vocab_rank']
                 ),
             ),
@@ -86,7 +88,7 @@ class TextClassificationProcessor(Processor):
                 dtype="float",
                 description="the frequency of text length in training set",
                 require_training_set=True,
-                func=lambda info, x, stat: feat_length_freq(
+                func=lambda info, x, c, stat: feat_length_freq(
                     info, x['text'], stat['length_fre']
                 ),
             ),

@@ -42,27 +42,27 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
-                func=lambda info, x: count_tokens(info, x['text'], side='source'),
+                func=lambda info, x, c: count_tokens(info, x['text'], side='source'),
             ),
             "text_chars": feature.Value(
                 dtype="float",
                 description="text length in characters",
-                func=lambda info, x: len(x['text']),
+                func=lambda info, x, c: len(x['text']),
             ),
             "entity_number": feature.Value(
                 dtype="float",
                 description="number of named entities in the text",
-                func=lambda info, x: len(get_named_entities(x['text'])),
+                func=lambda info, x, c: len(get_named_entities(x['text'])),
             ),
             "aspect_length": feature.Value(
                 dtype="float",
                 description="aspect length in tokens",
-                func=lambda info, x: count_tokens(info, x['aspect'], side='source'),
+                func=lambda info, x, c: count_tokens(info, x['aspect'], side='source'),
             ),
             "aspect_position": feature.Value(
                 dtype="float",
                 description="relative position of the aspect in the text",
-                func=lambda info, x: float(x["text"].find(x["aspect"]))
+                func=lambda info, x, c: float(x["text"].find(x["aspect"]))
                 / len(x["text"]),
             ),
         }
