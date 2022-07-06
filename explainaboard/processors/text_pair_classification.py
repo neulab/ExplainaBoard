@@ -118,11 +118,22 @@ class TextPairClassificationProcessor(Processor):
 
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples,
-            lambda x: x['text1'] + x["text2"],
+            lambda x: x['text1'],
             unwrap(sys_info.source_tokenizer),
         )
 
-        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
+            samples,
+            lambda x: x["text2"],
+            unwrap(sys_info.target_tokenizer),
+        )
+
+        return {
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
+        }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_similarity(self, sys_info: SysOutputInfo, existing_features: dict):
@@ -157,7 +168,7 @@ class TextPairClassificationProcessor(Processor):
             unwrap(sys_info.source_tokenizer),
         ) + feat_num_oov(
             existing_features,
-            statistics['source_vocab'],
+            statistics['target_vocab'],
             lambda x: x['text2'],
             unwrap(sys_info.target_tokenizer),
         )
@@ -174,7 +185,7 @@ class TextPairClassificationProcessor(Processor):
             unwrap(sys_info.source_tokenizer),
         ) + feat_freq_rank(
             existing_features,
-            statistics['source_vocab_rank'],
+            statistics['target_vocab_rank'],
             lambda x: x['text2'],
             unwrap(sys_info.target_tokenizer),
         )
