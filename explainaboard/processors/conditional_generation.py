@@ -264,7 +264,7 @@ class ConditionalGenerationProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics['source_vocab'],
+            statistics['source_vocab_rank'],
             lambda x: x['source'],
             unwrap(sys_info.source_tokenizer),
         )
@@ -284,7 +284,7 @@ class ConditionalGenerationProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics['target_vocab'],
+            statistics['target_vocab_rank'],
             lambda x: x['reference'],
             unwrap(sys_info.target_tokenizer),
         )
@@ -606,11 +606,16 @@ class ConditionalGenerationProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
+        )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
+        )
         return {
-            'source_vocab': accumulate_vocab_from_samples(
-                samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
-            ),
-            'target_vocab': accumulate_vocab_from_samples(
-                samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
-            ),
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
         }

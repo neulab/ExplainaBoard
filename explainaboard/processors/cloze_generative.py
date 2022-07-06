@@ -12,6 +12,7 @@ from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -152,25 +153,27 @@ class ClozeGenerativeProcessor(Processor):
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"]))
 
-    # training set dependent features
+        # training set dependent features
+
     def _get_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
             existing_features,
-            statistics,
+            statistics['source_vocab'],
             lambda x: x['context'],
             unwrap(sys_info.source_tokenizer),
         )
 
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
+        # training set dependent features
+        # (this could be merged into the above one for further optimization)
+
     def _get_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics,
+            statistics['source_vocab_rank'],
             lambda x: x['context'],
             unwrap(sys_info.source_tokenizer),
         )
@@ -195,6 +198,8 @@ class ClozeGenerativeProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
+
+        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
