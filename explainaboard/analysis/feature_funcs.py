@@ -142,3 +142,19 @@ def cap_feature(s):
         return "first_caps"
     else:
         return "not_first_caps"
+
+
+def relative_position(sys_info: SysOutputInfo, text: str, word: str):
+    tokens = unwrap(sys_info.source_tokenizer)(text).strs
+    if word not in tokens:
+        return 0
+    else:
+        return float(tokens.index(word)) / len(tokens)
+
+
+def absolute_position(sys_info: SysOutputInfo, text: str, word: str):
+    tokens = unwrap(sys_info.source_tokenizer)(text).strs
+    if word not in tokens:
+        return 0
+    else:
+        return float(tokens.index(word)) / len(tokens)

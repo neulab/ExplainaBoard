@@ -1,14 +1,22 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
+from typing import cast
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-import explainaboard.analysis.analyses
-import explainaboard.analysis.feature_funcs
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature_funcs import (
+    absolute_position,
+    accumulate_vocab_from_samples,
+    count_tokens,
+    feat_freq_rank,
+    feat_num_oov,
+    relative_position,
+)
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -23,83 +31,73 @@ class ClozeGenerativeProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.cloze_generative
 
-    @classmethod
-    def default_analyses(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "context": feature.Value("string"),
-                "question_mark": feature.Value("string"),
-                "hint": feature.Value("string"),
-                "answers": feature.Value("string"),
-                "context_length": feature.Value(
-                    dtype="float",
-                    description="the length of context",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+    def default_analyses(self) -> list[AnalysisLevel]:
+        features: dict[str, FeatureType] = {
+            "context": feature.Value("string"),
+            "question_mark": feature.Value("string"),
+            "hint": feature.Value("string"),
+            "answers": feature.Value("string"),
+            "context_length": feature.Value(
+                dtype="float",
+                description="the length of context",
+                func=lambda info, x, c: count_tokens(info, x['context']),
+            ),
+            "relative_blank_position": feature.Value(
+                dtype="float",
+                description="the relative position of blank (question mark)"
+                " in the whole context",
+                func=lambda info, x, c: relative_position(
+                    info, x['context'], x['question_mark']
                 ),
-                "relative_blank_position": feature.Value(
-                    dtype="float",
-                    description="the relative position of blank (question mark)"
-                    " in the whole context",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "absolute_blank_position": feature.Value(
+                dtype="float",
+                description="the absolute position of blank (question mark)"
+                " in the whole context",
+                func=lambda info, x, c: absolute_position(
+                    info, x['context'], x['question_mark']
                 ),
-                "absolute_blank_position": feature.Value(
-                    dtype="float",
-                    description="the absolute position of blank (question mark)"
-                    " in the whole context",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "answer_length": feature.Value(
+                dtype="float",
+                description="the length of answer",
+                func=lambda info, x, c: count_tokens(info, x['answer']),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_num_oov(
+                    info, x['text'], stat['vocab']
                 ),
-                "answer_length": feature.Value(
-                    dtype="float",
-                    description="the length of answer",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "the average rank of each word based on its frequency in "
+                    "training set"
                 ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_freq_rank(
+                    info, x['text'], stat['vocab_rank']
                 ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-            }
-        )
+            ),
+        }
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses: list[BucketAnalysis] = [
+            BucketAnalysis(x, method="continuous") for x in continuous_features
+        ]
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
+                analyses=cast(list[Analysis], analyses),
+            )
+        ]
 
     @classmethod
     def default_metrics(
@@ -117,67 +115,6 @@ class ClozeGenerativeProcessor(Processor):
                 target_language=target_language,
             ),
         ]
-
-    def __init__(self):
-        super().__init__()
-
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_context_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["context"]))
-
-    def _get_relative_blank_position(
-        self, sys_info: SysOutputInfo, existing_features: dict
-    ):
-        source_tokens = unwrap(sys_info.source_tokenizer)(
-            existing_features["context"]
-        ).strs
-        if existing_features["question_mark"] not in source_tokens:
-            return 0
-        else:
-            return (
-                source_tokens.index(existing_features["question_mark"])
-                * 1.0
-                / len(source_tokens)
-            )
-
-    def _get_absolute_blank_position(
-        self, sys_info: SysOutputInfo, existing_features: dict
-    ):
-        source_tokens = unwrap(sys_info.source_tokenizer)(
-            existing_features["context"]
-        ).strs
-        if existing_features["question_mark"] not in source_tokens:
-            return 0
-        else:
-            return source_tokens.index(existing_features["question_mark"])
-
-    def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"]))
-
-    # training set dependent features
-    def _get_num_oov(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.analysis.feature_funcs.feat_num_oov(
-            existing_features,
-            statistics,
-            lambda x: x['context'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.analysis.feature_funcs.feat_freq_rank(
-            existing_features,
-            statistics,
-            lambda x: x['context'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # --- End feature functions
 
     def _get_true_label(self, data_point):
         """
@@ -197,6 +134,6 @@ class ClozeGenerativeProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.analysis.feature_funcs.accumulate_vocab_from_samples(
+        return accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )

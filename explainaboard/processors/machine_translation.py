@@ -10,8 +10,6 @@ from explainaboard.analysis.analyses import AnalysisLevel, BucketAnalysis
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
-from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
