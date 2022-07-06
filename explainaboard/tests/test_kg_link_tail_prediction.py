@@ -57,7 +57,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_with_user_defined_features(self):
@@ -109,10 +109,10 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-        symmetry_performances = sys_info.results.fine_grained['symmetry']
+        symmetry_performances = sys_info.results.analyses['symmetry']
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
@@ -144,10 +144,10 @@ class TestKgLinkTailPrediction(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-        symmetry_performances = sys_info.results.fine_grained['symmetry']
+        symmetry_performances = sys_info.results.analyses['symmetry']
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):

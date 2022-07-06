@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
 import json
-from typing import cast
+from typing import Any, cast
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.metric import MetricConfig
+from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.metrics.ranking import (
     HitsConfig,
     MeanRankConfig,
@@ -144,7 +145,6 @@ class KGLinkTailPredictionProcessor(Processor):
         )
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)
-        raise NotImplementedError('_gen_metric_stats needs to be replaced')
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
@@ -202,6 +202,45 @@ class KGLinkTailPredictionProcessor(Processor):
             "link_fre": dict_link,
             "tail_fre": dict_tail,
         }
+
+    def _gen_cases_and_stats(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: list[dict],
+        statistics: Any,
+        analysis_level: AnalysisLevel,
+    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+        # Note that this is overridden to calculate stats from rank
+        cases = []
+        true_data = [self._get_true_label(x) for x in sys_output]
+        pred_data = [self._get_predicted_label(x) for x in sys_output]
+        rank_data = [x.get('true_rank') for x in sys_output]
+        if any(item is None for item in rank_data):
+            raise ValueError(
+                'Some data points do not have rank information; check system outputs.'
+            )
+        metric_stats = []
+        for metric in [x.to_metric() for x in analysis_level.metric_configs]:
+            if hasattr(metric, 'calc_stats_from_rank'):
+                metric_stats.append(metric.calc_stats_from_rank(rank_data))
+            else:
+                metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+        # Calculate features
+        for i, output in progress(
+            enumerate(sys_output), desc='calculating example-level features'
+        ):
+            case = AnalysisCase(sample_id=i, features={})
+            for feat_name, feat_spec in analysis_level.features.items():
+                if feat_spec.func is None:
+                    case.features[feat_name] = output[feat_name]
+                elif not feat_spec.require_training_set:
+                    case.features[feat_name] = feat_spec.func(sys_info, output, case)
+                elif statistics is not None:
+                    case.features[feat_name] = feat_spec.func(
+                        sys_info, output, case, statistics
+                    )
+            cases.append(case)
+        return cases, metric_stats
 
     # TODO(gneubig): this needs replaced
     # def _gen_metric_stats(

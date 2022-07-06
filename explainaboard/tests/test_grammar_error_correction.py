@@ -19,7 +19,7 @@ class TestGrammarErrorCorrection(unittest.TestCase):
             output_source=Source.local_filesystem,
             output_file_type=FileType.json,
         )
-        data = loader.load()
+        data = loader.load().samples
 
         metadata = {
             "task_name": TaskType.grammatical_error_correction.value,
@@ -29,10 +29,9 @@ class TestGrammarErrorCorrection(unittest.TestCase):
         }
         processor = get_processor(TaskType.grammatical_error_correction.value)
         sys_info = processor.process(metadata, data)
-        processor.print_analyses(sys_info.results.fine_grained)
-        # print(sys_info.results.overall["SeqCorrectCount"].value)
-        self.assertAlmostEqual(sys_info.results.overall["SeqCorrectCount"].value, 8)
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
+        self.assertAlmostEqual(overall_map["SeqCorrectCount"].value, 8)
+        self.assertIsNotNone(sys_info.results.analyses)
 
 
 if __name__ == '__main__':

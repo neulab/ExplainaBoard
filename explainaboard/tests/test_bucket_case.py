@@ -1,13 +1,16 @@
 import unittest
 
-# from dataclasses import asdict
-from explainaboard.info import AnalysisCase, AnalysisCaseLabeledSpan, AnalysisCaseSpan
+from explainaboard.analysis.case import (
+    AnalysisCase,
+    AnalysisCaseLabeledSpan,
+    AnalysisCaseSpan,
+)
 
 
 class TestAnalysisCaseClass(unittest.TestCase):
     def test_bucket_class_class(self):
 
-        my_bucket_seq = AnalysisCase(sample_id=0)
+        my_bucket_seq = AnalysisCase(sample_id=0, features={})
         # print(asdict(my_bucket_seq))
         # {'sample_id': '0'}
 
@@ -17,6 +20,7 @@ class TestAnalysisCaseClass(unittest.TestCase):
             char_span=(10, 25),
             text="New York",
             orig_str="input",
+            features={},
         )
 
         my_bucket_labeled_span = AnalysisCaseLabeledSpan(
@@ -27,6 +31,7 @@ class TestAnalysisCaseClass(unittest.TestCase):
             orig_str="input",
             true_label="LOC",
             predicted_label="ORG",
+            features={},
         )
         # print(asdict(my_bucket_span))
         # {'sample_id': '0', 'span': 'New York', 'true_label':

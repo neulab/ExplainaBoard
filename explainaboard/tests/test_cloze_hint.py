@@ -29,7 +29,7 @@ class TestClozeGenerative(unittest.TestCase):
         }
         processor = get_processor(TaskType.cloze_generative.value)
         sys_info = processor.process(metadata, data)
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
 
 
 if __name__ == '__main__':

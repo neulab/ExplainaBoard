@@ -60,7 +60,7 @@ class TestMachineTranslation(unittest.TestCase):
         sys_info = processor.process(metadata, data)
 
         # analysis.write_to_directory("./")
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
@@ -105,7 +105,7 @@ class TestMachineTranslation(unittest.TestCase):
         processor = get_processor(TaskType.machine_translation.value)
 
         sys_info = processor.process(dataclasses.asdict(data.metadata), data.samples)
-        self.assertTrue('num_capital_letters' in sys_info.results.fine_grained)
+        self.assertTrue('num_capital_letters' in sys_info.results.analyses)
 
 
 if __name__ == '__main__':

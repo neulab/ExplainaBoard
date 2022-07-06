@@ -37,7 +37,7 @@ we will see how different types of information from `sys_info` are collected.
 #### Print Bucket-wise Evaluation Results
 
 ```python
-   processor.print_analyses(sys_info.results.fine_grained)
+   processor.print_analyses(sys_info.results.analyses)
 ```
 
 
@@ -62,7 +62,7 @@ for metric_name, metric_info in sys_info.results.overall.items():
 
 #### Get fine-grained results
 ```python
-for feature_name, feature_info in sys_info.results.fine_grained.items():
+for feature_name, feature_info in sys_info.results.analyses.items():
     for bucket_name, bucket_info in feature_info.items():
         bucket_n_samples = bucket_info.n_samples
         for bucket_performance in bucket_info.performances:

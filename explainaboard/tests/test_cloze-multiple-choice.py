@@ -29,7 +29,7 @@ class TestClozeMultipleChoice(unittest.TestCase):
         }
         processor = get_processor(TaskType.cloze_mutiple_choice.value)
         sys_info = processor.process(metadata, data)
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
 
 
 if __name__ == '__main__':
