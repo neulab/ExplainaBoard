@@ -87,21 +87,16 @@ class TestNER(unittest.TestCase):
 
         # 1. Unittest: training set dependent features shouldn't be included
         # when training dataset is not provided
-        activate_features = [
-            x.name for x in sys_info.results.analyses[0] if x is not None
-        ]
-        self.assertTrue("span_econ" in activate_features)
-        self.assertTrue("span_efre" in activate_features)
+        span_analysis_map = {
+            x.name: x for x in sys_info.results.analyses[1] if x is not None
+        }
+        self.assertTrue("span_econ" in span_analysis_map)
+        self.assertTrue("span_efre" in span_analysis_map)
 
         # 2. Unittest: test the number of buckets of training dependent features
-        span_econ_analysis = cast(
-            BucketAnalysisResult,
-            [
-                x
-                for x in sys_info.results.analyses[0]
-                if x is not None and x.name == 'span_econ'
-            ][0],
-        )
+        span_econ_analysis = cast(BucketAnalysisResult, span_analysis_map['span_econ'])
+        for x in span_econ_analysis.bucket_performances:
+            print(f'span_econ_analysis.bucket_performances={x}')
         self.assertEqual(len(span_econ_analysis.bucket_performances), 3)
 
         # 3. Unittest: test detailed bucket information: bucket interval

@@ -165,6 +165,7 @@ class SeqLabProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Dataset, sys_info: SysOutputInfo):
+        print('\n**** running statistics_func\n')
         dl_features = samples.info.features
 
         tokens_sequences = []
@@ -192,6 +193,8 @@ class SeqLabProcessor(Processor):
             for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
         }
         vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+        for k, v in econ_dic.items():
+            print(f'econ_dic[{k}]={v}')
 
         return {
             "efre_dic": efre_dic,
