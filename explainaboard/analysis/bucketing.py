@@ -54,7 +54,7 @@ def continuous(
             bucket_collections.append(
                 AnalysisCaseCollection(
                     (conv(start_val), max_val),
-                    [j for j in sorted_idxs[start_i:]],
+                    [int(j) for j in sorted_idxs[start_i:]],
                 )
             )
             break
@@ -64,7 +64,7 @@ def continuous(
                 bucket_collections.append(
                     AnalysisCaseCollection(
                         (conv(start_val), conv(last_val)),
-                        [j for j in sorted_idxs[start_i:i]],
+                        [int(j) for j in sorted_idxs[start_i:i]],
                     )
                 )
                 start_val = val

@@ -81,7 +81,7 @@ class BucketAnalysis(Analysis):
             sample_ids = np.random.choice(
                 analysis_cases, self.sample_limit, replace=False
             )
-            return list(sample_ids)
+            return [int(x) for x in sample_ids]
         else:
             return analysis_cases
 
