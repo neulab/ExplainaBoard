@@ -61,7 +61,7 @@ class ClozeGenerativeProcessor(Processor):
             "answer_length": feature.Value(
                 dtype="float",
                 description="the length of answer",
-                func=lambda info, x, c: count_tokens(info, x['answers']['text']),
+                func=lambda info, x, c: count_tokens(info, x['answers']),
             ),
             "num_oov": feature.Value(
                 dtype="float",
