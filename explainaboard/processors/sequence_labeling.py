@@ -72,12 +72,8 @@ class SeqLabProcessor(Processor):
             k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
         ]
         examp_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                feature="true_label",
-                method="discrete",
-                number=15,
-            )
-        ] + [BucketAnalysis(x, method="continuous") for x in examp_continuous_features]
+            BucketAnalysis(x, method="continuous") for x in examp_continuous_features
+        ]
 
         span_features: dict[str, FeatureType] = {
             "span_text": feature.Value(
@@ -120,14 +116,14 @@ class SeqLabProcessor(Processor):
                 description="consistency of the span labels",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['econ_dic'].get(
-                    f'{c.text}|||{c.true_label}', 0.0
+                    f'{c.text.lower()}|||{c.true_label}', 0.0
                 ),
             ),
             "span_efre": feature.Value(
                 dtype="float",
                 description="frequency of the span in the training set",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['efre_dic'].get(c.text, 0.0),
+                func=lambda info, x, c, stat: stat['efre_dic'].get(c.text.lower(), 0.0),
             ),
         }
         span_continuous_features = [
@@ -165,7 +161,6 @@ class SeqLabProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Dataset, sys_info: SysOutputInfo):
-        print('\n**** running statistics_func\n')
         dl_features = samples.info.features
 
         tokens_sequences = []

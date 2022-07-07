@@ -2,24 +2,20 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass, field
-from typing import Any, Optional
-
-from explainaboard.analysis.case import AnalysisCase
+from typing import Optional
 
 
 @dataclass
 class BucketPerformance:
     bucket_interval: tuple
     n_samples: float
-    bucket_samples: list[Any] = field(default_factory=list)
+    bucket_samples: list[int] = field(default_factory=list)
     performances: list[Performance] = field(default_factory=list)
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
         if k == 'performances':
             return [Performance.from_dict(v1) for v1 in v]
-        if k == 'bucket_samples' and isinstance(v, dict):
-            return [AnalysisCase.from_dict(v1) for v1 in v]
         else:
             return v
 

@@ -95,8 +95,6 @@ class TestNER(unittest.TestCase):
 
         # 2. Unittest: test the number of buckets of training dependent features
         span_econ_analysis = cast(BucketAnalysisResult, span_analysis_map['span_econ'])
-        for x in span_econ_analysis.bucket_performances:
-            print(f'span_econ_analysis.bucket_performances={x}')
         self.assertEqual(len(span_econ_analysis.bucket_performances), 3)
 
         # 3. Unittest: test detailed bucket information: bucket interval
@@ -115,12 +113,12 @@ class TestNER(unittest.TestCase):
             "almost equal",
         )
         # 4. Unittest: test detailed bucket information: bucket samples
-        self.assertEqual(second_bucket.n_samples, 1007)
+        self.assertEqual(second_bucket.n_samples, 1050)
 
         # 5. Unittest: test detailed bucket information: metric
         self.assertEqual(second_bucket.performances[0].metric_name, "F1")
         self.assertAlmostEqual(
-            second_bucket.performances[0].value, 0.9203805708562846, 4, "almost equal"
+            second_bucket.performances[0].value, 0.9121588089330025, 4, "almost equal"
         )
         # 6 Unittest: test detailed bucket information: confidence interval
         for bucket_vals in sys_info.results.analyses[0]:

@@ -76,7 +76,7 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 @dataclass
 class AnalysisCaseCollection:
     interval: tuple
-    samples: list[AnalysisCase]
+    samples: list[int]
 
     def __len__(self):
         return len(self.samples)

@@ -38,7 +38,7 @@ def continuous(
     # Special case of one bucket
     if bucket_number == 1:
         max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
-        return [AnalysisCaseCollection((min_val, max_val), cases)]
+        return [AnalysisCaseCollection((min_val, max_val), list(range(len(cases))))]
 
     n_examps = len(vals)
     sorted_idxs = np.argsort(vals)
@@ -54,7 +54,7 @@ def continuous(
             bucket_collections.append(
                 AnalysisCaseCollection(
                     (conv(start_val), max_val),
-                    [cases[j] for j in sorted_idxs[start_i:]],
+                    [j for j in sorted_idxs[start_i:]],
                 )
             )
             break
@@ -64,7 +64,7 @@ def continuous(
                 bucket_collections.append(
                     AnalysisCaseCollection(
                         (conv(start_val), conv(last_val)),
-                        [cases[j] for j in sorted_idxs[start_i:i]],
+                        [j for j in sorted_idxs[start_i:i]],
                     )
                 )
                 start_val = val
@@ -88,18 +88,18 @@ def discrete(
     :param bucket_number: Maximum number of buckets
     :param bucket_setting: Minimum number of examples per bucket
     """
-    feat2case = {}
+    feat2idx = {}
     if bucket_setting is None:
         bucket_setting = 0
-    for k, v in sample_features:
-        if v not in feat2case:
-            feat2case[v] = [k]
+    for idx, (case, feat) in enumerate(sample_features):
+        if feat not in feat2idx:
+            feat2idx[feat] = [idx]
         else:
-            feat2case[v].append(k)
+            feat2idx[feat].append(idx)
     bucket_collections = [
-        AnalysisCaseCollection((k,), v)
-        for k, v in feat2case.items()
-        if len(v) >= bucket_setting
+        AnalysisCaseCollection((feat,), idxs)
+        for feat, idxs in feat2idx.items()
+        if len(idxs) >= bucket_setting
     ]
     bucket_collections.sort(key=lambda x: -len(x.samples))
     if len(bucket_collections) > bucket_number:
@@ -107,27 +107,27 @@ def discrete(
     return bucket_collections
 
 
-def fixed_continuous(
+def fixed(
     sample_features: list[tuple[AnalysisCase, T]],
     bucket_number: int,
     bucket_setting: list[tuple],
 ) -> list[AnalysisCaseCollection]:
     intervals = unwrap(bucket_setting)
-    bucket2examp: dict[tuple, list[AnalysisCase]] = {k: list() for k in intervals}
+    bucket2idx: dict[tuple, list[int]] = {k: list() for k in intervals}
 
     if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
-        for k, v in sample_features:
-            if v in bucket2examp:
-                bucket2examp[(v,)].append(k)
+        for idx, (case, feat) in enumerate(sample_features):
+            if feat in bucket2idx:
+                bucket2idx[(feat,)].append(idx)
     else:
-        for examp, value in sample_features:
-            res_key = find_key(bucket2examp, value)
+        for idx, (case, feat) in enumerate(sample_features):
+            res_key = find_key(bucket2idx, feat)
             if res_key is None:
                 continue
-            bucket2examp[res_key].append(examp)
+            bucket2idx[res_key].append(idx)
 
     bucket_collections = [
-        AnalysisCaseCollection((k,), v) for k, v in bucket2examp.items()
+        AnalysisCaseCollection((k,), v) for k, v in bucket2idx.items()
     ]
 
     return bucket_collections

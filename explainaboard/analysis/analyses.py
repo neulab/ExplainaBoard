@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Optional, TypeVar
 
@@ -8,7 +8,7 @@ import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import FeatureType, Value
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
@@ -76,13 +76,12 @@ class BucketAnalysis(Analysis):
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
-    def _subsample_analysis_cases(
-        self, analysis_cases: list[AnalysisCaseType]
-    ) -> list[AnalysisCaseType]:
+    def _subsample_analysis_cases(self, analysis_cases: list[int]) -> list[int]:
         if len(analysis_cases) > self.sample_limit:
-            ids = np.array(range(len(analysis_cases)))
-            bucket_sample_ids = np.random.choice(ids, self.sample_limit, replace=False)
-            return [analysis_cases[i] for i in bucket_sample_ids]
+            sample_ids = np.random.choice(
+                analysis_cases, self.sample_limit, replace=False
+            )
+            return list(sample_ids)
         else:
             return analysis_cases
 
@@ -108,23 +107,20 @@ class BucketAnalysis(Analysis):
 
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
-            analysis_cases = bucket_collection.samples
-            sample_ids = [analysis_case.sample_id for analysis_case in analysis_cases]
-
             # Subsample examples to save
-            bucket_samples = self._subsample_analysis_cases(analysis_cases)
+            subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
 
             bucket_performance = BucketPerformance(
                 bucket_interval=bucket_collection.interval,
-                n_samples=len(analysis_cases),
-                bucket_samples=bucket_samples,
+                n_samples=len(bucket_collection.samples),
+                bucket_samples=subsampled_ids,
             )
 
             for metric_func, metric_stat in zip(
                 unwrap_generator(metrics),
                 unwrap_generator(stats),
             ):
-                bucket_stats = metric_stat.filter(sample_ids)
+                bucket_stats = metric_stat.filter(bucket_collection.samples)
                 metric_result = metric_func.evaluate_from_stats(
                     bucket_stats,
                     conf_value=conf_value,
