@@ -14,13 +14,12 @@ import numpy
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
-import explainaboard.analysis.feature_funcs
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.logging import get_logger
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
@@ -64,7 +63,6 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
 
     def default_analyses(self) -> list[AnalysisLevel]:
         f = super().default_analyses()
-        get_logger().warning('Temporarily disabling summarization features')
         new_examp_features = {
             "sum_attributes": feature.Value(
                 dtype="dict",
@@ -121,6 +119,16 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.analysis.feature_funcs.accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
+        )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
         )
+        return {
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
+        }

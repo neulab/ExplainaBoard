@@ -7,10 +7,9 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-import explainaboard.analysis.analyses
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
-import explainaboard.analysis.feature_funcs
 from explainaboard.analysis.feature_funcs import (
+    accumulate_vocab_from_samples,
     count_tokens,
     feat_freq_rank,
     feat_num_oov,
@@ -63,7 +62,9 @@ class QAMultipleChoiceProcessor(Processor):
                 dtype="float",
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
-                func=lambda info, x, c, stat: feat_num_oov(info, x['context'], stat),
+                func=lambda info, x, c, stat: feat_num_oov(
+                    info, x['context'], stat['source_vocab']
+                ),
             ),
             "fre_rank": feature.Value(
                 dtype="float",
@@ -71,7 +72,9 @@ class QAMultipleChoiceProcessor(Processor):
                     "average rank of context words based on training set freq"
                 ),
                 require_training_set=True,
-                func=lambda info, x, c, stat: feat_freq_rank(info, x['context'], stat),
+                func=lambda info, x, c, stat: feat_freq_rank(
+                    info, x['context'], stat['source_vocab_rank']
+                ),
             ),
         }
         continuous_features = [
@@ -107,9 +110,6 @@ class QAMultipleChoiceProcessor(Processor):
             ),
         ]
 
-    def __init__(self):
-        super().__init__()
-
     def _get_true_label(self, data_point):
         """
         Get the true label from a data point. Overloaded from parent class.
@@ -128,6 +128,8 @@ class QAMultipleChoiceProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.analysis.feature_funcs.accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
+
+        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}

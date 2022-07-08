@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 from typing import cast
 
 from datalabs import aggregating
@@ -88,9 +87,11 @@ class TextPairClassificationProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['text1'], stat['source_vocab'], side='source'
+                    info, x['text1'], stat['source_vocab_rank'], side='source'
                 )
-                + feat_freq_rank(info, x['text2'], stat['target_vocab'], side='target'),
+                + feat_freq_rank(
+                    info, x['text2'], stat['target_vocab_rank'], side='target'
+                ),
             ),
         }
 
@@ -122,11 +123,22 @@ class TextPairClassificationProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples, sys_info: SysOutputInfo):
+
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples,
+            lambda x: x['text1'],
+            unwrap(sys_info.source_tokenizer),
+        )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
+            samples,
+            lambda x: x["text2"],
+            unwrap(sys_info.target_tokenizer),
+        )
+
         return {
-            'source_vocab': accumulate_vocab_from_samples(
-                samples, lambda x: x['text1'], unwrap(sys_info.source_tokenizer)
-            ),
-            'target_vocab': accumulate_vocab_from_samples(
-                samples, lambda x: x['text2'], unwrap(sys_info.target_tokenizer)
-            ),
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
         }

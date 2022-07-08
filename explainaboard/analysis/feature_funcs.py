@@ -81,10 +81,7 @@ def accumulate_vocab_from_samples(
         for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
     }
     vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-    return {
-        "vocab": vocab,
-        "vocab_rank": vocab_rank,
-    }
+    return vocab, vocab_rank
 
 
 def feat_freq_rank(

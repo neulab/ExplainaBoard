@@ -77,9 +77,9 @@ class ConditionalGenerationProcessor(Processor):
             ),
             "src_fre_rank": feature.Value(
                 dtype="float",
-                description=("average training-set frequency rank of words in source"),
+                description="average training-set frequency rank of words in source",
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['source'], stat['source_vocab'], side='source'
+                    info, x['source'], stat['source_vocab_rank'], side='source'
                 ),
                 require_training_set=True,
             ),
@@ -97,7 +97,7 @@ class ConditionalGenerationProcessor(Processor):
                     "average training-set frequency rank of words in reference"
                 ),
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['reference'], stat['target_vocab'], side='target'
+                    info, x['reference'], stat['target_vocab_rank'], side='target'
                 ),
                 require_training_set=True,
             ),
@@ -421,11 +421,16 @@ class ConditionalGenerationProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
+        )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
+        )
         return {
-            'source_vocab': accumulate_vocab_from_samples(
-                samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
-            ),
-            'target_vocab': accumulate_vocab_from_samples(
-                samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
-            ),
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
         }

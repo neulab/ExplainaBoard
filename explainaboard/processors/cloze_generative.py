@@ -68,7 +68,7 @@ class ClozeGenerativeProcessor(Processor):
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['text'], stat['vocab']
+                    info, x['text'], stat['source_vocab']
                 ),
             ),
             "fre_rank": feature.Value(
@@ -79,7 +79,7 @@ class ClozeGenerativeProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['text'], stat['vocab_rank']
+                    info, x['text'], stat['source_vocab_rank']
                 ),
             ),
         }
@@ -134,6 +134,8 @@ class ClozeGenerativeProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
+
+        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
