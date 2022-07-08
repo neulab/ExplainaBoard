@@ -1,3 +1,4 @@
+import itertools
 import os
 import unittest
 
@@ -112,7 +113,12 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-        symmetry_performances = sys_info.results.analyses['symmetry']
+        analysis_map = {
+            x.name: x
+            for x in itertools.chain.from_iterable(sys_info.results.analyses)
+            if x is not None
+        }
+        symmetry_performances = analysis_map['symmetry'].bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
@@ -147,7 +153,12 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-        symmetry_performances = sys_info.results.analyses['symmetry']
+        analysis_map = {
+            x.name: x
+            for x in itertools.chain.from_iterable(sys_info.results.analyses)
+            if x is not None
+        }
+        symmetry_performances = analysis_map['symmetry'].bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
