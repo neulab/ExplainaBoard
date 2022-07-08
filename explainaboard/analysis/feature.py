@@ -66,8 +66,10 @@ class FeatureType:
 
     @classmethod
     def from_dict(cls, obj: dict) -> FeatureType:
+        # If the type is not specified use Value by default
         if not is_dataclass_dict(obj):
-            raise TypeError("from_dict() should be called on dict with _type")
+            obj = copy.deepcopy(obj)
+            obj['_type'] = 'Value'
         return _fromdict_inner(obj)
 
     def __post_init__(self):

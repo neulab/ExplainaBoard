@@ -1,4 +1,5 @@
 import dataclasses
+import itertools
 import os
 import unittest
 
@@ -105,7 +106,12 @@ class TestMachineTranslation(unittest.TestCase):
         processor = get_processor(TaskType.machine_translation.value)
 
         sys_info = processor.process(dataclasses.asdict(data.metadata), data.samples)
-        self.assertTrue('num_capital_letters' in sys_info.results.analyses)
+        analysis_map = {
+            x.name: x
+            for x in itertools.chain.from_iterable(sys_info.results.analyses)
+            if x is not None
+        }
+        self.assertTrue('num_capital_letters' in analysis_map)
 
 
 if __name__ == '__main__':

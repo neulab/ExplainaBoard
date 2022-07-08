@@ -12,7 +12,7 @@ from explainaboard import config
 from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.serialization import general_to_dict
 from explainaboard.utils.tokenizer import Tokenizer
@@ -103,10 +103,8 @@ class SysOutputInfo:
             replace_keys = []
             for key, value in data.items():
                 if isinstance(value, Callable):
-                    get_logger().warning(
-                        f'Temporarily allowing serialization of {type(value)}'
-                    )
-                    data[key] = str(value)
+                    # TODO(gneubig): cannot serialize functions so info is lost
+                    data[key] = None
                 if not isinstance(key, str):
                     replace_keys.append(key)
                 if isinstance(value, dict) or isinstance(value, list):

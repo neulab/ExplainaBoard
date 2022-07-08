@@ -10,11 +10,13 @@ from eaas.config import Config
 
 from explainaboard import TaskType
 from explainaboard.analysis.analyses import (
+    Analysis,
     AnalysisLevel,
     AnalysisResult,
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
@@ -151,36 +153,6 @@ class Processor(metaclass=abc.ABCMeta):
                     )
         return statistics
 
-    # def _gen_metric_stats(
-    #     self,
-    #     sys_info: SysOutputInfo,
-    #     sys_output: list[dict],
-    #     cases: list[list[AnalysisCase]],
-    # ) -> list[list[MetricStats]]:
-    #     """Generate sufficient statistics for scoring different metrics.
-
-    #     :param sys_info: Information about the system outputs
-    #     :param sys_output: The system output itself
-    #     :param cases: Analysis cases associated with the stats
-    #     :return: Statistics sufficient for scoring
-    #     """
-    #     all_stats: list[list[MetricStats]] = []
-    #     for my_level, my_cases in zip(unwrap(sys_info.analysis_levels), cases):
-
-    #         if my_level.name == 'example':
-    #             true_data = [self._get_true_label(x) for x in sys_output]
-    #             pred_data = [self._get_predicted_label(x) for x in sys_output]
-    #         else:
-    #             raise ValueError(f'unsupported analysis level {my_level.name}')
-
-    #         metric_stats = []
-    #         for metric_cfg in my_level.metric_configs:
-    #             metric_stats.append(
-    #                 metric_cfg.to_metric().calc_stats_from_data(true_data, pred_data)
-    #             )
-
-    #     return all_stats
-
     def _get_true_label(self, data_point: dict):
         """
         Get the true label from a data point. Returns "true_label" by default, but can
@@ -199,7 +171,11 @@ class Processor(metaclass=abc.ABCMeta):
         """
         return data_point["predicted_label"]
 
-    def _customize_analyses(self, metadata: dict) -> list[AnalysisLevel]:
+    def _customize_analyses(
+        self,
+        custom_features: dict[str, dict[str, dict]] | None,
+        custom_analyses: dict[str, list[dict]] | None,
+    ) -> list[AnalysisLevel]:
         """
         Customize analyses for this processor
         Args:
@@ -208,45 +184,19 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
 
         """
-        analyses = self.default_analyses()
-        get_logger().warning('Analysis customization is not implemented yet.')
-        return analyses
-
-        # features = copy.deepcopy(self._default_features)
-        # # add user-defined features into features list
-        # if metadata is not None:
-        #     for (
-        #         feature_name,
-        #         feature_config,
-        #     ) in metadata.items():
-        #         if feature_config["dtype"] == "string":
-        #             features[feature_name] = feature.Value(
-        #                 dtype="string",
-        #                 description=feature_config["description"],
-        #                 is_bucket=True,
-        #                 is_custom=True,
-        #                 bucket_info=feature.BucketInfo(
-        #                     method="bucket_attribute_discrete_value",
-        #                     number=feature_config["num_buckets"],
-        #                     setting=1,
-        #                 ),
-        #             )
-        #         elif feature_config["dtype"] == 'float':
-        #             features[feature_name] = feature.Value(
-        #                 dtype="float",
-        #                 description=feature_config["description"],
-        #                 is_bucket=True,
-        #                 is_custom=True,
-        #                 bucket_info=feature.BucketInfo(
-        #                     method="bucket_attribute_specified_bucket_value",
-        #                     number=feature_config["num_buckets"],
-        #                     setting=(),
-        #                 ),
-        #             )
-        #         else:
-        #             raise NotImplementedError
-        #
-        # return features
+        analysis_levels = self.default_analyses()
+        level_map = {x.name: x for x in analysis_levels}
+        if custom_analyses is not None:
+            for level_name, analysis_content in custom_analyses.items():
+                level_map[level_name].analyses.extend(
+                    [Analysis.from_dict(v) for v in analysis_content]
+                )
+        if custom_features is not None:
+            for level_name, feature_content in custom_features.items():
+                level_map[level_name].features.update(
+                    {k: FeatureType.from_dict(v) for k, v in feature_content.items()}
+                )
+        return analysis_levels
 
     def perform_analyses(
         self,
@@ -454,12 +404,6 @@ class Processor(metaclass=abc.ABCMeta):
             metadata["task_name"] = self.task_type().value
 
         sys_info = SysOutputInfo.from_dict(metadata)
-        get_logger().warning('Temporarily disabled metric configs')
-        # if sys_info.metric_configs is None:
-        #     sys_info.metric_configs = self.default_metrics(
-        #         source_language=sys_info.source_language,
-        #         target_language=sys_info.target_language,
-        #     )
         if sys_info.target_tokenizer is None:
             sys_info.target_tokenizer = get_default_tokenizer(
                 task_type=self.task_type(), lang=sys_info.target_language
@@ -475,7 +419,10 @@ class Processor(metaclass=abc.ABCMeta):
 
         # declare customized features: _features will be updated
         custom_features: dict = metadata.get('custom_features', {})
-        sys_info.analysis_levels = self._customize_analyses(custom_features)
+        custom_analyses: dict = metadata.get('custom_analyses', {})
+        sys_info.analysis_levels = self._customize_analyses(
+            custom_features, custom_analyses
+        )
 
         # get scoring statistics
         external_stats = self._gen_external_stats(sys_info, self._statistics_func)

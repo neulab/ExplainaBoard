@@ -34,6 +34,20 @@ class Analysis:
     ) -> AnalysisResult | None:
         raise NotImplementedError
 
+    @staticmethod
+    def from_dict(dikt: dict):
+        type = dikt.pop('_type')
+        if type == 'BucketAnalysis':
+            return BucketAnalysis(
+                feature=dikt['feature'],
+                method=dikt.get('method', 'continuous'),
+                number=dikt.get('number', 4),
+                setting=dikt.get('setting'),
+                sample_limit=dikt.get('sample_limit', 50),
+            )
+        else:
+            raise ValueError(f'invalid type {type}')
+
 
 @dataclass
 class BucketAnalysisResult(AnalysisResult):

@@ -23,6 +23,8 @@ from typing import (
 from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
+from explainaboard.analysis.analyses import Analysis
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.constants import Source
 from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
@@ -99,7 +101,9 @@ class FileLoaderMetadata:
     supported_languages: list[str] | None = None
     task_name: str | None = None
     supported_tasks: list[str] | None = None
-    custom_features: list[str] | None = None
+    custom_features: dict[str, dict[str, FeatureType]] | None = None
+    # analysis level name -> list of analyses dictionary
+    custom_analyses: dict[str, list[Analysis]] | None = None
 
     def merge(self, other: FileLoaderMetadata) -> None:
         """
@@ -117,6 +121,7 @@ class FileLoaderMetadata:
         self.task_name = other.task_name or self.task_name
         self.supported_tasks = other.supported_tasks or self.supported_tasks
         self.custom_features = other.custom_features or self.custom_features
+        self.custom_analyses = other.custom_analyses or self.custom_analyses
 
     @classmethod
     def from_dict(cls, data: dict) -> FileLoaderMetadata:
@@ -131,6 +136,18 @@ class FileLoaderMetadata:
                     '"target_language"'
                 )
             source_language = target_language = data.get('language')
+        custom_features: dict[str, dict[str, FeatureType]] | None = None
+        custom_analyses: dict[str, list[Analysis]] | None = None
+        if 'custom_features' in data:
+            custom_features = {
+                k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
+                for k1, v1 in data['custom_features'].items()
+            }
+        if 'custom_analyses' in data:
+            custom_analyses = {
+                k1: [Analysis.from_dict(v2) for v2 in v1]
+                for k1, v1 in data['custom_analyses'].items()
+            }
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
@@ -141,7 +158,8 @@ class FileLoaderMetadata:
             supported_languages=data.get('supported_languages'),
             task_name=data.get('task_name'),
             supported_tasks=data.get('supported_tasks'),
-            custom_features=data.get('custom_features'),
+            custom_features=custom_features,
+            custom_analyses=custom_analyses,
         )
 
     @classmethod
@@ -339,8 +357,15 @@ class FileLoader:
         before_fields = copy.deepcopy(self._fields)
         fields = self._map_fields(self._fields, actual_mapping)
         if raw_data.metadata.custom_features is not None:
-            for feat in raw_data.metadata.custom_features:
-                fields.append(FileLoaderField(feat, feat, None))
+            for level_name, feats in raw_data.metadata.custom_features.items():
+                if level_name == 'example':
+                    for feat in feats:
+                        fields.append(FileLoaderField(feat, feat, None))
+                else:
+                    raise ValueError(
+                        'cannot currently load custom features other '
+                        f'than on the example level (got {level_name})'
+                    )
         assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
         # process the actual data
