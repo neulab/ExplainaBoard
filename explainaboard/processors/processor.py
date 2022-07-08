@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, Optional
+import itertools
+from typing import Any, cast, Optional
 
 from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
 
 from explainaboard import TaskType
-from explainaboard.analysis.analyses import AnalysisLevel, AnalysisResult
+from explainaboard.analysis.analyses import (
+    AnalysisLevel,
+    AnalysisResult,
+    BucketAnalysisResult,
+)
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
@@ -370,7 +375,7 @@ class Processor(metaclass=abc.ABCMeta):
 
     def sort_bucket_info(
         self,
-        performance_over_bucket: dict[str, list[BucketPerformance]],
+        analysis_results: list[list[AnalysisResult]],
         sort_by: str = 'value',
         sort_by_metric: str = 'first',
         sort_ascending: bool = False,
@@ -414,18 +419,23 @@ class Processor(metaclass=abc.ABCMeta):
                     return bp.value
             raise ValueError(f'could not find metric {sort_by_metric}')
 
-        for feature_name, feature_value in performance_over_bucket.items():
+        for analysis_result in itertools.chain.from_iterable(analysis_results):
+            if not isinstance(analysis_result, BucketAnalysisResult):
+                continue
+            bucket_result = cast(
+                BucketAnalysisResult, analysis_result
+            ).bucket_performances
 
             # based on alphabetical order of the bucket lower boundary; low to high
             if sort_by == 'key':
-                feature_value.sort(key=lambda x: x.bucket_interval)
+                bucket_result.sort(key=lambda x: x.bucket_interval)
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
             elif sort_by == 'performance_value':
-                feature_value.sort(key=value_by_name, reverse=not sort_ascending)
+                bucket_result.sort(key=value_by_name, reverse=not sort_ascending)
             # sort by the number of samples in each bucket
             elif sort_by == 'n_bucket_samples':
-                feature_value.sort(
+                bucket_result.sort(
                     key=lambda x: x.n_samples, reverse=not sort_ascending
                 )
 
@@ -495,12 +505,11 @@ class Processor(metaclass=abc.ABCMeta):
             overall_statistics.analysis_cases,
             metric_stats=overall_statistics.metric_stats,
         )
-        get_logger().warning('Sorting buckets has not been implemented')
-        # self.sort_bucket_info(
-        #     performance_over_bucket,
-        #     sort_by=metadata.get('sort_by', 'key'),
-        #     sort_by_metric=metadata.get('sort_by_metric', 'first'),
-        #     sort_ascending=metadata.get('sort_ascending', False),
-        # )
+        self.sort_bucket_info(
+            analyses,
+            sort_by=metadata.get('sort_by', 'key'),
+            sort_by_metric=metadata.get('sort_by_metric', 'first'),
+            sort_ascending=metadata.get('sort_ascending', False),
+        )
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
         return sys_info
