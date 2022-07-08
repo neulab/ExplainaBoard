@@ -173,18 +173,24 @@ class Processor(metaclass=abc.ABCMeta):
 
     def _customize_analyses(
         self,
+        sys_info: SysOutputInfo,
         custom_features: dict[str, dict[str, dict]] | None,
         custom_analyses: dict[str, list[dict]] | None,
     ) -> list[AnalysisLevel]:
         """
         Customize analyses for this processor
         Args:
-            metadata: the metadata information of system output
+            custom_features: the features to customize
+            custom_analyses: the analyses to customize
 
         Returns:
 
         """
         analysis_levels = self.default_analyses()
+        for level in analysis_levels:
+            for config in level.metric_configs:
+                config.source_language = sys_info.source_language
+                config.target_language = sys_info.target_language
         level_map = {x.name: x for x in analysis_levels}
         if custom_analyses is not None:
             for level_name, analysis_content in custom_analyses.items():
@@ -421,7 +427,7 @@ class Processor(metaclass=abc.ABCMeta):
         custom_features: dict = metadata.get('custom_features', {})
         custom_analyses: dict = metadata.get('custom_analyses', {})
         sys_info.analysis_levels = self._customize_analyses(
-            custom_features, custom_analyses
+            sys_info, custom_features, custom_analyses
         )
 
         # get scoring statistics
