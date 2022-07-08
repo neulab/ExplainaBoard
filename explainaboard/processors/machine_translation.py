@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+import copy
 
 from datalabs import aggregating
 
@@ -25,6 +26,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
 
     def default_analyses(self) -> list[AnalysisLevel]:
         f = super().default_analyses()
+        f = copy.deepcopy(f)
         f[0].features["attr_compression"] = feature.Value(
             dtype="float",
             description="the ratio between source and reference length",

@@ -74,9 +74,13 @@ class TestMachineTranslation(unittest.TestCase):
         condgen_features_2 = condgen_processor.default_analyses()
 
         # MT features didn't change condgen features
-        self.assertDictEqual(condgen_features_1, condgen_features_2)
-        # condgen features are a subset of MT features
-        self.assertDictEqual(mt_features, {**mt_features, **condgen_features_1})
+        for cf1, cf2, mtf in zip(condgen_features_1, condgen_features_2, mt_features):
+            lcf1 = set(cf1.features.keys())
+            lcf2 = set(cf2.features.keys())
+            lmtf = set(mtf.features.keys())
+            self.assertEqual(lcf1, lcf2)
+            # condgen features are a subset of MT features
+            self.assertTrue(all([x in lmtf] for x in lcf1))
 
     def test_custom_features(self):
         loader = get_custom_dataset_loader(

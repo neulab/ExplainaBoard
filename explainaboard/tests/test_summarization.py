@@ -63,10 +63,13 @@ class TestSummarization(unittest.TestCase):
         sum_features = sum_processor.default_analyses()
         condgen_features_2 = condgen_processor.default_analyses()
 
-        # MT features didn't change condgen features
-        self.assertDictEqual(condgen_features_1, condgen_features_2)
-        # condgen features are a subset of sum features
-        self.assertDictEqual(sum_features, {**sum_features, **condgen_features_1})
+        for cf1, cf2, sumf in zip(condgen_features_1, condgen_features_2, sum_features):
+            lcf1 = set(cf1.features.keys())
+            lcf2 = set(cf2.features.keys())
+            lsumf = set(sumf.features.keys())
+            self.assertEqual(lcf1, lcf2)
+            # condgen features are a subset of MT features
+            self.assertTrue(all([x in lsumf] for x in lcf1))
 
 
 if __name__ == '__main__':
