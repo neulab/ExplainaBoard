@@ -4,9 +4,10 @@ import argparse
 import json
 import os
 
-from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.analysis.analyses import BucketAnalysis, BucketAnalysisResult
+from explainaboard.analysis.performance import Performance
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.logging import get_logger, progress
+from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 from explainaboard.visualizers.bar_chart import make_bar_chart
 
@@ -31,98 +32,119 @@ def draw_bar_chart_from_reports(
     for report in reports:
         with open(report) as fin:
             report_info.append(SysOutputInfo.from_dict(json.load(fin)))
-    overall_results = [list(unwrap(x.results.overall).values()) for x in report_info]
-    overall_metric_names = list(unwrap(report_info[0].results.overall).keys())
-    fg_results = [unwrap(x.results.fine_grained) for x in report_info]
 
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    num_levels = len(unwrap(report_info[0].analysis_levels))
+    for level_id in range(num_levels):
 
-    # Overall performance
-    ys = [[x.value for x in y] for y in overall_results]
-    y_errs = None
-    if overall_results[0][0].confidence_score_low is not None:
-        y_errs = [
-            (
-                [x.value - unwrap(x.confidence_score_low) for x in y],
-                [unwrap(x.confidence_score_high) - x.value for x in y],
-            )
-            for y in overall_results
+        overall_results: list[list[Performance]] = [
+            list(unwrap(x.results.overall)[level_id]) for x in report_info
         ]
-
-    make_bar_chart(
-        ys,
-        output_dir,
-        'overall',
-        output_fig_format='png',
-        fig_size=(8, 6),
-        sys_names=sys_names,
-        errs=y_errs,
-        title=None,
-        xticklabels=overall_metric_names,
-        ylabel='metric value',
-    )
-
-    # Bucket performance: feature name, for example, sentence length
-    for feature_name in progress(fg_results[0].keys()):
-        # Make sure that buckets exist
-        buckets: list[list[BucketPerformance]] = []
-        for i, fg_result in enumerate(fg_results):
-            if feature_name not in fg_result:
-                get_logger().error(f'error: feature {feature_name} not in {reports[i]}')
-            else:
-                buckets.append(fg_result[feature_name])
-                bnames0, bnames = [x.bucket_interval for x in buckets[0]], [
-                    x.bucket_interval for x in buckets[-1]
-                ]
-                if len(bnames0) != len(bnames):
-                    get_logger().error(
-                        f'error: different number of buckets for {feature_name} in '
-                        f'{reports[0]} and {reports[i]}'
-                    )
-                    buckets = []
-                elif bnames0 != bnames:
-                    get_logger().warning(
-                        f'warning: different bucket labels for {feature_name} in '
-                        f'{reports[0]} and {reports[i]}'
-                    )
-            if len(buckets) != i + 1:
-                break
-        if len(buckets) != len(reports):
-            continue
-
-        bucket0_intervals = [x.bucket_interval for x in buckets[0]]
-        bucket_metrics = [x.metric_name for x in buckets[0][0].performances]
-        for metric_id, metric_name in enumerate(bucket_metrics):
-
-            performances: list[list[Performance]] = [
-                [x.performances[metric_id] for x in y] for y in buckets
+        bucket_names: list[list[str]] = [
+            [
+                y.feature
+                for y in unwrap(x.analysis_levels)[level_id].analyses
+                if isinstance(y, BucketAnalysis)
             ]
-            ys = [[x.value for x in y] for y in performances]
+            for x in report_info
+        ]
+        bucket_results: list[list[BucketAnalysisResult]] = [
+            [
+                y
+                for y in unwrap(x.results.analyses)[level_id]
+                if isinstance(y, BucketAnalysisResult)
+            ]
+            for x in report_info
+        ]
+        metric_names: list[list[str]] = [
+            [y.metric_name for y in x] for x in overall_results
+        ]
+        for name, over, buck, buck_name, my_metrics in zip(
+            sys_names, overall_results, bucket_results, bucket_names, metric_names
+        ):
+            if len(over) != len(overall_results[0]):
+                raise ValueError(
+                    f'mismatched overall results in {name} and {sys_names[0]}'
+                )
+            if len(buck) != len(bucket_results[0]):
+                raise ValueError(f'mismatched buckets in {name} and {sys_names[0]}')
+            if buck_name != bucket_names[0]:
+                raise ValueError(
+                    f'mismatched bucket names in {name} and '
+                    f'{sys_names[0]}:\n{buck_name}\n{bucket_names[0]}'
+                )
+            if my_metrics != metric_names[0]:
+                raise ValueError(
+                    f'mismatched metric names in {name} and '
+                    f'{sys_names[0]}:\n{my_metrics}\n{metric_names[0]}'
+                )
 
-            y_errs = None
-            if performances[0][0].confidence_score_low is not None:
-                y_errs = [
-                    (
-                        [x.value - unwrap(x.confidence_score_low) for x in y],
-                        [unwrap(x.confidence_score_high) - x.value for x in y],
-                    )
-                    for y in performances
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Overall performance
+        ys = [[x.value for x in y] for y in overall_results]
+        y_errs = None
+        if overall_results[0][0].confidence_score_low is not None:
+            y_errs = [
+                (
+                    [x.value - unwrap(x.confidence_score_low) for x in y],
+                    [unwrap(x.confidence_score_high) - x.value for x in y],
+                )
+                for y in overall_results
+            ]
+
+        make_bar_chart(
+            ys,
+            output_dir,
+            'overall',
+            output_fig_format='png',
+            fig_size=(8, 6),
+            sys_names=sys_names,
+            errs=y_errs,
+            title=None,
+            xticklabels=metric_names[0],
+            ylabel='metric value',
+        )
+
+        # Bucket performance: feature name, for example, sentence length
+        for analysis_idx, fg_results in progress(enumerate(zip(*bucket_results))):
+            feature_name = bucket_names[0][analysis_idx]
+            ba_results: list[BucketAnalysisResult] = fg_results
+
+            bucket0_intervals = [
+                x.bucket_interval for x in ba_results[0].bucket_performances
+            ]
+            for metric_id, metric_name in enumerate(metric_names[0]):
+
+                performances: list[list[Performance]] = [
+                    [x.performances[metric_id] for x in y.bucket_performances]
+                    for y in ba_results
                 ]
+                ys = [[x.value for x in y] for y in performances]
 
-            make_bar_chart(
-                ys,
-                output_dir,
-                f'{feature_name}_{metric_name}',
-                output_fig_format='png',
-                fig_size=(8, 6),
-                sys_names=sys_names,
-                errs=y_errs,
-                title=None,
-                xlabel=feature_name,
-                xticklabels=bucket0_intervals,
-                ylabel=metric_name,
-            )
+                y_errs = None
+                if performances[0][0].confidence_score_low is not None:
+                    y_errs = [
+                        (
+                            [x.value - unwrap(x.confidence_score_low) for x in y],
+                            [unwrap(x.confidence_score_high) - x.value for x in y],
+                        )
+                        for y in performances
+                    ]
+
+                make_bar_chart(
+                    ys,
+                    output_dir,
+                    f'{feature_name}_{metric_name}',
+                    output_fig_format='png',
+                    fig_size=(8, 6),
+                    sys_names=sys_names,
+                    errs=y_errs,
+                    title=None,
+                    xlabel=feature_name,
+                    xticklabels=bucket0_intervals,
+                    ylabel=metric_name,
+                )
 
 
 def main():

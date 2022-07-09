@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import dataclasses
+
 from eaas.endpoint import EndpointConfig
 
 from explainaboard.metrics.metric import MetricConfig
@@ -38,3 +40,12 @@ def metric_name_to_config(
         )
     else:
         raise ValueError(f'Invalid metric {name}')
+
+
+def metric_config_from_dict(dikt: dict):
+    type = dikt.pop('_type')
+    config_cls = metric_name_to_config_class(type)
+    field_names = set(f.name for f in dataclasses.fields(config_cls))
+    return config_cls(
+        **{k: config_cls.dict_conv(k, v) for k, v in dikt.items() if k in field_names}
+    )

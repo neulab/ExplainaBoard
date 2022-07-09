@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from explainaboard.analysis.analyses import AnalysisResult
-from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.analysis.performance import Performance
 
 
 @dataclass
@@ -17,14 +17,9 @@ class Result:
     @classmethod
     def dict_conv(cls, k: str, v: dict):
         if k == 'overall':
-            return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
-        elif k == 'fine_grained':
-            return {
-                k1: [BucketPerformance.from_dict(v2) for v2 in v1]
-                for k1, v1 in v.items()
-            }
-        elif k == 'calibration':
-            return None if v is None else [Performance.from_dict(v1) for v1 in v]
+            return [[Performance.from_dict(v2) for v2 in v1] for v1 in v]
+        elif k == 'analyses':
+            return [[AnalysisResult.from_dict(v2) for v2 in v1] for v1 in v]
         else:
             raise NotImplementedError
 

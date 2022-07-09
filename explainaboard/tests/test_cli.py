@@ -2,9 +2,10 @@ import unittest
 from unittest import TestCase
 from unittest.mock import patch
 
-from explainaboard.explainaboard_main import main
+import explainaboard.explainaboard_main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, top_path
 from explainaboard.utils.cache_api import cache_online_file
+import explainaboard.visualizers.draw_hist
 
 
 class TestCLI(TestCase):
@@ -24,7 +25,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_textclass_datalab_pairwise(self):
         args = [
@@ -40,7 +41,31 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
+
+    def test_textclass_viz(self):
+        for sysname in ('lstm', 'cnn'):
+            args = [
+                'explainaboard.explainaboard_main',
+                '--task',
+                'text-classification',
+                '--system_outputs',
+                f'{top_path}/data/system_outputs/sst2/sst2-{sysname}-output.txt',
+                '--dataset',
+                'sst2',
+                '--report_json',
+                f'{top_path}/explainaboard/tests/output/reports/sst2-{sysname}-output.json',  # noqa
+            ]
+            with patch('sys.argv', args):
+                explainaboard.explainaboard_main.main()
+        args = [
+            'explainaboard.visualizers.draw_hist',
+            '--reports',
+            f'{top_path}/explainaboard/tests/output/reports/sst2-lstm-output.json',
+            f'{top_path}/explainaboard/tests/output/reports/sst2-cnn-output.json',
+        ]
+        with patch('sys.argv', args):
+            explainaboard.visualizers.draw_hist.main()
 
     def test_textclass_custom(self):
         args = [
@@ -55,7 +80,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_textpair_datalab(self):
@@ -71,7 +96,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_textpair_custom(self):
         args = [
@@ -86,7 +111,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_summ_custom(self):
         args = [
@@ -104,7 +129,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_summ_datalab(self):
@@ -126,7 +151,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_mt_custom(self):
         args = [
@@ -143,7 +168,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_codegen_custom(self):
         args = [
@@ -162,7 +187,7 @@ class TestCLI(TestCase):
             "report.json",
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_codegen_datalab(self):
         args = [
@@ -179,7 +204,7 @@ class TestCLI(TestCase):
             "report.json",
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_lm_custom(self):
         args = [
@@ -194,7 +219,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_ner_datalab(self):
         args = [
@@ -211,7 +236,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_ner_custom(self):
         args = [
@@ -226,7 +251,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_multichoiceqa_datalab(self):
         args = [
@@ -243,7 +268,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_multichoiceqa_custom(self):
         args = [
@@ -258,7 +283,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_extractiveqa_custom(self):
         args = [
@@ -273,7 +298,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     @unittest.skip(
         reason="to be fixed in future PR: "
@@ -292,7 +317,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_kglinktail_custom(self):
         args = [
@@ -307,7 +332,7 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()
 
     def test_absa_custom(self):
         args = [
@@ -322,4 +347,4 @@ class TestCLI(TestCase):
             '/dev/null',
         ]
         with patch('sys.argv', args):
-            main()
+            explainaboard.explainaboard_main.main()

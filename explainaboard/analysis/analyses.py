@@ -11,6 +11,7 @@ from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import metric_config_from_dict
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.typing_utils import unwrap_generator
 
@@ -21,6 +22,19 @@ class AnalysisResult:
 
     def print(self):
         raise NotImplementedError
+
+    @staticmethod
+    def from_dict(dikt):
+        type = dikt.pop('_type')
+        if type == 'BucketAnalysisResult':
+            bucket_performances = [
+                BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
+            ]
+            return BucketAnalysisResult(
+                name=dikt['name'], bucket_performances=bucket_performances
+            )
+        else:
+            raise ValueError(f'bad AnalysisResult type {type}')
 
 
 @dataclass
@@ -52,6 +66,10 @@ class Analysis:
 @dataclass
 class BucketAnalysisResult(AnalysisResult):
     bucket_performances: list[BucketPerformance]
+    _type: Optional[str] = None
+
+    def __post_init__(self):
+        self._type: str = self.__class__.__name__
 
     def print(self):
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
@@ -166,3 +184,15 @@ class AnalysisLevel:
     features: dict[str, FeatureType]
     analyses: list[Analysis]
     metric_configs: list[MetricConfig]
+
+    @staticmethod
+    def from_dict(dikt: dict):
+        features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
+        analyses = [Analysis.from_dict(v) for v in dikt['analyses']]
+        metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
+        return AnalysisLevel(
+            name=dikt['name'],
+            features=features,
+            analyses=analyses,
+            metric_configs=metric_configs,
+        )
