@@ -245,7 +245,6 @@ class TestMetric(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.analyses)
         overall = sys_info.results.overall[0]
         self.assertGreater(len(overall), 0)

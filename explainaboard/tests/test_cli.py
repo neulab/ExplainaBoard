@@ -1,9 +1,10 @@
+from pathlib import Path
 import unittest
 from unittest import TestCase
 from unittest.mock import patch
 
 import explainaboard.explainaboard_main
-from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, top_path
+from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_output_path, top_path
 from explainaboard.utils.cache_api import cache_online_file
 import explainaboard.visualizers.draw_hist
 
@@ -44,6 +45,9 @@ class TestCLI(TestCase):
             explainaboard.explainaboard_main.main()
 
     def test_textclass_viz(self):
+        print(f'test_output_path={test_output_path}')
+        Path(f"{test_output_path}/reports").mkdir(parents=True, exist_ok=True)
+        Path(f"{test_output_path}/figures").mkdir(parents=True, exist_ok=True)
         for sysname in ('lstm', 'cnn'):
             args = [
                 'explainaboard.explainaboard_main',
@@ -54,15 +58,17 @@ class TestCLI(TestCase):
                 '--dataset',
                 'sst2',
                 '--report_json',
-                f'{top_path}/explainaboard/tests/output/reports/sst2-{sysname}-output.json',  # noqa
+                f'{test_output_path}/reports/sst2-{sysname}-output.json',  # noqa
             ]
             with patch('sys.argv', args):
                 explainaboard.explainaboard_main.main()
         args = [
             'explainaboard.visualizers.draw_hist',
             '--reports',
-            f'{top_path}/explainaboard/tests/output/reports/sst2-lstm-output.json',
-            f'{top_path}/explainaboard/tests/output/reports/sst2-cnn-output.json',
+            f'{test_output_path}/reports/sst2-lstm-output.json',
+            f'{test_output_path}/reports/sst2-cnn-output.json',
+            '--output_dir',
+            f'{test_output_path}/figures/',
         ]
         with patch('sys.argv', args):
             explainaboard.visualizers.draw_hist.main()

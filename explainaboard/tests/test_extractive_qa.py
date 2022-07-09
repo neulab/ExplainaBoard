@@ -22,7 +22,7 @@ class TestExtractiveQA(unittest.TestCase):
             FileType.json,
             FileType.json,
         )
-        data = loader.load()
+        data = loader.load().samples
         self.assertEqual(len(data), 1190)
         sample = data[0]
         self.assertEqual(sample["predicted_answers"], {"text": "308"})
@@ -43,7 +43,6 @@ class TestExtractiveQA(unittest.TestCase):
         processor = get_processor(TaskType.qa_extractive)
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
         get_logger('test').info(f'OVERALL={sys_info.results.overall}')
@@ -88,7 +87,6 @@ class TestExtractiveQA(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
         # 0.6285714285714286

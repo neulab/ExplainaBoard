@@ -42,7 +42,6 @@ class TestSysDetails(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(
             sys_info.system_details, {"learning_rate": 0.0001, "number_of_layers": 10}
         )

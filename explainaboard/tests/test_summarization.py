@@ -40,7 +40,7 @@ class TestSummarization(unittest.TestCase):
             FileType.tsv,
             FileType.text,
         )
-        data = loader.load()
+        data = loader.load().samples
 
         metadata = {
             "task_name": TaskType.summarization.value,
@@ -52,7 +52,6 @@ class TestSummarization(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 

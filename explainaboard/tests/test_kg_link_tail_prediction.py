@@ -10,7 +10,7 @@ from explainaboard.metrics.ranking import (
     MeanRankConfig,
     MeanReciprocalRankConfig,
 )
-from explainaboard.tests.utils import test_artifacts_path
+from explainaboard.tests.utils import test_artifacts_path, test_output_path
 
 
 class TestKgLinkTailPrediction(unittest.TestCase):
@@ -31,7 +31,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
         sys_info = processor.process(metadata={}, sys_output=data.samples)
         # If you want to write out to disk you can use
-        sys_info.write_to_directory('./')
+        sys_info.write_to_directory(test_output_path)
 
     def test_no_user_defined_features(self):
         loader = get_custom_dataset_loader(
