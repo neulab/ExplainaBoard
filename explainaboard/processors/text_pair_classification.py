@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import cast, List
 
 from datalabs import aggregating
 
@@ -111,7 +111,7 @@ class TextPairClassificationProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(list[Analysis], analyses),
+                analyses=cast(List[Analysis], analyses),
             )
         ]
 

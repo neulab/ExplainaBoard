@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 import json
-from typing import Any, cast
+from typing import Any, cast, List
 
 from datalabs import aggregating
 
@@ -105,7 +105,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(list[Analysis], analyses),
+                analyses=cast(List[Analysis], analyses),
             )
         ]
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import copy
-from typing import Any, cast
+from typing import Any, cast, List
 
 from datalabs import aggregating, Dataset
 
@@ -143,13 +143,13 @@ class SeqLabProcessor(Processor):
                 name='example',
                 features=examp_features,
                 metric_configs=self.default_metrics(level='example'),
-                analyses=cast(list[Analysis], examp_analyses),
+                analyses=cast(List[Analysis], examp_analyses),
             ),
             AnalysisLevel(
                 name='span',
                 features=span_features,
                 metric_configs=self.default_metrics(level='span'),
-                analyses=cast(list[Analysis], span_analyses),
+                analyses=cast(List[Analysis], span_analyses),
             ),
         ]
 
@@ -268,7 +268,7 @@ class SeqLabProcessor(Processor):
             x.to_metric().calc_stats_from_data(true_data, pred_data)
             for x in analysis_level.metric_configs
         ]
-        return cast(list[AnalysisCase], cases), metric_stats
+        return cast(List[AnalysisCase], cases), metric_stats
 
     def get_econ_efre_dic(
         self, words: list[str], bio_tags: list[str]

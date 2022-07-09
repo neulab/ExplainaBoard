@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import cast
+from typing import cast, List
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -52,7 +52,7 @@ class GrammaticalErrorCorrection(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(list[Analysis], analyses),
+                analyses=cast(List[Analysis], analyses),
             )
         ]
 

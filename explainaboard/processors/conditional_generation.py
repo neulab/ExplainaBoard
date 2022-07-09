@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Iterator
-from typing import Any, cast
+from typing import Any, cast, List
 
 from datalabs import aggregating
 import numpy as np
@@ -163,13 +163,13 @@ class ConditionalGenerationProcessor(Processor):
                 name='example',
                 features=examp_features,
                 metric_configs=self.default_metrics(level='example'),
-                analyses=cast(list[Analysis], examp_analyses),
+                analyses=cast(List[Analysis], examp_analyses),
             ),
             AnalysisLevel(
                 name='tok',
                 features=tok_features,
                 metric_configs=self.default_metrics(level='tok'),
-                analyses=cast(list[Analysis], tok_analyses),
+                analyses=cast(List[Analysis], tok_analyses),
             ),
         ]
 
