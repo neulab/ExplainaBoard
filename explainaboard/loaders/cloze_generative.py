@@ -31,7 +31,7 @@ class ClozeGenerativeLoader(Loader):
                     FileLoaderField("context", target_field_names[0], str),
                     FileLoaderField("hint", target_field_names[1], str),
                     FileLoaderField("question_mark", target_field_names[2], str),
-                    FileLoaderField("answers", target_field_names[3], str),
+                    FileLoaderField("answers", target_field_names[3], list),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
@@ -39,7 +39,7 @@ class ClozeGenerativeLoader(Loader):
                     FileLoaderField("context", target_field_names[0], str),
                     FileLoaderField("hint", target_field_names[1], str),
                     FileLoaderField("question_mark", target_field_names[2], str),
-                    FileLoaderField("answers", target_field_names[3], str),
+                    FileLoaderField("answers", target_field_names[3], list),
                 ]
             ),
         }

@@ -7,7 +7,7 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
+from explainaboard.metrics.accuracy import CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -105,11 +105,6 @@ class ClozeGenerativeProcessor(Processor):
         cls, source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
-            AccuracyConfig(
-                name='Accuracy',
-                source_language=source_language,
-                target_language=target_language,
-            ),
             CorrectCountConfig(
                 name='CorrectCount',
                 source_language=source_language,
@@ -151,7 +146,7 @@ class ClozeGenerativeProcessor(Processor):
             return source_tokens.index(existing_features["question_mark"])
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"][0]))
 
         # training set dependent features
 
@@ -194,7 +189,7 @@ class ClozeGenerativeProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the predicted label for the output
         """
-        return data_point["predicted_answers"]
+        return data_point["predicted_answers"][0]
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
