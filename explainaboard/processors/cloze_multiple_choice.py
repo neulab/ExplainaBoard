@@ -68,7 +68,7 @@ class ClozeMultipleChoiceProcessor(Processor):
             "answer_length": feature.Value(
                 dtype="float",
                 description="the length of answer",
-                func=lambda info, x, c: count_tokens(info, x['answer']),
+                func=lambda info, x, c: count_tokens(info, x['answers']['text']),
             ),
             "num_oov": feature.Value(
                 dtype="float",

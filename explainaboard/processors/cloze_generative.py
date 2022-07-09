@@ -4,6 +4,7 @@ from collections.abc import Iterator
 from typing import cast, List
 
 from datalabs import aggregating
+import numpy as np
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -36,7 +37,7 @@ class ClozeGenerativeProcessor(Processor):
             "context": feature.Value("string"),
             "question_mark": feature.Value("string"),
             "hint": feature.Value("string"),
-            "answers": feature.Value("string"),
+            "answers": feature.Sequence(feature=feature.Value(dtype="string")),
             "context_length": feature.Value(
                 dtype="float",
                 description="the length of context",
@@ -61,7 +62,9 @@ class ClozeGenerativeProcessor(Processor):
             "answer_length": feature.Value(
                 dtype="float",
                 description="the length of answer",
-                func=lambda info, x, c: count_tokens(info, x['answers']),
+                func=lambda info, x, c: float(
+                    np.mean([count_tokens(info, y) for y in x['answers']])
+                ),
             ),
             "num_oov": feature.Value(
                 dtype="float",
