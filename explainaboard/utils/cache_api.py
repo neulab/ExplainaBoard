@@ -88,3 +88,14 @@ def cache_online_file(
         os.makedirs(path_dir)
     urllib.request.urlretrieve(online_path, file_path)
     return file_path
+
+
+def open_cached_file(relative_path, lifetime):
+    sanitized_path = sanitize_path(relative_path)
+    file_path = os.path.join(get_cache_dir(), sanitized_path)
+    if os.path.exists(file_path):
+        mod_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+        age = datetime.datetime.now() - mod_time
+        if lifetime is None or age < lifetime:
+            return file_path
+    return None

@@ -1,12 +1,12 @@
 [
-    {"predicted_answers":"longer"},
-    {"predicted_answers":"to see"},
-    {"predicted_answers":"dying"},
-    {"predicted_answers":"is"},
-    {"predicted_answers":"than"},
-    {"predicted_answers":"that/which"},
-    {"predicted_answers":"causes"},
-    {"predicted_answers":"strengthen"},
-    {"predicted_answers":"energetic"},
-    {"predicted_answers":"it/running"}
+    {"predicted_answers":["longer"]},
+    {"predicted_answers":["to see"]},
+    {"predicted_answers":["dying"]},
+    {"predicted_answers":["is"]},
+    {"predicted_answers":["than"]},
+    {"predicted_answers":["that"]},
+    {"predicted_answers":["causes"]},
+    {"predicted_answers":["strengthen"]},
+    {"predicted_answers":["energetic"]},
+    {"predicted_answers":["it"]}
 ]

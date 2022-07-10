@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import AccuracyConfig, MetricConfig
+from explainaboard.metrics.accuracy import AccuracyConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.spacy_loader import get_named_entities

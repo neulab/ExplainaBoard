@@ -7,10 +7,12 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import AccuracyConfig, CorrectCountConfig, MetricConfig
+from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -131,7 +133,7 @@ class QAMultipleChoiceProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
             existing_features,
-            statistics,
+            statistics['source_vocab'],
             lambda x: x['context'],
             unwrap(sys_info.source_tokenizer),
         )
@@ -143,7 +145,7 @@ class QAMultipleChoiceProcessor(Processor):
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics,
+            statistics['source_vocab_rank'],
             lambda x: x['context'],
             unwrap(sys_info.source_tokenizer),
         )
@@ -168,6 +170,8 @@ class QAMultipleChoiceProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
+
+        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}

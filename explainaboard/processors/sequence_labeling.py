@@ -16,7 +16,8 @@ from explainaboard.info import (
     SysOutputInfo,
 )
 from explainaboard.loaders.file_loader import DatalabFileLoader
-from explainaboard.metric import F1ScoreConfig, MetricStats
+from explainaboard.metrics.f1_score import F1ScoreConfig
+from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils import bucketing
 from explainaboard.utils.logging import progress
@@ -98,7 +99,7 @@ class SeqLabProcessor(Processor):
                             "span_text": feature.Value("string"),
                             "span_tokens": feature.Value(
                                 dtype="float",
-                                description="entity length",
+                                description="span length",
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -109,22 +110,17 @@ class SeqLabProcessor(Processor):
                             "span_pos": feature.Position(positions=[0, 0]),
                             "span_tag": feature.Value(
                                 dtype="string",
-                                description="entity tag",
+                                description="the tag of the span",
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_discrete_value",
-                                    number=4,
+                                    number=15,
                                     setting=1,
                                 ),
                             ),
                             "span_capitalness": feature.Value(
                                 dtype="string",
-                                description=(
-                                    "The capitalness of an entity. For example, "
-                                    "first_caps represents only the first character of "
-                                    "the entity is capital. full_caps denotes all "
-                                    "characters of the entity are capital"
-                                ),
+                                description=("whether the span is capitalized"),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_discrete_value",
@@ -135,7 +131,7 @@ class SeqLabProcessor(Processor):
                             "span_rel_pos": feature.Value(
                                 dtype="float",
                                 description=(
-                                    "The relative position of an entity in a sentence"
+                                    "relative position of span in the segment"
                                 ),
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
@@ -146,7 +142,7 @@ class SeqLabProcessor(Processor):
                             ),
                             "span_chars": feature.Value(
                                 dtype="float",
-                                description="The number of characters of an entity",
+                                description="number of characters in the span",
                                 is_bucket=True,
                                 bucket_info=feature.BucketInfo(
                                     method="bucket_attribute_specified_bucket_value",
@@ -156,7 +152,7 @@ class SeqLabProcessor(Processor):
                             ),
                             "span_econ": feature.Value(
                                 dtype="float",
-                                description="entity label consistency",
+                                description="span label consistency",
                                 is_bucket=True,
                                 require_training_set=True,
                                 bucket_info=feature.BucketInfo(
@@ -167,7 +163,7 @@ class SeqLabProcessor(Processor):
                             ),
                             "span_efre": feature.Value(
                                 dtype="float",
-                                description="entity frequency",
+                                description="span frequency in the training data",
                                 is_bucket=True,
                                 require_training_set=True,
                                 bucket_info=feature.BucketInfo(
@@ -471,7 +467,9 @@ class SeqLabProcessor(Processor):
                     true_labels, pred_labels, conf_value=sys_info.conf_value
                 )
                 conf_low, conf_high = (
-                    metric_val.conf_interval if metric_val.conf_interval else None
+                    metric_val.conf_interval
+                    if metric_val.conf_interval
+                    else (None, None)
                 )
                 performance = Performance(
                     metric_name=metric.config.name,

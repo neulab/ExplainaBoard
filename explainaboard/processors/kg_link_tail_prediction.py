@@ -7,15 +7,14 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import (
+from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.ranking import (
     Hits,
     HitsConfig,
     MeanRank,
     MeanRankConfig,
     MeanReciprocalRank,
     MeanReciprocalRankConfig,
-    MetricConfig,
-    MetricStats,
 )
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor

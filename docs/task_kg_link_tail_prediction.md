@@ -216,7 +216,8 @@ Below is an example of sorting alphabetically by bucket value:
 
 ```python
 from explainaboard import TaskType, get_custom_dataset_loader, get_processor
-from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
+from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig,
+  MeanRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
@@ -224,16 +225,16 @@ loader = get_custom_dataset_loader(task, dataset, dataset)
 data = loader.load()
 
 metadata = {
-            "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237",
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
-            "sort_by": "performance_value",
-            "sort_by_metric": "first",
-        }
+  "task_name": TaskType.kg_link_tail_prediction.value,
+  "dataset_name": "fb15k-237",
+  "metric_configs": [
+    HitsConfig(name='Hits4', hits_k=4),
+    MeanReciprocalRankConfig(name='MRR'),
+    MeanRankConfig(name='MR'),
+  ],
+  "sort_by": "performance_value",
+  "sort_by_metric": "first",
+}
 
 processor = get_processor(TaskType.kg_link_tail_prediction.value)
 sys_info = processor.process(metadata, data.samples)
@@ -257,7 +258,8 @@ The value of K in `Hits` metric could also be specified by users when needed. Be
 
 ```python
 from explainaboard import TaskType, get_custom_dataset_loader, get_processor
-from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
+from explainaboard.metrics.ranking import MeanRankConfig
+from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
@@ -265,18 +267,19 @@ loader = get_custom_dataset_loader(task, dataset, dataset)
 data = loader.load()
 
 metadata = {
-    "task_name": TaskType.kg_link_tail_prediction.value,
-    "dataset_name": "fb15k-237-subset",
-    "metric_configs": [
-        HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
-        HitsConfig(name='Hits3', hits_k=3),
-        HitsConfig(name='Hits5', hits_k=5),
-        MeanReciprocalRankConfig(name='MRR'),
-        MeanRankConfig(name='MR'),
-    ], 
-    "sort_by": "performance_value",  # or "key" to sort alphabetically by bucket lower boundary, or "n_bucket_samples" to sort by bucket size
-    "sort_by_metric": "Hits3",  # specifies the metric to sort by
-    "sort_ascending": False,  # set True when sorting by MeanRank metric
+  "task_name": TaskType.kg_link_tail_prediction.value,
+  "dataset_name": "fb15k-237-subset",
+  "metric_configs": [
+    HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
+    HitsConfig(name='Hits3', hits_k=3),
+    HitsConfig(name='Hits5', hits_k=5),
+    MeanReciprocalRankConfig(name='MRR'),
+    MeanRankConfig(name='MR'),
+  ],
+  "sort_by": "performance_value",
+  # or "key" to sort alphabetically by bucket lower boundary, or "n_bucket_samples" to sort by bucket size
+  "sort_by_metric": "Hits3",  # specifies the metric to sort by
+  "sort_ascending": False,  # set True when sorting by MeanRank metric
 }
 
 processor = get_processor(TaskType.kg_link_tail_prediction.value)
@@ -287,7 +290,8 @@ Finally, an example of sorting by the number of bucket examples:
 
 ```python
 from explainaboard import TaskType, get_custom_dataset_loader, get_processor
-from explainaboard.metric import HitsConfig, MeanReciprocalRankConfig, MeanRankConfig
+from explainaboard.metric import MeanRankConfig
+from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
@@ -295,16 +299,16 @@ loader = get_custom_dataset_loader(task, dataset, dataset)
 data = loader.load()
 
 metadata = {
-    "task_name": TaskType.kg_link_tail_prediction.value,
-    "dataset_name": "fb15k-237-subset",
-    "metric_configs": [
-        HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
-        HitsConfig(name='Hits3', hits_k=3),
-        HitsConfig(name='Hits5', hits_k=5),
-        MeanReciprocalRankConfig(name='MRR'),
-        MeanRankConfig(name='MR'),
-    ], 
-    "sort_by": "n_bucket_samples",
+  "task_name": TaskType.kg_link_tail_prediction.value,
+  "dataset_name": "fb15k-237-subset",
+  "metric_configs": [
+    HitsConfig(name='Hits1', hits_k=1),  # you can modify k here
+    HitsConfig(name='Hits3', hits_k=3),
+    HitsConfig(name='Hits5', hits_k=5),
+    MeanReciprocalRankConfig(name='MRR'),
+    MeanRankConfig(name='MR'),
+  ],
+  "sort_by": "n_bucket_samples",
 }
 
 processor = get_processor(TaskType.kg_link_tail_prediction.value)

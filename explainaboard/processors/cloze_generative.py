@@ -7,10 +7,12 @@ from datalabs import aggregating
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import AccuracyConfig, CorrectCountConfig, MetricConfig
+from explainaboard.metrics.accuracy import CorrectCountConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 import explainaboard.utils.feature_funcs
+from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -103,11 +105,6 @@ class ClozeGenerativeProcessor(Processor):
         cls, source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
-            AccuracyConfig(
-                name='Accuracy',
-                source_language=source_language,
-                target_language=target_language,
-            ),
             CorrectCountConfig(
                 name='CorrectCount',
                 source_language=source_language,
@@ -149,27 +146,29 @@ class ClozeGenerativeProcessor(Processor):
             return source_tokens.index(existing_features["question_mark"])
 
     def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"]))
+        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"][0]))
 
-    # training set dependent features
+        # training set dependent features
+
     def _get_num_oov(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_num_oov(
             existing_features,
-            statistics,
+            statistics['source_vocab'],
             lambda x: x['context'],
             unwrap(sys_info.source_tokenizer),
         )
 
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
+        # training set dependent features
+        # (this could be merged into the above one for further optimization)
+
     def _get_fre_rank(
         self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
     ):
         return explainaboard.utils.feature_funcs.feat_freq_rank(
             existing_features,
-            statistics,
+            statistics['source_vocab_rank'],
             lambda x: x['context'],
             unwrap(sys_info.source_tokenizer),
         )
@@ -190,10 +189,12 @@ class ClozeGenerativeProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the predicted label for the output
         """
-        return data_point["predicted_answers"]
+        return data_point["predicted_answers"][0]
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        return explainaboard.utils.feature_funcs.accumulate_vocab_from_samples(
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
+
+        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}

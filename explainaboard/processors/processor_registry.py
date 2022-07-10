@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from explainaboard import TaskType
-from explainaboard.metric import MetricConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 
 _processor_registry: dict = {}

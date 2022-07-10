@@ -10,7 +10,7 @@ from typing import Any, Optional
 
 from explainaboard import config
 from explainaboard.feature import Features
-from explainaboard.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.serialization import general_to_dict
 from explainaboard.utils.tokenizer import Tokenizer

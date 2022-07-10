@@ -7,7 +7,8 @@ from datalabs import aggregating
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
-from explainaboard.metric import EaaSMetricConfig, MetricConfig
+from explainaboard.metrics.eaas import EaaSMetricConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -76,15 +77,21 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
             )
         src = FileLoaderField(('translation', sys_info.source_language), '', str)
         trg = FileLoaderField(('translation', sys_info.target_language), '', str)
+
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples,
+            lambda x: FileLoader.find_field(x, src),
+            unwrap(sys_info.source_tokenizer),
+        )
+
+        target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
+            samples,
+            lambda x: FileLoader.find_field(x, trg),
+            unwrap(sys_info.target_tokenizer),
+        )
         return {
-            'source_vocab': accumulate_vocab_from_samples(
-                samples,
-                lambda x: FileLoader.find_field(x, src),
-                unwrap(sys_info.source_tokenizer),
-            ),
-            'target_vocab': accumulate_vocab_from_samples(
-                samples,
-                lambda x: FileLoader.find_field(x, trg),
-                unwrap(sys_info.target_tokenizer),
-            ),
+            'source_vocab': source_vocab,
+            'source_vocab_rank': source_vocab_rank,
+            'target_vocab': target_vocab,
+            'target_vocab_rank': target_vocab_rank,
         }
