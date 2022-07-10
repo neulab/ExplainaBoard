@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metric import MetricConfig, SegKtauCorrConfig
+from explainaboard.metrics.metric import MetricConfig
+from explainaboard.metrics.regression import SegKtauCorrConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
