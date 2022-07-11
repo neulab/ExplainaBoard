@@ -74,7 +74,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 ),
                 "link_fre": feature.Value(
                     dtype="float",
-                    description="the frequency of link relation in the training set",
+                    description="the frequency of relation in the training set",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -85,7 +85,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 ),
                 "head_fre": feature.Value(
                     dtype="float",
-                    description="the frequency of head relation in the training set",
+                    description="the frequency of head entity in the training set",
                     is_bucket=True,
                     bucket_info=feature.BucketInfo(
                         method="bucket_attribute_specified_bucket_value",
@@ -127,6 +127,7 @@ class KGLinkTailPredictionProcessor(Processor):
             HitsConfig(name='Hits2', hits_k=2),
             HitsConfig(name='Hits3', hits_k=3),
             HitsConfig(name='Hits5', hits_k=5),
+            HitsConfig(name='Hits10', hits_k=10),
             MeanReciprocalRankConfig(name='MRR'),
             MeanRankConfig(name='MR'),
         ]
