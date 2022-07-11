@@ -249,6 +249,10 @@ class KGLinkTailPredictionProcessor(Processor):
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, sys_info: SysOutputInfo, existing_features: dict):
 
+        # entities not found in `entity_type_level_map` get bucketed to this value.
+        # in FB15k, "0" is the same as the most generic entity type, "Thing".
+        default_level = "0"
+
         # list of entity types at each level:
         # [type_level_0, type_level_1, ... type_level_6]
         # e.g. ["Thing", "Agent", "Person", None, None, None, None]
@@ -256,7 +260,7 @@ class KGLinkTailPredictionProcessor(Processor):
             existing_features['true_tail'], None
         )
         if tail_entity_type_levels is None:
-            return "-1"  # entity types not found
+            return default_level  # entity types not found
 
         # find the index of the first occurrence of None in the list
         if None in tail_entity_type_levels:
