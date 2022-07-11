@@ -2,18 +2,20 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 import json
+from typing import Any, cast, List
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+from explainaboard import TaskType
+from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.case import AnalysisCase
+from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.metrics.ranking import (
-    Hits,
     HitsConfig,
-    MeanRank,
     MeanRankConfig,
-    MeanReciprocalRank,
     MeanReciprocalRankConfig,
 )
 from explainaboard.processors.processor import Processor
@@ -29,98 +31,87 @@ class KGLinkTailPredictionProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.kg_link_tail_prediction
 
-    @classmethod
-    def default_features(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "true_head": feature.Value("string"),
-                "true_head_decipher": feature.Value("string"),
-                "true_link": feature.Value("string"),
-                "true_tail": feature.Value("string"),
-                "true_tail_decipher": feature.Value("string"),
-                "predict": feature.Value("string"),
-                "true_label": feature.Value("string"),
-                "predictions": feature.Sequence(feature=feature.Value("string")),
-                "tail_entity_length": feature.Value(
-                    dtype="float",
-                    description="number of words in the tail entity",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+    def default_analyses(self) -> list[AnalysisLevel]:
+        features = {
+            "true_head": feature.Value("string"),
+            "true_head_decipher": feature.Value("string"),
+            "true_link": feature.Value(dtype="string", description="the relation type"),
+            "true_tail": feature.Value(dtype="string"),
+            "true_tail_decipher": feature.Value("string"),
+            "predict": feature.Value("string"),
+            "predictions": feature.Sequence(feature=feature.Value("string")),
+            "tail_entity_length": feature.Value(
+                dtype="float",
+                description="length of the tail entity in tokens",
+                func=lambda info, x, c: count_tokens(
+                    info, x['true_tail_decipher'], side='target'
                 ),
-                "head_entity_length": feature.Value(
-                    dtype="float",
-                    description="number of words in the head entity",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "head_entity_length": feature.Value(
+                dtype="float",
+                description="length of the head entity in tokens",
+                func=lambda info, x, c: count_tokens(
+                    info, x['true_head_decipher'], side='target'
                 ),
-                "tail_fre": feature.Value(
-                    dtype="float",
-                    description="the frequency of tail entity in the training set",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
+            ),
+            "tail_fre": feature.Value(
+                dtype="float",
+                description="average frequency of the tail entity",
+                require_training_set=True,
+                func=lambda info, x, stat: stat['tail_fre'].get(
+                    x['true_tail_decipher'], 0
                 ),
-                "link_fre": feature.Value(
-                    dtype="float",
-                    description="the frequency of link relation in the training set",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
+            ),
+            "link_fre": feature.Value(
+                dtype="float",
+                description="average frequency of the link",
+                require_training_set=True,
+                func=lambda info, x, stat: stat['link_fre'].get(x['true_link'], 0),
+            ),
+            "head_fre": feature.Value(
+                dtype="float",
+                description="average frequency of the head entity",
+                require_training_set=True,
+                func=lambda info, x, stat: stat['head_fre'].get(
+                    x['true_head_decipher'], 0
                 ),
-                "head_fre": feature.Value(
-                    dtype="float",
-                    description="the frequency of head relation in the training set",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "symmetry": feature.Value(
-                    dtype="string",
-                    description=(
-                        "boolean feature: 'symmetric' or 'asymmetric'; more "
-                        "granularity to be added"
-                    ),
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_discrete_value", number=2, setting=1
-                    ),
-                ),
-                "entity_type_level": feature.Value(
-                    dtype="string",
-                    description=(
-                        "most specific (highest) entity type level of true tail entity"
-                    ),
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_discrete_value", number=8, setting=1
-                    ),
-                ),
-            }
-        )
+            ),
+            "symmetry": feature.Value(
+                dtype="string",
+                description="whether the relation is symmetric",
+                func=lambda info, x, c: 'symmetric'
+                if x['true_link'] in self._symmetric_relations
+                else 'asymmetric',
+            ),
+            "entity_type_level": feature.Value(
+                dtype="string",
+                description="most specific entity type level of the true tail entity",
+                func=lambda info, x, c: self._get_entity_type_level(x),
+            ),
+        }
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
+        analyses: list[BucketAnalysis] = [
+            BucketAnalysis(x, method="continuous") for x in continuous_features
+        ] + [
+            BucketAnalysis(k, method="discrete", number=v)
+            for k, v in discrete_features.items()
+        ]
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
+                analyses=cast(List[Analysis], analyses),
+            )
+        ]
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             HitsConfig(name='Hits1', hits_k=1),
@@ -132,7 +123,7 @@ class KGLinkTailPredictionProcessor(Processor):
         ]
 
     # TODO: is this the best place to put this?
-    _symmetric_relations = [
+    _symmetric_relations = {
         '/base/popstra/celebrity/breakup./base/popstra/breakup/participant',
         '/base/popstra/celebrity/canoodled./base/popstra/canoodled/participant',
         '/base/popstra/celebrity/dated./base/popstra/dated/participant',
@@ -143,7 +134,7 @@ class KGLinkTailPredictionProcessor(Processor):
         '/location/location/adjoin_s./location/adjoining_relationship/adjoins',
         '/people/person/spouse_s./people/marriage/spouse',
         '/people/person/sibling_s./people/sibling relationship/sibling',
-    ]
+    }
 
     def __init__(self):
         super().__init__()
@@ -167,7 +158,6 @@ class KGLinkTailPredictionProcessor(Processor):
         dict_link: dict[str, int] = {}
         dict_tail: dict[str, int] = {}
 
-        entity_dic = {}
         file_path = cache_api.cache_online_file(
             'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
             'pre_computed/kg/entity2wikidata.json',
@@ -213,41 +203,86 @@ class KGLinkTailPredictionProcessor(Processor):
             "tail_fre": dict_tail,
         }
 
-    def _gen_metric_stats(
-        self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> list[MetricStats]:
-        """Generate sufficient statistics for scoring different metrics.
-        :param sys_info: Information about the system outputs
-        :param sys_output: The system output itself
-        :return: Statistics sufficient for scoring
-        """
-
-        metrics = unwrap(self._get_metrics(sys_info))
+    def _gen_cases_and_stats(
+        self,
+        sys_info: SysOutputInfo,
+        sys_output: list[dict],
+        statistics: Any,
+        analysis_level: AnalysisLevel,
+    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+        # Note that this is overridden to calculate stats from rank
+        cases = []
         true_data = [self._get_true_label(x) for x in sys_output]
         pred_data = [self._get_predicted_label(x) for x in sys_output]
-        rank_data = [
-            self._get_rank_data(x) for x in sys_output
-        ]  # rank of true entity in predictions
-
+        rank_data = [x.get('true_rank') for x in sys_output]
         if any(item is None for item in rank_data):
             raise ValueError(
                 'Some data points do not have rank information; check system outputs.'
             )
-
         metric_stats = []
-        for metric in metrics:
-            if (
-                isinstance(metric, MeanReciprocalRank)
-                or isinstance(metric, MeanRank)
-                or isinstance(metric, Hits)
-            ):
+        for metric in [x.to_metric() for x in analysis_level.metric_configs]:
+            if hasattr(metric, 'calc_stats_from_rank'):
                 metric_stats.append(metric.calc_stats_from_rank(rank_data))
             else:
                 metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
-        return metric_stats
+        # Calculate features
+        for i, output in progress(
+            enumerate(sys_output), desc='calculating example-level features'
+        ):
+            case = AnalysisCase(sample_id=i, features={})
+            for feat_name, feat_spec in analysis_level.features.items():
+                if feat_spec.func is None:
+                    case.features[feat_name] = output[feat_name]
+                elif not feat_spec.require_training_set:
+                    case.features[feat_name] = feat_spec.func(sys_info, output, case)
+                elif statistics is not None:
+                    case.features[feat_name] = feat_spec.func(
+                        sys_info, output, case, statistics
+                    )
+            cases.append(case)
+        return cases, metric_stats
+
+    # TODO(gneubig): this needs replaced
+    # def _gen_metric_stats(
+    #     self,
+    #     sys_info: SysOutputInfo,
+    #     sys_output: list[dict],
+    #     cases: list[list[AnalysisCase]],
+    # ) -> list[list[MetricStats]]:
+    #     """Generate sufficient statistics for scoring different metrics.
+    #     :param sys_info: Information about the system outputs
+    #     :param sys_output: The system output itself
+    #     :return: Statistics sufficient for scoring
+    #     """
+
+    #     metrics = [
+    #         x.to_metric() for x in unwrap(sys_info.analysis_levels)[0].metric_configs
+    #     ]
+    #     true_data = [self._get_true_label(x) for x in sys_output]
+    #     pred_data = [self._get_predicted_label(x) for x in sys_output]
+    #     rank_data = [
+    #         x.get('true_rank') for x in sys_output
+    #     ]  # rank of true entity in predictions
+
+    #     if any(item is None for item in rank_data):
+    #         raise ValueError(
+    #             'Some data points do not have rank information; check system outputs.'
+    #         )
+
+    #     metric_stats = []
+    #     for metric in metrics:
+    #         if (
+    #             isinstance(metric, MeanReciprocalRank)
+    #             or isinstance(metric, MeanRank)
+    #             or isinstance(metric, Hits)
+    #         ):
+    #             metric_stats.append(metric.calc_stats_from_rank(rank_data))
+    #         else:
+    #             metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+    #     return [metric_stats]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_entity_type_level(self, sys_info: SysOutputInfo, existing_features: dict):
+    def _get_entity_type_level(self, existing_features: dict):
 
         # list of entity types at each level:
         # [type_level_0, type_level_1, ... type_level_6]
@@ -265,57 +300,6 @@ class KGLinkTailPredictionProcessor(Processor):
             most_specific_level = len(tail_entity_type_levels) - 1
         return str(most_specific_level)
 
-    def _get_tail_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(
-            unwrap(sys_info.target_tokenizer)(existing_features["true_tail_decipher"])
-        )
-
-    def _get_head_entity_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(
-            unwrap(sys_info.source_tokenizer)(existing_features["true_head_decipher"])
-        )
-
-    def _get_tail_fre(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics
-    ):
-        if (
-            statistics is None
-            or existing_features["true_tail_decipher"]
-            not in statistics['tail_fre'].keys()
-        ):
-            return 0
-        else:
-            return statistics['tail_fre'][existing_features["true_tail_decipher"]]
-
-    def _get_head_fre(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics
-    ):
-        if (
-            statistics is None
-            or existing_features["true_head_decipher"]
-            not in statistics['head_fre'].keys()
-        ):
-            return 0
-        else:
-            return statistics['head_fre'][existing_features["true_head_decipher"]]
-
-    def _get_link_fre(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics
-    ):
-        if (
-            statistics is None
-            or existing_features["true_link"] not in statistics['link_fre'].keys()
-        ):
-            return 0
-        else:
-            return statistics['link_fre'][existing_features["true_link"]]
-
-    def _get_symmetry(self, sys_info: SysOutputInfo, existing_features: dict):
-        if existing_features['true_link'] in self._symmetric_relations:
-            return 'symmetric'
-        else:
-            return 'asymmetric'
-
     # --- End feature functions
 
     def _get_true_label(self, data_point: dict):
@@ -323,9 +307,3 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def _get_predicted_label(self, data_point: dict):
         return data_point["predictions"]
-
-    def _get_rank_data(self, data_point: dict):
-        if "true_rank" in data_point.keys():
-            return data_point["true_rank"]
-        else:
-            return None

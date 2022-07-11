@@ -1,14 +1,34 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
-from typing import Any
 
 from lexicalrichness import LexicalRichness
 import sacrebleu
 
+from explainaboard.info import SysOutputInfo
 from explainaboard.utils import basic_words
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import unwrap
+
+
+def _get_tokens(
+    sys_info: SysOutputInfo, text: str | list[str], side: str = 'source'
+) -> list[str]:
+    if isinstance(text, list):
+        if side != 'none':
+            raise ValueError('Expecting "none" as side when passing in list of strs')
+        return text
+    elif side == 'source':
+        return unwrap(sys_info.source_tokenizer)(text).strs
+    elif side == 'target':
+        return unwrap(sys_info.target_tokenizer)(text).strs
+    else:
+        raise ValueError(f'Bad side {side}')
+
+
+def count_tokens(sys_info: SysOutputInfo, text: str, side: str = 'source') -> float:
+    return len(_get_tokens(sys_info, text, side))
 
 
 def get_similarity_by_sacrebleu(text1, text2):
@@ -65,34 +85,42 @@ def accumulate_vocab_from_samples(
 
 
 def feat_freq_rank(
-    existing_features: dict,
-    statistics: Any,
-    text_from_sample: Callable,
-    tokenizer: Tokenizer,
-):
+    sys_info: SysOutputInfo,
+    text: str | list[str],
+    vocab_rank: dict[str, int],
+    side: str = 'source',
+) -> float:
     fre_rank = 0
 
-    tokens = tokenizer(text_from_sample(existing_features))
+    tokens = _get_tokens(sys_info, text, side)
+    max_rank = len(vocab_rank)
     for w in tokens:
-        if w not in statistics:
-            fre_rank += len(statistics)
-        else:
-            fre_rank += statistics[w]
+        fre_rank += vocab_rank.get(w, max_rank)
 
     return fre_rank * 1.0 / len(tokens)
 
 
 def feat_num_oov(
-    existing_features: dict,
-    statistics: Any,
-    text_from_sample: Callable,
-    tokenizer: Tokenizer,
-):
+    sys_info: SysOutputInfo,
+    text: str | list[str],
+    vocab: dict[str, int],
+    side: str = 'source',
+) -> int:
     num_oov = 0
-    for w in tokenizer(text_from_sample(existing_features)):
-        if w not in statistics.keys():
+    for w in _get_tokens(sys_info, text, side):
+        if w not in vocab:
             num_oov += 1
     return num_oov
+
+
+def feat_length_freq(
+    sys_info: SysOutputInfo,
+    text: str,
+    length_freq: dict[int, float],
+    side: str = 'source',
+) -> float:
+    length = len(_get_tokens(sys_info, text, side))
+    return length_freq.get(length, 0.0)
 
 
 def cap_feature(s):
@@ -111,3 +139,19 @@ def cap_feature(s):
         return "first_caps"
     else:
         return "not_first_caps"
+
+
+def relative_position(sys_info: SysOutputInfo, text: str, word: str):
+    tokens = unwrap(sys_info.source_tokenizer)(text).strs
+    if word not in tokens:
+        return 0
+    else:
+        return float(tokens.index(word)) / len(tokens)
+
+
+def absolute_position(sys_info: SysOutputInfo, text: str, word: str):
+    tokens = unwrap(sys_info.source_tokenizer)(text).strs
+    if word not in tokens:
+        return 0
+    else:
+        return float(tokens.index(word)) / len(tokens)

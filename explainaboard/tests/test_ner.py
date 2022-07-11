@@ -1,8 +1,10 @@
 import dataclasses
 import os
+from typing import cast
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_registry import (
     get_custom_dataset_loader,
@@ -33,7 +35,7 @@ class TestNER(unittest.TestCase):
             FileType.conll,
             FileType.conll,
         )
-        data = loader.load()
+        data = loader.load().samples
 
         metadata = {
             "task_name": TaskType.named_entity_recognition.value,
@@ -44,18 +46,18 @@ class TestNER(unittest.TestCase):
         processor = get_processor(TaskType.named_entity_recognition)
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
         # ------ Deep Test --------
 
         # test: training set dependent features should be disabled when
         # training dataset is not provided
-        activate_features = sys_info.results.fine_grained.keys()
-        self.assertTrue(
-            "span_econ" not in activate_features
-            and "span_efre" not in activate_features
-        )
+        activate_features = [
+            x.name for x in sys_info.results.analyses[0] if x is not None
+        ]
+        self.assertTrue("span_econ" not in activate_features)
+        self.assertTrue("span_efre" not in activate_features)
 
     def test_datalab_loader(self):
         loader = get_datalab_loader(
@@ -65,7 +67,7 @@ class TestNER(unittest.TestCase):
             output_source=Source.local_filesystem,
             output_file_type=FileType.conll,
         )
-        data = loader.load()
+        data = loader.load().samples
 
         metadata = {
             "task_name": TaskType.named_entity_recognition.value,
@@ -76,27 +78,28 @@ class TestNER(unittest.TestCase):
         processor = get_processor(TaskType.named_entity_recognition)
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
         # ---------------------------------------------------------------------------
         #                               Deep Test
         # ---------------------------------------------------------------------------
 
-        # 1. Unittest: training set dependent features shouldn't included
+        # 1. Unittest: training set dependent features shouldn't be included
         # when training dataset is not provided
-        activate_features = sys_info.results.fine_grained.keys()
-        self.assertTrue(
-            "span_econ" in activate_features and "span_efre" in activate_features
-        )
+        span_analysis_map = {
+            x.name: x for x in sys_info.results.analyses[1] if x is not None
+        }
+        self.assertTrue("span_econ" in span_analysis_map)
+        self.assertTrue("span_efre" in span_analysis_map)
 
         # 2. Unittest: test the number of buckets of training dependent features
-        n_buckets = len(sys_info.results.fine_grained["span_econ"])
-        self.assertEqual(n_buckets, 3)
+        span_econ_analysis = cast(BucketAnalysisResult, span_analysis_map['span_econ'])
+        self.assertEqual(len(span_econ_analysis.bucket_performances), 3)
 
         # 3. Unittest: test detailed bucket information: bucket interval
         # [0.007462686567164179,0.9565217391304348]
-        second_bucket = sys_info.results.fine_grained["span_econ"][1]
+        second_bucket = span_econ_analysis.bucket_performances[1]
         self.assertAlmostEqual(
             second_bucket.bucket_interval[0],
             0.007462686567164179,
@@ -110,16 +113,16 @@ class TestNER(unittest.TestCase):
             "almost equal",
         )
         # 4. Unittest: test detailed bucket information: bucket samples
-        self.assertEqual(second_bucket.n_samples, 1007)
+        self.assertEqual(second_bucket.n_samples, 1050)
 
         # 5. Unittest: test detailed bucket information: metric
         self.assertEqual(second_bucket.performances[0].metric_name, "F1")
         self.assertAlmostEqual(
-            second_bucket.performances[0].value, 0.9203805708562846, 4, "almost equal"
+            second_bucket.performances[0].value, 0.9121588089330025, 4, "almost equal"
         )
         # 6 Unittest: test detailed bucket information: confidence interval
-        for bucket_name, bucket_vals in sys_info.results.fine_grained.items():
-            for bucket in bucket_vals:
+        for bucket_vals in sys_info.results.analyses[0]:
+            for bucket in cast(BucketAnalysisResult, bucket_vals).bucket_performances:
                 for performance in bucket.performances:
                     if performance.confidence_score_low is not None:
                         self.assertGreaterEqual(
@@ -160,5 +163,5 @@ class TestNER(unittest.TestCase):
         )
         processor = get_processor(TaskType.named_entity_recognition)
         sys_info = processor.process(metadata, data.samples)
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

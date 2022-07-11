@@ -6,11 +6,10 @@ import unittest
 from eaas import Config
 from eaas.async_client import AsyncClient
 import numpy as np
-import sklearn.metrics
+from sklearn.metrics import f1_score
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_custom_dataset_loader
-import explainaboard.metric
 import explainaboard.metrics.accuracy
 import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
@@ -80,7 +79,7 @@ class TestMetric(unittest.TestCase):
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
 
-        sklearn_f1 = sklearn.metrics.f1_score(true, pred, average='micro')
+        sklearn_f1 = f1_score(true, pred, average='micro')
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
@@ -90,7 +89,7 @@ class TestMetric(unittest.TestCase):
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
-        sklearn_f1 = sklearn.metrics.f1_score(true, pred, average='macro')
+        sklearn_f1 = f1_score(true, pred, average='macro')
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
@@ -170,7 +169,7 @@ class TestMetric(unittest.TestCase):
             FileType.tsv,
             FileType.text,
         )
-        sys_output = loader.load()
+        sys_output = loader.load().samples
 
         # Initialize client and decide which metrics to test
         eaas_client = AsyncClient(Config())
@@ -234,7 +233,7 @@ class TestMetric(unittest.TestCase):
             FileType.json,
             FileType.json,
         )
-        data = loader.load()
+        data = loader.load().samples
 
         metadata = {
             "task_name": TaskType.qa_extractive.value,
@@ -246,18 +245,19 @@ class TestMetric(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
-        self.assertIsNotNone(sys_info.results.fine_grained)
-        self.assertGreater(len(sys_info.results.overall), 0)
+        self.assertIsNotNone(sys_info.results.analyses)
+        overall = sys_info.results.overall[0]
+        self.assertGreater(len(overall), 0)
+        overall_map = {x.metric_name: x for x in overall}
         self.assertAlmostEqual(
-            sys_info.results.overall["ExactMatch"].value,
+            overall_map["ExactMatch"].value,
             0.6974789915966386,
             2,
             "almost equal",
         )
         # should be 0.8235975260931867
         self.assertAlmostEqual(
-            sys_info.results.overall["F1"].value,
+            overall_map["F1"].value,
             0.8235975260931867,
             2,
             "almost equal",

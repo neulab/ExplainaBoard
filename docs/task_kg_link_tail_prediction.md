@@ -290,7 +290,7 @@ Finally, an example of sorting by the number of bucket examples:
 
 ```python
 from explainaboard import TaskType, get_custom_dataset_loader, get_processor
-from explainaboard.metric import MeanRankConfig
+from explainaboard.metrics.ranking import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"

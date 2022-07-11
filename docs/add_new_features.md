@@ -13,6 +13,9 @@ We need to declare the new feature `token_number` in the task processor module
 corresponding to its task, in this case: `explainaboard/processors/text_classification.py`
 
 ```python
+import explainaboard.analysis.analyses
+
+
 class TextClassificationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
@@ -22,19 +25,19 @@ class TextClassificationProcessor(Processor):
     def features(cls) -> feature.Features:
         return feature.Features({
             ...
-            ...
-            "token_number": feature.Value(dtype="float",
-                                        is_bucket=True,
-                                        bucket_info=feature.BucketInfo(
-                                            _method="bucket_attribute_specified_bucket_value",
-                                            _number=4,
-                                            _setting=())),
+                ...
+        "token_number": feature.Value(dtype="float",
+                                      is_bucket=True,
+                                      bucket_info=explainaboard.analysis.analyses.BucketAnalysis(
+                                          _method="bucket_attribute_specified_bucket_value",
+                                          _number=4,
+                                          _setting=())),
 
         })
 
-    @classmethod
-    def default_metrics(cls) -> List[str]:
-        return ["Accuracy"]
+        @classmethod
+        def default_metrics(cls) -> List[str]:
+            return ["Accuracy"]
 ```
 where
 * `dtype` represents the data type of the feature

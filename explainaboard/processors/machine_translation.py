@@ -1,19 +1,20 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+import copy
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+from explainaboard import TaskType
+from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
-from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -23,44 +24,18 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
     def task_type(cls) -> TaskType:
         return TaskType.machine_translation
 
-    @classmethod
-    def default_features(cls) -> feature.Features:
-        f = super().default_features()
-        f.update(
-            feature.Features(
-                {
-                    # declaim task-specific features
-                    "attr_compression": feature.Value(
-                        dtype="float",
-                        description="the ratio between source and reference length",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                }
-            )
+    def default_analyses(self) -> list[AnalysisLevel]:
+        f = super().default_analyses()
+        f = copy.deepcopy(f)
+        f[0].features["attr_compression"] = feature.Value(
+            dtype="float",
+            description="the ratio between source and reference length",
+            func=lambda info, x, c: c.features['source_length']
+            / c.features['reference_length'],
         )
-        return f
+        f[0].analyses.append(BucketAnalysis('attr_compression', method="continuous"))
 
-    @classmethod
-    def default_metrics(
-        cls, source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        return [
-            EaaSMetricConfig(
-                name='bleu',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='length_ratio',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-        ]
+        return f
 
     def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(

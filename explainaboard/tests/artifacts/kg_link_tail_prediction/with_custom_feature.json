@@ -1,11 +1,22 @@
 {
   "metadata": {
     "custom_features": {
-      "rel_type": {
-        "dtype": "string",
-        "description": "symmetric or asymmetric",
-        "num_buckets": 2
+      "example": {
+        "rel_type": {
+          "dtype": "string",
+          "description": "symmetric or asymmetric"
+        }
       }
+    },
+    "custom_analyses": {
+      "example": [
+        {
+          "_type": "BucketAnalysis",
+          "feature": "rel_type",
+          "num_buckets": 2,
+          "method": "discrete"
+        }
+      ]
     }
   },
   "examples": [

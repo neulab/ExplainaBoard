@@ -96,7 +96,7 @@ class TestTextClassification(unittest.TestCase):
         processor = get_processor(TaskType.text_classification)
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_process_training_set_dependent_features(self):
@@ -120,7 +120,7 @@ class TestTextClassification(unittest.TestCase):
         processor = get_processor(TaskType.text_classification)
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_process_metadata_in_output_file(self):
@@ -140,5 +140,5 @@ class TestTextClassification(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

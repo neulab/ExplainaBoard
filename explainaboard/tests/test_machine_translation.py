@@ -1,4 +1,5 @@
 import dataclasses
+import itertools
 import os
 import unittest
 
@@ -59,8 +60,7 @@ class TestMachineTranslation(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
@@ -68,14 +68,18 @@ class TestMachineTranslation(unittest.TestCase):
         condgen_processor = get_processor(TaskType.conditional_generation.value)
         mt_processor = get_processor(TaskType.machine_translation.value)
 
-        condgen_features_1 = condgen_processor.default_features()
-        mt_features = mt_processor.default_features()
-        condgen_features_2 = condgen_processor.default_features()
+        condgen_features_1 = condgen_processor.default_analyses()
+        mt_features = mt_processor.default_analyses()
+        condgen_features_2 = condgen_processor.default_analyses()
 
         # MT features didn't change condgen features
-        self.assertDictEqual(condgen_features_1, condgen_features_2)
-        # condgen features are a subset of MT features
-        self.assertDictEqual(mt_features, {**mt_features, **condgen_features_1})
+        for cf1, cf2, mtf in zip(condgen_features_1, condgen_features_2, mt_features):
+            lcf1 = set(cf1.features.keys())
+            lcf2 = set(cf2.features.keys())
+            lmtf = set(mtf.features.keys())
+            self.assertEqual(lcf1, lcf2)
+            # condgen features are a subset of MT features
+            self.assertTrue(all([x in lmtf] for x in lcf1))
 
     def test_custom_features(self):
         loader = get_custom_dataset_loader(
@@ -105,7 +109,12 @@ class TestMachineTranslation(unittest.TestCase):
         processor = get_processor(TaskType.machine_translation.value)
 
         sys_info = processor.process(dataclasses.asdict(data.metadata), data.samples)
-        self.assertTrue('num_capital_letters' in sys_info.results.fine_grained)
+        analysis_map = {
+            x.name: x
+            for x in itertools.chain.from_iterable(sys_info.results.analyses)
+            if x is not None
+        }
+        self.assertTrue('num_capital_letters' in analysis_map)
 
 
 if __name__ == '__main__':

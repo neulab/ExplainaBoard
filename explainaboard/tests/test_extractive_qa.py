@@ -22,7 +22,7 @@ class TestExtractiveQA(unittest.TestCase):
             FileType.json,
             FileType.json,
         )
-        data = loader.load()
+        data = loader.load().samples
         self.assertEqual(len(data), 1190)
         sample = data[0]
         self.assertEqual(sample["predicted_answers"], {"text": "308"})
@@ -43,20 +43,20 @@ class TestExtractiveQA(unittest.TestCase):
         processor = get_processor(TaskType.qa_extractive)
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
         get_logger('test').info(f'OVERALL={sys_info.results.overall}')
         # should be 0.6974789915966386
+        overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
         self.assertAlmostEqual(
-            sys_info.results.overall["ExactMatch"].value,
+            overall_map["ExactMatch"].value,
             0.6974789915966386,
             2,
             "almost equal",
         )
         # should be 0.8235975260931867
         self.assertAlmostEqual(
-            sys_info.results.overall["F1"].value,
+            overall_map["F1"].value,
             0.8235975260931867,
             2,
             "almost equal",
@@ -74,7 +74,7 @@ class TestExtractiveQA(unittest.TestCase):
             FileType.json,
             FileType.json,
         )
-        data = loader.load()
+        data = loader.load().samples
         metadata = {
             "task_name": TaskType.qa_extractive.value,
             "dataset_name": "squad",
@@ -86,23 +86,20 @@ class TestExtractiveQA(unittest.TestCase):
         processor = get_processor(TaskType.qa_extractive)
 
         sys_info = processor.process(metadata, data)
-        get_logger('test').info(
-            f'--------- sys_info.metric_configs {sys_info.metric_configs}'
-        )
 
-        # analysis.write_to_directory("./")
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
         # 0.6285714285714286
+        overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
         self.assertAlmostEqual(
-            sys_info.results.overall["ExactMatch"].value,
+            overall_map["ExactMatch"].value,
             0.6285714285714286,
             2,
             "almost equal",
         )
         # 0.7559651817716333
         self.assertAlmostEqual(
-            sys_info.results.overall["F1"].value,
+            overall_map["F1"].value,
             0.7559651817716333,
             2,
             "almost equal",

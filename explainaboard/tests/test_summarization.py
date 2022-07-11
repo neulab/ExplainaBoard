@@ -40,7 +40,7 @@ class TestSummarization(unittest.TestCase):
             FileType.tsv,
             FileType.text,
         )
-        data = loader.load()
+        data = loader.load().samples
 
         metadata = {
             "task_name": TaskType.summarization.value,
@@ -52,8 +52,7 @@ class TestSummarization(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        # analysis.write_to_directory("./")
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
@@ -61,14 +60,17 @@ class TestSummarization(unittest.TestCase):
         condgen_processor = get_processor(TaskType.conditional_generation.value)
         sum_processor = get_processor(TaskType.summarization.value)
 
-        condgen_features_1 = condgen_processor.default_features()
-        sum_features = sum_processor.default_features()
-        condgen_features_2 = condgen_processor.default_features()
+        condgen_features_1 = condgen_processor.default_analyses()
+        sum_features = sum_processor.default_analyses()
+        condgen_features_2 = condgen_processor.default_analyses()
 
-        # MT features didn't change condgen features
-        self.assertDictEqual(condgen_features_1, condgen_features_2)
-        # condgen features are a subset of sum features
-        self.assertDictEqual(sum_features, {**sum_features, **condgen_features_1})
+        for cf1, cf2, sumf in zip(condgen_features_1, condgen_features_2, sum_features):
+            lcf1 = set(cf1.features.keys())
+            lcf2 = set(cf2.features.keys())
+            lsumf = set(sumf.features.keys())
+            self.assertEqual(lcf1, lcf2)
+            # condgen features are a subset of MT features
+            self.assertTrue(all([x in lsumf] for x in lcf1))
 
     # Commented out following code since it's too slow for unittest
     @unittest.skipUnless('test_sum' in OPTIONAL_TEST_SUITES, reason='time consuming')

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from functools import lru_cache
+import itertools
 
 from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
@@ -10,19 +11,19 @@ from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
 from datalabs.operations.featurize.summarization import get_oracle_summary
 import numpy
 
-from explainaboard import feature, TaskType
+from explainaboard import TaskType
+from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
-summary_attribute = SUMAttribute()
+sum_attr = SUMAttribute()
 
 
 @hash_dict
@@ -60,135 +61,61 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def task_type(cls) -> TaskType:
         return TaskType.summarization
 
-    @classmethod
-    def default_features(cls) -> feature.Features:
-        f = super().default_features()
-        f.update(
-            feature.Features(
-                {
-                    "attr_compression": feature.Value(
-                        dtype="float",
-                        description="compression",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "attr_copy_len": feature.Value(
-                        dtype="float",
-                        description="copy length",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "attr_coverage": feature.Value(
-                        dtype="float",
-                        description="coverage",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    "attr_novelty": feature.Value(
-                        dtype="float",
-                        description="novelty",
-                        is_bucket=True,
-                        bucket_info=feature.BucketInfo(
-                            method="bucket_attribute_specified_bucket_value",
-                            number=4,
-                            setting=(),
-                        ),
-                    ),
-                    # TODO: these are commented out because the
-                    #  implementation is currently
-                    # "oracle_score": feature.Value(
-                    #     dtype="float",
-                    #     description="the sample-level oracle score",
-                    #     is_bucket=True,
-                    #     bucket_info=feature.BucketInfo(
-                    #         method="bucket_attribute_specified_bucket_value",
-                    #         number=4,
-                    #         setting=(),
-                    #     ),
-                    # ),
-                    # "oracle_position": feature.Value(
-                    #     dtype="float",
-                    #     description="the sample-level oracle position",
-                    #     is_bucket=True,
-                    #     bucket_info=feature.BucketInfo(
-                    #         method="bucket_attribute_specified_bucket_value",
-                    #         number=4,
-                    #         setting=(),
-                    #     ),
-                    # ),
-                }
-            )
-        )
+    def default_analyses(self) -> list[AnalysisLevel]:
+        f = super().default_analyses()
+        new_examp_features = {
+            "sum_attributes": feature.Value(
+                dtype="dict",
+                func=lambda info, x, c: sum_attr.cal_attributes_each(
+                    x["source"], x["reference"]
+                ),
+            ),
+            "attr_compression": feature.Value(
+                dtype="float",
+                description="compression",
+                func=lambda info, x, c: c.features['sum_attributes'][
+                    "attr_compression"
+                ],
+            ),
+            "attr_copy_len": feature.Value(
+                dtype="float",
+                description="copy length",
+                func=lambda info, x, c: c.features['sum_attributes']["attr_copy_len"],
+            ),
+            "attr_coverage": feature.Value(
+                dtype="float",
+                description="coverage",
+                func=lambda info, x, c: c.features['sum_attributes']["attr_coverage"],
+            ),
+            "attr_novelty": feature.Value(
+                dtype="float",
+                description="novelty",
+                func=lambda info, x, c: c.features['sum_attributes']["attr_novelty"],
+            ),
+            # "oracle_score": feature.Value(
+            #     dtype="float",
+            #     description="the sample-level oracle score",
+            #     func=...,
+            # ),
+            # "oracle_position": feature.Value(
+            #     dtype="float",
+            #     description="the sample-level oracle position",
+            #     func=...,
+            # ),
+        }
+        new_examp_cont_features = [
+            k for k, v in new_examp_features.items() if ('float' in unwrap(v.dtype))
+        ]
+        new_examp_analyses: Sequence[Analysis] = [
+            BucketAnalysis(x, method="continuous") for x in new_examp_cont_features
+        ]
+        f[0].features.update(new_examp_features)
+        f[0].analyses = list(itertools.chain(f[0].analyses, new_examp_analyses))
         return f
 
     @classmethod
-    def default_metrics(
-        cls, source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        return [
-            EaaSMetricConfig(
-                name='rouge1',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='rouge2',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='rougeL',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='length_ratio',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-        ]
-
-    def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
-        return get_oracle(existing_features)["oracle_position"]
-
-    def _get_oracle_score(self, sys_info: SysOutputInfo, existing_features: dict):
-        return get_oracle(existing_features)["oracle_score"]
-
-    def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
-        res = summary_attribute.cal_attributes_each(
-            existing_features["source"], existing_features["reference"]
-        )
-        return res["attr_compression"]
-
-    def _get_attr_copy_len(self, sys_info: SysOutputInfo, existing_features: dict):
-        res = summary_attribute.cal_attributes_each(
-            existing_features["source"], existing_features["reference"]
-        )
-        return res["attr_copy_len"]
-
-    def _get_attr_coverage(self, sys_info: SysOutputInfo, existing_features: dict):
-        res = summary_attribute.cal_attributes_each(
-            existing_features["source"], existing_features["reference"]
-        )
-        return res["attr_coverage"]
-
-    def _get_attr_novelty(self, sys_info: SysOutputInfo, existing_features: dict):
-        res = summary_attribute.cal_attributes_each(
-            existing_features["source"], existing_features["reference"]
-        )
-        return res["attr_novelty"]
+    def _get_default_eaas_strs(cls):
+        return ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
