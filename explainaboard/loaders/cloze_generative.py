@@ -36,10 +36,10 @@ class ClozeGenerativeLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("context", target_field_names[0], str),
-                    FileLoaderField("hint", target_field_names[1], str),
-                    FileLoaderField("question_mark", target_field_names[2], str),
-                    FileLoaderField("answers", target_field_names[3], list),
+                    FileLoaderField("context_column", target_field_names[0], str),
+                    FileLoaderField("hint_column", target_field_names[1], str),
+                    FileLoaderField("question_column", target_field_names[2], str),
+                    FileLoaderField("answers_column", target_field_names[3], list),
                 ]
             ),
         }

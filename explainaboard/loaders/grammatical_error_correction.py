@@ -42,8 +42,8 @@ class GrammaticalErrorCorrectionLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField('text', 'text', str),
-                    FileLoaderField('edits', 'edits', dict),
+                    FileLoaderField('source_column', 'text', str),
+                    FileLoaderField('reference_column', 'edits', dict),
                 ]
             ),
         }

@@ -76,14 +76,20 @@ class KgLinkTailPredictionLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("head", target_field_names[0], str),
+                    FileLoaderField("head_column", target_field_names[0], str),
                     FileLoaderField(
-                        "head", target_field_names[1], str, parser=map_preprocessor
+                        "head_column",
+                        target_field_names[1],
+                        str,
+                        parser=map_preprocessor,
                     ),
-                    FileLoaderField("link", target_field_names[2], str),
-                    FileLoaderField("tail", target_field_names[3], str),
+                    FileLoaderField("link_column", target_field_names[2], str),
+                    FileLoaderField("tail_column", target_field_names[3], str),
                     FileLoaderField(
-                        "tail", target_field_names[4], str, parser=map_preprocessor
+                        "tail_column",
+                        target_field_names[4],
+                        str,
+                        parser=map_preprocessor,
                     ),
                 ]
             ),

@@ -45,18 +45,18 @@ class QAExtractiveLoader(Loader):
             FileType.datalab: DatalabFileLoader(
                 [
                     FileLoaderField(
-                        "context",
+                        "context_column",
                         target_field_names[0],
                         str,
                         strip_before_parsing=False,
                     ),
                     FileLoaderField(
-                        "question",
+                        "question_column",
                         target_field_names[1],
                         str,
                         strip_before_parsing=False,
                     ),
-                    FileLoaderField("answers", target_field_names[2]),
+                    FileLoaderField("answers_column", target_field_names[2]),
                 ]
             ),
         }
