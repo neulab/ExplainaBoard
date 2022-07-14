@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast, Optional, Union
+
 import numpy as np
 from scipy.stats import pearsonr
+
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
-from typing import cast, Optional, Union
+
 
 @dataclass
 @register_metric_config
@@ -18,7 +21,6 @@ class SegKtauCorrConfig(MetricConfig):
 
 
 class SegKtauCorrScore(Metric):
-
     def is_simple_average(self, stats: MetricStats):
         """
         Whether the evaluation score is a simple average of the sufficient statistics.
@@ -29,10 +31,10 @@ class SegKtauCorrScore(Metric):
         return False
 
     def calc_stats_from_data(
-            self,
-            true_data: list[Union[str, list[str]]],
-            pred_data: list[str],
-            config: Optional[MetricConfig] = None,
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
 
         return MetricStats(
@@ -55,7 +57,7 @@ class SegKtauCorrScore(Metric):
         return data
 
     def get_scores_from_stats(
-            self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> dict[str, list]:
         config = cast(SegKtauCorrConfig, self._get_config(config))
         scores: dict[str, list] = {}
@@ -69,8 +71,7 @@ class SegKtauCorrScore(Metric):
             score_manual = float(manual_score) if manual_score != '' else None
 
             if config.no_human and (
-                    'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith(
-                'ref')
+                'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith('ref')
             ):
                 continue
 
@@ -91,12 +92,12 @@ class SegKtauCorrScore(Metric):
         for i in range(1, len(score)):
             for j in range(0, i):
                 if (
-                        abs(score[i][0] - score[j][0]) < config.threshold
-                        or abs(score[i][0] - score[j][0]) == 0
+                    abs(score[i][0] - score[j][0]) < config.threshold
+                    or abs(score[i][0] - score[j][0]) == 0
                 ):
                     continue
                 elif (
-                        score[i][0] - score[j][0] >= config.threshold
+                    score[i][0] - score[j][0] >= config.threshold
                 ):  # system i is better than system j
                     if score[i][1] > score[j][1]:
                         conc += 1
@@ -112,9 +113,23 @@ class SegKtauCorrScore(Metric):
         return conc, disc, num
 
     def calc_metric_from_aggregate(
-            self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
-        scores = self.get_scores_from_stats(agg_stats, config)
+        if len(agg_stats.shape) == 2:
+            val = self.calc_metric_from_aggregate_single(agg_stats, config)
+            return val
+        else:
+            n_samples = agg_stats.shape[0]
+            ret_metric = np.zeros(n_samples)
+            for i, single_stat in enumerate(agg_stats):
+                val = self.calc_metric_from_aggregate_single(single_stat, config)
+                ret_metric[i] = val
+            return ret_metric
+
+    def calc_metric_from_aggregate_single(
+        self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        scores = self.get_scores_from_stats(single_stat, config)
         total_seg_num = 0
         total_conc = 0
         total_disc = 0
@@ -143,10 +158,10 @@ class RootMeanSquareErrorConfig(MetricConfig):
 
 class RootMeanSquareErrorScore(Metric):
     def calc_stats_from_data(
-            self,
-            true_data: list[Union[str, list[str]]],
-            pred_data: list[str],
-            config: Optional[MetricConfig] = None,
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
 
         return MetricStats(
@@ -164,7 +179,6 @@ class RootMeanSquareErrorScore(Metric):
         """
         return False
 
-
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
         Aggregate sufficient statistics from multiple examples into a single example
@@ -176,7 +190,7 @@ class RootMeanSquareErrorScore(Metric):
         return data
 
     def get_scores_from_stats(
-            self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> tuple[np.ndarray, np.ndarray]:
         config = cast(RootMeanSquareErrorConfig, self._get_config(config))
         score_manuals = []
@@ -190,8 +204,7 @@ class RootMeanSquareErrorScore(Metric):
             score_manual = float(manual_score) if manual_score != '' else None
 
             if config.no_human and (
-                    'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith(
-                'ref')
+                'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith('ref')
             ):
                 continue
 
@@ -207,9 +220,23 @@ class RootMeanSquareErrorScore(Metric):
         return (data - np.min(data)) / (np.max(data) - np.min(data))
 
     def calc_metric_from_aggregate(
-            self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
-        score_manuals, scores = self.get_scores_from_stats(agg_stats, config)
+        if len(agg_stats.shape) == 2:
+            val = self.calc_metric_from_aggregate_single(agg_stats, config)
+            return val
+        else:
+            n_samples = agg_stats.shape[0]
+            ret_metric = np.zeros(n_samples)
+            for i, single_stat in enumerate(agg_stats):
+                val = self.calc_metric_from_aggregate_single(single_stat, config)
+                ret_metric[i] = val
+            return ret_metric
+
+    def calc_metric_from_aggregate_single(
+        self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        score_manuals, scores = self.get_scores_from_stats(single_stat, config)
         score_manuals = self.normalize(score_manuals)
         scores = self.normalize(scores)
         val = np.sqrt((np.square(score_manuals - scores)).mean())
@@ -227,10 +254,10 @@ class SysPearsonCorrConfig(MetricConfig):
 
 class SysPearsonCorrScore(Metric):
     def calc_stats_from_data(
-            self,
-            true_data: list[Union[str, list[str]]],
-            pred_data: list[str],
-            config: Optional[MetricConfig] = None,
+        self,
+        true_data: list[Union[str, list[str]]],
+        pred_data: list[str],
+        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
 
         return MetricStats(
@@ -248,7 +275,6 @@ class SysPearsonCorrScore(Metric):
         """
         return False
 
-
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
         Aggregate sufficient statistics from multiple examples into a single example
@@ -260,7 +286,7 @@ class SysPearsonCorrScore(Metric):
         return data
 
     def get_scores_from_stats(
-            self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> dict[str, list]:
         scores: dict[str, list] = {}
         for stat in agg_stats:
@@ -281,20 +307,33 @@ class SysPearsonCorrScore(Metric):
         return scores
 
     def calc_metric_from_aggregate(
-            self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> float:
+        if len(agg_stats.shape) == 2:
+            val = self.calc_metric_from_aggregate_single(agg_stats, config)
+            return val
+        else:
+            n_samples = agg_stats.shape[0]
+            ret_metric = np.zeros(n_samples)
+            for i, single_stat in enumerate(agg_stats):
+                val = self.calc_metric_from_aggregate_single(single_stat, config)
+                ret_metric[i] = val
+            return ret_metric
+
+    def calc_metric_from_aggregate_single(
+        self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
         config = cast(SysPearsonCorrConfig, self._get_config(config))
-        scores = self.get_scores_from_stats(agg_stats, config)
-
+        scores = self.get_scores_from_stats(single_stat, config)
         keys = [i for i in scores.keys()]
         if config.no_human:
             keys = [
                 key
                 for key in keys
                 if (
-                        'Human' not in key
-                        and 'HUMAN' not in key
-                        and (not key.startswith('ref'))
+                    'Human' not in key
+                    and 'HUMAN' not in key
+                    and (not key.startswith('ref'))
                 )
             ]
         if not config.no_human:
@@ -316,7 +355,5 @@ class SysPearsonCorrScore(Metric):
         # print("number of system:"+str(len(system_score)))
 
         val = pearsonr(system_score, manual_score)[0]
+
         return val
-
-
-
