@@ -11,13 +11,12 @@ class TestTextRegression(unittest.TestCase):
     tsv_dataset = os.path.join(artifact_path, "./wmt20-DA/cs-en/data.tsv")
     txt_output = os.path.join(artifact_path, "./wmt20-DA/cs-en/score.tsv")
 
-
-
     def test_da_cs_en(self):
 
         metadata = {
             "task_name": TaskType.text_regression.value,
             "metric_names": ["SysPearsonCorr"],
+            "conf_value": None,
         }
         loader = get_custom_dataset_loader(
             TaskType.text_regression,

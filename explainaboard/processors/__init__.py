@@ -39,5 +39,4 @@ __all__ = [
     'cloze_generative',
     'grammatical_error_correction',
     'text_regression',
-
 ]
