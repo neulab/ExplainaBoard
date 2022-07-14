@@ -48,9 +48,9 @@ class AspectBasedSentimentClassificationLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField(field_names[0], field_names[0], str),
-                    FileLoaderField(field_names[1], field_names[1], str),
-                    FileLoaderField(field_names[2], field_names[2], str),
+                    FileLoaderField("span_column", field_names[0], str),
+                    FileLoaderField("text", field_names[1], str),
+                    FileLoaderField("label", field_names[2], str),
                 ]
             ),
         }

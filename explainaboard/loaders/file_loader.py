@@ -533,6 +533,15 @@ class DatalabFileLoader(FileLoader):
         if isinstance(dataset, DatasetDict) or isinstance(dataset, IterableDatasetDict):
             raise ValueError('Cannot handle DatasetDict returns')
         info = dataset.info
+
+        # update src_name based on task schema (e.g., text1_column => sentence1)
+        ignore_tasks = ["machine-translation", "code-generation"]
+        print(info.task_templates[0].task)
+        if info.task_templates[0].task not in ignore_tasks:
+            for idx in range(len(self._fields)):
+                src_name = cast(str, self._fields[idx].src_name)
+                self._fields[idx].src_name = getattr(info.task_templates[0], src_name)
+
         # Infer metadata from the dataset
         metadata = FileLoaderMetadata()
         if info.languages is not None:

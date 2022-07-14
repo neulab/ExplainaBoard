@@ -36,10 +36,10 @@ class ClozeMultipleChoiceLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("context", target_field_names[0], str),
-                    FileLoaderField("options", target_field_names[1], list),
-                    FileLoaderField("question_mark", target_field_names[2], str),
-                    FileLoaderField("answers", target_field_names[3], dict),
+                    FileLoaderField("context_column", target_field_names[0], str),
+                    FileLoaderField("options_column", target_field_names[1], list),
+                    FileLoaderField("question_column", target_field_names[2], str),
+                    FileLoaderField("answers_column", target_field_names[3], dict),
                 ]
             ),
         }
