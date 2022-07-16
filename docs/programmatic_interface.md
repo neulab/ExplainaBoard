@@ -15,7 +15,7 @@ loader = get_datalab_loader(
     output_source=Source.local_filesystem,
     output_file_type=FileType.text,
 )
-data = loader.load()
+data = loader.load().samples
 processor = get_processor(TaskType.text_classification)
 analysis = processor.process(metadata={}, sys_output=data)
 analysis.write_to_directory("./")

@@ -9,32 +9,55 @@ Take the `text_classification` task for example, suppose that we aim to add
 
 ## Adding Features by Directly Modifying the Processor
 
-If we want to declare a new feature `chars_per_word`, we can do so by directly modifying
-the task processor module corresponding to its task, in this case:
+If we want to declare a new feature we can do so by directly modifying the processor
+module corresponding to its task, in this case:
 `explainaboard/processors/text_classification.py`
 
-To add a feature that is calculated for each example, you can add an additional 
+To add a feature that is analyzed for each example:
+1. add an entry or two to the `features` list
+2. make sure that a `BucketAnalysis` object is added to the `analyses` list. For many
+   processors, float features are added automatically, but string features need to be
+   added explicitly, as below.
 
 ```python
 from explainaboard.processors.processor import Processor
-from explainaboard.analysis.analyses import AnalysisLevel
+from explainaboard.analysis.analyses import AnalysisLevel, BucketAnalysis
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis import feature
 from explainaboard.analysis.feature_funcs import count_tokens
+from explainaboard.utils.typing_utils import unwrap
 
 class TextClassificationProcessor(Processor):
     ...
 
     def default_analyses(self) -> list[AnalysisLevel]:
+        # ---- Features ----
         features: dict[str, FeatureType] = {
-            ...,
             "chars_per_word": feature.Value(
                 dtype="float",
-                description="text length in tokens",
+                description="character count divided by token count",
                 func=lambda info, x, c: float(len(x['text'])) / count_tokens(info, x['text']),
-            )
+            ),
+            "contains_question": feature.Value(
+                dtype="string",
+                description="",
+                func=lambda info, x, c: "yes" if "?" in x['text'] else "no",
+            ),
+            # ...
         }
-        ...
+        # ---- Analyses ----
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses: list[BucketAnalysis] = [
+            BucketAnalysis(
+                feature="contains_question",
+                method="discrete",
+                number=2,
+            )
+        ] + [BucketAnalysis(x, method="continuous") for x in continuous_features]
+        # ...
+
 
 ```
 where
@@ -46,7 +69,11 @@ where
    * `info`: the SysOutputInfo object
    * `x`: the original example data from the system output/dataset
    * `c`: the `AnalysisCase` corresponding to this example
-    
+
+Note that it is possible to define features not only over the whole example, but also
+over individual tokens or spans. You can take a look at `sequence_labeling.py` or 
+`conditional_generation.py` for examples of this.
+
 ## Features and Unittests
 
 Note that you may need to change the test cases in the module relevant to your task

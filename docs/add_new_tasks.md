@@ -85,7 +85,11 @@ task to the one you're trying to implement to get hints.
 (3) Import this module (`text_classification.py`) in `__init__.py`
 For example, in this file `explainaboard/loaders/__init__.py`, we have:
 ```python
-from . import text_classification
+from explainaboard.loaders import text_classification
+
+__all__ = [
+    'text_classification'
+]
 ```
 
 ## Create a Processor module for your task
@@ -105,12 +109,17 @@ task, and `processors/named_entity_recognition.py` gives a good example of a mor
 (3) Import this module (text_classification.py) in `__init__.py`
 For example, in this file `explainaboard/processors/__init__.py`, we have: 
 ```python
-from . import text_classification
+from explainaboard.processors import text_classification
+
+__all__ = [
+    'text_classification'
+]
 ```
 
 
 ## Update new task information
-Once you finish all the above steps, you need to register the new task in the script tasks.py by declaring the supported formats, metrics, etc.
+Once you finish all the above steps, you need to register the new task in the script
+tasks.py by declaring the supported formats, metrics, etc.
 
 For example, the following information can be added for text classification tasks.
 ```python
@@ -125,10 +134,6 @@ For example, the following information can be added for text classification task
                 See more details about the format of upload files:
                 https://github.com/neulab/ExplainaBoard/blob/main/docs/task_text_classification.md
                 """,
-                supported=True,
-                supported_metrics=["F1Score", "Accuracy"],
-                supported_formats=["tsv"],
-                supported_datasets=[],
             )
         ],
     ),
@@ -138,5 +143,5 @@ For example, the following information can be added for text classification task
 
 (1) Create a new python file `test_text_classification.py` in the folder `explainaboard/tests/`
 
-(2) Implement a unittest for this task referencing that of other similar tasks
+(2) Implement unit tests for this task referencing that of other similar tasks
 
