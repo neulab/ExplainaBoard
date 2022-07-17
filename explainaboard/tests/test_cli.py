@@ -45,7 +45,6 @@ class TestCLI(TestCase):
             explainaboard.explainaboard_main.main()
 
     def test_textclass_viz(self):
-        print(f'test_output_path={test_output_path}')
         Path(f"{test_output_path}/reports").mkdir(parents=True, exist_ok=True)
         Path(f"{test_output_path}/figures").mkdir(parents=True, exist_ok=True)
         for sysname in ('lstm', 'cnn'):

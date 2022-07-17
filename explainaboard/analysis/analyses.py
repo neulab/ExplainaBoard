@@ -33,6 +33,12 @@ class AnalysisResult:
             return BucketAnalysisResult(
                 name=dikt['name'], bucket_performances=bucket_performances
             )
+        elif type == 'ComboCountAnalysisResult':
+            return ComboCountAnalysisResult(
+                name=dikt['name'],
+                features=dikt['features'],
+                combo_counts=dikt['combo_counts'],
+            )
         else:
             raise ValueError(f'bad AnalysisResult type {type}')
 
@@ -59,8 +65,10 @@ class Analysis:
                 setting=dikt.get('setting'),
                 sample_limit=dikt.get('sample_limit', 50),
             )
-        else:
-            raise ValueError(f'invalid type {type}')
+        elif type == 'ComboCountAnalysis':
+            return ComboCountAnalysis(
+                features=dikt['features'],
+            )
 
 
 @dataclass
@@ -184,7 +192,7 @@ class BucketAnalysis(Analysis):
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
     features: tuple
-    combo_counts: dict[tuple, int] | None = None
+    combo_counts: list[tuple[tuple, int]] | None = None
     _type: Optional[str] = None
 
     def __post_init__(self):
@@ -193,15 +201,9 @@ class ComboCountAnalysisResult(AnalysisResult):
     def print(self):
         get_logger('report').info('feature combos for ' + ', '.join(self.features))
         get_logger('report').info('\t'.join(self.features + ('#',)))
-        for k in sorted(self.combo_counts.keys()):
-            get_logger('report').info('\t'.join(k + (str(self.combo_counts[k]),)))
+        for k, v in sorted(self.combo_counts):
+            get_logger('report').info('\t'.join(k + (str(v),)))
         get_logger('report').info('')
-
-    def json_repr(self):
-        sanitized_counts: dict[str, int] = {}
-        for k, v in self.combo_counts.items():
-            sanitized_counts['\t'.join(k)] = v
-        return {'features': '\t'.join(self.features), 'combo_counts': sanitized_counts}
 
 
 @dataclass
@@ -235,14 +237,15 @@ class ComboCountAnalysis(Analysis):
                     f'combo analysis: feature {x} not found, ' f'skipping'
                 )
                 return None
-        combo_counts: dict[tuple, int] = {}
+        combo_map: dict[tuple, int] = {}
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
-            combo_counts[feat_vals] = combo_counts.get(feat_vals, 0) + 1
+            combo_map[feat_vals] = combo_map.get(feat_vals, 0) + 1
+        combo_list = list(combo_map.items())
         return ComboCountAnalysisResult(
             name='combo(' + ','.join(self.features) + ')',
             features=self.features,
-            combo_counts=combo_counts,
+            combo_counts=combo_list,
         )
 
 
