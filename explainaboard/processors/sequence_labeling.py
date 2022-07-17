@@ -140,7 +140,7 @@ class SeqLabProcessor(Processor):
                 method="discrete",
                 number=15,
             ),
-            ComboCountAnalysis(features=("span_true_label", "span_predicted_label")),
+            ComboCountAnalysis(features=("span_true_label", "span_pred_label")),
             BucketAnalysis(
                 feature="span_capitalness",
                 method="discrete",

@@ -130,6 +130,9 @@ class BucketAnalysis(Analysis):
             self.method,
         )
         if len(cases) == 0 or self.feature not in cases[0].features:
+            get_logger().warning(
+                f'bucket analysis: feature {self.feature} not found, ' f'skipping'
+            )
             return None
         samples_over_bucket = bucket_func(
             sample_features=[(x, x.features[self.feature]) for x in cases],
@@ -177,6 +180,7 @@ class BucketAnalysis(Analysis):
 
         return BucketAnalysisResult(self.feature, bucket_performances)
 
+
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
     features: tuple
@@ -187,15 +191,16 @@ class ComboCountAnalysisResult(AnalysisResult):
         self._type: str = self.__class__.__name__
 
     def print(self):
-        get_logger('report').info('feature combos for '+', '.join(self.features))
+        get_logger('report').info('feature combos for ' + ', '.join(self.features))
         get_logger('report').info('\t'.join(self.features + ('#',)))
         for k in sorted(self.combo_counts.keys()):
             get_logger('report').info('\t'.join(k + (str(self.combo_counts[k]),)))
         get_logger('report').info('')
 
     def json_repr(self):
-        sanitized_counts: dict[str,int] = {}
+        sanitized_counts: dict[str, int] = {}
         for k, v in self.combo_counts.items():
+            sanitized_counts['\t'.join(k)] = v
         return {'features': '\t'.join(self.features), 'combo_counts': sanitized_counts}
 
 
@@ -216,20 +221,26 @@ class ComboCountAnalysis(Analysis):
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
     def perform(
-            self,
-            cases: list[AnalysisCase],
-            metrics: list[Metric],
-            stats: list[MetricStats],
-            conf_value: float,
+        self,
+        cases: list[AnalysisCase],
+        metrics: list[Metric],
+        stats: list[MetricStats],
+        conf_value: float,
     ) -> AnalysisResult | None:
-        if len(cases) == 0 or any((x not in cases[0].features) for x in self.features):
+        if len(cases) == 0:
             return None
+        for x in self.features:
+            if x not in cases[0].features:
+                get_logger().warning(
+                    f'combo analysis: feature {x} not found, ' f'skipping'
+                )
+                return None
         combo_counts: dict[tuple, int] = {}
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
             combo_counts[feat_vals] = combo_counts.get(feat_vals, 0) + 1
         return ComboCountAnalysisResult(
-            name='combo('+','.join(self.features)+')',
+            name='combo(' + ','.join(self.features) + ')',
             features=self.features,
             combo_counts=combo_counts,
         )
