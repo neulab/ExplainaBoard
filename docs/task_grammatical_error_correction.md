@@ -5,7 +5,7 @@ perform the following command after installing [`DataLab`](https://github.com/Ex
 ```python
 from datalabs import load_dataset
 dataset = load_dataset("gaokao2018_np1", "writing_grammar")
-dataset['test'][0]
+print(dataset['test'][0])
 ```
  
 In what follows, we will describe how to analyze grammatical error correction systems. 

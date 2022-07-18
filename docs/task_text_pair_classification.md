@@ -42,7 +42,7 @@ Alternatively, you can load the dataset from an existing file using the
 explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
-in which case the file format of this file is TSV
+in which case the file format of the custom dataset file (`snli-dataset.tsv`) is TSV
 
 ```
 text1 \t text2 \t true_label

@@ -10,11 +10,11 @@ can be kept up-to-date whenever new functionalities have been implemented in Exp
 
 - #### When you add a new task:
     - please register your task in the script [`tasks.py`](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tasks.py)
-    - please add a unittest for your task in the folder [`tests`](https://github.com/neulab/ExplainaBoard/tree/main/explainaboard/tests)
+    - please add unit tests for your task in the folder [`tests`](https://github.com/neulab/ExplainaBoard/tree/main/explainaboard/tests)
     - please update [`cli_interface.md'](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md) to add the cli information of your task
 - #### When you add a new metric or re-naming evaluation metrics,
-    - please update the `supported_metrics` information in [`tasks.py`](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tasks.py)
     - please add a unittest in [`test_metric.py`](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_metric.py)
+    - please update the metric information in the relevant [processors](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/processors)
 - #### When you add a new supported format,
-    - please modify the `supported_tasks` information [`tasks.py`](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tasks.py)
     - please add a unittest in the folder [`tests`](https://github.com/neulab/ExplainaBoard/tree/main/explainaboard/tests)
+    - please update the loader for appropriate tasks in [loaders](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/loaders)

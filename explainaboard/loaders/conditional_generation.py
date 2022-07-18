@@ -26,6 +26,10 @@ class ConditionalGenerationLoader(Loader):
 
     OUTPUT_FIELDS = ['source', 'reference']
     JSON_FIELDS: list[str | tuple[str, str]] = ['source', 'reference']
+    JSON_FIELDS_DATALAB: list[str | tuple[str, str]] = [
+        'source_column',
+        'reference_column',
+    ]
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
@@ -48,8 +52,12 @@ class ConditionalGenerationLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField(cls.JSON_FIELDS[0], cls.OUTPUT_FIELDS[0], str),
-                    FileLoaderField(cls.JSON_FIELDS[1], cls.OUTPUT_FIELDS[1], str),
+                    FileLoaderField(
+                        cls.JSON_FIELDS_DATALAB[0], cls.OUTPUT_FIELDS[0], str
+                    ),
+                    FileLoaderField(
+                        cls.JSON_FIELDS_DATALAB[1], cls.OUTPUT_FIELDS[1], str
+                    ),
                 ]
             ),
         }
@@ -67,11 +75,19 @@ class ConditionalGenerationLoader(Loader):
 
 @register_loader(TaskType.summarization)
 class SummarizationLoader(ConditionalGenerationLoader):
-    JSON_FIELDS = ['text', 'summary']
+    JSON_FIELDS_DATALAB: list[str | tuple[str, str]] = [
+        'source_column',
+        'reference_column',
+    ]
 
 
 @register_loader(TaskType.machine_translation)
 class MachineTranslationLoader(ConditionalGenerationLoader):
+    JSON_FIELDS_DATALAB = [
+        ('translation', FileLoaderField.SOURCE_LANGUAGE),
+        ('translation', FileLoaderField.TARGET_LANGUAGE),
+    ]
+
     JSON_FIELDS = [
         ('translation', FileLoaderField.SOURCE_LANGUAGE),
         ('translation', FileLoaderField.TARGET_LANGUAGE),

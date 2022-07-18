@@ -48,9 +48,9 @@ class TextPairClassificationLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("text1", target_names[0], str),
-                    FileLoaderField("text2", target_names[1], str),
-                    FileLoaderField("label", target_names[2], str),
+                    FileLoaderField("text1_column", target_names[0], str),
+                    FileLoaderField("text2_column", target_names[1], str),
+                    FileLoaderField("label_column", target_names[2], str),
                 ]
             ),
         }

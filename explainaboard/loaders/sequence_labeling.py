@@ -45,8 +45,8 @@ class SeqLabLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("tokens", field_names[0], list),
-                    FileLoaderField("tags", field_names[1], list),
+                    FileLoaderField("tokens_column", field_names[0], list),
+                    FileLoaderField("tags_column", field_names[1], list),
                 ]
             ),
         }

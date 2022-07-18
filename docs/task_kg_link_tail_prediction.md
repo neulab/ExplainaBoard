@@ -216,8 +216,8 @@ Below is an example of sorting alphabetically by bucket value:
 
 ```python
 from explainaboard import TaskType, get_custom_dataset_loader, get_processor
-from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig,
-  MeanRankConfig
+from explainaboard.metrics.ranking import (HitsConfig, MeanReciprocalRankConfig,
+  MeanRankConfig)
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
