@@ -18,6 +18,12 @@ from explainaboard.utils.typing_utils import unwrap_generator
 
 @dataclass
 class AnalysisResult:
+    """
+    A result of an analysis, where the actual details of the result will be implemented
+    by the inheriting class.
+    :param name: The name of the analysis.
+    """
+
     name: str
 
     def print(self):
@@ -52,6 +58,17 @@ class Analysis:
         stats: list[MetricStats],
         conf_value: float,
     ) -> AnalysisResult | None:
+        """
+        A super-class for analyses, which take in examples and analyze their features in
+        some way. The exact analysis performed will vary depending on the inheriting
+        class.
+        :param cases: The list of analysis cases over which to perform the analysis.
+          These could be examples, spans, tokens, etc.
+        :param metrics: The metrics used to evaluate the cases.
+        :param stats: The statistics calculated by each metric.
+        :conf_value: In the case that any significance analysis is performed, the
+          confidence level.
+        """
         raise NotImplementedError
 
     @staticmethod
@@ -73,6 +90,13 @@ class Analysis:
 
 @dataclass
 class BucketAnalysisResult(AnalysisResult):
+    """
+    A result of running a `BucketAnalysis`.
+    :param bucket_performances: A list of performances bucket-by-bucket, including the
+      interval over which the bucket is calculated, the performance itself, etc.
+      See `BucketPerformance` for more details.
+    """
+
     bucket_performances: list[BucketPerformance]
     _type: Optional[str] = None
 
@@ -96,12 +120,15 @@ class BucketAnalysisResult(AnalysisResult):
 @dataclass
 class BucketAnalysis(Analysis):
     """
-    The class is used to define a dataclass for bucketing strategy
+    Perform an analysis of various examples bucketed by features.
+    Depending on which `method` is chosen here, the way bucketing is performed will be
+    different. See the documentation of each function in the
+    `explainaboard.analysis.bucketing` package for more details.
     Args:
         feature: the name of the feature to bucket
-        method: the bucket strategy
-        number: the number of buckets to be bucketed
-        setting: parameters of bucketing
+        method: the bucket strategy, can be "continuous", "discrete", or "fixed"
+        number: the number of buckets to be used
+        setting: parameters of bucketing, varying by `method`
     """
 
     feature: str
@@ -191,6 +218,15 @@ class BucketAnalysis(Analysis):
 
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
+    """
+    A result of running a `ComboCountAnalysis`.
+    :param features: A tuple of strings, representing the feature names that were
+      analyzed
+    :param combo_counts: A list of tuples. The first tuple element is the feature
+      values corresponding to the feature names in `features`. The second element is
+      the count of that feature combination in the corpus.
+    """
+
     features: tuple
     combo_counts: list[tuple[tuple, int]] | None = None
     _type: Optional[str] = None
@@ -209,9 +245,10 @@ class ComboCountAnalysisResult(AnalysisResult):
 @dataclass
 class ComboCountAnalysis(Analysis):
     """
-    A class used to count feature combinations (e.g. for confusion matrices)
+    A class used to count feature combinations (e.g. for confusion matrices). It will
+    return counts of each combination of values for the features named in `features`.
     Args:
-        features: the name of the feature to bucket
+        features: the name of the features over which to perform the analysis
     """
 
     features: tuple
