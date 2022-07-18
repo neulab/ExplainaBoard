@@ -7,8 +7,8 @@ from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.text_regression)
-class TextRegressionLoader(Loader):
+@register_loader(TaskType.nlg_meta_evaluation)
+class NLGMetaEvaluationLoader(Loader):
     """
     Validate and Reformat system output file with tsv format:
     text \t true_label \t predicted_label

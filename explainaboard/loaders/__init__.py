@@ -10,11 +10,11 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
+    nlg_meta_evaluation,
     qa_multiple_choice,
     sequence_labeling,
     text_classification,
     text_pair_classification,
-    text_regression,
 )
 
 get_datalab_loader = loader_registry.get_datalab_loader
@@ -35,5 +35,5 @@ __all__ = [
     'text_pair_classification',
     'cloze_generative',
     'grammatical_error_correction',
-    'text_regression',
+    'nlg_meta_evaluation',
 ]

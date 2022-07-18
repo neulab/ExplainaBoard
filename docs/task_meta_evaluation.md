@@ -1,9 +1,9 @@
-# Analyzing Text Regression
+# Analyzing Meta Evaluation for NLG Tasks
 
 
 ## Data Preparation
 
-The dataset file fomat is:
+The dataset file format is:
 ```
 SYSName \t SEGID \t TestSet \t src \t ref \t sys \t manualRaw \t manualZ
 ```
@@ -38,7 +38,7 @@ You can load the dataset from an existing file using the
 `--custom_dataset_paths` option
 
 ```shell
-explainaboard   --task text-regression --custom_dataset_paths ./data/system_outputs/text_regression/wmt20-DA/cs-en/data.tsv --system_outputs ./data/system_outputs/text_regression/wmt20-DA/cs-en/score.tsv --output_file_type tsv --output_dir output/cs-en --source_language en --target_language en --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
+explainaboard   --task nlg-meta-evaluation --custom_dataset_paths ./data/system_outputs/text_regression/wmt20-DA/cs-en/data.tsv --system_outputs ./data/system_outputs/text_regression/wmt20-DA/cs-en/score.tsv --output_file_type tsv --output_dir output/cs-en --source_language en --target_language en --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
 ```
 
 

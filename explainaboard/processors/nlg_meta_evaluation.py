@@ -10,11 +10,11 @@ from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richn
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.text_regression)
-class TextRegressionProcessor(Processor):
+@register_processor(TaskType.nlg_meta_evaluation)
+class NLGMetaEvaluationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.text_regression
+        return TaskType.nlg_meta_evaluation
 
     @classmethod
     def default_features(cls) -> feature.Features:

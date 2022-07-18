@@ -11,11 +11,11 @@ from explainaboard.processors import (
     language_modeling,
     machine_translation,
     named_entity_recognition,
+    nlg_meta_evaluation,
     qa_multiple_choice,
     summarization,
     text_classification,
     text_pair_classification,
-    text_regression,
     word_segmentation,
 )
 from explainaboard.processors.processor_registry import get_processor
@@ -38,5 +38,5 @@ __all__ = [
     'cloze_multiple_choice',
     'cloze_generative',
     'grammatical_error_correction',
-    'text_regression',
+    'nlg_meta_evaluation',
 ]
