@@ -2,7 +2,10 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.continuous import SquaredErrorConfig
+from explainaboard.metrics.continuous import (
+    AbsoluteErrorConfig,
+    RootMeanSquaredErrorConfig,
+)
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -37,7 +40,10 @@ class TabularRegressionProcessor(Processor):
     def default_metrics(
         cls, source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        return [SquaredErrorConfig(name='SquaredError')]
+        return [
+            RootMeanSquaredErrorConfig(name='RMSE'),
+            AbsoluteErrorConfig(name='AbsoluteError'),
+        ]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_value(self, sys_info: SysOutputInfo, existing_feature: dict):
