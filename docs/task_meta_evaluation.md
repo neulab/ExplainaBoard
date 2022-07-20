@@ -17,18 +17,20 @@ SYSName \t SEGID \t TestSet \t src \t ref \t sys \t manualRaw \t manualZ
 * manualZ is the manual evaluated Z score, standardized for each annotator. 
 
 We have an example dataset file:
-* [data.tsv](./data/system_outputs/text_regression/wmt20-DA/cs-en/data.tsv)
+* [data.tsv](./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv)
 
 More dataset files can be found at [WMT-DA-20](https://drive.google.com/drive/u/0/folders/1JXpo0yxPLYlNgLbOfP1bzs9z6SOx76Wo).
 
-In order to perform analysis of your results, your system outputs should add one column of systemScore (the score your metric predicts for the particular example) at the base of dataset file:
+In order to perform analysis of your results, your system outputs should be a one-column score (the score your metric predicts for the particular example):
 
 ```
-SYSName \t SEGID \t TestSet \t src \t ref \t sys \t manualRaw \t manualZ \t systemScore
+systemScore1
+systemScore2
+...
 ```
 
 We have an example system outputs file:
-* [score.tsv](./data/system_outputs/text_regression/wmt20-DA/cs-en/score.tsv)
+* [score.txt](./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt)
 
 
 
@@ -38,7 +40,7 @@ You can load the dataset from an existing file using the
 `--custom_dataset_paths` option
 
 ```shell
-explainaboard   --task nlg-meta-evaluation --custom_dataset_paths ./data/system_outputs/text_regression/wmt20-DA/cs-en/data.tsv --system_outputs ./data/system_outputs/text_regression/wmt20-DA/cs-en/score.tsv --output_file_type tsv --output_dir output/cs-en --source_language en --target_language en --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
+explainaboard   --task nlg-meta-evaluation --custom_dataset_paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv --system_outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt --output_file_type text --output_dir output/cs-en --source_language en --target_language en --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
 ```
 
 

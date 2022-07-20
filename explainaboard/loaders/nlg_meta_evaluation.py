@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from explainaboard import TaskType
 from explainaboard.constants import FileType
-from explainaboard.loaders.file_loader import FileLoader, FileLoaderField, TSVFileLoader
+from explainaboard.loaders.file_loader import (
+    FileLoader,
+    FileLoaderField,
+    TextFileLoader,
+    TSVFileLoader,
+)
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 
@@ -50,21 +55,8 @@ class NLGMetaEvaluationLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
-        field_name = [
-            'sys_name',
-            'seg_id',
-            'test_set',
-            'src',
-            'ref',
-            'sys',
-            'manual_raw',
-            'manual_z',
-            'auto_score',
-        ]
+
+        field_name = "auto_score"
         return {
-            FileType.tsv: TSVFileLoader(
-                [
-                    FileLoaderField(8, field_name[8], str),
-                ],
-            ),
+            FileType.text: TextFileLoader(field_name, str),
         }

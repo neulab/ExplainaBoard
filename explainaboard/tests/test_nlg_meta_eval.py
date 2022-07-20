@@ -7,9 +7,9 @@ from explainaboard.tests.utils import test_artifacts_path
 
 
 class TestNLGMetaEval(unittest.TestCase):
-    artifact_path = os.path.join(test_artifacts_path, "text_regression")
+    artifact_path = os.path.join(test_artifacts_path, "nlg_meta_evaluation")
     tsv_dataset = os.path.join(artifact_path, "./wmt20-DA/cs-en/data.tsv")
-    txt_output = os.path.join(artifact_path, "./wmt20-DA/cs-en/score.tsv")
+    txt_output = os.path.join(artifact_path, "./wmt20-DA/cs-en/score.txt")
 
     def test_da_cs_en(self):
 
@@ -25,7 +25,7 @@ class TestNLGMetaEval(unittest.TestCase):
             Source.local_filesystem,
             Source.local_filesystem,
             FileType.tsv,
-            FileType.tsv,
+            FileType.text,
         )
         data = loader.load()
         processor = get_processor(TaskType.nlg_meta_evaluation)

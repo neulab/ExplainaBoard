@@ -10,6 +10,7 @@ from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
 
 
+# TODO: (1) Make Segment/System level configurable (2) Document this function
 @dataclass
 @register_metric_config
 class SegKtauCorrConfig(MetricConfig):
@@ -91,21 +92,10 @@ class SegKtauCorrScore(Metric):
         num = 0
         for i in range(1, len(score)):
             for j in range(0, i):
-                if (
-                    abs(score[i][0] - score[j][0]) < config.threshold
-                    or abs(score[i][0] - score[j][0]) == 0
-                ):
-                    continue
-                elif (
-                    score[i][0] - score[j][0] >= config.threshold
-                ):  # system i is better than system j
-                    if score[i][1] > score[j][1]:
-                        conc += 1
-                    else:
-                        disc += 1
-                    num += 1
-                else:  # system i is worse than system j
-                    if score[i][1] < score[j][1]:
+                if abs(score[i][0] - score[j][0]) >= config.threshold:
+                    manual_better = score[i][0] > score[j][0]
+                    system_better = score[i][1] > score[j][1]
+                    if manual_better == system_better:
                         conc += 1
                     else:
                         disc += 1
