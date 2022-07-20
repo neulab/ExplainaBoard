@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.accuracy import AccuracyConfig
+from explainaboard.metrics.continuous import SquaredErrorConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -37,7 +37,7 @@ class TabularRegressionProcessor(Processor):
     def default_metrics(
         cls, source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        return [AccuracyConfig(name='Accuracy')]
+        return [SquaredErrorConfig(name='SquaredError')]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_value(self, sys_info: SysOutputInfo, existing_feature: dict):
