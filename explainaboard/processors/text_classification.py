@@ -7,7 +7,12 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import (
+    Analysis,
+    AnalysisLevel,
+    BucketAnalysis,
+    ComboCountAnalysis,
+)
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import (
     count_tokens,
@@ -97,13 +102,17 @@ class TextClassificationProcessor(Processor):
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
-        analyses: list[BucketAnalysis] = [
+        # Create analyses
+        analyses: list[Analysis] = [
             BucketAnalysis(
                 feature="true_label",
                 method="discrete",
                 number=15,
-            )
-        ] + [BucketAnalysis(x, method="continuous") for x in continuous_features]
+            ),
+            ComboCountAnalysis(features=("true_label", "predicted_label")),
+        ]
+        for x in continuous_features:
+            analyses.append(BucketAnalysis(x, method="continuous"))
 
         return [
             AnalysisLevel(

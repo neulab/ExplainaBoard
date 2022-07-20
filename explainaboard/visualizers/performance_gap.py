@@ -22,6 +22,8 @@ def get_pairwise_performance_gap(
     fgr, fgr1, fgr2 = (unwrap(x.results.analyses) for x in (sys, sys1, sys2))
     for fgr_all, fgr1_all, fgr2_all in zip(fgr, fgr1, fgr2):
         for fgr_lev, fgr1_lev, fgr2_lev in zip(fgr_all, fgr1_all, fgr2_all):
+            if not isinstance(fgr_lev, BucketAnalysisResult):
+                continue
             fgr_buks, fgr1_buks, fgr2_buks = (
                 cast(BucketAnalysisResult, x) for x in (fgr_lev, fgr1_lev, fgr2_lev)
             )

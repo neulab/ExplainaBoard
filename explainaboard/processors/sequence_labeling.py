@@ -7,7 +7,12 @@ from typing import Any, cast, List
 from datalabs import aggregating, Dataset
 
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import (
+    Analysis,
+    AnalysisLevel,
+    BucketAnalysis,
+    ComboCountAnalysis,
+)
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledSpan
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import feat_freq_rank, feat_num_oov
@@ -129,14 +134,21 @@ class SeqLabProcessor(Processor):
         span_continuous_features = [
             k for k, v in span_features.items() if ('float' in unwrap(v.dtype))
         ]
-        span_analyses: list[BucketAnalysis] = [
+        span_analyses: list[Analysis] = [
             BucketAnalysis(
-                feature=k,
+                feature="span_true_label",
                 method="discrete",
-                number=v,
-            )
-            for k, v in {'span_true_label': 15, 'span_capitalness': 4}.items()
-        ] + [BucketAnalysis(x, method="continuous") for x in span_continuous_features]
+                number=15,
+            ),
+            ComboCountAnalysis(features=("span_true_label", "span_pred_label")),
+            BucketAnalysis(
+                feature="span_capitalness",
+                method="discrete",
+                number=4,
+            ),
+        ]
+        for x in span_continuous_features:
+            span_analyses.append(BucketAnalysis(x, method="continuous"))
 
         return [
             AnalysisLevel(

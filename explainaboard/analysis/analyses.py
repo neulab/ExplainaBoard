@@ -18,6 +18,12 @@ from explainaboard.utils.typing_utils import unwrap_generator
 
 @dataclass
 class AnalysisResult:
+    """
+    A result of an analysis, where the actual details of the result will be implemented
+    by the inheriting class.
+    :param name: The name of the analysis.
+    """
+
     name: str
 
     def print(self):
@@ -33,6 +39,12 @@ class AnalysisResult:
             return BucketAnalysisResult(
                 name=dikt['name'], bucket_performances=bucket_performances
             )
+        elif type == 'ComboCountAnalysisResult':
+            return ComboCountAnalysisResult(
+                name=dikt['name'],
+                features=dikt['features'],
+                combo_counts=dikt['combo_counts'],
+            )
         else:
             raise ValueError(f'bad AnalysisResult type {type}')
 
@@ -46,6 +58,17 @@ class Analysis:
         stats: list[MetricStats],
         conf_value: float,
     ) -> AnalysisResult | None:
+        """
+        A super-class for analyses, which take in examples and analyze their features in
+        some way. The exact analysis performed will vary depending on the inheriting
+        class.
+        :param cases: The list of analysis cases over which to perform the analysis.
+          These could be examples, spans, tokens, etc.
+        :param metrics: The metrics used to evaluate the cases.
+        :param stats: The statistics calculated by each metric.
+        :conf_value: In the case that any significance analysis is performed, the
+          confidence level.
+        """
         raise NotImplementedError
 
     @staticmethod
@@ -59,12 +82,21 @@ class Analysis:
                 setting=dikt.get('setting'),
                 sample_limit=dikt.get('sample_limit', 50),
             )
-        else:
-            raise ValueError(f'invalid type {type}')
+        elif type == 'ComboCountAnalysis':
+            return ComboCountAnalysis(
+                features=dikt['features'],
+            )
 
 
 @dataclass
 class BucketAnalysisResult(AnalysisResult):
+    """
+    A result of running a `BucketAnalysis`.
+    :param bucket_performances: A list of performances bucket-by-bucket, including the
+      interval over which the bucket is calculated, the performance itself, etc.
+      See `BucketPerformance` for more details.
+    """
+
     bucket_performances: list[BucketPerformance]
     _type: Optional[str] = None
 
@@ -88,12 +120,15 @@ class BucketAnalysisResult(AnalysisResult):
 @dataclass
 class BucketAnalysis(Analysis):
     """
-    The class is used to define a dataclass for bucketing strategy
+    Perform an analysis of various examples bucketed by features.
+    Depending on which `method` is chosen here, the way bucketing is performed will be
+    different. See the documentation of each function in the
+    `explainaboard.analysis.bucketing` package for more details.
     Args:
         feature: the name of the feature to bucket
-        method: the bucket strategy
-        number: the number of buckets to be bucketed
-        setting: parameters of bucketing
+        method: the bucket strategy, can be "continuous", "discrete", or "fixed"
+        number: the number of buckets to be used
+        setting: parameters of bucketing, varying by `method`
     """
 
     feature: str
@@ -130,6 +165,9 @@ class BucketAnalysis(Analysis):
             self.method,
         )
         if len(cases) == 0 or self.feature not in cases[0].features:
+            get_logger().warning(
+                f'bucket analysis: feature {self.feature} not found, ' f'skipping'
+            )
             return None
         samples_over_bucket = bucket_func(
             sample_features=[(x, x.features[self.feature]) for x in cases],
@@ -176,6 +214,76 @@ class BucketAnalysis(Analysis):
             bucket_performances.append(bucket_performance)
 
         return BucketAnalysisResult(self.feature, bucket_performances)
+
+
+@dataclass
+class ComboCountAnalysisResult(AnalysisResult):
+    """
+    A result of running a `ComboCountAnalysis`.
+    :param features: A tuple of strings, representing the feature names that were
+      analyzed
+    :param combo_counts: A list of tuples. The first tuple element is the feature
+      values corresponding to the feature names in `features`. The second element is
+      the count of that feature combination in the corpus.
+    """
+
+    features: tuple
+    combo_counts: list[tuple[tuple, int]] | None = None
+    _type: Optional[str] = None
+
+    def __post_init__(self):
+        self._type: str = self.__class__.__name__
+
+    def print(self):
+        get_logger('report').info('feature combos for ' + ', '.join(self.features))
+        get_logger('report').info('\t'.join(self.features + ('#',)))
+        for k, v in sorted(self.combo_counts):
+            get_logger('report').info('\t'.join(k + (str(v),)))
+        get_logger('report').info('')
+
+
+@dataclass
+class ComboCountAnalysis(Analysis):
+    """
+    A class used to count feature combinations (e.g. for confusion matrices). It will
+    return counts of each combination of values for the features named in `features`.
+    Args:
+        features: the name of the features over which to perform the analysis
+    """
+
+    features: tuple
+    _type: Optional[str] = None
+
+    def __post_init__(self):
+        self._type: str = self.__class__.__name__
+
+    AnalysisCaseType = TypeVar('AnalysisCaseType')
+
+    def perform(
+        self,
+        cases: list[AnalysisCase],
+        metrics: list[Metric],
+        stats: list[MetricStats],
+        conf_value: float,
+    ) -> AnalysisResult | None:
+        if len(cases) == 0:
+            return None
+        for x in self.features:
+            if x not in cases[0].features:
+                get_logger().warning(
+                    f'combo analysis: feature {x} not found, ' f'skipping'
+                )
+                return None
+        combo_map: dict[tuple, int] = {}
+        for case in cases:
+            feat_vals = tuple([case.features[x] for x in self.features])
+            combo_map[feat_vals] = combo_map.get(feat_vals, 0) + 1
+        combo_list = list(combo_map.items())
+        return ComboCountAnalysisResult(
+            name='combo(' + ','.join(self.features) + ')',
+            features=self.features,
+            combo_counts=combo_list,
+        )
 
 
 @dataclass
