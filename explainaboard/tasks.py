@@ -189,6 +189,16 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
             )
         ],
     ),
+    TaskCategory(
+        "nlg-meta-evaluation",
+        "evaluate evaluation metrics.  ",
+        [
+            Task(
+                name=TaskType.nlg_meta_evaluation,
+                description="""evaluate evaluation metrics.""",
+            )
+        ],
+    ),
 ]
 
 
