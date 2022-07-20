@@ -46,8 +46,8 @@ class TextClassificationLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("text", target_field_names[0], str),
-                    FileLoaderField("label", target_field_names[1], str),
+                    FileLoaderField("text_column", target_field_names[0], str),
+                    FileLoaderField("label_column", target_field_names[1], str),
                 ]
             ),
         }

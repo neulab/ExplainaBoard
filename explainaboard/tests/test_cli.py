@@ -57,6 +57,36 @@ class TestCLI(TestCase):
         with patch('sys.argv', args):
             main()
 
+    def test_tabreg_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'tabular-regression',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt',
+            '--custom_dataset_paths',
+            f'{top_path}/data/system_outputs/sst2_tabreg/sst2-tabreg-dataset.json',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
+    def test_tabclass_custom(self):
+        args = [
+            'explainaboard.explainaboard_main',
+            '--task',
+            'tabular-classification',
+            '--system_outputs',
+            f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
+            '--custom_dataset_paths',
+            f'{top_path}/data/system_outputs/sst2_tabclass/sst2-tabclass-dataset.json',
+            '--report_json',
+            '/dev/null',
+        ]
+        with patch('sys.argv', args):
+            main()
+
     @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_textpair_datalab(self):
         args = [

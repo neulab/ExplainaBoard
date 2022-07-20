@@ -13,6 +13,8 @@ from explainaboard.loaders import (
     nlg_meta_evaluation,
     qa_multiple_choice,
     sequence_labeling,
+    tabular_classification,
+    tabular_regression,
     text_classification,
     text_pair_classification,
 )
@@ -31,6 +33,8 @@ __all__ = [
     'loader',
     'sequence_labeling',
     'qa_multiple_choice',
+    'tabular_classification',
+    'tabular_regression',
     'text_classification',
     'text_pair_classification',
     'cloze_generative',

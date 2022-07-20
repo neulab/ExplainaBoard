@@ -39,7 +39,7 @@ class LanguageModelingLoader(Loader):
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField("text", field_name, str),
+                    FileLoaderField("text", field_name, str),  # text_column?
                 ]
             ),
         }
