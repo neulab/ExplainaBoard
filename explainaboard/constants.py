@@ -18,6 +18,8 @@ class TaskType(str, Enum):
     cloze_mutiple_choice = "cloze-multiple-choice"
     cloze_generative = "cloze-generative"
     grammatical_error_correction = "grammatical-error-correction"
+    tabular_regression = "tabular-regression"
+    tabular_classification = "tabular-classification"
 
     @staticmethod
     def list():

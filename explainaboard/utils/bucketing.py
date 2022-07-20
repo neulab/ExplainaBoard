@@ -52,17 +52,8 @@ def bucket_attribute_specified_bucket_value(
     start_i, cutoff_i = 0, n_examps / float(bucket_number)
     bucket_collections: list[BucketCaseCollection] = []
     for i, val in enumerate(sorted_vals):
-        # Return the final bucket
-        if bucket_number - len(bucket_collections) == 1 or val == max_val:
-            bucket_collections.append(
-                BucketCaseCollection(
-                    (conv(start_val), max_val),
-                    [cases[j] for j in sorted_idxs[start_i:]],
-                )
-            )
-            break
         # If the last value is not the same, maybe make a new bucket
-        elif val != last_val:
+        if val != last_val:
             if i >= cutoff_i:
                 bucket_collections.append(
                     BucketCaseCollection(
@@ -76,6 +67,13 @@ def bucket_attribute_specified_bucket_value(
                     bucket_number - len(bucket_collections)
                 )
             last_val = val
+    # Return the last bucket
+    bucket_collections.append(
+        BucketCaseCollection(
+            (conv(start_val), max_val),
+            [cases[j] for j in sorted_idxs[start_i:]],
+        )
+    )
 
     return bucket_collections
 
