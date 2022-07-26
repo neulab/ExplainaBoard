@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from explainaboard.info import SysOutputInfo
 from explainaboard.meta_analyses.utils import report_to_sysout
 from explainaboard.utils.typing_utils import unwrap
