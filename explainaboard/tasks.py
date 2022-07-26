@@ -199,6 +199,20 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
             )
         ],
     ),
+    TaskCategory(
+        "tabular-prediction",
+        "Predict a class or value from tabular data",
+        [
+            Task(
+                name=TaskType.tabular_classification,
+                description="Predict a label from tabular data",
+            ),
+            Task(
+                name=TaskType.tabular_regression,
+                description="Predict a continuous value from tabular data",
+            ),
+        ],
+    ),
 ]
 
 
