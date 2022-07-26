@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from explainaboard.info import SysOutputInfo
 from explainaboard.utils.typing_utils import unwrap
@@ -12,7 +12,7 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict[str, Any]]:
     The metrics that describe each bucket become the "features" of this new
     system output.
     '''
-    FeaturesDict = dict[str, Any]
+    FeaturesDict = Dict[str, Any]
     results_fine_grained = unwrap(report.results.fine_grained)
     meta_examples = []
     for feature_name, feature_buckets in results_fine_grained.items():
