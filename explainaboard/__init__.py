@@ -4,7 +4,7 @@ from explainaboard.loaders import (
     get_custom_dataset_loader,
     get_datalab_loader,
 )
-from explainaboard.meta_analyses import RankFlippingMetaAnalysis
+from explainaboard.meta_analyses import RankFlippingMetaAnalysis, RankingMetaAnalysis
 from explainaboard.processors import get_processor
 from explainaboard.tasks import get_task_categories, Task, TaskCategory
 
@@ -20,4 +20,5 @@ __all__ = [
     'TaskCategory',
     'TaskType',
     'RankFlippingMetaAnalysis',
+    'RankingMetaAnalysis',
 ]
