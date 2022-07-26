@@ -7,6 +7,7 @@ import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
+from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
@@ -27,7 +28,7 @@ class Hits(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
-        config = cast(HitsConfig, self._get_config(config))
+        config = cast(HitsConfig, unwrap_or(config, self.config))
         return MetricStats(
             np.array(
                 [
@@ -40,7 +41,7 @@ class Hits(Metric):
     def calc_stats_from_rank(
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
-        config = cast(HitsConfig, self._get_config(config))
+        config = cast(HitsConfig, unwrap_or(self.config))
         return MetricStats(
             np.array([(1.0 if rank <= config.hits_k else 0.0) for rank in rank_data])
         )

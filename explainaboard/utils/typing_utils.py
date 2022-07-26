@@ -25,6 +25,22 @@ def unwrap(obj: Optional[T]) -> T:
     return obj
 
 
+def unwrap_or(obj: Optional[T], default: T) -> T:
+    '''Unwrap the ``Optional`` type hint, or return the default value.
+
+    This function takes an object wrapped with the ``Optional``, and returns itself
+    if the object is not ``None``. Otherwise this function returns ``default``.
+
+    :param obj: The object to unwrap.
+    :type obj: ``Optional[T]``
+    :param default: The default value.
+    :type default: ``T``
+    :return: ``obj`` or ``default`` according to the value of ``obj``.
+    :rtype: The underlying type ``T``.
+    '''
+    return obj if obj is not None else default
+
+
 def unwrap_generator(obj: Optional[Iterable[T]]) -> Generator[T, None, None]:
     '''Unwrap the ``Optional`` ``Iterable``s and provides its generator.
 
