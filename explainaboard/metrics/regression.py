@@ -14,6 +14,21 @@ from explainaboard.metrics.registry import register_metric_config
 @dataclass
 @register_metric_config
 class SegKtauCorrConfig(MetricConfig):
+    """
+    no_human: The machine translation systems to be evaluated include automatic
+         machine translation systems and human translations. The current implementation
+        supports different settings with and without human translations as additional
+        systems. The default setting excludes all human translations.
+    threshold: Following ‘Results of the WMT20 Metrics Shared Task
+        (https://aclanthology.org/2020.wmt-1.77.pdf)’, to calculate segment level ktau
+         score, we generate pairs of DA judgments attributed to distinct
+        translations of the same source segment.  Distinct translations of the same
+        source input whose DA scores fell within a threshold (which could have been
+        deemed equal quality) were omitted from the evaluation of segment-level
+        metrics. We use threshold=25 as the minimum required difference between two
+        system scores to produce DARR judgments.
+    """
+
     no_human: bool = True
     threshold: float = 25
 
