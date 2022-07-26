@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Generator, Iterable
-from typing import Any, Optional, TypeVar
+from typing import Any, cast, Optional, TypeVar
 
 T = TypeVar('T')
 
@@ -42,13 +42,18 @@ def unwrap_generator(obj: Optional[Iterable[T]]) -> Generator[T, None, None]:
         yield from obj
 
 
-NarrowType = TypeVar("NarrowType")
+def downcast(obj: Any, subcls: type[T]) -> T:
+    """Downcast the object.
 
+    :param obj: The object to be downcasted.
+    :type obj: ``Any``
+    :param subcls: The type that ``obj`` is casted to.
+    :type subcls: ``type[T]``
+    :return: ``obj`` itself
+    :rtype: ``T``
+    :raises TypeError: ``obj`` is not an object of ``T``.
+    """
+    if not isinstance(obj, subcls):
+        raise TypeError(f"{obj} is not an object of {subcls.__name__}")
 
-def narrow(obj: Any, narrow_type: type[NarrowType]) -> NarrowType:
-    """returns the object with the narrowed type or raises a TypeError
-    (obj: Any, new_type: type[T]) -> T"""
-    if isinstance(obj, narrow_type):
-        return obj
-    else:
-        raise TypeError(f"{obj} is expected to be {narrow_type}")
+    return cast(obj, subcls)
