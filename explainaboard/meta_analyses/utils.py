@@ -1,10 +1,10 @@
-from typing import Any, Dict
+from typing import Any
 
 from explainaboard.info import SysOutputInfo
 from explainaboard.utils.typing_utils import unwrap
 
 
-def report_to_sysout(report: SysOutputInfo) -> list[dict[str, Any]]:
+def report_to_sysout(report: SysOutputInfo) -> list[dict]:
     '''
     Loops through all the buckets in a report, converts them to "examples"
     as if they were a system output file.
@@ -12,7 +12,6 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict[str, Any]]:
     The metrics that describe each bucket become the "features" of this new
     system output.
     '''
-    FeaturesDict = Dict[str, Any]
     results_fine_grained = unwrap(report.results.fine_grained)
     meta_examples = []
     for feature_name, feature_buckets in results_fine_grained.items():
@@ -21,7 +20,7 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict[str, Any]]:
         for bucket in feature_buckets:
 
             # loop through and record all the metrics that describe this bucket
-            example_features: FeaturesDict = {}
+            example_features: dict[str, Any] = {}
             for perf in bucket.performances:
 
                 example_features['feature_name'] = feature_name
