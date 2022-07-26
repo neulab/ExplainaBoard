@@ -42,10 +42,10 @@ def unwrap_generator(obj: Optional[Iterable[T]]) -> Generator[T, None, None]:
         yield from obj
 
 
-def downcast(obj: Any, subcls: type[T]) -> T:
-    """Downcast the object.
+def narrow(obj: Any, subcls: type[T]) -> T:
+    """Narrow (downcast) an object with a type-safe manner.
 
-    :param obj: The object to be downcasted.
+    :param obj: The object to be casted.
     :type obj: ``Any``
     :param subcls: The type that ``obj`` is casted to.
     :type subcls: ``type[T]``
