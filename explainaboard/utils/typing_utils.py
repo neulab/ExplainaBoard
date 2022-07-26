@@ -55,7 +55,7 @@ def narrow(obj: Any, subcls: type[T]) -> T:
     """
     if not isinstance(obj, subcls):
         raise TypeError(
-            f"{obj.__class__.__name__} is not an object of {subcls.__name__}"
+            f"{obj.__class__.__name__} is not a subclass of {subcls.__name__}"
         )
 
     return cast(obj, subcls)
