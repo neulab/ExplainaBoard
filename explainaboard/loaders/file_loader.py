@@ -367,7 +367,7 @@ class TSVFileLoader(FileLoader):
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
-        data = narrow(data, str)
+        data = narrow(str, data)
         if source == Source.in_memory:
             file = StringIO(data)
             lines = list(csv.reader(file, delimiter='\t', quoting=csv.QUOTE_NONE))
@@ -396,7 +396,7 @@ class CoNLLFileLoader(FileLoader):
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
-        data = narrow(data, str)
+        data = narrow(str, data)
         if source == Source.in_memory:
             return FileLoaderReturn(data.splitlines())
         elif source == Source.local_filesystem:
@@ -431,7 +431,7 @@ class CoNLLFileLoader(FileLoader):
                     field.src_name: [] for field in self._fields
                 }  # reset
 
-        max_field: int = max([narrow(x.src_name, int) for x in self._fields])
+        max_field: int = max([narrow(int, x.src_name) for x in self._fields])
         for line in raw_data.samples:
             # at sentence boundary
             if line.startswith("-DOCSTART-") or line == "" or line == "\n":
@@ -447,7 +447,7 @@ class CoNLLFileLoader(FileLoader):
 
                 for field in self._fields:
                     curr_sentence_fields[field.src_name].append(
-                        self.parse_data(splits[narrow(field.src_name, int)], field)
+                        self.parse_data(splits[narrow(int, field.src_name)], field)
                     )
 
         add_sample()  # add last example
@@ -458,7 +458,7 @@ class JSONFileLoader(FileLoader):
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
-        data = narrow(data, str)
+        data = narrow(str, data)
         if source == Source.in_memory:
             loaded = json.loads(data)
         elif source == Source.local_filesystem:
@@ -524,7 +524,7 @@ class DatalabFileLoader(FileLoader):
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
-        config = narrow(data, DatalabLoaderOption)
+        config = narrow(DatalabLoaderOption, data)
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
         )
@@ -594,7 +594,7 @@ class TextFileLoader(FileLoader):
     def load_raw(
         cls, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
-        data = narrow(data, str)
+        data = narrow(str, data)
         if source == Source.in_memory:
             return FileLoaderReturn(data.splitlines())
         elif source == Source.local_filesystem:

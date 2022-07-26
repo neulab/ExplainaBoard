@@ -42,13 +42,17 @@ def unwrap_generator(obj: Optional[Iterable[T]]) -> Generator[T, None, None]:
         yield from obj
 
 
-def narrow(obj: Any, subcls: type[T]) -> T:
+def narrow(subcls: type[T], obj: Any) -> T:
     """Narrow (downcast) an object with a type-safe manner.
 
-    :param obj: The object to be casted.
-    :type obj: ``Any``
+    This function does the same type casting with ``typing.cast()``, but additionally
+    checks the actual type of the given object. If the type of the given object is not
+    castable to the given type, this funtion raises a ``TypeError``.
+
     :param subcls: The type that ``obj`` is casted to.
     :type subcls: ``type[T]``
+    :param obj: The object to be casted.
+    :type obj: ``Any``
     :return: ``obj`` itself
     :rtype: ``T``
     :raises TypeError: ``obj`` is not an object of ``T``.
