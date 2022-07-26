@@ -58,4 +58,4 @@ def narrow(obj: Any, subcls: type[T]) -> T:
             f"{obj.__class__.__name__} is not a subclass of {subcls.__name__}"
         )
 
-    return cast(obj, subcls)
+    return cast(subcls, obj)
