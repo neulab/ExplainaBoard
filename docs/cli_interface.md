@@ -187,6 +187,12 @@ explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > re
 ```
 
 
+## [Open Domain QA](xx)
+```shell
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system_outputs test.dpr.nq.txt  > log.res
+```
+
+
 ## [Multiple Choice QA](task_qa_multiple_choice.md)
 
 Answer a question from multiple options.
