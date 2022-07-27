@@ -327,3 +327,79 @@ metadata = {
 }
 ```
 [Here](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_system_details.py) is a complete code.
+
+### Meta/Quantitative Analysis
+A preliminary version of the rank-flipping quantitative analysis has been implemented. Example code:
+
+```python
+from explainaboard import RankFlippingMetaAnalysis, TaskType, get_custom_dataset_loader, get_processor
+
+# get the reports from two models you want to compare
+model1_sys_out = "./FB15K-237-models/rotate_all_buckets.json"
+model2_sys_out = "./FB15K-237-models/rescal_all_buckets.json"
+
+# rotate
+dataset = model1_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model1_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+
+# rescal
+dataset = model2_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model2_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+
+# meta-analysis
+meta_analysis = RankFlippingMetaAnalysis(
+    model1_report = model1_report, 
+    model2_report = model2_report
+)
+meta_analysis_results = meta_analysis.run_meta_analysis()
+print(meta_analysis_results)
+```
+
+Meta-analysis for bucket-level ranking tables:
+```python
+from explainaboard import RankingMetaAnalysis, TaskType, get_custom_dataset_loader, get_processor
+
+# get the reports from two models you want to compare
+model1_sys_out = "./FB15K-237-models/rotate_all_buckets.json"
+model2_sys_out = "./FB15K-237-models/rescal_all_buckets.json"
+...
+
+# rotate
+dataset = model1_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model1_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+
+# rescal
+dataset = model2_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model2_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+...
+
+# meta-analysis
+meta_analysis = RankingMetaAnalysis(
+    model_reports = {
+        'rotate':    model1_report, 
+        'rescal':    model2_report,
+        'conve':     model3_report,
+        'distmult':  model4_report,
+        'transe':    model5_report,
+        'tucker':    model6_report,
+    }
+)
+meta_analysis_results = meta_analysis.run_meta_analysis()
+meta_analysis.get_ranking_table('Hits5')
+```
