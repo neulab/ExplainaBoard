@@ -4,9 +4,10 @@ import unittest
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_custom_dataset_loader, get_datalab_loader
 from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.metrics.human_eval import LikertScoreConfig
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 from explainaboard.utils import cache_api
-from explainaboard.metrics.human_eval import LikertScoreConfig
+
 
 class TestSummarization(unittest.TestCase):
     artifact_path = os.path.join(test_artifacts_path, "summarization")
@@ -56,8 +57,6 @@ class TestSummarization(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-
-
     def test_generate_system_human_eval(self):
         loader = get_custom_dataset_loader(
             TaskType.summarization,
@@ -73,8 +72,9 @@ class TestSummarization(unittest.TestCase):
         metadata = {
             "task_name": TaskType.summarization.value,
             "dataset_name": "cnndm",
-            "metric_configs": [LikertScoreConfig(name = "LikertScore_fluency",
-                                                aspect = "fluency")]
+            "metric_configs": [
+                LikertScoreConfig(name="LikertScore_fluency", aspect="fluency")
+            ],
         }
 
         processor = get_processor(TaskType.summarization.value)
@@ -85,10 +85,6 @@ class TestSummarization(unittest.TestCase):
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)
         self.assertGreater(len(sys_info.results.overall), 0)
-
-
-
-
 
     def test_default_features_dont_modify_condgen(self):
 
