@@ -490,6 +490,7 @@ class DatalabLoaderOption:
     dataset: str
     subdataset: str | None = None
     split: str = "test"
+    custom_features: list[str] | None = None
 
 
 class DatalabFileLoader(FileLoader):
@@ -536,11 +537,13 @@ class DatalabFileLoader(FileLoader):
 
         # update src_name based on task schema (e.g., text1_column => sentence1)
         ignore_tasks = ["machine-translation", "code-generation"]
-        print(info.task_templates[0].task)
         if info.task_templates[0].task not in ignore_tasks:
             for idx in range(len(self._fields)):
                 src_name = cast(str, self._fields[idx].src_name)
                 self._fields[idx].src_name = getattr(info.task_templates[0], src_name)
+        if config.custom_features is not None:
+            for feat in config.custom_features:
+                self._fields.append(FileLoaderField(feat, feat, None))
 
         # Infer metadata from the dataset
         metadata = FileLoaderMetadata()
