@@ -524,6 +524,7 @@ class Processor(metaclass=abc.ABCMeta):
         if "task_name" not in metadata.keys():
             metadata["task_name"] = self.task_type().value
 
+
         sys_info = SysOutputInfo.from_dict(metadata)
         if sys_info.metric_configs is None:
             sys_info.metric_configs = self.default_metrics(

@@ -21,8 +21,9 @@ from explainaboard.info import (
 import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
+from explainaboard.metrics.human_eval import HUMAN_METRICS, LikertScoreConfig
 import explainaboard.metrics.metric
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import bucketing
@@ -198,22 +199,22 @@ class ConditionalGenerationProcessor(Processor):
         )
 
     @classmethod
-    def default_metrics(
-        cls, source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        defaults = ['rouge1', 'rouge2', 'rougeL', 'bleu', 'length_ratio']
+    def default_metrics(cls, source_language=None, target_language=None):
+        defaults_automated = ['rouge1', 'rouge2', 'rougeL', 'bleu', 'length_ratio']
+        defaults_human = ["LikertScore_fluency", "LikertScore_coherence"]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language
             )
-            for x in defaults
+            for x in defaults_automated
+        ] + [
+            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
+            for x in defaults_human
         ]
 
     @classmethod
-    def full_metric_list(
-        cls, source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        full_metrics = [
+    def full_metric_list(cls, source_language=None, target_language=None):
+        full_metrics_automated = [
             "bleu",
             "bart_score_summ",
             "bart_score_mt",
@@ -230,12 +231,18 @@ class ConditionalGenerationProcessor(Processor):
             "prism",
             "length",
             "length_ratio",
+            "LikertScore_fluency",
+            "LikertScore_coherence",
         ]
+        full_metrics_human = ["LikertScore_fluency", "LikertScore_coherence"]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language
             )
-            for x in full_metrics
+            for x in full_metrics_automated
+        ] + [
+            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
+            for x in full_metrics_human
         ]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
@@ -295,9 +302,7 @@ class ConditionalGenerationProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["hypothesis"]
 
-    def _gen_metric_stats(
-        self, sys_info: SysOutputInfo, sys_output: list[dict]
-    ) -> list[MetricStats]:
+    def _gen_metric_stats(self, sys_info: SysOutputInfo, sys_output: list[dict]):
         """Generate sufficient statistics for scoring.
         :param sys_info: Information about the system outputs
         :param sys_output: The system output itself
@@ -306,6 +311,8 @@ class ConditionalGenerationProcessor(Processor):
 
         # Queue up EaaS client request for all metrics
         inputs = []
+        true_data = []
+        pred_data = []
         for _id, feature_table in enumerate(sys_output):
             inputs.append(
                 {
@@ -314,20 +321,39 @@ class ConditionalGenerationProcessor(Processor):
                     "hypothesis": feature_table["hypothesis"],
                 }
             )
-        metric_names = [x.name for x in unwrap_generator(sys_info.metric_configs)]
+            true_data.append(feature_table["reference"])
+            pred_data.append(feature_table["hypothesis"])
+
+        metric_names_automated = []
+        metric_configs_human = []
+        for metric_config in unwrap_generator(sys_info.metric_configs):
+            if metric_config.name not in HUMAN_METRICS:
+                metric_names_automated.append(metric_config.name)
+            else:
+                metric_configs_human.append(metric_config)
+
+        # For EaaS Metrics
         async_request = self._get_eaas_client().async_score(
             inputs,
-            metrics=metric_names,
+            metrics=metric_names_automated,
             calculate=['corpus', 'stats'],
         )
 
-        # Share the request result with all stats functions
-        return [
+        metric_stats = [
             explainaboard.metrics.eaas.EaaSMetricStats(
                 name=name, pos=i, eaas_request=async_request
             )
-            for i, name in enumerate(metric_names)
+            for i, name in enumerate(metric_names_automated)
         ]
+
+        # For human metric
+        for metric_config in metric_configs_human:
+            metric_stats.append(
+                metric_config.to_metric().calc_stats_from_data(true_data, pred_data)
+            )
+
+        # Share the request result with all stats functions
+        return metric_stats
 
     # TODO(odashi): Restructure this function (and EaaS client) to be type-safe.
     def _fetch_metric_stats(self, metric_stats: dict[str, Any]):
