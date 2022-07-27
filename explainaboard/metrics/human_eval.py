@@ -8,8 +8,13 @@ import numpy as np
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricResult, MetricStats
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.agreement import fleiss_kappa
+from explainaboard.utils.typing_utils import unwrap
 
-HUMAN_METRICS = ["LikertScore_fluency", "LikertScore_coherence"]
+HUMAN_METRICS = [
+    "LikertScore_fluency",
+    "LikertScore_coherence",
+    "LikertScore_factuality",
+]
 UNANNOTATED_SYMBOL = -1
 
 
@@ -19,6 +24,7 @@ class LikertScoreConfig(MetricConfig):
     aspect: str = "fluency"
     n_annotators: int = 3
     categories: int = 5
+    instruction: str = "Annotation instruction"
 
     def to_metric(self):
         return LikertScore(self)
@@ -29,6 +35,15 @@ class LikertScore(Metric):
     Calculates the hits metric, telling whether the predicted output is in a set of true
     outputs.
     """
+
+    def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
+        """
+        Get the configuration or overwritten configuration
+        :param config: Optional configuration to override the default configuration
+        :return: Either the default or overridden configuration
+        """
+        ret_config: MetricConfig = unwrap(config) if config is not None else self.config
+        return ret_config
 
     def is_simple_average(self, stats: MetricStats):
         return False

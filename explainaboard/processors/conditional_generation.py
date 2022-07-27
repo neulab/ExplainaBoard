@@ -232,7 +232,11 @@ class ConditionalGenerationProcessor(Processor):
             "length",
             "length_ratio",
         ]
-        full_metrics_human = ["LikertScore_fluency", "LikertScore_coherence"]
+        full_metrics_human = [
+            "LikertScore_fluency",
+            "LikertScore_coherence",
+            "LikertScore_factuality",
+        ]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language

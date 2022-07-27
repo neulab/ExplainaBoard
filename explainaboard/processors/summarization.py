@@ -13,6 +13,7 @@ import numpy
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.eaas import EaaSMetricConfig
+from explainaboard.metrics.human_eval import LikertScoreConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -20,7 +21,6 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
-from explainaboard.metrics.human_eval import LikertScoreConfig
 
 summary_attribute = SUMAttribute()
 
@@ -136,7 +136,11 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     @classmethod
     def default_metrics(cls, source_language=None, target_language=None):
         defaults_automated = ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
-        defaults_human = ["LikertScore_fluency", "LikertScore_coherence"]
+        defaults_human = [
+            "LikertScore_fluency",
+            "LikertScore_coherence",
+            "LikertScore_factuality",
+        ]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language
