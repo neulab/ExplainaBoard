@@ -231,8 +231,6 @@ class ConditionalGenerationProcessor(Processor):
             "prism",
             "length",
             "length_ratio",
-            "LikertScore_fluency",
-            "LikertScore_coherence",
         ]
         full_metrics_human = ["LikertScore_fluency", "LikertScore_coherence"]
         return [

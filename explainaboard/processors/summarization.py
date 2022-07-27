@@ -13,7 +13,6 @@ import numpy
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -21,6 +20,7 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
+from explainaboard.metrics.human_eval import LikertScoreConfig
 
 summary_attribute = SUMAttribute()
 
@@ -134,30 +134,17 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(
-        cls, source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+    def default_metrics(cls, source_language=None, target_language=None):
+        defaults_automated = ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
+        defaults_human = ["LikertScore_fluency", "LikertScore_coherence"]
         return [
             EaaSMetricConfig(
-                name='rouge1',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='rouge2',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='rougeL',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='length_ratio',
-                source_language=source_language,
-                target_language=target_language,
-            ),
+                name=x, source_language=source_language, target_language=target_language
+            )
+            for x in defaults_automated
+        ] + [
+            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
+            for x in defaults_human
         ]
 
     def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
