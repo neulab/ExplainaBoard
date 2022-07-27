@@ -488,6 +488,7 @@ class Processor(metaclass=abc.ABCMeta):
                 value=metric_result.value,
                 confidence_score_low=conf_low,
                 confidence_score_high=conf_high,
+                agreement=metric_result.agreement,
             )
             overall_results[metric_cfg.name] = overall_performance
         return overall_results
@@ -523,7 +524,6 @@ class Processor(metaclass=abc.ABCMeta):
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = self.task_type().value
-
 
         sys_info = SysOutputInfo.from_dict(metadata)
         if sys_info.metric_configs is None:

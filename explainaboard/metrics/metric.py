@@ -24,6 +24,8 @@ class MetricResult:
     conf_interval: Optional[tuple[float, float]] = None
     # The p-value of the confidence interval
     conf_value: Optional[float] = None
+    # The agreement of different annotators
+    agreement: Optional[float] = None
 
     def to_dict(self):
         ret = {
@@ -34,6 +36,8 @@ class MetricResult:
             ret['conf_interval'] = self.conf_interval
         if self.conf_value is not None:
             ret['conf_value'] = self.conf_value
+        if self.agreement is not None:
+            ret['agreement'] = self.agreement
         return ret
 
 

@@ -81,6 +81,7 @@ class TestSummarization(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
         print(sys_info.results.overall)
+        print(metadata["metric_configs"][0])
 
         # analysis.write_to_directory("./")
         self.assertIsNotNone(sys_info.results.fine_grained)

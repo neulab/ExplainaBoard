@@ -5,10 +5,12 @@ from typing import cast, Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import Metric, MetricConfig, MetricResult, MetricStats
 from explainaboard.metrics.registry import register_metric_config
+from explainaboard.utils.agreement import fleiss_kappa
 
 HUMAN_METRICS = ["LikertScore_fluency", "LikertScore_coherence"]
+UNANNOTATED_SYMBOL = -1
 
 
 @dataclass
@@ -16,7 +18,7 @@ HUMAN_METRICS = ["LikertScore_fluency", "LikertScore_coherence"]
 class LikertScoreConfig(MetricConfig):
     aspect: str = "fluency"
     n_annotators: int = 3
-    agreement: float = 0.0
+    categories: int = 5
 
     def to_metric(self):
         return LikertScore(self)
@@ -36,14 +38,37 @@ class LikertScore(Metric):
     ) -> MetricStats:
         config = cast(LikertScoreConfig, self._get_config(config))
 
-        # TODO(Calculate Agreement)
-
         # "-1" indicates samples to be evaluated
         return MetricStats(
             np.array(
-                [[-1.0] * config.n_annotators for t, p in zip(true_data, pred_data)]
+                [
+                    [UNANNOTATED_SYMBOL] * config.n_annotators
+                    for t, p in zip(true_data, pred_data)
+                ]
             )
         )
+
+    def calc_agreement(self, stats: MetricStats) -> float:
+        data = stats.get_data()
+
+        if data.ndim != 2:
+            raise ValueError("the dimension of stats._data should be 2")
+
+        config = cast(LikertScoreConfig, self.config)
+
+        n_samples, n_annotators = data.shape[0], data.shape[1]
+        n_categories = config.categories
+        mat_kappa = np.zeros((n_samples, n_categories))
+
+        for i in range(n_samples):
+            for j in range(n_annotators):
+                category_annotated = (
+                    0 if data[i][j] == UNANNOTATED_SYMBOL else data[i][j]
+                )
+                mat_kappa[i][category_annotated] += 1
+
+        # self.config.agreement = fleiss_kappa(mat_kappa)
+        return fleiss_kappa(mat_kappa)
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """
@@ -52,7 +77,30 @@ class LikertScore(Metric):
         :return: aggregated stats
         """
         data = stats.get_data()
+
         if data.size == 0:
             return np.array(0.0)
         else:
             return np.mean(np.mean(data, axis=-1), axis=-1)  # this could be redefined
+
+    def evaluate_from_stats(
+        self,
+        stats: MetricStats,
+        conf_value: Optional[float] = None,
+        config: Optional[MetricConfig] = None,
+    ) -> MetricResult:
+        """Return an evaluation result over stats.
+        :param stats: pre-computed metric stats
+        :param conf_value: if set to not None, must be a number between 0 and 1,
+            indicating the p-value of confidence intervals
+        :param config: a configuration to over-ride the default for this object
+        :return: a resulting metric value
+        """
+        config = self._get_config(config)
+        agg_stats = self.aggregate_stats(stats)
+        agreement = self.calc_agreement(stats)
+        value = self.calc_metric_from_aggregate(agg_stats, config)
+        conf_interval = (
+            self.calc_confidence_interval(stats, conf_value) if conf_value else None
+        )
+        return MetricResult(config, float(value), conf_interval, conf_value, agreement)
