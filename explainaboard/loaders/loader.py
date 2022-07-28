@@ -107,16 +107,27 @@ class Loader:
         if not output_file_type:
             output_file_type = self.default_output_file_type()
 
-        # determine file loaders
-        # Propagates KeyError to outside if unsupported file type is specified.
-        self._dataset_file_loader = unwrap_or_else(
-            dataset_file_loader,
-            lambda: self.default_dataset_file_loaders()[unwrap(dataset_file_type)],
-        )
-        self._output_file_loader = unwrap_or_else(
-            output_file_loader,
-            lambda: self.default_output_file_loaders()[unwrap(output_file_type)],
-        )
+        # determine file loaders1
+        try:
+            self._dataset_file_loader = unwrap_or_else(
+                dataset_file_loader,
+                lambda: self.default_dataset_file_loaders()[unwrap(dataset_file_type)],
+            )
+        except KeyError:
+            raise ValueError(
+                f"{dataset_file_type} is not a supported dataset file type of "
+                f"{self.__class__.__name__}."
+            )
+        try:
+            self._output_file_loader = unwrap_or_else(
+                output_file_loader,
+                lambda: self.default_output_file_loaders()[unwrap(output_file_type)],
+            )
+        except KeyError:
+            raise ValueError(
+                f"{output_file_type} is not a supported output file type of "
+                f"{self.__class__.__name__}."
+            )
 
         self._dataset_data = dataset_data  # base64, filepath or datalab options
         self._output_data = output_data
