@@ -145,16 +145,6 @@ class KtauCorrelationConfig(CorrelationConfig):
 
 
 class KtauCorrelation(CorrelationMetric):
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
-
-        data = stats.get_data()
-        return data
-
     def count(self, score: list, config: Optional[MetricConfig] = None):
         config = cast(KtauCorrelationConfig, self._get_config(config))
         conc = 0
