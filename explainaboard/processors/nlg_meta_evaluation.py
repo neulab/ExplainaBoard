@@ -3,7 +3,10 @@ from __future__ import annotations
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.regression import SegKtauCorrConfig
+from explainaboard.metrics.nlg_meta_evaluation import (
+    KtauCorrelationConfig,
+    PearsonCorrelationConfig,
+)
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
@@ -86,7 +89,10 @@ class NLGMetaEvaluationProcessor(Processor):
     def default_metrics(
         cls, source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        return [SegKtauCorrConfig(name='SegKtauCorr')]
+        return [
+            KtauCorrelationConfig(name='SegKtauCorr', group_by='segment'),
+            PearsonCorrelationConfig(name='SysPearsonCorr', group_by='system'),
+        ]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_mean_ref_sys_length(
