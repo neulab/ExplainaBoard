@@ -20,18 +20,17 @@ For example, suppose that you have a system output of the summarization task
 in `tsv` format:
 
 ```python
-from explainaboard import TaskType, get_datalab_loader, get_custom_dataset_loader
+from explainaboard import TaskType, get_dataset_class
 dataset_path = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
 output_path = "./explainaboard/tests/artifacts/summarization/output.txt"
-loader = get_custom_dataset_loader(
-            TaskType.summarization,
-            dataset_path,
-            output_path,
-            Source.local_filesystem,
-            Source.local_filesystem,
-            FileType.tsv,
-            FileType.text,
-        )
+loader = get_dataset_class(TaskType.summarization)(
+    dataset_path,
+    output_path,
+    Source.local_filesystem,
+    Source.local_filesystem,
+    FileType.tsv,
+    FileType.text,
+)
 data = loader.load()
 
 processor = get_processor(TaskType.summarization, data = data)

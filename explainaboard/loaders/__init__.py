@@ -18,8 +18,7 @@ from explainaboard.loaders import (
     text_pair_classification,
 )
 
-get_datalab_loader = loader_registry.get_datalab_loader
-get_custom_dataset_loader = loader_registry.get_custom_dataset_loader
+get_loader_class = loader_registry.get_loader_class
 DatalabLoaderOption = file_loader.DatalabLoaderOption
 
 __all__ = [
