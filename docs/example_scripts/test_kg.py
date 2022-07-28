@@ -1,4 +1,4 @@
-from explainaboard import get_custom_dataset_loader, get_processor, TaskType
+from explainaboard import get_loader_class, get_processor, TaskType
 
 # This code details (1) how to evaluate your systems using ExplainaBoard
 # programmatically (2)how to collect different results
@@ -9,7 +9,7 @@ dataset = (
     "../../explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 )
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 # Initialize the processor and perform the processing
 processor = get_processor(TaskType.kg_link_tail_prediction.value)

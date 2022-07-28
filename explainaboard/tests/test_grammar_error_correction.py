@@ -3,7 +3,7 @@ import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_datalab_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -12,8 +12,7 @@ class TestGrammarErrorCorrection(unittest.TestCase):
     json_output = os.path.join(artifact_path, "rst_2018_quanguojuan1_gec.json")
 
     def test_datalab_loader(self):
-        loader = get_datalab_loader(
-            TaskType.grammatical_error_correction,
+        loader = get_loader_class(TaskType.grammatical_error_correction).init_datalab(
             dataset=DatalabLoaderOption("gaokao2018_np1", "writing-grammar"),
             output_data=self.json_output,
             output_source=Source.local_filesystem,

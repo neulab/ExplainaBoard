@@ -193,12 +193,12 @@ pythonic interface provided by ExplainaBoard.
 First, a simple example of using Python access to data analysis
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 
 # Load the data
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 # Initialize the processor and perform the processing
 processor = get_processor(TaskType.kg_link_tail_prediction.value)
@@ -215,13 +215,13 @@ The following code gives an example.
 Below is an example of sorting alphabetically by bucket value:
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig,
   MeanRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 
 metadata = {
@@ -257,13 +257,13 @@ The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set t
 The value of K in `Hits` metric could also be specified by users when needed. Below is an example of how to use this configuration while performing bucket sorting by the custom metric:
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 
 metadata = {
@@ -289,13 +289,13 @@ sys_info = processor.process(metadata, data.samples)
 Finally, an example of sorting by the number of bucket examples:
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metric import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 
 metadata = {

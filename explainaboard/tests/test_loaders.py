@@ -1,8 +1,8 @@
 import os
 from unittest import TestCase
 
-from explainaboard import FileType, get_datalab_loader, Source, TaskType
-from explainaboard.loaders import get_custom_dataset_loader
+from explainaboard import FileType, Source, TaskType
+from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,
     DatalabLoaderOption,
@@ -26,8 +26,8 @@ class BaseLoaderTests(TestCase):
         dataset_with_custom_feature = os.path.join(
             artifact_path, "with_custom_feature.json"
         )
-        loader = get_custom_dataset_loader(  # use defaults
-            TaskType.kg_link_tail_prediction,
+        loader = get_loader_class(TaskType.kg_link_tail_prediction)(
+            # use defaults
             test_data,
             dataset_with_custom_feature,
         )
@@ -105,8 +105,7 @@ class BaseLoaderTests(TestCase):
 
 class TestLoadFromDatalab(TestCase):
     def test_invalid_dataset_name(self):
-        loader = get_datalab_loader(
-            task=TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification).init_datalab(
             dataset=DatalabLoaderOption("invalid_name"),
             output_data="outputdata",
             output_source=Source.in_memory,

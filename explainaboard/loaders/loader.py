@@ -32,6 +32,30 @@ class Loader:
     """
 
     @classmethod
+    def init_datalab(
+        cls,
+        dataset: DatalabLoaderOption,
+        output_data: str,
+        output_source: Optional[Source] = None,
+        output_file_type: Optional[FileType] = None,
+        field_mapping: dict[str, str] | None = None,
+    ) -> Loader:
+        """Convenient method to initializes a loader for a dataset from datalab.
+
+        The loader downloads the dataset and merges the user provided output with the
+        dataset.
+        """
+        return cls(
+            dataset_data=dataset,
+            output_data=output_data,
+            dataset_source=Source.in_memory,
+            output_source=output_source,
+            dataset_file_type=FileType.datalab,
+            output_file_type=output_file_type,
+            field_mapping=field_mapping,
+        )
+
+    @classmethod
     def default_source(cls) -> Source:
         return Source.local_filesystem
 
