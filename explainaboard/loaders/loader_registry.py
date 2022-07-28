@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from typing import Optional
 
 from explainaboard import TaskType
@@ -10,6 +9,18 @@ from explainaboard.loaders.loader import Loader
 
 # loader_registry is a global variable, storing all basic loading functions
 _loader_registry: dict[TaskType, type[Loader]] = {}
+
+
+def get_loader_class(task: TaskType | str) -> type[Loader]:
+    """Obtains the loader class for the specified task type.
+
+    Args:
+        task: Task type or task name.
+
+    Returns:
+        The Loader class associated to `task`.
+    """
+    return _loader_registry[TaskType(task)]
 
 
 def get_custom_dataset_loader(
@@ -68,17 +79,3 @@ def register_loader(task_type: TaskType):
         return cls
 
     return register_loader_fn
-
-
-@dataclass
-class SupportedFileFormats:
-    custom_dataset: list[FileType] = field(default_factory=list)
-    system_output: list[FileType] = field(default_factory=list)
-
-
-def get_supported_file_types_for_loader(task: TaskType) -> SupportedFileFormats:
-    loader_class = _loader_registry[task]
-    return SupportedFileFormats(
-        list(loader_class.default_dataset_file_loaders().keys()),
-        list(loader_class.default_output_file_loaders().keys()),
-    )

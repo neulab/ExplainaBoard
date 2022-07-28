@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import final, Literal, Optional
 
 from explainaboard.constants import FileType, Source
@@ -10,6 +10,14 @@ from explainaboard.loaders.file_loader import (
     FileLoaderReturn,
     TextFileLoader,
 )
+
+
+@dataclass
+class SupportedFileTypes:
+    """List of dataset/output file types supported by the loader."""
+
+    custom_dataset: list[FileType] = field(default_factory=list)
+    system_output: list[FileType] = field(default_factory=list)
 
 
 class Loader:
@@ -42,6 +50,13 @@ class Loader:
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {FileType.text: TextFileLoader()}
+
+    @classmethod
+    def supported_file_types(cls) -> SupportedFileTypes:
+        return SupportedFileTypes(
+            list(cls.default_dataset_file_loaders().keys()),
+            list(cls.default_output_file_loaders().keys()),
+        )
 
     def __init__(
         self,
