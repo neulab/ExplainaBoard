@@ -10,7 +10,6 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
-    nlg_meta_evaluation,
     qa_multiple_choice,
     sequence_labeling,
     tabular_classification,
@@ -38,5 +37,4 @@ __all__ = [
     'text_pair_classification',
     'cloze_generative',
     'grammatical_error_correction',
-    'nlg_meta_evaluation',
 ]

@@ -21,7 +21,7 @@ def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
         TaskType.machine_translation,
         TaskType.summarization,
     }
-    if task_type in cond_gen_tasks or task_type == TaskType.nlg_meta_evaluation:
+    if task_type in cond_gen_tasks:
         if lang == 'zh':
             return SacreBleuTokenizer(variety='zh')
         elif lang == 'ja':
