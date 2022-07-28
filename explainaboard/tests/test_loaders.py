@@ -118,7 +118,7 @@ class TestLoadFromDatalab(TestCase):
     def test_datalab_loader_with_features(self):
         output_data = '\n'.join(['x' for _ in range(500)])
         # Without features
-        loader = get_loader_class(TaskType.machine_translation)(
+        loader = get_loader_class(TaskType.machine_translation).init_datalab(
             dataset=DatalabLoaderOption("conala", split="test"),
             output_data=output_data,
             output_source=Source.in_memory,
@@ -129,7 +129,7 @@ class TestLoadFromDatalab(TestCase):
         self.assertFalse('orig_en' in data.samples[0])
         # With features
         custom_features = ['orig_en']
-        loader = get_loader_class(TaskType.machine_translation)(
+        loader = get_loader_class(TaskType.machine_translation).init_datalab(
             dataset=DatalabLoaderOption(
                 "conala", split="test", custom_features=custom_features
             ),
