@@ -106,8 +106,7 @@ class BaseLoaderTests(TestCase):
 class TestLoadFromDatalab(TestCase):
     def test_datalab_loader(self):
         output_data = '\n'.join(['positive' for x in range(872)])
-        loader = get_datalab_loader(
-            task=TaskType.text_classification,
+        loader = get_loader_class(task=TaskType.text_classification)(
             dataset=DatalabLoaderOption("sst2", split="validation"),
             output_data=output_data,
             output_source=Source.in_memory,
@@ -119,8 +118,7 @@ class TestLoadFromDatalab(TestCase):
     def test_datalab_loader_with_features(self):
         output_data = '\n'.join(['x' for _ in range(500)])
         # Without features
-        loader = get_datalab_loader(
-            task=TaskType.machine_translation,
+        loader = get_loader_class(task=TaskType.machine_translation)(
             dataset=DatalabLoaderOption("conala", split="test"),
             output_data=output_data,
             output_source=Source.in_memory,
@@ -131,8 +129,7 @@ class TestLoadFromDatalab(TestCase):
         self.assertFalse('orig_en' in data.samples[0])
         # With features
         custom_features = ['orig_en']
-        loader = get_datalab_loader(
-            task=TaskType.machine_translation,
+        loader = get_loader_class(task=TaskType.machine_translation)(
             dataset=DatalabLoaderOption(
                 "conala", split="test", custom_features=custom_features
             ),
