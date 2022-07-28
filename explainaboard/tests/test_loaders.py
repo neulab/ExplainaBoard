@@ -106,7 +106,7 @@ class BaseLoaderTests(TestCase):
 class TestLoadFromDatalab(TestCase):
     def test_datalab_loader(self):
         output_data = '\n'.join(['positive' for x in range(872)])
-        loader = get_loader_class(task=TaskType.text_classification)(
+        loader = get_loader_class(TaskType.text_classification).init_datalab(
             dataset=DatalabLoaderOption("sst2", split="validation"),
             output_data=output_data,
             output_source=Source.in_memory,
