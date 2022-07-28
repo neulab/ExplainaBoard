@@ -36,8 +36,8 @@ class Loader:
         cls,
         dataset: DatalabLoaderOption,
         output_data: str,
-        output_source: Optional[Source] = None,
-        output_file_type: Optional[FileType] = None,
+        output_source: Source | None = None,
+        output_file_type: FileType | None = None,
         field_mapping: dict[str, str] | None = None,
     ) -> Loader:
         """Convenient method to initializes a loader for a dataset from datalab.
