@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Generator, Iterable
-from typing import Any, cast, Optional, TypeVar
+from typing import Any, Optional, TypeVar
 
 T = TypeVar('T')
 
@@ -62,4 +62,7 @@ def narrow(subcls: type[T], obj: Any) -> T:
             f"{obj.__class__.__name__} is not a subclass of {subcls.__name__}"
         )
 
-    return cast(subcls, obj)
+    # NOTE(odashi): typing.cast() does not work with TypeVar.
+    # Simply returning the obj is correct because we already narrowed its type
+    # by the previous if-statement.
+    return obj
