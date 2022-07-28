@@ -12,7 +12,7 @@ class TestClozeMultipleChoice(unittest.TestCase):
     json_output = os.path.join(artifact_path, "rst_2018_quanguojuan1_cloze_choice.json")
 
     def test_datalab_loader(self):
-        loader = get_loader_class(TaskType.cloze_mutiple_choice).init_datalab(
+        loader = get_loader_class(TaskType.cloze_mutiple_choice).from_datalab(
             dataset=DatalabLoaderOption("gaokao2018_np1", "cloze-multiple-choice"),
             output_data=self.json_output,
             output_source=Source.local_filesystem,

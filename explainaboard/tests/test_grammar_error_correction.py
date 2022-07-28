@@ -12,7 +12,7 @@ class TestGrammarErrorCorrection(unittest.TestCase):
     json_output = os.path.join(artifact_path, "rst_2018_quanguojuan1_gec.json")
 
     def test_datalab_loader(self):
-        loader = get_loader_class(TaskType.grammatical_error_correction).init_datalab(
+        loader = get_loader_class(TaskType.grammatical_error_correction).from_datalab(
             dataset=DatalabLoaderOption("gaokao2018_np1", "writing-grammar"),
             output_data=self.json_output,
             output_source=Source.local_filesystem,

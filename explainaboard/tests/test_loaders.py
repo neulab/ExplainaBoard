@@ -106,7 +106,7 @@ class BaseLoaderTests(TestCase):
 class TestLoadFromDatalab(TestCase):
     def test_datalab_loader(self):
         output_data = '\n'.join(['positive' for x in range(872)])
-        loader = get_loader_class(TaskType.text_classification).init_datalab(
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("sst2", split="validation"),
             output_data=output_data,
             output_source=Source.in_memory,
@@ -118,7 +118,7 @@ class TestLoadFromDatalab(TestCase):
     def test_datalab_loader_with_features(self):
         output_data = '\n'.join(['x' for _ in range(500)])
         # Without features
-        loader = get_loader_class(TaskType.machine_translation).init_datalab(
+        loader = get_loader_class(TaskType.machine_translation).from_datalab(
             dataset=DatalabLoaderOption("conala", split="test"),
             output_data=output_data,
             output_source=Source.in_memory,
@@ -129,7 +129,7 @@ class TestLoadFromDatalab(TestCase):
         self.assertFalse('orig_en' in data.samples[0])
         # With features
         custom_features = ['orig_en']
-        loader = get_loader_class(TaskType.machine_translation).init_datalab(
+        loader = get_loader_class(TaskType.machine_translation).from_datalab(
             dataset=DatalabLoaderOption(
                 "conala", split="test", custom_features=custom_features
             ),
@@ -142,7 +142,7 @@ class TestLoadFromDatalab(TestCase):
         self.assertTrue('orig_en' in data.samples[0])
 
     def test_invalid_dataset_name(self):
-        loader = get_loader_class(TaskType.text_classification).init_datalab(
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("invalid_name"),
             output_data="outputdata",
             output_source=Source.in_memory,

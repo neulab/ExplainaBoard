@@ -8,7 +8,7 @@ You can process an existing dataset, such as `sst2`:
 ```python
 from explainaboard import TaskType, get_loader_class, get_processor
 # using a dataset we provide (datalab)
-loader = get_loader_class(TaskType.text_classification).init_datalab(
+loader = get_loader_class(TaskType.text_classification).from_datalab(
     dataset=DatalabLoaderOption("sst2"),
     output_data="./explainaboard/tests/artifacts/text_classification/output_sst2.txt",
     output_source=Source.local_filesystem,

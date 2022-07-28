@@ -12,7 +12,7 @@ class TestClozeGenerative(unittest.TestCase):
     json_output = os.path.join(artifact_path, "rst_2018_quanguojuan1_cloze_hint.json")
 
     def test_datalab_loader(self):
-        loader = get_loader_class(TaskType.cloze_generative).init_datalab(
+        loader = get_loader_class(TaskType.cloze_generative).from_datalab(
             dataset=DatalabLoaderOption("gaokao2018_np1", "cloze-hint"),
             output_data=self.json_output,
             output_source=Source.local_filesystem,

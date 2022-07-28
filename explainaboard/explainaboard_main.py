@@ -377,7 +377,7 @@ def main():
             if not dataset:
                 raise ValueError("neither custom_dataset_paths or dataset is defined")
             loaders = [
-                get_loader_class(task).init_datalab(
+                get_loader_class(task).from_datalab(
                     DatalabLoaderOption(dataset, sub_dataset, split=split),
                     sys_output,
                     Source.local_filesystem,

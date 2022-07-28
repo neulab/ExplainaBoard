@@ -77,7 +77,7 @@ class TestSummarization(unittest.TestCase):
             'predictions/summarization/cnndm-bart-output.txt',
         )
 
-        loader = get_loader_class(TaskType.summarization).init_datalab(
+        loader = get_loader_class(TaskType.summarization).from_datalab(
             dataset=DatalabLoaderOption("cnn_dailymail", "3.0.0"),
             output_data=json_output_customized,
             output_source=Source.local_filesystem,

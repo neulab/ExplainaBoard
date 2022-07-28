@@ -54,7 +54,7 @@ class TestNER(unittest.TestCase):
         )
 
     def test_datalab_loader(self):
-        loader = get_loader_class(TaskType.named_entity_recognition).init_datalab(
+        loader = get_loader_class(TaskType.named_entity_recognition).from_datalab(
             dataset=DatalabLoaderOption("conll2003", "ner"),
             output_data=self.conll_output_full,
             output_source=Source.local_filesystem,
@@ -139,7 +139,7 @@ class TestNER(unittest.TestCase):
         #  lacks implementation of dataloader?)
 
     def test_customized_metadata1(self):
-        loader = get_loader_class(TaskType.named_entity_recognition).init_datalab(
+        loader = get_loader_class(TaskType.named_entity_recognition).from_datalab(
             dataset=DatalabLoaderOption("conll2003", "ner"),
             output_data=self.json_output_customized,
             output_source=Source.local_filesystem,

@@ -32,7 +32,7 @@ class Loader:
     """
 
     @classmethod
-    def init_datalab(
+    def from_datalab(
         cls,
         dataset: DatalabLoaderOption,
         output_data: str,

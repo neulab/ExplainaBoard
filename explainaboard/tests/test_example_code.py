@@ -12,7 +12,7 @@ class TestExampleCode(unittest.TestCase):
     """
 
     def test_readme_datalab_dataset(self):
-        loader = get_loader_class(TaskType.text_classification).init_datalab(
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("sst2"),
             output_data=f"{top_path}/explainaboard/tests/artifacts/text_classification/"
             "output_sst2.txt",

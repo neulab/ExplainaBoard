@@ -54,7 +54,7 @@ class TestTextClassification(unittest.TestCase):
         )
 
     def test_load_dataset_from_datalab(self):
-        loader = get_loader_class(TaskType.text_classification).init_datalab(
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("sst2"),
             output_data=os.path.join(self.artifact_path, "output_sst2.txt"),
             output_source=Source.local_filesystem,
