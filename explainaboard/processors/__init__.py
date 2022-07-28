@@ -11,6 +11,7 @@ from explainaboard.processors import (
     language_modeling,
     machine_translation,
     named_entity_recognition,
+    nlg_meta_evaluation,
     qa_multiple_choice,
     summarization,
     tabular_classification,
@@ -41,4 +42,5 @@ __all__ = [
     'cloze_multiple_choice',
     'cloze_generative',
     'grammatical_error_correction',
+    'nlg_meta_evaluation',
 ]
