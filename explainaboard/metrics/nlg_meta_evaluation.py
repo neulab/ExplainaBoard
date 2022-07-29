@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast, Optional, Union
+from typing import Optional, Union
 
 import numpy as np
 from scipy.stats import pearsonr
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
+from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 
 @dataclass
@@ -47,7 +48,7 @@ class CorrelationMetric(Metric):
         pred_data: list[str],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
-        config = cast(CorrelationConfig, self._get_config(config))
+        config = narrow(CorrelationConfig, unwrap_or(config, self.config))
 
         return MetricStats(
             np.array(
@@ -61,7 +62,7 @@ class CorrelationMetric(Metric):
     def get_scores_from_stats(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> dict[str, list]:
-        config = cast(KtauCorrelationConfig, self._get_config(config))
+        config = narrow(CorrelationConfig, unwrap_or(config, self.config))
         scores: dict[str, list] = {}
         for stat in agg_stats:
             sys_name = stat[0]
@@ -146,7 +147,7 @@ class KtauCorrelationConfig(CorrelationConfig):
 
 class KtauCorrelation(CorrelationMetric):
     def count(self, score: list, config: Optional[MetricConfig] = None):
-        config = cast(KtauCorrelationConfig, self._get_config(config))
+        config = narrow(KtauCorrelationConfig, unwrap_or(config, self.config))
         conc = 0
         disc = 0
         num = 0
@@ -194,7 +195,7 @@ class PearsonCorrelation(CorrelationMetric):
     def calc_metric_from_aggregate_single(
         self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
-        config = cast(PearsonCorrelationConfig, self._get_config(config))
+        config = narrow(PearsonCorrelationConfig, unwrap_or(config, self.config))
         scores = self.get_scores_from_stats(single_stat, config)
 
         manual_score = []
