@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import final, Literal, Optional
 
 from explainaboard.constants import FileType, Source
@@ -10,6 +10,14 @@ from explainaboard.loaders.file_loader import (
     FileLoaderReturn,
     TextFileLoader,
 )
+
+
+@dataclass
+class SupportedFileTypes:
+    """List of dataset/output file types supported by the loader."""
+
+    custom_dataset: list[FileType] = field(default_factory=list)
+    system_output: list[FileType] = field(default_factory=list)
 
 
 class Loader:
@@ -22,6 +30,30 @@ class Loader:
     :param file_loader: a dict of file loaders. To customize the loading process,
     either implement a custom FileLoader or override `load()`
     """
+
+    @classmethod
+    def from_datalab(
+        cls,
+        dataset: DatalabLoaderOption,
+        output_data: str,
+        output_source: Optional[Source] = None,
+        output_file_type: Optional[FileType] = None,
+        field_mapping: dict[str, str] | None = None,
+    ) -> Loader:
+        """Convenient method to initializes a loader for a dataset from datalab.
+
+        The loader downloads the dataset and merges the user provided output with the
+        dataset.
+        """
+        return cls(
+            dataset_data=dataset,
+            output_data=output_data,
+            dataset_source=Source.in_memory,
+            output_source=output_source,
+            dataset_file_type=FileType.datalab,
+            output_file_type=output_file_type,
+            field_mapping=field_mapping,
+        )
 
     @classmethod
     def default_source(cls) -> Source:
@@ -42,6 +74,13 @@ class Loader:
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {FileType.text: TextFileLoader()}
+
+    @classmethod
+    def supported_file_types(cls) -> SupportedFileTypes:
+        return SupportedFileTypes(
+            list(cls.default_dataset_file_loaders().keys()),
+            list(cls.default_output_file_loaders().keys()),
+        )
 
     def __init__(
         self,
