@@ -58,13 +58,27 @@ def unwrap_generator(obj: Optional[Iterable[T]]) -> Generator[T, None, None]:
         yield from obj
 
 
-NarrowType = TypeVar("NarrowType")
+def narrow(subcls: type[T], obj: Any) -> T:
+    """Narrow (downcast) an object with a type-safe manner.
 
+    This function does the same type casting with ``typing.cast()``, but additionally
+    checks the actual type of the given object. If the type of the given object is not
+    castable to the given type, this funtion raises a ``TypeError``.
 
-def narrow(obj: Any, narrow_type: type[NarrowType]) -> NarrowType:
-    """returns the object with the narrowed type or raises a TypeError
-    (obj: Any, new_type: type[T]) -> T"""
-    if isinstance(obj, narrow_type):
-        return obj
-    else:
-        raise TypeError(f"{obj} is expected to be {narrow_type}")
+    :param subcls: The type that ``obj`` is casted to.
+    :type subcls: ``type[T]``
+    :param obj: The object to be casted.
+    :type obj: ``Any``
+    :return: ``obj`` itself
+    :rtype: ``T``
+    :raises TypeError: ``obj`` is not an object of ``T``.
+    """
+    if not isinstance(obj, subcls):
+        raise TypeError(
+            f"{obj.__class__.__name__} is not a subclass of {subcls.__name__}"
+        )
+
+    # NOTE(odashi): typing.cast() does not work with TypeVar.
+    # Simply returning the obj is correct because we already narrowed its type
+    # by the previous if-statement.
+    return obj
