@@ -3,7 +3,14 @@
     "label": {
       "dtype": "string",
       "description": "the true label",
-      "num_buckets": 10
+      "num_buckets": 2
+    }
+  },
+  "natural_questions_comp_gen": {
+    "question_types": {
+      "dtype": "string",
+      "description": "the question type",
+      "num_buckets": 5
     }
   }
 }

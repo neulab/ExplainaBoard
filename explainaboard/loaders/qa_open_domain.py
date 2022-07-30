@@ -25,22 +25,18 @@ class QAOpenDomainLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        target_field_names = ["question", "answers", "question_types"]
+        target_field_names = ["question", "answers"]
         return {
             FileType.json: JSONFileLoader(
                 [
                     FileLoaderField("question", target_field_names[0], str),
                     FileLoaderField("answers", target_field_names[1], list),
-                    FileLoaderField("question_types", target_field_names[2], list),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
                 [
                     FileLoaderField("question_column", target_field_names[0], str),
                     FileLoaderField("answers_column", target_field_names[1], list),
-                    FileLoaderField(
-                        "question_types_column", target_field_names[2], list
-                    ),
                 ]
             ),
         }
