@@ -16,7 +16,7 @@ class TestResources(unittest.TestCase):
                 'label': {
                     'dtype': 'string',
                     'description': 'the true label',
-                    'num_buckets': 10,
+                    'num_buckets': 2,
                 }
             },
         )
