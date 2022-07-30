@@ -2,7 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders import get_custom_dataset_loader, get_datalab_loader
+from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 from explainaboard.utils import cache_api
@@ -14,8 +14,7 @@ class TestSummarization(unittest.TestCase):
     txt_output = os.path.join(artifact_path, "output.txt")
 
     def test_load_tsv(self):
-        loader = get_custom_dataset_loader(
-            TaskType.summarization,
+        loader = get_loader_class(TaskType.summarization)(
             self.tsv_dataset,
             self.txt_output,
             Source.local_filesystem,
@@ -31,8 +30,7 @@ class TestSummarization(unittest.TestCase):
         self.assertTrue(sample["hypothesis"].startswith("washington"))
 
     def test_generate_system_analysis(self):
-        loader = get_custom_dataset_loader(
-            TaskType.summarization,
+        loader = get_loader_class(TaskType.summarization)(
             self.tsv_dataset,
             self.txt_output,
             Source.local_filesystem,
@@ -79,8 +77,7 @@ class TestSummarization(unittest.TestCase):
             'predictions/summarization/cnndm-bart-output.txt',
         )
 
-        loader = get_datalab_loader(
-            TaskType.summarization,
+        loader = get_loader_class(TaskType.summarization).from_datalab(
             dataset=DatalabLoaderOption("cnn_dailymail", "3.0.0"),
             output_data=json_output_customized,
             output_source=Source.local_filesystem,
