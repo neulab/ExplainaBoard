@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import final, Literal, Optional
 
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import (
@@ -10,6 +9,7 @@ from explainaboard.loaders.file_loader import (
     FileLoaderReturn,
     TextFileLoader,
 )
+from explainaboard.utils.typing_utils import unwrap, unwrap_or_else
 
 
 @dataclass
@@ -36,8 +36,8 @@ class Loader:
         cls,
         dataset: DatalabLoaderOption,
         output_data: str,
-        output_source: Optional[Source] = None,
-        output_file_type: Optional[FileType] = None,
+        output_source: Source | None = None,
+        output_file_type: FileType | None = None,
         field_mapping: dict[str, str] | None = None,
     ) -> Loader:
         """Convenient method to initializes a loader for a dataset from datalab.
@@ -108,40 +108,29 @@ class Loader:
             output_file_type = self.default_output_file_type()
 
         # determine file loaders
-        self._dataset_file_loader = self.select_file_loader(
-            "dataset", dataset_file_type, dataset_file_loader
-        )
-        self._output_file_loader = self.select_file_loader(
-            "output", output_file_type, output_file_loader
-        )
+        try:
+            self._dataset_file_loader = unwrap_or_else(
+                dataset_file_loader,
+                lambda: self.default_dataset_file_loaders()[unwrap(dataset_file_type)],
+            )
+        except KeyError:
+            raise ValueError(
+                f"{dataset_file_type} is not a supported dataset file type of "
+                f"{self.__class__.__name__}."
+            )
+        try:
+            self._output_file_loader = unwrap_or_else(
+                output_file_loader,
+                lambda: self.default_output_file_loaders()[unwrap(output_file_type)],
+            )
+        except KeyError:
+            raise ValueError(
+                f"{output_file_type} is not a supported output file type of "
+                f"{self.__class__.__name__}."
+            )
 
         self._dataset_data = dataset_data  # base64, filepath or datalab options
         self._output_data = output_data
-
-    @classmethod
-    @final
-    def select_file_loader(
-        cls,
-        split: Literal["dataset", "output"],
-        file_type: FileType,
-        custom_loader: Optional[FileLoader],
-    ) -> FileLoader:
-        if custom_loader:
-            return custom_loader
-        else:
-            if split == "dataset":
-                default_file_loaders = cls.default_dataset_file_loaders()
-            elif split == "output":
-                default_file_loaders = cls.default_output_file_loaders()
-            else:
-                raise ValueError("split must be one of [dataset, output]")
-            if file_type not in default_file_loaders:
-                raise ValueError(
-                    f"A file loader for {file_type} is not provided. "
-                    "please pass it in as an argument."
-                )
-            else:
-                return default_file_loaders[file_type]
 
     def load(self) -> FileLoaderReturn:
         dataset_loaded_data = self._dataset_file_loader.load(
