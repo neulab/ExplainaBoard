@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from io import StringIO
 import itertools
 import json
+import multiprocessing
 from typing import (
     Any,
     cast,
@@ -24,6 +25,7 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.constants import Source
+from explainaboard.utils.get_data_processor import get_data_processor
 from explainaboard.utils.load_resources import get_custmomized_features
 from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
@@ -529,16 +531,34 @@ class DatalabFileLoader(FileLoader):
         config = narrow(DatalabLoaderOption, data)
 
         # load customized features from global config files
+        data_processors = {}
         customized_features_from_config = get_custmomized_features()
         if config.dataset in customized_features_from_config.keys():
             feature_names = list(customized_features_from_config[config.dataset].keys())
             config.custom_features = feature_names + (
                 [] if config.custom_features is None else config.custom_features
             )
+            # get data_processors
+            for feature_name, feature_config in customized_features_from_config[
+                config.dataset
+            ].items():
+                if "func" in feature_config.keys():
+                    data_processors[feature_name] = get_data_processor(
+                        feature_name, eval(feature_config["func"])
+                    )
 
+        # print("-------------------------")
+        # print(data_processors)
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
         )
+
+        # process data based on customized data processors
+        for feature_name, data_processor in data_processors.items():
+            dataset = dataset.apply(
+                data_processor, num_proc=multiprocessing.cpu_count(), mode="memory"
+            )
+
         # TODO(gneubig): patch for an inconsistency in datalab, where DatasetDict
         #  doesn't have info
         if isinstance(dataset, DatasetDict) or isinstance(dataset, IterableDatasetDict):

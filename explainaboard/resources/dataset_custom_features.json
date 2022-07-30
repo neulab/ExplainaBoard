@@ -4,6 +4,18 @@
       "dtype": "string",
       "description": "the true label",
       "num_buckets": 2
+    },
+    "text_len": {
+      "dtype": "float",
+      "description": "text length",
+      "num_buckets": 4,
+      "func": "lambda x:len(x['text'].split())"
+    },
+    "long_text": {
+      "dtype": "string",
+      "description": "text length",
+      "num_buckets": 4,
+      "func": "lambda x:'Long Text' if len(x['text'].split()) > 20 else 'Short Text'"
     }
   },
   "natural_questions_comp_gen": {

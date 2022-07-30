@@ -11,12 +11,10 @@ class TestResources(unittest.TestCase):
         print(get_custmomized_features())
 
         self.assertEqual(
-            get_custmomized_features()["sst2"],
+            get_custmomized_features()["sst2"]["label"],
             {
-                'label': {
-                    'dtype': 'string',
-                    'description': 'the true label',
-                    'num_buckets': 2,
-                }
+                'dtype': 'string',
+                'description': 'the true label',
+                'num_buckets': 2,
             },
         )
