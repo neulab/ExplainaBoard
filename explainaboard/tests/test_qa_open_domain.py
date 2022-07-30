@@ -3,7 +3,7 @@ import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_datalab_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -12,8 +12,7 @@ class TestQAOpenDomain(unittest.TestCase):
     system_output_file = os.path.join(artifact_path, "test.dpr.nq.txt")
 
     def test_datalab_loader(self):
-        loader = get_datalab_loader(
-            TaskType.qa_open_domain,
+        loader = get_loader_class(TaskType.qa_open_domain).from_datalab(
             dataset=DatalabLoaderOption("natural_questions_comp_gen"),
             output_data=self.system_output_file,
             output_source=Source.local_filesystem,
