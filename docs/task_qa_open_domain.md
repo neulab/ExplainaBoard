@@ -30,7 +30,7 @@ etc. from different systems.
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system_outputs ./data/system_outputs/test.dpr.nq.txt  > report.json
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system_outputs ./data/system_outputs/qa_open_domain/test.dpr.nq.txt  > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
@@ -41,19 +41,3 @@ where
                   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
 
-
-
-Now let's look at the results to see what sort of interesting insights we can
-glean from them.
-
-TODO: add insights
-
-## Advanced Analysis Options
-
-One also can perform pair-wise analysis:
-```shell
-explainaboard --task qa-multiple-choice --system_outputs model_1 model_2 > report.json
-```
-where two system outputs are fed separated by space.
-* `report.json`: the generated analysis file with json format, whose schema is similar to the above one with single system evaluation except that
-   all performance values are obtained using the sys1 subtract sys2.

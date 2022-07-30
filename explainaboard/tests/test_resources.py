@@ -10,4 +10,13 @@ class TestResources(unittest.TestCase):
 
         print(get_custmomized_features())
 
-        # self.assertEqual([('PER', 1, 3), ('ORG', 3, 4)], spans)
+        self.assertEqual(
+            get_custmomized_features()["sst2"],
+            {
+                'label': {
+                    'dtype': 'string',
+                    'description': 'the true label',
+                    'num_buckets': 10,
+                }
+            },
+        )
