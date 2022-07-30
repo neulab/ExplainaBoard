@@ -10,14 +10,16 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
+    nlg_meta_evaluation,
     qa_multiple_choice,
     sequence_labeling,
+    tabular_classification,
+    tabular_regression,
     text_classification,
     text_pair_classification,
 )
 
-get_datalab_loader = loader_registry.get_datalab_loader
-get_custom_dataset_loader = loader_registry.get_custom_dataset_loader
+get_loader_class = loader_registry.get_loader_class
 DatalabLoaderOption = file_loader.DatalabLoaderOption
 
 __all__ = [
@@ -30,8 +32,11 @@ __all__ = [
     'loader',
     'sequence_labeling',
     'qa_multiple_choice',
+    'tabular_classification',
+    'tabular_regression',
     'text_classification',
     'text_pair_classification',
     'cloze_generative',
     'grammatical_error_correction',
+    'nlg_meta_evaluation',
 ]

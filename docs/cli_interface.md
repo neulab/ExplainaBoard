@@ -37,6 +37,8 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Multiple-choice Cloze](#Multiple-choice Cloze)
 * [Generative Cloze](#generative-cloze)
 * [Grammatical Error Correction](#grammatical-error-correction)
+* [Tabular Classification](#tabular-classification)
+* [Tabular Regression](#tabular-regression)
 
 ## [Text Classification](task_text_classification.md)
 
@@ -258,4 +260,31 @@ Correct errors in a text
 This is an example using the dataset from `DataLab`
 ```shell
 explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
+```
+
+## Tabular Classification
+
+Classification over tabular data takes in a set of features and predicts a class for
+the outputs. The example below is over the `sst2` dataset used in text classification,
+but after the text has been vectorized into bag-of-words features. By default the only
+features that is analyzed by ExplainaBoard is the `label` feature, so you might want to
+specify other features to perform bucketing over using the `metadata` entry in the
+dataset `json` file, as is done in `sst2-tabclass-dataset.json` below.
+
+**CLI Examples**
+
+The below example loads a dataset from an existing file:
+```shell
+explainaboard --task tabular-classification --custom_dataset_paths ./data/system_outputs/sst2_tabclass/sst2-tabclass-dataset.json --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+```
+## Tabular Regression
+
+Regression over tabular data is basically the same as tabular classification above, but
+the predicted outputs are continuous numbers instead of classes.
+
+**CLI Examples**
+
+The below example loads a dataset from an existing file:
+```shell
+explainaboard --task tabular-regression --custom_dataset_paths ./data/system_outputs/sst2_tabreg/sst2-tabclass-dataset.json --system_outputs ./data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt
 ```

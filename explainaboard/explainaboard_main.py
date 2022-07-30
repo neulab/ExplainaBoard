@@ -5,12 +5,7 @@ import json
 import os
 import sys
 
-from explainaboard import (
-    get_custom_dataset_loader,
-    get_datalab_loader,
-    get_processor,
-    TaskType,
-)
+from explainaboard import get_loader_class, get_processor, TaskType
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (
@@ -361,8 +356,7 @@ def main():
         }
         if custom_dataset_paths:  # load custom datasets
             loaders = [
-                get_custom_dataset_loader(
-                    task,
+                get_loader_class(task)(
                     dataset,
                     output,
                     Source.local_filesystem,
@@ -383,8 +377,7 @@ def main():
             if not dataset:
                 raise ValueError("neither custom_dataset_paths or dataset is defined")
             loaders = [
-                get_datalab_loader(
-                    task,
+                get_loader_class(task).from_datalab(
                     DatalabLoaderOption(dataset, sub_dataset, split=split),
                     sys_output,
                     Source.local_filesystem,

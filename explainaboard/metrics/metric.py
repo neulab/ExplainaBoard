@@ -7,7 +7,7 @@ from typing import Optional, Union
 import numpy as np
 from scipy.stats import t as stats_t
 
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.utils.typing_utils import unwrap, unwrap_or
 
 
 @dataclass
@@ -126,15 +126,6 @@ class Metric:
         """
         self.config: MetricConfig = config
 
-    def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
-        """
-        Get the configuration or overwritten configuration
-        :param config: Optional configuration to override the default configuration
-        :return: Either the default or overridden configuration
-        """
-        ret_config: MetricConfig = unwrap(config) if config is not None else self.config
-        return ret_config
-
     @abc.abstractmethod
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -250,13 +241,13 @@ class Metric:
         :param config: a configuration to over-ride the default for this object
         :return: a resulting metric value
         """
-        config = self._get_config(config)
+        actual_config = unwrap_or(config, self.config)
         agg_stats = self.aggregate_stats(stats)
-        value = self.calc_metric_from_aggregate(agg_stats, config)
+        value = self.calc_metric_from_aggregate(agg_stats, actual_config)
         conf_interval = (
             self.calc_confidence_interval(stats, conf_value) if conf_value else None
         )
-        return MetricResult(config, float(value), conf_interval, conf_value)
+        return MetricResult(actual_config, float(value), conf_interval, conf_value)
 
     def evaluate(
         self,

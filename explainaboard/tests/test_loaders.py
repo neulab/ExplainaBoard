@@ -1,8 +1,8 @@
 import os
 from unittest import TestCase
 
-from explainaboard import FileType, get_datalab_loader, Source, TaskType
-from explainaboard.loaders import get_custom_dataset_loader
+from explainaboard import FileType, Source, TaskType
+from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,
     DatalabLoaderOption,
@@ -26,8 +26,8 @@ class BaseLoaderTests(TestCase):
         dataset_with_custom_feature = os.path.join(
             artifact_path, "with_custom_feature.json"
         )
-        loader = get_custom_dataset_loader(  # use defaults
-            TaskType.kg_link_tail_prediction,
+        loader = get_loader_class(TaskType.kg_link_tail_prediction)(
+            # use defaults
             test_data,
             dataset_with_custom_feature,
         )
@@ -104,9 +104,45 @@ class BaseLoaderTests(TestCase):
 
 
 class TestLoadFromDatalab(TestCase):
+    def test_datalab_loader(self):
+        output_data = '\n'.join(['positive' for x in range(872)])
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
+            dataset=DatalabLoaderOption("sst2", split="validation"),
+            output_data=output_data,
+            output_source=Source.in_memory,
+            output_file_type=FileType.text,
+        )
+        data = loader.load()
+        self.assertEqual(len(data.samples), 872)
+
+    def test_datalab_loader_with_features(self):
+        output_data = '\n'.join(['x' for _ in range(500)])
+        # Without features
+        loader = get_loader_class(TaskType.machine_translation).from_datalab(
+            dataset=DatalabLoaderOption("conala", split="test"),
+            output_data=output_data,
+            output_source=Source.in_memory,
+            output_file_type=FileType.text,
+        )
+        data = loader.load()
+        self.assertEqual(len(data.samples), 500)
+        self.assertFalse('orig_en' in data.samples[0])
+        # With features
+        custom_features = ['orig_en']
+        loader = get_loader_class(TaskType.machine_translation).from_datalab(
+            dataset=DatalabLoaderOption(
+                "conala", split="test", custom_features=custom_features
+            ),
+            output_data=output_data,
+            output_source=Source.in_memory,
+            output_file_type=FileType.text,
+        )
+        data = loader.load()
+        self.assertEqual(len(data.samples), 500)
+        self.assertTrue('orig_en' in data.samples[0])
+
     def test_invalid_dataset_name(self):
-        loader = get_datalab_loader(
-            task=TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("invalid_name"),
             output_data="outputdata",
             output_source=Source.in_memory,
