@@ -543,7 +543,7 @@ class Processor(metaclass=abc.ABCMeta):
                 )
             )
 
-        # declare customized features: _features will be updated
+        # declare customized features: _features will be updated:
         custom_features: dict = metadata.get('custom_features', {})
         sys_info.features = self._customize_features(custom_features)
 

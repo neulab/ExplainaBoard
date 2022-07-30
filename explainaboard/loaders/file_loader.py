@@ -24,6 +24,7 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.constants import Source
+from explainaboard.utils.load_resources import get_custmomized_features
 from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
 
@@ -99,7 +100,7 @@ class FileLoaderMetadata:
     supported_languages: list[str] | None = None
     task_name: str | None = None
     supported_tasks: list[str] | None = None
-    custom_features: list[str] | None = None
+    custom_features: dict | None = None
 
     def merge(self, other: FileLoaderMetadata) -> None:
         """
@@ -339,7 +340,7 @@ class FileLoader:
         before_fields = copy.deepcopy(self._fields)
         fields = self._map_fields(self._fields, actual_mapping)
         if raw_data.metadata.custom_features is not None:
-            for feat in raw_data.metadata.custom_features:
+            for feat in raw_data.metadata.custom_features.keys():
                 fields.append(FileLoaderField(feat, feat, None))
         assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
@@ -526,6 +527,15 @@ class DatalabFileLoader(FileLoader):
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
         config = narrow(DatalabLoaderOption, data)
+
+        # load customized features from global config files
+        customized_features_from_config = get_custmomized_features()
+        if config.dataset in customized_features_from_config.keys():
+            feature_names = list(customized_features_from_config[config.dataset].keys())
+            config.custom_features = feature_names + (
+                [] if config.custom_features is None else config.custom_features
+            )
+
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
         )
@@ -547,6 +557,14 @@ class DatalabFileLoader(FileLoader):
 
         # Infer metadata from the dataset
         metadata = FileLoaderMetadata()
+        # load customized features from global config files
+        if config.dataset in customized_features_from_config.keys():
+            if metadata.custom_features is None:
+                metadata.custom_features = {}
+            metadata.custom_features.update(
+                customized_features_from_config[config.dataset]
+            )
+
         if info.languages is not None:
             metadata.supported_languages = info.languages
             # Infer languages:

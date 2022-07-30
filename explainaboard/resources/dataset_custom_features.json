@@ -1,0 +1,9 @@
+{
+  "sst2": {
+    "label": {
+      "dtype": "string",
+      "description": "the true label",
+      "num_buckets": 10
+    }
+  }
+}
