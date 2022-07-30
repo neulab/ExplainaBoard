@@ -107,7 +107,7 @@ class Loader:
         if not output_file_type:
             output_file_type = self.default_output_file_type()
 
-        # determine file loaders1
+        # determine file loaders
         try:
             self._dataset_file_loader = unwrap_or_else(
                 dataset_file_loader,
