@@ -2,7 +2,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_custom_dataset_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.tests.utils import test_artifacts_path
 from explainaboard.utils.logging import get_logger
 
@@ -13,8 +13,7 @@ class TestExtractiveQA(unittest.TestCase):
     def test_extractive_qa_en(self):
         json_en_dataset = os.path.join(self.artifact_path, "dataset-xquad-en.json")
         json_en_output = os.path.join(self.artifact_path, "output-xquad-en.json")
-        loader = get_custom_dataset_loader(
-            TaskType.qa_extractive,
+        loader = get_loader_class(TaskType.qa_extractive)(
             json_en_dataset,
             json_en_output,
             Source.local_filesystem,
@@ -65,8 +64,7 @@ class TestExtractiveQA(unittest.TestCase):
     def test_extractive_qa_zh(self):
         json_zh_dataset = os.path.join(self.artifact_path, "dataset-xquad-zh.json")
         json_zh_output = os.path.join(self.artifact_path, "output-xquad-zh.json")
-        loader = get_custom_dataset_loader(
-            TaskType.qa_extractive,
+        loader = get_loader_class(TaskType.qa_extractive)(
             json_zh_dataset,
             json_zh_output,
             Source.local_filesystem,

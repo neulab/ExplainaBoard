@@ -3,7 +3,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, TaskType
-from explainaboard.loaders.loader_registry import get_custom_dataset_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.tests.utils import test_artifacts_path
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
@@ -36,8 +36,7 @@ class TestMultilingualMultiTask(unittest.TestCase):
         task_dummy = TaskType.text_classification
         tasks = []
         for dataset, output in zip(datasets, outputs):
-            loader = get_custom_dataset_loader(
-                task_dummy,
+            loader = get_loader_class(task_dummy)(
                 dataset,
                 output,
                 dataset_file_type=file_type,
@@ -52,8 +51,7 @@ class TestMultilingualMultiTask(unittest.TestCase):
 
         # Get loaders using real `task` and `file_type`
         loaders = [
-            get_custom_dataset_loader(
-                task,
+            get_loader_class(task)(
                 dataset,
                 output,
                 dataset_file_type=file_type,

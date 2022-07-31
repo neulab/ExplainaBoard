@@ -10,6 +10,7 @@ import numpy as np
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
+from explainaboard.utils.typing_utils import unwrap_or
 
 
 class ExtractiveQAMetric(Metric):
@@ -26,7 +27,7 @@ class ExtractiveQAMetric(Metric):
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
-        config = self._get_config(config)
+        config = unwrap_or(config, self.config)
         preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
         return MetricStats(
             np.array(

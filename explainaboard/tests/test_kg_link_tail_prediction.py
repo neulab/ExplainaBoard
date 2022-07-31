@@ -4,7 +4,7 @@ import unittest
 
 from explainaboard import FileType, get_processor, TaskType
 from explainaboard.loaders.file_loader import FileLoaderMetadata
-from explainaboard.loaders.loader_registry import get_custom_dataset_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.metrics.ranking import (
     HitsConfig,
     MeanRankConfig,
@@ -25,7 +25,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         # Load the data
         dataset = self.dataset_no_custom_feature
         task = TaskType.kg_link_tail_prediction
-        loader = get_custom_dataset_loader(task, dataset, dataset)
+        loader = get_loader_class(task)(dataset, dataset)
         data = loader.load()
         # Initialize the processor and perform the processing
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
@@ -34,8 +34,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         sys_info.write_to_directory(test_output_path)
 
     def test_no_user_defined_features(self):
-        loader = get_custom_dataset_loader(
-            TaskType.kg_link_tail_prediction,
+        loader = get_loader_class(TaskType.kg_link_tail_prediction)(
             self.test_data,
             self.dataset_no_custom_feature,
             dataset_file_type=FileType.json,
@@ -62,8 +61,8 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_with_user_defined_features(self):
-        loader = get_custom_dataset_loader(  # use defaults
-            TaskType.kg_link_tail_prediction,
+        loader = get_loader_class(TaskType.kg_link_tail_prediction)(
+            # use defaults
             self.test_data,
             self.dataset_with_custom_feature,
         )
@@ -87,8 +86,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
         )
 
     def test_sort_buckets_by_value(self):
-        loader = get_custom_dataset_loader(
-            TaskType.kg_link_tail_prediction,
+        loader = get_loader_class(TaskType.kg_link_tail_prediction)(
             self.test_data,
             self.dataset_no_custom_feature,
         )
@@ -127,8 +125,7 @@ class TestKgLinkTailPrediction(unittest.TestCase):
             self.assertGreater(first_item, second_item)
 
     def test_sort_buckets_by_key(self):
-        loader = get_custom_dataset_loader(
-            TaskType.kg_link_tail_prediction,
+        loader = get_loader_class(TaskType.kg_link_tail_prediction)(
             self.test_data,
             self.dataset_no_custom_feature,
         )

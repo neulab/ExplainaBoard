@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.metrics import f1_score
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders import get_custom_dataset_loader
+from explainaboard.loaders import get_loader_class
 import explainaboard.metrics.accuracy
 import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
@@ -160,8 +160,7 @@ class TestMetric(unittest.TestCase):
         txt_output = os.path.join(
             test_artifacts_path, "machine_translation", "output.txt"
         )
-        loader = get_custom_dataset_loader(
-            TaskType.machine_translation,
+        loader = get_loader_class(TaskType.machine_translation)(
             tsv_dataset,
             txt_output,
             Source.local_filesystem,
@@ -224,8 +223,7 @@ class TestMetric(unittest.TestCase):
         json_en_output = os.path.join(
             test_artifacts_path, "extractive_qa", "output-xquad-en.json"
         )
-        loader = get_custom_dataset_loader(
-            TaskType.qa_extractive,
+        loader = get_loader_class(TaskType.qa_extractive)(
             json_en_dataset,
             json_en_output,
             Source.local_filesystem,

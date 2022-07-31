@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import final, Literal, Optional
+from dataclasses import dataclass, field
 
 from explainaboard.constants import FileType, Source
 from explainaboard.loaders.file_loader import (
@@ -10,6 +9,15 @@ from explainaboard.loaders.file_loader import (
     FileLoaderReturn,
     TextFileLoader,
 )
+from explainaboard.utils.typing_utils import unwrap, unwrap_or_else
+
+
+@dataclass
+class SupportedFileTypes:
+    """List of dataset/output file types supported by the loader."""
+
+    custom_dataset: list[FileType] = field(default_factory=list)
+    system_output: list[FileType] = field(default_factory=list)
 
 
 class Loader:
@@ -22,6 +30,30 @@ class Loader:
     :param file_loader: a dict of file loaders. To customize the loading process,
     either implement a custom FileLoader or override `load()`
     """
+
+    @classmethod
+    def from_datalab(
+        cls,
+        dataset: DatalabLoaderOption,
+        output_data: str,
+        output_source: Source | None = None,
+        output_file_type: FileType | None = None,
+        field_mapping: dict[str, str] | None = None,
+    ) -> Loader:
+        """Convenient method to initializes a loader for a dataset from datalab.
+
+        The loader downloads the dataset and merges the user provided output with the
+        dataset.
+        """
+        return cls(
+            dataset_data=dataset,
+            output_data=output_data,
+            dataset_source=Source.in_memory,
+            output_source=output_source,
+            dataset_file_type=FileType.datalab,
+            output_file_type=output_file_type,
+            field_mapping=field_mapping,
+        )
 
     @classmethod
     def default_source(cls) -> Source:
@@ -42,6 +74,13 @@ class Loader:
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         return {FileType.text: TextFileLoader()}
+
+    @classmethod
+    def supported_file_types(cls) -> SupportedFileTypes:
+        return SupportedFileTypes(
+            list(cls.default_dataset_file_loaders().keys()),
+            list(cls.default_output_file_loaders().keys()),
+        )
 
     def __init__(
         self,
@@ -69,40 +108,29 @@ class Loader:
             output_file_type = self.default_output_file_type()
 
         # determine file loaders
-        self._dataset_file_loader = self.select_file_loader(
-            "dataset", dataset_file_type, dataset_file_loader
-        )
-        self._output_file_loader = self.select_file_loader(
-            "output", output_file_type, output_file_loader
-        )
+        try:
+            self._dataset_file_loader = unwrap_or_else(
+                dataset_file_loader,
+                lambda: self.default_dataset_file_loaders()[unwrap(dataset_file_type)],
+            )
+        except KeyError:
+            raise ValueError(
+                f"{dataset_file_type} is not a supported dataset file type of "
+                f"{self.__class__.__name__}."
+            )
+        try:
+            self._output_file_loader = unwrap_or_else(
+                output_file_loader,
+                lambda: self.default_output_file_loaders()[unwrap(output_file_type)],
+            )
+        except KeyError:
+            raise ValueError(
+                f"{output_file_type} is not a supported output file type of "
+                f"{self.__class__.__name__}."
+            )
 
         self._dataset_data = dataset_data  # base64, filepath or datalab options
         self._output_data = output_data
-
-    @classmethod
-    @final
-    def select_file_loader(
-        cls,
-        split: Literal["dataset", "output"],
-        file_type: FileType,
-        custom_loader: Optional[FileLoader],
-    ) -> FileLoader:
-        if custom_loader:
-            return custom_loader
-        else:
-            if split == "dataset":
-                default_file_loaders = cls.default_dataset_file_loaders()
-            elif split == "output":
-                default_file_loaders = cls.default_output_file_loaders()
-            else:
-                raise ValueError("split must be one of [dataset, output]")
-            if file_type not in default_file_loaders:
-                raise ValueError(
-                    f"A file loader for {file_type} is not provided. "
-                    "please pass it in as an argument."
-                )
-            else:
-                return default_file_loaders[file_type]
 
     def load(self) -> FileLoaderReturn:
         dataset_loaded_data = self._dataset_file_loader.load(

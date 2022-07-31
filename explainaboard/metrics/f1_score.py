@@ -9,6 +9,7 @@ import numpy as np
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, SpanOps
+from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
@@ -47,7 +48,7 @@ class F1Score(Metric):
             * c*stat_mult + 3: number of matches with the predicted output
                 (when self.separate_match=True only)
         """
-        config = cast(F1ScoreConfig, self._get_config(config))
+        config = cast(F1ScoreConfig, unwrap_or(config, self.config))
         stat_mult: int = 4 if config.separate_match else 3
 
         id_map: dict[str, int] = {}
@@ -84,7 +85,7 @@ class F1Score(Metric):
         if agg_stats.ndim == 1:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
 
-        config = cast(F1ScoreConfig, self._get_config(config))
+        config = cast(F1ScoreConfig, unwrap_or(config, self.config))
         supported_averages = {'micro', 'macro'}
         stat_mult: int = 4 if config.separate_match else 3
         if config.average not in supported_averages:

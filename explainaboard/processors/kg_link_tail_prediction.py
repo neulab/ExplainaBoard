@@ -64,13 +64,13 @@ class KGLinkTailPredictionProcessor(Processor):
             ),
             "link_fre": feature.Value(
                 dtype="float",
-                description="average frequency of the link",
+                description="frequency of relation in training set",
                 require_training_set=True,
                 func=lambda info, x, stat: stat['link_fre'].get(x['true_link'], 0),
             ),
             "head_fre": feature.Value(
                 dtype="float",
-                description="average frequency of the head entity",
+                description="frequency of head entity in training set",
                 require_training_set=True,
                 func=lambda info, x, stat: stat['head_fre'].get(
                     x['true_head_decipher'], 0
@@ -284,6 +284,10 @@ class KGLinkTailPredictionProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
+
+        # entities not found in `entity_type_level_map` get bucketed to this value.
+        # in FB15k, "0" is the same as the most generic entity type, "Thing".
+        default_level = "0"
 
         # entities not found in `entity_type_level_map` get bucketed to this value.
         # in FB15k, "0" is the same as the most generic entity type, "Thing".
