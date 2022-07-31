@@ -61,7 +61,6 @@ class TestTextClassification(unittest.TestCase):
             output_file_type=FileType.text,
         )
         data = loader.load()
-
         metadata = {
             "task_name": TaskType.text_classification.value,
             "dataset_name": "sst2",

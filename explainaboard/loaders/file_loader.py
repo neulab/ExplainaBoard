@@ -492,7 +492,7 @@ class DatalabLoaderOption:
     dataset: str
     subdataset: str | None = None
     split: str = "test"
-    custom_features: list[str] | None = None
+    custom_features: dict | None = None
 
 
 class DatalabFileLoader(FileLoader):
@@ -533,14 +533,13 @@ class DatalabFileLoader(FileLoader):
         data_processors = {}
         customized_features_from_config = get_custmomized_features()
         if config.dataset in customized_features_from_config.keys():
-            feature_names = list(customized_features_from_config[config.dataset].keys())
-            config.custom_features = feature_names + (
-                [] if config.custom_features is None else config.custom_features
-            )
-            # get data_processors
-            for feature_name, feature_config in customized_features_from_config[
-                config.dataset
-            ].items():
+            if config.custom_features is None:
+                config.custom_features = customized_features_from_config[config.dataset]
+            else:
+                config.custom_features.update(
+                    customized_features_from_config[config.dataset]
+                )
+            for feature_name, feature_config in config.custom_features.items():
                 if "func" in feature_config.keys():
                     data_processors[feature_name] = get_data_processor(
                         feature_name, eval(feature_config["func"])
@@ -571,18 +570,15 @@ class DatalabFileLoader(FileLoader):
                 src_name = cast(str, self._fields[idx].src_name)
                 self._fields[idx].src_name = getattr(info.task_templates[0], src_name)
         if config.custom_features is not None:
-            for feat in config.custom_features:
+            for feat in config.custom_features.keys():
                 self._fields.append(FileLoaderField(feat, feat, None))
 
         # Infer metadata from the dataset
         metadata = FileLoaderMetadata()
-        # load customized features from global config files
-        if config.dataset in customized_features_from_config.keys():
+        if config.custom_features is not None:
             if metadata.custom_features is None:
                 metadata.custom_features = {}
-            metadata.custom_features.update(
-                customized_features_from_config[config.dataset]
-            )
+            metadata.custom_features.update(config.custom_features)
 
         if info.languages is not None:
             metadata.supported_languages = info.languages

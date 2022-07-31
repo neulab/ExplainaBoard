@@ -13,8 +13,8 @@
     },
     "long_text": {
       "dtype": "string",
-      "description": "text length",
-      "num_buckets": 4,
+      "description": "whether a text is long",
+      "num_buckets": 2,
       "func": "lambda x:'Long Text' if len(x['text'].split()) > 20 else 'Short Text'"
     }
   },
