@@ -447,7 +447,9 @@ def main():
             metadata["task_name"] = task
 
             processor = get_processor(task=task)
-            report = processor.process(metadata=metadata, sys_output=system_dataset)
+            report = processor.process(
+                metadata=metadata, sys_output=system_dataset.samples
+            )
             reports.append(report)
 
             # print to the console

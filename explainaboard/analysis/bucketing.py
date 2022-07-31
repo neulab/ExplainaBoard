@@ -34,7 +34,7 @@ def continuous(
     cases = [x1 for x1, x2 in sample_features]
     vals = np.array([x2 for x1, x2 in sample_features])
     # Function to convert numpy datatypes to Python native types
-    conv = int if np.issubdtype(vals[0], int) else float
+    conv = int if np.issubdtype(type(vals[0]), int) else float
     # Special case of one bucket
     if bucket_number == 1:
         max_val, min_val = conv(np.max(vals)), conv(np.min(vals))

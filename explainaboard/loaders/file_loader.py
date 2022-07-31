@@ -371,7 +371,6 @@ class FileLoader:
         # process the actual data
         for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
-
             for field in fields:  # parse data point according to fields
                 parsed_data_point[field.target_name] = self.parse_data(
                     self.find_field(data_point, field, field_mapping), field

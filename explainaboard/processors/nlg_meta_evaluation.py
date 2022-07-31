@@ -6,11 +6,7 @@ from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
 from explainaboard.analysis.feature import FeatureType
-from explainaboard.analysis.feature_funcs import (
-    count_tokens,
-    get_basic_words,
-    get_lexical_richness,
-)
+from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.nlg_meta_evaluation import (
     KtauCorrelationConfig,
@@ -91,21 +87,6 @@ class NLGMetaEvaluationProcessor(Processor):
                 description="ratio of system output length to reference length",
                 func=lambda info, x, c: c.features['sys_length']
                 / c.features['ref_length'],
-            ),
-            "text_chars": feature.Value(
-                dtype="float",
-                description="text length in characters",
-                func=lambda info, x, c: len(x['text']),
-            ),
-            "basic_words": feature.Value(
-                dtype="float",
-                description="the ratio of basic words",
-                func=lambda info, x, c: get_basic_words(x['text']),
-            ),
-            "lexical_richness": feature.Value(
-                dtype="float",
-                description="lexical diversity",
-                func=lambda info, x, c: get_lexical_richness(x['text']),
             ),
         }
         continuous_features = [

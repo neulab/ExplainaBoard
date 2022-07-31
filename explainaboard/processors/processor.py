@@ -200,7 +200,10 @@ class Processor(metaclass=abc.ABCMeta):
         if custom_features is not None:
             for level_name, feature_content in custom_features.items():
                 level_map[level_name].features.update(
-                    {k: FeatureType.from_dict(v) for k, v in feature_content.items()}
+                    {
+                        k: (FeatureType.from_dict(v) if isinstance(v, dict) else v)
+                        for k, v in feature_content.items()
+                    }
                 )
         return analysis_levels
 
