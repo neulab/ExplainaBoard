@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from io import StringIO
 import itertools
 import json
-import multiprocessing
 from typing import (
     Any,
     cast,
@@ -554,10 +553,10 @@ class DatalabFileLoader(FileLoader):
         )
 
         # process data based on customized data processors
+        # TODO(multiprocessing.cpu_count()) -> AttributeError: module 'threading'
+        #  has no attribute '_Condition'
         for feature_name, data_processor in data_processors.items():
-            dataset = dataset.apply(
-                data_processor, num_proc=multiprocessing.cpu_count(), mode="memory"
-            )
+            dataset = dataset.apply(data_processor, num_proc=1, mode="memory")
 
         # TODO(gneubig): patch for an inconsistency in datalab, where DatasetDict
         #  doesn't have info
