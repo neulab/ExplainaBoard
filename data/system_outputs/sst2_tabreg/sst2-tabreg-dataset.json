@@ -1,11 +1,22 @@
 {
   "metadata": {
     "custom_features": {
-      "total_words": {
-        "dtype": "float",
-        "description": "total number of words in the input",
-        "num_buckets": 4
+      "example": {
+        "total_words": {
+          "dtype": "float",
+          "description": "total number of words"
+        }
       }
+    },
+    "custom_analyses": {
+      "example": [
+        {
+          "_type": "BucketAnalysis",
+          "feature": "total_words",
+          "num_buckets": 4,
+          "method": "continuous"
+        }
+      ]
     }
   },
   "examples": [
