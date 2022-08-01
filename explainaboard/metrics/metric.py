@@ -53,6 +53,8 @@ class MetricConfig(dict):
     source_language: str | None = None
     target_language: str | None = None
     cls_name: str = ''
+    # The external statistics for metrics
+    external_stats: np.ndarray | None = None
 
     def __post_init__(self):
         # Save the class name

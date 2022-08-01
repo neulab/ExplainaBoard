@@ -22,7 +22,6 @@ UNANNOTATED_SYMBOL = -1
 @register_metric_config
 class LikertScoreConfig(MetricConfig):
     aspect: str = "fluency"
-    stats: list[list]|None = None
     n_annotators: int = 3
     categories: int = 5
     instruction: str = "Annotation instruction"
@@ -49,30 +48,42 @@ class LikertScore(Metric):
     def is_simple_average(self, stats: MetricStats):
         return False
 
-    def calc_stats_from_external(self, config: Optional[MetricConfig] = None) -> MetricStats:
+    def calc_stats_from_external(
+        self, config: Optional[MetricConfig] = None
+    ) -> MetricStats:
 
         config = cast(LikertScoreConfig, self._get_config(config))
-        return MetricStats(
-            np.array(
-                config.stats
-            )
-        )
+        return MetricStats(config.external_stats)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
         config = cast(LikertScoreConfig, self._get_config(config))
 
-        # "-1" indicates samples to be evaluated
-        return MetricStats(
-            np.array(
-                [
-                    [UNANNOTATED_SYMBOL] * config.n_annotators
-                    for t, p in zip(true_data, pred_data)
-                ]
+        if config is not None and config.external_stats is not None:
+            n_sample, n_annotators = config.external_stats.shape
+            if n_sample != len(true_data):
+                raise ValueError(
+                    f"the row number of `external_stats` should be equal "
+                    f"to the number of test samples: {len(true_data)}"
+                )
+            if n_annotators != config.n_annotators:
+                raise ValueError(
+                    f"the column number of `external_stats`"
+                    f"should be equal to n_annotators: "
+                    f"{config.n_annotators}"
+                )
+            return MetricStats(config.external_stats)
+        else:
+            # "-1" indicates samples to be evaluated
+            return MetricStats(
+                np.array(
+                    [
+                        [UNANNOTATED_SYMBOL] * config.n_annotators
+                        for t, p in zip(true_data, pred_data)
+                    ]
+                )
             )
-        ) if config.stats is None else MetricStats(np.array(config.stats))
-
 
     def calc_agreement(self, stats: MetricStats) -> float:
         data = stats.get_data()

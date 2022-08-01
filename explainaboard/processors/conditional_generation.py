@@ -20,8 +20,8 @@ from explainaboard.info import (
 )
 import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.external_eval import EXTERNAL_METRICS, LikertScoreConfig
+from explainaboard.metrics.f1_score import F1ScoreConfig
 import explainaboard.metrics.metric
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
@@ -207,6 +207,7 @@ class ConditionalGenerationProcessor(Processor):
             )
             for x in defaults_automated
         ]
+
     @classmethod
     def full_metric_list(cls, source_language=None, target_language=None):
         full_metrics_automated = [
@@ -346,7 +347,9 @@ class ConditionalGenerationProcessor(Processor):
         # For human metric
         for metric_config in metric_configs_human:
             metric_stats.append(
-                metric_config.to_metric().calc_stats_from_data(true_data, pred_data)
+                metric_config.to_metric().calc_stats_from_data(
+                    true_data, pred_data, metric_config
+                )
             )
 
         # Share the request result with all stats functions

@@ -141,6 +141,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
             )
             for x in defaults_automated
         ]
+
     def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
         return get_oracle(existing_features)["oracle_position"]
 
