@@ -14,7 +14,7 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
     FileLoaderMetadata,
 )
-from explainaboard.metrics.registry import metric_name_to_config
+from explainaboard.metrics.registry import get_metric_config_class
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
@@ -429,7 +429,7 @@ def main():
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
             metric_configs = [
-                metric_name_to_config(name, source_language, target_language)
+                get_metric_config_class(name)(name, source_language, target_language)
                 for name in metric_names
             ]
             metadata["metric_configs"] = metric_configs

@@ -8,7 +8,6 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
-from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -64,8 +63,9 @@ class EaaSMetricStats(MetricStats):
         return MetricStats(sdata[indices])
 
 
+# NOTE(odashi): Not register this config to the registry.
+# This metric class has different usage than other metrics.
 @dataclass
-@register_metric_config
 class EaaSMetricConfig(MetricConfig):
     def to_metric(self):
         return EaaSMetric(self)
