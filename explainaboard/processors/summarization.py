@@ -13,7 +13,6 @@ import numpy
 from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.human_eval import LikertScoreConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -136,21 +135,12 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     @classmethod
     def default_metrics(cls, source_language=None, target_language=None):
         defaults_automated = ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
-        defaults_human = [
-            "LikertScore_fluency",
-            "LikertScore_coherence",
-            "LikertScore_factuality",
-        ]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language
             )
             for x in defaults_automated
-        ] + [
-            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
-            for x in defaults_human
         ]
-
     def _get_oracle_position(self, sys_info: SysOutputInfo, existing_features: dict):
         return get_oracle(existing_features)["oracle_position"]
 

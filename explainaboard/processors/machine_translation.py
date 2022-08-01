@@ -8,7 +8,6 @@ from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.human_eval import LikertScoreConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -48,15 +47,11 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
     @classmethod
     def default_metrics(cls, source_language=None, target_language=None):
         defaults_automated = ['bleu', 'length_ratio']
-        defaults_human = ["LikertScore_fluency", "LikertScore_coherence"]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language
             )
             for x in defaults_automated
-        ] + [
-            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
-            for x in defaults_human
         ]
 
     def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):

@@ -21,7 +21,7 @@ from explainaboard.info import (
 import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
-from explainaboard.metrics.human_eval import HUMAN_METRICS, LikertScoreConfig
+from explainaboard.metrics.external_eval import EXTERNAL_METRICS, LikertScoreConfig
 import explainaboard.metrics.metric
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
@@ -201,17 +201,12 @@ class ConditionalGenerationProcessor(Processor):
     @classmethod
     def default_metrics(cls, source_language=None, target_language=None):
         defaults_automated = ['rouge1', 'rouge2', 'rougeL', 'bleu', 'length_ratio']
-        defaults_human = ["LikertScore_fluency", "LikertScore_coherence"]
         return [
             EaaSMetricConfig(
                 name=x, source_language=source_language, target_language=target_language
             )
             for x in defaults_automated
-        ] + [
-            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
-            for x in defaults_human
         ]
-
     @classmethod
     def full_metric_list(cls, source_language=None, target_language=None):
         full_metrics_automated = [
@@ -329,7 +324,7 @@ class ConditionalGenerationProcessor(Processor):
         metric_names_automated = []
         metric_configs_human = []
         for metric_config in unwrap_generator(sys_info.metric_configs):
-            if metric_config.name not in HUMAN_METRICS:
+            if metric_config.name not in EXTERNAL_METRICS:
                 metric_names_automated.append(metric_config.name)
             else:
                 metric_configs_human.append(metric_config)
