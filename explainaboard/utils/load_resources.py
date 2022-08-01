@@ -5,7 +5,7 @@ from typing import Optional
 from explainaboard.config import CUSTOMIZED_FEATURES_CONFIG_FILE
 
 
-def get_custmomized_features(path_file: Optional[str] = None) -> dict:
+def get_customized_features(path_file: Optional[str] = None) -> dict:
     """
     get customized features from configure file
     :return: a dict

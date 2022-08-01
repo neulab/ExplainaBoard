@@ -24,7 +24,7 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.constants import Source
-from explainaboard.utils.load_resources import get_custmomized_features
+from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
 
@@ -529,7 +529,7 @@ class DatalabFileLoader(FileLoader):
         config = narrow(DatalabLoaderOption, data)
 
         # load customized features from global config files
-        customized_features_from_config = get_custmomized_features()
+        customized_features_from_config = get_customized_features()
         if config.dataset in customized_features_from_config.keys():
             feature_names = list(customized_features_from_config[config.dataset].keys())
             config.custom_features = feature_names + (
