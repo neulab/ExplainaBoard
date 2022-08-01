@@ -11,6 +11,7 @@ class TaskType(str, Enum):
     aspect_based_sentiment_classification = "aspect-based-sentiment-classification"
     kg_link_tail_prediction = "kg-link-tail-prediction"
     qa_multiple_choice = "qa-multiple-choice"
+    qa_open_domain = "qa-open-domain"
     conditional_generation = "conditional-generation"
     word_segmentation = "word-segmentation"
     language_modeling = "language-modeling"
@@ -18,6 +19,7 @@ class TaskType(str, Enum):
     cloze_mutiple_choice = "cloze-multiple-choice"
     cloze_generative = "cloze-generative"
     grammatical_error_correction = "grammatical-error-correction"
+    nlg_meta_evaluation = "nlg-meta-evaluation"
     tabular_regression = "tabular-regression"
     tabular_classification = "tabular-classification"
 

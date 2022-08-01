@@ -123,6 +123,10 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.
                 name=TaskType.qa_multiple_choice,
                 description="Answer a question from multiple options",
             ),
+            Task(
+                name=TaskType.qa_open_domain,
+                description="Answer a question in an open domain",
+            ),
         ],
     ),
     TaskCategory(
@@ -186,6 +190,16 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_kg_link_tail_predict
             Task(
                 name=TaskType.language_modeling,
                 description="Predict the log probability of words in a sequence",
+            )
+        ],
+    ),
+    TaskCategory(
+        "nlg-meta-evaluation",
+        "evaluate evaluation metrics.  ",
+        [
+            Task(
+                name=TaskType.nlg_meta_evaluation,
+                description="""evaluate evaluation metrics.""",
             )
         ],
     ),

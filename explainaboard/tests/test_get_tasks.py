@@ -1,7 +1,7 @@
 import unittest
 
 from explainaboard import get_task_categories
-from explainaboard.loaders.loader_registry import get_supported_file_types_for_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.processors.processor_registry import get_metric_list_for_processor
 
 
@@ -20,7 +20,7 @@ class TestTasks(unittest.TestCase):
             self.assertIsNotNone(task_category.name)
             for task in task_category.tasks:
                 supported_metrics = get_metric_list_for_processor(task.name)
-                supported_formats = get_supported_file_types_for_loader(task.name)
+                supported_formats = get_loader_class(task.name).supported_file_types()
                 self.assertEqual(
                     len(supported_metrics),
                     len(set([x.name for x in supported_metrics])),

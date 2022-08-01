@@ -3,7 +3,7 @@ import os
 import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_custom_dataset_loader
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.tests.utils import test_artifacts_path
 
 
@@ -14,8 +14,7 @@ class TestMachineTranslation(unittest.TestCase):
     json_output_with_features = os.path.join(artifact_path, "output_with_features.json")
 
     def test_load_tsv(self):
-        loader = get_custom_dataset_loader(
-            TaskType.machine_translation,
+        loader = get_loader_class(TaskType.machine_translation)(
             self.tsv_dataset,
             self.txt_output,
             Source.local_filesystem,
@@ -38,8 +37,7 @@ class TestMachineTranslation(unittest.TestCase):
         )
 
     def test_generate_system_analysis(self):
-        loader = get_custom_dataset_loader(
-            TaskType.machine_translation,
+        loader = get_loader_class(TaskType.machine_translation)(
             self.tsv_dataset,
             self.txt_output,
             Source.local_filesystem,
@@ -78,8 +76,7 @@ class TestMachineTranslation(unittest.TestCase):
         self.assertDictEqual(mt_features, {**mt_features, **condgen_features_1})
 
     def test_custom_features(self):
-        loader = get_custom_dataset_loader(
-            TaskType.machine_translation,
+        loader = get_loader_class(TaskType.machine_translation)(
             self.tsv_dataset,
             self.json_output_with_features,
             Source.local_filesystem,

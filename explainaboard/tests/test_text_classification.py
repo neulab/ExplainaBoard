@@ -4,10 +4,7 @@ import unittest
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption, FileLoaderMetadata
-from explainaboard.loaders.loader_registry import (
-    get_custom_dataset_loader,
-    get_datalab_loader,
-)
+from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.tests.utils import load_file_as_str, test_artifacts_path
 
 
@@ -19,8 +16,8 @@ class TestTextClassification(unittest.TestCase):
     json_output = os.path.join(artifact_path, "output_user_metadata.json")
 
     def test_load_custom_dataset_tsv(self):
-        loader = get_custom_dataset_loader(  # use defaults
-            TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification)(
+            # use defaults
             self.tsv_dataset,
             self.txt_output,
         )
@@ -37,8 +34,7 @@ class TestTextClassification(unittest.TestCase):
         )
 
     def test_load_custom_dataset_json(self):
-        loader = get_custom_dataset_loader(
-            TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification)(
             self.json_dataset,
             self.json_output,
             dataset_file_type=FileType.json,
@@ -58,33 +54,35 @@ class TestTextClassification(unittest.TestCase):
         )
 
     def test_load_dataset_from_datalab(self):
-        loader = get_datalab_loader(
-            TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("sst2"),
             output_data=os.path.join(self.artifact_path, "output_sst2.txt"),
             output_source=Source.local_filesystem,
             output_file_type=FileType.text,
         )
         data = loader.load()
+
+        metadata = {
+            "task_name": TaskType.text_classification.value,
+            "dataset_name": "sst2",
+            "metric_names": ["Accuracy"],
+            # don't forget this, otherwise the user-defined features will be ignored
+            "custom_features": data.metadata.custom_features,
+        }
+
+        processor = get_processor(TaskType.text_classification.value)
+
+        sys_info = processor.process(metadata, data.samples)
+        processor.print_bucket_info(sys_info.results.fine_grained)
+
         self.assertEqual(len(data), 1821)
-        self.assertEqual(
-            data[0],
-            {
-                'text': 'if you sometimes like to go to the movies to have fun , '
-                'wasabi is a good place to start .',
-                'true_label': 'positive',
-                'id': '0',
-                'predicted_label': 'positive',
-            },
-        )
 
     def test_process(self):
         metadata = {
             "task_name": TaskType.text_classification,
             "metric_names": ["Accuracy", "F1Score"],
         }
-        loader = get_custom_dataset_loader(
-            TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification)(
             load_file_as_str(self.tsv_dataset),
             load_file_as_str(self.txt_output),
             Source.in_memory,
@@ -106,8 +104,7 @@ class TestTextClassification(unittest.TestCase):
             "dataset_name": "ag_news",
             "reload_stat": False,
         }
-        loader = get_custom_dataset_loader(
-            TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification)(
             self.json_dataset,
             self.json_output,
             Source.local_filesystem,
@@ -124,8 +121,7 @@ class TestTextClassification(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_process_metadata_in_output_file(self):
-        loader = get_custom_dataset_loader(
-            TaskType.text_classification,
+        loader = get_loader_class(TaskType.text_classification)(
             self.json_dataset,
             self.json_output,
             Source.local_filesystem,

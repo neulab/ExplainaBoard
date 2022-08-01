@@ -193,12 +193,12 @@ pythonic interface provided by ExplainaBoard.
 First, a simple example of using Python access to data analysis
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 
 # Load the data
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 # Initialize the processor and perform the processing
 processor = get_processor(TaskType.kg_link_tail_prediction.value)
@@ -215,13 +215,13 @@ The following code gives an example.
 Below is an example of sorting alphabetically by bucket value:
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig,
   MeanRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 
 metadata = {
@@ -257,13 +257,13 @@ The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set t
 The value of K in `Hits` metric could also be specified by users when needed. Below is an example of how to use this configuration while performing bucket sorting by the custom metric:
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 
 metadata = {
@@ -289,13 +289,13 @@ sys_info = processor.process(metadata, data.samples)
 Finally, an example of sorting by the number of bucket examples:
 
 ```python
-from explainaboard import TaskType, get_custom_dataset_loader, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metric import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
 dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
-loader = get_custom_dataset_loader(task, dataset, dataset)
+loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 
 metadata = {
@@ -327,3 +327,79 @@ metadata = {
 }
 ```
 [Here](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_system_details.py) is a complete code.
+
+### Meta/Quantitative Analysis
+A preliminary version of the rank-flipping quantitative analysis has been implemented. Example code:
+
+```python
+from explainaboard import RankFlippingMetaAnalysis, TaskType, get_custom_dataset_loader, get_processor
+
+# get the reports from two models you want to compare
+model1_sys_out = "./FB15K-237-models/rotate_all_buckets.json"
+model2_sys_out = "./FB15K-237-models/rescal_all_buckets.json"
+
+# rotate
+dataset = model1_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model1_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+
+# rescal
+dataset = model2_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model2_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+
+# meta-analysis
+meta_analysis = RankFlippingMetaAnalysis(
+    model1_report = model1_report, 
+    model2_report = model2_report
+)
+meta_analysis_results = meta_analysis.run_meta_analysis()
+print(meta_analysis_results)
+```
+
+Meta-analysis for bucket-level ranking tables:
+```python
+from explainaboard import RankingMetaAnalysis, TaskType, get_custom_dataset_loader, get_processor
+
+# get the reports from two models you want to compare
+model1_sys_out = "./FB15K-237-models/rotate_all_buckets.json"
+model2_sys_out = "./FB15K-237-models/rescal_all_buckets.json"
+...
+
+# rotate
+dataset = model1_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model1_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+
+# rescal
+dataset = model2_sys_out
+task = TaskType.kg_link_tail_prediction
+loader = get_custom_dataset_loader(task, dataset, dataset)
+data = loader.load()
+processor = get_processor(TaskType.kg_link_tail_prediction.value)
+model2_report = processor.process(metadata={'custom_features': data.metadata.custom_features}, sys_output=data.samples)
+...
+
+# meta-analysis
+meta_analysis = RankingMetaAnalysis(
+    model_reports = {
+        'rotate':    model1_report, 
+        'rescal':    model2_report,
+        'conve':     model3_report,
+        'distmult':  model4_report,
+        'transe':    model5_report,
+        'tucker':    model6_report,
+    }
+)
+meta_analysis_results = meta_analysis.run_meta_analysis()
+meta_analysis.get_ranking_table('Hits5')
+```

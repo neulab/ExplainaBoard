@@ -10,7 +10,9 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
+    nlg_meta_evaluation,
     qa_multiple_choice,
+    qa_open_domain,
     sequence_labeling,
     tabular_classification,
     tabular_regression,
@@ -18,8 +20,7 @@ from explainaboard.loaders import (
     text_pair_classification,
 )
 
-get_datalab_loader = loader_registry.get_datalab_loader
-get_custom_dataset_loader = loader_registry.get_custom_dataset_loader
+get_loader_class = loader_registry.get_loader_class
 DatalabLoaderOption = file_loader.DatalabLoaderOption
 
 __all__ = [
@@ -38,4 +39,6 @@ __all__ = [
     'text_pair_classification',
     'cloze_generative',
     'grammatical_error_correction',
+    'qa_open_domain',
+    'nlg_meta_evaluation',
 ]

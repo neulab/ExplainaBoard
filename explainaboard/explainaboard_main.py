@@ -3,14 +3,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import sys
 
-from explainaboard import (
-    get_custom_dataset_loader,
-    get_datalab_loader,
-    get_processor,
-    TaskType,
-)
+from explainaboard import get_loader_class, get_processor, TaskType
 from explainaboard.analyzers import get_pairwise_performance_gap
 from explainaboard.analyzers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
@@ -21,6 +15,7 @@ from explainaboard.loaders.file_loader import (
     FileLoaderMetadata,
 )
 from explainaboard.metrics.registry import metric_name_to_config
+from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
@@ -361,8 +356,7 @@ def main():
         }
         if custom_dataset_paths:  # load custom datasets
             loaders = [
-                get_custom_dataset_loader(
-                    task,
+                get_loader_class(task)(
                     dataset,
                     output,
                     Source.local_filesystem,
@@ -383,8 +377,7 @@ def main():
             if not dataset:
                 raise ValueError("neither custom_dataset_paths or dataset is defined")
             loaders = [
-                get_datalab_loader(
-                    task,
+                get_loader_class(task).from_datalab(
                     DatalabLoaderOption(dataset, sub_dataset, split=split),
                     sys_output,
                     Source.local_filesystem,
@@ -481,17 +474,12 @@ def main():
                     f"{output_dir_figures}/{x_file_name}",
                 )
 
-        if args.report_json is not None:
-            report_file = open(args.report_json, 'w')
-        else:
-            report_file = sys.stdout
-        if len(system_outputs) == 1:  # individual system analysis
-            reports[0].print_as_json(file=report_file)
-        elif len(system_outputs) == 2:  # pairwise analysis
-            compare_analysis = get_pairwise_performance_gap(reports[0], reports[1])
-            compare_analysis.print_as_json(file=report_file)
-        if args.report_json is not None:
-            report_file.close()
+        with text_writer(args.report_json) as report_file:
+            if len(system_outputs) == 1:  # individual system analysis
+                reports[0].print_as_json(file=report_file)
+            elif len(system_outputs) == 2:  # pairwise analysis
+                compare_analysis = get_pairwise_performance_gap(reports[0], reports[1])
+                compare_analysis.print_as_json(file=report_file)
 
 
 if __name__ == '__main__':

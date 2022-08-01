@@ -1,0 +1,38 @@
+{
+  "sst2": {
+    "label": {
+      "dtype": "string",
+      "description": "the true label",
+      "num_buckets": 2
+    }
+  },
+  "natural_questions_comp_gen": {
+    "question_types": {
+      "dtype": "string",
+      "description": "the question type",
+      "num_buckets": 5
+    }
+  },
+  "sumeval2022": {
+      "overall_setting": {
+        "dtype": "string",
+        "description": "overall setting",
+        "num_buckets": 20
+      },
+      "dataset_name": {
+        "dtype": "string",
+        "description": "dataset",
+        "num_buckets": 4
+      },
+      "model_name": {
+        "dtype": "string",
+        "description": "model name",
+        "num_buckets": 2
+      },
+      "target_lang_data_size": {
+        "dtype": "float",
+        "description": "dataset size for target language",
+        "num_buckets": 6
+      }
+  }
+}

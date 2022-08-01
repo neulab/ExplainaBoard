@@ -26,7 +26,12 @@ class Accuracy(Metric):
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
         return MetricStats(
-            np.array([(1.0 if x == y else 0.0) for x, y in zip(true_data, pred_data)])
+            np.array(
+                [
+                    (1.0 if y == x or isinstance(x, list) and y in x else 0.0)
+                    for x, y in zip(true_data, pred_data)
+                ]
+            )
         )
 
 

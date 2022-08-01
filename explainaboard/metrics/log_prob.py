@@ -7,6 +7,7 @@ import numpy as np
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import register_metric_config
+from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
@@ -53,7 +54,7 @@ class LogProb(Metric):
         """
         if agg_stats.ndim == 1:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
-        config = cast(LogProbConfig, self._get_config(config))
+        config = cast(LogProbConfig, unwrap_or(config, self.config))
         val = agg_stats if agg_stats.size == 1 else agg_stats[:, 0] / agg_stats[:, 1]
         if config.ppl:
             val = np.exp(-val)
