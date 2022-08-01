@@ -53,15 +53,14 @@ class SysOutputInfo:
         system_name (str): the name of the system .
         dataset_name (str): the dataset used of the system.
         sub_dataset_name (str): the name of the sub-dataset.
+        dataset_split (str): the name of the split.
         source_language (str): the language of the input
         target_language (str): the language of the output
-        code (str): the url of the code.
-        download_link (str): the url of the system output.
-        paper (Paper, optional): the published paper of the system.
-        features (Features, optional): the features used to describe system output's
-            column type.
-        is_print_case (bool): Whether or not to print out cases
-        conf_value (float): The p-value of the confidence interval
+        reload_stat (bool): whether to reload the statistics or not
+        system_details (dict): a dictionary of system details
+        source_tokenizer (Tokenizer): the tokenizer for source sentences
+        target_tokenizer (Tokenizer): the tokenizer for target sentences
+        analysis_levels: the levels of analysis to perform
     """
 
     # set in the system_output scripts
@@ -73,7 +72,6 @@ class SysOutputInfo:
     source_language: str | None = None
     target_language: str | None = None
     reload_stat: bool = True
-    is_print_case: bool = True
     conf_value: float = 0.05
     system_details: Optional[dict] = None
     source_tokenizer: Optional[Tokenizer] = None
@@ -81,9 +79,6 @@ class SysOutputInfo:
     analysis_levels: Optional[list[AnalysisLevel]] = None
 
     # set later
-    # code: str = None
-    # download_link: str = None
-    # paper_info: PaperInfo = PaperInfo()
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:

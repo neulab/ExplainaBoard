@@ -107,7 +107,12 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
             k for k, v in new_examp_features.items() if ('float' in unwrap(v.dtype))
         ]
         new_examp_analyses: Sequence[Analysis] = [
-            BucketAnalysis(x, method="continuous") for x in new_examp_cont_features
+            BucketAnalysis(
+                description=new_examp_features[x].description,
+                feature=x,
+                method="continuous",
+            )
+            for x in new_examp_cont_features
         ]
         f[0].features.update(new_examp_features)
         f[0].analyses = list(itertools.chain(f[0].analyses, new_examp_analyses))

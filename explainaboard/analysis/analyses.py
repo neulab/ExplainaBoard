@@ -51,6 +51,15 @@ class AnalysisResult:
 
 @dataclass
 class Analysis:
+    """
+    A super-class for analyses, which take in examples and analyze their features in
+    some way. The exact analysis performed will vary depending on the inheriting
+    class.
+    :param description: a textual description of the analysis to be performed
+    """
+
+    description: str | None
+
     def perform(
         self,
         cases: list[AnalysisCase],
@@ -76,6 +85,7 @@ class Analysis:
         type = dikt.pop('_type')
         if type == 'BucketAnalysis':
             return BucketAnalysis(
+                description=dikt.get('description'),
                 feature=dikt['feature'],
                 method=dikt.get('method', 'continuous'),
                 number=dikt.get('number', 4),
@@ -84,6 +94,7 @@ class Analysis:
             )
         elif type == 'ComboCountAnalysis':
             return ComboCountAnalysis(
+                description=dikt.get('description'),
                 features=dikt['features'],
             )
 

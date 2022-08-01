@@ -81,7 +81,10 @@ class QAMultipleChoiceProcessor(Processor):
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
         analyses: list[BucketAnalysis] = [
-            BucketAnalysis(x, method="continuous") for x in continuous_features
+            BucketAnalysis(
+                description=features[x].description, feature=x, method="continuous"
+            )
+            for x in continuous_features
         ]
 
         return [

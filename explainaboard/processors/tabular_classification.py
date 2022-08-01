@@ -41,14 +41,22 @@ class TextClassificationProcessor(Processor):
         # Create analyses
         analyses: list[Analysis] = [
             BucketAnalysis(
+                description=features["true_label"].description,
                 feature="true_label",
                 method="discrete",
                 number=15,
             ),
-            ComboCountAnalysis(features=("true_label", "predicted_label")),
+            ComboCountAnalysis(
+                description="confusion matrix",
+                features=("true_label", "predicted_label"),
+            ),
         ]
         for x in continuous_features:
-            analyses.append(BucketAnalysis(x, method="continuous"))
+            analyses.append(
+                BucketAnalysis(
+                    description=features[x].description, feature=x, method="continuous"
+                )
+            )
 
         return [
             AnalysisLevel(

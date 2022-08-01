@@ -33,7 +33,13 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
             func=lambda info, x, c: c.features['source_length']
             / c.features['reference_length'],
         )
-        f[0].analyses.append(BucketAnalysis('attr_compression', method="continuous"))
+        f[0].analyses.append(
+            BucketAnalysis(
+                description=f[0].features['attr_compression'].description,
+                feature='attr_compression',
+                method="continuous",
+            )
+        )
 
         return f
 

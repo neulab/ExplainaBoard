@@ -95,7 +95,11 @@ class NLGMetaEvaluationProcessor(Processor):
         # Create analyses
         analyses: list[Analysis] = []
         for x in continuous_features:
-            analyses.append(BucketAnalysis(x, method="continuous"))
+            analyses.append(
+                BucketAnalysis(
+                    description=features[x].description, feature=x, method="continuous"
+                )
+            )
 
         return [
             AnalysisLevel(
