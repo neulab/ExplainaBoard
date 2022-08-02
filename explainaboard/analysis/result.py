@@ -15,11 +15,13 @@ class Result:
     analyses: Optional[list[list[AnalysisResult]]] = None
 
     @classmethod
-    def dict_conv(cls, k: str, v: dict):
+    def dict_conv(cls, k: str, v: list[list[dict]] | None):
         if k == 'overall':
-            return [[Performance.from_dict(v2) for v2 in v1] for v1 in v]
+            return [[Performance.from_dict(v2) for v2 in v1] for v1 in v] if v else None
         elif k == 'analyses':
-            return [[AnalysisResult.from_dict(v2) for v2 in v1] for v1 in v]
+            return (
+                [[AnalysisResult.from_dict(v2) for v2 in v1] for v1 in v] if v else None
+            )
         else:
             raise NotImplementedError
 

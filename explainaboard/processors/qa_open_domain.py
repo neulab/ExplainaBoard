@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import cast, List
+from typing import List
 
 from datalabs import aggregating
 
@@ -19,41 +19,35 @@ from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQACon
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
-@register_processor(TaskType.qa_extractive)
-class QAExtractiveProcessor(Processor):
+@register_processor(TaskType.qa_open_domain)
+class QAOpenDomainProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.qa_extractive
+        return TaskType.qa_open_domain
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_features(self) -> list[AnalysisLevel]:
         features = {
-            "context": feature.Value("string"),
             "question": feature.Value("string"),
-            "id": feature.Value("string"),
+            # "question_types": feature.Sequence(feature=feature.Value("string")),
             "answers": feature.Sequence(feature=feature.Value("string")),
-            "predicted_answers": feature.Value("string"),
-            "context_length": feature.Value(
-                dtype="float",
-                description="context length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['context']),
-            ),
             "question_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
+            # "question_type": feature.Value(
+            #     dtype="string",
+            #     description="type of the question",
+            #     func=lambda info, x, c: ' '.join(x['question_types']),
+            # ),
             "answer_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
-                    info,
-                    x['answers']['text'][0]
-                    if isinstance(x["answers"]["text"], list)
-                    else x['answers']['text'],
-                    side='target',
+                    info, x['answers']['text'], side='target'
                 ),
             ),
             "num_oov": feature.Value(
@@ -90,7 +84,7 @@ class QAExtractiveProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
+                analyses=narrow(List[Analysis], analyses),
             )
         ]
 
@@ -98,34 +92,39 @@ class QAExtractiveProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        if source_language != target_language:
-            raise ValueError(
-                'Source and target language must be equal for extractive '
-                f'QA, but got {source_language} and {target_language}'
-            )
         return [
-            F1ScoreQAConfig(
-                name='F1',
-                source_language=source_language,
-                target_language=target_language,
-            ),
             ExactMatchQAConfig(
                 name='ExactMatch',
                 source_language=source_language,
                 target_language=target_language,
             ),
+            F1ScoreQAConfig(
+                name='F1',
+                source_language=source_language,
+                target_language=target_language,
+            ),
         ]
+
+    def _get_true_label(self, data_point):
+        """
+        Get the true label from a data point. Overloaded from parent class.
+        :param data_point: the data point under consideration
+        :return: the true label for the output
+        """
+        return data_point["answers"]
+
+    def _get_predicted_label(self, data_point):
+        """
+        Get the predicted label from a data point. Overloaded from parent class.
+        :param data_point: the data point under consideration
+        :return: the predicted label for the output
+        """
+        return data_point["predicted_answer"]
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
+            samples, lambda x: x['question'], unwrap(sys_info.source_tokenizer)
         )
 
         return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
-
-    def _get_true_label(self, data_point: dict):
-        return data_point["answers"]["text"]
-
-    def _get_predicted_label(self, data_point: dict):
-        return data_point["predicted_answers"]["text"]

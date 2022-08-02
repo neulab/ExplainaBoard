@@ -123,6 +123,10 @@ https://github.com/neulab/ExplainaBoard/blob/main/docs/task_extractive_qa_squad.
                 name=TaskType.qa_multiple_choice,
                 description="Answer a question from multiple options",
             ),
+            Task(
+                name=TaskType.qa_open_domain,
+                description="Answer a question in an open domain",
+            ),
         ],
     ),
     TaskCategory(

@@ -11,7 +11,7 @@
     "custom_analyses": {
       "example": [
         {
-          "_type": "BucketAnalysis",
+          "cls_name": "BucketAnalysis",
           "feature": "commonsense_category",
           "num_buckets": 8,
           "method": "discrete"

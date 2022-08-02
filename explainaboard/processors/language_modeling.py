@@ -78,7 +78,12 @@ class LanguageModelingProcessor(Processor):
             k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
         ]
         examp_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(x, method="continuous") for x in examp_continuous_features
+            BucketAnalysis(
+                description=examp_features[x].description,
+                feature=x,
+                method="continuous",
+            )
+            for x in examp_continuous_features
         ]
 
         tok_features: dict[str, FeatureType] = {
@@ -127,7 +132,10 @@ class LanguageModelingProcessor(Processor):
             if k != 'tok_log_prob'
         ]
         tok_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(x, method="continuous") for x in tok_continuous_features
+            BucketAnalysis(
+                description=tok_features[x].description, feature=x, method="continuous"
+            )
+            for x in tok_continuous_features
         ]
 
         return [

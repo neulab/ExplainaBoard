@@ -31,7 +31,7 @@ class AnalysisResult:
 
     @staticmethod
     def from_dict(dikt):
-        type = dikt.pop('_type')
+        type = dikt.pop('cls_name')
         if type == 'BucketAnalysisResult':
             bucket_performances = [
                 BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
@@ -51,6 +51,15 @@ class AnalysisResult:
 
 @dataclass
 class Analysis:
+    """
+    A super-class for analyses, which take in examples and analyze their features in
+    some way. The exact analysis performed will vary depending on the inheriting
+    class.
+    :param description: a textual description of the analysis to be performed
+    """
+
+    description: str | None
+
     def perform(
         self,
         cases: list[AnalysisCase],
@@ -73,9 +82,10 @@ class Analysis:
 
     @staticmethod
     def from_dict(dikt: dict):
-        type = dikt.pop('_type')
+        type = dikt.pop('cls_name')
         if type == 'BucketAnalysis':
             return BucketAnalysis(
+                description=dikt.get('description'),
                 feature=dikt['feature'],
                 method=dikt.get('method', 'continuous'),
                 number=dikt.get('number', 4),
@@ -84,6 +94,7 @@ class Analysis:
             )
         elif type == 'ComboCountAnalysis':
             return ComboCountAnalysis(
+                description=dikt.get('description'),
                 features=dikt['features'],
             )
 
@@ -98,10 +109,10 @@ class BucketAnalysisResult(AnalysisResult):
     """
 
     bucket_performances: list[BucketPerformance]
-    _type: Optional[str] = None
+    cls_name: Optional[str] = None
 
     def __post_init__(self):
-        self._type: str = self.__class__.__name__
+        self.cls_name: str = self.__class__.__name__
 
     def print(self):
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
@@ -136,10 +147,10 @@ class BucketAnalysis(Analysis):
     number: int = 4
     setting: Any = None  # For different bucket_methods, the settings are diverse
     sample_limit: int = 50
-    _type: Optional[str] = None
+    cls_name: Optional[str] = None
 
     def __post_init__(self):
-        self._type: str = self.__class__.__name__
+        self.cls_name: str = self.__class__.__name__
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
@@ -229,10 +240,10 @@ class ComboCountAnalysisResult(AnalysisResult):
 
     features: tuple
     combo_counts: list[tuple[tuple, int]] | None = None
-    _type: Optional[str] = None
+    cls_name: Optional[str] = None
 
     def __post_init__(self):
-        self._type: str = self.__class__.__name__
+        self.cls_name: str = self.__class__.__name__
 
     def print(self):
         get_logger('report').info('feature combos for ' + ', '.join(self.features))
@@ -252,10 +263,10 @@ class ComboCountAnalysis(Analysis):
     """
 
     features: tuple
-    _type: Optional[str] = None
+    cls_name: Optional[str] = None
 
     def __post_init__(self):
-        self._type: str = self.__class__.__name__
+        self.cls_name: str = self.__class__.__name__
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 

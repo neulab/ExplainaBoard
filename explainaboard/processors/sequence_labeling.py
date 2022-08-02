@@ -77,7 +77,12 @@ class SeqLabProcessor(Processor):
             k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
         ]
         examp_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(x, method="continuous") for x in examp_continuous_features
+            BucketAnalysis(
+                description=examp_features[x].description,
+                feature=x,
+                method="continuous",
+            )
+            for x in examp_continuous_features
         ]
 
         span_features: dict[str, FeatureType] = {
@@ -136,19 +141,30 @@ class SeqLabProcessor(Processor):
         ]
         span_analyses: list[Analysis] = [
             BucketAnalysis(
+                description=span_features["span_true_label"].description,
                 feature="span_true_label",
                 method="discrete",
                 number=15,
             ),
-            ComboCountAnalysis(features=("span_true_label", "span_pred_label")),
+            ComboCountAnalysis(
+                description="confusion matrix",
+                features=("span_true_label", "span_pred_label"),
+            ),
             BucketAnalysis(
+                description=span_features["span_capitalness"].description,
                 feature="span_capitalness",
                 method="discrete",
                 number=4,
             ),
         ]
         for x in span_continuous_features:
-            span_analyses.append(BucketAnalysis(x, method="continuous"))
+            span_analyses.append(
+                BucketAnalysis(
+                    description=span_features[x].description,
+                    feature=x,
+                    method="continuous",
+                )
+            )
 
         return [
             AnalysisLevel(

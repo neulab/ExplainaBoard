@@ -94,9 +94,17 @@ class KGLinkTailPredictionProcessor(Processor):
         ]
         discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
         analyses: list[BucketAnalysis] = [
-            BucketAnalysis(x, method="continuous") for x in continuous_features
+            BucketAnalysis(
+                description=features[x].description, feature=x, method="continuous"
+            )
+            for x in continuous_features
         ] + [
-            BucketAnalysis(k, method="discrete", number=v)
+            BucketAnalysis(
+                description=features[k].description,
+                feature=k,
+                method="discrete",
+                number=v,
+            )
             for k, v in discrete_features.items()
         ]
 
