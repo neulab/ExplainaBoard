@@ -48,11 +48,11 @@ class MetricConfig(dict):
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    _type: str | None = None
+    cls_name: str | None = None
 
     def __post_init__(self):
         # Save the class name
-        self._type = type(self).__name__
+        self.cls_name = type(self).__name__
 
     def to_metric(self):
         raise NotImplementedError

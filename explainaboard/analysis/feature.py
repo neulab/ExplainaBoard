@@ -8,14 +8,14 @@ from typing import Optional
 
 def is_dataclass_dict(obj):
     """
-    this function is used to judge if obj is a dictionary with a key `_type`
+    this function is used to judge if obj is a dictionary with a key `cls_name`
     :param obj: a python object with different potential type
     :return: boolean variable
     """
     if (
         not isinstance(obj, dict)
-        or '_type' not in obj.keys()
-        or obj['_type'] not in FEATURETYPE_REGISTRY.keys()
+        or 'cls_name' not in obj.keys()
+        or obj['cls_name'] not in FEATURETYPE_REGISTRY.keys()
     ):
         return False
     else:
@@ -34,7 +34,7 @@ def _fromdict_inner(obj):
         result = {}
         for name, data in obj.items():
             result[name] = _fromdict_inner(data)
-        return FEATURETYPE_REGISTRY[obj["_type"]](**result)
+        return FEATURETYPE_REGISTRY[obj["cls_name"]](**result)
 
     # exactly the same as before (without the tuple clause)
     elif isinstance(obj, (list, tuple)):
@@ -51,8 +51,8 @@ def _fromdict_inner(obj):
 class FeatureType:
     # dtype: declare the data type of a feature, e.g. dict, list, float
     dtype: Optional[str] = None
-    # _type: declare the class type of the feature: Sequence, Position
-    _type: Optional[str] = None
+    # cls_name: declare the class type of the feature: Sequence, Position
+    cls_name: Optional[str] = None
     # description: descriptive information of a feature
     description: Optional[str] = None
     # func: the function that is used to calculate the feature
@@ -71,11 +71,11 @@ class FeatureType:
             raise ValueError(f'called from_dict on non-dict object "{obj}"')
         elif not is_dataclass_dict(obj):
             obj = copy.deepcopy(obj)
-            obj['_type'] = 'Value'
+            obj['cls_name'] = 'Value'
         return _fromdict_inner(obj)
 
     def __post_init__(self):
-        self._type: str = self.__class__.__name__
+        self.cls_name: str = self.__class__.__name__
 
 
 @dataclass
@@ -102,7 +102,7 @@ class Position(FeatureType):
 
     def __post_init__(self):
         super().__post_init__()
-        self._type: str = "Position"
+        self.cls_name: str = "Position"
 
 
 @dataclass

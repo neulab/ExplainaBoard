@@ -43,7 +43,7 @@ def metric_name_to_config(
 
 
 def metric_config_from_dict(dikt: dict):
-    type = dikt.pop('_type')
+    type = dikt.pop('cls_name')
     config_cls = metric_name_to_config_class(type)
     field_names = set(f.name for f in dataclasses.fields(config_cls))
     return config_cls(
