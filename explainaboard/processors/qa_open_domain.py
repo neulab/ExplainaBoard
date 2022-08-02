@@ -28,7 +28,7 @@ class QAOpenDomainProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.qa_open_domain
 
-    def default_features(self) -> list[AnalysisLevel]:
+    def default_analyses(self) -> list[AnalysisLevel]:
         features = {
             "question": feature.Value("string"),
             # "question_types": feature.Sequence(feature=feature.Value("string")),
