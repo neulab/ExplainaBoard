@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import List
+from typing import cast
 
 from datalabs import aggregating
 
@@ -19,7 +19,7 @@ from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQACon
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.typing_utils import narrow, unwrap
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.qa_open_domain)
@@ -47,7 +47,7 @@ class QAOpenDomainProcessor(Processor):
                 dtype="float",
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
-                    info, x['answers']['text'], side='target'
+                    info, x['answers'][0], side='target'
                 ),
             ),
             "num_oov": feature.Value(
@@ -84,7 +84,7 @@ class QAOpenDomainProcessor(Processor):
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=narrow(List[Analysis], analyses),
+                analyses=cast(list[Analysis], analyses),
             )
         ]
 
