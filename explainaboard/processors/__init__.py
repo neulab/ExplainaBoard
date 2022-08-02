@@ -13,6 +13,7 @@ from explainaboard.processors import (
     named_entity_recognition,
     nlg_meta_evaluation,
     qa_multiple_choice,
+    qa_open_domain,
     summarization,
     tabular_classification,
     tabular_regression,
@@ -42,5 +43,6 @@ __all__ = [
     'cloze_multiple_choice',
     'cloze_generative',
     'grammatical_error_correction',
+    'qa_open_domain',
     'nlg_meta_evaluation',
 ]

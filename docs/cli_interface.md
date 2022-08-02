@@ -187,6 +187,22 @@ explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > re
 ```
 
 
+## [Open Domain QA](task_qa_open_domain.md)
+Open-domain QA aims to answer a question in the form of natural language based on large-scale 
+unstructured documents
+
+Following examples show how an open-domain QA system can be evaluated with detailed analyses using 
+ExplainaBoard CLI.
+
+**CLI Example**
+
+Using Build-in datasets from DataLab:
+```shell
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system_outputs ./data/system_outputs/test.dpr.nq.txt  > report.json
+```
+
+
+
 ## [Multiple Choice QA](task_qa_multiple_choice.md)
 
 Answer a question from multiple options.
