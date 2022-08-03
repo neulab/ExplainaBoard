@@ -61,17 +61,21 @@ class TestTextClassification(unittest.TestCase):
             output_file_type=FileType.text,
         )
         data = loader.load()
+
+        metadata = {
+            "task_name": TaskType.text_classification.value,
+            "dataset_name": "sst2",
+            "metric_names": ["Accuracy"],
+            # don't forget this, otherwise the user-defined features will be ignored
+            "custom_features": data.metadata.custom_features,
+        }
+
+        processor = get_processor(TaskType.text_classification.value)
+
+        sys_info = processor.process(metadata, data.samples)
+        processor.print_bucket_info(sys_info.results.fine_grained)
+
         self.assertEqual(len(data), 1821)
-        self.assertEqual(
-            data[0],
-            {
-                'text': 'if you sometimes like to go to the movies to have fun , '
-                'wasabi is a good place to start .',
-                'true_label': 'positive',
-                'id': '0',
-                'predicted_label': 'positive',
-            },
-        )
 
     def test_process(self):
         metadata = {

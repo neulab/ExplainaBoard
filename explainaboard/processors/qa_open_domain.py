@@ -27,7 +27,6 @@ class QAOpenDomainProcessor(Processor):
         return feature.Features(
             {
                 "question": feature.Value("string"),
-                "question_types": feature.Sequence(feature=feature.Value("string")),
                 "answers": feature.Sequence(feature=feature.Value("string")),
                 "question_length": feature.Value(
                     dtype="float",
@@ -37,14 +36,6 @@ class QAOpenDomainProcessor(Processor):
                         method="bucket_attribute_specified_bucket_value",
                         number=4,
                         setting=(),
-                    ),
-                ),
-                "question_type": feature.Value(
-                    dtype="string",
-                    description="question type",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_discrete_value", number=4, setting=1
                     ),
                 ),
                 "answer_length": feature.Value(
@@ -106,9 +97,6 @@ class QAOpenDomainProcessor(Processor):
         super().__init__()
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_question_type(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return " ".join(existing_feature["question_types"])
-
     def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
         return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
 
