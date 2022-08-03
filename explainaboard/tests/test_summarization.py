@@ -6,7 +6,7 @@ import numpy as np
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.metrics.external_eval import LikertScoreConfig
+from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 from explainaboard.utils import cache_api
 
@@ -115,7 +115,7 @@ class TestSummarization(unittest.TestCase):
             "task_name": TaskType.summarization.value,
             "dataset_name": "cnndm",
             "metric_configs": [
-                LikertScoreConfig(
+                ExternalEvalConfig(
                     name="LikertScore_fluency",
                     aspect="fluency",
                     n_annotators=2,

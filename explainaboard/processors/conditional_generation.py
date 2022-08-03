@@ -20,7 +20,7 @@ from explainaboard.info import (
 )
 import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.external_eval import EXTERNAL_METRICS, LikertScoreConfig
+from explainaboard.metrics.external_eval import EXTERNAL_METRICS, ExternalEvalConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
 import explainaboard.metrics.metric
 from explainaboard.metrics.metric import MetricStats
@@ -239,7 +239,7 @@ class ConditionalGenerationProcessor(Processor):
             )
             for x in full_metrics_automated
         ] + [
-            LikertScoreConfig(name=x, aspect=x.split("LikertScore_")[1])
+            ExternalEvalConfig(name=x, aspect=x.split("LikertScore_")[1])
             for x in full_metrics_human
         ]
 

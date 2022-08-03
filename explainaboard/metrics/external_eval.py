@@ -20,17 +20,17 @@ UNANNOTATED_SYMBOL = -1
 
 @dataclass
 @register_metric_config
-class LikertScoreConfig(MetricConfig):
+class ExternalEvalConfig(MetricConfig):
     aspect: str = "fluency"
     n_annotators: int = 3
     categories: int = 5
     instruction: str = "Annotation instruction"
 
     def to_metric(self):
-        return LikertScore(self)
+        return ExternalEval(self)
 
 
-class LikertScore(Metric):
+class ExternalEval(Metric):
     """
     Calculates the hits metric, telling whether the predicted output is in a set of true
     outputs.
@@ -52,13 +52,13 @@ class LikertScore(Metric):
         self, config: Optional[MetricConfig] = None
     ) -> MetricStats:
 
-        config = cast(LikertScoreConfig, self._get_config(config))
+        config = cast(ExternalEvalConfig, self._get_config(config))
         return MetricStats(config.external_stats)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        config = cast(LikertScoreConfig, self._get_config(config))
+        config = cast(ExternalEvalConfig, self._get_config(config))
 
         if config is not None and config.external_stats is not None:
             n_sample, n_annotators = config.external_stats.shape
@@ -91,7 +91,7 @@ class LikertScore(Metric):
         if data.ndim != 2:
             raise ValueError("the dimension of stats._data should be 2")
 
-        config = cast(LikertScoreConfig, self.config)
+        config = cast(ExternalEvalConfig, self.config)
 
         n_samples, n_annotators = data.shape[0], data.shape[1]
         n_categories = config.categories
