@@ -165,13 +165,16 @@ class Processor(metaclass=abc.ABCMeta):
         :param sys_output: The system output itself
         :return: Statistics sufficient for scoring
         """
-        metrics = unwrap(self._get_metrics(sys_info))
+        # metrics = unwrap(self._get_metrics(sys_info))
         true_data = [self._get_true_label(x) for x in sys_output]
         pred_data = [self._get_predicted_label(x) for x in sys_output]
         metric_stats = []
 
-        for metric in metrics:
-            metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+        for config in unwrap(sys_info.metric_configs):
+            metric = config.to_metric()
+            metric_stats.append(
+                metric.calc_stats_from_data(true_data, pred_data, config)
+            )
         return metric_stats
 
     def _get_feature_func(self, feature_name: str, is_custom: bool):
@@ -488,6 +491,7 @@ class Processor(metaclass=abc.ABCMeta):
                 value=metric_result.value,
                 confidence_score_low=conf_low,
                 confidence_score_high=conf_high,
+                agreement=metric_result.agreement,
             )
             overall_results[metric_cfg.name] = overall_performance
         return overall_results

@@ -8,7 +8,6 @@ from explainaboard import feature, TaskType
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -46,20 +45,13 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         return f
 
     @classmethod
-    def default_metrics(
-        cls, source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+    def default_metrics(cls, source_language=None, target_language=None):
+        defaults_automated = ['bleu', 'length_ratio']
         return [
             EaaSMetricConfig(
-                name='bleu',
-                source_language=source_language,
-                target_language=target_language,
-            ),
-            EaaSMetricConfig(
-                name='length_ratio',
-                source_language=source_language,
-                target_language=target_language,
-            ),
+                name=x, source_language=source_language, target_language=target_language
+            )
+            for x in defaults_automated
         ]
 
     def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):

@@ -48,6 +48,7 @@ class Performance:
     value: float
     confidence_score_low: Optional[float] = None
     confidence_score_high: Optional[float] = None
+    agreement: Optional[float] = None
 
     @classmethod
     def from_dict(cls, data_dict: dict) -> Performance:
