@@ -530,7 +530,7 @@ class DatalabFileLoader(FileLoader):
 
         # load customized features from global config files
         customized_features_from_config = get_customized_features()
-        if config.dataset in customized_features_from_config.keys():
+        if config.dataset in customized_features_from_config:
             feature_names = list(customized_features_from_config[config.dataset].keys())
             config.custom_features = feature_names + (
                 [] if config.custom_features is None else config.custom_features
@@ -558,7 +558,7 @@ class DatalabFileLoader(FileLoader):
         # Infer metadata from the dataset
         metadata = FileLoaderMetadata()
         # load customized features from global config files
-        if config.dataset in customized_features_from_config.keys():
+        if config.dataset in customized_features_from_config:
             if metadata.custom_features is None:
                 metadata.custom_features = {}
             metadata.custom_features.update(
