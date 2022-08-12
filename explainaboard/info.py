@@ -161,6 +161,13 @@ class SysOutputInfo:
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
+        """
+        A deserialization utility function that takes in a key corresponding to a
+        parameter name, and dictionary corresponding to a serialized version of that
+        parameter's value, then return the deserialized version of the value.
+        :param k: the parameter name
+        :param v: the parameter's value
+        """
         if k == 'results':
             return Result.from_dict(v)
         elif k.endswith('tokenizer'):

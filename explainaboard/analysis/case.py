@@ -20,6 +20,13 @@ class AnalysisCase:
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
+        """
+        A deserialization utility function that takes in a key corresponding to a
+        parameter name, and dictionary corresponding to a serialized version of that
+        parameter's value, then return the deserialized version of the value.
+        :param k: the parameter name
+        :param v: the parameter's value
+        """
         return v
 
     @classmethod
