@@ -82,6 +82,10 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 
 @dataclass
 class AnalysisCaseCollection:
+    # This tuple is either tuple[float,float] (for continuous values) or tuple[str] for
+    # discrete values
+    # TODO(gneubig): add actual type annotation to this effect. at the moment it's a
+    #    bit complicated due to the implementation of the bucketing functions
     interval: tuple
     samples: list[int]
 
