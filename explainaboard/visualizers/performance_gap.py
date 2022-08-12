@@ -1,5 +1,4 @@
 import copy
-from typing import cast
 
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.info import SysOutputInfo
@@ -20,12 +19,13 @@ def get_pairwise_performance_gap(
             orm_met.confidence_score_high = None
 
     fgr, fgr1, fgr2 = (unwrap(x.results.analyses) for x in (sys, sys1, sys2))
-    for fgr_lev, fgr1_lev, fgr2_lev in zip(fgr, fgr1, fgr2):
-        if not isinstance(fgr_lev, BucketAnalysisResult):
+    for fgr_buks, fgr1_buks, fgr2_buks in zip(fgr, fgr1, fgr2):
+        if (
+            not isinstance(fgr_buks, BucketAnalysisResult)
+            or not isinstance(fgr1_buks, BucketAnalysisResult)
+            or not isinstance(fgr2_buks, BucketAnalysisResult)
+        ):
             continue
-        fgr_buks, fgr1_buks, fgr2_buks = (
-            cast(BucketAnalysisResult, x) for x in (fgr_lev, fgr1_lev, fgr2_lev)
-        )
         for fgr_buk, fgr1_buk, fgr2_buk in zip(
             fgr_buks.bucket_performances,
             fgr1_buks.bucket_performances,
