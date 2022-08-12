@@ -32,7 +32,7 @@ class LanguageModelingProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.language_modeling
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
             "text": feature.Value("string"),
             "log_probs": feature.Value("string"),
@@ -74,17 +74,6 @@ class LanguageModelingProcessor(Processor):
                 ),
             ),
         }
-        examp_continuous_features = [
-            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
-        ]
-        examp_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=examp_features[x].description,
-                feature=x,
-                method="continuous",
-            )
-            for x in examp_continuous_features
-        ]
 
         tok_features: dict[str, FeatureType] = {
             "tok_log_prob": feature.Value(
@@ -125,33 +114,56 @@ class LanguageModelingProcessor(Processor):
                 func=lambda info, x, c, stat: stat['vocab'].get(c.text, 0.0),
             ),
         }
-        tok_continuous_features = [
-            k
-            for k, v in tok_features.items()
-            if ('float' in unwrap(v.dtype))
-            if k != 'tok_log_prob'
-        ]
-        tok_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=tok_features[x].description, feature=x, method="continuous"
-            )
-            for x in tok_continuous_features
-        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=examp_features,
                 metric_configs=self.default_metrics(level='example'),
-                analyses=cast(List[Analysis], examp_analyses),
             ),
             AnalysisLevel(
-                name='tok',
+                name='token',
                 features=tok_features,
-                metric_configs=self.default_metrics(level='tok'),
-                analyses=cast(List[Analysis], tok_analyses),
+                metric_configs=self.default_metrics(level='token'),
             ),
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        analyses: list[Analysis] = []
+        examp_features = self.default_analysis_levels()[0].features
+        examp_continuous_features = [
+            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses.extend(
+            [
+                BucketAnalysis(
+                    level="example",
+                    description=examp_features[x].description,
+                    feature=x,
+                    method="continuous",
+                )
+                for x in examp_continuous_features
+            ]
+        )
+        tok_features = self.default_analysis_levels()[1].features
+        tok_continuous_features = [
+            k
+            for k, v in tok_features.items()
+            if ('float' in unwrap(v.dtype))
+            if k != 'tok_log_prob'
+        ]
+        analyses.extend(
+            [
+                BucketAnalysis(
+                    level="token",
+                    description=tok_features[x].description,
+                    feature=x,
+                    method="continuous",
+                )
+                for x in tok_continuous_features
+            ]
+        )
+        return analyses
 
     def _gen_cases_and_stats(
         self,
@@ -164,7 +176,7 @@ class LanguageModelingProcessor(Processor):
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
             )
-        elif analysis_level.name != 'tok':
+        elif analysis_level.name != 'token':
             raise ValueError(f'{analysis_level.name}-level analysis not supported')
         # Do tok-level analysis
         cases: list[AnalysisCaseSpan] = []

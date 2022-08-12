@@ -7,16 +7,15 @@
         }
       }
     },
-    "custom_analyses": {
-      "example": [
-        {
-          "cls_name": "BucketAnalysis",
-          "feature": "num_capital_letters",
-          "num_buckets": 4,
-          "method": "continuous"
-        }
-      ]
-    }
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "num_capital_letters",
+        "num_buckets": 4,
+        "method": "continuous"
+      }
+    ]
   },
   "examples": [
     {

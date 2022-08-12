@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import cast, List
 
 from datalabs import aggregating
 import numpy as np
@@ -32,7 +31,7 @@ class ClozeGenerativeProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.cloze_generative
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "context": feature.Value("string"),
             "question_mark": feature.Value("string"),
@@ -86,24 +85,30 @@ class ClozeGenerativeProcessor(Processor):
                 ),
             ),
         }
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
-        analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=features[x].description, feature=x, method="continuous"
-            )
-            for x in continuous_features
-        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        features = self.default_analysis_levels()[0].features
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        analyses: list[Analysis] = [
+            BucketAnalysis(
+                level="example",
+                description=features[x].description,
+                feature=x,
+                method="continuous",
+            )
+            for x in continuous_features
+        ]
+        return analyses
 
     @classmethod
     def default_metrics(

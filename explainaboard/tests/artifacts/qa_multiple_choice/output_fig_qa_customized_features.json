@@ -8,16 +8,15 @@
         }
       }
     },
-    "custom_analyses": {
-      "example": [
-        {
-          "cls_name": "BucketAnalysis",
-          "feature": "commonsense_category",
-          "num_buckets": 8,
-          "method": "discrete"
-        }
-      ]
-    }
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "commonsense_category",
+        "num_buckets": 8,
+        "method": "discrete"
+      }
+    ]
   },
   "examples": [
     {

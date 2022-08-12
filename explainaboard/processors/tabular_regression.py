@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import cast, List
-
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
@@ -22,7 +20,7 @@ class TabularRegressionProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.tabular_regression
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "true_value": feature.Value(
                 dtype="float",
@@ -33,6 +31,17 @@ class TabularRegressionProcessor(Processor):
                 description="the predicted value",
             ),
         }
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
+            )
+        ]
+
+    def default_analyses(self) -> list[Analysis]:
+        features = self.default_analysis_levels()[0].features
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
@@ -41,18 +50,13 @@ class TabularRegressionProcessor(Processor):
         for x in continuous_features:
             analyses.append(
                 BucketAnalysis(
-                    description=features[x].description, feature=x, method="continuous"
+                    level="example",
+                    description=features[x].description,
+                    feature=x,
+                    method="continuous",
                 )
             )
-
-        return [
-            AnalysisLevel(
-                name='example',
-                features=features,
-                metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
-            )
-        ]
+        return analyses
 
     @classmethod
     def default_metrics(

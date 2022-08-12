@@ -58,9 +58,9 @@ class TestSummarization(unittest.TestCase):
         condgen_processor = get_processor(TaskType.conditional_generation.value)
         sum_processor = get_processor(TaskType.summarization.value)
 
-        condgen_features_1 = condgen_processor.default_analyses()
-        sum_features = sum_processor.default_analyses()
-        condgen_features_2 = condgen_processor.default_analyses()
+        condgen_features_1 = condgen_processor.default_analysis_levels()
+        sum_features = sum_processor.default_analysis_levels()
+        condgen_features_2 = condgen_processor.default_analysis_levels()
 
         for cf1, cf2, sumf in zip(condgen_features_1, condgen_features_2, sum_features):
             lcf1 = set(cf1.features.keys())

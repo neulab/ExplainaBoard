@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 import json
-from typing import Any, cast, List
+from typing import Any
 
 from datalabs import aggregating
 
@@ -31,7 +31,7 @@ class KGLinkTailPredictionProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.kg_link_tail_prediction
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
             "true_head": feature.Value("string"),
             "true_head_decipher": feature.Value("string"),
@@ -89,33 +89,46 @@ class KGLinkTailPredictionProcessor(Processor):
                 func=lambda info, x, c: self._get_entity_type_level(x),
             ),
         }
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
-        discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
-        analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=features[x].description, feature=x, method="continuous"
-            )
-            for x in continuous_features
-        ] + [
-            BucketAnalysis(
-                description=features[k].description,
-                feature=k,
-                method="discrete",
-                number=v,
-            )
-            for k, v in discrete_features.items()
-        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        features = self.default_analysis_levels()[0].features
+        continuous_features = [
+            k for k, v in features.items() if ('float' in unwrap(v.dtype))
+        ]
+        discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
+        analyses: list[Analysis] = []
+        analyses.extend(
+            [
+                BucketAnalysis(
+                    level="example",
+                    description=features[x].description,
+                    feature=x,
+                    method="continuous",
+                )
+                for x in continuous_features
+            ]
+        )
+        analyses.extend(
+            [
+                BucketAnalysis(
+                    level="example",
+                    description=features[k].description,
+                    feature=k,
+                    method="discrete",
+                    number=v,
+                )
+                for k, v in discrete_features.items()
+            ]
+        )
+        return analyses
 
     @classmethod
     def default_metrics(

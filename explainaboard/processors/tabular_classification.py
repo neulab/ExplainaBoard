@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import cast, List
-
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import (
@@ -24,7 +22,7 @@ class TextClassificationProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.tabular_classification
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "true_label": feature.Value(
                 dtype="string",
@@ -35,18 +33,31 @@ class TextClassificationProcessor(Processor):
                 description="the predicted label",
             ),
         }
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
+            )
+        ]
+
+    def default_analyses(self) -> list[Analysis]:
+        features = self.default_analysis_levels()[0].features
         continuous_features = [
             k for k, v in features.items() if ('float' in unwrap(v.dtype))
         ]
         # Create analyses
         analyses: list[Analysis] = [
             BucketAnalysis(
+                level="example",
                 description=features["true_label"].description,
                 feature="true_label",
                 method="discrete",
                 number=15,
             ),
             ComboCountAnalysis(
+                level="example",
                 description="confusion matrix",
                 features=("true_label", "predicted_label"),
             ),
@@ -54,18 +65,13 @@ class TextClassificationProcessor(Processor):
         for x in continuous_features:
             analyses.append(
                 BucketAnalysis(
-                    description=features[x].description, feature=x, method="continuous"
+                    level="example",
+                    description=features[x].description,
+                    feature=x,
+                    method="continuous",
                 )
             )
-
-        return [
-            AnalysisLevel(
-                name='example',
-                features=features,
-                metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
-            )
-        ]
+        return analyses
 
     @classmethod
     def default_metrics(
