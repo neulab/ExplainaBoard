@@ -10,7 +10,7 @@ import numpy as np
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 import explainaboard.analysis.analyses
-from explainaboard.analysis.analyses import AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import (
     AnalysisCase,
     AnalysisCaseMultiSpan,
@@ -158,6 +158,9 @@ class ConditionalGenerationProcessor(Processor):
                 metric_configs=self.default_metrics(level='token'),
             ),
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def _get_default_eaas_strs(cls):

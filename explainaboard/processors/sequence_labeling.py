@@ -163,7 +163,7 @@ class SeqLabProcessor(Processor):
                 number=4,
             ),
         ]
-        analyses.extend(super().default_analyses())
+        analyses.extend(self.continuous_feature_analyses())
         return analyses
 
     def _get_true_label(self, data_point: dict):

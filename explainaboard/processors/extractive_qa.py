@@ -6,7 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     count_tokens,
@@ -82,6 +82,9 @@ class QAExtractiveProcessor(Processor):
                 metric_configs=self.default_metrics(),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(

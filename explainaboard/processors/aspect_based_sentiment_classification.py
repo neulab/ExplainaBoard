@@ -95,7 +95,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             ),
         ]
         # Continuous features
-        analyses.extend(super().default_analyses())
+        analyses.extend(self.continuous_feature_analyses())
         return analyses
 
     @classmethod

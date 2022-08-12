@@ -6,7 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import (
     absolute_position,
@@ -97,6 +97,9 @@ class ClozeMultipleChoiceProcessor(Processor):
                 metric_configs=self.default_metrics(),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(

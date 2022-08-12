@@ -58,7 +58,7 @@ class TextClassificationProcessor(Processor):
                 features=("true_label", "predicted_label"),
             ),
         ]
-        analyses.extend(super().default_analyses())
+        analyses.extend(self.continuous_feature_analyses())
         return analyses
 
     @classmethod

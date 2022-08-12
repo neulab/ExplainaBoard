@@ -47,10 +47,13 @@ class Processor(metaclass=abc.ABCMeta):
         list would have one level for each."""
         ...
 
+    @abc.abstractmethod
     def default_analyses(self) -> list[Analysis]:
-        """Returns the analyses to be performed.
+        """Returns the analyses to be performed."""
+        ...
 
-        By default it performs analysis over
+    def continuous_feature_analyses(self) -> list[Analysis]:
+        """Return analyses over
         all continuous features specified in the analysis levels."""
         analyses: list[Analysis] = []
         analysis_levels = self.default_analysis_levels()
