@@ -12,6 +12,7 @@ from explainaboard.analysis.analyses import (
     Analysis,
     AnalysisLevel,
     AnalysisResult,
+    BucketAnalysis,
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
@@ -46,10 +47,26 @@ class Processor(metaclass=abc.ABCMeta):
         list would have one level for each."""
         ...
 
-    @abc.abstractmethod
     def default_analyses(self) -> list[Analysis]:
-        """Returns the analyses to be performed."""
-        ...
+        """Returns the analyses to be performed.
+
+        By default it performs analysis over
+        all continuous features specified in the analysis levels."""
+        analyses: list[Analysis] = []
+        analysis_levels = self.default_analysis_levels()
+        for lev in analysis_levels:
+            # Continuous features
+            for k, v in lev.features.items():
+                if v.dtype == 'float32':
+                    analyses.append(
+                        BucketAnalysis(
+                            level=lev.name,
+                            description=lev.features[k].description,
+                            feature=k,
+                            method="continuous",
+                        )
+                    )
+        return analyses
 
     @classmethod
     @abc.abstractmethod

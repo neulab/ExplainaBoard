@@ -10,7 +10,7 @@ import numpy as np
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 import explainaboard.analysis.analyses
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.case import (
     AnalysisCase,
     AnalysisCaseMultiSpan,
@@ -158,40 +158,6 @@ class ConditionalGenerationProcessor(Processor):
                 metric_configs=self.default_metrics(level='token'),
             ),
         ]
-
-    def default_analyses(self) -> list[Analysis]:
-        analyses: list[Analysis] = []
-        examp_features = self.default_analysis_levels()[0].features
-        examp_continuous_features = [
-            k for k, v in examp_features.items() if v.dtype == 'float32'
-        ]
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="example",
-                    description=examp_features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-                for x in examp_continuous_features
-            ]
-        )
-        tok_features = self.default_analysis_levels()[1].features
-        tok_continuous_features = [
-            k for k, v in tok_features.items() if v.dtype == 'float32'
-        ]
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="token",
-                    description=tok_features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-                for x in tok_continuous_features
-            ]
-        )
-        return analyses
 
     @classmethod
     def _get_default_eaas_strs(cls):

@@ -140,59 +140,30 @@ class SeqLabProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
-        analyses: list[Analysis] = []
-        default_levels = self.default_analysis_levels()
-        examp_features = default_levels[0].features
-        examp_continuous_features = [
-            k for k, v in examp_features.items() if v.dtype == 'float32'
+        analysis_levels = self.default_analysis_levels()
+        span_features = analysis_levels[1].features
+        analyses: list[Analysis] = [
+            BucketAnalysis(
+                level="span",
+                description=span_features["span_true_label"].description,
+                feature="span_true_label",
+                method="discrete",
+                number=15,
+            ),
+            ComboCountAnalysis(
+                level="span",
+                description="confusion matrix",
+                features=("span_true_label", "span_pred_label"),
+            ),
+            BucketAnalysis(
+                level="span",
+                description=span_features["span_capitalness"].description,
+                feature="span_capitalness",
+                method="discrete",
+                number=4,
+            ),
         ]
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level='example',
-                    description=examp_features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-                for x in examp_continuous_features
-            ]
-        )
-        span_features = default_levels[1].features
-        span_continuous_features = [
-            k for k, v in span_features.items() if v.dtype == 'float32'
-        ]
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="span",
-                    description=span_features["span_true_label"].description,
-                    feature="span_true_label",
-                    method="discrete",
-                    number=15,
-                ),
-                ComboCountAnalysis(
-                    level="span",
-                    description="confusion matrix",
-                    features=("span_true_label", "span_pred_label"),
-                ),
-                BucketAnalysis(
-                    level="span",
-                    description=span_features["span_capitalness"].description,
-                    feature="span_capitalness",
-                    method="discrete",
-                    number=4,
-                ),
-            ]
-        )
-        for x in span_continuous_features:
-            analyses.append(
-                BucketAnalysis(
-                    level="span",
-                    description=span_features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-            )
+        analyses.extend(super().default_analyses())
         return analyses
 
     def _get_true_label(self, data_point: dict):

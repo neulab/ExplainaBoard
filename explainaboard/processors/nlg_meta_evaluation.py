@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.metrics.metric import MetricConfig
@@ -94,22 +94,6 @@ class NLGMetaEvaluationProcessor(Processor):
                 metric_configs=self.default_metrics(),
             )
         ]
-
-    def default_analyses(self) -> list[Analysis]:
-        features = self.default_analysis_levels()[0].features
-        continuous_features = [k for k, v in features.items() if v.dtype == 'float32']
-        # Create analyses
-        analyses: list[Analysis] = []
-        for x in continuous_features:
-            analyses.append(
-                BucketAnalysis(
-                    level="example",
-                    description=features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-            )
-        return analyses
 
     @classmethod
     def default_metrics(

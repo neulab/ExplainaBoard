@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
-import copy
+from collections.abc import Iterator
 from functools import lru_cache
 
 from datalabs import aggregating
@@ -13,7 +12,7 @@ import numpy
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
@@ -104,28 +103,6 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
             # ),
         }
         f[0].features.update(new_examp_features)
-        return f
-
-    def default_analyses(self) -> list[Analysis]:
-        features = self.default_analysis_levels()[0].features
-        new_examp_cont_features = [
-            "attr_compression",
-            "attr_copy_len",
-            "attr_coverage",
-            "attr_novelty",
-        ]
-        new_examp_analyses: Sequence[Analysis] = [
-            BucketAnalysis(
-                level="example",
-                description=features[x].description,
-                feature=x,
-                method="continuous",
-            )
-            for x in new_examp_cont_features
-        ]
-        f = super().default_analyses()
-        f = copy.deepcopy(f)
-        f.extend(new_examp_analyses)
         return f
 
     @classmethod

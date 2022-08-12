@@ -98,33 +98,20 @@ class KGLinkTailPredictionProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
-        features = self.default_analysis_levels()[0].features
-        continuous_features = [k for k, v in features.items() if v.dtype == 'float32']
+        analysis_levels = self.default_analysis_levels()
+        features = analysis_levels[0].features
         discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
-        analyses: list[Analysis] = []
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="example",
-                    description=features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-                for x in continuous_features
-            ]
-        )
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="example",
-                    description=features[k].description,
-                    feature=k,
-                    method="discrete",
-                    number=v,
-                )
-                for k, v in discrete_features.items()
-            ]
-        )
+        analyses: list[Analysis] = [
+            BucketAnalysis(
+                level=analysis_levels[0].name,
+                description=features[k].description,
+                feature=k,
+                method="discrete",
+                number=v,
+            )
+            for k, v in discrete_features.items()
+        ]
+        analyses.extend(super().default_analyses())
         return analyses
 
     @classmethod

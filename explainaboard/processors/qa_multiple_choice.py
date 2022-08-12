@@ -6,7 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     count_tokens,
@@ -84,20 +84,6 @@ class QAMultipleChoiceProcessor(Processor):
                 metric_configs=self.default_metrics(),
             )
         ]
-
-    def default_analyses(self) -> list[Analysis]:
-        features = self.default_analysis_levels()[0].features
-        continuous_features = [k for k, v in features.items() if v.dtype == 'float32']
-        analyses: list[Analysis] = [
-            BucketAnalysis(
-                level="example",
-                description=features[x].description,
-                feature=x,
-                method="continuous",
-            )
-            for x in continuous_features
-        ]
-        return analyses
 
     @classmethod
     def default_metrics(

@@ -130,39 +130,18 @@ class LanguageModelingProcessor(Processor):
 
     def default_analyses(self) -> list[Analysis]:
         analyses: list[Analysis] = []
-        examp_features = self.default_analysis_levels()[0].features
-        examp_continuous_features = [
-            k for k, v in examp_features.items() if v.dtype == 'float32'
-        ]
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="example",
-                    description=examp_features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-                for x in examp_continuous_features
-            ]
-        )
-        tok_features = self.default_analysis_levels()[1].features
-        tok_continuous_features = [
-            k
-            for k, v in tok_features.items()
-            if v.dtype == 'float32'
-            if k != 'tok_log_prob'
-        ]
-        analyses.extend(
-            [
-                BucketAnalysis(
-                    level="token",
-                    description=tok_features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-                for x in tok_continuous_features
-            ]
-        )
+        analysis_levels = self.default_analysis_levels()
+        for lev in analysis_levels:
+            for k, v in lev.features.items():
+                if v.dtype == 'float32' and k != 'tok_log_prob':
+                    analyses.append(
+                        BucketAnalysis(
+                            level=lev.name,
+                            description=lev.features[k].description,
+                            feature=k,
+                            method="continuous",
+                        )
+                    )
         return analyses
 
     def _gen_cases_and_stats(

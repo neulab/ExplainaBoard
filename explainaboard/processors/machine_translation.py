@@ -7,7 +7,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
@@ -34,20 +34,6 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
             / c.features['reference_length'],
         )
 
-        return f
-
-    def default_analyses(self) -> list[Analysis]:
-        levs = self.default_analysis_levels()
-        f = super().default_analyses()
-        f = copy.deepcopy(f)
-        f.append(
-            BucketAnalysis(
-                level="example",
-                description=levs[0].features['attr_compression'].description,
-                feature='attr_compression',
-                method="continuous",
-            )
-        )
         return f
 
     @aggregating()

@@ -109,7 +109,6 @@ class TextClassificationProcessor(Processor):
 
     def default_analyses(self) -> list[Analysis]:
         features = self.default_analysis_levels()[0].features
-        continuous_features = [k for k, v in features.items() if v.dtype == 'float32']
         # Create analyses
         analyses: list[Analysis] = [
             BucketAnalysis(
@@ -125,15 +124,7 @@ class TextClassificationProcessor(Processor):
                 features=("true_label", "predicted_label"),
             ),
         ]
-        for x in continuous_features:
-            analyses.append(
-                BucketAnalysis(
-                    level="example",
-                    description=features[x].description,
-                    feature=x,
-                    method="continuous",
-                )
-            )
+        analyses.extend(super().default_analyses())
         return analyses
 
     @classmethod
