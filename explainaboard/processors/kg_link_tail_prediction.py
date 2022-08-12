@@ -22,7 +22,6 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -100,9 +99,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def default_analyses(self) -> list[Analysis]:
         features = self.default_analysis_levels()[0].features
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
+        continuous_features = [k for k, v in features.items() if v.dtype == 'float32']
         discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
         analyses: list[Analysis] = []
         analyses.extend(

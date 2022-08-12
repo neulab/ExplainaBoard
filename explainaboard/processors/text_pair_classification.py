@@ -108,9 +108,7 @@ class TextPairClassificationProcessor(Processor):
 
     def default_analyses(self) -> list[Analysis]:
         features = self.default_analysis_levels()[0].features
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
+        continuous_features = [k for k, v in features.items() if v.dtype == 'float32']
         # Create analyses
         analyses: list[Analysis] = [
             BucketAnalysis(

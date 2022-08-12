@@ -163,7 +163,7 @@ class ConditionalGenerationProcessor(Processor):
         analyses: list[Analysis] = []
         examp_features = self.default_analysis_levels()[0].features
         examp_continuous_features = [
-            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
+            k for k, v in examp_features.items() if v.dtype == 'float32'
         ]
         analyses.extend(
             [
@@ -178,7 +178,7 @@ class ConditionalGenerationProcessor(Processor):
         )
         tok_features = self.default_analysis_levels()[1].features
         tok_continuous_features = [
-            k for k, v in tok_features.items() if ('float' in unwrap(v.dtype))
+            k for k, v in tok_features.items() if v.dtype == 'float32'
         ]
         analyses.extend(
             [

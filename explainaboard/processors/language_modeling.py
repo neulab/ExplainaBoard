@@ -132,7 +132,7 @@ class LanguageModelingProcessor(Processor):
         analyses: list[Analysis] = []
         examp_features = self.default_analysis_levels()[0].features
         examp_continuous_features = [
-            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
+            k for k, v in examp_features.items() if v.dtype == 'float32'
         ]
         analyses.extend(
             [
@@ -149,7 +149,7 @@ class LanguageModelingProcessor(Processor):
         tok_continuous_features = [
             k
             for k, v in tok_features.items()
-            if ('float' in unwrap(v.dtype))
+            if v.dtype == 'float32'
             if k != 'tok_log_prob'
         ]
         analyses.extend(

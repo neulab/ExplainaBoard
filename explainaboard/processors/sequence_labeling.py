@@ -144,7 +144,7 @@ class SeqLabProcessor(Processor):
         default_levels = self.default_analysis_levels()
         examp_features = default_levels[0].features
         examp_continuous_features = [
-            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
+            k for k, v in examp_features.items() if v.dtype == 'float32'
         ]
         analyses.extend(
             [
@@ -159,7 +159,7 @@ class SeqLabProcessor(Processor):
         )
         span_features = default_levels[1].features
         span_continuous_features = [
-            k for k, v in span_features.items() if ('float' in unwrap(v.dtype))
+            k for k, v in span_features.items() if v.dtype == 'float32'
         ]
         analyses.extend(
             [
