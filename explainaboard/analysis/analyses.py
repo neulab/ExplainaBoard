@@ -33,18 +33,9 @@ class AnalysisResult:
     def from_dict(dikt):
         type = dikt.pop('cls_name')
         if type == 'BucketAnalysisResult':
-            bucket_performances = [
-                BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
-            ]
-            return BucketAnalysisResult(
-                name=dikt['name'], bucket_performances=bucket_performances
-            )
+            return BucketAnalysisResult.from_dict(dikt)
         elif type == 'ComboCountAnalysisResult':
-            return ComboCountAnalysisResult(
-                name=dikt['name'],
-                features=dikt['features'],
-                combo_counts=dikt['combo_counts'],
-            )
+            return ComboCountAnalysisResult.from_dict(dikt)
         else:
             raise ValueError(f'bad AnalysisResult type {type}')
 
@@ -110,6 +101,15 @@ class BucketAnalysisResult(AnalysisResult):
 
     bucket_performances: list[BucketPerformance]
     cls_name: Optional[str] = None
+
+    @staticmethod
+    def from_dict(dikt: dict) -> BucketAnalysisResult:
+        bucket_performances = [
+            BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
+        ]
+        return BucketAnalysisResult(
+            name=dikt['name'], bucket_performances=bucket_performances
+        )
 
     def __post_init__(self):
         self.cls_name: str = self.__class__.__name__
@@ -241,6 +241,14 @@ class ComboCountAnalysisResult(AnalysisResult):
     features: tuple
     combo_counts: list[tuple[tuple, int]] | None = None
     cls_name: Optional[str] = None
+
+    @staticmethod
+    def from_dict(dikt: dict) -> ComboCountAnalysisResult:
+        return ComboCountAnalysisResult(
+            name=dikt['name'],
+            features=dikt['features'],
+            combo_counts=dikt['combo_counts'],
+        )
 
     def __post_init__(self):
         self.cls_name: str = self.__class__.__name__
