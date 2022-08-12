@@ -303,7 +303,7 @@ def create_parser():
 
 
 def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
-    """Obtains MetricConfig class frin registry or corresponding EaaS binding.
+    """Obtains MetricConfig class from registry or corresponding EaaS binding.
 
     Args:
         name: Name of the metric.
