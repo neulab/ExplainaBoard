@@ -6,7 +6,7 @@ from unittest.mock import patch
 import explainaboard.explainaboard_main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_output_path, top_path
 from explainaboard.utils.cache_api import cache_online_file
-import explainaboard.visualizers.draw_hist
+import explainaboard.visualizers.draw_charts
 
 
 class TestCLI(TestCase):
@@ -70,7 +70,7 @@ class TestCLI(TestCase):
             f'{test_output_path}/figures/',
         ]
         with patch('sys.argv', args):
-            explainaboard.visualizers.draw_hist.main()
+            explainaboard.visualizers.draw_charts.main()
 
     def test_textclass_custom(self):
         args = [
