@@ -7,7 +7,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
@@ -24,8 +24,8 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
     def task_type(cls) -> TaskType:
         return TaskType.machine_translation
 
-    def default_analyses(self) -> list[AnalysisLevel]:
-        f = super().default_analyses()
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
+        f = super().default_analysis_levels()
         f = copy.deepcopy(f)
         f[0].features["attr_compression"] = feature.Value(
             dtype="float",
@@ -33,20 +33,8 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
             func=lambda info, x, c: c.features['source_length']
             / c.features['reference_length'],
         )
-        f[0].analyses.append(
-            BucketAnalysis(
-                description=f[0].features['attr_compression'].description,
-                feature='attr_compression',
-                method="continuous",
-            )
-        )
 
         return f
-
-    def _get_attr_compression(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(
-            unwrap(sys_info.source_tokenizer)(existing_features["source"])
-        ) / len(unwrap(sys_info.target_tokenizer)(existing_features["reference"]))
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):

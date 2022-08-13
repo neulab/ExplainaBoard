@@ -8,16 +8,15 @@
         }
       }
     },
-    "custom_analyses": {
-      "example": [
-        {
-          "cls_name": "BucketAnalysis",
-          "feature": "rel_type",
-          "num_buckets": 2,
-          "method": "discrete"
-        }
-      ]
-    }
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "rel_type",
+        "num_buckets": 2,
+        "method": "discrete"
+      }
+    ]
   },
   "examples": [
     {

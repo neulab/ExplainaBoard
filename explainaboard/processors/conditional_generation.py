@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Iterator
-from typing import Any, cast, List
+from typing import Any, cast
 
 from datalabs import aggregating
 import numpy as np
@@ -10,7 +10,7 @@ import numpy as np
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 import explainaboard.analysis.analyses
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import (
     AnalysisCase,
     AnalysisCaseMultiSpan,
@@ -43,7 +43,7 @@ class ConditionalGenerationProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.conditional_generation
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
             "source": feature.Value("string"),
             "reference": feature.Value("string"),
@@ -102,17 +102,6 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
         }
-        examp_continuous_features = [
-            k for k, v in examp_features.items() if ('float' in unwrap(v.dtype))
-        ]
-        examp_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=examp_features[x].description,
-                feature=x,
-                method="continuous",
-            )
-            for x in examp_continuous_features
-        ]
 
         tok_features: dict[str, FeatureType] = {
             "tok_text": feature.Value(
@@ -156,30 +145,22 @@ class ConditionalGenerationProcessor(Processor):
                 ),
             ),
         }
-        tok_continuous_features = [
-            k for k, v in tok_features.items() if ('float' in unwrap(v.dtype))
-        ]
-        tok_analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=tok_features[x].description, feature=x, method="continuous"
-            )
-            for x in tok_continuous_features
-        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=examp_features,
                 metric_configs=self.default_metrics(level='example'),
-                analyses=cast(List[Analysis], examp_analyses),
             ),
             AnalysisLevel(
-                name='tok',
+                name='token',
                 features=tok_features,
-                metric_configs=self.default_metrics(level='tok'),
-                analyses=cast(List[Analysis], tok_analyses),
+                metric_configs=self.default_metrics(level='token'),
             ),
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def _get_default_eaas_strs(cls):
@@ -199,7 +180,7 @@ class ConditionalGenerationProcessor(Processor):
                 )
                 for x in eaas_defaults
             ],
-            'tok': [
+            'token': [
                 F1ScoreConfig(
                     name='F1',
                     source_language=source_language,
@@ -325,7 +306,7 @@ class ConditionalGenerationProcessor(Processor):
                             sys_info, output, case, statistics
                         )
                 cases.append(case)
-        elif analysis_level.name == 'tok':
+        elif analysis_level.name == 'token':
             # Calculate features
             for i, output in progress(
                 enumerate(sys_output), desc='calculating token-level features'

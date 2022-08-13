@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import itertools
 from typing import Any, cast, Optional
 
 from datalabs import aggregating, Dataset, DatasetDict, load_dataset
@@ -13,6 +12,7 @@ from explainaboard.analysis.analyses import (
     Analysis,
     AnalysisLevel,
     AnalysisResult,
+    BucketAnalysis,
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
@@ -40,12 +40,36 @@ class Processor(metaclass=abc.ABCMeta):
         ...
 
     @abc.abstractmethod
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         """Returns a list of analysis levels, indicating analyses that can be
         applied to different views of the higher-level example. For instance, a task may
         perform 'example'-level analysis, and 'token'-level analysis in which case this
         list would have one level for each."""
         ...
+
+    @abc.abstractmethod
+    def default_analyses(self) -> list[Analysis]:
+        """Returns the analyses to be performed."""
+        ...
+
+    def continuous_feature_analyses(self) -> list[Analysis]:
+        """Return analyses over
+        all continuous features specified in the analysis levels."""
+        analyses: list[Analysis] = []
+        analysis_levels = self.default_analysis_levels()
+        for lev in analysis_levels:
+            # Continuous features
+            for k, v in lev.features.items():
+                if v.dtype == 'float32':
+                    analyses.append(
+                        BucketAnalysis(
+                            level=lev.name,
+                            description=lev.features[k].description,
+                            feature=k,
+                            method="continuous",
+                        )
+                    )
+        return analyses
 
     @classmethod
     @abc.abstractmethod
@@ -175,8 +199,8 @@ class Processor(metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         custom_features: dict[str, dict[str, dict]] | None,
-        custom_analyses: dict[str, list[dict]] | None,
-    ) -> list[AnalysisLevel]:
+        custom_analyses: list[dict] | None,
+    ) -> tuple[list[AnalysisLevel], list[Analysis]]:
         """
         Customize analyses for this processor
         Args:
@@ -186,17 +210,15 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
 
         """
-        analysis_levels = self.default_analyses()
+        analysis_levels = self.default_analysis_levels()
+        analyses = self.default_analyses()
         for level in analysis_levels:
             for config in level.metric_configs:
                 config.source_language = sys_info.source_language
                 config.target_language = sys_info.target_language
         level_map = {x.name: x for x in analysis_levels}
         if custom_analyses is not None:
-            for level_name, analysis_content in custom_analyses.items():
-                level_map[level_name].analyses.extend(
-                    [Analysis.from_dict(v) for v in analysis_content]
-                )
+            analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
         if custom_features is not None:
             for level_name, feature_content in custom_features.items():
                 level_map[level_name].features.update(
@@ -205,14 +227,14 @@ class Processor(metaclass=abc.ABCMeta):
                         for k, v in feature_content.items()
                     }
                 )
-        return analysis_levels
+        return analysis_levels, analyses
 
     def perform_analyses(
         self,
         sys_info: SysOutputInfo,
         analysis_cases: list[list[AnalysisCase]],
         metric_stats: list[list[MetricStats]],
-    ) -> list[list[AnalysisResult]]:
+    ) -> list[AnalysisResult]:
         """
         Perform fine-grained analyses
         :param sys_info: Information about the system output
@@ -224,23 +246,21 @@ class Processor(metaclass=abc.ABCMeta):
         """
 
         all_results = []
-        for my_level, my_cases, my_stats in zip(
-            unwrap(sys_info.analysis_levels), analysis_cases, metric_stats
-        ):
-            my_results = []
-            my_metrics = [x.to_metric() for x in my_level.metric_configs]
-            for my_analysis in progress(
-                my_level.analyses, desc=f"{my_level.name}-level analysis"
-            ):
-                my_results.append(
-                    my_analysis.perform(
-                        cases=my_cases,
-                        metrics=my_metrics,
-                        stats=my_stats,
-                        conf_value=sys_info.conf_value,
-                    )
+        level_map = {v.name: i for i, v in enumerate(unwrap(sys_info.analysis_levels))}
+        metrics = [
+            [y.to_metric() for y in x.metric_configs]
+            for x in unwrap(sys_info.analysis_levels)
+        ]
+        for my_analysis in progress(unwrap(sys_info.analyses)):
+            level_id = level_map[my_analysis.level]
+            all_results.append(
+                my_analysis.perform(
+                    cases=analysis_cases[level_id],
+                    metrics=metrics[level_id],
+                    stats=metric_stats[level_id],
+                    conf_value=sys_info.conf_value,
                 )
-            all_results.append(my_results)
+            )
 
         return all_results
 
@@ -334,7 +354,7 @@ class Processor(metaclass=abc.ABCMeta):
 
     def sort_bucket_info(
         self,
-        analysis_results: list[list[AnalysisResult]],
+        analysis_results: list[AnalysisResult],
         sort_by: str = 'value',
         sort_by_metric: str = 'first',
         sort_ascending: bool = False,
@@ -378,7 +398,7 @@ class Processor(metaclass=abc.ABCMeta):
                     return bp.value
             raise ValueError(f'could not find metric {sort_by_metric}')
 
-        for analysis_result in itertools.chain.from_iterable(analysis_results):
+        for analysis_result in analysis_results:
             if not isinstance(analysis_result, BucketAnalysisResult):
                 continue
             bucket_result = cast(
@@ -428,8 +448,8 @@ class Processor(metaclass=abc.ABCMeta):
 
         # declare customized features: _features will be updated
         custom_features: dict = metadata.get('custom_features', {})
-        custom_analyses: dict = metadata.get('custom_analyses', {})
-        sys_info.analysis_levels = self._customize_analyses(
+        custom_analyses: list = metadata.get('custom_analyses', [])
+        sys_info.analysis_levels, sys_info.analyses = self._customize_analyses(
             sys_info, custom_features, custom_analyses
         )
 

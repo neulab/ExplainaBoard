@@ -22,10 +22,9 @@ fine_grained_res = unwrap(sys_info.results.analyses)
 overall_res = unwrap(sys_info.results.overall)
 
 # print bucket information
-for analysis_level in fine_grained_res:
-    for analysis in analysis_level:
-        if analysis is not None:
-            analysis.print()
+for analysis in fine_grained_res:
+    if analysis is not None:
+        analysis.print()
 
 # save analysis report locally
 sys_info.print_as_json(file=open("./report.json", 'w'))
@@ -48,7 +47,7 @@ for metric_info in unwrap(sys_info.results.overall)[0]:
 
 
 # get fine-grained results
-for analyses in fine_grained_res[0]:
+for analyses in fine_grained_res:
     buckets = cast(BucketAnalysisResult, analyses)
     for bucket_info in buckets.bucket_performances:
         for bucket_performance in bucket_info.performances:

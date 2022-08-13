@@ -103,7 +103,7 @@ class FileLoaderMetadata:
     supported_tasks: list[str] | None = None
     custom_features: dict[str, dict[str, FeatureType]] | None = None
     # analysis level name -> list of analyses dictionary
-    custom_analyses: dict[str, list[Analysis]] | None = None
+    custom_analyses: list[Analysis] | None = None
 
     def merge(self, other: FileLoaderMetadata) -> None:
         """
@@ -137,17 +137,14 @@ class FileLoaderMetadata:
                 )
             source_language = target_language = data.get('language')
         custom_features: dict[str, dict[str, FeatureType]] | None = None
-        custom_analyses: dict[str, list[Analysis]] | None = None
+        custom_analyses: list[Analysis] | None = None
         if 'custom_features' in data:
             custom_features = {
                 k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
                 for k1, v1 in data['custom_features'].items()
             }
         if 'custom_analyses' in data:
-            custom_analyses = {
-                k1: [Analysis.from_dict(v2) for v2 in v1]
-                for k1, v1 in data['custom_analyses'].items()
-            }
+            custom_analyses = [Analysis.from_dict(v) for v in data['custom_analyses']]
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),

@@ -1,5 +1,4 @@
 import dataclasses
-import itertools
 import os
 import unittest
 
@@ -66,9 +65,9 @@ class TestMachineTranslation(unittest.TestCase):
         condgen_processor = get_processor(TaskType.conditional_generation.value)
         mt_processor = get_processor(TaskType.machine_translation.value)
 
-        condgen_features_1 = condgen_processor.default_analyses()
-        mt_features = mt_processor.default_analyses()
-        condgen_features_2 = condgen_processor.default_analyses()
+        condgen_features_1 = condgen_processor.default_analysis_levels()
+        mt_features = mt_processor.default_analysis_levels()
+        condgen_features_2 = condgen_processor.default_analysis_levels()
 
         # MT features didn't change condgen features
         for cf1, cf2, mtf in zip(condgen_features_1, condgen_features_2, mt_features):
@@ -106,11 +105,7 @@ class TestMachineTranslation(unittest.TestCase):
         processor = get_processor(TaskType.machine_translation.value)
 
         sys_info = processor.process(dataclasses.asdict(data.metadata), data.samples)
-        analysis_map = {
-            x.name: x
-            for x in itertools.chain.from_iterable(sys_info.results.analyses)
-            if x is not None
-        }
+        analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
         self.assertTrue('num_capital_letters' in analysis_map)
 
 

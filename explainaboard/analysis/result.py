@@ -12,16 +12,14 @@ from explainaboard.analysis.performance import Performance
 class Result:
     overall: Optional[list[list[Performance]]] = None
     # {feature_name: {bucket_name: performance}}
-    analyses: Optional[list[list[AnalysisResult]]] = None
+    analyses: Optional[list[AnalysisResult]] = None
 
     @classmethod
     def dict_conv(cls, k: str, v: list[list[dict]] | None):
         if k == 'overall':
             return [[Performance.from_dict(v2) for v2 in v1] for v1 in v] if v else None
         elif k == 'analyses':
-            return (
-                [[AnalysisResult.from_dict(v2) for v2 in v1] for v1 in v] if v else None
-            )
+            return [AnalysisResult.from_dict(v1) for v1 in v] if v else None
         else:
             raise NotImplementedError
 

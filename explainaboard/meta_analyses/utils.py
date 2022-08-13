@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import itertools
 from typing import Any
 
 from explainaboard.analysis.analyses import BucketAnalysisResult
@@ -18,7 +17,7 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
     '''
     results_fine_grained = [
         narrow(BucketAnalysisResult, x)
-        for x in itertools.chain.from_iterable(unwrap(report.results.analyses))
+        for x in unwrap(report.results.analyses)
         if isinstance(x, BucketAnalysisResult)
     ]
     meta_examples = []
