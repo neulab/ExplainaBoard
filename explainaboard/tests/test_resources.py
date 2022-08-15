@@ -9,12 +9,21 @@ class TestResources(unittest.TestCase):
     def test_get_customized_features(self):
 
         self.assertEqual(
-            get_customized_features()["sst2"],
             {
-                'label': {
-                    'dtype': 'string',
-                    'description': 'the true label',
-                    'num_buckets': 2,
-                }
+                "custom_features": {
+                    "example": {
+                        "label": {"dtype": "string", "description": "the true label"}
+                    }
+                },
+                "custom_analyses": [
+                    {
+                        "cls_name": "BucketAnalysis",
+                        "feature": "label",
+                        "level": "example",
+                        "num_buckets": 2,
+                        "method": "discrete",
+                    }
+                ],
             },
+            get_customized_features()["sst2"],
         )

@@ -73,7 +73,8 @@ class TestTextClassification(unittest.TestCase):
         processor = get_processor(TaskType.text_classification.value)
 
         sys_info = processor.process(metadata, data.samples)
-        processor.print_bucket_info(sys_info.results.fine_grained)
+        for analysis in sys_info.results.analyses:
+            analysis.print()
 
         self.assertEqual(len(data), 1821)
 

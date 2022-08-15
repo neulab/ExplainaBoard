@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass, field
-from typing import Optional
+
+from explainaboard.metrics.metric import AuxiliaryMetricResult
 
 
 @dataclass
@@ -38,8 +39,9 @@ class BucketPerformance:
 class Performance:
     metric_name: str
     value: float
-    confidence_score_low: Optional[float] = None
-    confidence_score_high: Optional[float] = None
+    confidence_score_low: float | None = None
+    confidence_score_high: float | None = None
+    auxiliary_result: AuxiliaryMetricResult | None = None
 
     @classmethod
     def from_dict(cls, data_dict: dict) -> Performance:

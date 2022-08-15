@@ -566,7 +566,9 @@ class DatalabFileLoader(FileLoader):
                 parsed_level_feats = {
                     k: FeatureType.from_dict(v) for k, v in level_feats.items()
                 }
-                config.custom_features[level_name].update(parsed_level_feats)
+                new_features = config.custom_features.get(level_name, {})
+                new_features.update(parsed_level_feats)
+                config.custom_features[level_name] = new_features
             config.custom_analyses = [
                 Analysis.from_dict(x) for x in ds_feats['custom_analyses']
             ]
