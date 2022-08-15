@@ -25,7 +25,7 @@ class QAOpenDomainLoader(Loader):
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        target_field_names = ["question", "answers", "question_types"]
+        target_field_names = ["question", "answers"]
         return {
             FileType.json: JSONFileLoader(
                 [

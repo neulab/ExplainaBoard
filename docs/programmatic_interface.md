@@ -25,7 +25,7 @@ or use a custom dataset input as a raw file
 ```python
 dataset = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
 output = "./explainaboard/tests/artifacts/summarization/output.tsv"
-loader = get_loader_class(TaskType.summarization)(dataset=dataset, output=output)
+loader = get_loader_class(TaskType.summarization)(dataset_data=dataset, output_data=output)
 data = loader.load()
 processor = get_processor(TaskType.summarization)
 analysis = processor.process(metadata={}, sys_output=data)

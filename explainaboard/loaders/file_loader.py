@@ -26,6 +26,7 @@ from datalabs.features.features import ClassLabel, Sequence
 from explainaboard.analysis.analyses import Analysis
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.constants import Source
+from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
 
@@ -103,7 +104,7 @@ class FileLoaderMetadata:
     supported_tasks: list[str] | None = None
     custom_features: dict[str, dict[str, FeatureType]] | None = None
     # analysis level name -> list of analyses dictionary
-    custom_analyses: dict[str, list[Analysis]] | None = None
+    custom_analyses: list[Analysis] | None = None
 
     def merge(self, other: FileLoaderMetadata) -> None:
         """
@@ -137,17 +138,14 @@ class FileLoaderMetadata:
                 )
             source_language = target_language = data.get('language')
         custom_features: dict[str, dict[str, FeatureType]] | None = None
-        custom_analyses: dict[str, list[Analysis]] | None = None
+        custom_analyses: list[Analysis] | None = None
         if 'custom_features' in data:
             custom_features = {
                 k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
                 for k1, v1 in data['custom_features'].items()
             }
         if 'custom_analyses' in data:
-            custom_analyses = {
-                k1: [Analysis.from_dict(v2) for v2 in v1]
-                for k1, v1 in data['custom_analyses'].items()
-            }
+            custom_analyses = [Analysis.from_dict(v) for v in data['custom_analyses']]
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
@@ -514,7 +512,8 @@ class DatalabLoaderOption:
     dataset: str
     subdataset: str | None = None
     split: str = "test"
-    custom_features: list[str] | None = None
+    custom_features: dict[str, list[str]] | None = None
+    custom_analyses: list[Analysis] | None = None
 
 
 class DatalabFileLoader(FileLoader):
@@ -550,6 +549,28 @@ class DatalabFileLoader(FileLoader):
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
         config = narrow(DatalabLoaderOption, data)
+
+        # load customized features from global config files
+        customized_features_from_config = get_customized_features()
+        if config.dataset in customized_features_from_config:
+            ds_feats = customized_features_from_config[config.dataset]
+            if config.custom_features is None:
+                config.custom_features = {}
+            for level_name, level_feats in ds_feats['custom_features'].items():
+                if level_name != 'example':
+                    raise NotImplementedError(
+                        'currently custom features are only '
+                        'supported on the example level, but got '
+                        f'{level_name}'
+                    )
+                feature_names = list(level_feats.keys())
+                config.custom_features[
+                    level_name
+                ] = feature_names + config.custom_features.get(level_name, [])
+            config.custom_analyses = [
+                Analysis.from_dict(x) for x in ds_feats['custom_analyses']
+            ]
+
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
         )
@@ -565,12 +586,22 @@ class DatalabFileLoader(FileLoader):
             for idx in range(len(self._fields)):
                 src_name = cast(str, self._fields[idx].src_name)
                 self._fields[idx].src_name = getattr(info.task_templates[0], src_name)
-        if config.custom_features is not None:
-            for feat in config.custom_features:
-                self._fields.append(FileLoaderField(feat, feat, None))
 
         # Infer metadata from the dataset
         metadata = FileLoaderMetadata()
+        # load customized features from global config files
+        if config.dataset in customized_features_from_config:
+            if metadata.custom_features is None:
+                metadata.custom_features = {}
+            if metadata.custom_analyses is None:
+                metadata.custom_analyses = []
+            metadata.custom_features.update(
+                customized_features_from_config[config.dataset]['custom_features']
+            )
+            metadata.custom_analyses.extend(
+                customized_features_from_config[config.dataset]['custom_analyses']
+            )
+
         if info.languages is not None:
             metadata.supported_languages = info.languages
             # Infer languages:

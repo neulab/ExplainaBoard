@@ -26,7 +26,9 @@ from explainaboard.analysis.feature_funcs import (
     feat_num_oov,
 )
 from explainaboard.info import SysOutputInfo
+import explainaboard.metrics.eaas
 from explainaboard.metrics.eaas import EaaSMetricConfig, get_eaas_client
+from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
 import explainaboard.metrics.metric
 from explainaboard.metrics.metric import MetricConfig, MetricStats
@@ -213,7 +215,7 @@ class ConditionalGenerationProcessor(Processor):
     def full_metric_list(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        eaas_full = [
+        full_metrics_automated = [
             "bleu",
             "bart_score_summ",
             "bart_score_mt",
@@ -231,15 +233,29 @@ class ConditionalGenerationProcessor(Processor):
             "length",
             "length_ratio",
         ]
-        defaults: dict[str, list[MetricConfig]] = {
-            'example': [
+        full_metrics_human = [
+            "LikertScore_fluency",
+            "LikertScore_coherence",
+            "LikertScore_factuality",
+        ]
+        example_configs: list[MetricConfig] = []
+        for x in full_metrics_automated:
+            example_configs.append(
                 EaaSMetricConfig(
                     name=x,
                     source_language=source_language,
                     target_language=target_language,
                 )
-                for x in eaas_full
-            ],
+            )
+        for x in full_metrics_human:
+            example_configs.append(
+                ExternalEvalConfig(
+                    name=x,
+                    aspect=x.split("LikertScore_")[1],
+                )
+            )
+        defaults: dict[str, list[MetricConfig]] = {
+            'example': example_configs,
             'tok': [
                 F1ScoreConfig(
                     name='F1',
