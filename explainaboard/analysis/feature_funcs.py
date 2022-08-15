@@ -12,9 +12,7 @@ from explainaboard.utils.tokenizer import Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
-def _get_tokens(
-    sys_info: SysOutputInfo, text: str | list[str], side: str = 'source'
-) -> list[str]:
+def _get_tokens(sys_info: SysOutputInfo, text: str | list[str], side: str) -> list[str]:
     if isinstance(text, list):
         if side != 'none':
             raise ValueError('Expecting "none" as side when passing in list of strs')
@@ -28,6 +26,15 @@ def _get_tokens(
 
 
 def count_tokens(sys_info: SysOutputInfo, text: str, side: str = 'source') -> float:
+    """
+    Count the number of tokens in the text
+    :param sys_info: system output information
+    :param text: the text where the tokens should be counted
+    :param side: whether to tokenize using the source or target side tokenizer.
+      (set to 'source' by default as most tasks will have the same source and target
+      tokenizer)
+    :returns: the number of tokens in the text
+    """
     return len(_get_tokens(sys_info, text, side))
 
 
