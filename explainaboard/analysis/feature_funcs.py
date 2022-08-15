@@ -146,17 +146,43 @@ def cap_feature(s):
         return "not_first_caps"
 
 
-def relative_position(sys_info: SysOutputInfo, text: str, word: str):
-    tokens = unwrap(sys_info.source_tokenizer)(text).strs
+def relative_position(
+    sys_info: SysOutputInfo, text: str, word: str, side: str = 'source'
+) -> float:
+    """
+    Return the relative position of a token within the string text with respect to the
+    total number of tokens in the text. If the token is not found, return '-1'
+    :param sys_info: system output information
+    :param text: the text where the tokens should be counted
+    :param word: the token to search for
+    :param side: whether to tokenize using the source or target side tokenizer.
+      (set to 'source' by default as most tasks will have the same source and target
+      tokenizer)
+    :returns: the relative position of the token
+    """
+    tokens = _get_tokens(sys_info, text, side)
     if word not in tokens:
-        return 0
+        return -1
     else:
         return float(tokens.index(word)) / len(tokens)
 
 
-def absolute_position(sys_info: SysOutputInfo, text: str, word: str):
-    tokens = unwrap(sys_info.source_tokenizer)(text).strs
+def absolute_position(
+    sys_info: SysOutputInfo, text: str, word: str, side: str = 'source'
+) -> float:
+    """
+    Return the absolute position of a token within the string text. If the token is not
+    found, return '-1'
+    :param sys_info: system output information
+    :param text: the text where the tokens should be counted
+    :param word: the token to search for
+    :param side: whether to tokenize using the source or target side tokenizer.
+      (set to 'source' by default as most tasks will have the same source and target
+      tokenizer)
+    :returns: the absolute position of the token
+    """
+    tokens = _get_tokens(sys_info, text, side)
     if word not in tokens:
-        return 0
+        return -1
     else:
         return float(tokens.index(word)) / len(tokens)
