@@ -14,8 +14,6 @@ from explainaboard.utils.typing_utils import unwrap
 
 def _get_tokens(sys_info: SysOutputInfo, text: str | list[str], side: str) -> list[str]:
     if isinstance(text, list):
-        if side != 'none':
-            raise ValueError('Expecting "none" as side when passing in list of strs')
         return text
     elif side == 'source':
         return unwrap(sys_info.source_tokenizer)(text).strs
