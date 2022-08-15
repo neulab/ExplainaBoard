@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import cast, List
 
 from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     count_tokens,
@@ -28,7 +27,7 @@ class QAOpenDomainProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.qa_open_domain
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
             "question": feature.Value("string"),
             # "question_types": feature.Sequence(feature=feature.Value("string")),
@@ -64,24 +63,17 @@ class QAOpenDomainProcessor(Processor):
                 ),
             ),
         }
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
-        analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=features[x].description, feature=x, method="continuous"
-            )
-            for x in continuous_features
-        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(

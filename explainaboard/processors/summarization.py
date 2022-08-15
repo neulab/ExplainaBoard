@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator
 from functools import lru_cache
-import itertools
 
 from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
@@ -13,7 +12,7 @@ import numpy
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
@@ -61,8 +60,8 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def task_type(cls) -> TaskType:
         return TaskType.summarization
 
-    def default_analyses(self) -> list[AnalysisLevel]:
-        f = super().default_analyses()
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
+        f = super().default_analysis_levels()
         new_examp_features = {
             "sum_attributes": feature.Value(
                 dtype="dict",
@@ -93,19 +92,7 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                 func=lambda info, x, c: c.features['sum_attributes']["attr_novelty"],
             ),
         }
-        new_examp_cont_features = [
-            k for k, v in new_examp_features.items() if ('float' in unwrap(v.dtype))
-        ]
-        new_examp_analyses: Sequence[Analysis] = [
-            BucketAnalysis(
-                description=new_examp_features[x].description,
-                feature=x,
-                method="continuous",
-            )
-            for x in new_examp_cont_features
-        ]
         f[0].features.update(new_examp_features)
-        f[0].analyses = list(itertools.chain(f[0].analyses, new_examp_analyses))
         return f
 
     @classmethod

@@ -488,10 +488,9 @@ def main():
                     )
             get_logger('report').info('')
             get_logger('report').info('--- Fine-grained Analyses')
-            for analysis_level in report.results.analyses:
-                for analysis in analysis_level:
-                    if analysis is not None:
-                        analysis.print()
+            for analysis in report.results.analyses:
+                if analysis is not None:
+                    analysis.print()
 
             if output_dir:
 

@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import cast, List
 
 from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import (
     absolute_position,
@@ -32,7 +31,7 @@ class ClozeGenerativeProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.cloze_generative
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "context": feature.Value("string"),
             "question_mark": feature.Value("string"),
@@ -86,24 +85,17 @@ class ClozeGenerativeProcessor(Processor):
                 ),
             ),
         }
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
-        analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=features[x].description, feature=x, method="continuous"
-            )
-            for x in continuous_features
-        ]
 
         return [
             AnalysisLevel(
                 name='example',
                 features=features,
                 metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(

@@ -25,6 +25,7 @@ class AnalysisResult:
     """
 
     name: str
+    level: str
 
     def print(self):
         raise NotImplementedError
@@ -50,6 +51,7 @@ class Analysis:
     """
 
     description: str | None
+    level: str
 
     def perform(
         self,
@@ -77,6 +79,7 @@ class Analysis:
         if type == 'BucketAnalysis':
             return BucketAnalysis(
                 description=dikt.get('description'),
+                level=dikt['level'],
                 feature=dikt['feature'],
                 method=dikt.get('method', 'continuous'),
                 number=dikt.get('number', 4),
@@ -86,6 +89,7 @@ class Analysis:
         elif type == 'ComboCountAnalysis':
             return ComboCountAnalysis(
                 description=dikt.get('description'),
+                level=dikt['level'],
                 features=dikt['features'],
             )
 
@@ -108,7 +112,9 @@ class BucketAnalysisResult(AnalysisResult):
             BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
         ]
         return BucketAnalysisResult(
-            name=dikt['name'], bucket_performances=bucket_performances
+            name=dikt['name'],
+            level=dikt['level'],
+            bucket_performances=bucket_performances,
         )
 
     def __post_init__(self):
@@ -224,7 +230,9 @@ class BucketAnalysis(Analysis):
 
             bucket_performances.append(bucket_performance)
 
-        return BucketAnalysisResult(self.feature, bucket_performances)
+        return BucketAnalysisResult(
+            name=self.feature, level=self.level, bucket_performances=bucket_performances
+        )
 
 
 @dataclass
@@ -246,6 +254,7 @@ class ComboCountAnalysisResult(AnalysisResult):
     def from_dict(dikt: dict) -> ComboCountAnalysisResult:
         return ComboCountAnalysisResult(
             name=dikt['name'],
+            level=dikt['level'],
             features=dikt['features'],
             combo_counts=dikt['combo_counts'],
         )
@@ -267,6 +276,7 @@ class ComboCountAnalysis(Analysis):
     A class used to count feature combinations (e.g. for confusion matrices). It will
     return counts of each combination of values for the features named in `features`.
     Args:
+        level: the level to which this analysis should be applied
         features: the name of the features over which to perform the analysis
     """
 
@@ -300,6 +310,7 @@ class ComboCountAnalysis(Analysis):
         combo_list = list(combo_map.items())
         return ComboCountAnalysisResult(
             name='combo(' + ','.join(self.features) + ')',
+            level=self.level,
             features=self.features,
             combo_counts=combo_list,
         )
@@ -309,17 +320,14 @@ class ComboCountAnalysis(Analysis):
 class AnalysisLevel:
     name: str
     features: dict[str, FeatureType]
-    analyses: list[Analysis]
     metric_configs: list[MetricConfig]
 
     @staticmethod
     def from_dict(dikt: dict):
         features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
-        analyses = [Analysis.from_dict(v) for v in dikt['analyses']]
         metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
         return AnalysisLevel(
             name=dikt['name'],
             features=features,
-            analyses=analyses,
             metric_configs=metric_configs,
         )

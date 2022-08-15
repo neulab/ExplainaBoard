@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 import json
-from typing import Any, cast, List
+from typing import Any
 
 from datalabs import aggregating
 
@@ -22,7 +22,6 @@ from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -31,7 +30,7 @@ class KGLinkTailPredictionProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.kg_link_tail_prediction
 
-    def default_analyses(self) -> list[AnalysisLevel]:
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
             "true_head": feature.Value("string"),
             "true_head_decipher": feature.Value("string"),
@@ -89,17 +88,22 @@ class KGLinkTailPredictionProcessor(Processor):
                 func=lambda info, x, c: self._get_entity_type_level(x),
             ),
         }
-        continuous_features = [
-            k for k, v in features.items() if ('float' in unwrap(v.dtype))
-        ]
-        discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
-        analyses: list[BucketAnalysis] = [
-            BucketAnalysis(
-                description=features[x].description, feature=x, method="continuous"
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
             )
-            for x in continuous_features
-        ] + [
+        ]
+
+    def default_analyses(self) -> list[Analysis]:
+        analysis_levels = self.default_analysis_levels()
+        features = analysis_levels[0].features
+        discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
+        analyses: list[Analysis] = [
             BucketAnalysis(
+                level=analysis_levels[0].name,
                 description=features[k].description,
                 feature=k,
                 method="discrete",
@@ -107,15 +111,8 @@ class KGLinkTailPredictionProcessor(Processor):
             )
             for k, v in discrete_features.items()
         ]
-
-        return [
-            AnalysisLevel(
-                name='example',
-                features=features,
-                metric_configs=self.default_metrics(),
-                analyses=cast(List[Analysis], analyses),
-            )
-        ]
+        analyses.extend(self.continuous_feature_analyses())
+        return analyses
 
     @classmethod
     def default_metrics(

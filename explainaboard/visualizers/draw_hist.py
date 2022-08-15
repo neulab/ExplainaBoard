@@ -4,7 +4,7 @@ import argparse
 import json
 import os
 
-from explainaboard.analysis.analyses import BucketAnalysis, BucketAnalysisResult
+from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.analysis.performance import Performance
 from explainaboard.info import SysOutputInfo
 from explainaboard.utils.logging import progress
@@ -36,25 +36,20 @@ def draw_bar_chart_from_reports(
     num_levels = len(unwrap(report_info[0].analysis_levels))
     for level_id in range(num_levels):
 
+        level_name = unwrap(report_info[0].analysis_levels)[level_id].name
+
         overall_results: list[list[Performance]] = [
             list(unwrap(x.results.overall)[level_id]) for x in report_info
-        ]
-        bucket_names: list[list[str]] = [
-            [
-                y.feature
-                for y in unwrap(x.analysis_levels)[level_id].analyses
-                if isinstance(y, BucketAnalysis)
-            ]
-            for x in report_info
         ]
         bucket_results: list[list[BucketAnalysisResult]] = [
             [
                 y
-                for y in unwrap(x.results.analyses)[level_id]
-                if isinstance(y, BucketAnalysisResult)
+                for y in unwrap(x.results.analyses)
+                if isinstance(y, BucketAnalysisResult) and y.level == level_name
             ]
             for x in report_info
         ]
+        bucket_names: list[list[str]] = [[y.name for y in x] for x in bucket_results]
         metric_names: list[list[str]] = [
             [y.metric_name for y in x] for x in overall_results
         ]

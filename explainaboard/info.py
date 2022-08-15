@@ -9,7 +9,7 @@ import sys
 from typing import Callable, Optional
 
 from explainaboard import config
-from explainaboard.analysis.analyses import AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
@@ -77,6 +77,7 @@ class SysOutputInfo:
     source_tokenizer: Optional[Tokenizer] = None
     target_tokenizer: Optional[Tokenizer] = None
     analysis_levels: Optional[list[AnalysisLevel]] = None
+    analyses: Optional[list[Analysis]] = None
 
     # set later
     results: Result = field(default_factory=lambda: Result())

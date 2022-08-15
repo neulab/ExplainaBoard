@@ -49,9 +49,7 @@ class TestNER(unittest.TestCase):
 
         # test: training set dependent features should be disabled when
         # training dataset is not provided
-        activate_features = [
-            x.name for x in sys_info.results.analyses[0] if x is not None
-        ]
+        activate_features = [x.name for x in sys_info.results.analyses if x is not None]
         self.assertTrue("span_econ" not in activate_features)
         self.assertTrue("span_efre" not in activate_features)
 
@@ -83,7 +81,7 @@ class TestNER(unittest.TestCase):
         # 1. Unittest: training set dependent features shouldn't be included
         # when training dataset is not provided
         span_analysis_map = {
-            x.name: x for x in sys_info.results.analyses[1] if x is not None
+            x.name: x for x in sys_info.results.analyses if x is not None
         }
         self.assertTrue("span_econ" in span_analysis_map)
         self.assertTrue("span_efre" in span_analysis_map)
@@ -116,7 +114,9 @@ class TestNER(unittest.TestCase):
             second_bucket.performances[0].value, 0.9121588089330025, 4, "almost equal"
         )
         # 6 Unittest: test detailed bucket information: confidence interval
-        for bucket_vals in sys_info.results.analyses[0]:
+        for bucket_vals in sys_info.results.analyses:
+            if not isinstance(bucket_vals, BucketAnalysisResult):
+                continue
             for bucket in cast(BucketAnalysisResult, bucket_vals).bucket_performances:
                 for performance in bucket.performances:
                     if performance.confidence_score_low is not None:
