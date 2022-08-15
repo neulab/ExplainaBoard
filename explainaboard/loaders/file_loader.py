@@ -512,7 +512,7 @@ class DatalabLoaderOption:
     dataset: str
     subdataset: str | None = None
     split: str = "test"
-    custom_features: dict[str, list[str]] | None = None
+    custom_features: dict[str, dict[str, FeatureType]] | None = None
     custom_analyses: list[Analysis] | None = None
 
 
@@ -563,10 +563,10 @@ class DatalabFileLoader(FileLoader):
                         'supported on the example level, but got '
                         f'{level_name}'
                     )
-                feature_names = list(level_feats.keys())
-                config.custom_features[
-                    level_name
-                ] = feature_names + config.custom_features.get(level_name, [])
+                parsed_level_feats = {
+                    k: FeatureType.from_dict(v) for k, v in level_feats.items()
+                }
+                config.custom_features[level_name].update(parsed_level_feats)
             config.custom_analyses = [
                 Analysis.from_dict(x) for x in ds_feats['custom_analyses']
             ]
@@ -588,16 +588,19 @@ class DatalabFileLoader(FileLoader):
                 self._fields[idx].src_name = getattr(info.task_templates[0], src_name)
 
         # Infer metadata from the dataset
-        metadata = FileLoaderMetadata()
+        metadata = FileLoaderMetadata(
+            custom_features=config.custom_features,
+            custom_analyses=config.custom_analyses,
+        )
         # load customized features from global config files
         if config.dataset in customized_features_from_config:
             if metadata.custom_features is None:
                 metadata.custom_features = {}
-            if metadata.custom_analyses is None:
-                metadata.custom_analyses = []
             metadata.custom_features.update(
                 customized_features_from_config[config.dataset]['custom_features']
             )
+            if metadata.custom_analyses is None:
+                metadata.custom_analyses = []
             metadata.custom_analyses.extend(
                 customized_features_from_config[config.dataset]['custom_analyses']
             )
