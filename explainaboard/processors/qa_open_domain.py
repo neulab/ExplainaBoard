@@ -38,11 +38,6 @@ class QAOpenDomainProcessor(Processor):
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
-            # "question_type": feature.Value(
-            #     dtype="string",
-            #     description="type of the question",
-            #     func=lambda info, x, c: ' '.join(x['question_types']),
-            # ),
             "answer_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
