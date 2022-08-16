@@ -1,12 +1,22 @@
 {
   "metadata": {
     "custom_features": {
-      "commonsense_category": {
-        "dtype": "string",
-        "description": "commonsense_category",
-        "num_buckets": 8
+      "example": {
+        "commonsense_category": {
+          "dtype": "string",
+          "description": "common sense category"
+        }
       }
-    }
+    },
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "commonsense_category",
+        "num_buckets": 8,
+        "method": "discrete"
+      }
+    ]
   },
   "examples": [
     {

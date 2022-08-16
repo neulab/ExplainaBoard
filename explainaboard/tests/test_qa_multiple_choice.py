@@ -42,7 +42,7 @@ class TestQAMultipleChoice(unittest.TestCase):
         processor = get_processor(TaskType.qa_multiple_choice.value)
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_multiple_qa_customized_feature(self):
@@ -74,7 +74,7 @@ class TestQAMultipleChoice(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
 

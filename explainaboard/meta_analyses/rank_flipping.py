@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import itertools
+
 from explainaboard.info import SysOutputInfo
 from explainaboard.meta_analyses.utils import report_to_sysout
 from explainaboard.utils.typing_utils import unwrap
@@ -65,7 +67,12 @@ class RankFlippingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis cl
                     "description": metric_config.name,
                     "num_buckets": 2,  # for rank flipping, True or False
                 }
-                for metric_config in unwrap(self.model1_report.metric_configs)
+                for metric_config in itertools.chain.from_iterable(
+                    [
+                        x.metric_configs
+                        for x in unwrap(self.model1_report.analysis_levels)
+                    ]
+                )
             }
         }
         return metadata
@@ -81,8 +88,12 @@ class RankFlippingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis cl
         The rank-flipping meta-analysis will then reveal which buckets, and how
         many, subvert this expectation.
         '''
-        m1_overall = unwrap(self.model1_report.results.overall)
-        m2_overall = unwrap(self.model2_report.results.overall)
+        m1_overall = list(
+            itertools.chain.from_iterable(unwrap(self.model1_report.results.overall))
+        )
+        m2_overall = list(
+            itertools.chain.from_iterable(unwrap(self.model2_report.results.overall))
+        )
         model1_metric_is_greater = {
             metric_name: m1_overall[metric_name].value > m2_overall[metric_name].value
             for metric_name in metadata['custom_features'].keys()

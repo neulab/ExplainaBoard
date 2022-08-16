@@ -47,8 +47,8 @@ class NLGMetaEvaluationLoader(Loader):
                     FileLoaderField(3, target_field_names[3], str),
                     FileLoaderField(4, target_field_names[4], str),
                     FileLoaderField(5, target_field_names[5], str),
-                    FileLoaderField(6, target_field_names[6], str),
-                    FileLoaderField(7, target_field_names[7], str),
+                    FileLoaderField(6, target_field_names[6], float),
+                    FileLoaderField(7, target_field_names[7], float),
                 ],
             ),
         }
@@ -58,5 +58,5 @@ class NLGMetaEvaluationLoader(Loader):
 
         field_name = "auto_score"
         return {
-            FileType.text: TextFileLoader(field_name, str),
+            FileType.text: TextFileLoader(field_name, float),
         }

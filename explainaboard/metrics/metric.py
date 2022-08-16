@@ -11,6 +11,11 @@ from explainaboard.utils.typing_utils import unwrap, unwrap_or
 
 
 @dataclass
+class AuxiliaryMetricResult:
+    pass
+
+
+@dataclass
 class MetricResult:
     """
     A result of computing a metric over some data
@@ -24,8 +29,8 @@ class MetricResult:
     conf_interval: Optional[tuple[float, float]] = None
     # The p-value of the confidence interval
     conf_value: Optional[float] = None
-    # The agreement of different annotators
-    agreement: Optional[float] = None
+    # Extra data for
+    auxiliary_result: AuxiliaryMetricResult | None = None
 
     def to_dict(self):
         ret = {
@@ -36,8 +41,6 @@ class MetricResult:
             ret['conf_interval'] = self.conf_interval
         if self.conf_value is not None:
             ret['conf_value'] = self.conf_value
-        if self.agreement is not None:
-            ret['agreement'] = self.agreement
         return ret
 
 
@@ -52,7 +55,7 @@ class MetricConfig(dict):
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    cls_name: str = ''
+    cls_name: str | None = None
     # The external statistics for metrics
     external_stats: np.ndarray | None = None
 
@@ -62,6 +65,10 @@ class MetricConfig(dict):
 
     def to_metric(self):
         raise NotImplementedError
+
+    @classmethod
+    def dict_conv(cls, k, v):
+        return v
 
 
 class MetricStats:

@@ -25,10 +25,10 @@ class TestNLGMetaEval(unittest.TestCase):
             FileType.tsv,
             FileType.text,
         )
-        data = loader.load()
+        data = loader.load().samples
         processor = get_processor(TaskType.nlg_meta_evaluation)
 
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

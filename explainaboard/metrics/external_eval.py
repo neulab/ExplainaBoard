@@ -5,7 +5,13 @@ from typing import cast, Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricResult, MetricStats
+from explainaboard.metrics.metric import (
+    AuxiliaryMetricResult,
+    Metric,
+    MetricConfig,
+    MetricResult,
+    MetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.agreement import fleiss_kappa
 from explainaboard.utils.typing_utils import unwrap
@@ -16,6 +22,11 @@ EXTERNAL_METRICS = [
     "LikertScore_factuality",
 ]
 UNANNOTATED_SYMBOL = -1
+
+
+@dataclass
+class ExternalEvalResult(AuxiliaryMetricResult):
+    agreement: float
 
 
 @dataclass
@@ -60,7 +71,7 @@ class ExternalEval(Metric):
     ) -> MetricStats:
         config = cast(ExternalEvalConfig, self._get_config(config))
 
-        if config is not None and config.external_stats is not None:
+        if config.external_stats is not None:
             n_sample, n_annotators = config.external_stats.shape
             if n_sample != len(true_data):
                 raise ValueError(
@@ -140,4 +151,10 @@ class ExternalEval(Metric):
         conf_interval = (
             self.calc_confidence_interval(stats, conf_value) if conf_value else None
         )
-        return MetricResult(config, float(value), conf_interval, conf_value, agreement)
+        return MetricResult(
+            config,
+            float(value),
+            conf_interval,
+            conf_value,
+            ExternalEvalResult(agreement),
+        )

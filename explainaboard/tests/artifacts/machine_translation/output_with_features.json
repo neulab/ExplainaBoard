@@ -1,12 +1,21 @@
 {
   "metadata": {
     "custom_features": {
-      "num_capital_letters": {
-        "dtype": "float",
-        "description": "number of capital letters in the string",
-        "num_buckets": 4
+      "example": {
+        "num_capital_letters": {
+          "dtype": "float"
+        }
       }
-    }
+    },
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "num_capital_letters",
+        "num_buckets": 4,
+        "method": "continuous"
+      }
+    ]
   },
   "examples": [
     {

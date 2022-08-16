@@ -31,7 +31,7 @@ class LanguageModelingLoader(Loader):
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         field_name = 'text'
         return {
-            FileType.text: TextFileLoader(),
+            FileType.text: TextFileLoader(field_name, str),
             FileType.json: JSONFileLoader(
                 [
                     FileLoaderField("text", field_name, str),

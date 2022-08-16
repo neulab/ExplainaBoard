@@ -101,9 +101,11 @@ class F1Score(Metric):
                 np.sum(x, axis=1) for x in (true, pred, true_match, pred_match)
             )
 
+        np.seterr(invalid='ignore')
         p = np.where(pred != 0.0, pred_match / pred, 0.0)
         r = np.where(true != 0.0, true_match / true, 0.0)
         f1 = np.where(p + r != 0.0, 2 * p * r / (p + r), 0.0)
+        np.seterr(invalid='warn')
 
         if config.average == 'macro':
             f1 = np.mean(f1, axis=1)

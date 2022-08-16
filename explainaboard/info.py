@@ -6,11 +6,13 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Any, Optional
+from typing import Callable, Optional
 
 from explainaboard import config
-from explainaboard.feature import Features
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
+from explainaboard.analysis.case import AnalysisCase
+from explainaboard.analysis.result import Result
+from explainaboard.metrics.metric import MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.serialization import general_to_dict
 from explainaboard.utils.tokenizer import Tokenizer
@@ -43,150 +45,6 @@ class PaperInfo:
 
 
 @dataclass
-class Performance:
-    metric_name: str
-    value: float
-    confidence_score_low: Optional[float] = None
-    confidence_score_high: Optional[float] = None
-    agreement: Optional[float] = None
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> Performance:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(**{k: v for k, v in data_dict.items() if k in field_names})
-
-
-@dataclass
-class BucketCase:
-    """
-    A class to represent cases to display to users for analysis.
-    :param sample_id: The ID of a single sample
-    """
-
-    sample_id: int
-
-    def __post_init__(self):
-        if isinstance(self.sample_id, str):
-            raise ValueError
-
-    @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        return v
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> BucketCase:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
-
-
-@dataclass
-class BucketCaseSpan(BucketCase):
-    """
-    A bucket case that highlights a span in text.
-    :param text: The text that should be highlighted
-    :param token_span: The span of tokens to be highlighted
-    :param char_span: The span of characters to be highlighted
-    :param location: The name of the feature (e.g. "text", "source", "reference") over
-      which this span is calculated
-    """
-
-    token_span: tuple[int, int]
-    char_span: tuple[int, int]
-    orig_str: str
-    text: str
-
-    def __post_init__(self):
-        if isinstance(self.token_span, str) or isinstance(self.char_span, str):
-            raise ValueError
-
-
-@dataclass
-class BucketCaseMultiSpan(BucketCase):
-    """
-    A bucket case that highlights multiple spans in text
-    :param spans: The spans that are highlighted
-    """
-
-    spans: list[BucketCaseSpan]
-
-
-@dataclass
-class BucketCaseLabeledSpan(BucketCaseSpan):
-    """
-    A bucket case that highlights a span in text along with a label.
-    :param true_label: The actual label
-    :param predicted_label: The label that is predicted
-    """
-
-    true_label: str
-    predicted_label: str
-
-
-@dataclass
-class BucketPerformance:
-    bucket_interval: tuple
-    n_samples: float
-    bucket_samples: list[Any] = field(default_factory=list)
-    performances: list[Performance] = field(default_factory=list)
-
-    @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        if k == 'performances':
-            return [Performance.from_dict(v1) for v1 in v]
-        if k == 'bucket_samples' and isinstance(v, dict):
-            return [BucketCase.from_dict(v1) for v1 in v]
-        else:
-            return v
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> BucketPerformance:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
-
-
-@dataclass
-class BucketCaseCollection:
-    interval: tuple
-    samples: list[BucketCase]
-
-    def __len__(self):
-        return len(self.samples)
-
-
-@dataclass
-class Result:
-    overall: Optional[dict[str, Performance]] = None
-    # {feature_name: {bucket_name: performance}}
-    fine_grained: Optional[dict[str, list[BucketPerformance]]] = None
-    calibration: Optional[list[Performance]] = None
-
-    @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        if k == 'overall':
-            return {k1: Performance.from_dict(v1) for k1, v1 in v.items()}
-        elif k == 'fine_grained':
-            return {
-                k1: [BucketPerformance.from_dict(v2) for v2 in v1]
-                for k1, v1 in v.items()
-            }
-        elif k == 'calibration':
-            return None if v is None else [Performance.from_dict(v1) for v1 in v]
-        else:
-            raise NotImplementedError
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> Result:
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
-
-
-@dataclass
 class SysOutputInfo:
     """Information about a system output and its analysis settings
 
@@ -195,15 +53,14 @@ class SysOutputInfo:
         system_name (str): the name of the system .
         dataset_name (str): the dataset used of the system.
         sub_dataset_name (str): the name of the sub-dataset.
+        dataset_split (str): the name of the split.
         source_language (str): the language of the input
         target_language (str): the language of the output
-        code (str): the url of the code.
-        download_link (str): the url of the system output.
-        paper (Paper, optional): the published paper of the system.
-        features (Features, optional): the features used to describe system output's
-            column type.
-        is_print_case (bool): Whether or not to print out cases
-        conf_value (float): The p-value of the confidence interval
+        reload_stat (bool): whether to reload the statistics or not
+        system_details (dict): a dictionary of system details
+        source_tokenizer (Tokenizer): the tokenizer for source sentences
+        target_tokenizer (Tokenizer): the tokenizer for target sentences
+        analysis_levels: the levels of analysis to perform
     """
 
     # set in the system_output scripts
@@ -215,18 +72,14 @@ class SysOutputInfo:
     source_language: str | None = None
     target_language: str | None = None
     reload_stat: bool = True
-    is_print_case: bool = True
     conf_value: float = 0.05
     system_details: Optional[dict] = None
-    metric_configs: Optional[list[MetricConfig]] = None
     source_tokenizer: Optional[Tokenizer] = None
     target_tokenizer: Optional[Tokenizer] = None
+    analysis_levels: Optional[list[AnalysisLevel]] = None
+    analyses: Optional[list[Analysis]] = None
 
     # set later
-    # code: str = None
-    # download_link: str = None
-    # paper_info: PaperInfo = PaperInfo()
-    features: Optional[Features] = None
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
@@ -245,6 +98,9 @@ class SysOutputInfo:
         else:
             replace_keys = []
             for key, value in data.items():
+                if isinstance(value, Callable):
+                    # TODO(gneubig): cannot serialize functions so info is lost
+                    data[key] = None
                 if not isinstance(key, str):
                     replace_keys.append(key)
                 if isinstance(value, dict) or isinstance(value, list):
@@ -306,10 +162,21 @@ class SysOutputInfo:
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
+        """
+        A deserialization utility function that takes in a key corresponding to a
+        parameter name, and dictionary corresponding to a serialized version of that
+        parameter's value, then return the deserialized version of the value.
+        :param k: the parameter name
+        :param v: the parameter's value
+        """
         if k == 'results':
             return Result.from_dict(v)
         elif k.endswith('tokenizer'):
             return Tokenizer.from_dict(v)
+        elif k == 'analysis_levels':
+            return [AnalysisLevel.from_dict(v1) for v1 in v]
+        elif k == 'analyses':
+            return [Analysis.from_dict(v1) for v1 in v]
         else:
             return v
 
@@ -337,19 +204,5 @@ class SysOutputInfo:
 @dataclass
 class OverallStatistics:
     sys_info: SysOutputInfo
-    metric_stats: list[MetricStats]
-    active_features: list[str]
-
-
-def print_bucket_perfs(bucket_perfs: list[BucketPerformance], print_information: str):
-    metric_names = [x.metric_name for x in bucket_perfs[0].performances]
-    for i, metric_name in enumerate(metric_names):
-        get_logger('report').info(f"the information of #{print_information}#")
-        get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
-        for bucket_perf in bucket_perfs:
-            get_logger('report').info(
-                f"{bucket_perf.bucket_interval}\t"
-                f"{bucket_perf.performances[i].value}\t"
-                f"{bucket_perf.n_samples}"
-            )
-        get_logger('report').info('')
+    analysis_cases: list[list[AnalysisCase]]
+    metric_stats: list[list[MetricStats]]

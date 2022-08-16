@@ -1,18 +1,23 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+from explainaboard import TaskType
+from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
+from explainaboard.analysis.feature_funcs import (
+    accumulate_vocab_from_samples,
+    count_tokens,
+    feat_freq_rank,
+    feat_num_oov,
+)
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
-from explainaboard.utils.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -22,63 +27,57 @@ class QAOpenDomainProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.qa_open_domain
 
-    @classmethod
-    def default_features(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "question": feature.Value("string"),
-                "answers": feature.Sequence(feature=feature.Value("string")),
-                "question_length": feature.Value(
-                    dtype="float",
-                    description="the length of question",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
+        features = {
+            "question": feature.Value("string"),
+            # "question_types": feature.Sequence(feature=feature.Value("string")),
+            "answers": feature.Sequence(feature=feature.Value("string")),
+            "question_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x, c: count_tokens(info, x['question']),
+            ),
+            "answer_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x, c: count_tokens(
+                    info, x['answers'][0], side='target'
                 ),
-                "answer_length": feature.Value(
-                    dtype="float",
-                    description="the length of answer",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words in the context",
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_num_oov(
+                    info, x['context'], stat['source_vocab']
                 ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "average rank of context words based on training set freq"
                 ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_freq_rank(
+                    info, x['context'], stat['source_vocab_rank']
                 ),
-            }
-        )
+            ),
+        }
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
+            )
+        ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             ExactMatchQAConfig(
@@ -92,41 +91,6 @@ class QAOpenDomainProcessor(Processor):
                 target_language=target_language,
             ),
         ]
-
-    def __init__(self):
-        super().__init__()
-
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_question_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["question"]))
-
-    def _get_answer_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.target_tokenizer)(existing_features["answers"][0]))
-
-    # training set dependent features
-    def _get_num_oov(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features,
-            statistics['source_vocab'],
-            lambda x: x['question'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features,
-            statistics['source_vocab_rank'],
-            lambda x: x['question'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # --- End feature functions
 
     def _get_true_label(self, data_point):
         """

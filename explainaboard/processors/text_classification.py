@@ -1,18 +1,31 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from typing import Any
 
 from datalabs import aggregating
 
-from explainaboard import feature, TaskType
+from explainaboard import TaskType
+from explainaboard.analysis import feature
+from explainaboard.analysis.analyses import (
+    Analysis,
+    AnalysisLevel,
+    BucketAnalysis,
+    ComboCountAnalysis,
+)
+from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature_funcs import (
+    count_tokens,
+    feat_freq_rank,
+    feat_length_freq,
+    feat_num_oov,
+    get_basic_words,
+    get_lexical_richness,
+)
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-import explainaboard.utils.feature_funcs
-from explainaboard.utils.feature_funcs import get_basic_words, get_lexical_richness
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
@@ -23,164 +36,113 @@ class TextClassificationProcessor(Processor):
     def task_type(cls) -> TaskType:
         return TaskType.text_classification
 
-    @classmethod
-    def default_features(cls) -> feature.Features:
-        return feature.Features(
-            {
-                "text": feature.Value("string"),
-                "true_label": feature.Value("string"),
-                "predicted_label": feature.Value("string"),
-                "label": feature.Value(
-                    dtype="string",
-                    description="category",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_discrete_value", number=4, setting=1
-                    ),
+    def default_analysis_levels(self) -> list[AnalysisLevel]:
+        features: dict[str, FeatureType] = {
+            "text": feature.Value(
+                dtype="string",
+                description="the text of the example",
+            ),
+            "true_label": feature.Value(
+                dtype="string",
+                description="the true label of the input",
+            ),
+            "predicted_label": feature.Value(
+                dtype="string",
+                description="the predicted label",
+            ),
+            "text_length": feature.Value(
+                dtype="float",
+                description="text length in tokens",
+                func=lambda info, x, c: count_tokens(info, x['text']),
+            ),
+            "text_chars": feature.Value(
+                dtype="float",
+                description="text length in characters",
+                func=lambda info, x, c: len(x['text']),
+            ),
+            "basic_words": feature.Value(
+                dtype="float",
+                description="the ratio of basic words",
+                func=lambda info, x, c: get_basic_words(x['text']),
+            ),
+            "lexical_richness": feature.Value(
+                dtype="float",
+                description="lexical diversity",
+                func=lambda info, x, c: get_lexical_richness(x['text']),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_num_oov(
+                    info, x['text'], stat['vocab']
                 ),
-                "text_length": feature.Value(
-                    dtype="float",
-                    description="text length in tokens",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "the average rank of each word based on its frequency in "
+                    "training set"
                 ),
-                "text_chars": feature.Value(
-                    dtype="float",
-                    description="text length in characters",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_freq_rank(
+                    info, x['text'], stat['vocab_rank']
                 ),
-                "basic_words": feature.Value(
-                    dtype="float",
-                    description="the ratio of basic words",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
+            ),
+            "length_fre": feature.Value(
+                dtype="float",
+                description="the frequency of text length in training set",
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_length_freq(
+                    info, x['text'], stat['length_fre']
                 ),
-                "lexical_richness": feature.Value(
-                    dtype="float",
-                    description="lexical diversity",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                ),
-                "num_oov": feature.Value(
-                    dtype="float",
-                    description="the number of out-of-vocabulary words",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "fre_rank": feature.Value(
-                    dtype="float",
-                    description=(
-                        "the average rank of each word based on its frequency in "
-                        "training set"
-                    ),
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-                "length_fre": feature.Value(
-                    dtype="float",
-                    description="the frequency of text length in training set",
-                    is_bucket=True,
-                    bucket_info=feature.BucketInfo(
-                        method="bucket_attribute_specified_bucket_value",
-                        number=4,
-                        setting=(),
-                    ),
-                    require_training_set=True,
-                ),
-            }
-        )
+            ),
+        }
+
+        return [
+            AnalysisLevel(
+                name='example',
+                features=features,
+                metric_configs=self.default_metrics(),
+            )
+        ]
+
+    def default_analyses(self) -> list[Analysis]:
+        features = self.default_analysis_levels()[0].features
+        # Create analyses
+        analyses: list[Analysis] = [
+            BucketAnalysis(
+                level="example",
+                description=features["true_label"].description,
+                feature="true_label",
+                method="discrete",
+                number=15,
+            ),
+            ComboCountAnalysis(
+                level="example",
+                description="confusion matrix",
+                features=("true_label", "predicted_label"),
+            ),
+        ]
+        analyses.extend(self.continuous_feature_analyses())
+        return analyses
 
     @classmethod
     def default_metrics(
-        cls, source_language=None, target_language=None
+        cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
-
-    # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
-    def _get_text_length(self, sys_info: SysOutputInfo, existing_features: dict):
-        return len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
-
-    def _get_text_chars(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return len(existing_feature["text"])
-
-    def _get_label(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return existing_feature["true_label"]
-
-    def _get_basic_words(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return get_basic_words(existing_feature["text"])
-
-    def _get_lexical_richness(self, sys_info: SysOutputInfo, existing_feature: dict):
-        return get_lexical_richness(existing_feature["text"])
-
-    # training set dependent features
-    def _get_num_oov(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.utils.feature_funcs.feat_num_oov(
-            existing_features,
-            statistics,
-            lambda x: x['text'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    # (this could be merged into the above one for further optimization)
-    def _get_fre_rank(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        return explainaboard.utils.feature_funcs.feat_freq_rank(
-            existing_features,
-            statistics,
-            lambda x: x['text'],
-            unwrap(sys_info.source_tokenizer),
-        )
-
-    # training set dependent features
-    def _get_length_fre(
-        self, sys_info: SysOutputInfo, existing_features: dict, statistics: Any
-    ):
-        length = len(unwrap(sys_info.source_tokenizer)(existing_features["text"]))
-        return statistics['length_fre'].get(str(length), 0)
-
-    # --- End feature functions
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
-        length_fre: dict[str, float] = {}
+        length_fre: dict[int, float] = {}
         total_samps = 0
         tokenizer = unwrap(sys_info.source_tokenizer)
         for sample in progress(samples):
             text = sample["text"]
             tokens = tokenizer(text)
-            length = str(len(tokens))
+            length = len(tokens)
 
             length_fre[length] = length_fre.get(length, 0.0) + 1.0
 

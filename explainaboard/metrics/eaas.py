@@ -1,14 +1,27 @@
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from eaas.async_client import AsyncRequest
+from eaas.async_client import AsyncClient, AsyncRequest
+from eaas.config import Config
 import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.utils.typing_utils import unwrap
+
+_eaas_config = None
+_eaas_client = None
+
+
+def get_eaas_client():
+    global _eaas_config, _eaas_client
+    if not _eaas_client:
+        _eaas_config = Config()
+        _eaas_client = AsyncClient(_eaas_config)
+    return _eaas_client
 
 
 class EaaSMetricStats(MetricStats):
@@ -119,4 +132,16 @@ class EaaSMetric(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        raise NotImplementedError
+        # Note that it's better to batch requests when possible, e.g. as in
+        # `processors/conditional_generation.py`
+        inputs = []
+        for td, pd in zip(true_data, pred_data):
+            ntd = copy.deepcopy(td)
+            ntd['hypothesis'] = pd
+            inputs.append(ntd)
+        async_request = get_eaas_client().async_score(
+            inputs,
+            metrics=[self.config.name],
+            calculate=['corpus', 'stats'],
+        )
+        return EaaSMetricStats(name=self.config.name, pos=0, eaas_request=async_request)

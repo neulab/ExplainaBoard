@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 from typing import Union
 
 import numpy as np
@@ -69,8 +70,8 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         Returns the rank of each element of `ids` based on `values`, high-to-low.
         0-indexed.
         '''
-        values = np.array(values)
-        sort_idx = (np.argsort(values)[::-1]).tolist()
+        values_np = np.array(values)
+        sort_idx = (np.argsort(values_np)[::-1]).tolist()
         return [sort_idx.index(i) for i in ids]
 
     def _metrics_to_metadata(self) -> dict:
@@ -88,7 +89,9 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
                     "description": metric_config.name,
                     "num_buckets": len(self.model_reports),
                 }
-                for metric_config in unwrap(model1.metric_configs)
+                for metric_config in itertools.chain.from_iterable(
+                    [x.metric_configs for x in unwrap(model1.analysis_levels)]
+                )
             }
         }
         return metadata
@@ -105,7 +108,10 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         The rank-flipping meta-analysis will then reveal which buckets, and how
         many, subvert this expectation.
         '''
-        model_overall_results = [unwrap(r.results.overall) for r in self.model_reports]
+        model_overall_results = [
+            list(itertools.chain.from_iterable(unwrap(r.results.overall)))
+            for r in self.model_reports
+        ]
         reference_info = {
             'feature_name': 'overall',
             'bucket_interval': '',

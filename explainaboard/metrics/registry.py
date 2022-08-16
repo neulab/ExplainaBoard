@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 from typing import TypeVar
 
 from explainaboard.metrics.metric import MetricConfig
@@ -40,3 +41,12 @@ def get_metric_config_class(name: str) -> type[MetricConfig]:
     if config_cls is None:
         raise ValueError(f'Invalid Metric {name}')
     return config_cls
+
+
+def metric_config_from_dict(dikt: dict):
+    type = dikt.pop('cls_name')
+    config_cls = get_metric_config_class(type)
+    field_names = set(f.name for f in dataclasses.fields(config_cls))
+    return config_cls(
+        **{k: config_cls.dict_conv(k, v) for k, v in dikt.items() if k in field_names}
+    )

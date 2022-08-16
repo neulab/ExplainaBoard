@@ -23,6 +23,8 @@ from typing import (
 from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
+from explainaboard.analysis.analyses import Analysis
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.constants import Source
 from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.preprocessor import Preprocessor
@@ -100,7 +102,9 @@ class FileLoaderMetadata:
     supported_languages: list[str] | None = None
     task_name: str | None = None
     supported_tasks: list[str] | None = None
-    custom_features: dict | None = None
+    custom_features: dict[str, dict[str, FeatureType]] | None = None
+    # analysis level name -> list of analyses dictionary
+    custom_analyses: list[Analysis] | None = None
 
     def merge(self, other: FileLoaderMetadata) -> None:
         """
@@ -118,6 +122,7 @@ class FileLoaderMetadata:
         self.task_name = other.task_name or self.task_name
         self.supported_tasks = other.supported_tasks or self.supported_tasks
         self.custom_features = other.custom_features or self.custom_features
+        self.custom_analyses = other.custom_analyses or self.custom_analyses
 
     @classmethod
     def from_dict(cls, data: dict) -> FileLoaderMetadata:
@@ -132,6 +137,15 @@ class FileLoaderMetadata:
                     '"target_language"'
                 )
             source_language = target_language = data.get('language')
+        custom_features: dict[str, dict[str, FeatureType]] | None = None
+        custom_analyses: list[Analysis] | None = None
+        if 'custom_features' in data:
+            custom_features = {
+                k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
+                for k1, v1 in data['custom_features'].items()
+            }
+        if 'custom_analyses' in data:
+            custom_analyses = [Analysis.from_dict(v) for v in data['custom_analyses']]
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
@@ -142,7 +156,8 @@ class FileLoaderMetadata:
             supported_languages=data.get('supported_languages'),
             task_name=data.get('task_name'),
             supported_tasks=data.get('supported_tasks'),
-            custom_features=data.get('custom_features'),
+            custom_features=custom_features,
+            custom_analyses=custom_analyses,
         )
 
     @classmethod
@@ -340,14 +355,20 @@ class FileLoader:
         before_fields = copy.deepcopy(self._fields)
         fields = self._map_fields(self._fields, actual_mapping)
         if raw_data.metadata.custom_features is not None:
-            for feat in raw_data.metadata.custom_features.keys():
-                fields.append(FileLoaderField(feat, feat, None))
+            for level_name, feats in raw_data.metadata.custom_features.items():
+                if level_name == 'example':
+                    for feat in feats:
+                        fields.append(FileLoaderField(feat, feat, None))
+                else:
+                    raise ValueError(
+                        'cannot currently load custom features other '
+                        f'than on the example level (got {level_name})'
+                    )
         assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
         # process the actual data
         for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
-
             for field in fields:  # parse data point according to fields
                 parsed_data_point[field.target_name] = self.parse_data(
                     self.find_field(data_point, field, field_mapping), field
@@ -491,7 +512,8 @@ class DatalabLoaderOption:
     dataset: str
     subdataset: str | None = None
     split: str = "test"
-    custom_features: list[str] | None = None
+    custom_features: dict[str, dict[str, FeatureType]] | None = None
+    custom_analyses: list[Analysis] | None = None
 
 
 class DatalabFileLoader(FileLoader):
@@ -531,10 +553,25 @@ class DatalabFileLoader(FileLoader):
         # load customized features from global config files
         customized_features_from_config = get_customized_features()
         if config.dataset in customized_features_from_config:
-            feature_names = list(customized_features_from_config[config.dataset].keys())
-            config.custom_features = feature_names + (
-                [] if config.custom_features is None else config.custom_features
-            )
+            ds_feats = customized_features_from_config[config.dataset]
+            if config.custom_features is None:
+                config.custom_features = {}
+            for level_name, level_feats in ds_feats['custom_features'].items():
+                if level_name != 'example':
+                    raise NotImplementedError(
+                        'currently custom features are only '
+                        'supported on the example level, but got '
+                        f'{level_name}'
+                    )
+                parsed_level_feats = {
+                    k: FeatureType.from_dict(v) for k, v in level_feats.items()
+                }
+                new_features = config.custom_features.get(level_name, {})
+                new_features.update(parsed_level_feats)
+                config.custom_features[level_name] = new_features
+            config.custom_analyses = [
+                Analysis.from_dict(x) for x in ds_feats['custom_analyses']
+            ]
 
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
@@ -551,18 +588,23 @@ class DatalabFileLoader(FileLoader):
             for idx in range(len(self._fields)):
                 src_name = cast(str, self._fields[idx].src_name)
                 self._fields[idx].src_name = getattr(info.task_templates[0], src_name)
-        if config.custom_features is not None:
-            for feat in config.custom_features:
-                self._fields.append(FileLoaderField(feat, feat, None))
 
         # Infer metadata from the dataset
-        metadata = FileLoaderMetadata()
+        metadata = FileLoaderMetadata(
+            custom_features=config.custom_features,
+            custom_analyses=config.custom_analyses,
+        )
         # load customized features from global config files
         if config.dataset in customized_features_from_config:
             if metadata.custom_features is None:
                 metadata.custom_features = {}
             metadata.custom_features.update(
-                customized_features_from_config[config.dataset]
+                customized_features_from_config[config.dataset]['custom_features']
+            )
+            if metadata.custom_analyses is None:
+                metadata.custom_analyses = []
+            metadata.custom_analyses.extend(
+                customized_features_from_config[config.dataset]['custom_analyses']
             )
 
         if info.languages is not None:

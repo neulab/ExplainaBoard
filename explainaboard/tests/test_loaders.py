@@ -126,9 +126,9 @@ class TestLoadFromDatalab(TestCase):
         )
         data = loader.load()
         self.assertEqual(len(data.samples), 500)
-        self.assertFalse('orig_en' in data.samples[0])
+        self.assertTrue('orig_en' not in data.samples[0])
         # With features
-        custom_features = ['orig_en']
+        custom_features = {'example': ['orig_en']}
         loader = get_loader_class(TaskType.machine_translation).from_datalab(
             dataset=DatalabLoaderOption(
                 "conala", split="test", custom_features=custom_features

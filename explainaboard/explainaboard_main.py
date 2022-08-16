@@ -7,8 +7,6 @@ import os
 import eaas.endpoint
 
 from explainaboard import get_loader_class, get_processor, TaskType
-from explainaboard.analyzers import get_pairwise_performance_gap
-from explainaboard.analyzers.draw_hist import draw_bar_chart_from_reports
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (
@@ -27,6 +25,8 @@ from explainaboard.utils.tensor_analysis import (
     print_score_tensor,
 )
 from explainaboard.utils.typing_utils import unwrap
+from explainaboard.visualizers import get_pairwise_performance_gap
+from explainaboard.visualizers.draw_hist import draw_bar_chart_from_reports
 
 
 def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
@@ -474,18 +474,23 @@ def main():
             metadata["task_name"] = task
 
             processor = get_processor(task=task)
-            report = processor.process(metadata=metadata, sys_output=system_dataset)
+            report = processor.process(
+                metadata=metadata, sys_output=system_dataset.samples
+            )
             reports.append(report)
 
             # print to the console
             get_logger('report').info('--- Overall Performance')
-            for metric_stat in report.results.overall.values():
-                get_logger('report').info(
-                    f'{metric_stat.metric_name}\t{metric_stat.value}'
-                )
+            for overall_level in report.results.overall:
+                for metric_stat in overall_level:
+                    get_logger('report').info(
+                        f'{metric_stat.metric_name}\t{metric_stat.value}'
+                    )
             get_logger('report').info('')
-            get_logger('report').info('--- Bucketed Performance')
-            processor.print_bucket_info(report.results.fine_grained)
+            get_logger('report').info('--- Fine-grained Analyses')
+            for analysis in report.results.analyses:
+                if analysis is not None:
+                    analysis.print()
 
             if output_dir:
 
