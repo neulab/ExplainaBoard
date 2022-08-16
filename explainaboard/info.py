@@ -175,6 +175,8 @@ class SysOutputInfo:
             return Tokenizer.from_dict(v)
         elif k == 'analysis_levels':
             return [AnalysisLevel.from_dict(v1) for v1 in v]
+        elif k == 'analyses':
+            return [Analysis.from_dict(v1) for v1 in v]
         else:
             return v
 
