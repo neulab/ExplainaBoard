@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import cast, final, Optional
+from typing import Any, cast, final, Optional
 
 from eaas.async_client import AsyncClient, AsyncRequest
 from eaas.config import Config
@@ -66,13 +66,13 @@ class EaaSMetricStats(MetricStats):
         """See MetricStats.num_statistics."""
         return self.get_data().shape[-1]
 
-    def get_data(self) -> np.ndarray:
+    def get_data(self) -> np.ndarray[tuple[int, int], Any]:
         """See MetricStats.get_data."""
         self._fetch_results()
         # self._data must have the data at this point.
         return cast(np.ndarray, self._data)
 
-    def get_batch_data(self) -> np.ndarray:
+    def get_batch_data(self) -> np.ndarray[tuple[int, int, int], Any]:
         """See MetricStats.get_batch_data."""
         raise NotImplementedError
 

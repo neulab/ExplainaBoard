@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import final, Optional
+from typing import Any, final, Optional
 
 import numpy as np
 from scipy.stats import t as stats_t
@@ -109,7 +109,7 @@ class MetricStats(metaclass=abc.ABCMeta):
         ...
 
     @abc.abstractmethod
-    def get_data(self) -> np.ndarray:
+    def get_data(self) -> np.ndarray[tuple[int, int], Any]:
         """Get the sufficient statistics in ndarray format.
 
         This function must always return a 2-dimensional ndarray.
@@ -123,7 +123,7 @@ class MetricStats(metaclass=abc.ABCMeta):
         ...
 
     @abc.abstractmethod
-    def get_batch_data(self) -> np.ndarray:
+    def get_batch_data(self) -> np.ndarray[tuple[int, int, int], Any]:
         """Getthe sufficient statistics in ndarray format.
 
         This function must always return a 3-dimensional ndarray.
@@ -217,7 +217,7 @@ class SimpleMetricStats(MetricStats):
         """See MetricStats.num_statistics."""
         return self._data.shape[-1]
 
-    def get_data(self) -> np.ndarray:
+    def get_data(self) -> np.ndarray[tuple[int, int], Any]:
         """See MetricStats.get_data."""
         if self.is_batched():
             raise RuntimeError(
@@ -225,7 +225,7 @@ class SimpleMetricStats(MetricStats):
             )
         return self._data
 
-    def get_batch_data(self) -> np.ndarray:
+    def get_batch_data(self) -> np.ndarray[tuple[int, int, int], Any]:
         """See MetricStats.get_batch_data."""
         if not self.is_batched():
             raise RuntimeError(
