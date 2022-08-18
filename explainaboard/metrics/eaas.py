@@ -38,29 +38,18 @@ class EaaSMetricStats(MetricStats):
         self.eaas_request = eaas_request
         self._data: Optional[np.ndarray] = None
 
-        # TODO(odashi): remove this field: this is private but unused.
-        self._corpus_value = None
-
     def __len__(self):
         return len(self.get_data())
 
     def _fetch_results(self):
         if self._data is None:
             result = self.eaas_request.get_result()
-            self._corpus_value = result['scores'][self.pos]['corpus']
             self._data = np.array(
                 [
                     x if isinstance(x, list) else [x]
                     for x in result['scores'][self.pos]['stats']
                 ]
             )
-
-    def get_corpus_value(self) -> float:
-        """
-        Return the evaluation metric value over all examples in the corpus.
-        """
-        self._fetch_results()
-        return unwrap(self._corpus_value)
 
     def get_data(self) -> np.ndarray:
         self._fetch_results()
