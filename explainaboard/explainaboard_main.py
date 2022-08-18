@@ -4,6 +4,8 @@ import argparse
 import json
 import os
 
+import eaas.endpoint
+
 from explainaboard import get_loader_class, get_processor, TaskType
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
@@ -12,6 +14,8 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
     FileLoaderMetadata,
 )
+from explainaboard.metrics.eaas import EaaSMetricConfig
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.registry import get_metric_config_class
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
@@ -298,6 +302,29 @@ def create_parser():
     return parser
 
 
+def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
+    """Obtains MetricConfig class from registry or corresponding EaaS binding.
+
+    Args:
+        name: Name of the metric.
+
+    Returns:
+        A MetricConfig class associated to either a registered Metric or EaaS.
+
+    Raises:
+        ValueError: `name` is not registered in neither the registry nor EaaS.
+    """
+    try:
+        return get_metric_config_class(name)
+    except ValueError:
+        if name in eaas.endpoint.EndpointConfig().valid_metrics:
+            return EaaSMetricConfig
+
+    raise ValueError(
+        f"Metric name {name} is not registered in neither the registry nor EaaS."
+    )
+
+
 # TODO(Pengfei): The overall implementation of this script should be deduplicated
 def main():
     args = create_parser().parse_args()
@@ -429,7 +456,7 @@ def main():
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
             metric_configs = [
-                get_metric_config_class(name)(name, source_language, target_language)
+                get_metric_config_or_eaas(name)(name, source_language, target_language)
                 for name in metric_names
             ]
             metadata["metric_configs"] = metric_configs

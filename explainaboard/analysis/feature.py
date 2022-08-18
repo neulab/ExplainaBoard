@@ -8,18 +8,12 @@ from typing import Optional
 
 def is_dataclass_dict(obj):
     """
-    this function is used to judge if obj is a dictionary with a key `cls_name`
+    this function is used to judge if the input dictionary contains 'cls_name' and
+    the value of 'cls_name' is in the feature type registry
     :param obj: a python object with different potential type
     :return: boolean variable
     """
-    if (
-        not isinstance(obj, dict)
-        or 'cls_name' not in obj.keys()
-        or obj['cls_name'] not in FEATURETYPE_REGISTRY.keys()
-    ):
-        return False
-    else:
-        return True
+    return isinstance(obj, dict) and obj.get('cls_name') in FEATURETYPE_REGISTRY
 
 
 def _fromdict_inner(obj):

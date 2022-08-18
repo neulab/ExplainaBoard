@@ -23,6 +23,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
     ],
     packages=find_packages(),
+    package_data={"explainaboard.resources": ["*.json"]},
     entry_points={
         "console_scripts": [
             "explainaboard=explainaboard.explainaboard_main:main",

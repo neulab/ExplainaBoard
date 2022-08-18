@@ -11,8 +11,8 @@
     "custom_analyses": [
       {
         "cls_name": "BucketAnalysis",
-        "level": "example",
         "feature": "total_words",
+        "level": "example",
         "num_buckets": 4,
         "method": "continuous"
       }

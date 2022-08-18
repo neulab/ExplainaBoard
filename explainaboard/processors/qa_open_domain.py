@@ -6,7 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     count_tokens,
@@ -37,11 +37,6 @@ class QAOpenDomainProcessor(Processor):
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
-            # "question_type": feature.Value(
-            #     dtype="string",
-            #     description="type of the question",
-            #     func=lambda info, x, c: ' '.join(x['question_types']),
-            # ),
             "answer_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
@@ -76,6 +71,9 @@ class QAOpenDomainProcessor(Processor):
                 metric_configs=self.default_metrics(),
             )
         ]
+
+    def default_analyses(self) -> list[Analysis]:
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(

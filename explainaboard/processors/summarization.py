@@ -91,16 +91,6 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
                 description="novelty",
                 func=lambda info, x, c: c.features['sum_attributes']["attr_novelty"],
             ),
-            # "oracle_score": feature.Value(
-            #     dtype="float",
-            #     description="the sample-level oracle score",
-            #     func=...,
-            # ),
-            # "oracle_position": feature.Value(
-            #     dtype="float",
-            #     description="the sample-level oracle position",
-            #     func=...,
-            # ),
         }
         f[0].features.update(new_examp_features)
         return f

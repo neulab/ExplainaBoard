@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass, field
-from typing import Optional
+
+from explainaboard.metrics.metric import AuxiliaryMetricResult
 
 
 @dataclass
@@ -14,6 +15,13 @@ class BucketPerformance:
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
+        """
+        A deserialization utility function that takes in a key corresponding to a
+        parameter name, and dictionary corresponding to a serialized version of that
+        parameter's value, then return the deserialized version of the value.
+        :param k: the parameter name
+        :param v: the parameter's value
+        """
         if k == 'performances':
             return [Performance.from_dict(v1) for v1 in v]
         else:
@@ -31,8 +39,9 @@ class BucketPerformance:
 class Performance:
     metric_name: str
     value: float
-    confidence_score_low: Optional[float] = None
-    confidence_score_high: Optional[float] = None
+    confidence_score_low: float | None = None
+    confidence_score_high: float | None = None
+    auxiliary_result: AuxiliaryMetricResult | None = None
 
     @classmethod
     def from_dict(cls, data_dict: dict) -> Performance:

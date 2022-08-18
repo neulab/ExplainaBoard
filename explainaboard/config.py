@@ -14,3 +14,4 @@ JAX_AVAILABLE = False
 
 # File Names
 SYS_OUTPUT_INFO_FILENAME = "system_analysis.json"
+CUSTOMIZED_FEATURES_CONFIG_FILE = "dataset_custom_features.json"

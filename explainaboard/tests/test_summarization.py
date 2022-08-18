@@ -1,11 +1,15 @@
 import os
 import unittest
 
+import numpy as np
+
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.metrics.external_eval import ExternalEvalConfig, ExternalEvalResult
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 from explainaboard.utils import cache_api
+from explainaboard.utils.typing_utils import narrow
 
 
 class TestSummarization(unittest.TestCase):
@@ -94,11 +98,50 @@ class TestSummarization(unittest.TestCase):
             "metric_names": ["rouge1"],
         }
         processor = get_processor(TaskType.summarization)
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.fine_grained)
+        self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
 
+    @unittest.skip('Not yet fixed in v0.11')
+    def test_generate_system_human_eval(self):
+        loader = get_loader_class(TaskType.summarization)(
+            self.tsv_dataset,
+            self.txt_output,
+            Source.local_filesystem,
+            Source.local_filesystem,
+            FileType.tsv,
+            FileType.text,
+        )
+        data = loader.load()
 
-if __name__ == '__main__':
-    unittest.main()
+        metadata = {
+            "task_name": TaskType.summarization.value,
+            "dataset_name": "cnndm",
+            "metric_configs": {
+                "example": [
+                    ExternalEvalConfig(
+                        name="LikertScore_fluency",
+                        aspect="fluency",
+                        n_annotators=2,
+                        categories=5,
+                        external_stats=np.array([[2, 2], [1, 1], [3, 3]]),
+                    )
+                ]
+            },
+        }
+
+        processor = get_processor(TaskType.summarization.value)
+
+        sys_info = processor.process(metadata, data.samples)
+        # print(sys_info.results.overall)
+        # print(metadata["metric_configs"][0])
+        self.assertIsNotNone(sys_info.results.analyses)
+        fluency = [
+            x
+            for x in sys_info.results.overall[0]
+            if x.metric_name == "LikertScore_fluency"
+        ][0]
+        self.assertEqual(fluency.value, 2.0)
+        human_performance = narrow(ExternalEvalResult, fluency.auxiliary_result)
+        self.assertEqual(human_performance.agreement, 1.0)

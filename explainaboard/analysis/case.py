@@ -20,6 +20,13 @@ class AnalysisCase:
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):
+        """
+        A deserialization utility function that takes in a key corresponding to a
+        parameter name, and dictionary corresponding to a serialized version of that
+        parameter's value, then return the deserialized version of the value.
+        :param k: the parameter name
+        :param v: the parameter's value
+        """
         return v
 
     @classmethod
@@ -75,6 +82,10 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 
 @dataclass
 class AnalysisCaseCollection:
+    # This tuple is either tuple[float,float] (for continuous values) or tuple[str] for
+    # discrete values
+    # TODO(gneubig): add actual type annotation to this effect. at the moment it's a
+    #    bit complicated due to the implementation of the bucketing functions
     interval: tuple
     samples: list[int]
 

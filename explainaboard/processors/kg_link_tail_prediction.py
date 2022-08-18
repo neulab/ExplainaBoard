@@ -111,7 +111,7 @@ class KGLinkTailPredictionProcessor(Processor):
             )
             for k, v in discrete_features.items()
         ]
-        analyses.extend(super().default_analyses())
+        analyses.extend(self.continuous_feature_analyses())
         return analyses
 
     @classmethod
