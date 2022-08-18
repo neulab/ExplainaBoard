@@ -9,7 +9,6 @@ import numpy as np
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-import explainaboard.analysis.analyses
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import (
     AnalysisCase,
@@ -17,7 +16,6 @@ from explainaboard.analysis.case import (
     AnalysisCaseSpan,
 )
 from explainaboard.analysis.feature import FeatureType
-import explainaboard.analysis.feature_funcs
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     cap_feature,
@@ -26,12 +24,14 @@ from explainaboard.analysis.feature_funcs import (
     feat_num_oov,
 )
 from explainaboard.info import SysOutputInfo
-import explainaboard.metrics.eaas
-from explainaboard.metrics.eaas import EaaSMetricConfig, get_eaas_client
+from explainaboard.metrics.eaas import (
+    EaaSMetricConfig,
+    EaaSMetricStats,
+    get_eaas_client,
+)
 from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
-import explainaboard.metrics.metric
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.logging import progress
@@ -300,9 +300,7 @@ class ConditionalGenerationProcessor(Processor):
                 calculate=['corpus', 'stats'],
             )
             metric_stats: list[MetricStats] = [
-                explainaboard.metrics.eaas.EaaSMetricStats(
-                    name=name, pos=i, eaas_request=async_request
-                )
+                EaaSMetricStats(name=name, pos=i, eaas_request=async_request)
                 for i, name in enumerate(metric_names)
             ]
             # Calculate features
@@ -393,7 +391,7 @@ class ConditionalGenerationProcessor(Processor):
                     stats_list.append([1.0, 0.0, 0.0])
                 else:
                     stats_list.append([0.0, 1.0, 0.0])
-            metric_stats = [MetricStats(np.array(stats_list))]
+            metric_stats = [SimpleMetricStats(np.array(stats_list))]
         else:
             raise ValueError(f'{analysis_level.name}-level analysis not supported')
 

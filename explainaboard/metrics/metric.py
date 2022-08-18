@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import final, Optional
 
 import numpy as np
 from scipy.stats import t as stats_t
 
-from explainaboard.utils.typing_utils import unwrap, unwrap_or
+from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
@@ -71,53 +71,167 @@ class MetricConfig(dict):
         return v
 
 
-class MetricStats:
-    """
-    A class holding the sufficient statistics necessary to calculate a metric
+class MetricStats(metaclass=abc.ABCMeta):
+    """Interface of sufficient statistics necessary to calculate a metric."""
+
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Returns the "length" of the dataset.
+
+        Returns:
+            The "length". It must be either:
+            - Number of the whole samples if `is_batched() == False`
+            - Number of batches if `is_batched() == True`
+        """
+        ...
+
+    @abc.abstractmethod
+    def is_batched(self) -> bool:
+        """Retruns whether this statistics is batched or not.
+
+        If this function returns True, `get_batch_data()` must return a corresponding
+        value.
+
+        Returns:
+            `True` if the underlying data is batched, `False` otherwise.
+        """
+        ...
+
+    @abc.abstractmethod
+    def num_statistics(self) -> int:
+        """Returns the number of statistics for each data.
+
+        This value must be the same as the size of the last dimension in `get_data()`.
+
+        Returns:
+            The number of statistics for each data.
+        """
+        ...
+
+    @abc.abstractmethod
+    def get_data(self) -> np.ndarray:
+        """Get the sufficient statistics in ndarray format.
+
+        This function must always return a 2-dimensional ndarray.
+        This function may return a shallow copy of the underlying object. Changing the
+        return value in-place may cause unintended changes of the behavior.
+
+        Returns:
+            The sufficient statistics.
+            The shape must be `[dataset_length, num_statistics]`.
+        """
+        ...
+
+    @abc.abstractmethod
+    def get_batch_data(self) -> np.ndarray:
+        """Getthe sufficient statistics in ndarray format.
+
+        This function must always return a 3-dimensional ndarray.
+        This function may return a shallow copy of the underlying object. Changing the
+        return value in-place may cause unintended changes of the behavior.
+
+        Returns:
+            The sufficient statistics.
+            The shape must be `[num_batches, batch_size, num_statistics]`.
+        """
+        ...
+
+    @final
+    def filter(self, indices: list[int] | np.ndarray) -> MetricStats:
+        """Return a view of these stats filtered down to the indicated indices.
+
+        This function requires that the statistics is not batched.
+
+        This function may return a shallow copy of the underlying object. Changing the
+        return value in-place may cause unintended changes of the behavior.
+
+        Args:
+            indices: The indices over which the stats should be calculated.
+                Shape must be either:
+                - `[num_indices]` to simply filter the whole data.
+                - `[num_batches, num_indices]` to filter the whole data and make the
+                    batched results.
+
+        Returns:
+            The filtered statistics.
+            If the given indices is 1-dimensional, it is non-batched statistics.
+            Otherwise, it is batched statistics.
+
+        Raises:
+            ValueError: Attempted unsupported operation.
+        """
+        if self.is_batched():
+            raise ValueError("MetricStats.filter() does not support batched data.")
+
+        indices_array = np.array(indices)
+        if indices_array.ndim not in [1, 2]:
+            raise ValueError(f"Unsupported shape: {indices_array.shape}")
+
+        data = self.get_data()
+        filtered = data[indices_array.flatten()]
+        filtered_batched = filtered.reshape(indices_array.shape + (data.shape[1],))
+        return SimpleMetricStats(filtered_batched)
+
+
+@final
+class SimpleMetricStats(MetricStats):
+    """MetricStats that directly holds an ndarray.
+
+    This class may hold a shallow copy of the given ndarray.
+    In-place modification of the array results in unexpected change of the behavior.
     """
 
-    def __init__(self, data: Optional[np.ndarray]):
+    def __init__(self, data: np.ndarray) -> None:
+        """Initializes SimpleMetricsStats.
+
+        Args:
+            data: A numpy array representing the statistics.
+                The shape must be either:
+                - `[dataset_length]` for representing the whole data with 1 value.
+                - `[dataset_length, num_statistics]` for representing the whole data
+                - `[num_batches, batch_size, num_statistics]` for representing batched
+                    data.
+
+        Rasies:
+            ValueError: The given data has an unsupported shape.
         """
-        :param data: A numpy array of dimensions [x,y], where x in the length of the
-            dataset, and y is the size of the sufficient statistics necessary to
-            calculate the metric. Alternatively, it can be [b,x,y] where b is the
-            batch size, particularly for bootstrap sampling.
-        """
-        if data is not None and data.ndim == 1:
-            data = data.reshape((data.shape[0], 1))
-        self._data = data
+        if data.ndim == 1:
+            self._data = np.expand_dims(data, 1)
+        elif data.ndim in [2, 3]:
+            self._data = data
+        else:
+            raise ValueError(f"data has unsupported shape: {data.shape}")
+
+        # The shape size must be either 2 or 3 at this point.
+        self._batched = self._data.ndim == 3
 
     def __len__(self) -> int:
-        """
-        Returns the number of samples in the dataset
-        """
-        return len(unwrap(self._data))
+        """See MetricStats.__len__."""
+        return len(self._data)
+
+    def is_batched(self) -> bool:
+        """See MetricStats.is_batched."""
+        return self._batched
+
+    def num_statistics(self) -> int:
+        """See MetricStats.num_statistics."""
+        return self._data.shape[-1]
 
     def get_data(self) -> np.ndarray:
-        """
-        Get the sufficient statistics in ndarray format
-        """
-        return unwrap(self._data)
+        """See MetricStats.get_data."""
+        if self.is_batched():
+            raise RuntimeError(
+                "Attempted to obtain non-batched data from batched Statistics."
+            )
+        return self._data
 
-    def filter(self, indices: Union[list[int], np.ndarray]) -> MetricStats:
-        """
-        Return a view of these stats filtered down to the indicated indices.
-        :param indices: The indices over which the stats should be calculated
-        :return: The filtered stats
-        """
-        sdata = self.get_data()
-        if sdata.ndim != 2:
-            raise ValueError(f'Can only filter non-batched statistics {sdata.shape}')
-        if type(indices) != np.ndarray:
-            indices = np.array(indices)
-        if indices.ndim == 1:
-            return MetricStats(sdata[indices])
-        else:
-            batch, samples = indices.shape
-            indices = indices.reshape((batch * samples,))
-            filtered_data = sdata[indices]
-            filtered_data = filtered_data.reshape((batch, samples, sdata.shape[1]))
-            return MetricStats(filtered_data)
+    def get_batch_data(self) -> np.ndarray:
+        """See MetricStats.get_batch_data."""
+        if not self.is_batched():
+            raise RuntimeError(
+                "Attempted to obtain batched data from non-batched Statistics."
+            )
+        return self._data
 
 
 class Metric:
@@ -158,7 +272,7 @@ class Metric:
         :return: aggregated stats
         """
 
-        data = stats.get_data()
+        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
             return np.array(0.0)
         else:
@@ -203,21 +317,27 @@ class Metric:
         if conf_value <= 0.0 or conf_value >= 1.0:
             raise ValueError(f'Bad confidence value {conf_value}')
 
-        stats_data = stats.get_data()
-        # We cannot calculate confidence intervals if we only have a single sample
-        if stats_data.shape[0] <= 1:
+        stats_data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
+        num_stats = stats.num_statistics()
+
+        if stats_data.shape[-2] <= 1:
+            # We cannot calculate confidence intervals if we only have a single sample
             return None
+
         # Do t-test if applicable
         elif self.is_simple_average(stats):
-            if stats_data.shape[1] != 1:
-                raise ValueError(f'problem with shape in t-test {stats_data.shape}')
+            if num_stats != 1:
+                raise ValueError(
+                    "t-test can be applied for only 1 stat, "
+                    f"but the MetricStats has {num_stats} stats."
+                )
             my_mean = np.mean(stats_data)
             my_std = np.std(stats_data)
             if my_std == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
                 alpha=conf_value,
-                df=stats_data.shape[0] - 1,
+                df=stats_data.shape[-2] - 1,
                 loc=my_mean,
                 scale=my_std,
             )

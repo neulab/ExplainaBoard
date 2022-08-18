@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, cast, List
+from typing import Any
 
 from datalabs import aggregating
 import numpy as np
@@ -19,7 +19,7 @@ from explainaboard.analysis.feature_funcs import (
 )
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.log_prob import LogProbConfig
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.logging import progress
@@ -158,7 +158,7 @@ class LanguageModelingProcessor(Processor):
         elif analysis_level.name != 'token':
             raise ValueError(f'{analysis_level.name}-level analysis not supported')
         # Do tok-level analysis
-        cases: list[AnalysisCaseSpan] = []
+        cases: list[AnalysisCase] = []
         # Calculate features
         for i, output in progress(
             enumerate(sys_output), desc='calculating tok-level features'
@@ -191,10 +191,10 @@ class LanguageModelingProcessor(Processor):
                             sys_info, output, case, statistics
                         )
                 cases.append(case)
-        metric_stats = [
-            MetricStats(np.array([x.features['tok_log_prob'] for x in cases]))
+        metric_stats: list[MetricStats] = [
+            SimpleMetricStats(np.array([x.features['tok_log_prob'] for x in cases]))
         ]
-        return cast(List[AnalysisCase], cases), metric_stats
+        return cases, metric_stats
 
     @classmethod
     def default_metrics(
