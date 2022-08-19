@@ -72,12 +72,12 @@ def plot_combo_counts(
                     ha='center',
                     size='xx-large',
                 )
-        plt.xlabel(feature_names[0], fontsize=18)
-        ax.set_xticks(np.arange(len(sorted_names[0])))
-        ax.set_xticklabels(sorted_names[0])
-        plt.ylabel(feature_names[1], fontsize=18)
-        ax.set_yticks(np.arange(len(sorted_names[1])))
-        ax.set_yticklabels(sorted_names[1])
+        plt.ylabel(feature_names[0], fontsize=16)
+        ax.set_yticks(np.arange(len(sorted_names[0])))
+        ax.set_yticklabels(sorted_names[0])
+        plt.xlabel(feature_names[1], fontsize=16)
+        ax.set_xticks(np.arange(len(sorted_names[1])))
+        ax.set_xticklabels(sorted_names[1])
         plt.title(f'confusion for {sys_name}', fontsize=18)
         out_file = os.path.join(
             output_dir, f'{feature_names[0]}_{feature_names[1]}_combo_{combo_idx}.png'
@@ -208,10 +208,8 @@ def draw_charts_from_reports(
             )
 
         if all([isinstance(x, BucketAnalysisResult) for x in analysis_result]):
-            print(f'buckets {[x.name for x in analysis_result]}')
             plot_buckets(analysis_result, output_dir, sys_names)
         elif all([isinstance(x, ComboCountAnalysisResult) for x in analysis_result]):
-            print(f'combo {[x.name for x in analysis_result]}')
             plot_combo_counts(analysis_result, output_dir, sys_names)
         else:
             raise ValueError('illegal types of analyses')
