@@ -87,7 +87,7 @@ class MetricStats(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def is_batched(self) -> bool:
-        """Retruns whether this statistics is batched or not.
+        """Returns whether this statistics object is batched or not.
 
         If this function returns True, `get_batch_data()` must return a corresponding
         value.
