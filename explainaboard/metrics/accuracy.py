@@ -5,7 +5,12 @@ from typing import Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 
 
@@ -25,7 +30,7 @@ class Accuracy(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        return MetricStats(
+        return SimpleMetricStats(
             np.array(
                 [
                     (1.0 if y == x or isinstance(x, list) and y in x else 0.0)
@@ -54,7 +59,7 @@ class CorrectCount(Accuracy):
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
 
-        return MetricStats(
+        return SimpleMetricStats(
             np.array(
                 [
                     (1.0 if y == x or isinstance(x, list) and y in x else 0.0)
@@ -69,7 +74,7 @@ class CorrectCount(Accuracy):
         :param stats: stats for every example
         :return: aggregated stats
         """
-        data = stats.get_data()
+        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
             return np.array(0.0)
         else:
@@ -117,4 +122,4 @@ class SeqCorrectCount(CorrectCount):
                     recall.append(1.0)
                 else:
                     recall.append(0.0)
-        return MetricStats(np.array(recall))
+        return SimpleMetricStats(np.array(recall))

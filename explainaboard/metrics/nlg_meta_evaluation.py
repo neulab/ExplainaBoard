@@ -6,7 +6,12 @@ from typing import Optional, Union
 import numpy as np
 from scipy.stats import pearsonr
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.typing_utils import narrow, unwrap_or
 
@@ -50,7 +55,7 @@ class CorrelationMetric(Metric):
     ) -> MetricStats:
         config = narrow(CorrelationConfig, unwrap_or(config, self.config))
 
-        return MetricStats(
+        return SimpleMetricStats(
             np.array(
                 [
                     (true[0], true[1], true[3 if config.use_z_score else 2], pred)
@@ -100,9 +105,7 @@ class CorrelationMetric(Metric):
         :param stats: stats for every example
         :return: aggregated stats
         """
-
-        data = stats.get_data()
-        return data
+        return stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None

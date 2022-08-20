@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Any, cast, final, Optional
 
 from eaas.async_client import AsyncClient, AsyncRequest
 from eaas.config import Config
@@ -10,7 +10,6 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
-from explainaboard.utils.typing_utils import unwrap
 
 _eaas_config = None
 _eaas_client = None
@@ -24,45 +23,58 @@ def get_eaas_client():
     return _eaas_client
 
 
+@final
 class EaaSMetricStats(MetricStats):
+    """MetricStats with EaaS invocations.
+
+    Obtaining the data from EaaS is deferred until it is wanted.
     """
-    Stats from EaaS for calculation of any of the metrics. These are calculated lazily,
-    so that a request is dispatched to the EaaS server and the results are retrieved
-    when they're needed.
-    """
 
-    def __init__(self, name: str, pos: int, eaas_request: AsyncRequest):
-        super().__init__(data=None)
-        self.name = name
-        self.pos = pos
-        self.eaas_request = eaas_request
-        self._data: Optional[np.ndarray] = None
+    def __init__(self, name: str, pos: int, eaas_request: AsyncRequest) -> None:
+        """Initializes the EaaSMetricStats.
 
-    def __len__(self):
-        return len(self.get_data())
+        Args:
+            name: Name of this metric.
+            pos: Position of the statistics in the returned array.
+            eaas_request: Request object to the EaaS service.
+        """
+        self._name = name  # TODO(odashi): Remove this member.
+        self._pos = pos
+        self._eaas_request = eaas_request
+        self._data: np.ndarray | None = None
 
-    def _fetch_results(self):
+    def _fetch_results(self) -> None:
+        """Obtains the data from the EaaS service."""
         if self._data is None:
-            result = self.eaas_request.get_result()
+            result = self._eaas_request.get_result()
             self._data = np.array(
                 [
                     x if isinstance(x, list) else [x]
-                    for x in result['scores'][self.pos]['stats']
+                    for x in result['scores'][self._pos]['stats']
                 ]
             )
 
-    def get_data(self) -> np.ndarray:
-        self._fetch_results()
-        return unwrap(self._data)
+    def __len__(self) -> int:
+        """See MetricStats.__len__."""
+        return len(self.get_data())
 
-    def filter(self, indices: Union[list[int], np.ndarray]) -> MetricStats:
-        """
-        Return a view of these stats filtered down to the indicated indices
-        """
-        sdata: np.ndarray = self.get_data()
-        if not isinstance(indices, np.ndarray):
-            indices = np.array(indices)
-        return MetricStats(sdata[indices])
+    def is_batched(self) -> bool:
+        """See MetricStats.is_batched."""
+        return False
+
+    def num_statistics(self) -> int:
+        """See MetricStats.num_statistics."""
+        return self.get_data().shape[-1]
+
+    def get_data(self) -> np.ndarray[tuple[int, int], Any]:
+        """See MetricStats.get_data."""
+        self._fetch_results()
+        # self._data must have the data at this point.
+        return cast(np.ndarray, self._data)
+
+    def get_batch_data(self) -> np.ndarray[tuple[int, int, int], Any]:
+        """See MetricStats.get_batch_data."""
+        raise NotImplementedError
 
 
 # NOTE(odashi): Not register this config to the registry.
@@ -113,10 +125,11 @@ class EaaSMetric(Metric):
         :param stats: stats for every example
         :return: aggregated stats
         """
+        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if self.config.name in {'bleu', 'chrf'}:
-            return np.sum(stats.get_data(), axis=-2)
+            return np.sum(data, axis=-2)
         else:
-            return np.mean(stats.get_data(), axis=-2)
+            return np.mean(data, axis=-2)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None

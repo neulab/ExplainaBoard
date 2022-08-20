@@ -5,7 +5,12 @@ from typing import Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 
 
@@ -26,7 +31,7 @@ class RootMeanSquaredError(Metric):
     ) -> MetricStats:
         error = np.array([(x - y) for x, y in zip(true_data, pred_data)])
         squared_error = error * error
-        return MetricStats(squared_error)
+        return SimpleMetricStats(squared_error)
 
     def is_simple_average(self, stats: MetricStats):
         return False
@@ -53,4 +58,4 @@ class AbsoluteError(Metric):
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
         error = np.array([abs(x - y) for x, y in zip(true_data, pred_data)])
-        return MetricStats(error)
+        return SimpleMetricStats(error)
