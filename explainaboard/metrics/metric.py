@@ -124,7 +124,7 @@ class MetricStats(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_batch_data(self) -> np.ndarray[tuple[int, int, int], Any]:
-        """Getthe sufficient statistics in ndarray format.
+        """Get the sufficient statistics in ndarray format.
 
         This function must always return a 3-dimensional ndarray.
         This function may return a shallow copy of the underlying object. Changing the
