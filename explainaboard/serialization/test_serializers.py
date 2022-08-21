@@ -10,10 +10,10 @@ from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow
 
-registry = TypeRegistry[Serializable]()
+test_registry = TypeRegistry[Serializable]()
 
 
-@registry.register("Foo")
+@test_registry.register("Foo")
 class Foo(Serializable):
     """Serializable class."""
 
@@ -32,7 +32,7 @@ class Foo(Serializable):
         return cls(narrow(int, data["a"]), narrow(str, data["b"]))
 
 
-@registry.register("Bar")
+@test_registry.register("Bar")
 @dataclass(frozen=True)
 class Bar(Serializable):
     """Serializable dataclass."""
@@ -48,7 +48,7 @@ class Bar(Serializable):
         return cls(narrow(int, data["x"]), narrow(str, data["y"]))
 
 
-@registry.register("Nested")
+@test_registry.register("Nested")
 @dataclass(frozen=True)
 class Nested(Serializable):
     """Nested serializable class."""
@@ -81,7 +81,7 @@ class Unserializable:
     pass
 
 
-@registry.register("WithClsName")
+@test_registry.register("WithClsName")
 class WithClsName(Serializable):
     """Class with "cls_name" attribute."""
 
@@ -95,7 +95,7 @@ class WithClsName(Serializable):
 
 class PrimitiveSerializerTest(unittest.TestCase):
     def test_serialize_primitives(self) -> None:
-        s = PrimitiveSerializer(registry)
+        s = PrimitiveSerializer(test_registry)
 
         self.assertIs(s.serialize(None), None)
         self.assertIs(s.serialize(True), True)
@@ -116,7 +116,7 @@ class PrimitiveSerializerTest(unittest.TestCase):
         self.assertEqual(s.serialize({"1": 10, "2": 20}), {"1": 10, "2": 20})
 
     def test_serialize_serializables(self) -> None:
-        s = PrimitiveSerializer(registry)
+        s = PrimitiveSerializer(test_registry)
 
         foo = Foo(111, "222")
         bar = Bar(333, "444")
@@ -143,7 +143,7 @@ class PrimitiveSerializerTest(unittest.TestCase):
         )
 
     def test_serialize_invalid(self) -> None:
-        s = PrimitiveSerializer(registry)
+        s = PrimitiveSerializer(test_registry)
 
         with self.assertRaisesRegex(ValueError, r"^No name associated"):
             s.serialize(Unregistered())
@@ -158,7 +158,7 @@ class PrimitiveSerializerTest(unittest.TestCase):
             s.serialize({"cls_name": None})
 
     def test_deserialize_primitives(self) -> None:
-        s = PrimitiveSerializer(registry)
+        s = PrimitiveSerializer(test_registry)
 
         self.assertIs(s.deserialize(None), None)
         self.assertIs(s.deserialize(True), True)
@@ -179,7 +179,7 @@ class PrimitiveSerializerTest(unittest.TestCase):
         self.assertEqual(s.deserialize({"1": 10, "2": 20}), {"1": 10, "2": 20})
 
     def test_deserialize_serializables(self) -> None:
-        s = PrimitiveSerializer(registry)
+        s = PrimitiveSerializer(test_registry)
 
         foo = Foo(111, "222")
         bar = Bar(333, "444")
@@ -206,7 +206,7 @@ class PrimitiveSerializerTest(unittest.TestCase):
         )
 
     def test_deserialize_invalid(self) -> None:
-        s = PrimitiveSerializer(registry)
+        s = PrimitiveSerializer(test_registry)
 
         with self.assertRaisesRegex(ValueError, r"^Value of \"cls_name\" must be str"):
             # Ensure that this case should be prevented.

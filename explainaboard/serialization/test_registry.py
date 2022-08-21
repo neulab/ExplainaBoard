@@ -9,25 +9,25 @@ from explainaboard.serialization.registry import TypeRegistry
 
 class TypeRegistryTest(unittest.TestCase):
     def test_register_decorator(self) -> None:
-        registry = TypeRegistry[object]()
+        test_registry = TypeRegistry[object]()
 
-        @registry.register("foo")
+        @test_registry.register("foo")
         class Bar:
             pass
 
-        self.assertIs(registry.get_type("foo"), Bar)
-        self.assertEqual(registry.get_name(Bar), "foo")
+        self.assertIs(test_registry.get_type("foo"), Bar)
+        self.assertEqual(test_registry.get_name(Bar), "foo")
 
     def test_register_function(self) -> None:
-        registry = TypeRegistry[object]()
+        test_registry = TypeRegistry[object]()
 
         class Qux:
             pass
 
-        registry.register("baz")(Qux)
+        test_registry.register("baz")(Qux)
 
-        self.assertIs(registry.get_type("baz"), Qux)
-        self.assertEqual(registry.get_name(Qux), "baz")
+        self.assertIs(test_registry.get_type("baz"), Qux)
+        self.assertEqual(test_registry.get_name(Qux), "baz")
 
     def test_register_builtin(self) -> None:
         registry = TypeRegistry[object]()
