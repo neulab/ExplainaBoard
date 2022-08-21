@@ -1,3 +1,21 @@
+"""
+draw_charts.py
+
+This is a program that takes in an ExplainaBoard report or reports and outputs visual
+summaries of the included analyses.
+
+Here is an example of usage:
+> explainaboard --task text-classification --dataset sst2 \
+                --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt \
+                --report_json report-lstm.json
+> explainaboard --task text-classification --dataset sst2 \
+                --system_outputs ./data/system_outputs/sst2/sst2-cnn-output.txt \
+                --report_json report-cnn.json
+> python -m explainaboard.visualizers.draw_charts \
+                --reports report-lstm.json report-cnn.json
+
+The output will be written to the `figures/` directory.
+"""
 from __future__ import annotations
 
 import argparse
@@ -260,6 +278,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    # explainaboard --system_outputs ./data/system_outputs/multilingual/json/
-    # CL-mlpp15out1sum/marc/test-de_9330.json
-    # python draw_charts.py --reports ../log.res
