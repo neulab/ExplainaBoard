@@ -30,7 +30,7 @@ def plot_combo_counts(
     """
 
     # get feature maps
-    if any([x.features != combo_results[0].features for x in combo_results]):
+    if any(x.features != combo_results[0].features for x in combo_results):
         raise ValueError(
             f'all combo_results must have the same features, but got '
             f'{[x.features for x in combo_results]}'
@@ -46,7 +46,7 @@ def plot_combo_counts(
         [v[0] for v in sorted(x.items(), key=lambda y: -y[1])] for x in feature_maps
     ]
     first_set = set(sorted_names[0])
-    if all([set(x) == first_set for x in sorted_names]):
+    if all(set(x) == first_set for x in sorted_names):
         sorted_names = [sorted_names[0] for _ in sorted_names]
     feature_maps = [{v: i for i, v in enumerate(x)} for x in sorted_names]
 
@@ -150,7 +150,7 @@ def draw_charts_from_reports(
 
     # TODO(gneubig): This should get the system name from inside the report
     if sys_names is None:
-        sys_names = [os.path.basename(x).replace('.json', '') for x in reports]
+        sys_names = [os.path.splitext(os.path.basename(x))[0] for x in reports]
     elif len(sys_names) != len(reports):
         raise ValueError('Length of sys_names must equal that of reports')
 
@@ -195,21 +195,21 @@ def draw_charts_from_reports(
     analysis_results: list[list[AnalysisResult]] = [
         unwrap(x.results.analyses) for x in report_info
     ]
-    if any([len(x) != len(analysis_results[0]) for x in analysis_results]):
+    if any(len(x) != len(analysis_results[0]) for x in analysis_results):
         raise ValueError(
             f'mismatched number of analyses: {[len(x) for x in analysis_results]}'
         )
 
     # Bucket performance: feature name, for example, sentence length
     for analysis_result in progress(zip(*analysis_results)):
-        if any([x.name != analysis_result[0].name for x in analysis_result]):
+        if any(x.name != analysis_result[0].name for x in analysis_result):
             raise ValueError(
                 f'mismatched analyses: {[x.name for x in analysis_result]}'
             )
 
-        if all([isinstance(x, BucketAnalysisResult) for x in analysis_result]):
+        if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
             plot_buckets(analysis_result, output_dir, sys_names)
-        elif all([isinstance(x, ComboCountAnalysisResult) for x in analysis_result]):
+        elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
             plot_combo_counts(analysis_result, output_dir, sys_names)
         else:
             raise ValueError('illegal types of analyses')
