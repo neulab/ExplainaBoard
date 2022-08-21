@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Union
+from typing import Dict, List, Tuple, Union
 
 # TODO(odashi):
 # Recursive type is supported by only the head of mypy:
@@ -17,9 +17,9 @@ PrimitiveData = Union[  # type: ignore
     int,
     float,
     str,
-    list["PrimitiveData"],  # type: ignore
-    tuple["PrimitiveData", ...],  # type: ignore
-    dict[str, "PrimitiveData"],  # type: ignore
+    List["PrimitiveData"],  # type: ignore
+    Tuple["PrimitiveData", ...],  # type: ignore
+    Dict[str, "PrimitiveData"],  # type: ignore
 ]
 
 # Type of elements in Serializable objects.
@@ -29,9 +29,9 @@ SerializableData = Union[  # type: ignore
     int,
     float,
     str,
-    list["SerializableData"],  # type: ignore
-    tuple["SerializableData", ...],  # type: ignore
-    dict[str, "SerializableData"],  # type: ignore
+    List["SerializableData"],  # type: ignore
+    Tuple["SerializableData", ...],  # type: ignore
+    Dict[str, "SerializableData"],  # type: ignore
     "Serializable",
 ]
 
