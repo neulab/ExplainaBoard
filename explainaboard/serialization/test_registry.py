@@ -1,5 +1,7 @@
 """Tests for explainaboard.serialization.registry"""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.serialization.registry import TypeRegistry
