@@ -59,13 +59,19 @@ def plot_combo_counts(
         for feats, count in unwrap(combo_result.combo_counts):
             for feat, featmap in zip(feats, feature_maps):
                 featmap[feat] = featmap.get(feat, 0) + count
-    # sort in descending order of frequency
+    # sort in descending order of frequency of each feature map
     sorted_names = [
         [v[0] for v in sorted(x.items(), key=lambda y: -y[1])] for x in feature_maps
     ]
     first_set = set(sorted_names[0])
+    # if all sets of keys are the same, sort in descending order of total frequency
     if all(set(x) == first_set for x in sorted_names):
-        sorted_names = [sorted_names[0] for _ in sorted_names]
+        total_cnt: dict[str, int] = {}
+        for feature_map in feature_maps:
+            for k, v in feature_map.items():
+                total_cnt[k] = total_cnt.get(k, 0) + v
+        total_sorted = [v[0] for v in sorted(total_cnt.items(), key=lambda y: -y[1])]
+        sorted_names = [total_sorted for _ in sorted_names]
     feature_maps = [{v: i for i, v in enumerate(x)} for x in sorted_names]
 
     # Create all the plots
