@@ -87,7 +87,7 @@ class WithClsName(Serializable):
         return {"cls_name": None}
 
     @classmethod
-    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+    def deserialize(cls, _data: dict[str, SerializableData]) -> Serializable:
         return cls()
 
 
