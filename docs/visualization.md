@@ -11,7 +11,7 @@ If you've preferred to use the offline [CLI interface](cli_interface.md), there 
 also some rudimentary visualization tools at your disposal.
 
 **Charts:** If you want to draw visualizations of the bucketed analysis results or
-or confusion matrices offline, you can run the following command over one or more
+confusion matrices offline, you can run the following command over one or more
 reports:
 ```shell
 python -m explainaboard.visualizers.draw_charts --reports report1.json report2.json
