@@ -5,7 +5,12 @@ from typing import Any, cast, Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.typing_utils import unwrap_or
 
@@ -29,7 +34,7 @@ class Hits(Metric):
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
         config = cast(HitsConfig, unwrap_or(config, self.config))
-        return MetricStats(
+        return SimpleMetricStats(
             np.array(
                 [
                     (1.0 if t in p[: config.hits_k] else 0.0)
@@ -42,7 +47,7 @@ class Hits(Metric):
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
         config = cast(HitsConfig, unwrap_or(config, self.config))
-        return MetricStats(
+        return SimpleMetricStats(
             np.array([(1.0 if rank <= config.hits_k else 0.0) for rank in rank_data])
         )
 
@@ -74,7 +79,7 @@ class MeanReciprocalRank(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        return MetricStats(
+        return SimpleMetricStats(
             np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
@@ -83,7 +88,7 @@ class MeanReciprocalRank(Metric):
     ) -> MetricStats:
         if any([rank is None for rank in rank_data]):
             raise ValueError('cannot calculate statistics when rank is none')
-        return MetricStats(np.array([1.0 / rank for rank in rank_data]))
+        return SimpleMetricStats(np.array([1.0 / rank for rank in rank_data]))
 
 
 @dataclass
@@ -109,11 +114,13 @@ class MeanRank(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        return MetricStats(
+        return SimpleMetricStats(
             np.array([self.mr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
     def calc_stats_from_rank(
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        return MetricStats(np.array([rank for rank in rank_data if rank is not None]))
+        return SimpleMetricStats(
+            np.array([rank for rank in rank_data if rank is not None])
+        )

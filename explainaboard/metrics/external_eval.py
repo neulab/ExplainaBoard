@@ -11,6 +11,7 @@ from explainaboard.metrics.metric import (
     MetricConfig,
     MetricResult,
     MetricStats,
+    SimpleMetricStats,
 )
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.agreement import fleiss_kappa
@@ -64,7 +65,7 @@ class ExternalEval(Metric):
     ) -> MetricStats:
 
         config = cast(ExternalEvalConfig, self._get_config(config))
-        return MetricStats(config.external_stats)
+        return SimpleMetricStats(config.external_stats)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -84,10 +85,10 @@ class ExternalEval(Metric):
                     f"should be equal to n_annotators: "
                     f"{config.n_annotators}"
                 )
-            return MetricStats(config.external_stats)
+            return SimpleMetricStats(config.external_stats)
         else:
             # "-1" indicates samples to be evaluated
-            return MetricStats(
+            return SimpleMetricStats(
                 np.array(
                     [
                         [UNANNOTATED_SYMBOL] * config.n_annotators
@@ -97,10 +98,10 @@ class ExternalEval(Metric):
             )
 
     def calc_agreement(self, stats: MetricStats) -> float:
-        data = stats.get_data()
+        if stats.is_batched():
+            raise ValueError("Unsupported for batched statistics.")
 
-        if data.ndim != 2:
-            raise ValueError("the dimension of stats._data should be 2")
+        data = stats.get_data()
 
         config = cast(ExternalEvalConfig, self.config)
 
@@ -124,12 +125,13 @@ class ExternalEval(Metric):
         :param stats: stats for every example
         :return: aggregated stats
         """
-        data = stats.get_data()
+        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
         if data.size == 0:
             return np.array(0.0)
         else:
-            return np.mean(np.mean(data, axis=-1), axis=-1)  # this could be redefined
+            # Averaging over all axes except the batch dimension.
+            return np.mean(data, axis=(-1, -2))
 
     def evaluate_from_stats(
         self,

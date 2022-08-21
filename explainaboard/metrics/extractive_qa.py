@@ -7,7 +7,12 @@ from typing import Optional, Union
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 from explainaboard.utils.typing_utils import unwrap_or
@@ -29,7 +34,7 @@ class ExtractiveQAMetric(Metric):
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
         config = unwrap_or(config, self.config)
         preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
-        return MetricStats(
+        return SimpleMetricStats(
             np.array(
                 [
                     max([self.sample_level_metric(t, p, preprocessor) for t in ts])

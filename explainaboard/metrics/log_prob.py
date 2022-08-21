@@ -5,7 +5,12 @@ from typing import cast, Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.typing_utils import unwrap_or
 
@@ -26,8 +31,7 @@ class LogProb(Metric):
     """
 
     def is_simple_average(self, stats: MetricStats):
-        stats_data = stats.get_data()
-        return stats_data.ndim == 1 or stats_data.shape[-1] == 1
+        return stats.num_statistics() == 1
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -37,9 +41,9 @@ class LogProb(Metric):
         level) and either one float for each or float+length rows
         """
         if len(pred_data) == 0 or isinstance(pred_data[0], float):
-            return MetricStats(np.array(pred_data))
+            return SimpleMetricStats(np.array(pred_data))
         elif isinstance(pred_data[0], list):
-            return MetricStats(np.array([[sum(x), len(x)] for x in pred_data]))
+            return SimpleMetricStats(np.array([[sum(x), len(x)] for x in pred_data]))
         else:
             t = type(pred_data[0])
             raise ValueError(f'Invalid type of pred_data for calc_stats_from_data {t}')

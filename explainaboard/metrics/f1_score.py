@@ -6,7 +6,12 @@ from typing import cast, Optional
 
 import numpy as np
 
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    Metric,
+    MetricConfig,
+    MetricStats,
+    SimpleMetricStats,
+)
 from explainaboard.metrics.registry import register_metric_config
 from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, SpanOps
 from explainaboard.utils.typing_utils import unwrap_or
@@ -73,7 +78,7 @@ class F1Score(Metric):
                     stats[i, tid * stat_mult + 2] += 1
                     if config.separate_match:
                         stats[i, tid * stat_mult + 3] += 1
-        return MetricStats(stats)
+        return SimpleMetricStats(stats)
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
@@ -185,4 +190,4 @@ class SeqF1Score(F1Score):
                 for span in spans:
                     c = tag_ids[span[0]]
                     stats[i, c * stat_mult + offset] += 1
-        return MetricStats(stats)
+        return SimpleMetricStats(stats)
