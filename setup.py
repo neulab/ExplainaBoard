@@ -4,6 +4,7 @@ import os
 from setuptools import find_packages, setup
 from version import __version__
 
+
 setup(
     name="explainaboard",
     version=__version__,
@@ -29,21 +30,9 @@ setup(
             "explainaboard=explainaboard.explainaboard_main:main",
         ],
     },
-    install_requires=[
-        "datalabs>=0.4.6",
-        "eaas>=0.3.9",
-        "lexicalrichness!=0.1.6",
-        "matplotlib",
-        "nltk>=3.2",
-        "numpy",
-        "sacrebleu",
-        "scikit-learn",
-        "scipy",
-        "seqeval",
-        "spacy",
-        "tqdm",
-        "wheel",
-    ],
+    install_requires=codecs.open("requirements.txt", encoding="utf-8")
+    .read()
+    .splitlines(),
     extras_require={
         "dev": [
             "pre-commit",
