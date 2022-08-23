@@ -4,7 +4,6 @@ import os
 from setuptools import find_packages, setup
 from version import __version__
 
-
 setup(
     name="explainaboard",
     version=__version__,
