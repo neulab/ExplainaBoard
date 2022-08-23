@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - uses: actions/cache@v3
@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: format
@@ -53,7 +53,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: isort
@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: lint
@@ -83,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install Python 3
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: 3.9
       - name: mypy
