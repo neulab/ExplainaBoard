@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import unittest
 from unittest import TestCase
@@ -6,12 +7,17 @@ from unittest.mock import patch
 import explainaboard.explainaboard_main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_output_path, top_path
 from explainaboard.utils.cache_api import cache_online_file
+from explainaboard.utils.logging import get_logger
 import explainaboard.visualizers.draw_charts
 
 
 class TestCLI(TestCase):
     """TODO: these tests only tests if they run. After the main script
     has been refactored, we can make these tests more useful"""
+
+    def setUp(self):
+        # To disable non-critical logging.
+        get_logger("report").setLevel(logging.WARNING)
 
     def test_textclass_datalab(self):
         args = [
