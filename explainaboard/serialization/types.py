@@ -80,10 +80,10 @@ class SerializableDataclass(Serializable):
     This class provides a common implementation to serialize/deserialize dataclass.
 
     Example:
-        @dataclass
-        MyData(SerializableDataclass):
-            foo: int
-            bar: str
+        >>> @dataclass
+        >>> MyData(SerializableDataclass):
+        >>>     foo: int
+        >>>     bar: str
 
         >>> MyData(111, "222").serialize()
         {"foo": 111, "bar": "222"}
