@@ -19,7 +19,8 @@ class TestCLI(TestCase):
 
     def setUp(self):
         # To disable non-critical logging.
-        get_logger("report").setLevel(logging.WARNING)
+        for name in [None, "report"]:
+            get_logger(name).setLevel(logging.WARNING)
         # To disable progress bar when downloading datasets using datalabs.
         set_progress_bar_enabled(False)
 
