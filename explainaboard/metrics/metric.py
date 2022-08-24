@@ -336,7 +336,7 @@ class Metric:
             if my_std == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
-                alpha=conf_value,
+                confidence=conf_value,
                 df=stats_data.shape[-2] - 1,
                 loc=my_mean,
                 scale=my_std,
