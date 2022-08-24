@@ -7,7 +7,11 @@ import unittest
 
 from explainaboard.serialization.registry import TypeRegistry
 from explainaboard.serialization.serializers import PrimitiveSerializer
-from explainaboard.serialization.types import Serializable, SerializableData
+from explainaboard.serialization.types import (
+    Serializable,
+    SerializableData,
+    SerializableDataclass,
+)
 from explainaboard.utils.typing_utils import narrow
 
 test_registry = TypeRegistry[Serializable]()
@@ -48,6 +52,15 @@ class Bar(Serializable):
         return cls(narrow(int, data["x"]), narrow(str, data["y"]))
 
 
+@test_registry.register("Baz")
+@dataclass(frozen=True)
+class Baz(SerializableDataclass):
+    """Serializable dataclass with mixin."""
+
+    n: int
+    m: str
+
+
 @test_registry.register("Nested")
 @dataclass(frozen=True)
 class Nested(Serializable):
@@ -55,13 +68,16 @@ class Nested(Serializable):
 
     foo: Foo
     bar: Bar
+    baz: Baz
 
     def serialize(self) -> dict[str, SerializableData]:
-        return {"foo": self.foo, "bar": self.bar}
+        return {"foo": self.foo, "bar": self.bar, "baz": self.baz}
 
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
-        return cls(narrow(Foo, data["foo"]), narrow(Bar, data["bar"]))
+        return cls(
+            narrow(Foo, data["foo"]), narrow(Bar, data["bar"]), narrow(Baz, data["baz"])
+        )
 
 
 class Unregistered(Serializable):
@@ -120,26 +136,36 @@ class PrimitiveSerializerTest(unittest.TestCase):
 
         foo = Foo(111, "222")
         bar = Bar(333, "444")
-        nested = Nested(foo, bar)
+        baz = Baz(555, "666")
+        nested = Nested(foo, bar, baz)
 
         foo_dict = {"cls_name": "Foo", "a": 111, "b": "222"}
         bar_dict = {"cls_name": "Bar", "x": 333, "y": "444"}
-        nested_dict = {"cls_name": "Nested", "foo": foo_dict, "bar": bar_dict}
+        baz_dict = {"cls_name": "Baz", "n": 555, "m": "666"}
+        nested_dict = {
+            "cls_name": "Nested",
+            "foo": foo_dict,
+            "bar": bar_dict,
+            "baz": baz_dict,
+        }
 
         self.assertIsInstance(s.serialize(foo), dict)
         self.assertIsInstance(s.serialize(bar), dict)
+        self.assertIsInstance(s.serialize(baz), dict)
         self.assertIsInstance(s.serialize(nested), dict)
-        self.assertIsInstance(s.serialize([foo, bar]), list)
-        self.assertIsInstance(s.serialize((foo, bar)), tuple)
-        self.assertIsInstance(s.serialize({"foo": foo, "bar": bar}), dict)
+        self.assertIsInstance(s.serialize([foo, bar, baz]), list)
+        self.assertIsInstance(s.serialize((foo, bar, baz)), tuple)
+        self.assertIsInstance(s.serialize({"foo": foo, "bar": bar, "baz": baz}), dict)
 
         self.assertEqual(s.serialize(foo), foo_dict)
         self.assertEqual(s.serialize(bar), bar_dict)
+        self.assertEqual(s.serialize(baz), baz_dict)
         self.assertEqual(s.serialize(nested), nested_dict)
-        self.assertEqual(s.serialize([foo, bar]), [foo_dict, bar_dict])
-        self.assertEqual(s.serialize((foo, bar)), (foo_dict, bar_dict))
+        self.assertEqual(s.serialize([foo, bar, baz]), [foo_dict, bar_dict, baz_dict])
+        self.assertEqual(s.serialize((foo, bar, baz)), (foo_dict, bar_dict, baz_dict))
         self.assertEqual(
-            s.serialize({"foo": foo, "bar": bar}), {"foo": foo_dict, "bar": bar_dict}
+            s.serialize({"foo": foo, "bar": bar, "baz": baz}),
+            {"foo": foo_dict, "bar": bar_dict, "baz": baz_dict},
         )
 
     def test_serialize_invalid(self) -> None:
@@ -183,26 +209,38 @@ class PrimitiveSerializerTest(unittest.TestCase):
 
         foo = Foo(111, "222")
         bar = Bar(333, "444")
-        nested = Nested(foo, bar)
+        baz = Baz(555, "666")
+        nested = Nested(foo, bar, baz)
 
         foo_dict = {"cls_name": "Foo", "a": 111, "b": "222"}
         bar_dict = {"cls_name": "Bar", "x": 333, "y": "444"}
-        nested_dict = {"cls_name": "Nested", "foo": foo_dict, "bar": bar_dict}
+        baz_dict = {"cls_name": "Baz", "n": 555, "m": "666"}
+        nested_dict = {
+            "cls_name": "Nested",
+            "foo": foo_dict,
+            "bar": bar_dict,
+            "baz": baz_dict,
+        }
 
         self.assertIsInstance(s.deserialize(foo_dict), Foo)
         self.assertIsInstance(s.deserialize(bar_dict), Bar)
+        self.assertIsInstance(s.deserialize(baz_dict), Baz)
         self.assertIsInstance(s.deserialize(nested_dict), Nested)
-        self.assertIsInstance(s.deserialize([foo_dict, bar_dict]), list)
-        self.assertIsInstance(s.deserialize((foo_dict, bar_dict)), tuple)
-        self.assertIsInstance(s.deserialize({"foo": foo_dict, "bar": bar_dict}), dict)
+        self.assertIsInstance(s.deserialize([foo_dict, bar_dict, baz_dict]), list)
+        self.assertIsInstance(s.deserialize((foo_dict, bar_dict, baz_dict)), tuple)
+        self.assertIsInstance(
+            s.deserialize({"foo": foo_dict, "bar": bar_dict, "baz": baz_dict}), dict
+        )
 
         self.assertEqual(s.deserialize(foo_dict), foo)
         self.assertEqual(s.deserialize(bar_dict), bar)
+        self.assertEqual(s.deserialize(baz_dict), baz)
         self.assertEqual(s.deserialize(nested_dict), nested)
-        self.assertEqual(s.deserialize([foo_dict, bar_dict]), [foo, bar])
-        self.assertEqual(s.deserialize((foo_dict, bar_dict)), (foo, bar))
+        self.assertEqual(s.deserialize([foo_dict, bar_dict, baz_dict]), [foo, bar, baz])
+        self.assertEqual(s.deserialize((foo_dict, bar_dict, baz_dict)), (foo, bar, baz))
         self.assertEqual(
-            s.deserialize({"foo": foo_dict, "bar": bar_dict}), {"foo": foo, "bar": bar}
+            s.deserialize({"foo": foo_dict, "bar": bar_dict, "baz": baz_dict}),
+            {"foo": foo, "bar": bar, "baz": baz},
         )
 
     def test_deserialize_invalid(self) -> None:
