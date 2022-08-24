@@ -1,3 +1,9 @@
+"""Pre-processing functions for qa-table_text_hybrid task
+The pre-processing is so complicated that I put most of the original processing code
+here. The official evaluation script can be found here:
+https://github.com/NExTplusplus/L2I/blob/main/evaluate.py
+"""
+
 from __future__ import annotations
 
 import re

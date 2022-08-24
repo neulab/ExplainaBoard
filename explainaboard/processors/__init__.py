@@ -14,13 +14,13 @@ from explainaboard.processors import (
     nlg_meta_evaluation,
     qa_multiple_choice,
     qa_open_domain,
+    qa_table_text_hybrid,
     summarization,
     tabular_classification,
     tabular_regression,
     text_classification,
     text_pair_classification,
     word_segmentation,
-    qa_table_text_hybrid,
 )
 from explainaboard.processors.processor_registry import get_processor
 

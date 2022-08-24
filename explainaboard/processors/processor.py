@@ -495,5 +495,3 @@ class Processor(metaclass=abc.ABCMeta):
         )
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
         return sys_info
-
-
