@@ -50,7 +50,7 @@ Let's say we have one system output file:
 
 The below example loads the `gaokao2018_np1` dataset (with the subdataset name of `writing-grammar`) from DataLab:
 ```shell
-explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
+explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
 ```
 
 where
