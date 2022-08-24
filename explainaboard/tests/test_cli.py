@@ -1,17 +1,28 @@
+import logging
 from pathlib import Path
 import unittest
 from unittest import TestCase
 from unittest.mock import patch
 
+from datalabs import set_progress_bar_enabled
+
 import explainaboard.explainaboard_main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_output_path, top_path
 from explainaboard.utils.cache_api import cache_online_file
-import explainaboard.visualizers.draw_hist
+from explainaboard.utils.logging import get_logger
+import explainaboard.visualizers.draw_charts
 
 
 class TestCLI(TestCase):
     """TODO: these tests only tests if they run. After the main script
     has been refactored, we can make these tests more useful"""
+
+    def setUp(self):
+        # To disable non-critical logging.
+        for name in [None, "report"]:
+            get_logger(name).setLevel(logging.WARNING)
+        # To disable progress bar when downloading datasets using datalabs.
+        set_progress_bar_enabled(False)
 
     def test_textclass_datalab(self):
         args = [
@@ -70,7 +81,7 @@ class TestCLI(TestCase):
             f'{test_output_path}/figures/',
         ]
         with patch('sys.argv', args):
-            explainaboard.visualizers.draw_hist.main()
+            explainaboard.visualizers.draw_charts.main()
 
     def test_textclass_custom(self):
         args = [

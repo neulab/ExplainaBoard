@@ -25,7 +25,7 @@ jobs:
           python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
       - name: unittest
-        run: python -m unittest
+        run: EXPLAINABOARD_HIDE_PROGRESS=1 python -m unittest -v
   format:
     runs-on: ubuntu-latest
     steps:

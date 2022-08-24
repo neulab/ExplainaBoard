@@ -26,7 +26,7 @@ from explainaboard.utils.tensor_analysis import (
 )
 from explainaboard.utils.typing_utils import unwrap
 from explainaboard.visualizers import get_pairwise_performance_gap
-from explainaboard.visualizers.draw_hist import draw_bar_chart_from_reports
+from explainaboard.visualizers.draw_charts import draw_charts_from_reports
 
 
 def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
@@ -501,7 +501,7 @@ def main():
                 # generate figures and save them into  `output_dir_figures`
                 if not os.path.exists(f"{output_dir_figures}/{x_file_name}"):
                     os.makedirs(f"{output_dir_figures}/{x_file_name}")
-                draw_bar_chart_from_reports(
+                draw_charts_from_reports(
                     [f"{output_dir_reports}/{x_file_name}.json"],
                     f"{output_dir_figures}/{x_file_name}",
                 )
