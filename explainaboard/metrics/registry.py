@@ -20,8 +20,6 @@ def register_metric_config(cls: type[MetricConfigT]) -> type[MetricConfigT]:
         `cls` itself. The type information is preserved.
     """
     _metric_config_registry[cls.__name__] = cls
-    if cls.__name__.endswith('Config'):
-        _metric_config_registry[cls.__name__[:-6]] = cls
     return cls
 
 
@@ -39,7 +37,7 @@ def get_metric_config_class(name: str) -> type[MetricConfig]:
     """
     config_cls = _metric_config_registry.get(name)
     if config_cls is None:
-        raise ValueError(f'Invalid Metric {name}')
+        raise ValueError(f'Invalid MetricConfig name: {name}')
     return config_cls
 
 
