@@ -17,7 +17,8 @@ class TestCLI(TestCase):
 
     def setUp(self):
         # To disable non-critical logging.
-        get_logger("report").setLevel(logging.WARNING)
+        for name in [None, "report"]:
+            get_logger(name).setLevel(logging.WARNING)
 
     def test_textclass_datalab(self):
         args = [
