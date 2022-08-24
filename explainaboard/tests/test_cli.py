@@ -4,6 +4,8 @@ import unittest
 from unittest import TestCase
 from unittest.mock import patch
 
+from datalabs import set_progress_bar_enabled
+
 import explainaboard.explainaboard_main
 from explainaboard.tests.utils import OPTIONAL_TEST_SUITES, test_output_path, top_path
 from explainaboard.utils.cache_api import cache_online_file
@@ -18,6 +20,8 @@ class TestCLI(TestCase):
     def setUp(self):
         # To disable non-critical logging.
         get_logger("report").setLevel(logging.WARNING)
+        # To disable progress bar when downloading datasets using datalabs.
+        set_progress_bar_enabled(False)
 
     def test_textclass_datalab(self):
         args = [
