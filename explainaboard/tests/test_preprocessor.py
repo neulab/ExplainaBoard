@@ -9,10 +9,6 @@ class TestExampleCode(unittest.TestCase):
     """
 
     def test_mlqa_preprocessor(self):
-        """
-        This tests the MLQAPreprocess
-        """
-
         en_preprocessor = ExtractiveQAPreprocessor(language='en')
         text = "This is a boring movie."
         text_processed = en_preprocessor(text)
