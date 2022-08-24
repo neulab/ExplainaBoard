@@ -20,6 +20,7 @@ from explainaboard.processors import (
     text_classification,
     text_pair_classification,
     word_segmentation,
+    qa_table_text_hybrid,
 )
 from explainaboard.processors.processor_registry import get_processor
 
@@ -45,4 +46,5 @@ __all__ = [
     'grammatical_error_correction',
     'qa_open_domain',
     'nlg_meta_evaluation',
+    'qa_table_text_hybrid',
 ]

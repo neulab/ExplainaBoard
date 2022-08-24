@@ -18,6 +18,7 @@ from explainaboard.loaders import (
     tabular_regression,
     text_classification,
     text_pair_classification,
+    qa_table_text_hybrid,
 )
 
 get_loader_class = loader_registry.get_loader_class
@@ -41,4 +42,5 @@ __all__ = [
     'grammatical_error_correction',
     'qa_open_domain',
     'nlg_meta_evaluation',
+    'qa_table_text_hybrid',
 ]
