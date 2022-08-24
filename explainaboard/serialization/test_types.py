@@ -14,14 +14,28 @@ class MyData(SerializableDataclass):
     bar: str
 
 
+class WithoutDecorator(SerializableDataclass):
+    """SerializableDataclass without decorator."""
+
+    pass
+
+
 class TestSerializableDataclass(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(MyData(111, "222").serialize(), {"foo": 111, "bar": "222"})
+
+    def test_serialize_without_decorator(self) -> None:
+        with self.assertRaisesRegex(TypeError, r"is not a dataclass"):
+            WithoutDecorator().serialize()
 
     def test_deserialize(self) -> None:
         self.assertEqual(
             MyData.deserialize({"foo": 333, "bar": "444"}), MyData(333, "444")
         )
+
+    def test_deserialize_without_decorator(self) -> None:
+        with self.assertRaisesRegex(TypeError, r"is not a dataclass"):
+            WithoutDecorator.deserialize({})
 
     def test_deserialize_excessive(self) -> None:
         # Unrecognized members are ignored.

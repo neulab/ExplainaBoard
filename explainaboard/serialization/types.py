@@ -95,12 +95,17 @@ class SerializableDataclass(Serializable):
     @final
     def serialize(self) -> dict[str, SerializableData]:
         """See Serializable.serialize."""
+        if not dataclasses.is_dataclass(self):
+            raise TypeError(f"{self.__class__.__name__} is not a dataclass.")
         return dataclasses.asdict(self)
 
     @final
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
         """See Serializable.deserialize."""
+        if not dataclasses.is_dataclass(cls):
+            raise TypeError(f"{cls.__name__} is not a dataclass.")
+
         # This function does not process runtime type checking for now.
         field_names = set(field.name for field in dataclasses.fields(cls))
         return cls(**{k: v for k, v in data.items() if k in field_names})
