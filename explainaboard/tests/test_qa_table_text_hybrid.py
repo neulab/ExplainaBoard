@@ -6,7 +6,7 @@ from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.utils import cache_api
 
 
-class TestClozeMultipleChoice(unittest.TestCase):
+class TestQATableTextHybrid(unittest.TestCase):
     json_output_customized = cache_api.cache_online_file(
         'https://explainaboard.s3.amazonaws.com/system_outputs/'
         'qa_table_text_hybrid/predictions_list.json',

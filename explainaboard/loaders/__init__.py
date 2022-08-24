@@ -13,12 +13,12 @@ from explainaboard.loaders import (
     nlg_meta_evaluation,
     qa_multiple_choice,
     qa_open_domain,
+    qa_table_text_hybrid,
     sequence_labeling,
     tabular_classification,
     tabular_regression,
     text_classification,
     text_pair_classification,
-    qa_table_text_hybrid,
 )
 
 get_loader_class = loader_registry.get_loader_class

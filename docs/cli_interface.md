@@ -32,6 +32,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Chunking](#chunking)
 * [Extractive QA](#extractive-qa)
 * [Multiple Choice QA](#multiple-choice-qa)
+* [Hybrid Table Text QA](#hybrid-table-text-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
 * [Multiple-choice Cloze](#Multiple-choice Cloze)
@@ -184,6 +185,25 @@ explainaboard --task qa-extractive --custom_dataset_paths ./data/system_outputs/
 The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
 ```shell
 explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > report.json
+```
+
+
+## [Hybrid Table Text QA](task_qa_table_text_hybrid.md)
+This task aims to answer a question based on a hybrid of tabular
+and textual context, e.g., [Zhu et al.2021](https://aclanthology.org/2021.acl-long.254.pdf).
+
+
+**CLI Example**
+
+
+The below example loads the `tat_qa` dataset from DataLab. 
+```shell
+explainaboard --task qa-table-text-hybrid --output_file_type json --dataset tat_qa --system_outputs predictions_list.json > report.json
+```
+where you can download the file `predictions_list.json` by:
+
+```shell
+wget -P ./ https://explainaboard.s3.amazonaws.com/system_outputs/qa_table_text_hybrid/predictions_list.json
 ```
 
 
