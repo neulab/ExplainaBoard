@@ -1,11 +1,12 @@
 import logging
 from pathlib import Path
+import tempfile
 import unittest
 from unittest import TestCase
 from unittest.mock import patch
 
 from datalabs import set_progress_bar_enabled
-from integration_tests.utils import OPTIONAL_TEST_SUITES, test_output_path, top_path
+from integration_tests.utils import OPTIONAL_TEST_SUITES, top_path
 
 import explainaboard.explainaboard_main
 from explainaboard.utils.cache_api import cache_online_file
@@ -56,32 +57,36 @@ class CLITest(TestCase):
             explainaboard.explainaboard_main.main()
 
     def test_textclass_viz(self):
-        Path(f"{test_output_path}/reports").mkdir(parents=True, exist_ok=True)
-        Path(f"{test_output_path}/figures").mkdir(parents=True, exist_ok=True)
-        for sysname in ('lstm', 'cnn'):
+        with tempfile.TemporaryDirectory() as tempdir:
+            td = Path(tempdir)
+            reports_dir = td / 'reports'
+            figures_dir = td / 'figures'
+            reports_dir.mkdir(parents=True)
+            figures_dir.mkdir(parents=True)
+            for sysname in ('lstm', 'cnn'):
+                args = [
+                    'explainaboard.explainaboard_main',
+                    '--task',
+                    'text-classification',
+                    '--system_outputs',
+                    f'{top_path}/data/system_outputs/sst2/sst2-{sysname}-output.txt',
+                    '--dataset',
+                    'sst2',
+                    '--report_json',
+                    str(reports_dir / f'sst2-{sysname}-output.json'),  # noqa
+                ]
+                with patch('sys.argv', args):
+                    explainaboard.explainaboard_main.main()
             args = [
-                'explainaboard.explainaboard_main',
-                '--task',
-                'text-classification',
-                '--system_outputs',
-                f'{top_path}/data/system_outputs/sst2/sst2-{sysname}-output.txt',
-                '--dataset',
-                'sst2',
-                '--report_json',
-                f'{test_output_path}/reports/sst2-{sysname}-output.json',  # noqa
+                'explainaboard.visualizers.draw_hist',
+                '--reports',
+                str(reports_dir / 'sst2-lstm-output.json'),
+                str(reports_dir / 'sst2-cnn-output.json'),
+                '--output_dir',
+                str(figures_dir),
             ]
             with patch('sys.argv', args):
-                explainaboard.explainaboard_main.main()
-        args = [
-            'explainaboard.visualizers.draw_hist',
-            '--reports',
-            f'{test_output_path}/reports/sst2-lstm-output.json',
-            f'{test_output_path}/reports/sst2-cnn-output.json',
-            '--output_dir',
-            f'{test_output_path}/figures/',
-        ]
-        with patch('sys.argv', args):
-            explainaboard.visualizers.draw_charts.main()
+                explainaboard.visualizers.draw_charts.main()
 
     def test_textclass_custom(self):
         args = [
