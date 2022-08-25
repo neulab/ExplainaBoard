@@ -125,7 +125,7 @@ def create_parser():
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
     parser.add_argument('--task', type=str, required=False, help="the task name")
     parser.add_argument(
-        '--system_outputs',
+        '--system-outputs',
         type=str,
         required=True,
         nargs="+",
@@ -169,21 +169,21 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--systems_aggregation',
+        '--systems-aggregation',
         type=str,
         required=False,
         help="None|minus|combination",
     )
 
     parser.add_argument(
-        '--datasets_aggregation',
+        '--datasets-aggregation',
         type=str,
         required=False,
         help="None|average|",
     )
 
     parser.add_argument(
-        '--languages_aggregation',
+        '--languages-aggregation',
         type=str,
         required=False,
         help="None|average|",
@@ -198,7 +198,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--sub_dataset',
+        '--sub-dataset',
         type=str,
         required=False,
         default=None,
@@ -215,7 +215,7 @@ def create_parser():
 
     parser.add_argument(
         '--language',
-        '--target_language',
+        '--target-language',
         dest='target_language',
         type=str,
         required=False,
@@ -225,7 +225,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--source_language',
+        '--source-language',
         type=str,
         required=False,
         default=None,
@@ -233,7 +233,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--reload_stat',
+        '--reload-stat',
         type=str,
         required=False,
         default=None,
@@ -249,7 +249,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--output_file_type',
+        '--output-file-type',
         type=str,
         required=False,
         default=None,
@@ -257,7 +257,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--conf_value',
+        '--conf-value',
         type=float,
         required=False,
         default=0.05,
@@ -265,7 +265,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--output_dir',
+        '--output-dir',
         type=str,
         required=False,
         default=None,
@@ -273,7 +273,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--report_json',
+        '--report-json',
         type=str,
         required=False,
         default=None,
@@ -281,21 +281,21 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--system_details',
+        '--system-details',
         type=str,
         required=False,
         help="a json file to store detailed information for a system",
     )
 
     parser.add_argument(
-        '--custom_dataset_paths',
+        '--custom-dataset-paths',
         type=str,
         nargs="*",
         help="path to custom dataset",
     )
 
     parser.add_argument(
-        '--custom_dataset_file_type',
+        '--custom-dataset-file-type',
         type=str,
         help="file types for custom datasets",
     )

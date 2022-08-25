@@ -257,7 +257,7 @@ def main():
     )
 
     parser.add_argument(
-        '--sys_names',
+        '--sys-names',
         type=str,
         required=False,
         nargs="+",
@@ -266,7 +266,7 @@ def main():
     )
 
     parser.add_argument(
-        '--output_dir',
+        '--output-dir',
         type=str,
         required=False,
         default="figures",
