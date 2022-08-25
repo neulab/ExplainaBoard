@@ -127,7 +127,7 @@ class APEF1ScoreConfig(MetricConfig):
 
 class APEF1Score(Metric):
     """
-    Calculate F1 score over BIO-tagged spans.
+    Calculate F1 score w.r.t argument pair extraction task
     """
 
     def is_simple_average(self, stats: MetricStats):
@@ -139,9 +139,14 @@ class APEF1Score(Metric):
         pred_data: list[list[str]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        def _get_label(token):
+            return (
+                token.split("-")[1] + "-" + token.split("-")[2]
+                if len(token.split("-")) == 3
+                else token.split("-")[1]
+            )
 
         stats = []
-
         for tags, pred_tags in zip(true_data, pred_data):
 
             reply_dict: dict[int, str] = {}
@@ -149,20 +154,15 @@ class APEF1Score(Metric):
             gold_spans = set()
             pred_spans = set()
 
-            def get_label(token):
-                return (
-                    token.split("-")[1] + "-" + token.split("-")[2]
-                    if len(token.split("-")) == 3
-                    else token.split("-")[1]
-                )
-
             for token_idx, token in enumerate(tags):
 
-                gold_label = get_label(token)
+                gold_label = _get_label(token)
                 prefix = token.split("-")[0]
 
                 next_label = (
-                    get_label(tags[token_idx + 1]) if token_idx + 1 < len(tags) else 'O'
+                    _get_label(tags[token_idx + 1])
+                    if token_idx + 1 < len(tags)
+                    else 'O'
                 )
 
                 pred_label = pred_tags[token_idx]
@@ -204,10 +204,12 @@ class APEF1Score(Metric):
 
             for token_idx, token in enumerate(tags):
 
-                gold_label = get_label(token)
+                gold_label = _get_label(token)
                 prefix = token.split("-")[0]
                 next_label = (
-                    get_label(tags[token_idx + 1]) if token_idx + 1 < len(tags) else 'O'
+                    _get_label(tags[token_idx + 1])
+                    if token_idx + 1 < len(tags)
+                    else 'O'
                 )
 
                 pred_label = pred_tags[token_idx]

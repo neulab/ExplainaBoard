@@ -7,7 +7,11 @@ from datalabs import aggregating
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
-from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
+from explainaboard.analysis.feature_funcs import (
+    accumulate_vocab_from_samples,
+    feat_freq_rank,
+    feat_num_oov,
+)
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.f1_score import APEF1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig
@@ -27,10 +31,34 @@ class ArgumentPairExtractionProcessor(Processor):
             "sentences": feature.Sequence(feature=feature.Value("string")),
             "true_tags": feature.Sequence(feature=feature.Value("string")),
             "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "num_sent": feature.Value(
+                dtype="float",
+                description="the number of sentences",
+                func=lambda info, x, c: len(x['sentences']),
+            ),
             "text_length": feature.Value(
                 dtype="float",
-                description="text length in tokens",
-                func=lambda info, x, c: len(x['sentences']),
+                description="the length of all sentences",
+                func=lambda info, x, c: len(" ".join(x['sentences'])),
+            ),
+            "num_oov": feature.Value(
+                dtype="float",
+                description="the number of out-of-vocabulary words",
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_num_oov(
+                    info, " ".join(x['sentences']), stat['vocab']
+                ),
+            ),
+            "fre_rank": feature.Value(
+                dtype="float",
+                description=(
+                    "the average rank of each word based on its frequency in "
+                    "training set"
+                ),
+                require_training_set=True,
+                func=lambda info, x, c, stat: feat_freq_rank(
+                    info, " ".join(x['sentences']), stat['vocab_rank']
+                ),
             ),
         }
 
@@ -75,10 +103,10 @@ class ArgumentPairExtractionProcessor(Processor):
 
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
-        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+        vocab, vocab_rank = accumulate_vocab_from_samples(
             samples,
             lambda x: " ".join(x['sentences']),
             unwrap(sys_info.source_tokenizer),
         )
 
-        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
+        return {'vocab': vocab, 'vocab_rank': vocab_rank}
