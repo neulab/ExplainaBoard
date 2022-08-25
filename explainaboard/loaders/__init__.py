@@ -1,4 +1,5 @@
 from explainaboard.loaders import (
+    argument_pair_extraction,
     aspect_based_sentiment_classification,
     cloze_generative,
     cloze_multiple_choice,
@@ -43,4 +44,5 @@ __all__ = [
     'qa_open_domain',
     'nlg_meta_evaluation',
     'qa_table_text_hybrid',
+    'argument_pair_extraction',
 ]

@@ -120,6 +120,169 @@ class F1Score(Metric):
 
 @dataclass
 @register_metric_config
+class APEF1ScoreConfig(MetricConfig):
+    def to_metric(self):
+        return APEF1Score(self)
+
+
+class APEF1Score(Metric):
+    """
+    Calculate F1 score over BIO-tagged spans.
+    """
+
+    def is_simple_average(self, stats: MetricStats):
+        return False
+
+    def calc_stats_from_data(
+        self,
+        true_data: list[list[str]],
+        pred_data: list[list[str]],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+
+        stats = []
+
+        for tags, pred_tags in zip(true_data, pred_data):
+
+            reply_dict: dict[int, str] = {}
+            reply_pred_dict: dict[int, str] = {}
+            gold_spans = set()
+            pred_spans = set()
+
+            def get_label(token):
+                return (
+                    token.split("-")[1] + "-" + token.split("-")[2]
+                    if len(token.split("-")) == 3
+                    else token.split("-")[1]
+                )
+
+            for token_idx, token in enumerate(tags):
+
+                gold_label = get_label(token)
+                prefix = token.split("-")[0]
+
+                next_label = (
+                    get_label(tags[token_idx + 1]) if token_idx + 1 < len(tags) else 'O'
+                )
+
+                pred_label = pred_tags[token_idx]
+                next_pred_label = (
+                    pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
+                )
+
+                if prefix == 'Reply':
+                    if gold_label.startswith("B-"):
+                        start = token_idx
+                    if (
+                        gold_label.startswith("B-") or gold_label.startswith("I-")
+                    ) and (next_label.startswith("O") or next_label.startswith('B')):
+                        end = token_idx
+                        pair_idx = int(gold_label[2:])
+                        if pair_idx not in reply_dict.keys():
+                            reply_dict[pair_idx] = str(start) + '|' + str(end)
+                        else:
+                            reply_dict[pair_idx] += '||' + str(start) + '|' + str(end)
+
+                    if pred_label.startswith("B-"):
+                        start_pred = token_idx
+                    if (
+                        pred_label.startswith("B-") or pred_label.startswith("I-")
+                    ) and (
+                        next_pred_label.startswith("O")
+                        or next_pred_label.startswith('B')
+                    ):
+                        end_pred = token_idx
+                        pair_idx = int(pred_label[2:])
+                        if pair_idx not in reply_pred_dict.keys():
+                            reply_pred_dict[pair_idx] = (
+                                str(start_pred) + '|' + str(end_pred)
+                            )
+                        else:
+                            reply_pred_dict[pair_idx] += (
+                                '||' + str(start_pred) + '|' + str(end_pred)
+                            )
+
+            for token_idx, token in enumerate(tags):
+
+                gold_label = get_label(token)
+                prefix = token.split("-")[0]
+                next_label = (
+                    get_label(tags[token_idx + 1]) if token_idx + 1 < len(tags) else 'O'
+                )
+
+                pred_label = pred_tags[token_idx]
+                next_pred_label = (
+                    pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
+                )
+
+                if prefix == 'Review':
+                    if gold_label.startswith("B-"):
+                        start = token_idx
+                    if (
+                        gold_label.startswith("B-") or gold_label.startswith("I-")
+                    ) and (next_label.startswith("O") or next_label.startswith('B')):
+                        end = token_idx
+                        pair_idx = int(gold_label[2:])
+                        if pair_idx in reply_dict:
+                            replies = reply_dict[pair_idx]
+                            for reply in replies.split("||"):
+                                reply_start, reply_end = reply.split("|")
+                                gold_spans.add(
+                                    f"{start}-{end}-{reply_start}-{reply_end}"
+                                )
+
+                    if pred_label.startswith("B-"):
+                        start_pred = token_idx
+                    if (
+                        pred_label.startswith("B-") or pred_label.startswith("I-")
+                    ) and (
+                        next_pred_label.startswith("O")
+                        or next_pred_label.startswith('B')
+                    ):
+                        end_pred = token_idx
+                        pair_idx = int(pred_label[2:])
+                        if pair_idx in reply_pred_dict:
+                            replies_pred = reply_pred_dict[pair_idx]
+                            for reply_pred in replies_pred.split("||"):
+                                reply_start_pred, reply_end_pred = reply_pred.split("|")
+                                pred_spans.add(
+                                    f"{start_pred}-{end_pred}-{reply_start_pred}"
+                                    f"-{reply_end_pred}"
+                                )
+
+            stats.append(
+                [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]
+            )
+
+        return SimpleMetricStats(np.array(stats))
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
+        if data.size == 0:
+            return np.array(0.0)
+        else:
+            """
+            when data.ndim == 3, e.g.,
+            * 1000 * 100 * 3 -> 1000 * 3
+            """
+            data_sum = np.sum(data, axis=(-2))
+            total_gold = data_sum[0] if data.ndim == 2 else data_sum[:, 0]
+            total_pred = data_sum[1] if data.ndim == 2 else data_sum[:, 1]
+            correct_num = data_sum[2] if data.ndim == 2 else data_sum[:, 2]
+
+            precision = correct_num * 1.0 / total_pred
+            recall = correct_num * 1.0 / total_gold
+            fscore = 2.0 * precision * recall / (precision + recall)
+            return np.array(fscore)
+
+
+@dataclass
+@register_metric_config
 class SeqF1ScoreConfig(F1ScoreConfig):
     tag_schema: str = 'bio'
 

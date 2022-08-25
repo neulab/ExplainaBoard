@@ -23,6 +23,7 @@ class TaskType(str, Enum):
     nlg_meta_evaluation = "nlg-meta-evaluation"
     tabular_regression = "tabular-regression"
     tabular_classification = "tabular-classification"
+    argument_pair_extraction = "argument-pair-extraction"
 
     @staticmethod
     def list():
