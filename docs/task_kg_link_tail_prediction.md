@@ -67,7 +67,7 @@ where
 * `predictions`: a list of predictions
 
 Let's say we have one system output file: 
-* [test-kg-prediction-no-user-defined.json](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-no-user-defined.json) 
+* [test-kg-prediction-no-user-defined.json](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/artifacts/test-kg-prediction-no-user-defined.json) 
 
 
 
@@ -177,7 +177,7 @@ Note that you must provide the rank of the true entity in the predictions, for a
 
 ### Perform Analysis with CLI
 
-An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/artifacts/test-kg-prediction-user-defined.json), and you can test it using the following command:
+An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/artifacts/test-kg-prediction-user-defined.json), and you can test it using the following command:
 
 ```shell
 explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/data_mini.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
@@ -196,7 +196,7 @@ First, a simple example of using Python access to data analysis
 from explainaboard import TaskType, get_loader_class, get_processor
 
 # Load the data
-dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+dataset = "./integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
@@ -219,7 +219,7 @@ from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import (HitsConfig, MeanReciprocalRankConfig,
   MeanRankConfig)
 
-dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+dataset = "./integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
@@ -261,7 +261,7 @@ from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
-dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+dataset = "./integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
@@ -293,7 +293,7 @@ from explainaboard import TaskType, get_loader_class, get_processor
 from explainaboard.metrics.ranking import MeanRankConfig
 from explainaboard.metrics.ranking import HitsConfig, MeanReciprocalRankConfig
 
-dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+dataset = "./integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
@@ -326,7 +326,7 @@ metadata = {
     "system_details": system_details,
 }
 ```
-[Here](https://github.com/neulab/ExplainaBoard/blob/main/explainaboard/tests/test_system_details.py) is a complete code.
+[Here](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/test_system_details.py) is a complete code.
 
 ### Meta/Quantitative Analysis
 A preliminary version of the rank-flipping quantitative analysis has been implemented. Example code:

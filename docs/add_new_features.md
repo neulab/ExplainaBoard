@@ -77,7 +77,7 @@ over individual tokens or spans. You can take a look at `sequence_labeling.py` o
 ## Features and Unittests
 
 Note that you may need to change the test cases in the module relevant to your task
-in `explainaboard/tests/` upon adding a new feature, such as changing the number of
+in `integration_tests/` upon adding a new feature, such as changing the number of
 features in asserts to match the current number of features or testing that feature
 independently.
 

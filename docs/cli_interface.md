@@ -255,7 +255,7 @@ Fill in a blank based on multiple provided options
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub_dataset cloze-multiple-choice --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_choice.json > report.json
+explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub_dataset cloze-multiple-choice --metrics CorrectScore --system_outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_choice.json > report.json
 ```
 
 
@@ -265,7 +265,7 @@ Fill in a blank based on hint
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
+explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
 ```
 
 
@@ -275,7 +275,7 @@ Correct errors in a text
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
+explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
 ```
 
 ## Tabular Classification
