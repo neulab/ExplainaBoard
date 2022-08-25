@@ -363,7 +363,7 @@ def main():
         if output_dir_reports and not os.path.exists(output_dir_reports):
             os.makedirs(output_dir_reports)
 
-        # check for benchmark submission: explainaboard  --system_outputs ./data/
+        # check for benchmark submission: explainaboard  --system-outputs ./data/
         # system_outputs/sst2/user_specified_metadata.json
         num_systems = len(system_outputs)
         dataset_file_types: list[str | None] = [dataset_file_type] * num_systems

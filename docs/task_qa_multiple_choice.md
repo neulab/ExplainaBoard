@@ -53,11 +53,11 @@ etc. from different systems.
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-    explainaboard --task qa-multiple-choice --system_outputs ./data/system_outputs/fig_qa/gpt2.json > report.json
+    explainaboard --task qa-multiple-choice --system-outputs ./data/system_outputs/fig_qa/gpt2.json > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
+* `--system-outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
 * `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer
@@ -75,7 +75,7 @@ TODO: add insights
 
 One also can perform pair-wise analysis:
 ```shell
-explainaboard --task qa-multiple-choice --system_outputs model_1 model_2 > report.json
+explainaboard --task qa-multiple-choice --system-outputs model_1 model_2 > report.json
 ```
 where two system outputs are fed separated by space.
 * `report.json`: the generated analysis file with json format, whose schema is similar to the above one with single system evaluation except that

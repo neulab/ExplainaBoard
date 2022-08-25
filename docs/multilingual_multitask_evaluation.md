@@ -38,7 +38,7 @@ Once the system outputs are ready, evaluation can be conducted through following
 
 
 ```
-explainaboard --system_outputs ./data/system_outputs/multilingual/json/mt5base/xnli/*
+explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/xnli/*
 ```
 
 
@@ -68,28 +68,28 @@ For example,
 
 * Differant languages on `marc` dataset (text classification task) using `mt5base (a.k.a CL-mt5base)` system
 ```shell
-explainaboard --system_outputs ./data/system_outputs/multilingual/json/mt5base/marc/*
+explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/marc/*
 ```
 
 * Differant languages on `xquad` dataset (text classification task) using `mt5base` system
 ```shell
-explainaboard --system_outputs ./data/system_outputs/multilingual/json/mt5base/xquad/*
+explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/xquad/*
 ```
 
 * Differant languages on `xnli` dataset (natural language inference task) using `mlpp (a.k.a CL-mlpp15out1sum)` system
 ```shell
-explainaboard --system_outputs ./data/system_outputs/multilingual/json/mlpp/xnli/*
+explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/xnli/*
 ```
 
 * Differant languages on `marc` dataset (text classification task) using `mlpp` system
 ```shell
-explainaboard --system_outputs ./data/system_outputs/multilingual/json/mlpp/marc/*
+explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/marc/*
 ```
 
 
 * Differant languages on `xquad` dataset (extractive question answwering) using `mlpp` system
 ```shell
-explainaboard --system_outputs ./data/system_outputs/multilingual/json/mlpp/xquad/*
+explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/xquad/*
 ```
 
 
@@ -188,7 +188,7 @@ know the average performance ove all languages for each dataset,
 
 
 ```
-explainaboard --reports ./output/reports/* --languages_aggregation average
+explainaboard --reports ./output/reports/* --languages-aggregation average
 ```
 Then following results will be printed:
 
@@ -234,7 +234,7 @@ For example, the following command represent: the performance gap between two sy
 from `mar` and `xnli` datasets.
 
 ```
-explainaboard --reports ./output/reports/* --datasets marc xnli --systems_aggregation minus
+explainaboard --reports ./output/reports/* --datasets marc xnli --systems-aggregation minus
 ```
 
 Then following results will be printed:
