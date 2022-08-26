@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -78,6 +79,37 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 
     true_label: str
     predicted_label: str
+
+
+@dataclass
+class AnalysisCaseBlock(AnalysisCase):
+
+    text: str
+    orig_str: str
+
+
+@dataclass
+class AnalysisCaseLabeledBlock(AnalysisCaseBlock):
+    """
+    A bucket case that highlights a span in text along with a label.
+    :param true_label: The actual label
+    :param predicted_label: The label that is predicted
+    """
+
+    true_label: str
+    predicted_label: str
+    # the number of review sentence
+    block_review_sentences: Optional[float] = None
+    # the number of review tokens
+    block_review_tokens: Optional[float] = None
+    # the relative position of review block
+    block_review_position: Optional[float] = None
+    # the number of reply sentence
+    block_reply_sentences: Optional[float] = None
+    # the number of reply tokens
+    block_reply_tokens: Optional[float] = None
+    # the relative position of reply block
+    block_reply_position: Optional[float] = None
 
 
 @dataclass

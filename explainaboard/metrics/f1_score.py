@@ -13,7 +13,12 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.metrics.registry import register_metric_config
-from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, SpanOps
+from explainaboard.utils.span_utils import (
+    BIOSpanOps,
+    BMESSpanOps,
+    gen_text_blocks,
+    SpanOps,
+)
 from explainaboard.utils.typing_utils import unwrap_or
 
 
@@ -139,123 +144,13 @@ class APEF1Score(Metric):
         pred_data: list[list[str]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
-        def _get_label(token):
-            return (
-                token.split("-")[1] + "-" + token.split("-")[2]
-                if len(token.split("-")) == 3
-                else token.split("-")[1]
-            )
 
         stats = []
         for tags, pred_tags in zip(true_data, pred_data):
-
-            reply_dict: dict[int, str] = {}
-            reply_pred_dict: dict[int, str] = {}
-            gold_spans = set()
-            pred_spans = set()
-
-            for token_idx, token in enumerate(tags):
-
-                gold_label = _get_label(token)
-                prefix = token.split("-")[0]
-
-                next_label = (
-                    _get_label(tags[token_idx + 1])
-                    if token_idx + 1 < len(tags)
-                    else 'O'
-                )
-
-                pred_label = pred_tags[token_idx]
-                next_pred_label = (
-                    pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
-                )
-
-                if prefix == 'Reply':
-                    if gold_label.startswith("B-"):
-                        start = token_idx
-                    if (
-                        gold_label.startswith("B-") or gold_label.startswith("I-")
-                    ) and (next_label.startswith("O") or next_label.startswith('B')):
-                        end = token_idx
-                        pair_idx = int(gold_label[2:])
-                        if pair_idx not in reply_dict.keys():
-                            reply_dict[pair_idx] = str(start) + '|' + str(end)
-                        else:
-                            reply_dict[pair_idx] += '||' + str(start) + '|' + str(end)
-
-                    if pred_label.startswith("B-"):
-                        start_pred = token_idx
-                    if (
-                        pred_label.startswith("B-") or pred_label.startswith("I-")
-                    ) and (
-                        next_pred_label.startswith("O")
-                        or next_pred_label.startswith('B')
-                    ):
-                        end_pred = token_idx
-                        pair_idx = int(pred_label[2:])
-                        if pair_idx not in reply_pred_dict.keys():
-                            reply_pred_dict[pair_idx] = (
-                                str(start_pred) + '|' + str(end_pred)
-                            )
-                        else:
-                            reply_pred_dict[pair_idx] += (
-                                '||' + str(start_pred) + '|' + str(end_pred)
-                            )
-
-            for token_idx, token in enumerate(tags):
-
-                gold_label = _get_label(token)
-                prefix = token.split("-")[0]
-                next_label = (
-                    _get_label(tags[token_idx + 1])
-                    if token_idx + 1 < len(tags)
-                    else 'O'
-                )
-
-                pred_label = pred_tags[token_idx]
-                next_pred_label = (
-                    pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
-                )
-
-                if prefix == 'Review':
-                    if gold_label.startswith("B-"):
-                        start = token_idx
-                    if (
-                        gold_label.startswith("B-") or gold_label.startswith("I-")
-                    ) and (next_label.startswith("O") or next_label.startswith('B')):
-                        end = token_idx
-                        pair_idx = int(gold_label[2:])
-                        if pair_idx in reply_dict:
-                            replies = reply_dict[pair_idx]
-                            for reply in replies.split("||"):
-                                reply_start, reply_end = reply.split("|")
-                                gold_spans.add(
-                                    f"{start}-{end}-{reply_start}-{reply_end}"
-                                )
-
-                    if pred_label.startswith("B-"):
-                        start_pred = token_idx
-                    if (
-                        pred_label.startswith("B-") or pred_label.startswith("I-")
-                    ) and (
-                        next_pred_label.startswith("O")
-                        or next_pred_label.startswith('B')
-                    ):
-                        end_pred = token_idx
-                        pair_idx = int(pred_label[2:])
-                        if pair_idx in reply_pred_dict:
-                            replies_pred = reply_pred_dict[pair_idx]
-                            for reply_pred in replies_pred.split("||"):
-                                reply_start_pred, reply_end_pred = reply_pred.split("|")
-                                pred_spans.add(
-                                    f"{start_pred}-{end_pred}-{reply_start_pred}"
-                                    f"-{reply_end_pred}"
-                                )
-
+            gold_spans, pred_spans = gen_text_blocks(tags, pred_tags)
             stats.append(
                 [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]
             )
-
         return SimpleMetricStats(np.array(stats))
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
