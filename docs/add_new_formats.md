@@ -21,8 +21,8 @@ in `tsv` format:
 
 ```python
 from explainaboard import TaskType, get_dataset_class
-dataset_path = "./explainaboard/tests/artifacts/summarization/dataset.tsv"
-output_path = "./explainaboard/tests/artifacts/summarization/output.txt"
+dataset_path = "./integration_tests/artifacts/summarization/dataset.tsv"
+output_path = "./integration_tests/artifacts/summarization/output.txt"
 loader = get_dataset_class(TaskType.summarization)(
     dataset_path,
     output_path,

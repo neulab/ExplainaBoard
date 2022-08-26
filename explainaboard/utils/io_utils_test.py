@@ -8,12 +8,14 @@ import unittest
 from explainaboard.utils import io_utils
 
 
-class TestIOUtils(unittest.TestCase):
+class IOUtilsTest(unittest.TestCase):
     def test_text_writer_file(self):
-        with tempfile.TemporaryDirectory as dirname:
-            with io_utils.text_writer(os.path.join(dirname, "test.txt")) as fp:
+        with tempfile.TemporaryDirectory() as dirname:
+            filename = os.path.join(dirname, "test.txt")
+            with io_utils.text_writer(filename) as fp:
                 fp.write("foobar")
-            self.assertEqual(open(dirname, "test.txt").read(), "foobar")
+            with open(filename) as fp:
+                self.assertEqual(fp.read(), "foobar")
 
     def test_text_writer_stdout(self):
         with io_utils.text_writer() as fp:

@@ -8,7 +8,7 @@ from explainaboard.loaders.file_loader import (
 )
 
 
-class FileLoaderTests(TestCase):
+class FileLoaderTest(TestCase):
     def test_tsv_validation(self):
         self.assertRaises(
             ValueError,
@@ -23,10 +23,10 @@ class FileLoaderTests(TestCase):
         data = loader.load(content, Source.in_memory)
         self.assertEqual(
             [
-                {"id": '0', "output": "line1"},
+                {"id": "0", "output": "line1"},
                 {"id": "1", "output": "line2"},
             ],
-            data,
+            data.samples,
         )
 
     def test_text_file_loader_int(self):
@@ -35,10 +35,10 @@ class FileLoaderTests(TestCase):
         data = loader.load(content, Source.in_memory)
         self.assertEqual(
             [
-                {"id": '0', "prediction": 1},
+                {"id": "0", "prediction": 1},
                 {"id": "1", "prediction": 2},
             ],
-            data,
+            data.samples,
         )
 
     def test_text_file_loader_validate(self):

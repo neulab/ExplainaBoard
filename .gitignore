@@ -18,9 +18,9 @@ explainaboard/tasks/re/a.json
 explainaboard/tasks/re/instantiate.json
 explainaboard/tasks/re/tensoreval-backup.py
 explainaboard/tasks/re/test_re.tsv
-explainaboard/tests/app.py
-explainaboard/tests/system_analysis.json
-explainaboard/tests/test_api.py
+integration_tests/app.py
+integration_tests/system_analysis.json
+integration_tests/test_api.py
 gen_samples.py
 htmlcov
 instantiate.json
