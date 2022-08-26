@@ -5,8 +5,8 @@
 # This script must be run from the root directory of the repository. This script
 # requires Docker to be installed.
 #
-# Usage:
-# ./cicd/gen_requirements_lock.sh
+# When requirements.txt is updated, run:
+#   ./cicd/gen_requirements_lock.sh
 
 run_docker() {
     local python_version=$1
@@ -29,7 +29,7 @@ gen_lockfile() {
 
     python3 -m venv /tmp/venv
     source /tmp/venv/bin/activate
-    python3 -m pip install --upgrade pip
+    python3 -m pip install --upgrade pip wheel
     python3 -m pip install -r requirements.txt
     echo "# Do not edit by hand. Automatically generated from ${BASH_SOURCE}." \
         > ${lock_file}
