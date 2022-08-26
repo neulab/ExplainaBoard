@@ -27,15 +27,18 @@ jobs:
         if: steps.pip-cache.outputs.cache-hit != 'true'
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install --upgrade pip wheel
-          .venv/bin/python -m pip install -r .github/workflows/requirements.lock.${{ matrix.python-version }}
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r .github/workflows/requirements.lock.${{ matrix.python-version }}
       - name: Install data dependencies
         run: |
           source .venv/bin/activate
           python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
       - name: test
-        run: bash cicd/run_unit_tests.sh
+        run: |
+          source .venv/bin/activate
+          bash cicd/run_unit_tests.sh
   integration-tests:
     runs-on: ubuntu-latest
     strategy:
@@ -56,15 +59,18 @@ jobs:
         if: steps.pip-cache.outputs.cache-hit != 'true'
         run: |
           python -m venv .venv
-          .venv/bin/python -m pip install --upgrade pip wheel
-          .venv/bin/python -m pip install -r .github/workflows/requirements.lock.${{ matrix.python-version }}
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel
+          python -m pip install -r .github/workflows/requirements.lock.${{ matrix.python-version }}
       - name: Install data dependencies
         run: |
           source .venv/bin/activate
           python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
       - name: test
-        run: bash cicd/run_integration_tests.sh
+        run: |
+          source .venv/bin/activate
+          bash cicd/run_integration_tests.sh
   format:
     runs-on: ubuntu-latest
     steps:
