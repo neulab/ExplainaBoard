@@ -24,22 +24,22 @@ etc. from different systems.
 
 The below example loads the `sst2` dataset from DataLab:
 ```shell
-explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task text-classification --dataset sst2 --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be
+* `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: denotes the dataset name
 * `report.json`: the generated analysis file with json format. Tips: use a json viewer
   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
 Alternatively, you can load the dataset from an existing file using the
-`--custom_dataset_paths` option
+`--custom-dataset-paths` option
 
 ```shell
-explainaboard --task text-classification --custom_dataset_paths ./data/system_outputs/sst2/sst2-dataset.tsv --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task text-classification --custom-dataset-paths ./data/system_outputs/sst2/sst2-dataset.tsv --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 in which case the file format of this file is TSV
@@ -51,7 +51,7 @@ text \t true_label
 
 One also can perform pair-wise analysis:
 ```shell
-explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt ./data/system_outputs/sst2/sst2-cnn-output.txt > report.json
+explainaboard --task text-classification --dataset sst2 --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt ./data/system_outputs/sst2/sst2-cnn-output.txt > report.json
 ```
 where two system outputs are fed separated by space.
 * `report.json`: the generated analysis file with json format, whose schema is similar 

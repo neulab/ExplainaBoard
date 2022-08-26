@@ -43,11 +43,11 @@ wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart
 
 Then run the below command and it should work:
 ```shell
-explainaboard --task summarization --dataset cnn_dailymail --system_outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
+explainaboard --task summarization --dataset cnn_dailymail --system-outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
 ```
 
 * `--task`: denotes the task name.
-* `--system_outputs`: denote the path of system outputs. Multiple one should be
+* `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: optional, denotes the dataset name
 * `--metrics`: optional, different metrics should be separated by space. See [more supported metrics](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md#summarization)
@@ -62,7 +62,7 @@ source_sentence \t target_sentence
 
 In this case, we can directly use the miniature dataset distributed with the repo:
 ```shell
-explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system_outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
+explainaboard --task summarization --custom-dataset-paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system-outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
 ```
 
 ## Other Task Examples
@@ -71,19 +71,19 @@ explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/
 
 Try it out for translation as below. The examples use a custom dataset that is not included in DataLab at the moment.
 ```shell
-explainaboard --task machine-translation --custom_dataset_paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system_outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
+explainaboard --task machine-translation --custom-dataset-paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system-outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
 ```
 
 ### Code Generation
 
 You can try out evaluation of code generation on the CoNaLa dataset in DataLab as below:
 ```shell
-explainaboard --task machine-translation --dataset conala --output_file_type json --system_outputs ./data/system_outputs/conala/conala-baseline-output.json --report_json report.json
+explainaboard --task machine-translation --dataset conala --output-file-type json --system-outputs ./data/system_outputs/conala/conala-baseline-output.json --report-json report.json
 ```
 
 You can also use a custom code generation dataset:
 ```shell
-explainaboard --task machine-translation --custom_dataset_file_type json --custom_dataset_paths data/system_outputs/conala/conala-dataset.json --output_file_type json --system_outputs ./data/system_outputs/conala/conala-baseline-output.json --report_json report.json
+explainaboard --task machine-translation --custom-dataset-file-type json --custom-dataset-paths data/system_outputs/conala/conala-dataset.json --output-file-type json --system-outputs ./data/system_outputs/conala/conala-baseline-output.json --report-json report.json
 ```
 
 ## Notes

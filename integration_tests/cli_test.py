@@ -29,11 +29,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'text-classification',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
             '--dataset',
             'sst2',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -44,12 +44,12 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'text-classification',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
             f'{top_path}/data/system_outputs/sst2/sst2-cnn-output.txt',
             '--dataset',
             'sst2',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -63,11 +63,11 @@ class CLITest(TestCase):
                 'explainaboard.explainaboard_main',
                 '--task',
                 'text-classification',
-                '--system_outputs',
+                '--system-outputs',
                 f'{top_path}/data/system_outputs/sst2/sst2-{sysname}-output.txt',
                 '--dataset',
                 'sst2',
-                '--report_json',
+                '--report-json',
                 f'{test_output_path}/reports/sst2-{sysname}-output.json',  # noqa
             ]
             with patch('sys.argv', args):
@@ -77,7 +77,7 @@ class CLITest(TestCase):
             '--reports',
             f'{test_output_path}/reports/sst2-lstm-output.json',
             f'{test_output_path}/reports/sst2-cnn-output.json',
-            '--output_dir',
+            '--output-dir',
             f'{test_output_path}/figures/',
         ]
         with patch('sys.argv', args):
@@ -88,11 +88,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'text-classification',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/sst2/sst2-dataset.tsv',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -103,11 +103,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'tabular-regression',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/sst2_tabreg/sst2-tabreg-dataset.json',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -118,11 +118,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'tabular-classification',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/sst2/sst2-lstm-output.txt',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/sst2_tabclass/sst2-tabclass-dataset.json',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -134,11 +134,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'text-pair-classification',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/snli/snli-roberta-output.txt',
             '--dataset',
             'snli',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -149,11 +149,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'text-pair-classification',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/snli/snli-roberta-output.txt',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/snli/snli-dataset.tsv',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -164,14 +164,14 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'summarization',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/cnndm/cnndm_mini-dataset.tsv',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/cnndm/cnndm_mini-bart-output.txt',
             '--metrics',
             'rouge2',
             'chrf',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -189,11 +189,11 @@ class CLITest(TestCase):
             'summarization',
             '--dataset',
             'cnn_dailymail',
-            '--system_outputs',
+            '--system-outputs',
             filename,
             '--metrics',
             'rouge2',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -204,13 +204,13 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'machine-translation',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt',  # noqa
             '--metrics',
             'bleu',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -221,15 +221,15 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             "--task",
             "machine-translation",
-            "--custom_dataset_file_type",
+            "--custom-dataset-file-type",
             "json",
-            "--custom_dataset_paths",
+            "--custom-dataset-paths",
             f"{top_path}/data/system_outputs/conala/conala-dataset.json",
-            "--output_file_type",
+            "--output-file-type",
             "json",
-            "--system_outputs",
+            "--system-outputs",
             f"{top_path}/data/system_outputs/conala/conala-baseline-output.json",
-            "--report_json",
+            "--report-json",
             "report.json",
         ]
         with patch('sys.argv', args):
@@ -242,11 +242,11 @@ class CLITest(TestCase):
             "machine-translation",
             "--dataset",
             "conala",
-            "--output_file_type",
+            "--output-file-type",
             "json",
-            "--system_outputs",
+            "--system-outputs",
             f"{top_path}/data/system_outputs/conala/conala-baseline-output.json",
-            "--report_json",
+            "--report-json",
             "report.json",
         ]
         with patch('sys.argv', args):
@@ -257,11 +257,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'language-modeling',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/wikitext/wikitext-dataset.txt',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/wikitext/wikitext-sys1-output.txt',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -274,11 +274,11 @@ class CLITest(TestCase):
             'named-entity-recognition',
             '--dataset',
             'conll2003',
-            '--sub_dataset',
+            '--sub-dataset',
             'ner',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/conll2003/conll2003-elmo-output.conll',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -289,11 +289,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'named-entity-recognition',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/conll2003/conll2003-dataset.conll',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/conll2003/conll2003-elmo-output.conll',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -308,9 +308,9 @@ class CLITest(TestCase):
             'fig_qa',
             '--split',
             'validation',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -321,11 +321,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'qa-multiple-choice',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/fig_qa/fig_qa-dataset.json',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -336,11 +336,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'qa-extractive',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/squad/squad_mini-dataset.json',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/squad/squad_mini-example-output.json',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -357,9 +357,9 @@ class CLITest(TestCase):
             'kg-link-tail-prediction',
             '--dataset',
             'fb15k_237',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -370,11 +370,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'kg-link-tail-prediction',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):
@@ -385,11 +385,11 @@ class CLITest(TestCase):
             'explainaboard.explainaboard_main',
             '--task',
             'aspect-based-sentiment-classification',
-            '--custom_dataset_paths',
+            '--custom-dataset-paths',
             f'{top_path}/data/system_outputs/absa/absa-dataset.tsv',
-            '--system_outputs',
+            '--system-outputs',
             f'{top_path}/data/system_outputs/absa/absa-example-output.txt',
-            '--report_json',
+            '--report-json',
             '/dev/null',
         ]
         with patch('sys.argv', args):

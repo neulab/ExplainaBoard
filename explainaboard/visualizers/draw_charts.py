@@ -6,11 +6,11 @@ summaries of the included analyses.
 
 Here is an example of usage:
 > explainaboard --task text-classification --dataset sst2 \
-                --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt \
-                --report_json report-lstm.json
+                --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt \
+                --report-json report-lstm.json
 > explainaboard --task text-classification --dataset sst2 \
-                --system_outputs ./data/system_outputs/sst2/sst2-cnn-output.txt \
-                --report_json report-cnn.json
+                --system-outputs ./data/system_outputs/sst2/sst2-cnn-output.txt \
+                --report-json report-cnn.json
 > python -m explainaboard.visualizers.draw_charts \
                 --reports report-lstm.json report-cnn.json
 
@@ -257,7 +257,7 @@ def main():
     )
 
     parser.add_argument(
-        '--sys_names',
+        '--sys-names',
         type=str,
         required=False,
         nargs="+",
@@ -266,7 +266,7 @@ def main():
     )
 
     parser.add_argument(
-        '--output_dir',
+        '--output-dir',
         type=str,
         required=False,
         default="figures",
