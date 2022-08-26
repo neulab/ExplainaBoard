@@ -19,13 +19,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          cache-dependency-path: '.github/workflows/requirements.lock.${{ matrix.python-version }}'
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           python -m pip install -r .github/workflows/requirements.lock.${{ matrix.python-version }}
-          python -m spacy download en_core_web_sm
       - name: Install data dependencies
         run: |
+          python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
       - name: test
         run: bash cicd/run_unit_tests.sh
@@ -41,13 +41,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          cache-dependency-path: '.github/workflows/requirements.lock.${{ matrix.python-version }}'
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           python -m pip install -r .github/workflows/requirements.lock.${{ matrix.python-version }}
-          python -m spacy download en_core_web_sm
       - name: Install data dependencies
         run: |
+          python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
       - name: test
         run: bash cicd/run_integration_tests.sh
