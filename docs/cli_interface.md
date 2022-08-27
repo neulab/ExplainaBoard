@@ -40,6 +40,20 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Grammatical Error Correction](#grammatical-error-correction)
 * [Tabular Classification](#tabular-classification)
 * [Tabular Regression](#tabular-regression)
+* [Argument Pair Extraction](argument-pair-extraction)
+
+##[Argument Pair Extraction](argument_pair_extraction.md)
+This task aim to detect the argument pairs from each passage pair of review and rebuttal.
+
+**CLI Examples**
+
+The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab: 
+```shell
+explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
+```
+
+
+
 
 ## [Text Classification](task_text_classification.md)
 
