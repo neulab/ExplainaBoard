@@ -117,7 +117,7 @@ class SysOutputInfo:
     ) -> None:
         """Write `SysOutputInfo` as JSON to `dataset_info_dir`.
 
-        This function is not thread-safe. Modify the target directory/files by other
+        This function is not thread-safe. Modification of the target directory/files by other
         processes/threads may cause unintended behavior.
 
         Args:
