@@ -50,12 +50,12 @@ Let's say we have one system output file:
 
 The below example loads the `gaokao2018_np1` dataset (with the subdataset name of `writing-grammar`) from DataLab:
 ```shell
-explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
+explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub-dataset writing-grammar --metrics SeqCorrectScore --system-outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
 ```
 
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be
+* `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: denotes the dataset name
 * `--dataset`: denotes the subdataset name
@@ -64,4 +64,4 @@ where
   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
 Alternatively, you can load the dataset from an existing file using the
-`--custom_dataset_paths` option
+`--custom-dataset-paths` option

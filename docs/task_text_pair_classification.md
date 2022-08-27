@@ -24,22 +24,22 @@ Let's say we have one system output file from a RoBERTa model.
 
 The below example loads the `snli` dataset from DataLab:
 ```shell
-explainaboard --task text-pair-classification --dataset snli --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
+explainaboard --task text-pair-classification --dataset snli --system-outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be
+* `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: denotes the dataset name
 * `report.json`: the generated analysis file with json format. Tips: use a json viewer
   like [this one](http://jsonviewer.stack.hu/) for better interpretation.
 
 Alternatively, you can load the dataset from an existing file using the
-`--custom_dataset_paths` option
+`--custom-dataset-paths` option
 
 ```shell
-explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
+explainaboard --task text-pair-classification --custom-dataset-paths ./data/system_outputs/snli/snli-dataset.tsv --system-outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
 in which case the file format of the custom dataset file (`snli-dataset.tsv`) is TSV

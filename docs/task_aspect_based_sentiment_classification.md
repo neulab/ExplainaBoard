@@ -31,11 +31,11 @@ aspect \t sentence \t true_label
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
+explainaboard --task aspect-based-sentiment-classification --custom-dataset-paths ./data/system_outputs/absa/absa-dataset.txt --system-outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
+* `--system-outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/neulab/ExplainaBoard/blob/main/data/reports/report_absa.json). Tips: use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) for better interpretation.

@@ -76,13 +76,13 @@ Let's say we have one system output file:
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
+explainaboard --task kg-link-tail-prediction --custom-dataset-paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json --system-outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
 
 ```
 where
 * `--task`: denotes the task name. 
-* `--custom_dataset_paths`: the path of test samples
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
+* `--custom-dataset-paths`: the path of test samples
+* `--system-outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
 * `report.json`: the generated analysis file with json format. Tips: use a json viewer like [`this one`](http://jsonviewer.stack.hu/) for better interpretation.
@@ -91,7 +91,7 @@ If the dataset has been supported by [`DataLab`](https://github.com/ExpressAI/Da
 you could also run (the advantage is that more bucketing features will be supported):
 
 ```shell
-    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub_dataset origin --system_outputs test_distmult.json > log.res
+    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub-dataset origin --system-outputs test_distmult.json > log.res
 ```
 where 
 * `test_distmult.json` represents the system output file, for example, you can download
@@ -180,7 +180,7 @@ Note that you must provide the rank of the true entity in the predictions, for a
 An example system output is [provided](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/artifacts/test-kg-prediction-user-defined.json), and you can test it using the following command:
 
 ```shell
-explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/data_mini.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
+explainaboard --task kg-link-tail-prediction --custom-dataset-paths ./data/system_outputs/fb15k-237/data_mini.json --system-outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
 
 
