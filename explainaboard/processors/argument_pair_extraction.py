@@ -7,14 +7,10 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledBlock
 from explainaboard.analysis.feature import FeatureType
-from explainaboard.analysis.feature_funcs import (
-    accumulate_vocab_from_samples,
-    feat_freq_rank,
-    feat_num_oov,
-)
+from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.f1_score import APEF1ScoreConfig, F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats
@@ -75,25 +71,14 @@ class ArgumentPairExtractionProcessor(Processor):
                 description="the length of all sentences",
                 func=lambda info, x, c: len(" ".join(x['sentences'])),
             ),
-            "num_oov": feature.Value(
-                dtype="float",
-                description="the number of out-of-vocabulary words",
-                require_training_set=True,
-                func=lambda info, x, c, stat: feat_num_oov(
-                    info, " ".join(x['sentences']), stat['vocab']
-                ),
-            ),
-            "fre_rank": feature.Value(
-                dtype="float",
-                description=(
-                    "the average rank of each word based on its frequency in "
-                    "training set"
-                ),
-                require_training_set=True,
-                func=lambda info, x, c, stat: feat_freq_rank(
-                    info, " ".join(x['sentences']), stat['vocab_rank']
-                ),
-            ),
+            # "num_oov": feature.Value(
+            #     dtype="float",
+            #     description="the number of out-of-vocabulary words",
+            #     require_training_set=True,
+            #     func=lambda info, x, c, stat: feat_num_oov(
+            #         info, " ".join(x['sentences']), stat['vocab']
+            #     ),
+            # ),
         }
 
         block_features: dict[str, FeatureType] = {
@@ -102,11 +87,6 @@ class ArgumentPairExtractionProcessor(Processor):
                 description="text of the block",
                 func=lambda info, x, c: c.text,
             ),
-            "true_label": feature.Value(
-                dtype="string",
-                description="true label of block text",
-                func=lambda info, x, c: c.true_label,
-            ),
             "n_review_sentences": feature.Value(
                 dtype="float",
                 description="the number of review sentence",
@@ -114,27 +94,27 @@ class ArgumentPairExtractionProcessor(Processor):
             ),
             "n_review_tokens": feature.Value(
                 dtype="float",
-                description="the number of review sentence",
+                description="the number of review tokens",
                 func=lambda info, x, c: c.block_review_tokens,
             ),
             "n_review_position": feature.Value(
                 dtype="float",
-                description="the number of review sentence",
+                description="the relative position of review sentence",
                 func=lambda info, x, c: c.block_review_position,
             ),
             "n_reply_sentences": feature.Value(
                 dtype="float",
-                description="the number of review sentence",
+                description="the number of reply sentence",
                 func=lambda info, x, c: c.block_reply_sentences,
             ),
             "n_reply_tokens": feature.Value(
                 dtype="float",
-                description="the number of review sentence",
+                description="the number of reply tokens",
                 func=lambda info, x, c: c.block_reply_tokens,
             ),
             "n_reply_position": feature.Value(
                 dtype="float",
-                description="the number of review sentence",
+                description="the relative position of reply sentence",
                 func=lambda info, x, c: c.block_reply_position,
             ),
         }
@@ -153,18 +133,7 @@ class ArgumentPairExtractionProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
-        analysis_levels = self.default_analysis_levels()
-        block_features = analysis_levels[1].features
-        analyses: list[Analysis] = [
-            BucketAnalysis(
-                level="block",
-                description=block_features["true_label"].description,
-                feature="block_true_label",
-                method="discrete",
-                number=8,
-            )
-        ]
-
+        analyses: list[Analysis] = []
         analyses.extend(self.continuous_feature_analyses())
         return analyses
 
