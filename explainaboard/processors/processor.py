@@ -487,6 +487,7 @@ class Processor(metaclass=abc.ABCMeta):
             overall_statistics.analysis_cases,
             metric_stats=overall_statistics.metric_stats,
         )
+
         self.sort_bucket_info(
             analyses,
             sort_by=metadata.get('sort_by', 'key'),

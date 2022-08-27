@@ -6,7 +6,7 @@ from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
     count_tokens,
@@ -35,13 +35,43 @@ class QATableTextHybridProcessor(Processor):
             "table": feature.Sequence(feature=feature.Value("string")),
             "true_answer": feature.Sequence(feature=feature.Value("string")),
             "predicted_answer": feature.Sequence(feature=feature.Value("string")),
-            "answer_type": feature.Value("string"),
-            "answer_scale": feature.Value("string"),
             "predicted_answer_scale": feature.Value("string"),
+            "answer_type": feature.Value(
+                dtype="string",
+                description="type of answer",
+            ),
+            "answer_scale": feature.Value(
+                dtype="string",
+                description="scale of answer",
+            ),
+            "context_length": feature.Value(
+                dtype="float",
+                description="context length in tokens",
+                func=lambda info, x, c: sum(
+                    [count_tokens(info, text) for text in x['context']["text"]]
+                ),
+            ),
+            "table_rows": feature.Value(
+                dtype="float",
+                description="the number of table row",
+                func=lambda info, x, c: len(x['table']),
+            ),
+            "table_columns": feature.Value(
+                dtype="float",
+                description="the number of table column",
+                func=lambda info, x, c: len(x['table'][0])
+                if len(x['table']) > 0
+                else 0,
+            ),
             "question_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
+            ),
+            "answer_length": feature.Value(
+                dtype="float",
+                description="the length of answer",
+                func=lambda info, x, c: len(x['true_answer']),
             ),
         }
 
@@ -54,7 +84,26 @@ class QATableTextHybridProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
-        return self.continuous_feature_analyses()
+        features = self.default_analysis_levels()[0].features
+        # Create analyses
+        analyses: list[Analysis] = [
+            BucketAnalysis(
+                level="example",
+                description=features["answer_type"].description,
+                feature="answer_type",
+                method="discrete",
+                number=10,
+            ),
+            BucketAnalysis(
+                level="example",
+                description=features["answer_scale"].description,
+                feature="answer_scale",
+                method="discrete",
+                number=10,
+            ),
+        ]
+        analyses.extend(self.continuous_feature_analyses())
+        return analyses
 
     @classmethod
     def default_metrics(

@@ -212,7 +212,7 @@ and textual context, e.g., [Zhu et al.2021](https://aclanthology.org/2021.acl-lo
 
 The below example loads the `tat_qa` dataset from DataLab. 
 ```shell
-explainaboard --task qa-table-text-hybrid --output_file_type json --dataset tat_qa --system_outputs predictions_list.json > report.json
+explainaboard --task qa-table-text-hybrid --output-file-type json --dataset tat_qa --system-outputs predictions_list.json > report.json
 ```
 where you can download the file `predictions_list.json` by:
 
@@ -232,7 +232,7 @@ ExplainaBoard CLI.
 
 Using Build-in datasets from DataLab:
 ```shell
-explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system-outputs ./data/system_outputs/test.dpr.nq.txt  > report.json
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system-outputs ./data/system_outputs/qa_open_domain/test.dpr.nq.txt  > report.json
 ```
 
 
