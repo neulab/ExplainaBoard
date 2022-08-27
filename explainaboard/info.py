@@ -109,13 +109,49 @@ class SysOutputInfo:
                 data[str(key)] = data[key]
                 del data[key]
 
-    def write_to_directory(self, dataset_info_dir, file_name=""):
-        """Write `SysOutputInfo` as JSON to `dataset_info_dir`."""
-        file_path = (
-            os.path.join(dataset_info_dir, config.SYS_OUTPUT_INFO_FILENAME)
-            if file_name == ""
-            else os.path.join(dataset_info_dir, file_name)
+    def write_to_directory(
+        self,
+        dataset_info_dir: str,
+        file_name: str | None = None,
+        overwrite: bool = False,
+    ) -> None:
+        """Write `SysOutputInfo` as JSON to `dataset_info_dir`.
+
+        This function is not thread-safe. Modification of the target directory/files by
+        other processes/threads may cause unintended behavior.
+
+        Args:
+            dataset_info_dir: Directory path to store the JSON file. If the directory
+                does not exist, this function craetes it recursively.
+            file_name: JSON file name under `dataset_info_dir`. If None, default file
+                name is used.
+            overwrite: If True, this function overwrites the existing file. If Fasle, it
+                raises an Exception if the file already exists.
+
+        Raises:
+            RuntimeError: File already exists.
+        """
+        file_name = (
+            file_name if file_name is not None else config.SYS_OUTPUT_INFO_FILENAME
         )
+        file_path = os.path.join(dataset_info_dir, file_name)
+
+        # Checks the directory.
+        if os.path.exists(dataset_info_dir):
+            if not os.path.isdir(dataset_info_dir):
+                raise RuntimeError(f"Not a directory: {dataset_info_dir}")
+        else:
+            os.makedirs(dataset_info_dir)
+
+        # Checks the file.
+        if os.path.exists(file_path):
+            if not os.path.isfile(file_path):
+                raise RuntimeError(f"Not a file: {file_path}")
+            if not overwrite:
+                raise RuntimeError(
+                    f"Attempted to overwrite the existing file: {file_path}"
+                )
+
         with open(file_path, "wb") as f:
             self._dump_info(f)
 
