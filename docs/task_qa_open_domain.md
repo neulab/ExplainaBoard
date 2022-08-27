@@ -30,11 +30,11 @@ etc. from different systems.
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system_outputs ./data/system_outputs/qa_open_domain/test.dpr.nq.txt  > report.json
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system-outputs ./data/system_outputs/qa_open_domain/test.dpr.nq.txt  > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
-* `--system_outputs`: denote the path of system outputs. Multiple one should be 
+* `--system-outputs`: denote the path of system outputs. Multiple one should be 
   separated by space, for example, system1 system2
 * `--dataset`:denotes the dataset name
 * `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer

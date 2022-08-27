@@ -19,7 +19,7 @@ all analysis information will be stored in `sys_info.`
 from explainaboard import TaskType, get_loader_class, get_processor
 
 # Load the data
-dataset = "./explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+dataset = "./integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()

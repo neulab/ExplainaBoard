@@ -9,7 +9,7 @@ from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.utils.typing_utils import unwrap
 
 dataset = (
-    "../../explainaboard/tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
+    "../../integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
 )
 task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)

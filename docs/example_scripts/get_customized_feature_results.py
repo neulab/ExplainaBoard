@@ -49,7 +49,7 @@ def get_customized_results(dataset, customized_features):
 
 customized_features = ["rel_type"]
 dataset = (
-    "../../explainaboard/tests/artifacts/"
+    "../../integration_tests/artifacts/"
     "kg_link_tail_prediction/with_custom_feature.json"
 )
 customized_features_performance = get_customized_results(dataset, customized_features)

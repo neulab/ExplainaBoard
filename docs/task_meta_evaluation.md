@@ -37,10 +37,18 @@ We have an example system outputs file:
 
 ## Performing Basic Analysis
 You can load the dataset from an existing file using the
-`--custom_dataset_paths` option
+`--custom-dataset-paths` option
 
 ```shell
-explainaboard   --task nlg-meta-evaluation --custom_dataset_paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv --system_outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt --output_file_type text --output_dir output/cs-en --source_language en --target_language en --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
+explainaboard \
+    --task nlg-meta-evaluation \
+    --custom-dataset-paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv \
+    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt \
+    --output-file-type text \
+    --output-dir output/cs-en \
+    --source-language en \
+    --target-language en \
+    --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
 ```
 
 

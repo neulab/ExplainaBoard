@@ -27,10 +27,10 @@ An example system output file is here:
 
 The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
 ```shell
-explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > report.json
+explainaboard --task qa-extractive --dataset squad --system-outputs MY_FILE > report.json
 ```
 * `--task`: denotes the task name.
-* `--system_outputs`: denote the path of system outputs. Multiple one should be
+* `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
 * `report.json`: the generated analysis file with json format. . Tips: use a json viewer
@@ -38,7 +38,7 @@ explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > re
 
 You can use a custom dataset directly:
 ```shell
-explainaboard --task qa-extractive --custom_dataset_paths ./data/system_outputs/squad/squad_mini-dataset.json --system_outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
+explainaboard --task qa-extractive --custom-dataset-paths ./data/system_outputs/squad/squad_mini-dataset.json --system-outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
 ```
 
 The dataset can be in the following format:

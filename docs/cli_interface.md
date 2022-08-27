@@ -51,12 +51,12 @@ Sentiment Treebank, a set of sentiment tags over English reviews.
 
 The below example loads the `sst2` dataset from DataLab:
 ```shell
-explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task text-classification --dataset sst2 --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 The below example loads a dataset from an existing file:
 ```shell
-explainaboard --task text-classification --custom_dataset_paths ./data/system_outputs/sst2/sst2-dataset.tsv --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task text-classification --custom-dataset-paths ./data/system_outputs/sst2/sst2-dataset.tsv --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 
@@ -71,12 +71,12 @@ Stanford Natural Language Inference dataset.
 
 The below example loads the `snli` dataset from DataLab:
 ```shell
-explainaboard --task text-pair-classification --dataset snli --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
+explainaboard --task text-pair-classification --dataset snli --system-outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
 The below example loads a dataset from an existing file:
 ```shell
-explainaboard --task text-pair-classification --custom_dataset_paths ./data/system_outputs/snli/snli-dataset.tsv --system_outputs ./data/system_outputs/snli/snli-roberta-output.txt
+explainaboard --task text-pair-classification --custom-dataset-paths ./data/system_outputs/snli/snli-dataset.tsv --system-outputs ./data/system_outputs/snli/snli-roberta-output.txt
 ```
 
 
@@ -90,7 +90,7 @@ a summarization system on the CNN-daily mail dataset.
 
 The below example loads a miniature version of the CNN-daily mail dataset (100 lines only) from an existing file:
 ```shell
-explainaboard --task summarization --custom_dataset_paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system_outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
+explainaboard --task summarization --custom-dataset-paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system-outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
 ```
 Note that this uses two different metrics separated by a space.
 
@@ -102,7 +102,7 @@ wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart
 
 Then run the below command and it should work:
 ```shell
-explainaboard --task summarization --dataset cnn_dailymail --system_outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
+explainaboard --task summarization --dataset cnn_dailymail --system-outputs ./data/system_outputs/cnndm/cnndm-bart-output.txt --metrics rouge2
 ```
 
 ## Language Modeling
@@ -115,7 +115,7 @@ probability for each space-separated word. Here is an example:
 
 The below example analyzes the wikitext corpus:
 ```shell
-explainaboard --task language-modeling --custom_dataset_paths ./data/system_outputs/wikitext/wikitext-dataset.txt --system_outputs ./data/system_outputs/wikitext-sys1-output.txt
+explainaboard --task language-modeling --custom-dataset-paths ./data/system_outputs/wikitext/wikitext-dataset.txt --system-outputs ./data/system_outputs/wikitext-sys1-output.txt
 ```
 
 ## Named Entity Recognition
@@ -127,12 +127,12 @@ The below examples demonstrate how you can perform such analysis on the CoNLL 20
 
 The below example loads the `conll2003` NER dataset from DataLab:
 ```shell
-explainaboard --task named-entity-recognition --dataset conll2003 --sub_dataset ner --system_outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll
+explainaboard --task named-entity-recognition --dataset conll2003 --sub-dataset ner --system-outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll
 ```
 
 Alternatively, you can reference a dataset file directly.
 ```shell
-explainaboard --task named-entity-recognition --custom_dataset_paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system_outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll 
+explainaboard --task named-entity-recognition --custom-dataset-paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system-outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll 
 ```
 
 
@@ -143,13 +143,13 @@ Word segmentation aims to segment texts without spaces between words.
 
 The below example loads the `msr` dataset from DataLab:
 ```shell
-explainaboard --task word-segmentation --dataset msr --system_outputs ./data/system_outputs/cws/test-msr-predictions.tsv
+explainaboard --task word-segmentation --dataset msr --system-outputs ./data/system_outputs/cws/test-msr-predictions.tsv
 ```
 Note that the file `test-msr-predictions.tsv` can be downloaded [here](https://datalab-hub.s3.amazonaws.com/predictions/test-msr-predictions.tsv)
 
 Alternatively, you can reference a dataset file directly.
 ```
-explainaboard --task word-segmentation --custom_dataset_paths ./data/system_outputs/cws/test.tsv --system_outputs ./data/system_outputs/cws/prediction.tsv
+explainaboard --task word-segmentation --custom-dataset-paths ./data/system_outputs/cws/test.tsv --system-outputs ./data/system_outputs/cws/prediction.tsv
 ```
 
 
@@ -160,12 +160,12 @@ Dividing text into syntactically related non-overlapping groups of words.
 
 The below example loads the `conll00_chunk` dataset from DataLab:
 ```shell
-explainaboard --task chunking --dataset conll00_chunk --system_outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
+explainaboard --task chunking --dataset conll00_chunk --system-outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
 ```
 
 Alternatively, you can reference a dataset file directly.
 ```
-explainaboard --task chunking --custom_dataset_paths ./data/system_outputs/chunking/dataset-test-conll00.tsv --system_outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
+explainaboard --task chunking --custom-dataset-paths ./data/system_outputs/chunking/dataset-test-conll00.tsv --system-outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
 ```
 
 
@@ -179,12 +179,12 @@ The below example performs this extraction on the dataset SQuAD.
 
 Below is an example of referencing the dataset directly.
 ```shell
-explainaboard --task qa-extractive --custom_dataset_paths ./data/system_outputs/squad/squad_mini-dataset.json --system_outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
+explainaboard --task qa-extractive --custom-dataset-paths ./data/system_outputs/squad/squad_mini-dataset.json --system-outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
 ```
 
 The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
 ```shell
-explainaboard --task qa-extractive --dataset squad --system_outputs MY_FILE > report.json
+explainaboard --task qa-extractive --dataset squad --system-outputs MY_FILE > report.json
 ```
 
 
@@ -218,7 +218,7 @@ ExplainaBoard CLI.
 
 Using Build-in datasets from DataLab:
 ```shell
-explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system_outputs ./data/system_outputs/test.dpr.nq.txt  > report.json
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system-outputs ./data/system_outputs/test.dpr.nq.txt  > report.json
 ```
 
 
@@ -232,12 +232,12 @@ The following example demonstrates this on the metaphor QA dataset.
 
 The below example loads the `fig_qa` dataset from DataLab.
 ```shell
-explainaboard --task qa-multiple-choice --dataset fig_qa --system_outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
+explainaboard --task qa-multiple-choice --dataset fig_qa --system-outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
 ```
 
 And this is what it looks like with a custom dataset.
 ```shell
-explainaboard --task qa-multiple-choice --custom_dataset_paths ./data/system_outputs/fig_qa/fig_qa-dataset.json --system_outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
+explainaboard --task qa-multiple-choice --custom-dataset-paths ./data/system_outputs/fig_qa/fig_qa-dataset.json --system-outputs ./data/system_outputs/fig_qa/fig_qa-gptneo-output.json > report.json
 ```
 
 
@@ -250,11 +250,11 @@ Predicting the tail entity of missing links in knowledge graphs
 The below example loads the `fb15k_237` dataset from DataLab.
 ```shell
     wget https://datalab-hub.s3.amazonaws.com/predictions/test_distmult.json
-    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub_dataset origin --system_outputs test_distmult.json > log.res
+    explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub-dataset origin --system-outputs test_distmult.json > log.res
 ```
 
 ```shell
-    explainaboard --task kg-link-tail-prediction --custom_dataset_paths ./data/system_outputs/fb15k-237/data_mini.json --system_outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
+    explainaboard --task kg-link-tail-prediction --custom-dataset-paths ./data/system_outputs/fb15k-237/data_mini.json --system-outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
  
 
@@ -266,7 +266,7 @@ Predict the sentiment of a text based on a specific aspect.
 
 This is an example with a custom dataset.
 ```shell
-explainaboard --task aspect-based-sentiment-classification --custom_dataset_paths ./data/system_outputs/absa/absa-dataset.txt --system_outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
+explainaboard --task aspect-based-sentiment-classification --custom-dataset-paths ./data/system_outputs/absa/absa-dataset.txt --system-outputs ./data/system_outputs/absa/absa-example-output.tsv > report.json
 ```
 
 ## [Multiple-choice Cloze]
@@ -275,7 +275,7 @@ Fill in a blank based on multiple provided options
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub_dataset cloze-multiple-choice --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_choice.json > report.json
+explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub-dataset cloze-multiple-choice --metrics CorrectScore --system-outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_choice.json > report.json
 ```
 
 
@@ -285,7 +285,7 @@ Fill in a blank based on hint
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub_dataset cloze-hint --metrics CorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
+explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub-dataset cloze-hint --metrics CorrectScore --system-outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_cloze_hint.json > report.json
 ```
 
 
@@ -295,7 +295,7 @@ Correct errors in a text
 **CLI Example**
 This is an example using the dataset from `DataLab`
 ```shell
-explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub_dataset writing-grammar --metrics SeqCorrectScore --system_outputs ./explainaboard/tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
+explainaboard --task grammatical-error-correction --dataset gaokao2018_np1 --sub-dataset writing-grammar --metrics SeqCorrectScore --system-outputs ./integration_tests/artifacts/gaokao/rst_2018_quanguojuan1_gec.json > report.json
 ```
 
 ## Tabular Classification
@@ -311,7 +311,7 @@ dataset `json` file, as is done in `sst2-tabclass-dataset.json` below.
 
 The below example loads a dataset from an existing file:
 ```shell
-explainaboard --task tabular-classification --custom_dataset_paths ./data/system_outputs/sst2_tabclass/sst2-tabclass-dataset.json --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task tabular-classification --custom-dataset-paths ./data/system_outputs/sst2_tabclass/sst2-tabclass-dataset.json --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 ## Tabular Regression
 
@@ -322,5 +322,5 @@ the predicted outputs are continuous numbers instead of classes.
 
 The below example loads a dataset from an existing file:
 ```shell
-explainaboard --task tabular-regression --custom_dataset_paths ./data/system_outputs/sst2_tabreg/sst2-tabclass-dataset.json --system_outputs ./data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt
+explainaboard --task tabular-regression --custom-dataset-paths ./data/system_outputs/sst2_tabreg/sst2-tabclass-dataset.json --system-outputs ./data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt
 ```

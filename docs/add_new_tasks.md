@@ -141,7 +141,7 @@ For example, the following information can be added for text classification task
 
 ## Finally, create a Unittest module for your task
 
-(1) Create a new python file `test_text_classification.py` in the folder `explainaboard/tests/`
+(1) Create a new python file `test_text_classification.py` in the folder `integration_tests/`
 
 (2) Implement unit tests for this task referencing that of other similar tasks
 
