@@ -25,9 +25,9 @@ class HitsConfig(MetricConfig):
 
 
 class Hits(Metric):
-    """
-    Calculates the hits metric, telling whether the predicted output is in a set of true
-    outputs.
+    """Calculates the hits metric.
+
+    The metric calculates whether the predicted output is in a set of true outputs.
     """
 
     def calc_stats_from_data(
@@ -99,9 +99,9 @@ class MeanRankConfig(MetricConfig):
 
 
 class MeanRank(Metric):
-    """
-    Calculates the mean rank, rank(true_output), the rank of the true output in the
-    predicted n-best list.
+    """Calculates the mean rank of tru_output.
+
+    The metric represents the rank of the true output in the predicted n-best list.
     """
 
     def mr_val(self, true: Any, preds: list):

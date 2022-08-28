@@ -250,7 +250,7 @@ class Processor(metaclass=abc.ABCMeta):
                 a dictionary of feature name -> list of performances by bucket
         """
 
-        all_results = []
+        all_results: list[AnalysisResult] = []
         level_map = {v.name: i for i, v in enumerate(unwrap(sys_info.analysis_levels))}
         metrics = [
             [y.to_metric() for y in x.metric_configs]
@@ -259,11 +259,13 @@ class Processor(metaclass=abc.ABCMeta):
         for my_analysis in progress(unwrap(sys_info.analyses)):
             level_id = level_map[my_analysis.level]
             all_results.append(
-                my_analysis.perform(
-                    cases=analysis_cases[level_id],
-                    metrics=metrics[level_id],
-                    stats=metric_stats[level_id],
-                    conf_value=sys_info.conf_value,
+                unwrap(
+                    my_analysis.perform(
+                        cases=analysis_cases[level_id],
+                        metrics=metrics[level_id],
+                        stats=metric_stats[level_id],
+                        conf_value=sys_info.conf_value,
+                    )
                 )
             )
 
