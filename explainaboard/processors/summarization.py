@@ -1,14 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
-from functools import lru_cache
 
 from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
-from datalabs.operations.featurize.summarization import get_oracle_summary
-import numpy
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -19,39 +16,9 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
 sum_attr = SUMAttribute()
-
-
-@hash_dict
-@lru_cache(maxsize=10)
-def get_oracle(existing_features: dict):
-    """
-    oracle_info =
-        {
-        "source":src,
-        "reference":ref,
-        "oracle_summary":oracle,
-        "oracle_labels":labels,
-        "oracle_score":max_score
-        }
-    """
-
-    sample = {
-        "text": existing_features["source"],
-        "summary": existing_features["reference"],
-    }
-    oracle_info = get_oracle_summary.func(sample)
-
-    index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
-    oracle_position = numpy.mean(index_of_oracles)
-
-    return {
-        "oracle_position": oracle_position,
-        "oracle_score": oracle_info["oracle_score"],
-    }
 
 
 @register_processor(TaskType.summarization)
