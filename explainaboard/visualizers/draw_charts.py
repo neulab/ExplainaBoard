@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from typing import cast
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -232,9 +233,15 @@ def draw_charts_from_reports(
             )
 
         if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
-            plot_buckets(analysis_result, output_dir, sys_names)
+            plot_buckets(
+                cast(list[BucketAnalysisResult], analysis_result), output_dir, sys_names
+            )
         elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
-            plot_combo_counts(analysis_result, output_dir, sys_names)
+            plot_combo_counts(
+                cast(list[ComboCountAnalysisResult], analysis_result),
+                output_dir,
+                sys_names,
+            )
         else:
             raise ValueError('illegal types of analyses')
 
