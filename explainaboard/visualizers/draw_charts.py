@@ -21,7 +21,9 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from typing import cast
+
+# NOTE(odashi): List is required to set the first argument of cast() in Python 3.8.
+from typing import cast, List
 
 from matplotlib import pyplot as plt
 import numpy as np
@@ -236,13 +238,13 @@ def draw_charts_from_reports(
 
         if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
             plot_buckets(
-                cast(list[BucketAnalysisResult], analysis_result_list),
+                cast(List[BucketAnalysisResult], analysis_result_list),
                 output_dir,
                 sys_names,
             )
         elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
             plot_combo_counts(
-                cast(list[ComboCountAnalysisResult], analysis_result_list),
+                cast(List[ComboCountAnalysisResult], analysis_result_list),
                 output_dir,
                 sys_names,
             )
