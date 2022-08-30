@@ -7,6 +7,7 @@ from typing import Any, final, Optional
 import numpy as np
 from scipy.stats import t as stats_t
 
+from explainaboard.serialization.types import SerializableDataclass
 from explainaboard.utils.typing_utils import unwrap_or
 
 
@@ -45,7 +46,7 @@ class MetricResult:
 
 
 @dataclass
-class MetricConfig(dict):
+class MetricConfig(SerializableDataclass):
     """
     The configuration for the metric. This can be passed in to the metric either in
     the constructor (e.g. for compute-intensive operations such as model loading),
@@ -55,20 +56,11 @@ class MetricConfig(dict):
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    cls_name: str | None = None
     # The external statistics for metrics
     external_stats: np.ndarray | None = None
 
-    def __post_init__(self):
-        # Save the class name
-        self.cls_name = type(self).__name__
-
     def to_metric(self):
         raise NotImplementedError
-
-    @classmethod
-    def dict_conv(cls, k, v):
-        return v
 
 
 class MetricStats(metaclass=abc.ABCMeta):
