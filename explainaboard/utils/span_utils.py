@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, cast, Optional
+from typing import Any, cast, Optional, List
 
 
 def cap_feature(s):
@@ -241,8 +241,8 @@ class BlockOps:
     ) -> tuple[list[Block], list[Block]]:
 
         gold_spans, pred_spans = gen_text_blocks(true_tags, pred_tags, sentences)
-        gold_spans_list = cast(list[Block], gold_spans)
-        pred_spans_list = cast(list[Block], pred_spans)
+        gold_spans_list = cast(List[Block], gold_spans)
+        pred_spans_list = cast(List[Block], pred_spans)
         return gold_spans_list, pred_spans_list
 
 

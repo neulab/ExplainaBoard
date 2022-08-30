@@ -180,8 +180,8 @@ class ArgumentPairExtractionProcessor(Processor):
             true_spans, pred_spans = self._block_ops.get_blocks(
                 output['true_tags'], output['pred_tags'], sentences
             )
-            true_spans = cast(list[Block], true_spans)
-            pred_spans = cast(list[Block], pred_spans)
+            true_spans = cast(List[Block], true_spans)
+            pred_spans = cast(List[Block], pred_spans)
             # merge the spans together
             merged_spans: dict[tuple[int, int, int, int], Block] = {}
             for span in true_spans:
