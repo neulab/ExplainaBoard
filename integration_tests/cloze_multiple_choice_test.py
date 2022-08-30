@@ -28,7 +28,7 @@ class ClozeMultipleChoiceTest(unittest.TestCase):
             "metric_names": ["CorrectCount"],
         }
         processor = get_processor(TaskType.cloze_mutiple_choice.value)
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failures=True)
         self.assertIsNotNone(sys_info.results.analyses)
 
 

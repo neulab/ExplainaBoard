@@ -32,7 +32,7 @@ class WordSegmentationTest(unittest.TestCase):
 
         processor = get_processor(TaskType.word_segmentation)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failures=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

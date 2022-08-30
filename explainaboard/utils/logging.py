@@ -1,13 +1,18 @@
+"""Logging utilities."""
+
+from collections.abc import Iterable
 import logging
 import os
-from typing import Optional
+from typing import Optional, TypeVar
 
 from tqdm import tqdm
 
 hide_progress = 'EXPLAINABOARD_HIDE_PROGRESS' in os.environ
 
+T = TypeVar("T")
 
-def progress(gen, desc: str = None):
+
+def progress(gen: Iterable[T], desc: Optional[str] = None) -> Iterable[T]:
     return gen if hide_progress else tqdm(gen, desc=desc)
 
 

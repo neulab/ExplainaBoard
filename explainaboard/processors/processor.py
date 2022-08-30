@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, cast, Optional
+from typing import Any, cast, final, Optional
 
 from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
@@ -234,23 +234,26 @@ class Processor(metaclass=abc.ABCMeta):
                 )
         return analysis_levels, analyses
 
+    @final
     def perform_analyses(
         self,
         sys_info: SysOutputInfo,
         analysis_cases: list[list[AnalysisCase]],
         metric_stats: list[list[MetricStats]],
+        skip_failures: bool = False,
     ) -> list[AnalysisResult]:
         """
         Perform fine-grained analyses
         :param sys_info: Information about the system output
         :param analysis_cases: They cases to analyze
         :param metric_stats: The stats from which to calculate performance
+        :param skip_failures: Whether to skip analysis when it encountered some errors.
         :return:
             performances_over_bucket:
                 a dictionary of feature name -> list of performances by bucket
         """
 
-        all_results = []
+        all_results: list[AnalysisResult] = []
         level_map = {v.name: i for i, v in enumerate(unwrap(sys_info.analysis_levels))}
         metrics = [
             [y.to_metric() for y in x.metric_configs]
@@ -258,14 +261,19 @@ class Processor(metaclass=abc.ABCMeta):
         ]
         for my_analysis in progress(unwrap(sys_info.analyses)):
             level_id = level_map[my_analysis.level]
-            all_results.append(
-                my_analysis.perform(
-                    cases=analysis_cases[level_id],
-                    metrics=metrics[level_id],
-                    stats=metric_stats[level_id],
-                    conf_value=sys_info.conf_value,
+            try:
+                all_results.append(
+                    my_analysis.perform(
+                        cases=analysis_cases[level_id],
+                        metrics=metrics[level_id],
+                        stats=metric_stats[level_id],
+                        conf_value=sys_info.conf_value,
+                    )
                 )
-            )
+            except Exception as ex:
+                if not skip_failures:
+                    raise
+                get_logger().warning(f"Analysis failed, skipped. Reason: {ex}")
 
         return all_results
 
@@ -479,13 +487,18 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info.results = Result(overall=overall_results, analyses=None)
         return OverallStatistics(sys_info, analysis_cases, metric_stats)
 
-    def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
+    @final
+    def process(
+        self, metadata: dict, sys_output: list[dict], skip_failures: bool = False
+    ) -> SysOutputInfo:
+        """"""
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = unwrap(overall_statistics.sys_info)
         analyses = self.perform_analyses(
             sys_info,
             overall_statistics.analysis_cases,
             metric_stats=overall_statistics.metric_stats,
+            skip_failures=skip_failures,
         )
         self.sort_bucket_info(
             analyses,

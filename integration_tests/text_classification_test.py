@@ -94,7 +94,7 @@ class TextClassificationTest(unittest.TestCase):
         )
         data = loader.load()
         processor = get_processor(TaskType.text_classification)
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failures=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

@@ -23,7 +23,7 @@ class ExampleCodeTest(unittest.TestCase):
         )
         data = loader.load().samples
         processor = get_processor(TaskType.text_classification)
-        analysis = processor.process(metadata={}, sys_output=data)
+        analysis = processor.process(metadata={}, sys_output=data, skip_failures=True)
 
         with tempfile.TemporaryDirectory() as tempdir:
             analysis.write_to_directory(tempdir)
@@ -36,7 +36,7 @@ class ExampleCodeTest(unittest.TestCase):
         )
         data = loader.load().samples
         processor = get_processor(TaskType.summarization)
-        analysis = processor.process(metadata={}, sys_output=data)
+        analysis = processor.process(metadata={}, sys_output=data, skip_failures=True)
 
         with tempfile.TemporaryDirectory() as tempdir:
             analysis.write_to_directory(tempdir)
