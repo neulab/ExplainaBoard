@@ -13,7 +13,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 from explainaboard.utils.typing_utils import unwrap_or
 
@@ -54,7 +54,7 @@ class ExtractiveQAMetric(Metric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("ExactMatchQAConfig")
 class ExactMatchQAConfig(MetricConfig):
     def to_metric(self):
         return ExactMatchQA(self)
@@ -72,7 +72,7 @@ class ExactMatchQA(ExtractiveQAMetric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("F1ScoreQAConfig")
 class F1ScoreQAConfig(MetricConfig):
     def to_metric(self):
         return F1ScoreQA(self)
