@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, cast, Optional, List
+from typing import Any, cast, List, Optional
 
 
 def cap_feature(s):
