@@ -5,7 +5,6 @@ import dataclasses
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.serialization.registry import TypeRegistry
 
-
 metric_config_registry = TypeRegistry[MetricConfig]()
 
 
