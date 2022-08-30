@@ -12,12 +12,12 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("CorrelationConfig")
 class CorrelationConfig(MetricConfig):
     """
     Configuration for a correlation.
@@ -129,7 +129,7 @@ class CorrelationMetric(Metric):
 
 # TODO: (1) Make Segment/System level configurable (2) Document this function
 @dataclass
-@register_metric_config
+@metric_config_registry.register("KtauCorrelationConfig")
 class KtauCorrelationConfig(CorrelationConfig):
     """
     :param threshold: Following ‘Results of the WMT20 Metrics Shared Task
@@ -188,7 +188,7 @@ class KtauCorrelation(CorrelationMetric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("PearsonCorrelationConfig")
 class PearsonCorrelationConfig(CorrelationConfig):
     def to_metric(self):
         return PearsonCorrelation(self)
