@@ -1,4 +1,4 @@
-# Analyzing Argument Pair Extraction (APE) Task
+# Analyzing the Argument Pair Extraction (APE) Task
 
 In this file we describe how to analyze APE models.
 We will give an example using the  [ape](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset, but other datasets
@@ -8,7 +8,7 @@ can be analyzed in a similar way.
 
 In order to perform analysis of your results, they should be in the following conll format:
 
-```json
+```
 O	O
 O	O
 O	O

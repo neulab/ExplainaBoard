@@ -12,8 +12,8 @@ from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.qa_table_text_hybrid)
-class QATableTextHybridLoader(Loader):
+@register_loader(TaskType.qa_tat)
+class QATatLoader(Loader):
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
         return FileType.json

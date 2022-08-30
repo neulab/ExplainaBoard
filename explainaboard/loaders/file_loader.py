@@ -66,12 +66,6 @@ class FileLoaderField:
         if self.strip_before_parsing is None:
             self.strip_before_parsing = self.dtype == str
 
-        # # validation
-        # if not any([isinstance(self.src_name, x) for x in [str, int, Iterable[str]]]):
-        #     raise ValueError("src_name must be str, int, or Iterable[str]")
-        # if not any([isinstance(self.target_name, x) for x in [str, int]]):
-        #     raise ValueError("src_name must be str or int")
-
         if self.dtype is None and self.strip_before_parsing:
             raise ValueError(
                 "strip_before_parsing only works with int, float and str types"
@@ -569,7 +563,6 @@ class DatalabFileLoader(FileLoader):
                 new_features = config.custom_features.get(level_name, {})
                 new_features.update(parsed_level_feats)
                 config.custom_features[level_name] = new_features
-            # config.custom_analyses = ds_feats['custom_analyses']
 
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False

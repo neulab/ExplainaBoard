@@ -35,22 +35,12 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Hybrid Table Text QA](#hybrid-table-text-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
-* [Multiple-choice Cloze](#Multiple-choice Cloze)
+* [Multiple choice Cloze](#multiple-choice-cloze)
 * [Generative Cloze](#generative-cloze)
 * [Grammatical Error Correction](#grammatical-error-correction)
 * [Tabular Classification](#tabular-classification)
 * [Tabular Regression](#tabular-regression)
 * [Argument Pair Extraction](argument-pair-extraction)
-
-##[Argument Pair Extraction](argument_pair_extraction.md)
-This task aim to detect the argument pairs from each passage pair of review and rebuttal.
-
-**CLI Examples**
-
-The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab: 
-```shell
-explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
-```
 
 
 
@@ -212,7 +202,7 @@ and textual context, e.g., [Zhu et al.2021](https://aclanthology.org/2021.acl-lo
 
 The below example loads the `tat_qa` dataset from DataLab. 
 ```shell
-explainaboard --task qa-table-text-hybrid --output-file-type json --dataset tat_qa --system-outputs predictions_list.json > report.json
+explainaboard --task qa-tat --output-file-type json --dataset tat_qa --system-outputs predictions_list.json > report.json
 ```
 where you can download the file `predictions_list.json` by:
 
@@ -337,4 +327,15 @@ the predicted outputs are continuous numbers instead of classes.
 The below example loads a dataset from an existing file:
 ```shell
 explainaboard --task tabular-regression --custom-dataset-paths ./data/system_outputs/sst2_tabreg/sst2-tabclass-dataset.json --system-outputs ./data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt
+```
+
+
+## [Argument Pair Extraction](argument_pair_extraction.md)
+This task aim to detect the argument pairs from each passage pair of review and rebuttal.
+
+**CLI Examples**
+
+The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab: 
+```shell
+explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
 ```

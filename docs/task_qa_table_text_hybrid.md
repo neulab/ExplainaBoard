@@ -1,7 +1,7 @@
-# Analyzing Hybrid of Tabular and Textual Content QA
+# Analyzing QA over Hybrid Tabular/Textual Content
 
 In this file we describe how to analyze QA models trained on datasets 
-with hybrid of tabular and textual context.
+with a hybrid of tabular and textual context.
 We will give an example using the  [tat_qa](https://github.com/ExpressAI/DataLab/blob/main/datasets/tat_qa/tat_qa.py) dataset, but other datasets
 can be analyzed in a similar way.
 
@@ -25,23 +25,15 @@ where each line represents one predicted answer. Specifically,
 Check this [page](https://www.datafountain.cn/competitions/573/datasets) to know detailed 
 definition of `scale`.
 
-An example system output file is here: [test.dpr.nq.txt](https://explainaboard.s3.amazonaws.com/system_outputs/qa_table_text_hybrid/predictions_list.json)
+An example system output file is here: [predictions_list.json](https://explainaboard.s3.amazonaws.com/system_outputs/qa_table_text_hybrid/predictions_list.json)
 
  
-
-Let's say we have several files such as 
-* [predictions_list.json](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/fig_qa/gpt2.json) 
-
-
-etc. from different systems.
-
-
 ## Performing Basic Analysis
 
 In order to perform your basic analysis, we can run the following command:
 
 ```shell
-explainaboard --task qa-table-text-hybrid --output-file-type json --dataset tat_qa --system-outputs predictions_list.json > report.json
+explainaboard --task qa-tat --output-file-type json --dataset tat_qa --system-outputs predictions_list.json > report.json
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)

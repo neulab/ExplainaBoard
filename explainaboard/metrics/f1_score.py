@@ -133,6 +133,16 @@ class APEF1ScoreConfig(MetricConfig):
 class APEF1Score(Metric):
     """
     Calculate F1 score w.r.t argument pair extraction task
+    Note that this task is kinda special compared with common sequence labeling tasks
+    (such as NER), For example, this is one example's tags:
+    'tags': ['Review-B-5',
+      'Review-I-5', 'Review-I-5', 'Review-I-5', 'Review-B-7', 'Review-I-7',
+      'Review-I-7', 'Review-B-4', 'Review-B-2', 'Review-B-1', 'Review-B-8',
+      'Review-I-8', 'Review-I-8', 'Review-I-8', 'Reply-O', 'Reply-B-3', 'Reply-I-3',
+      'Reply-I-3', 'Reply-B-5', 'Reply-I-5', 'Reply-I-5', 'Reply-I-5', 'Reply-B-4']
+    where
+    (Review-B-5, Review-I-5, Review-I-5, Review-I-5, Reply-B-5, Reply-I-5, Reply-I-5,
+     Reply-I-5) is one successful identification.
     """
 
     def is_simple_average(self, stats: MetricStats):
@@ -146,8 +156,11 @@ class APEF1Score(Metric):
     ) -> MetricStats:
 
         stats = []
+
         for tags, pred_tags in zip(true_data, pred_data):
-            gold_spans, pred_spans = gen_text_blocks(tags, pred_tags)
+            gold_spans, pred_spans = cast(
+                tuple[set, set], gen_text_blocks(tags, pred_tags)
+            )
             stats.append(
                 [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]
             )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, cast, Optional
 
 
 def cap_feature(s):
@@ -27,7 +27,7 @@ def gen_text_blocks(
     true_tags: list[str],
     pred_tags: list[str],
     sentences: Optional[list[str]] = None,
-):
+) -> tuple[set[str], set[str]] | tuple[list[Block], list[Block]]:
     reply_dict: dict[int, str] = {}
     reply_pred_dict: dict[int, str] = {}
     gold_spans = []
@@ -228,7 +228,7 @@ class Block:
 class BlockOps:
     def __init__(
         self, resources: dict[str, Any] | None = None, match_type: Optional[str] = None
-    ):
+    ) -> None:
         self.resources = resources or {}
         self.match_type: Optional[str] = None
         self.match_func = None
@@ -238,9 +238,12 @@ class BlockOps:
         true_tags: list[str],
         pred_tags: list[str],
         sentences: list[str],
-    ):
+    ) -> tuple[list[Block], list[Block]]:
+
         gold_spans, pred_spans = gen_text_blocks(true_tags, pred_tags, sentences)
-        return gold_spans, pred_spans
+        gold_spans_list = cast(list[Block], gold_spans)
+        pred_spans_list = cast(list[Block], pred_spans)
+        return gold_spans_list, pred_spans_list
 
 
 @dataclass

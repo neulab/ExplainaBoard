@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
+import itertools
 from typing import Optional
 
 import numpy as np
 
+from explainaboard.metrics.auxiliary import qa_table_text_hybrid_auxiliary as eval_util
 from explainaboard.metrics.metric import (
     Metric,
     MetricConfig,
@@ -13,14 +15,14 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.metrics.registry import register_metric_config
-from explainaboard.utils.eval_utils import qa_table_text_hybrid as eval_util
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 from explainaboard.utils.typing_utils import unwrap_or
 
 
 class HybridQAMetric(Metric):
     """
-    An abstract class for HybridQA tasks that measures scores after normalization.
+    An abstract class for HybridQA tasks (see more details about this task:
+    https://nextplusplus.github.io/TAT-QA/ ) that measures scores after normalization.
     The actual metric must inherit this class and implement the sample_level_metric()
     function.
     """
@@ -63,16 +65,14 @@ class HybridQAMetric(Metric):
             config = unwrap_or(config, self.config)
             preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
 
-            stat_values = []
-            for prediction_string in prediction_strings:
-                for ground_truth_answer_string in ground_truth_answer_strings:
-                    stat_values.append(
-                        self.sample_level_metric(
-                            prediction_string, ground_truth_answer_string, preprocessor
-                        )
-                    )
+            args_iter = itertools.product(
+                prediction_strings, ground_truth_answer_strings
+            )
+            stat_values_iter = (
+                self.sample_level_metric(y, t, preprocessor) for y, t in args_iter
+            )
 
-            stat_list.append(max(stat_values))
+            stat_list.append(max(stat_values_iter))
         return SimpleMetricStats(np.array(stat_list))
 
     @abc.abstractmethod
@@ -112,12 +112,7 @@ class ExactMatchHybridQA(HybridQAMetric):
         ground_truth = eval_util._answer_to_bags(ground_truth)
         prediction = eval_util._answer_to_bags(prediction)
 
-        exact_match = 0.0
-        if set(prediction[0]) == set(ground_truth[0]) and len(prediction[0]) == len(
-            ground_truth[0]
-        ):
-            exact_match = 1.0
-        return exact_match
+        return float(sorted(prediction[0]) == sorted(ground_truth[0]))
 
 
 @dataclass
@@ -148,6 +143,5 @@ class F1ScoreHybridQA(HybridQAMetric):
         prediction = eval_util._answer_to_bags(prediction)
         f1_per_bag = eval_util._align_bags(prediction[1], ground_truth[1])
         f1 = np.mean(f1_per_bag)
-        f1 = round(f1, 2)
 
         return f1

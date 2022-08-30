@@ -14,7 +14,7 @@ class QATableTextHybridTest(unittest.TestCase):
     )
 
     def test_datalab_loader(self):
-        loader = get_loader_class(TaskType.qa_table_text_hybrid).from_datalab(
+        loader = get_loader_class(TaskType.qa_tat).from_datalab(
             dataset=DatalabLoaderOption("tat_qa"),
             output_data=self.json_output_customized,
             output_source=Source.local_filesystem,
@@ -23,19 +23,19 @@ class QATableTextHybridTest(unittest.TestCase):
         data = loader.load()
 
         metadata = {
-            "task_name": TaskType.qa_table_text_hybrid,
+            "task_name": TaskType.qa_tat,
             "dataset_name": "tat_qa",
             "metric_names": ["ExactMatchHybridQA", "F1ScoreHybridQA"],
         }
-        processor = get_processor(TaskType.qa_table_text_hybrid)
+        processor = get_processor(TaskType.qa_tat)
         sys_info = processor.process(metadata, data)
         self.assertIsNotNone(sys_info.results.analyses)
 
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
             sys_info.results.overall[0][0].value,
-            0.746223,
-            4,
+            0.746978,
+            3,
             "almost equal",
         )
 

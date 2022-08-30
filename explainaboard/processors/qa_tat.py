@@ -22,11 +22,11 @@ from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_table_text_hybrid)
-class QATableTextHybridProcessor(Processor):
+@register_processor(TaskType.qa_tat)
+class QATatProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.qa_table_text_hybrid
+        return TaskType.qa_tat
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {

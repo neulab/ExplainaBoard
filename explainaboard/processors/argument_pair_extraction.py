@@ -71,14 +71,6 @@ class ArgumentPairExtractionProcessor(Processor):
                 description="the length of all sentences",
                 func=lambda info, x, c: len(" ".join(x['sentences'])),
             ),
-            # "num_oov": feature.Value(
-            #     dtype="float",
-            #     description="the number of out-of-vocabulary words",
-            #     require_training_set=True,
-            #     func=lambda info, x, c, stat: feat_num_oov(
-            #         info, " ".join(x['sentences']), stat['vocab']
-            #     ),
-            # ),
         }
 
         block_features: dict[str, FeatureType] = {
@@ -176,7 +168,8 @@ class ArgumentPairExtractionProcessor(Processor):
             )
         elif analysis_level.name != 'block':
             raise ValueError(f'{analysis_level.name}-level analysis not supported')
-        # Do span-level analysis
+        # Do block-level analysis. `AnalysisCaseLabeledBlock` typing is necessary
+        # otherwise an error will happen later when using `x.true_label`
         cases: list[AnalysisCaseLabeledBlock] = []
         # Calculate features
         for i, output in progress(
@@ -187,9 +180,10 @@ class ArgumentPairExtractionProcessor(Processor):
             true_spans, pred_spans = self._block_ops.get_blocks(
                 output['true_tags'], output['pred_tags'], sentences
             )
-
+            true_spans = cast(list[Block], true_spans)
+            pred_spans = cast(list[Block], pred_spans)
             # merge the spans together
-            merged_spans: dict[tuple[int, int], Block] = {}
+            merged_spans: dict[tuple[int, int, int, int], Block] = {}
             for span in true_spans:
                 span.block_tag = f'{span.block_tag} {self._DEFAULT_TAG}'
                 merged_spans[unwrap(span.block_pos)] = span

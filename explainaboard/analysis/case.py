@@ -91,9 +91,8 @@ class AnalysisCaseBlock(AnalysisCase):
 @dataclass
 class AnalysisCaseLabeledBlock(AnalysisCaseBlock):
     """
-    A bucket case that highlights a span in text along with a label.
-    :param true_label: The actual label
-    :param predicted_label: The label that is predicted
+    A bucket case that annotates a text block with different
+    types of information
     """
 
     true_label: str

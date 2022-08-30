@@ -472,12 +472,12 @@ def main():
             # metadata[
             #     "user_defined_features_configs"
             # ] = loader.user_defined_features_configs
-            metadata_one = copy.deepcopy(metadata)
-            metadata_one["task_name"] = task
+            metadata_copied = copy.deepcopy(metadata)
+            metadata_copied["task_name"] = task
 
             processor = get_processor(task=task)
             report = processor.process(
-                metadata=metadata_one, sys_output=system_dataset.samples
+                metadata=metadata_copied, sys_output=system_dataset.samples
             )
             reports.append(report)
 

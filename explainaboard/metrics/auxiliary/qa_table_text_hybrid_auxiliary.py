@@ -14,42 +14,34 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 
 
-def negative_num_handle(x: str):
+def negative_num_factor(x: str) -> float:
     """
     :param x:  transform (134) -> -134
     :return:
     """
-    all = re.findall('(\([\d.\s]+\))', x.strip())  # noqa: W605
-    if len(all) > 0:
-        return -1
-    return 1
+    found = re.search(r"(\([\d.\s]+\))", x.strip())
+    return -1.0 if found else 1.0
 
 
-def percent_num_handle(x: str):
+def percent_num_factor(x: str) -> float:
     """
     :param x:  transform 12% -> 12/100
     :return:
     """
-    all = re.findall('([\d.\s]+%)', x.strip())  # noqa: W605
-    if len(all) > 0:
-        return 0.01
-    return 1
+    found = re.search(r"([\d.\s]+%)", x.strip())
+    return 0.01 if found else 1.0
 
 
-def word_scale_handle(x: str):
+def word_scale_factor(x: str) -> float:
     """
-    :param x: 1 million = 1,000,000
+    :param x: 1 million = 1_000_000
     :return:
     """
-    iter = re.finditer('([\d.]+\s?[a-zA-Z]+)', x)  # noqa: W605
-    for one in iter:
-        text = one.group(0).lower()
-        scale_val = scale_to_num(text)
-        return scale_val
-    return 1
+    found = re.search(r"([\d.]+\s?[a-zA-Z]+)", x)
+    return scale_to_num(found.group(0).lower()) if found else 1.0
 
 
-def scale_to_num(scale: str):
+def scale_to_num(scale: str) -> float:
     scale = scale.lower()
     num = 1.0
     if 'hundred' in scale:  # hundred
@@ -65,7 +57,7 @@ def scale_to_num(scale: str):
     return num
 
 
-def extract_one_num_from_str(s):
+def extract_one_num_from_str(s) -> int | None | float:
     s = _clean_num(s)
     r_num = r"([+-]?\d+(\.\d+)?)|([+-]?\.\d+)"
     groups = re.findall(r_num, s)
@@ -82,7 +74,7 @@ def extract_one_num_from_str(s):
 EXCLUDE_IN_NUM = "'\"\\$€£¥%(),[]"
 
 
-def _clean_num(text: str):
+def _clean_num(text: str) -> str:
     return "".join([ch for ch in str(text) if ch not in EXCLUDE_IN_NUM])
 
 
@@ -105,17 +97,16 @@ def is_number(text: str) -> bool:
 
 def to_number(text: str) -> float | None:
     num = extract_one_num_from_str(text)
-    scale_val = word_scale_handle(text)
-    negative_flag = negative_num_handle(text)
-    percent_flag = percent_num_handle(text)
+    scale_val = word_scale_factor(text)
+    negative_flag = negative_num_factor(text)
+    percent_flag = percent_num_factor(text)
     if num is not None:
         return round(num * scale_val * negative_flag * percent_flag, 4)
     return None
 
 
 def remove_articles(text: str) -> str:
-    regex = re.compile(r'\b(a|an|the)\b', re.UNICODE)
-    return re.sub(regex, ' ', text)
+    return re.sub(r'\b(a|an|the)\b', ' ', text)
 
 
 def white_space_fix(text: str) -> str:
@@ -161,7 +152,7 @@ def normalize_answer(text: str) -> str:
 STRIPPED_CHARACTERS = string.punctuation + ''.join([u"‘", u"’", u"´", u"`", "_"])
 
 
-def ws_tokenize(text):
+def ws_tokenize(text) -> list[str]:
     """Runs basic whitespace cleaning and splitting on a piece of text."""
     text = text.strip().lower()
     if not text:
@@ -172,7 +163,9 @@ def ws_tokenize(text):
     return tokens
 
 
-def _answer_to_bags(answer: Union[str, list[str], tuple[str, ...]]):
+def _answer_to_bags(
+    answer: Union[str, list[str], tuple[str, ...]]
+) -> tuple[list[str], list[set[str]]]:
     if isinstance(answer, (list, tuple)):
         raw_spans = answer
     else:
@@ -237,7 +230,7 @@ def _match_numbers_if_present(gold_bag: set[str], predicted_bag: set[str]) -> bo
     return False
 
 
-def extract_gold_answers(qa_annotation):
+def extract_gold_answers(qa_annotation: dict) -> tuple[str, list, str]:
     '''
     span
     multi-span
@@ -251,7 +244,8 @@ def extract_gold_answers(qa_annotation):
     answer_content = qa_annotation['answer']
     gold_answers = []
     if answer_type in ['multi-span', 'span']:  # list
-        assert isinstance(answer_content, list), answer_content
+        if not isinstance(answer_content, list):
+            raise TypeError("answer_content must be list.")
         gold_answers = answer_content  # multi-span
     elif answer_type in ["arithmetic"]:
         gold_answers.append(str(answer_content))
@@ -273,7 +267,7 @@ def metric_max_over_ground_truths(metric_fn, predictions, ground_truths):
     return max(scores_for_ground_truths)
 
 
-def get_answer_str(answers: list, scale: str):
+def get_answer_str(answers: list, scale: str) -> list[str]:
     """
     :param ans_type:  span, multi-span, arithmetic, count
     :param ans_list:
@@ -303,7 +297,7 @@ def get_answer_str(answers: list, scale: str):
     return [" ".join(ans_temp)]
 
 
-def add_percent_pred(prediction_strings, pred_scale, pred):
+def add_percent_pred(prediction_strings: list, pred_scale: str, pred: list) -> list:
     """
     to solve [pred = 0.2342] <>   [ans = 23.42 and scale == 'percent']
 
@@ -321,8 +315,8 @@ def add_percent_pred(prediction_strings, pred_scale, pred):
     if (
         not pred_scale and '%' not in pred_str and is_number(pred_str)
     ):  # mode only or no pred_scale num only
-        pred_str = to_number(pred_str)
-        if pred_str is None:
+        pred_str_num = to_number(pred_str)
+        if pred_str_num is None:
             return prediction_strings
-        prediction_strings.append('%.4f' % pred_str)
+        prediction_strings.append('%.4f' % pred_str_num)
     return prediction_strings
