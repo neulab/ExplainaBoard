@@ -1,6 +1,7 @@
 """Tests for explainaboard.metrics.log_prob"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.log_prob import LogProb, LogProbConfig

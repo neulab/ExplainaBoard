@@ -1,6 +1,7 @@
 """Tests for explainaboard.metrics.nlg_meta_evaluation"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.nlg_meta_evaluation import (

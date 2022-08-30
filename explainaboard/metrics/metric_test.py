@@ -1,6 +1,7 @@
 """Tests for explainaboard.metrics.metric"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.metric import MetricConfig

@@ -5,8 +5,8 @@ import unittest
 
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.registry import (
-    metric_config_registry,
     metric_config_from_dict,
+    metric_config_registry,
 )
 
 

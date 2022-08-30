@@ -1,6 +1,7 @@
 """Tests for explainaboard.metrics.continuous"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.continuous import (

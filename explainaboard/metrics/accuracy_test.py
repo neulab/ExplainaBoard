@@ -1,6 +1,7 @@
 """Tests for explainaboard.metrics.accuracy"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.accuracy import (

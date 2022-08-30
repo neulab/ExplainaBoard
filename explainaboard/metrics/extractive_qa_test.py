@@ -1,6 +1,7 @@
 """Tests for explainaboard.metrics.extractive_qa"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.extractive_qa import (

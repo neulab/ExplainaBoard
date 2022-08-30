@@ -1,15 +1,16 @@
 """Tests for explainaboard.metrics.ranking"""
 
 from __future__ import annotations
+
 import unittest
 
 from explainaboard.metrics.ranking import (
     Hits,
     HitsConfig,
-    MeanReciprocalRank,
-    MeanReciprocalRankConfig,
     MeanRank,
     MeanRankConfig,
+    MeanReciprocalRank,
+    MeanReciprocalRankConfig,
 )
 
 
