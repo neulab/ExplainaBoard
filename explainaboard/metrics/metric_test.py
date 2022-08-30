@@ -15,6 +15,7 @@ class MetricConfigTest(unittest.TestCase):
                 "name": "foo",
                 "source_language": None,
                 "target_language": None,
+                "cls_name": "MetricConfig",
                 "external_stats": None,
             },
         )

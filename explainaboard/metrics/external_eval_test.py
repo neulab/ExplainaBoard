@@ -21,6 +21,7 @@ class ExternalEvalConfigTest(unittest.TestCase):
                 "name": "ExternalEval",
                 "source_language": None,
                 "target_language": None,
+                "cls_name": "ExternalEvalConfig",
                 "external_stats": None,
                 "aspect": "foo",
                 "n_annotators": 1,

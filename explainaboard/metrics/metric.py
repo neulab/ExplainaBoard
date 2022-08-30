@@ -56,8 +56,13 @@ class MetricConfig(SerializableDataclass):
     name: str
     source_language: str | None = None
     target_language: str | None = None
+    cls_name: str | None = None
     # The external statistics for metrics
     external_stats: np.ndarray | None = None
+
+    def __post_init__(self):
+        # Save the class name
+        self.cls_name = type(self).__name__
 
     def to_metric(self):
         raise NotImplementedError

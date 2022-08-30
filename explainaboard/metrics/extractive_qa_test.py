@@ -20,6 +20,7 @@ class ExactMatchQAConfigTest(unittest.TestCase):
                 "name": "ExactMatchQA",
                 "source_language": None,
                 "target_language": None,
+                "cls_name": "ExactMatchQAConfig",
                 "external_stats": None,
             },
         )
@@ -45,6 +46,7 @@ class F1ScoreQAConfigTest(unittest.TestCase):
                 "name": "F1ScoreQA",
                 "source_language": None,
                 "target_language": None,
+                "cls_name": "F1ScoreQAConfig",
                 "external_stats": None,
             },
         )
