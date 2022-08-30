@@ -11,11 +11,11 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("RootMeanSquaredErrorConfig")
 class RootMeanSquaredErrorConfig(MetricConfig):
     def to_metric(self):
         return RootMeanSquaredError(self)
@@ -43,7 +43,7 @@ class RootMeanSquaredError(Metric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("AbsoluteErrorConfig")
 class AbsoluteErrorConfig(MetricConfig):
     def to_metric(self):
         return AbsoluteError(self)

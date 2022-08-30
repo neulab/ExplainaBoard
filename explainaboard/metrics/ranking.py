@@ -11,12 +11,12 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("HitsConfig")
 class HitsConfig(MetricConfig):
     hits_k: int = 5
 
@@ -53,7 +53,7 @@ class Hits(Metric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("MeanReciprocalRankConfig")
 class MeanReciprocalRankConfig(MetricConfig):
     def to_metric(self):
         return MeanReciprocalRank(self)
@@ -92,7 +92,7 @@ class MeanReciprocalRank(Metric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("MeanRankConfig")
 class MeanRankConfig(MetricConfig):
     def to_metric(self):
         return MeanRank(self)
