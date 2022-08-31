@@ -13,11 +13,7 @@ def get_processor(task: TaskType | str) -> Processor:
     return a processor based on the task type
     TODO: error handling
     """
-    if isinstance(task, TaskType):
-        name = task.name
-    elif isinstance(task, str):
-        name = task
-    processor_class = processor_registry.get_type(name)
+    processor_class = processor_registry.get_type(task.name)
     return processor_class()
 
 
