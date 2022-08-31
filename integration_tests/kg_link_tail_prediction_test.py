@@ -31,7 +31,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         # Initialize the processor and perform the processing
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
         sys_info = processor.process(
-            metadata={}, sys_output=data.samples, skip_failures=True
+            metadata={}, sys_output=data.samples, skip_failed_analyses=True
         )
 
         with tempfile.TemporaryDirectory() as tempdir:
@@ -60,7 +60,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data.samples, skip_failures=True)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -111,7 +111,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
-        sys_info = processor.process(metadata, data.samples, skip_failures=True)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -146,7 +146,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data.samples, skip_failures=True)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

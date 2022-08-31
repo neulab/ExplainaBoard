@@ -301,7 +301,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--skip-failures',
+        '--skip-failed-analyses',
         action='store_true',
         help="whether to skip failed analysis or report errors.",
     )
@@ -483,7 +483,7 @@ def main():
             report = processor.process(
                 metadata=metadata,
                 sys_output=system_dataset.samples,
-                skip_failures=args.skip_failures,
+                skip_failed_analyses=args.skip_failed_analyses,
             )
             reports.append(report)
 

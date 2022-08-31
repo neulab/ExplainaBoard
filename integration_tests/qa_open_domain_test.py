@@ -27,5 +27,5 @@ class QAOpenDomainTest(unittest.TestCase):
             "metric_names": ["ExactMatchQA"],
         }
         processor = get_processor(TaskType.qa_open_domain.value)
-        sys_info = processor.process(metadata, data.samples, skip_failures=True)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
         self.assertIsNotNone(sys_info.results.analyses)

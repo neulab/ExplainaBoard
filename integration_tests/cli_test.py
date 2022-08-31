@@ -99,7 +99,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/sst2/sst2-dataset.tsv',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -161,7 +161,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/snli/snli-dataset.tsv',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -180,7 +180,7 @@ class CLITest(TestCase):
             'chrf',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -220,7 +220,7 @@ class CLITest(TestCase):
             'bleu',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -240,7 +240,7 @@ class CLITest(TestCase):
             f"{top_path}/data/system_outputs/conala/conala-baseline-output.json",
             "--report-json",
             "report.json",
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -273,7 +273,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/wikitext/wikitext-sys1-output.txt',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -306,7 +306,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/conll2003/conll2003-elmo-output.conll',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -339,7 +339,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -355,7 +355,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/squad/squad_mini-example-output.json',
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -390,7 +390,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
             '--report-json',
             '/dev/null',
-            '--skip-failures',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()

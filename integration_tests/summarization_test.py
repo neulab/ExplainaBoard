@@ -52,7 +52,7 @@ class SummarizationTest(unittest.TestCase):
 
         processor = get_processor(TaskType.summarization.value)
 
-        sys_info = processor.process(metadata, data, skip_failures=True)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

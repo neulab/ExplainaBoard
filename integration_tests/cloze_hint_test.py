@@ -28,7 +28,7 @@ class ClozeGenerativeTest(unittest.TestCase):
             "metric_names": ["CorrectCount"],
         }
         processor = get_processor(TaskType.cloze_generative.value)
-        sys_info = processor.process(metadata, data, skip_failures=True)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
         self.assertIsNotNone(sys_info.results.analyses)
 
 

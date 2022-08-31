@@ -52,7 +52,7 @@ class TextPairClassificationTest(unittest.TestCase):
         data = loader.load()
         processor = get_processor(TaskType.text_pair_classification)
 
-        sys_info = processor.process(metadata, data, skip_failures=True)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

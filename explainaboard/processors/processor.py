@@ -240,14 +240,15 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         analysis_cases: list[list[AnalysisCase]],
         metric_stats: list[list[MetricStats]],
-        skip_failures: bool = False,
+        skip_failed_analyses: bool = False,
     ) -> list[AnalysisResult]:
         """
         Perform fine-grained analyses
         :param sys_info: Information about the system output
         :param analysis_cases: They cases to analyze
         :param metric_stats: The stats from which to calculate performance
-        :param skip_failures: Whether to skip analysis when it encountered some errors.
+        :param skip_failed_analyses: Whether to skip analysis when it encountered some
+            errors.
         :return:
             performances_over_bucket:
                 a dictionary of feature name -> list of performances by bucket
@@ -271,7 +272,7 @@ class Processor(metaclass=abc.ABCMeta):
                     )
                 )
             except Exception as ex:
-                if not skip_failures:
+                if not skip_failed_analyses:
                     raise
                 get_logger().warning(f"Analysis failed, skipped. Reason: {ex}")
 
@@ -489,7 +490,7 @@ class Processor(metaclass=abc.ABCMeta):
 
     @final
     def process(
-        self, metadata: dict, sys_output: list[dict], skip_failures: bool = False
+        self, metadata: dict, sys_output: list[dict], skip_failed_analyses: bool = False
     ) -> SysOutputInfo:
         """"""
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
@@ -498,7 +499,7 @@ class Processor(metaclass=abc.ABCMeta):
             sys_info,
             overall_statistics.analysis_cases,
             metric_stats=overall_statistics.metric_stats,
-            skip_failures=skip_failures,
+            skip_failed_analyses=skip_failed_analyses,
         )
         self.sort_bucket_info(
             analyses,

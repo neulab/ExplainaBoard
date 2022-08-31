@@ -40,7 +40,7 @@ class SysDetailsTest(unittest.TestCase):
         data = loader.load()
         processor = get_processor(TaskType.text_classification)
 
-        sys_info = processor.process(metadata, data, skip_failures=True)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(
             sys_info.system_details, {"learning_rate": 0.0001, "number_of_layers": 10}
