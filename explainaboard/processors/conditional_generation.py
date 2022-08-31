@@ -33,13 +33,13 @@ from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
-@register_processor(TaskType.conditional_generation)
+@processor_registry.register("conditional_generation")
 class ConditionalGenerationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

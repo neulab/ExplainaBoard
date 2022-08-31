@@ -20,11 +20,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.cloze_mutiple_choice)
+@processor_registry.register("cloze_mutiple_choice")
 class ClozeMultipleChoiceProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

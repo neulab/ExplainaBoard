@@ -15,13 +15,13 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.typing_utils import unwrap
 
 sum_attr = SUMAttribute()
 
 
-@register_processor(TaskType.summarization)
+@processor_registry.register("summarization")
 class SummarizationProcessor(ConditionalGenerationProcessor):
     @classmethod
     def task_type(cls) -> TaskType:

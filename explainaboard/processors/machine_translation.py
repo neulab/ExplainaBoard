@@ -14,11 +14,11 @@ from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.machine_translation)
+@processor_registry.register("machine_translation")
 class MachineTranslationProcessor(ConditionalGenerationProcessor):
     @classmethod
     def task_type(cls) -> TaskType:

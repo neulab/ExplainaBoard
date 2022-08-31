@@ -21,12 +21,12 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.log_prob import LogProbConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.language_modeling)
+@processor_registry.register("language_modeling")
 class LanguageModelingProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

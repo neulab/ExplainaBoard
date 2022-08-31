@@ -19,12 +19,12 @@ from explainaboard.metrics.ranking import (
     MeanReciprocalRankConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
 
 
-@register_processor(TaskType.kg_link_tail_prediction)
+@processor_registry.register("kg_link_tail_prediction")
 class KGLinkTailPredictionProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

@@ -13,11 +13,11 @@ from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.spacy_loader import get_named_entities
 
 
-@register_processor(TaskType.aspect_based_sentiment_classification)
+@processor_registry.register("aspect_based_sentiment_classification")
 class AspectBasedSentimentClassificationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

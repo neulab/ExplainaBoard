@@ -3,12 +3,12 @@ from __future__ import annotations
 from explainaboard import TaskType
 from explainaboard.metrics.f1_score import F1ScoreConfig, SeqF1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.processors.sequence_labeling import SeqLabProcessor
 from explainaboard.utils.span_utils import BIOSpanOps
 
 
-@register_processor(TaskType.chunking)
+@processor_registry.register("chunking")
 class ChunkingProcessor(SeqLabProcessor):
     @classmethod
     def task_type(cls) -> TaskType:

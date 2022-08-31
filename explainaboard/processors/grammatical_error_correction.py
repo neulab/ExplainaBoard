@@ -8,10 +8,10 @@ from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.metrics.accuracy import SeqCorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 
 
-@register_processor(TaskType.grammatical_error_correction)
+@processor_registry.register("grammatical_error_correction")
 class GrammaticalErrorCorrection(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

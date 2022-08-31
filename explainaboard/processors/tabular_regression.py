@@ -10,10 +10,10 @@ from explainaboard.metrics.continuous import (
 )
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 
 
-@register_processor(TaskType.tabular_regression)
+@processor_registry.register("tabular_regression")
 class TabularRegressionProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

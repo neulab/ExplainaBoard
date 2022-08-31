@@ -17,11 +17,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_multiple_choice)
+@processor_registry.register("qa_multiple_choice")
 class QAMultipleChoiceProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

@@ -12,10 +12,10 @@ from explainaboard.analysis.feature import FeatureType
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 
 
-@register_processor(TaskType.tabular_classification)
+@processor_registry.register("tabular_classification")
 class TextClassificationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:

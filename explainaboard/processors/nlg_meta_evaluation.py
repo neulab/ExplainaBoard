@@ -11,10 +11,10 @@ from explainaboard.metrics.nlg_meta_evaluation import (
     PearsonCorrelationConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.processors.processor_registry import processor_registry
 
 
-@register_processor(TaskType.nlg_meta_evaluation)
+@processor_registry.register("nlg_meta_evaluation")
 class NLGMetaEvaluationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
