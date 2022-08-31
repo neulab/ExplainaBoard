@@ -247,7 +247,7 @@ class Processor(metaclass=abc.ABCMeta):
         :param sys_info: Information about the system output
         :param analysis_cases: They cases to analyze
         :param metric_stats: The stats from which to calculate performance
-        :param skip_failed_analyses: Whether to skip analysis when it encountered some
+        :param skip_failed_analyses: Whether to skip analyses when they encountered some
             errors.
         :return:
             performances_over_bucket:

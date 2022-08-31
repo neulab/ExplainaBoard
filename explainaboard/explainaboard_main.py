@@ -303,7 +303,7 @@ def create_parser():
     parser.add_argument(
         '--skip-failed-analyses',
         action='store_true',
-        help="whether to skip failed analysis or report errors.",
+        help="whether to skip failed analyses or report errors.",
     )
     return parser
 
