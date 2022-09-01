@@ -25,7 +25,10 @@ def find_range(
         The range `k` in `keys` that satisfies `k[0] <= x <= k[1]`, or None if there are
         no such range in `keys`.
     """
-    return next(filter(lambda k: k[0] <= x <= k[1], keys))
+    return next(
+        filter(lambda k: k is not None and k[0] <= x <= k[1], keys),
+        None,
+    )
 
 
 def continuous(
