@@ -59,7 +59,7 @@ class Analysis:
         metrics: list[Metric],
         stats: list[MetricStats],
         conf_value: float,
-    ) -> AnalysisResult | None:
+    ) -> AnalysisResult:
         """
         A super-class for analyses, which take in examples and analyze their features in
         some way. The exact analysis performed will vary depending on the inheriting
@@ -68,7 +68,7 @@ class Analysis:
           These could be examples, spans, tokens, etc.
         :param metrics: The metrics used to evaluate the cases.
         :param stats: The statistics calculated by each metric.
-        :conf_value: In the case that any significance analysis is performed, the
+        :param conf_value: In the case that any significance analysis is performed, the
           confidence level.
         """
         raise NotImplementedError
@@ -180,17 +180,16 @@ class BucketAnalysis(Analysis):
         metrics: list[Metric],
         stats: list[MetricStats],
         conf_value: float,
-    ) -> AnalysisResult | None:
+    ) -> AnalysisResult:
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
             self.method,
         )
+
         if len(cases) == 0 or self.feature not in cases[0].features:
-            get_logger().warning(
-                f'bucket analysis: feature {self.feature} not found, ' f'skipping'
-            )
-            return None
+            raise RuntimeError(f"bucket analysis: feature {self.feature} not found.")
+
         samples_over_bucket = bucket_func(
             sample_features=[(x, x.features[self.feature]) for x in cases],
             bucket_number=self.number,
@@ -300,15 +299,11 @@ class ComboCountAnalysis(Analysis):
         metrics: list[Metric],
         stats: list[MetricStats],
         conf_value: float,
-    ) -> AnalysisResult | None:
-        if len(cases) == 0:
-            return None
+    ) -> AnalysisResult:
         for x in self.features:
             if x not in cases[0].features:
-                get_logger().warning(
-                    f'combo analysis: feature {x} not found, ' f'skipping'
-                )
-                return None
+                raise RuntimeError(f"combo analysis: feature {x} not found.")
+
         combo_map: dict[tuple, int] = {}
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])

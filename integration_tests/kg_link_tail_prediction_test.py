@@ -32,7 +32,9 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         data = loader.load()
         # Initialize the processor and perform the processing
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
-        sys_info = processor.process(metadata={}, sys_output=data.samples)
+        sys_info = processor.process(
+            metadata={}, sys_output=data.samples, skip_failed_analyses=True
+        )
 
         with tempfile.TemporaryDirectory() as tempdir:
             # If you want to write out to disk you can use
@@ -60,7 +62,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data.samples)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -111,7 +113,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         }
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
-        sys_info = processor.process(metadata, data.samples)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -148,7 +150,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
 
-        sys_info = processor.process(metadata, data.samples)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

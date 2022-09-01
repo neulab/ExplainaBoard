@@ -22,6 +22,9 @@ import argparse
 import json
 import os
 
+# NOTE(odashi): List is required to set the first argument of cast() in Python 3.8.
+from typing import cast, List
+
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -231,10 +234,20 @@ def draw_charts_from_reports(
                 f'mismatched analyses: {[x.name for x in analysis_result]}'
             )
 
+        analysis_result_list = list(analysis_result)
+
         if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
-            plot_buckets(analysis_result, output_dir, sys_names)
+            plot_buckets(
+                cast(List[BucketAnalysisResult], analysis_result_list),
+                output_dir,
+                sys_names,
+            )
         elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
-            plot_combo_counts(analysis_result, output_dir, sys_names)
+            plot_combo_counts(
+                cast(List[ComboCountAnalysisResult], analysis_result_list),
+                output_dir,
+                sys_names,
+            )
         else:
             raise ValueError('illegal types of analyses')
 
