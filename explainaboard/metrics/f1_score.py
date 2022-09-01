@@ -12,7 +12,6 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-
 from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.span_utils import (
     BIOSpanOps,
