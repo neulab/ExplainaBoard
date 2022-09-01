@@ -11,12 +11,12 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("LogProbConfig")
 class LogProbConfig(MetricConfig):
     # If false, return log probability, if true return perplexity
     ppl: bool = False

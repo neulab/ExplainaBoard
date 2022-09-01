@@ -1,7 +1,8 @@
 import os
+import tempfile
 import unittest
 
-from integration_tests.utils import test_artifacts_path, test_output_path
+from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor, TaskType
 from explainaboard.loaders.file_loader import FileLoaderMetadata
@@ -30,8 +31,10 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         # Initialize the processor and perform the processing
         processor = get_processor(TaskType.kg_link_tail_prediction.value)
         sys_info = processor.process(metadata={}, sys_output=data.samples)
-        # If you want to write out to disk you can use
-        sys_info.write_to_directory(test_output_path)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            # If you want to write out to disk you can use
+            sys_info.write_to_directory(tempdir)
 
     def test_no_user_defined_features(self):
         loader = get_loader_class(TaskType.kg_link_tail_prediction)(

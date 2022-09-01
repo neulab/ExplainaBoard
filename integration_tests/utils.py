@@ -24,10 +24,6 @@ test_artifacts_path: Final = os.path.join(
     os.path.dirname(pathlib.Path(__file__)), "artifacts"
 )
 
-test_output_path: Final = os.path.join(
-    os.path.dirname(pathlib.Path(__file__)), "output"
-)
-
 top_path: Final = os.path.join(
     pathlib.Path(__file__).parent.parent.absolute(),
 )

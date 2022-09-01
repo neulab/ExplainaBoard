@@ -1,6 +1,7 @@
+import tempfile
 import unittest
 
-from integration_tests.utils import test_output_path, top_path
+from integration_tests.utils import top_path
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_loader_class
@@ -23,7 +24,9 @@ class ExampleCodeTest(unittest.TestCase):
         data = loader.load().samples
         processor = get_processor(TaskType.text_classification)
         analysis = processor.process(metadata={}, sys_output=data)
-        analysis.write_to_directory(test_output_path)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            analysis.write_to_directory(tempdir)
 
     def test_readme_custom_dataset(self):
         dataset = f"{top_path}/integration_tests/artifacts/summarization/dataset.tsv"
@@ -34,4 +37,6 @@ class ExampleCodeTest(unittest.TestCase):
         data = loader.load().samples
         processor = get_processor(TaskType.summarization)
         analysis = processor.process(metadata={}, sys_output=data)
-        analysis.write_to_directory(test_output_path)
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            analysis.write_to_directory(tempdir)
