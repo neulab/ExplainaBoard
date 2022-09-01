@@ -120,8 +120,8 @@ def plot_buckets(
     """
     feature_name = bucket_results[0].name
 
-    bucket0_intervals = [
-        x.bucket_interval for x in bucket_results[0].bucket_performances
+    bucket0_ticklabels = [
+        unwrap(x.bucket_name) for x in bucket_results[0].bucket_performances
     ]
     bucket0_names = [
         x.metric_name for x in bucket_results[0].bucket_performances[0].performances
@@ -154,7 +154,7 @@ def plot_buckets(
             errs=y_errs,
             title=None,
             xlabel=feature_name,
-            xticklabels=bucket0_intervals,
+            xticklabels=bucket0_ticklabels,
             ylabel=metric_name,
         )
 

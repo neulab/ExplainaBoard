@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import itertools
-from typing import Union
+from typing import Any, Union
 
 import numpy as np
 import pandas as pd
@@ -112,9 +112,10 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
             list(itertools.chain.from_iterable(unwrap(r.results.overall)))
             for r in self.model_reports
         ]
-        reference_info = {
+        reference_info: dict[str, Any] = {
             'feature_name': 'overall',
-            'bucket_interval': '',
+            'bucket_interval': None,
+            'bucket_name': '',
             'bucket_size': -1,
         }
         for feature_id, feature in enumerate(metadata['custom_features'].keys()):
@@ -164,13 +165,14 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
             ]
             bucket_info = buckets_per_model[0]
             bucket_names.append(
-                f'{bucket_info["feature_name"]}_{bucket_info["bucket_interval"]}'
+                f'{bucket_info["feature_name"]}_{bucket_info["bucket_name"]}'
             )
 
             # calculate difference metrics
             example = {
                 'feature_name': bucket_info['feature_name'],
                 'bucket_interval': bucket_info['bucket_interval'],
+                'bucket_name': bucket_info['bucket_name'],
                 'bucket_size': bucket_info['bucket_size'],
             }
             for feature_id, feature in enumerate(metadata['custom_features'].keys()):

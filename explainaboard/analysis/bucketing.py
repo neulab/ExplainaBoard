@@ -1,33 +1,40 @@
 from __future__ import annotations
 
-from typing import Any, TypeVar
+from collections.abc import Hashable, Iterable
+
+# List and Tuple is required for the first argument of narrow().
+from typing import Any, cast, List, Tuple
 
 import numpy as np
 
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.utils.typing_utils import unwrap
-
-T = TypeVar('T')
 
 _INFINITE_INTERVAL = (-1e10, 1e10)
 
 
-def find_key(dict_obj, x):
-    for k, v in dict_obj.items():
-        if len(k) == 1:
-            if x == k[0]:
-                return k
-        elif len(k) == 2 and x >= k[0] and x <= k[1]:  # Attention !!!
-            return k
+def find_range(
+    keys: Iterable[tuple[float, float]], x: float
+) -> tuple[float, float] | None:
+    """Finds the range that covers the given value.
+
+    Args:
+        keys: iterable of ranges.
+        x: target value.
+
+    Returns:
+        The range `k` in `keys` that satisfies `k[0] <= x <= k[1]`, or None if there are
+        no such range in `keys`.
+    """
+    return next(filter(lambda k: k[0] <= x <= k[1], keys))
 
 
 def continuous(
-    sample_features: list[tuple[AnalysisCase, T]],
+    sample_features: list[tuple[AnalysisCase, Any]],
     bucket_number: int = 4,
     bucket_setting: Any = None,
 ) -> list[AnalysisCaseCollection]:
     if len(sample_features) == 0:
-        return [AnalysisCaseCollection(_INFINITE_INTERVAL, [])]
+        return [AnalysisCaseCollection(samples=[], interval=_INFINITE_INTERVAL)]
     if bucket_setting is not None and len(bucket_setting) > 0:
         raise NotImplementedError('bucket_setting incompatible with continuous')
     # Bucketing different Attributes
@@ -38,7 +45,12 @@ def continuous(
     # Special case of one bucket
     if bucket_number == 1:
         max_val, min_val = conv(np.max(vals)), conv(np.min(vals))
-        return [AnalysisCaseCollection((min_val, max_val), list(range(len(cases))))]
+        return [
+            AnalysisCaseCollection(
+                samples=list(range(len(cases))),
+                interval=(min_val, max_val),
+            )
+        ]
 
     n_examps = len(vals)
     sorted_idxs = np.argsort(vals)
@@ -54,8 +66,8 @@ def continuous(
             if i >= cutoff_i:
                 bucket_collections.append(
                     AnalysisCaseCollection(
-                        (conv(start_val), conv(last_val)),
-                        [int(j) for j in sorted_idxs[start_i:i]],
+                        samples=[int(j) for j in sorted_idxs[start_i:i]],
+                        interval=(conv(start_val), conv(last_val)),
                     )
                 )
                 start_val = val
@@ -67,8 +79,8 @@ def continuous(
     # Return the last bucket
     bucket_collections.append(
         AnalysisCaseCollection(
-            (conv(start_val), max_val),
-            [int(j) for j in sorted_idxs[start_i:]],
+            samples=[int(j) for j in sorted_idxs[start_i:]],
+            interval=(conv(start_val), max_val),
         )
     )
 
@@ -76,7 +88,7 @@ def continuous(
 
 
 def discrete(
-    sample_features: list[tuple[AnalysisCase, T]],
+    sample_features: list[tuple[AnalysisCase, Any]],
     bucket_number: int = int(1e10),
     bucket_setting: Any = 1,
 ) -> list[AnalysisCaseCollection]:
@@ -95,7 +107,7 @@ def discrete(
         else:
             feat2idx[feat].append(idx)
     bucket_collections = [
-        AnalysisCaseCollection((feat,), idxs)
+        AnalysisCaseCollection(samples=idxs, name=feat)
         for feat, idxs in feat2idx.items()
         if len(idxs) >= bucket_setting
     ]
@@ -106,26 +118,37 @@ def discrete(
 
 
 def fixed(
-    sample_features: list[tuple[AnalysisCase, T]],
+    sample_features: list[tuple[AnalysisCase, Any]],
     bucket_number: int,
-    bucket_setting: list[tuple],
+    bucket_setting: Any,
 ) -> list[AnalysisCaseCollection]:
-    intervals = unwrap(bucket_setting)
-    bucket2idx: dict[tuple, list[int]] = {k: list() for k in intervals}
+    interval_or_names = cast(List[Hashable], bucket_setting)
+    if len(interval_or_names) == 0:
+        raise ValueError("Can not determine bucket keys.")
 
-    if isinstance(list(intervals)[0][0], str):  # discrete value, such as entity tags
-        for idx, (case, feat) in enumerate(sample_features):
-            if feat in bucket2idx:
-                bucket2idx[(feat,)].append(idx)
+    features = [x[1] for x in sample_features]
+
+    if isinstance(interval_or_names[0], str):
+        names = cast(List[str], interval_or_names)
+        name2idx: dict[str, list[int]] = {k: [] for k in names}
+        name_features = cast(List[str], features)
+
+        for idx, name in enumerate(name_features):
+            if name in names:
+                name2idx[name].append(idx)
+
+        return [AnalysisCaseCollection(samples=v, name=k) for k, v in name2idx.items()]
     else:
-        for idx, (case, feat) in enumerate(sample_features):
-            res_key = find_key(bucket2idx, feat)
-            if res_key is None:
-                continue
-            bucket2idx[res_key].append(idx)
+        intervals = cast(List[Tuple[float, float]], interval_or_names)
+        interval2idx: dict[tuple[float, float], list[int]] = {k: [] for k in intervals}
+        interval_features = cast(List[float], features)
 
-    bucket_collections = [
-        AnalysisCaseCollection((k,), v) for k, v in bucket2idx.items()
-    ]
+        for idx, interval in enumerate(interval_features):
+            key = find_range(intervals, interval)
+            if key is not None:
+                interval2idx[key].append(idx)
 
-    return bucket_collections
+        return [
+            AnalysisCaseCollection(samples=v, interval=k)
+            for k, v in interval2idx.items()
+        ]

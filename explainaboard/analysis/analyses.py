@@ -13,7 +13,7 @@ from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import metric_config_from_dict
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.typing_utils import unwrap_generator
+from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 @dataclass
@@ -124,10 +124,15 @@ class BucketAnalysisResult(AnalysisResult):
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
         for i, metric_name in enumerate(metric_names):
             get_logger('report').info(f"the information of #{self.name}#")
-            get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
+            get_logger('report').info(f"bucket_name\t{metric_name}\t#samples")
             for bucket_perf in self.bucket_performances:
+                if bucket_perf.bucket_interval is not None:
+                    bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
+                else:
+                    bucket_name = unwrap(bucket_perf.bucket_name)
+
                 get_logger('report').info(
-                    f"{bucket_perf.bucket_interval}\t"
+                    f"{bucket_name}\t"
                     f"{bucket_perf.performances[i].value}\t"
                     f"{bucket_perf.n_samples}"
                 )
@@ -198,9 +203,10 @@ class BucketAnalysis(Analysis):
             subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
 
             bucket_performance = BucketPerformance(
-                bucket_interval=bucket_collection.interval,
-                n_samples=len(bucket_collection.samples),
+                n_samples=float(len(bucket_collection.samples)),
                 bucket_samples=subsampled_ids,
+                bucket_interval=bucket_collection.interval,
+                bucket_name=bucket_collection.name,
             )
 
             for metric_func, metric_stat in zip(

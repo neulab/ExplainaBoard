@@ -82,12 +82,17 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 
 @dataclass
 class AnalysisCaseCollection:
-    # This tuple is either tuple[float,float] (for continuous values) or tuple[str] for
-    # discrete values
-    # TODO(gneubig): add actual type annotation to this effect. at the moment it's a
-    #    bit complicated due to the implementation of the bucketing functions
-    interval: tuple
     samples: list[int]
+    interval: tuple[float, float] | None = None
+    name: str | None = None
 
-    def __len__(self):
+    def __post_init__(self) -> None:
+        if self.interval is None and self.name is None:
+            raise ValueError("Either interval or name must have a value.")
+        if self.interval is not None and self.name is not None:
+            raise ValueError(
+                "Both interval and name must not have values at the same time."
+            )
+
+    def __len__(self) -> int:
         return len(self.samples)

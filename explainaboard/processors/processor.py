@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, cast, Optional
+from typing import Any, Optional
 
 from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
@@ -406,13 +406,16 @@ class Processor(metaclass=abc.ABCMeta):
         for analysis_result in analysis_results:
             if not isinstance(analysis_result, BucketAnalysisResult):
                 continue
-            bucket_result = cast(
-                BucketAnalysisResult, analysis_result
-            ).bucket_performances
+            bucket_result = analysis_result.bucket_performances
 
             # based on alphabetical order of the bucket lower boundary; low to high
             if sort_by == 'key':
-                bucket_result.sort(key=lambda x: x.bucket_interval)
+                if bucket_result[0].bucket_interval is not None:
+                    # Sort by intervals.
+                    bucket_result.sort(key=lambda x: unwrap(x.bucket_interval))
+                else:
+                    # Sort by names.
+                    bucket_result.sort(key=lambda x: unwrap(x.bucket_name))
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
             elif sort_by == 'performance_value':
