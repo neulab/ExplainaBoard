@@ -178,7 +178,7 @@ class SeqLabProcessor(Processor):
         vocab: dict[str, int] = {}
         tag_vocab: dict[str, int] = {}
         for sample in progress(samples):
-            tokens, tags = sample["tokens"], sample["tags"]
+            tokens, tags = sample["tokens"], sample["true_tags"]
 
             # update vocabulary
             for token, tag in zip(tokens, tags):

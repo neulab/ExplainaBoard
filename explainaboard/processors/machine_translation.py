@@ -8,7 +8,6 @@ from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import AnalysisLevel
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
-from explainaboard.loaders.file_loader import FileLoader, FileLoaderField
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
@@ -41,20 +40,18 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
                 f'translation data, but source={sys_info.source_language} '
                 f', target={sys_info.target_language}'
             )
-        src = FileLoaderField(('translation', sys_info.source_language), '', str)
-        trg = FileLoaderField(('translation', sys_info.target_language), '', str)
 
         samples_list = list(samples)
 
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples_list,
-            lambda x: FileLoader.find_field(x, src),
+            lambda x: x['source'],
             unwrap(sys_info.source_tokenizer),
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
             samples_list,
-            lambda x: FileLoader.find_field(x, trg),
+            lambda x: x['reference'],
             unwrap(sys_info.target_tokenizer),
         )
         return {
