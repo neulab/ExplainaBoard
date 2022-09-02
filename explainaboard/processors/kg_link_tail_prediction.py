@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
 import json
 from typing import Any
-
-from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -152,8 +150,7 @@ class KGLinkTailPredictionProcessor(Processor):
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs

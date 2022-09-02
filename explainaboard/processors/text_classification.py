@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-from datalabs import aggregating
+from collections.abc import Iterable
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -133,8 +131,7 @@ class TextClassificationProcessor(Processor):
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

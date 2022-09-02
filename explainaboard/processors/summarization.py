@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
 
-from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
@@ -66,14 +65,14 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def _get_default_eaas_strs(cls):
         return ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
         )
         return {
             'source_vocab': source_vocab,

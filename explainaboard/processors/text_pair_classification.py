@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datalabs import aggregating
+from collections.abc import Iterable
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -132,17 +132,17 @@ class TextPairClassificationProcessor(Processor):
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 
-    @aggregating()
-    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
 
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples,
+            samples_list,
             lambda x: x['text1'],
             unwrap(sys_info.source_tokenizer),
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples,
+            samples_list,
             lambda x: x["text2"],
             unwrap(sys_info.target_tokenizer),
         )

@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
 import copy
-
-from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -36,8 +34,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
 
         return f
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
         if sys_info.source_language is None or sys_info.target_language is None:
             raise ValueError(
                 'source or target languages must be specified to load '
@@ -47,14 +44,16 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         src = FileLoaderField(('translation', sys_info.source_language), '', str)
         trg = FileLoaderField(('translation', sys_info.target_language), '', str)
 
+        samples_list = list(samples)
+
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples,
+            samples_list,
             lambda x: FileLoader.find_field(x, src),
             unwrap(sys_info.source_tokenizer),
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples,
+            samples_list,
             lambda x: FileLoader.find_field(x, trg),
             unwrap(sys_info.target_tokenizer),
         )
