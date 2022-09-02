@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from typing import Any, cast, final, Optional
 
-from datalabs import aggregating, Dataset, DatasetDict, load_dataset
+from datalabs import aggregating, Dataset, DatasetDict
 from eaas.async_client import AsyncClient
 from eaas.config import Config
 
@@ -20,6 +20,7 @@ from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
+from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -140,7 +141,13 @@ class Processor(metaclass=abc.ABCMeta):
                 )
             if statistics is None:
                 try:
-                    dataset = load_dataset(sys_info.dataset_name, sub_dataset)
+                    loader = get_loader_class(self.task_type()).from_datalab(
+                        DatalabLoaderOption(
+                            sys_info.dataset_name, sub_dataset, split=split_name
+                        ),
+                        output_data=None,
+                    )
+                    dataset = loader.load()
                 except Exception:
                     dataset = None
                 if dataset is None:

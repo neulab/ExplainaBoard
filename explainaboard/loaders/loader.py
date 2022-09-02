@@ -35,7 +35,7 @@ class Loader:
     def from_datalab(
         cls,
         dataset: DatalabLoaderOption,
-        output_data: str,
+        output_data: str | None,
         output_source: Source | None = None,
         output_file_type: FileType | None = None,
         field_mapping: dict[str, str] | None = None,
@@ -85,7 +85,7 @@ class Loader:
     def __init__(
         self,
         dataset_data: str | DatalabLoaderOption,
-        output_data: str,
+        output_data: str | None,
         dataset_source: Source | None = None,
         output_source: Source | None = None,
         dataset_file_type: FileType | None = None,
@@ -136,18 +136,21 @@ class Loader:
         dataset_loaded_data = self._dataset_file_loader.load(
             self._dataset_data, self._dataset_source, field_mapping=self._field_mapping
         )
-        output_loaded_data = self._output_file_loader.load(
-            self._output_data, self._output_source, field_mapping=self._field_mapping
-        )
-        dataset_loaded_data.metadata.merge(output_loaded_data.metadata)
-        if len(dataset_loaded_data) != len(output_loaded_data):
-            raise ValueError(
-                "dataset and output are of different length"
-                + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
+        if self._output_data:
+            output_loaded_data = self._output_file_loader.load(
+                self._output_data,
+                self._output_source,
+                field_mapping=self._field_mapping,
             )
-        data_list: list[dict] = output_loaded_data.samples
-        for i, output in enumerate(data_list):
-            dataset_loaded_data[i].update(output)
+            dataset_loaded_data.metadata.merge(output_loaded_data.metadata)
+            if len(dataset_loaded_data) != len(output_loaded_data):
+                raise ValueError(
+                    "dataset and output are of different length"
+                    + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
+                )
+            data_list: list[dict] = output_loaded_data.samples
+            for i, output in enumerate(data_list):
+                dataset_loaded_data[i].update(output)
         return dataset_loaded_data
 
 
