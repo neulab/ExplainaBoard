@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import count_tokens
+from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.nlg_meta_evaluation import (
     KtauCorrelationConfig,
@@ -97,6 +100,9 @@ class NLGMetaEvaluationProcessor(Processor):
 
     def default_analyses(self) -> list[Analysis]:
         return self.continuous_feature_analyses()
+
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+        return {}
 
     @classmethod
     def default_metrics(

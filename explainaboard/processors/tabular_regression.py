@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
+from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.continuous import (
     AbsoluteErrorConfig,
     RootMeanSquaredErrorConfig,
@@ -50,6 +53,9 @@ class TabularRegressionProcessor(Processor):
             RootMeanSquaredErrorConfig(name='RMSE'),
             AbsoluteErrorConfig(name='AbsoluteError'),
         ]
+
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+        return {}
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_true_label(self, data_point):

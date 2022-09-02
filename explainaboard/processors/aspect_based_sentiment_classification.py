@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import (
@@ -10,6 +12,7 @@ from explainaboard.analysis.analyses import (
 )
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import count_tokens
+from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
@@ -97,6 +100,9 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         # Continuous features
         analyses.extend(self.continuous_feature_analyses())
         return analyses
+
+    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+        return {}
 
     @classmethod
     def default_metrics(
