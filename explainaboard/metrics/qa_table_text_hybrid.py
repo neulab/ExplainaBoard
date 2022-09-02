@@ -77,7 +77,7 @@ class QATatMetric(Metric):
 
     @abc.abstractmethod
     def sample_level_metric(
-        self, ground_truth: list, prediction: list, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ) -> float:
         """
         Calculate a score given a ground truth answer string and a prediction.
@@ -107,12 +107,12 @@ class ExactMatchQATat(QATatMetric):
         return True
 
     def sample_level_metric(
-        self, ground_truth: list, prediction: list, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ) -> float:
-        ground_truth = eval_util._answer_to_bags(ground_truth)
-        prediction = eval_util._answer_to_bags(prediction)
+        ground_truths = eval_util._answer_to_bags(ground_truth)
+        predictions = eval_util._answer_to_bags(prediction)
 
-        return float(sorted(prediction[0]) == sorted(ground_truth[0]))
+        return float(sorted(predictions[0]) == sorted(ground_truths[0]))
 
 
 @dataclass
@@ -137,11 +137,11 @@ class F1ScoreQATat(QATatMetric):
         return True
 
     def sample_level_metric(
-        self, ground_truth: list, prediction: list, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ):
-        ground_truth = eval_util._answer_to_bags(ground_truth)
-        prediction = eval_util._answer_to_bags(prediction)
-        f1_per_bag = eval_util._align_bags(prediction[1], ground_truth[1])
+        ground_truths = eval_util._answer_to_bags(ground_truth)
+        predictions = eval_util._answer_to_bags(prediction)
+        f1_per_bag = eval_util._align_bags(predictions[1], ground_truths[1])
         f1 = np.mean(f1_per_bag)
 
         return f1
