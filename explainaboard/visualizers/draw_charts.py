@@ -132,8 +132,10 @@ def plot_buckets(
     """
     feature_name = bucket_results[0].name
 
-    bucket0_ticklabels = [
-        x.bucket_name or render_interval_to_tick_label(unwrap(x.bucket_interval))
+    bucket0_ticklabels: list[str] = [
+        x.bucket_name
+        if x.bucket_name is not None
+        else render_interval_to_tick_label(unwrap(x.bucket_interval))
         for x in bucket_results[0].bucket_performances
     ]
     bucket0_names = [
