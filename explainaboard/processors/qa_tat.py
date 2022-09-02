@@ -14,8 +14,8 @@ from explainaboard.analysis.feature_funcs import (
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.qa_table_text_hybrid import (
-    ExactMatchHybridQAConfig,
-    F1ScoreHybridQAConfig,
+    ExactMatchQATatConfig,
+    F1ScoreQATatConfig,
 )
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
@@ -110,13 +110,13 @@ class QATatProcessor(Processor):
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
-            ExactMatchHybridQAConfig(
-                name='HybridQAExactMatch',
+            ExactMatchQATatConfig(
+                name='QATatExactMatch',
                 source_language=source_language,
                 target_language=target_language,
             ),
-            F1ScoreHybridQAConfig(
-                name='HybridQAF1',
+            F1ScoreQATatConfig(
+                name='QATatF1',
                 source_language=source_language,
                 target_language=target_language,
             ),

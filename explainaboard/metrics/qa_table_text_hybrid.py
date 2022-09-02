@@ -19,7 +19,7 @@ from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preproces
 from explainaboard.utils.typing_utils import unwrap_or
 
 
-class HybridQAMetric(Metric):
+class QATatMetric(Metric):
     """
     An abstract class for HybridQA tasks (see more details about this task:
     https://nextplusplus.github.io/TAT-QA/ ) that measures scores after normalization.
@@ -86,13 +86,13 @@ class HybridQAMetric(Metric):
 
 
 @dataclass
-@metric_config_registry.register("ExactMatchHybridQAConfig")
-class ExactMatchHybridQAConfig(MetricConfig):
+@metric_config_registry.register("ExactMatchQATatConfig")
+class ExactMatchQATatConfig(MetricConfig):
     def to_metric(self):
-        return ExactMatchHybridQA(self)
+        return ExactMatchQATat(self)
 
 
-class ExactMatchHybridQA(HybridQAMetric):
+class ExactMatchQATat(QATatMetric):
     """
     Calculate a score for extractive QA based on exact match.
     """
@@ -116,13 +116,13 @@ class ExactMatchHybridQA(HybridQAMetric):
 
 
 @dataclass
-@metric_config_registry.register("F1ScoreHybridQAConfig")
-class F1ScoreHybridQAConfig(MetricConfig):
+@metric_config_registry.register("F1ScoreQATatConfig")
+class F1ScoreQATatConfig(MetricConfig):
     def to_metric(self):
-        return F1ScoreHybridQA(self)
+        return F1ScoreQATat(self)
 
 
-class F1ScoreHybridQA(HybridQAMetric):
+class F1ScoreQATat(QATatMetric):
     """
     Calculate a score for extractive QA based on F1 score.
     """

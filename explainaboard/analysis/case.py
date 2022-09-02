@@ -82,18 +82,14 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 
 
 @dataclass
-class AnalysisCaseBlock(AnalysisCase):
-
+class AnalysisCaseLabeledArgumentPair(AnalysisCase):
+    """
+    A bucket case that annotates a text block (pair of arguments) with different
+    types of information. This is specifically designed for argument pair extraction
+    task
+    """
     text: str
     orig_str: str
-
-
-@dataclass
-class AnalysisCaseLabeledBlock(AnalysisCaseBlock):
-    """
-    A bucket case that annotates a text block with different
-    types of information
-    """
 
     true_label: str
     predicted_label: str

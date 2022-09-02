@@ -25,7 +25,7 @@ class QATableTextHybridTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.qa_tat,
             "dataset_name": "tat_qa",
-            "metric_names": ["ExactMatchHybridQA", "F1ScoreHybridQA"],
+            "metric_names": ["ExactMatchQATat", "F1ScoreQATat"],
         }
         processor = get_processor(TaskType.qa_tat)
         sys_info = processor.process(metadata, data)

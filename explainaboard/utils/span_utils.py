@@ -23,11 +23,11 @@ def cap_feature(s):
         return "not_first_caps"
 
 
-def gen_text_blocks(
+def gen_argument_pairs(
     true_tags: list[str],
     pred_tags: list[str],
     sentences: Optional[list[str]] = None,
-) -> tuple[set[str], set[str]] | tuple[list[Block], list[Block]]:
+) -> tuple[set[str], set[str]] | tuple[list[ArgumentPair], list[ArgumentPair]]:
     reply_dict: dict[int, str] = {}
     reply_pred_dict: dict[int, str] = {}
     gold_spans = []
@@ -125,7 +125,7 @@ def gen_text_blocks(
                                 + "||"
                                 + "|".join(sentences[reply_start:reply_end])
                             )
-                            block = Block(
+                            block = ArgumentPair(
                                 block_text=block_text,
                                 block_tag="1",
                                 block_pos=block_pos,
@@ -169,7 +169,7 @@ def gen_text_blocks(
                                 + "|".join(sentences[reply_start_pred:reply_end_pred])
                             )
 
-                            block = Block(
+                            block = ArgumentPair(
                                 block_text=block_text,
                                 block_tag="1",
                                 block_pos=block_pos,
@@ -202,7 +202,7 @@ def gen_text_blocks(
 
 
 @dataclass
-class Block:
+class ArgumentPair:
     # surface string a block of text
     block_text: Optional[str] = None
     # the tag of a block
@@ -225,7 +225,7 @@ class Block:
     sample_id: Optional[int] = None
 
 
-class BlockOps:
+class ArgumentPairOps:
     def __init__(
         self, resources: dict[str, Any] | None = None, match_type: Optional[str] = None
     ) -> None:
@@ -233,16 +233,16 @@ class BlockOps:
         self.match_type: Optional[str] = None
         self.match_func = None
 
-    def get_blocks(
+    def get_argument_pairs(
         self,
         true_tags: list[str],
         pred_tags: list[str],
         sentences: list[str],
-    ) -> tuple[list[Block], list[Block]]:
+    ) -> tuple[list[ArgumentPair], list[ArgumentPair]]:
 
-        gold_spans, pred_spans = gen_text_blocks(true_tags, pred_tags, sentences)
-        gold_spans_list = cast(List[Block], gold_spans)
-        pred_spans_list = cast(List[Block], pred_spans)
+        gold_spans, pred_spans = gen_argument_pairs(true_tags, pred_tags, sentences)
+        gold_spans_list = cast(List[ArgumentPair], gold_spans)
+        pred_spans_list = cast(List[ArgumentPair], pred_spans)
         return gold_spans_list, pred_spans_list
 
 

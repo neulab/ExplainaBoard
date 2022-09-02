@@ -16,7 +16,7 @@ from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.span_utils import (
     BIOSpanOps,
     BMESSpanOps,
-    gen_text_blocks,
+    gen_argument_pairs,
     SpanOps,
 )
 from explainaboard.utils.typing_utils import unwrap_or
@@ -159,7 +159,7 @@ class APEF1Score(Metric):
 
         for tags, pred_tags in zip(true_data, pred_data):
             gold_spans, pred_spans = cast(
-                Tuple[set, set], gen_text_blocks(tags, pred_tags)
+                Tuple[set, set], gen_argument_pairs(tags, pred_tags)
             )
             stats.append(
                 [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]

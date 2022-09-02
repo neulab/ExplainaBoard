@@ -2,8 +2,7 @@
 
 In this file we describe how to analyze QA models trained on datasets 
 with a hybrid of tabular and textual context.
-We will give an example using the  [tat_qa](https://github.com/ExpressAI/DataLab/blob/main/datasets/tat_qa/tat_qa.py) dataset, but other datasets
-can be analyzed in a similar way.
+
 
 ## Data Preparation
 

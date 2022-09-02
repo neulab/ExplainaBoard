@@ -8,7 +8,7 @@ from datalabs import aggregating
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
-from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledBlock
+from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledArgumentPair
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import accumulate_vocab_from_samples
 from explainaboard.info import SysOutputInfo
@@ -17,7 +17,7 @@ from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.logging import progress
-from explainaboard.utils.span_utils import Block, BlockOps
+from explainaboard.utils.span_utils import ArgumentPair, ArgumentPairOps
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -29,7 +29,7 @@ class ArgumentPairExtractionProcessor(Processor):
 
     def __init__(self):
         super().__init__()
-        self._block_ops: BlockOps = BlockOps()
+        self._argument_pair_ops: ArgumentPairOps = ArgumentPairOps()
 
     _DEFAULT_TAG = 'O'
 
@@ -170,20 +170,20 @@ class ArgumentPairExtractionProcessor(Processor):
             raise ValueError(f'{analysis_level.name}-level analysis not supported')
         # Do block-level analysis. `AnalysisCaseLabeledBlock` typing is necessary
         # otherwise an error will happen later when using `x.true_label`
-        cases: list[AnalysisCaseLabeledBlock] = []
+        cases: list[AnalysisCaseLabeledArgumentPair] = []
         # Calculate features
         for i, output in progress(
             enumerate(sys_output), desc='calculating span-level features'
         ):
             # get the spans from each sentence
             sentences = output["sentences"]
-            true_spans, pred_spans = self._block_ops.get_blocks(
+            true_spans, pred_spans = self._argument_pair_ops.get_argument_pairs(
                 output['true_tags'], output['pred_tags'], sentences
             )
-            true_spans = cast(List[Block], true_spans)
-            pred_spans = cast(List[Block], pred_spans)
+            true_spans = cast(List[ArgumentPair], true_spans)
+            pred_spans = cast(List[ArgumentPair], pred_spans)
             # merge the spans together
-            merged_spans: dict[tuple[int, int, int, int], Block] = {}
+            merged_spans: dict[tuple[int, int, int, int], ArgumentPair] = {}
             for span in true_spans:
                 span.block_tag = f'{span.block_tag} {self._DEFAULT_TAG}'
                 merged_spans[unwrap(span.block_pos)] = span
@@ -198,7 +198,7 @@ class ArgumentPairExtractionProcessor(Processor):
             # analysis cases
             for ms in merged_spans.values():
                 true_tag, pred_tag = unwrap(ms.block_tag).split(' ')
-                case = AnalysisCaseLabeledBlock(
+                case = AnalysisCaseLabeledArgumentPair(
                     sample_id=i,
                     features={},
                     text=unwrap(ms.block_text),
