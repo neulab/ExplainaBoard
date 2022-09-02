@@ -15,7 +15,7 @@ from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.serialization import general_to_dict
-from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.tokenizer import get_tokenizer_serializer, Tokenizer
 
 logger = get_logger(__name__)
 
@@ -208,7 +208,7 @@ class SysOutputInfo:
         if k == 'results':
             return Result.from_dict(v)
         elif k.endswith('tokenizer'):
-            return Tokenizer.from_dict(v)
+            return get_tokenizer_serializer().deserialize(v)
         elif k == 'analysis_levels':
             return [AnalysisLevel.from_dict(v1) for v1 in v]
         elif k == 'analyses':
