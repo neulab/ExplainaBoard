@@ -88,6 +88,7 @@ class AnalysisCaseLabeledArgumentPair(AnalysisCase):
     types of information. This is specifically designed for argument pair extraction
     task
     """
+
     text: str
     orig_str: str
 
