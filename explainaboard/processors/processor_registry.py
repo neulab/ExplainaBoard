@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from explainaboard import TaskType
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 
 _processor_registry: dict = {}
@@ -27,8 +26,3 @@ def register_processor(task_type: TaskType):
         return cls
 
     return register_processor_fn
-
-
-def get_metric_list_for_processor(task: TaskType) -> list[MetricConfig]:
-    processor_class = _processor_registry[task]
-    return processor_class.full_metric_list()
