@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 import string
-from typing import Union
+from typing import Any
 
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -57,7 +57,7 @@ def scale_to_num(scale: str) -> float:
     return num
 
 
-def extract_one_num_from_str(s) -> int | None | float:
+def extract_one_num_from_str(s: str) -> int | None | float:
     s = _clean_num(s)
     r_num = r"([+-]?\d+(\.\d+)?)|([+-]?\.\d+)"
     groups = re.findall(r_num, s)
@@ -152,7 +152,7 @@ def normalize_answer(text: str) -> str:
 STRIPPED_CHARACTERS = string.punctuation + ''.join([u"‘", u"’", u"´", u"`", "_"])
 
 
-def ws_tokenize(text) -> list[str]:
+def ws_tokenize(text: str) -> list[str]:
     """Runs basic whitespace cleaning and splitting on a piece of text."""
     text = text.strip().lower()
     if not text:
@@ -164,7 +164,7 @@ def ws_tokenize(text) -> list[str]:
 
 
 def _answer_to_bags(
-    answer: Union[str, list[str], tuple[str, ...]]
+    answer: str | list[str] | tuple[str, ...]
 ) -> tuple[list[str], list[set[str]]]:
     if isinstance(answer, (list, tuple)):
         raw_spans = answer
@@ -230,7 +230,7 @@ def _match_numbers_if_present(gold_bag: set[str], predicted_bag: set[str]) -> bo
     return False
 
 
-def extract_gold_answers(qa_annotation: dict) -> tuple[str, list, str]:
+def extract_gold_answers(qa_annotation: dict[str, Any]) -> tuple[str, list, str]:
     '''
     span
     multi-span
@@ -256,18 +256,7 @@ def extract_gold_answers(qa_annotation: dict) -> tuple[str, list, str]:
     return answer_type, gold_answers, scale
 
 
-def metric_max_over_ground_truths(metric_fn, predictions, ground_truths):
-    scores_for_ground_truths = []
-    for pred in predictions:
-        for ground_truth in ground_truths:
-            score = metric_fn(pred, ground_truth)
-            scores_for_ground_truths.append(score)
-    if len(scores_for_ground_truths) == 0:
-        return 0, 0
-    return max(scores_for_ground_truths)
-
-
-def get_answer_str(answers: list, scale: str) -> list[str]:
+def get_answer_str(answers: list[str], scale: str) -> list[str]:
     """
     :param ans_type:  span, multi-span, arithmetic, count
     :param ans_list:
@@ -297,7 +286,9 @@ def get_answer_str(answers: list, scale: str) -> list[str]:
     return [" ".join(ans_temp)]
 
 
-def add_percent_pred(prediction_strings: list, pred_scale: str, pred: list) -> list:
+def add_percent_pred(
+    prediction_strings: list[str], pred_scale: str, pred: list[str]
+) -> list[str]:
     """
     to solve [pred = 0.2342] <>   [ans = 23.42 and scale == 'percent']
 
