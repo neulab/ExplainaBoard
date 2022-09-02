@@ -24,11 +24,6 @@ class Loader:
     """Base class of Loaders
     - system output is split into two parts: the dataset (features and true labels) and
     the output (predicted labels)
-    :param data: if str, base64 encoded system output or a path.
-    :param source: source of data
-    :param file_type: tsv, json, conll, etc.
-    :param file_loader: a dict of file loaders. To customize the loading process,
-    either implement a custom FileLoader or override `load()`
     """
 
     @classmethod
@@ -94,6 +89,23 @@ class Loader:
         output_file_loader: FileLoader | None = None,
         field_mapping: dict[str, str] | None = None,
     ):
+        """
+        Class initializer for the loader
+        :param dataset_data: a string pointing to a dataset file, or a specification of
+          the location of the data within DataLab
+        :param output_data: a string pointing to a system output file, or `None`, if
+          no output file will be read in
+        :param dataset_source: source of the dataset (e.g. local disk or network)
+        :param output_source: source of the system output
+        :param dataset_file_type: dataset file type (e.g. tsv, json, conll, etc.)
+        :param output_file_type: system output file type
+        :param dataset_file_loader: a FileLoader to customize the dataset loading
+          process
+        :param output_file_loader: FileLoader for output files
+        :param field_mapping: A mapping from fields in the original data to fields in
+          the output data
+        """
+
         # determine sources
         self._dataset_source: Source = dataset_source or self.default_source()
         self._output_source: Source = output_source or self.default_source()
@@ -133,6 +145,12 @@ class Loader:
         self._output_data = output_data
 
     def load(self) -> FileLoaderReturn:
+        """
+        Load data from the dataset and output.
+        If `output_data` is `None`, then data will only be returned from the dataset.
+        :returns: A FileLoaderReturn object with samples and metadata.
+        """
+
         dataset_loaded_data = self._dataset_file_loader.load(
             self._dataset_data, self._dataset_source, field_mapping=self._field_mapping
         )
