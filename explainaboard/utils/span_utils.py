@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, cast, List, Optional
 
 
 def cap_feature(s):
@@ -21,6 +21,229 @@ def cap_feature(s):
         return "first_caps"
     else:
         return "not_first_caps"
+
+
+def gen_argument_pairs(
+    true_tags: list[str],
+    pred_tags: list[str],
+    sentences: Optional[list[str]] = None,
+) -> tuple[set[str], set[str]] | tuple[list[ArgumentPair], list[ArgumentPair]]:
+    reply_dict: dict[int, str] = {}
+    reply_pred_dict: dict[int, str] = {}
+    gold_spans = []
+    pred_spans = []
+    gold_spans_set = set()
+    pred_spans_set = set()
+
+    def _get_label(token):
+        return (
+            token.split("-")[1] + "-" + token.split("-")[2]
+            if len(token.split("-")) == 3
+            else token.split("-")[1]
+        )
+
+    def _get_tokens(sentences, start, end):
+        return sum([len(sentences[i].split(" ")) for i in range(start, end)])
+
+    for token_idx, token in enumerate(true_tags):
+
+        gold_label = _get_label(token)
+        prefix = token.split("-")[0]
+
+        next_label = (
+            _get_label(true_tags[token_idx + 1])
+            if token_idx + 1 < len(true_tags)
+            else 'O'
+        )
+
+        pred_label = pred_tags[token_idx]
+        next_pred_label = (
+            pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
+        )
+
+        if prefix == 'Reply':
+            if gold_label.startswith("B-"):
+                start = token_idx
+            if (gold_label.startswith("B-") or gold_label.startswith("I-")) and (
+                next_label.startswith("O") or next_label.startswith('B')
+            ):
+                end = token_idx
+                pair_idx = int(gold_label[2:])
+                if pair_idx not in reply_dict.keys():
+                    reply_dict[pair_idx] = str(start) + '|' + str(end)
+                else:
+                    reply_dict[pair_idx] += '||' + str(start) + '|' + str(end)
+
+            if pred_label.startswith("B-"):
+                start_pred = token_idx
+            if (pred_label.startswith("B-") or pred_label.startswith("I-")) and (
+                next_pred_label.startswith("O") or next_pred_label.startswith('B')
+            ):
+                end_pred = token_idx
+                pair_idx = int(pred_label[2:])
+                if pair_idx not in reply_pred_dict.keys():
+                    reply_pred_dict[pair_idx] = str(start_pred) + '|' + str(end_pred)
+                else:
+                    reply_pred_dict[pair_idx] += (
+                        '||' + str(start_pred) + '|' + str(end_pred)
+                    )
+
+    for token_idx, token in enumerate(true_tags):
+
+        gold_label = _get_label(token)
+        prefix = token.split("-")[0]
+        next_label = (
+            _get_label(true_tags[token_idx + 1])
+            if token_idx + 1 < len(true_tags)
+            else 'O'
+        )
+
+        pred_label = pred_tags[token_idx]
+        next_pred_label = (
+            pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
+        )
+
+        if prefix == 'Review':
+            if gold_label.startswith("B-"):
+                start = token_idx
+            if (gold_label.startswith("B-") or gold_label.startswith("I-")) and (
+                next_label.startswith("O") or next_label.startswith('B')
+            ):
+                end = token_idx
+                pair_idx = int(gold_label[2:])
+                if pair_idx in reply_dict:
+                    replies = reply_dict[pair_idx]
+                    for reply in replies.split("||"):
+                        reply_start_str, reply_end_str = reply.split("|")
+                        reply_start = int(reply_start_str)
+                        reply_end = int(reply_end_str)
+
+                        if sentences is not None:
+                            block_pos = (start, end, reply_start, reply_end)
+                            block_text = (
+                                "|".join(sentences[start:end])
+                                + "||"
+                                + "|".join(sentences[reply_start:reply_end])
+                            )
+                            block = ArgumentPair(
+                                block_text=block_text,
+                                block_tag="1",
+                                block_pos=block_pos,
+                                block_review_sentences=end - start + 1,
+                                block_review_tokens=_get_tokens(sentences, start, end),
+                                block_review_position=start * 1.0 / len(sentences),
+                                block_reply_sentences=reply_end - reply_start + 1,
+                                block_reply_tokens=_get_tokens(
+                                    sentences, reply_start, reply_end
+                                ),
+                                block_reply_position=reply_start * 1.0 / len(sentences),
+                            )
+                            gold_spans.append(block)
+                        gold_spans_set.add(
+                            f"{start}-{end}-{reply_start}" f"-{reply_end}"
+                        )
+
+            if pred_label.startswith("B-"):
+                start_pred = token_idx
+            if (pred_label.startswith("B-") or pred_label.startswith("I-")) and (
+                next_pred_label.startswith("O") or next_pred_label.startswith('B')
+            ):
+                end_pred = token_idx
+                pair_idx = int(pred_label[2:])
+                if pair_idx in reply_pred_dict:
+                    replies_pred = reply_pred_dict[pair_idx]
+                    for reply_pred in replies_pred.split("||"):
+                        reply_start_pred_str, reply_end_pred_str = reply_pred.split("|")
+                        reply_start_pred = int(reply_start_pred_str)
+                        reply_end_pred = int(reply_end_pred_str)
+                        if sentences is not None:
+                            block_pos = (
+                                start_pred,
+                                end_pred,
+                                reply_start_pred,
+                                reply_end_pred,
+                            )
+                            block_text = (
+                                "|".join(sentences[start_pred:end_pred])
+                                + "||"
+                                + "|".join(sentences[reply_start_pred:reply_end_pred])
+                            )
+
+                            block = ArgumentPair(
+                                block_text=block_text,
+                                block_tag="1",
+                                block_pos=block_pos,
+                                block_review_sentences=end_pred - start_pred + 1,
+                                block_review_tokens=_get_tokens(
+                                    sentences, start_pred, end_pred
+                                ),
+                                block_review_position=start_pred * 1.0 / len(sentences),
+                                block_reply_sentences=reply_end_pred
+                                - reply_start_pred
+                                + 1,
+                                block_reply_tokens=_get_tokens(
+                                    sentences, reply_start_pred, reply_end_pred
+                                ),
+                                block_reply_position=reply_start_pred
+                                * 1.0
+                                / len(sentences),
+                            )
+
+                            pred_spans.append(block)
+                        pred_spans_set.add(
+                            f"{start_pred}-{end_pred}-{reply_start_pred}"
+                            f"-{reply_end_pred}"
+                        )
+
+    if sentences is not None:
+        return gold_spans, pred_spans
+    else:
+        return gold_spans_set, pred_spans_set
+
+
+@dataclass
+class ArgumentPair:
+    # surface string a block of text
+    block_text: Optional[str] = None
+    # the tag of a block
+    block_tag: Optional[str] = None
+    # the position of a block
+    block_pos: Optional[tuple[int, int, int, int]] = None
+    # the number of review sentence
+    block_review_sentences: Optional[float] = None
+    # the number of review tokens
+    block_review_tokens: Optional[float] = None
+    # the relative position of review block
+    block_review_position: Optional[float] = None
+    # the number of reply sentence
+    block_reply_sentences: Optional[float] = None
+    # the number of reply tokens
+    block_reply_tokens: Optional[float] = None
+    # the relative position of reply block
+    block_reply_position: Optional[float] = None
+    # the id of samples where a span is located
+    sample_id: Optional[int] = None
+
+
+class ArgumentPairOps:
+    def __init__(
+        self, resources: dict[str, Any] | None = None, match_type: Optional[str] = None
+    ) -> None:
+        self.resources = resources or {}
+        self.match_type: Optional[str] = None
+        self.match_func = None
+
+    def get_argument_pairs(
+        self,
+        true_tags: list[str],
+        pred_tags: list[str],
+        sentences: list[str],
+    ) -> tuple[list[ArgumentPair], list[ArgumentPair]]:
+
+        gold_spans, pred_spans = gen_argument_pairs(true_tags, pred_tags, sentences)
+        gold_spans_list = cast(List[ArgumentPair], gold_spans)
+        pred_spans_list = cast(List[ArgumentPair], pred_spans)
+        return gold_spans_list, pred_spans_list
 
 
 @dataclass

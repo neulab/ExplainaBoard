@@ -501,6 +501,7 @@ class Processor(metaclass=abc.ABCMeta):
             metric_stats=overall_statistics.metric_stats,
             skip_failed_analyses=skip_failed_analyses,
         )
+
         self.sort_bucket_info(
             analyses,
             sort_by=metadata.get('sort_by', 'key'),
