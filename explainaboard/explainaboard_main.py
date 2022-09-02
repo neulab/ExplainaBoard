@@ -299,6 +299,12 @@ def create_parser():
         type=str,
         help="file types for custom datasets",
     )
+
+    parser.add_argument(
+        '--skip-failed-analyses',
+        action='store_true',
+        help="whether to skip failed analyses or report errors.",
+    )
     return parser
 
 
@@ -475,7 +481,9 @@ def main():
 
             processor = get_processor(task=task)
             report = processor.process(
-                metadata=metadata, sys_output=system_dataset.samples
+                metadata=metadata,
+                sys_output=system_dataset.samples,
+                skip_failed_analyses=args.skip_failed_analyses,
             )
             reports.append(report)
 
