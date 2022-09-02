@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 
@@ -456,8 +457,8 @@ def main():
             "conf_value": args.conf_value,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
+            "custom_analyses": system_datasets[0].metadata.custom_analyses,
         }
-
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
@@ -477,11 +478,12 @@ def main():
             # metadata[
             #     "user_defined_features_configs"
             # ] = loader.user_defined_features_configs
-            metadata["task_name"] = task
+            metadata_copied = copy.deepcopy(metadata)
+            metadata_copied["task_name"] = task
 
             processor = get_processor(task=task)
             report = processor.process(
-                metadata=metadata,
+                metadata=metadata_copied,
                 sys_output=system_dataset.samples,
                 skip_failed_analyses=args.skip_failed_analyses,
             )

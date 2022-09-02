@@ -32,13 +32,18 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Chunking](#chunking)
 * [Extractive QA](#extractive-qa)
 * [Multiple Choice QA](#multiple-choice-qa)
+* [Hybrid Table Text QA](#hybrid-table-text-qa)
 * [Aspect-based Sentiment Classification](#aspect-based-sentiment-classification)
 * [KG Link Tail Prediction](#kg-link-tail-prediction)
-* [Multiple-choice Cloze](#Multiple-choice Cloze)
+* [Multiple choice Cloze](#multiple-choice-cloze)
 * [Generative Cloze](#generative-cloze)
 * [Grammatical Error Correction](#grammatical-error-correction)
 * [Tabular Classification](#tabular-classification)
 * [Tabular Regression](#tabular-regression)
+* [Argument Pair Extraction](argument-pair-extraction)
+
+
+
 
 ## [Text Classification](task_text_classification.md)
 
@@ -187,6 +192,25 @@ explainaboard --task qa-extractive --dataset squad --system-outputs MY_FILE > re
 ```
 
 
+## [Hybrid Table Text QA](task_qa_table_text_hybrid.md)
+This task aims to answer a question based on a hybrid of tabular
+and textual context, e.g., [Zhu et al.2021](https://aclanthology.org/2021.acl-long.254.pdf).
+
+
+**CLI Example**
+
+
+The below example loads the `tat_qa` dataset from DataLab. 
+```shell
+explainaboard --task qa-tat --output-file-type json --dataset tat_qa --system-outputs predictions_list.json > report.json
+```
+where you can download the file `predictions_list.json` by:
+
+```shell
+wget -P ./ https://explainaboard.s3.amazonaws.com/system_outputs/qa_table_text_hybrid/predictions_list.json
+```
+
+
 ## [Open Domain QA](task_qa_open_domain.md)
 Open-domain QA aims to answer a question in the form of natural language based on large-scale 
 unstructured documents
@@ -198,7 +222,7 @@ ExplainaBoard CLI.
 
 Using Build-in datasets from DataLab:
 ```shell
-explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system-outputs ./data/system_outputs/test.dpr.nq.txt  > report.json
+explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --system-outputs ./data/system_outputs/qa_open_domain/test.dpr.nq.txt  > report.json
 ```
 
 
@@ -303,4 +327,15 @@ the predicted outputs are continuous numbers instead of classes.
 The below example loads a dataset from an existing file:
 ```shell
 explainaboard --task tabular-regression --custom-dataset-paths ./data/system_outputs/sst2_tabreg/sst2-tabclass-dataset.json --system-outputs ./data/system_outputs/sst2_tabreg/sst2-tabreg-lstm-output.txt
+```
+
+
+## [Argument Pair Extraction](argument_pair_extraction.md)
+This task aim to detect the argument pairs from each passage pair of review and rebuttal.
+
+**CLI Examples**
+
+The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab: 
+```shell
+explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
 ```

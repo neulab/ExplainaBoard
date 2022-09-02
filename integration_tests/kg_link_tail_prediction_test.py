@@ -5,6 +5,7 @@ import unittest
 from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor, TaskType
+from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.metrics.ranking import (
@@ -12,6 +13,7 @@ from explainaboard.metrics.ranking import (
     MeanRankConfig,
     MeanReciprocalRankConfig,
 )
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class KgLinkTailPredictionTest(unittest.TestCase):
@@ -117,7 +119,9 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
-        symmetry_performances = analysis_map['symmetry'].bucket_performances
+        symmetry_performances = narrow(
+            BucketAnalysisResult, analysis_map['symmetry']
+        ).bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
@@ -152,10 +156,12 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
-        symmetry_performances = analysis_map['symmetry'].bucket_performances
+        symmetry_performances = narrow(
+            BucketAnalysisResult, analysis_map['symmetry']
+        ).bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
-            first_item = symmetry_performances[i].bucket_interval
-            second_item = symmetry_performances[i + 1].bucket_interval
+            first_item = unwrap(symmetry_performances[i].bucket_name)
+            second_item = unwrap(symmetry_performances[i + 1].bucket_name)
             self.assertGreater(second_item, first_item)

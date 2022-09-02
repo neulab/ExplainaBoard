@@ -1,5 +1,6 @@
 # when a new processor is implemented, remember to import it here so it gets registered
 from explainaboard.processors import (
+    argument_pair_extraction,
     aspect_based_sentiment_classification,
     chunking,
     cloze_generative,
@@ -14,6 +15,7 @@ from explainaboard.processors import (
     nlg_meta_evaluation,
     qa_multiple_choice,
     qa_open_domain,
+    qa_tat,
     summarization,
     tabular_classification,
     tabular_regression,
@@ -45,4 +47,6 @@ __all__ = [
     'grammatical_error_correction',
     'qa_open_domain',
     'nlg_meta_evaluation',
+    'qa_tat',
+    'argument_pair_extraction',
 ]

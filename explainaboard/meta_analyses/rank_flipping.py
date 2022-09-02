@@ -122,8 +122,8 @@ class RankFlippingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis cl
         paired_score_examples = []
         for m1_bucket, m2_bucket in zip(model1_buckets, model2_buckets):
 
-            # bucket info (feature name, bucket interval, bucket size) should match
-            # exactly
+            # bucket info (feature name, bucket interval, bucket name, bucket size)
+            # should match exactly
             if m1_bucket['feature_name'] != m2_bucket['feature_name']:
                 raise ValueError(
                     f'feature name does not match:\n{m1_bucket} vs {m2_bucket}'
@@ -131,6 +131,10 @@ class RankFlippingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis cl
             if m1_bucket['bucket_interval'] != m2_bucket['bucket_interval']:
                 raise ValueError(
                     f'bucket interval does not match:\n{m1_bucket} vs {m2_bucket}'
+                )
+            if m1_bucket['bucket_name'] != m2_bucket['bucket_name']:
+                raise ValueError(
+                    f'bucket name does not match:\n{m1_bucket} vs {m2_bucket}'
                 )
             if m1_bucket['bucket_size'] != m2_bucket['bucket_size']:
                 raise ValueError(
@@ -141,6 +145,7 @@ class RankFlippingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis cl
             example = {
                 'feature_name': m1_bucket['feature_name'],
                 'bucket_interval': m1_bucket['bucket_interval'],
+                'bucket_name': m1_bucket['bucket_name'],
                 'bucket_size': m1_bucket['bucket_size'],
             }
             for feature in metadata['custom_features'].keys():

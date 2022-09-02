@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -81,13 +82,45 @@ class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
 
 
 @dataclass
-class AnalysisCaseCollection:
-    # This tuple is either tuple[float,float] (for continuous values) or tuple[str] for
-    # discrete values
-    # TODO(gneubig): add actual type annotation to this effect. at the moment it's a
-    #    bit complicated due to the implementation of the bucketing functions
-    interval: tuple
-    samples: list[int]
+class AnalysisCaseLabeledArgumentPair(AnalysisCase):
+    """
+    A bucket case that annotates a text block (pair of arguments) with different
+    types of information. This is specifically designed for argument pair extraction
+    task
+    """
 
-    def __len__(self):
+    text: str
+    orig_str: str
+
+    true_label: str
+    predicted_label: str
+    # the number of review sentence
+    block_review_sentences: Optional[float] = None
+    # the number of review tokens
+    block_review_tokens: Optional[float] = None
+    # the relative position of review block
+    block_review_position: Optional[float] = None
+    # the number of reply sentence
+    block_reply_sentences: Optional[float] = None
+    # the number of reply tokens
+    block_reply_tokens: Optional[float] = None
+    # the relative position of reply block
+    block_reply_position: Optional[float] = None
+
+
+@dataclass
+class AnalysisCaseCollection:
+    samples: list[int]
+    interval: tuple[float, float] | None = None
+    name: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.interval is None and self.name is None:
+            raise ValueError("Either interval or name must have a value.")
+        if self.interval is not None and self.name is not None:
+            raise ValueError(
+                "Both interval and name must not have values at the same time."
+            )
+
+    def __len__(self) -> int:
         return len(self.samples)
