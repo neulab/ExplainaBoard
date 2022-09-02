@@ -112,6 +112,15 @@ def plot_combo_counts(
         plt.savefig(out_file, format='png', bbox_inches='tight')
 
 
+def render_interval_to_tick_label(interval: tuple[float, float]) -> str:
+    """
+    Render a bucket interval (tuple of floats) to a tick label to display on the chart
+    :param interval: the input value range
+    :returns: a string-rendered tick label
+    """
+    return f'[{interval[0]:.2f},{interval[0]:.2f}]'
+
+
 def plot_buckets(
     bucket_results: list[BucketAnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
@@ -124,7 +133,8 @@ def plot_buckets(
     feature_name = bucket_results[0].name
 
     bucket0_ticklabels = [
-        unwrap(x.bucket_name) for x in bucket_results[0].bucket_performances
+        x.bucket_name or render_interval_to_tick_label(unwrap(x.bucket_interval))
+        for x in bucket_results[0].bucket_performances
     ]
     bucket0_names = [
         x.metric_name for x in bucket_results[0].bucket_performances[0].performances
