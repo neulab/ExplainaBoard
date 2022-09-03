@@ -170,7 +170,7 @@ class SeqLabProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["pred_tags"]
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
 
         tokens_sequences = []
         tags_sequences = []

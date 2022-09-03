@@ -211,7 +211,7 @@ class LanguageModelingProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return [float(x) for x in data_point["log_probs"].split(' ')]
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

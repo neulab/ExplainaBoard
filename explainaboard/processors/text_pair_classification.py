@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -132,7 +133,7 @@ class TextPairClassificationProcessor(Processor):
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
 
         samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(

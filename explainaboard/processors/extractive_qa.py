@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -106,7 +107,7 @@ class QAExtractiveProcessor(Processor):
             ),
         ]
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )

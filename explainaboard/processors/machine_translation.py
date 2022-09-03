@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 import copy
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -33,7 +34,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
 
         return f
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         if sys_info.source_language is None or sys_info.target_language is None:
             raise ValueError(
                 'source or target languages must be specified to load '

@@ -421,7 +421,7 @@ class ConditionalGenerationProcessor(Processor):
 
         return tok_dics
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)

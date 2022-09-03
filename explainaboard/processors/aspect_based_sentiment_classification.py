@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -101,7 +102,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         analyses.extend(self.continuous_feature_analyses())
         return analyses
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         return {}
 
     @classmethod

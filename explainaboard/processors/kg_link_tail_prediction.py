@@ -150,7 +150,7 @@ class KGLinkTailPredictionProcessor(Processor):
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs

@@ -143,7 +143,7 @@ class ArgumentPairExtractionProcessor(Processor):
         """
         return data_point["pred_tags"]
 
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab, vocab_rank = accumulate_vocab_from_samples(
             samples,
             lambda x: " ".join(x['sentences']),

@@ -113,7 +113,7 @@ class Processor(metaclass=abc.ABCMeta):
         return {"cls": self, "sys_info": sys_info}  #
 
     @abc.abstractmethod
-    def _statistics_func(self, samples: Iterable, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         ...
 
     def _gen_external_stats(self, sys_info: SysOutputInfo):

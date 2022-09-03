@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterable
+from typing import Any
 
 from lexicalrichness import LexicalRichness
 import sacrebleu
@@ -74,7 +75,7 @@ def get_lexical_richness(sentence: str):
 
 
 def accumulate_vocab_from_samples(
-    samples: Iterable, text_from_sample: Callable[..., str], tokenizer: Tokenizer
+    samples: Iterable[Any], text_from_sample: Callable[..., str], tokenizer: Tokenizer
 ):
     vocab: dict[str, int] = {}
     for sample in progress(samples):
