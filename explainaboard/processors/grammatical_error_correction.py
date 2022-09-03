@@ -22,25 +22,23 @@ class GrammaticalErrorCorrection(Processor):
         return TaskType.grammatical_error_correction
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
-        features: dict[str, FeatureType] = feature.Features(
-            {
-                "text": feature.Value("string"),
-                "edits": feature.Dict(
-                    feature={
-                        "start_idx": feature.Sequence(feature=feature.Value("int32")),
-                        "end_idx": feature.Sequence(feature=feature.Value("int32")),
-                        "corrections": feature.Sequence(
-                            feature=feature.Sequence(feature=feature.Value("string"))
-                        ),
-                    }
-                ),
-                "text_length": feature.Value(
-                    dtype="float",
-                    description="length of the text",
-                    func=lambda info, x, c: count_tokens(info, x['text']),
-                ),
-            }
-        )
+        features: dict[str, FeatureType] = {
+            "text": feature.Value("string"),
+            "edits": feature.Dict(
+                feature={
+                    "start_idx": feature.Sequence(feature=feature.Value("int32")),
+                    "end_idx": feature.Sequence(feature=feature.Value("int32")),
+                    "corrections": feature.Sequence(
+                        feature=feature.Sequence(feature=feature.Value("string"))
+                    ),
+                }
+            ),
+            "text_length": feature.Value(
+                dtype="float",
+                description="length of the text",
+                func=lambda info, x, c: count_tokens(info, x['text']),
+            ),
+        }
 
         return [
             AnalysisLevel(
