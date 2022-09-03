@@ -31,7 +31,7 @@ from explainaboard.utils.typing_utils import unwrap
 class TextPairClassificationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.text_classification
+        return TaskType.text_pair_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {

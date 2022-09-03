@@ -69,11 +69,11 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples_list, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples_list, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
         )
         return {
             'source_vocab': source_vocab,

@@ -50,7 +50,6 @@ class MachineTranslationTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.machine_translation.value,
-            "dataset_name": "ted_multi",
             "metric_names": ["bleu"],
         }
 

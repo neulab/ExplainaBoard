@@ -137,20 +137,22 @@ class Processor(metaclass=abc.ABCMeta):
                     sys_info.dataset_name, sub_dataset
                 )
             if statistics is None:
-                loader = get_loader_class(self.task_type()).from_datalab(
-                    DatalabLoaderOption(
-                        sys_info.dataset_name, sub_dataset, split=split_name
-                    ),
-                    output_data=None,
-                )
-                dataset = loader.load()
-                if dataset is None:
-                    get_logger().warning(
-                        f"{sys_info.dataset_name} hasn't been supported by DataLab so"
-                        " no training set dependent features will be supported by"
-                        " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                dataset = None
+                try:
+                    loader = get_loader_class(self.task_type()).from_datalab(
+                        DatalabLoaderOption(
+                            sys_info.dataset_name, sub_dataset, split=split_name
+                        ),
+                        output_data=None,
                     )
-                else:
+                    dataset = loader.load()
+                except ValueError as e:
+                    get_logger().warning(
+                        f"{sys_info.dataset_name} could not be loaded by DataLab so"
+                        " no training set dependent features will be supported by"
+                        f" ExplainaBoard. Error: {e}"
+                    )
+                if dataset is not None:
                     statistics = self._statistics_func(dataset.samples, sys_info)
                     get_logger().info(
                         f"caching stats for {sys_info.dataset_name} {sub_dataset}"

@@ -52,7 +52,6 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237-subset",
             "metric_configs": [
                 HitsConfig(name='Hits4', hits_k=4),  # you can modify k here
                 MeanReciprocalRankConfig(name='MRR'),
@@ -102,7 +101,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237",
+            "dataset_name": "fb15k_237",
             "metric_configs": [
                 HitsConfig(name='Hits4', hits_k=4),
                 MeanReciprocalRankConfig(name='MRR'),
@@ -139,7 +138,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "dataset_name": "fb15k-237",
+            "dataset_name": "fb15k_237",
             "metric_configs": [
                 HitsConfig(name='Hits4', hits_k=4),
                 MeanReciprocalRankConfig(name='MRR'),

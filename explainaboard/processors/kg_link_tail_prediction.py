@@ -55,7 +55,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 dtype="float",
                 description="average frequency of the tail entity",
                 require_training_set=True,
-                func=lambda info, x, stat: stat['tail_fre'].get(
+                func=lambda info, x, c, stat: stat['tail_fre'].get(
                     x['true_tail_decipher'], 0
                 ),
             ),
@@ -63,13 +63,13 @@ class KGLinkTailPredictionProcessor(Processor):
                 dtype="float",
                 description="frequency of relation in training set",
                 require_training_set=True,
-                func=lambda info, x, stat: stat['link_fre'].get(x['true_link'], 0),
+                func=lambda info, x, c, stat: stat['link_fre'].get(x['true_link'], 0),
             ),
             "head_fre": feature.Value(
                 dtype="float",
                 description="frequency of head entity in training set",
                 require_training_set=True,
-                func=lambda info, x, stat: stat['head_fre'].get(
+                func=lambda info, x, c, stat: stat['head_fre'].get(
                     x['true_head_decipher'], 0
                 ),
             ),
@@ -161,44 +161,16 @@ class KGLinkTailPredictionProcessor(Processor):
         dict_link: dict[str, int] = {}
         dict_tail: dict[str, int] = {}
 
-        file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
-            'pre_computed/kg/entity2wikidata.json',
-        )
-        with open(file_path, 'r') as file:
-            entity_dic = json.loads(file.read())
-
         for sample in progress(samples):
 
-            tail = (
-                sample['tail']
-                if sample['tail'] not in entity_dic.keys()
-                else entity_dic[sample['tail']]['label']
-            )
-            if tail not in dict_tail.keys():
-                dict_tail[tail] = 1
-            else:
-                dict_tail[tail] += 1
+            tail = sample['true_tail_decipher']
+            dict_tail[tail] = dict_tail.get(tail, 0) + 1
 
-            head = (
-                sample['head']
-                if sample['head'] not in entity_dic.keys()
-                else entity_dic[sample['head']]['label']
-            )
-            if head not in dict_head.keys():
-                dict_head[head] = 1
-            else:
-                dict_head[head] += 1
+            head = sample['true_head_decipher']
+            dict_head[head] = dict_head.get(head, 0) + 1
 
-            link = (
-                sample['link']
-                if sample['link'] not in entity_dic.keys()
-                else entity_dic[sample['link']]['label']
-            )
-            if link not in dict_link.keys():
-                dict_link[link] = 1
-            else:
-                dict_link[link] += 1
+            link = sample['true_link']
+            dict_link[link] = dict_link.get(link, 0) + 1
 
         return {
             "head_fre": dict_head,
