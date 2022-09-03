@@ -21,7 +21,6 @@ from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
-from explainaboard.loaders.file_loader import FileLoaderReturn
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -138,17 +137,13 @@ class Processor(metaclass=abc.ABCMeta):
                     sys_info.dataset_name, sub_dataset
                 )
             if statistics is None:
-                dataset: FileLoaderReturn | None = None
-                try:
-                    loader = get_loader_class(self.task_type()).from_datalab(
-                        DatalabLoaderOption(
-                            sys_info.dataset_name, sub_dataset, split=split_name
-                        ),
-                        output_data=None,
-                    )
-                    dataset = loader.load()
-                except Exception:
-                    pass
+                loader = get_loader_class(self.task_type()).from_datalab(
+                    DatalabLoaderOption(
+                        sys_info.dataset_name, sub_dataset, split=split_name
+                    ),
+                    output_data=None,
+                )
+                dataset = loader.load()
                 if dataset is None:
                     get_logger().warning(
                         f"{sys_info.dataset_name} hasn't been supported by DataLab so"
