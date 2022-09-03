@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
 from typing import Any, cast, List
-
-from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -145,8 +143,7 @@ class ArgumentPairExtractionProcessor(Processor):
         """
         return data_point["pred_tags"]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab, vocab_rank = accumulate_vocab_from_samples(
             samples,
             lambda x: " ".join(x['sentences']),

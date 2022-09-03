@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Iterable
 from typing import Any, final, Optional
 
-from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
 
@@ -20,6 +20,7 @@ from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
+from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -110,18 +111,15 @@ class Processor(metaclass=abc.ABCMeta):
         """
         return {"cls": self, "sys_info": sys_info}  #
 
-    @aggregating
-    def _statistics_func(self):
-        return {}
+    @abc.abstractmethod
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        ...
 
-    def _gen_external_stats(
-        self, sys_info: SysOutputInfo, statistics_func: aggregating
-    ):
+    def _gen_external_stats(self, sys_info: SysOutputInfo):
         """Generate external statistics that are gathered from a relatively costly
         source, such as the training set.
         These are gathered once and then cached for future use.
         :param sys_info: Information about the system outputs
-        :param statistics_func: The function used to get the statistics
         :return: Statistics from, usually, the training set that are used to calculate
             other features
         """
@@ -139,36 +137,23 @@ class Processor(metaclass=abc.ABCMeta):
                     sys_info.dataset_name, sub_dataset
                 )
             if statistics is None:
+                dataset = None
                 try:
-                    dataset = load_dataset(sys_info.dataset_name, sub_dataset)
-                except Exception:
-                    dataset = None
-                if dataset is None:
+                    loader = get_loader_class(self.task_type()).from_datalab(
+                        DatalabLoaderOption(
+                            sys_info.dataset_name, sub_dataset, split=split_name
+                        ),
+                        output_data=None,
+                    )
+                    dataset = loader.load()
+                except ValueError as e:
                     get_logger().warning(
-                        f"{sys_info.dataset_name} hasn't been supported by DataLab so"
+                        f"{sys_info.dataset_name} could not be loaded by DataLab so"
                         " no training set dependent features will be supported by"
-                        " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                        f" ExplainaBoard. Error: {e}"
                     )
-                elif not (
-                    isinstance(dataset, Dataset) or isinstance(dataset, DatasetDict)
-                ):
-                    raise ValueError(
-                        'Expecting type Dataset or DatasetDict, '
-                        f'but got {type(dataset)}'
-                    )
-                elif split_name not in dataset:
-                    get_logger().warning(
-                        f"{sys_info.dataset_name} has no {split_name} split in DataLab "
-                        "so training set dependent features will not be calculated"
-                    )
-                else:
-                    self._statistics_func.resources = self._get_statistics_resources(
-                        sys_info
-                    )
-                    new_train = dataset[split_name].apply(  # type: ignore
-                        self._statistics_func, mode="local"
-                    )
-                    statistics = new_train._stat
+                if dataset is not None:
+                    statistics = self._statistics_func(dataset.samples, sys_info)
                     get_logger().info(
                         f"caching stats for {sys_info.dataset_name} {sub_dataset}"
                     )
@@ -472,7 +457,7 @@ class Processor(metaclass=abc.ABCMeta):
         )
 
         # get scoring statistics
-        external_stats = self._gen_external_stats(sys_info, self._statistics_func)
+        external_stats = self._gen_external_stats(sys_info)
 
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []

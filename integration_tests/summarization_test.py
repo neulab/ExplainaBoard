@@ -46,7 +46,7 @@ class SummarizationTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.summarization.value,
-            "dataset_name": "cnndm",
+            "dataset_name": "cnn_dailymail",
             "metric_names": ["bleu"],
         }
 
