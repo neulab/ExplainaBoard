@@ -10,6 +10,7 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.registry import metric_config_registry
 
 _eaas_config = None
 _eaas_client = None
@@ -77,9 +78,8 @@ class EaaSMetricStats(MetricStats):
         raise NotImplementedError
 
 
-# NOTE(odashi): Not register this config to the registry.
-# This metric class has different usage than other metrics.
 @dataclass
+@metric_config_registry.register("EaaSMetricConfig")
 class EaaSMetricConfig(MetricConfig):
     def to_metric(self):
         return EaaSMetric(self)
