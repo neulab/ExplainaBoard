@@ -320,7 +320,7 @@ class ConditionalGenerationProcessor(Processor):
                 for i, name in enumerate(metric_names_eaas)
             ]
 
-            # For human metric
+            # For non-EaaS metrics
             for metric_config in metric_configs_noneaas:
                 metric_stats.append(
                     metric_config.to_metric().calc_stats_from_data(
