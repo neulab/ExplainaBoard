@@ -22,7 +22,6 @@ class AccuracyConfigTest(unittest.TestCase):
                 "name": "Accuracy",
                 "source_language": None,
                 "target_language": None,
-                "cls_name": "AccuracyConfig",
                 "external_stats": None,
             },
         )
@@ -45,7 +44,6 @@ class CorrectCountConfigTest(unittest.TestCase):
                 "name": "CorrectCount",
                 "source_language": None,
                 "target_language": None,
-                "cls_name": "CorrectCountConfig",
                 "external_stats": None,
             },
         )
@@ -71,7 +69,6 @@ class SeqCorrectCountConfigTest(unittest.TestCase):
                 "name": "SeqCorrectCount",
                 "source_language": None,
                 "target_language": None,
-                "cls_name": "SeqCorrectCountConfig",
                 "external_stats": None,
             },
         )

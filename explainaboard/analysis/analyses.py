@@ -11,7 +11,7 @@ from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
-from explainaboard.metrics.registry import metric_config_from_dict
+from explainaboard.metrics.registry import get_metric_config_serializer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
@@ -326,7 +326,9 @@ class AnalysisLevel:
     @staticmethod
     def from_dict(dikt: dict):
         features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
-        metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
+        metric_configs = [
+            get_metric_config_serializer(v) for v in dikt['metric_configs']
+        ]
         return AnalysisLevel(
             name=dikt['name'],
             features=features,
