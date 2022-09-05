@@ -172,15 +172,18 @@ class ConditionalGenerationProcessor(Processor):
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         eaas_defaults = cls._get_default_eaas_strs()
-        defaults: dict[str, list[MetricConfig]] = {
-            'example': [
+        metric_configs: list[Any] = []
+        for metric_name in eaas_defaults:
+            metric_configs.append(
                 EaaSMetricConfig(
-                    name=x,
+                    name=metric_name,
                     source_language=source_language,
                     target_language=target_language,
                 )
-                for x in eaas_defaults
-            ],
+            )
+
+        defaults: dict[str, list] = {
+            'example': metric_configs,
             'token': [
                 F1ScoreConfig(
                     name='F1',
@@ -195,7 +198,7 @@ class ConditionalGenerationProcessor(Processor):
     def full_metric_list(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        full_metrics_automated = [
+        full_metrics_eaas = [
             "bleu",
             "bart_score_summ",
             "bart_score_mt",
@@ -219,7 +222,7 @@ class ConditionalGenerationProcessor(Processor):
             "LikertScore_factuality",
         ]
         example_configs: list[MetricConfig] = []
-        for x in full_metrics_automated:
+        for x in full_metrics_eaas:
             example_configs.append(
                 EaaSMetricConfig(
                     name=x,
@@ -282,26 +285,48 @@ class ConditionalGenerationProcessor(Processor):
         if analysis_level.name == 'example':
             # Note that this is over-ridden to accommodate efficient calculation of
             # EaaS-style metrics
-            inputs = [
-                {
-                    'source': x['source'],
-                    'references': [x['reference']],
-                    'hypothesis': x['hypothesis'],
-                }
-                for x in sys_output
-            ]
-            metric_names = [
-                x.name for x in unwrap_generator(analysis_level.metric_configs)
-            ]
+
+            inputs = []
+            true_data = []
+            pred_data = []
+            for _id, feature_table in enumerate(sys_output):
+                inputs.append(
+                    {
+                        "source": feature_table["source"],
+                        "references": [feature_table["reference"]],
+                        "hypothesis": feature_table["hypothesis"],
+                    }
+                )
+                true_data.append(feature_table["reference"])
+                pred_data.append(feature_table["hypothesis"])
+
+            metric_names_eaas = []
+            metric_configs_noneaas = []
+            for metric_config in unwrap_generator(analysis_level.metric_configs):
+                if isinstance(metric_config, EaaSMetricConfig):
+                    metric_names_eaas.append(metric_config.name)
+                else:
+                    metric_configs_noneaas.append(metric_config)
+
             async_request = get_eaas_client().async_score(
                 inputs,
-                metrics=metric_names,
+                metrics=metric_names_eaas,
                 calculate=['corpus', 'stats'],
             )
-            metric_stats: list[MetricStats] = [
+
+            metric_stats: list[Any] = [
                 EaaSMetricStats(name=name, pos=i, eaas_request=async_request)
-                for i, name in enumerate(metric_names)
+                for i, name in enumerate(metric_names_eaas)
             ]
+
+            # For non-EaaS metrics
+            for metric_config in metric_configs_noneaas:
+                metric_stats.append(
+                    metric_config.to_metric().calc_stats_from_data(
+                        true_data, pred_data, metric_config
+                    )
+                )
+
             # Calculate features
             for i, output in progress(
                 enumerate(sys_output), desc='calculating example-level features'
