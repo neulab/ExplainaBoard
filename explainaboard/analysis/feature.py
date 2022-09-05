@@ -51,12 +51,9 @@ class FeatureType:
     description: Optional[str] = None
     # func: the function that is used to calculate the feature
     func: Optional[Callable] = None
-    # is_custom: whether this is a custom feature input from outside
-    is_custom: bool = False
     # require_training_set: whether calculating this feature
     # relies on the training samples
     require_training_set: bool = False
-    id: Optional[str] = None
 
     @classmethod
     def from_dict(cls, obj: dict) -> FeatureType:
