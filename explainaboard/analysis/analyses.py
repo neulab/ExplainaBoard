@@ -327,9 +327,7 @@ class AnalysisLevel:
     def from_dict(dikt: dict):
         features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
         serializer = get_metric_config_serializer()
-        metric_configs = [
-            serializer.deserialize(v) for v in dikt['metric_configs']
-        ]
+        metric_configs = [serializer.deserialize(v) for v in dikt['metric_configs']]
         return AnalysisLevel(
             name=dikt['name'],
             features=features,
