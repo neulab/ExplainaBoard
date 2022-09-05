@@ -29,7 +29,7 @@ from explainaboard.metrics.eaas import (
     EaaSMetricStats,
     get_eaas_client,
 )
-from explainaboard.metrics.external_eval import EXTERNAL_METRICS, ExternalEvalConfig
+from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
@@ -173,29 +173,15 @@ class ConditionalGenerationProcessor(Processor):
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
         eaas_defaults = cls._get_default_eaas_strs()
-        full_metrics_human = [
-            "LikertScore_fluency",
-            "LikertScore_coherence",
-            "LikertScore_factuality",
-        ]
-
         metric_configs: list[Any] = []
-        for metric_name in eaas_defaults + full_metrics_human:
-            if metric_name in EXTERNAL_METRICS:
-                metric_configs.append(
-                    ExternalEvalConfig(
-                        name=metric_name,
-                        aspect=metric_name.split("LikertScore_")[1],
-                    )
+        for metric_name in eaas_defaults:
+            metric_configs.append(
+                EaaSMetricConfig(
+                    name=metric_name,
+                    source_language=source_language,
+                    target_language=target_language,
                 )
-            else:
-                metric_configs.append(
-                    EaaSMetricConfig(
-                        name=metric_name,
-                        source_language=source_language,
-                        target_language=target_language,
-                    )
-                )
+            )
 
         defaults: dict[str, list] = {
             'example': metric_configs,
@@ -213,7 +199,7 @@ class ConditionalGenerationProcessor(Processor):
     def full_metric_list(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        full_metrics_automated = [
+        full_metrics_eaas = [
             "bleu",
             "bart_score_summ",
             "bart_score_mt",
@@ -237,7 +223,7 @@ class ConditionalGenerationProcessor(Processor):
             "LikertScore_factuality",
         ]
         example_configs: list[MetricConfig] = []
-        for x in full_metrics_automated:
+        for x in full_metrics_eaas:
             example_configs.append(
                 EaaSMetricConfig(
                     name=x,
@@ -315,27 +301,27 @@ class ConditionalGenerationProcessor(Processor):
                 true_data.append(feature_table["reference"])
                 pred_data.append(feature_table["hypothesis"])
 
-            metric_names_automated = []
-            metric_configs_human = []
+            metric_names_eaas = []
+            metric_configs_noneaas = []
             for metric_config in unwrap_generator(analysis_level.metric_configs):
-                if metric_config.name not in EXTERNAL_METRICS:
-                    metric_names_automated.append(metric_config.name)
+                if isinstance(metric_config, EaaSMetricConfig):
+                    metric_names_eaas.append(metric_config.name)
                 else:
-                    metric_configs_human.append(metric_config)
+                    metric_configs_noneaas.append(metric_config)
 
             async_request = get_eaas_client().async_score(
                 inputs,
-                metrics=metric_names_automated,
+                metrics=metric_names_eaas,
                 calculate=['corpus', 'stats'],
             )
 
             metric_stats: list[Any] = [
                 EaaSMetricStats(name=name, pos=i, eaas_request=async_request)
-                for i, name in enumerate(metric_names_automated)
+                for i, name in enumerate(metric_names_eaas)
             ]
 
             # For human metric
-            for metric_config in metric_configs_human:
+            for metric_config in metric_configs_noneaas:
                 metric_stats.append(
                     metric_config.to_metric().calc_stats_from_data(
                         true_data, pred_data, metric_config
