@@ -8,10 +8,11 @@ from explainaboard.metrics.metric import AuxiliaryMetricResult
 
 @dataclass
 class BucketPerformance:
-    bucket_interval: tuple
     n_samples: float
     bucket_samples: list[int] = field(default_factory=list)
     performances: list[Performance] = field(default_factory=list)
+    bucket_interval: tuple[float, float] | None = None
+    bucket_name: str | None = None
 
     @classmethod
     def dict_conv(cls, k: str, v: dict):

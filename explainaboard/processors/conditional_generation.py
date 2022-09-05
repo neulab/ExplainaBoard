@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Iterator
+from collections.abc import Iterable
 from typing import Any, cast
 
-from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
@@ -422,14 +421,14 @@ class ConditionalGenerationProcessor(Processor):
 
         return tok_dics
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
         )
         return {
             'source_vocab': source_vocab,

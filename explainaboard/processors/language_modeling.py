@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any
 
-from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
@@ -211,8 +211,7 @@ class LanguageModelingProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return [float(x) for x in data_point["log_probs"].split(' ')]
 
-    @aggregating()
-    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

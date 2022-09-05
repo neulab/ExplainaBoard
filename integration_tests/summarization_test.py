@@ -46,13 +46,13 @@ class SummarizationTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.summarization.value,
-            "dataset_name": "cnndm",
+            "dataset_name": "cnn_dailymail",
             "metric_names": ["bleu"],
         }
 
         processor = get_processor(TaskType.summarization.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

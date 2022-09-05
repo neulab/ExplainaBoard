@@ -32,6 +32,7 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
 
                 example_features['feature_name'] = feature_buckets.name
                 example_features['bucket_interval'] = bucket.bucket_interval
+                example_features['bucket_name'] = bucket.bucket_name
                 example_features['bucket_size'] = bucket.n_samples
                 example_features[perf.metric_name] = perf.value
                 # example_features[f'{perf.metric_name}_CI'] = \

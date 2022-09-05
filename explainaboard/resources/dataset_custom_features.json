@@ -18,22 +18,33 @@
       }
     ]
   },
-  "natural_questions_comp_gen": {
+  "tat_qa": {
     "custom_features": {
       "example": {
-        "question_types": {
+        "answer_from": {
           "dtype": "string",
-          "description": "the question type"
+          "description": "where does the answer from"
+        },
+        "q_order": {
+          "dtype": "float",
+          "description": "the order of question"
         }
       }
     },
     "custom_analyses": [
       {
         "cls_name": "BucketAnalysis",
-        "feature": "question_types",
+        "feature": "answer_from",
+        "level": "example",
+        "num_buckets": 4,
+        "method": "discrete"
+      },
+      {
+        "cls_name": "BucketAnalysis",
+        "feature": "q_order",
         "level": "example",
         "num_buckets": 10,
-        "method": "discrete"
+        "method": "continuous"
       }
     ]
   },

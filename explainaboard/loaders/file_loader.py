@@ -66,12 +66,6 @@ class FileLoaderField:
         if self.strip_before_parsing is None:
             self.strip_before_parsing = self.dtype == str
 
-        # # validation
-        # if not any([isinstance(self.src_name, x) for x in [str, int, Iterable[str]]]):
-        #     raise ValueError("src_name must be str, int, or Iterable[str]")
-        # if not any([isinstance(self.target_name, x) for x in [str, int]]):
-        #     raise ValueError("src_name must be str or int")
-
         if self.dtype is None and self.strip_before_parsing:
             raise ValueError(
                 "strip_before_parsing only works with int, float and str types"
@@ -145,7 +139,7 @@ class FileLoaderMetadata:
                 for k1, v1 in data['custom_features'].items()
             }
         if 'custom_analyses' in data:
-            custom_analyses = [Analysis.from_dict(v) for v in data['custom_analyses']]
+            custom_analyses = data['custom_analyses']
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
@@ -569,9 +563,6 @@ class DatalabFileLoader(FileLoader):
                 new_features = config.custom_features.get(level_name, {})
                 new_features.update(parsed_level_feats)
                 config.custom_features[level_name] = new_features
-            config.custom_analyses = [
-                Analysis.from_dict(x) for x in ds_feats['custom_analyses']
-            ]
 
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
@@ -596,6 +587,7 @@ class DatalabFileLoader(FileLoader):
         )
         # load customized features from global config files
         if config.dataset in customized_features_from_config:
+
             if metadata.custom_features is None:
                 metadata.custom_features = {}
             metadata.custom_features.update(
