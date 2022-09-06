@@ -20,6 +20,7 @@ from explainaboard.loaders import (
     tabular_regression,
     text_classification,
     text_pair_classification,
+    text_to_sql,
 )
 
 get_loader_class = loader_registry.get_loader_class
@@ -45,4 +46,5 @@ __all__ = [
     'nlg_meta_evaluation',
     'qa_tat',
     'argument_pair_extraction',
+    'text_to_sql',
 ]
