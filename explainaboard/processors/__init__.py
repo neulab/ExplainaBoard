@@ -16,6 +16,7 @@ from explainaboard.processors import (
     qa_multiple_choice,
     qa_open_domain,
     qa_tat,
+    ranking,
     summarization,
     tabular_classification,
     tabular_regression,
@@ -49,4 +50,5 @@ __all__ = [
     'nlg_meta_evaluation',
     'qa_tat',
     'argument_pair_extraction',
+    'ranking',
 ]

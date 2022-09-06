@@ -24,6 +24,8 @@ class TaskType(str, Enum):
     tabular_regression = "tabular-regression"
     tabular_classification = "tabular-classification"
     argument_pair_extraction = "argument-pair-extraction"
+    ranking = "ranking"
+    argument_pair_identification = "argument-pair-identification"
 
     @staticmethod
     def list():

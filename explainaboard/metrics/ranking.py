@@ -16,7 +16,7 @@ from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@metric_config_registry.register("HitsConfig")
+@metric_config_registry.register("Hits")
 class HitsConfig(MetricConfig):
     hits_k: int = 5
 
@@ -53,7 +53,7 @@ class Hits(Metric):
 
 
 @dataclass
-@metric_config_registry.register("MeanReciprocalRankConfig")
+@metric_config_registry.register("MeanReciprocalRank")
 class MeanReciprocalRankConfig(MetricConfig):
     def to_metric(self):
         return MeanReciprocalRank(self)
@@ -92,7 +92,7 @@ class MeanReciprocalRank(Metric):
 
 
 @dataclass
-@metric_config_registry.register("MeanRankConfig")
+@metric_config_registry.register("MeanRank")
 class MeanRankConfig(MetricConfig):
     def to_metric(self):
         return MeanRank(self)
