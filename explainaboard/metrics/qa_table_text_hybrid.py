@@ -86,7 +86,7 @@ class QATatMetric(Metric):
 
 
 @dataclass
-@metric_config_registry.register("ExactMatchQATatConfig")
+@metric_config_registry.register("ExactMatchQATat")
 class ExactMatchQATatConfig(MetricConfig):
     def to_metric(self):
         return ExactMatchQATat(self)
@@ -116,7 +116,7 @@ class ExactMatchQATat(QATatMetric):
 
 
 @dataclass
-@metric_config_registry.register("F1ScoreQATatConfig")
+@metric_config_registry.register("F1ScoreQATat")
 class F1ScoreQATatConfig(MetricConfig):
     def to_metric(self):
         return F1ScoreQATat(self)

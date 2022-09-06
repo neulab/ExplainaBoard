@@ -9,6 +9,7 @@
 .python-version
 .vscode
 __pycache__
+app
 build
 coverage.xml
 demo.py
