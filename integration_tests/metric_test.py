@@ -11,6 +11,7 @@ from sklearn.metrics import f1_score
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_loader_class
+from explainaboard.utils import cache_api
 import explainaboard.metrics.accuracy
 import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
@@ -265,8 +266,8 @@ class MetricTest(unittest.TestCase):
         # python -m unittest integration_tests.metric_test.MetricTest.test_sql_em
         metric = explainaboard.metrics.sql_em_ex.SQLEmConfig(
             name='SQLEm',
-            db_dir="PATH_TO_DATABASE_FOLDER",
-            table_path="PATH_TO_TABLE_SCHEMA_FILE",
+            db_dir='https://expressai-xlab.s3.amazonaws.com/large_data/database',
+            table_path='https://expressai-xlab.s3.amazonaws.com/large_data/table/tables.json',
             etype='match'
         ).to_metric()
         true = [
@@ -286,8 +287,8 @@ class MetricTest(unittest.TestCase):
         # python -m unittest integration_tests.metric_test.MetricTest.test_sql_ex
         metric = explainaboard.metrics.sql_em_ex.SQLExConfig(
             name='SQLEx',
-            db_dir="PATH_TO_DATABASE_FOLDER",
-            table_path="PATH_TO_TABLE_SCHEMA_FILE",
+            db_dir='https://expressai-xlab.s3.amazonaws.com/large_data/database',
+            table_path='https://expressai-xlab.s3.amazonaws.com/large_data/table/tables.json',
             etype='exec'
         ).to_metric()
         true = [

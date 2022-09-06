@@ -8,7 +8,7 @@ import argparse
 import signal
 from explainaboard.metrics.auxiliary.sql_evaluation.process_sql import get_schema, Schema, get_sql
 from explainaboard.metrics.auxiliary.sql_evaluation.exec_eval import eval_exec_match
-
+from explainaboard.utils import cache_api
 # Flag to disable value evaluation
 DISABLE_VALUE = True
 # Flag to disable distinct in select evaluation
@@ -505,7 +505,10 @@ def sql_evaluate(glist, plist, config):
 
     # glist
     # plist: prediction sql \t db_id
-
+    table_path = cache_api.cache_online_file(
+        table_path,
+        os.path.join("resources/spider/", "tables.json"),
+    )
     kmaps = build_foreign_key_map_from_json(table_path)
     assert len(plist) == len(glist), "number of sqls must equal"
     glist = [glist]
@@ -552,7 +555,10 @@ def sql_evaluate(glist, plist, config):
             p_str = p_str.replace("value", "1")
             g_str, db = g
             db_name = db
-            db = os.path.join(db_dir, db, db + ".sqlite")
+            db = cache_api.cache_online_file(
+                os.path.join(db_dir, db, db + ".sqlite"),
+                os.path.join("resources/spider/", db, db + ".sqlite"),
+            )
             schema = Schema(get_schema(db))
             g_sql = get_sql(schema, g_str)
             hardness = evaluator.eval_hardness(g_sql)
