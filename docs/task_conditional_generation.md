@@ -73,6 +73,9 @@ Try it out for translation as below. The examples use a custom dataset that is n
 ```shell
 explainaboard --task machine-translation --custom-dataset-paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system-outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
 ```
+Note 1: The number of `--custom-dataset-paths` need to match the number of `system-outputs`
+
+Note 2: If you want to perform **pair-wise analysis** for two system outputs on the same reference, you can pass in the paths separated by space, for example, `--system-outputs system1 system2`. Please also pass in the same paths twice for `--custom-dataset-paths`, for example, `--custom-dataset-paths path1 path1`. 
 
 ### Code Generation
 
