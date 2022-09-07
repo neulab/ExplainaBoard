@@ -8,7 +8,7 @@ from explainaboard.metrics.sql_em_ex import (
     SQLEm,
     SQLEx,
     SQLEmConfig,
-    SQLEmConfig,
+    SQLExConfig,
 )
 
 
