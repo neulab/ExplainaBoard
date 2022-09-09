@@ -18,7 +18,7 @@ class Preprocessor:
         self.language = language
         self.resources = resources or self.default_resources()
 
-    def set_language(self, language: str):
+    def set_language(self, language: str) -> Preprocessor:
         self.language = language
         return self
 
@@ -89,7 +89,7 @@ class ExtractiveQAPreprocessor(Preprocessor):
 
         language = resources['language']
 
-        def remove_articles(text, lang):
+        def remove_articles(text: str, lang: str) -> str:
             if lang in ['en', 'eng']:
                 return re.sub(r'\b(a|an|the)\b', ' ', text)
             elif lang in ['es', 'spa']:
@@ -109,7 +109,7 @@ class ExtractiveQAPreprocessor(Preprocessor):
             else:
                 return text
 
-        def white_space_fix(text, lang):
+        def white_space_fix(text: str, lang: str) -> str:
 
             if lang in self.MIXED_SEGMENTATION_LANGS:
                 tokens = self.mlqa_tokenizer(text)
@@ -117,10 +117,10 @@ class ExtractiveQAPreprocessor(Preprocessor):
                 tokens = self.ss_tokenizer(text)
             return ' '.join([t for t in tokens if t.strip() != ''])
 
-        def remove_punc(text):
+        def remove_punc(text: str) -> str:
             return ''.join(ch for ch in text if ch not in self.PUNCT)
 
-        def lower(text):
+        def lower(text: str) -> str:
             return text.lower()
 
         return white_space_fix(
