@@ -30,12 +30,12 @@ class QATatProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "question": feature.Value("string"),
-            "context": feature.Sequence(feature=feature.Value("string")),
-            "table": feature.Sequence(feature=feature.Value("string")),
-            "true_answer": feature.Sequence(feature=feature.Value("string")),
-            "predicted_answer": feature.Sequence(feature=feature.Value("string")),
-            "predicted_answer_scale": feature.Value("string"),
+            "question": feature.Value(dtype="string"),
+            "context": feature.Sequence(feature=feature.Value(dtype="string")),
+            "table": feature.Sequence(feature=feature.Value(dtype="string")),
+            "true_answer": feature.Sequence(feature=feature.Value(dtype="string")),
+            "predicted_answer": feature.Sequence(feature=feature.Value(dtype="string")),
+            "predicted_answer_scale": feature.Value(dtype="string"),
             "answer_type": feature.Value(
                 dtype="string",
                 description="type of answer",

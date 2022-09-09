@@ -3,6 +3,7 @@
     "custom_features": {
       "example": {
         "total_words": {
+          "cls_name": "Value",
           "dtype": "float",
           "description": "total number of words"
         }
