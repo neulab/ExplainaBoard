@@ -18,7 +18,7 @@ class Preprocessor:
         self.language = language
         self.resources = resources or self.default_resources()
 
-    def set_language(self, language: str):
+    def set_language(self, language: str) -> Preprocessor:
         self.language = language
         return self
 
@@ -89,43 +89,38 @@ class ExtractiveQAPreprocessor(Preprocessor):
 
         language = resources['language']
 
-        def remove_articles(text, lang):
-            if lang == 'en' or lang is None:
+        def remove_articles(text: str, lang: str) -> str:
+            if lang in ['en', 'eng']:
                 return re.sub(r'\b(a|an|the)\b', ' ', text)
-            elif lang == 'es':
+            elif lang in ['es', 'spa']:
                 return re.sub(r'\b(un|una|unos|unas|el|la|los|las)\b', ' ', text)
-            elif lang == 'hi':
-                return text  # Hindi does not have formal articles
-            elif lang == 'vi':
+            elif lang in ['vi', 'vie']:
                 return re.sub(r'\b(của|là|cái|chiếc|những)\b', ' ', text)
-            elif lang == 'de':
+            elif lang in ['de', 'deu']:
                 return re.sub(
                     r'\b(ein|eine|einen|einem|eines|einer|der|die|das|den|dem|'
                     r'des)\b',
                     ' ',
                     text,
                 )
-            elif lang == 'ar':
+            elif lang in ['ar', 'ara']:
                 # TODO(Pengfei): W605 invalid escape sequence '\s'
                 return re.sub('\sال^|ال', ' ', text)  # noqa
-            elif lang == 'zh':
-                return text  # Chinese does not have formal articles
-            else:  # TODO(Pengfei): is this too strong?
-                raise Exception('Unknown Language {}'.format(lang))
+            else:
+                return text
 
-        def white_space_fix(text, lang):
-            if lang in self.WHITESPACE_LANGS or lang is None:
-                tokens = self.ss_tokenizer(text)
-            elif lang in self.MIXED_SEGMENTATION_LANGS:
+        def white_space_fix(text: str, lang: str) -> str:
+
+            if lang in self.MIXED_SEGMENTATION_LANGS:
                 tokens = self.mlqa_tokenizer(text)
             else:
-                raise Exception('Unknown Language {}'.format(lang))
+                tokens = self.ss_tokenizer(text)
             return ' '.join([t for t in tokens if t.strip() != ''])
 
-        def remove_punc(text):
+        def remove_punc(text: str) -> str:
             return ''.join(ch for ch in text if ch not in self.PUNCT)
 
-        def lower(text):
+        def lower(text: str) -> str:
             return text.lower()
 
         return white_space_fix(
