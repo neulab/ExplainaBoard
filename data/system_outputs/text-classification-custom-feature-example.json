@@ -1,0 +1,1029 @@
+{
+  "metadata": {
+    "custom_features": {
+      "example": {
+        "verb": {
+          "dtype": "string",
+          "description": "the verb in the example"
+        },
+        "subject": {
+          "dtype": "string",
+          "description": "the subject in the example"
+        },
+        "adverb": {
+          "dtype": "string",
+          "description": "the adverb in the example"
+        },
+        "LL_delta": {
+          "dtype": "float",
+          "description": "log likelihood / confidence"
+        }
+      }
+    },
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "verb",
+        "num_buckets": 15,
+        "method": "discrete"
+      },
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "subject",
+        "num_buckets": 50,
+        "method": "discrete"
+      },
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "adverb",
+        "num_buckets": 10,
+        "method": "discrete"
+      },
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "example",
+        "feature": "LL_delta",
+        "num_buckets": 3,
+        "method": "continuous"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "orator",
+      "adverb": "nicely",
+      "LL_delta": -1.506662368774414
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "person",
+      "adverb": "nicely",
+      "LL_delta": -1.4083833694458008
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "driver",
+      "adverb": "nicely",
+      "LL_delta": -1.3554716110229492
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "businessman",
+      "adverb": "well",
+      "LL_delta": -1.2693967819213867
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "businessman",
+      "adverb": "easily",
+      "LL_delta": -1.2040882110595703
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "orator",
+      "adverb": "well",
+      "LL_delta": -1.0774717330932615
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "driver",
+      "adverb": "well",
+      "LL_delta": -1.075348138809204
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "driver",
+      "adverb": "smoothly",
+      "LL_delta": -1.071072340011597
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "person",
+      "adverb": "terribly",
+      "LL_delta": -1.0384845733642574
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "businessman",
+      "adverb": "quickly",
+      "LL_delta": -1.0209674835205078
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "person",
+      "adverb": "terribly",
+      "LL_delta": -0.9456443786621098
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "play",
+      "subject": "musician",
+      "adverb": "beautifully",
+      "LL_delta": -0.9411754608154296
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "student",
+      "adverb": "nicely",
+      "LL_delta": -0.9226560592651368
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "person",
+      "adverb": "nicely",
+      "LL_delta": -0.912822723388672
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "artist",
+      "adverb": "terribly",
+      "LL_delta": -0.9126319885253902
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "photograph",
+      "subject": "photographer",
+      "adverb": "nicely",
+      "LL_delta": -0.8893487453460693
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "chef",
+      "adverb": "terribly",
+      "LL_delta": -0.874859094619751
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cook",
+      "subject": "chef",
+      "adverb": "terribly",
+      "LL_delta": -0.8504447937011719
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "painter",
+      "adverb": "terribly",
+      "LL_delta": -0.8333482742309566
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "play",
+      "subject": "musician",
+      "adverb": "nicely",
+      "LL_delta": -0.8035383224487305
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "person",
+      "adverb": "well",
+      "LL_delta": -0.7782516479492188
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "person",
+      "adverb": "nicely",
+      "LL_delta": -0.7557229995727544
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "chef",
+      "adverb": "nicely",
+      "LL_delta": -0.7495479583740239
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "salesman",
+      "adverb": "easily",
+      "LL_delta": -0.745875358581543
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "person",
+      "adverb": "well",
+      "LL_delta": -0.726109504699707
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "baker",
+      "adverb": "terribly",
+      "LL_delta": -0.7027394771575928
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "artist",
+      "adverb": "well",
+      "LL_delta": -0.6954393386840816
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cook",
+      "subject": "chef",
+      "adverb": "nicely",
+      "LL_delta": -0.6640443801879878
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "perform",
+      "subject": "person",
+      "adverb": "easily",
+      "LL_delta": -0.6624374389648438
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "shave",
+      "subject": "barber",
+      "adverb": "nicely",
+      "LL_delta": -0.6199331283569327
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "salesman",
+      "adverb": "well",
+      "LL_delta": -0.6187562942504883
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "baker",
+      "adverb": "nicely",
+      "LL_delta": -0.6058731079101562
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "shave",
+      "subject": "barber",
+      "adverb": "neatly",
+      "LL_delta": -0.5943164825439458
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "pack",
+      "subject": "mover",
+      "adverb": "well",
+      "LL_delta": -0.5779972076416011
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "hairdresser",
+      "adverb": "nicely",
+      "LL_delta": -0.5702674388885498
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "student",
+      "adverb": "quickly",
+      "LL_delta": -0.5655498504638672
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "painter",
+      "adverb": "well",
+      "LL_delta": -0.5635221004486084
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "sell",
+      "subject": "product",
+      "adverb": "quickly",
+      "LL_delta": -0.5580940246582031
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "salesman",
+      "adverb": "quickly",
+      "LL_delta": -0.556310653686523
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "surgeon",
+      "adverb": "smoothly",
+      "LL_delta": -0.5551595687866215
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "patissier",
+      "adverb": "terribly",
+      "LL_delta": -0.5543451309204106
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "person",
+      "adverb": "well",
+      "LL_delta": -0.5442295074462891
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "person",
+      "adverb": "quickly",
+      "LL_delta": -0.5440711975097661
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "photograph",
+      "subject": "photographer",
+      "adverb": "beautifully",
+      "LL_delta": -0.5414628982543945
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "sell",
+      "subject": "product",
+      "adverb": "well",
+      "LL_delta": -0.5350227355957031
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "person",
+      "adverb": "easily",
+      "LL_delta": -0.5014390945434575
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "hairdresser",
+      "adverb": "cleanly",
+      "LL_delta": -0.4737424850463867
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "hairdresser",
+      "adverb": "roughly",
+      "LL_delta": -0.467742919921875
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "person",
+      "adverb": "smoothly",
+      "LL_delta": -0.4577398300170898
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "student",
+      "adverb": "easily",
+      "LL_delta": -0.4503669738769531
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cook",
+      "subject": "chef",
+      "adverb": "well",
+      "LL_delta": -0.4385490417480473
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "person",
+      "adverb": "well",
+      "LL_delta": -0.4260807037353511
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "student",
+      "adverb": "well",
+      "LL_delta": -0.4225597381591797
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "sell",
+      "subject": "product",
+      "adverb": "easily",
+      "LL_delta": -0.3990402221679687
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "cook",
+      "subject": "vegetable",
+      "adverb": "well",
+      "LL_delta": -0.3942909240722656
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "pack",
+      "subject": "bag",
+      "adverb": "easily",
+      "LL_delta": -0.3931684494018554
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "tailor",
+      "adverb": "smoothly",
+      "LL_delta": -0.3931474685668941
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "artist",
+      "adverb": "easily",
+      "LL_delta": -0.3843317031860351
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "surgeon",
+      "adverb": "easily",
+      "LL_delta": -0.3811597824096679
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "patissier",
+      "adverb": "nicely",
+      "LL_delta": -0.3706188201904301
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "chef",
+      "adverb": "well",
+      "LL_delta": -0.3632354736328129
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "baker",
+      "adverb": "well",
+      "LL_delta": -0.3377695083618164
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "clean",
+      "subject": "maid",
+      "adverb": "quickly",
+      "LL_delta": -0.2993850708007812
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "tailor",
+      "adverb": "easily",
+      "LL_delta": -0.2498388290405273
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "person",
+      "adverb": "easily",
+      "LL_delta": -0.2277135848999023
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "pack",
+      "subject": "mover",
+      "adverb": "easily",
+      "LL_delta": -0.1811590194702153
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "perform",
+      "subject": "musician",
+      "adverb": "easily",
+      "LL_delta": -0.1738414764404297
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "cook",
+      "subject": "vegetable",
+      "adverb": "nicely",
+      "LL_delta": -0.163461685180664
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "painter",
+      "adverb": "easily",
+      "LL_delta": -0.0831098556518554
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "cook",
+      "subject": "vegetable",
+      "adverb": "terribly",
+      "LL_delta": -0.0691413879394531
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "pack",
+      "subject": "jacket",
+      "adverb": "easily",
+      "LL_delta": -0.0615291595458984
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "clean",
+      "subject": "janitor",
+      "adverb": "quickly",
+      "LL_delta": -0.0250587463378906
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "clean",
+      "subject": "floor",
+      "adverb": "easily",
+      "LL_delta": -0.0146007537841796
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "bake",
+      "subject": "patissier",
+      "adverb": "well",
+      "LL_delta": 0.0256519317626953
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "clean",
+      "subject": "floor",
+      "adverb": "quickly",
+      "LL_delta": 0.027592658996582
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "clean",
+      "subject": "maid",
+      "adverb": "easily",
+      "LL_delta": 0.0539302825927734
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "clean",
+      "subject": "countertop",
+      "adverb": "easily",
+      "LL_delta": 0.0598964691162109
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "fabric",
+      "adverb": "roughly",
+      "LL_delta": 0.0689067840576171
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "clean",
+      "subject": "countertop",
+      "adverb": "quickly",
+      "LL_delta": 0.0711622238159184
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "canvas",
+      "adverb": "easily",
+      "LL_delta": 0.1060733795166015
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "clean",
+      "subject": "janitor",
+      "adverb": "easily",
+      "LL_delta": 0.14545726776123
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "wood",
+      "adverb": "easily",
+      "LL_delta": 0.1500225067138672
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "cake",
+      "adverb": "well",
+      "LL_delta": 0.2209663391113276
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "cloth",
+      "adverb": "easily",
+      "LL_delta": 0.2696752548217773
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "pack",
+      "subject": "bag",
+      "adverb": "well",
+      "LL_delta": 0.2698593139648437
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "shave",
+      "subject": "stubble",
+      "adverb": "neatly",
+      "LL_delta": 0.2700939178466797
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "cut",
+      "adverb": "easily",
+      "LL_delta": 0.2765970230102543
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "play",
+      "subject": "instrument",
+      "adverb": "nicely",
+      "LL_delta": 0.2927007675170898
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "play",
+      "subject": "instrument",
+      "adverb": "beautifully",
+      "LL_delta": 0.3000192642211909
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "cut",
+      "adverb": "smoothly",
+      "LL_delta": 0.3139095306396489
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "shave",
+      "subject": "stubble",
+      "adverb": "nicely",
+      "LL_delta": 0.3298263549804692
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "pastry",
+      "adverb": "well",
+      "LL_delta": 0.3570890426635742
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "car",
+      "adverb": "quickly",
+      "LL_delta": 0.3589601516723628
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "perform",
+      "subject": "sonata",
+      "adverb": "easily",
+      "LL_delta": 0.3788576126098633
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cook",
+      "subject": "meat",
+      "adverb": "well",
+      "LL_delta": 0.402878761291503
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "stitch",
+      "subject": "cloth",
+      "adverb": "smoothly",
+      "LL_delta": 0.40556812286377
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "paper",
+      "adverb": "roughly",
+      "LL_delta": 0.4069814682006831
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "cake",
+      "adverb": "nicely",
+      "LL_delta": 0.4187803268432617
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "car",
+      "adverb": "smoothly",
+      "LL_delta": 0.4593169689178467
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "pack",
+      "subject": "jacket",
+      "adverb": "well",
+      "LL_delta": 0.4771738052368164
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "canvas",
+      "adverb": "well",
+      "LL_delta": 0.4784154891967773
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "pastry",
+      "adverb": "nicely",
+      "LL_delta": 0.5304899215698242
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "pack",
+      "subject": "traveller",
+      "adverb": "easily",
+      "LL_delta": 0.5531539916992188
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "poem",
+      "adverb": "well",
+      "LL_delta": 0.5561447143554688
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "car",
+      "adverb": "easily",
+      "LL_delta": 0.5624666213989258
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "poem",
+      "adverb": "nicely",
+      "LL_delta": 0.5675525665283203
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "cake",
+      "adverb": "terribly",
+      "LL_delta": 0.5722599029541025
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "paper",
+      "adverb": "nicely",
+      "LL_delta": 0.5861625671386719
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "essay",
+      "adverb": "easily",
+      "LL_delta": 0.6100044250488286
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "line",
+      "adverb": "well",
+      "LL_delta": 0.6102819442749023
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "fabric",
+      "adverb": "nicely",
+      "LL_delta": 0.6376714706420898
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "sell",
+      "subject": "car",
+      "adverb": "well",
+      "LL_delta": 0.6454150676727295
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "canvas",
+      "adverb": "terribly",
+      "LL_delta": 0.6463785171508789
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "bake",
+      "subject": "pastry",
+      "adverb": "terribly",
+      "LL_delta": 0.6589632034301762
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cook",
+      "subject": "meat",
+      "adverb": "nicely",
+      "LL_delta": 0.6800177097320557
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "fabric",
+      "adverb": "cleanly",
+      "LL_delta": 0.6933422088623051
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "truck",
+      "adverb": "smoothly",
+      "LL_delta": 0.702345609664917
+    },
+    {
+      "predicted_label": "agent",
+      "verb": "pack",
+      "subject": "traveller",
+      "adverb": "well",
+      "LL_delta": 0.7200689315795898
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "play",
+      "subject": "violin",
+      "adverb": "nicely",
+      "LL_delta": 0.7236003875732422
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "shave",
+      "subject": "beard",
+      "adverb": "neatly",
+      "LL_delta": 0.7446787357330318
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cook",
+      "subject": "meat",
+      "adverb": "terribly",
+      "LL_delta": 0.7645168304443364
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "essay",
+      "adverb": "quickly",
+      "LL_delta": 0.7698249816894531
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "photograph",
+      "subject": "lake",
+      "adverb": "beautifully",
+      "LL_delta": 0.7703266143798828
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "shave",
+      "subject": "beard",
+      "adverb": "nicely",
+      "LL_delta": 0.7713451385498047
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "cut",
+      "subject": "paper",
+      "adverb": "cleanly",
+      "LL_delta": 0.7788219451904297
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "play",
+      "subject": "violin",
+      "adverb": "beautifully",
+      "LL_delta": 0.785669326782227
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "photograph",
+      "subject": "landscape",
+      "adverb": "beautifully",
+      "LL_delta": 0.7921714782714844
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "wood",
+      "adverb": "well",
+      "LL_delta": 0.7982654571533203
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "perform",
+      "subject": "scene",
+      "adverb": "easily",
+      "LL_delta": 0.8932237625122075
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "code",
+      "adverb": "easily",
+      "LL_delta": 0.8958930969238281
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "car",
+      "adverb": "well",
+      "LL_delta": 0.9147393703460692
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "read",
+      "subject": "line",
+      "adverb": "nicely",
+      "LL_delta": 0.9148836135864248
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "paint",
+      "subject": "wood",
+      "adverb": "terribly",
+      "LL_delta": 0.9515314102172856
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "photograph",
+      "subject": "lake",
+      "adverb": "nicely",
+      "LL_delta": 1.0064373016357422
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "photograph",
+      "subject": "landscape",
+      "adverb": "nicely",
+      "LL_delta": 1.0525121688842771
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "write",
+      "subject": "code",
+      "adverb": "quickly",
+      "LL_delta": 1.0799055099487305
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "truck",
+      "adverb": "well",
+      "LL_delta": 1.0895328521728511
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "car",
+      "adverb": "nicely",
+      "LL_delta": 1.3036737442016606
+    },
+    {
+      "predicted_label": "patient",
+      "verb": "drive",
+      "subject": "truck",
+      "adverb": "nicely",
+      "LL_delta": 1.4493036270141602
+    }
+  ]
+}
