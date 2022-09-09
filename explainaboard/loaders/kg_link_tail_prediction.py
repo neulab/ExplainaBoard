@@ -45,8 +45,9 @@ class KgLinkTailPredictionLoader(Loader):
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
 
         file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
-            'pre_computed/kg/entity2wikidata.json',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
             entity_dic = json.loads(file.read())

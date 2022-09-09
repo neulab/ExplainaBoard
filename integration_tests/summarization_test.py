@@ -79,8 +79,9 @@ class SummarizationTest(unittest.TestCase):
     def test_datalab_loader(self):
 
         json_output_customized = cache_api.cache_online_file(
-            'http://www.phontron.com/download/cnndm-bart-output.txt',
-            'predictions/summarization/cnndm-bart-output.txt',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
         )
 
         loader = get_loader_class(TaskType.summarization).from_datalab(
