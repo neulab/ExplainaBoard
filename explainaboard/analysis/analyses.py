@@ -90,7 +90,7 @@ class Analysis:
             return ComboCountAnalysis(
                 description=dikt.get('description'),
                 level=dikt['level'],
-                features=dikt['features'],
+                features=tuple(dikt['features']),
             )
 
 

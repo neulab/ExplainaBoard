@@ -48,6 +48,12 @@
         "feature": "LL_delta",
         "num_buckets": 3,
         "method": "continuous"
+      },
+      {
+        "cls_name": "ComboCountAnalysis",
+        "level": "example",
+        "description": "ComboCountAnalysis of predicted_label and adverb",
+        "features": ["predicted_label", "adverb"]
       }
     ]
   },
