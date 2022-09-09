@@ -23,13 +23,13 @@ class GrammaticalErrorCorrection(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
-            "text": feature.Value("string"),
+            "text": feature.Value(dtype="string"),
             "edits": feature.Dict(
                 feature={
-                    "start_idx": feature.Sequence(feature=feature.Value("int32")),
-                    "end_idx": feature.Sequence(feature=feature.Value("int32")),
+                    "start_idx": feature.Sequence(feature=feature.Value(dtype="int32")),
+                    "end_idx": feature.Sequence(feature=feature.Value(dtype="int32")),
                     "corrections": feature.Sequence(
-                        feature=feature.Sequence(feature=feature.Value("string"))
+                        feature=feature.Sequence(feature=feature.Value(dtype="string"))
                     ),
                 }
             ),

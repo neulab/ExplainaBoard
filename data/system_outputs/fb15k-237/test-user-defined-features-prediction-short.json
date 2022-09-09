@@ -2,11 +2,13 @@
   "metadata": {
     "custom_features": {
       "toy_string_feature": {
+        "cls_name": "Value",
         "dtype": "string",
         "description": "most specific (highest) entity type level of true tail entity",
         "num_buckets": 8
       },
       "toy_float_feature": {
+        "cls_name": "Value",
         "dtype": "float",
         "description": "just a toy float feature for testing",
         "num_buckets": 4

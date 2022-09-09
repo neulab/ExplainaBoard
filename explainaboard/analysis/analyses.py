@@ -8,12 +8,12 @@ import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import metric_config_from_dict
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.typing_utils import unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
 @dataclass
@@ -325,7 +325,13 @@ class AnalysisLevel:
 
     @staticmethod
     def from_dict(dikt: dict):
-        features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
+        ft_serializer = get_feature_type_serializer()
+
+        features = {
+            # See https://github.com/python/mypy/issues/4717
+            k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+            for k, v in dikt['features'].items()
+        }
         metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
         return AnalysisLevel(
             name=dikt['name'],

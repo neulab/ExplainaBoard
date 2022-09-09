@@ -4,11 +4,14 @@ import copy
 import dataclasses
 from inspect import getsource
 
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.utils.tokenizer import get_tokenizer_serializer, Tokenizer
 
 
 def general_to_dict(data):
     """DEPRECATED: do not use this function for new implementations."""
+    if isinstance(data, FeatureType):
+        return get_feature_type_serializer().serialize(data)
     if isinstance(data, Tokenizer):
         return get_tokenizer_serializer().serialize(data)
     elif hasattr(data, 'to_dict'):

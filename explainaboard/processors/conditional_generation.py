@@ -46,9 +46,9 @@ class ConditionalGenerationProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
-            "source": feature.Value("string"),
-            "reference": feature.Value("string"),
-            "hypothesis": feature.Value("string"),
+            "source": feature.Value(dtype="string"),
+            "reference": feature.Value(dtype="string"),
+            "hypothesis": feature.Value(dtype="string"),
             "source_length": feature.Value(
                 dtype="float",
                 description="length of the source",

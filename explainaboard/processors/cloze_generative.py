@@ -33,9 +33,9 @@ class ClozeGenerativeProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
-            "context": feature.Value("string"),
-            "question_mark": feature.Value("string"),
-            "hint": feature.Value("string"),
+            "context": feature.Value(dtype="string"),
+            "question_mark": feature.Value(dtype="string"),
+            "hint": feature.Value(dtype="string"),
             "answers": feature.Sequence(feature=feature.Value(dtype="string")),
             "context_length": feature.Value(
                 dtype="float",

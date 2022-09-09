@@ -1,123 +1,265 @@
 from __future__ import annotations
 
+from abc import ABCMeta
 from collections.abc import Callable
-import copy
-from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, final, TypeVar
+
+from explainaboard.serialization.registry import TypeRegistry
+from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable, SerializableData
+from explainaboard.utils.logging import get_logger
+from explainaboard.utils.typing_utils import narrow
+
+_feature_type_registry = TypeRegistry[Serializable]()
+
+T = TypeVar("T")
 
 
-def is_dataclass_dict(obj):
+def get_feature_type_serializer() -> PrimitiveSerializer:
+    """Returns a serializer object for FeatureTypes.
+
+    Returns:
+        A serializer object.
     """
-    this function is used to judge if the input dictionary contains 'cls_name' and
-    the value of 'cls_name' is in the feature type registry
-    :param obj: a python object with different potential type
-    :return: boolean variable
-    """
-    return isinstance(obj, dict) and obj.get('cls_name') in FEATURETYPE_REGISTRY
+    return PrimitiveSerializer(_feature_type_registry)
 
 
-def _fromdict_inner(obj):
-    """
-    This function aim to construct a dataclass based on a potentially nested
-    dictionary (obj) recursively
-    :param obj: python object
-    :return: an object with dataclass
-    """
-    # reconstruct the dataclass using the type tag
-    if is_dataclass_dict(obj):
-        result = {}
-        for name, data in obj.items():
-            result[name] = _fromdict_inner(data)
-        return FEATURETYPE_REGISTRY[obj["cls_name"]](**result)
+def _get_value(cls: type[T], data: dict[str, SerializableData], key: str) -> T | None:
+    """Helper to obtain typed value in the SerializableData dict.
 
-    # exactly the same as before (without the tuple clause)
-    elif isinstance(obj, (list, tuple)):
-        return type(obj)(_fromdict_inner(v) for v in obj)
-    elif isinstance(obj, dict):
-        return type(obj)(
-            (_fromdict_inner(k), _fromdict_inner(v)) for k, v in obj.items()
+    Args:
+        cls: Type to obtain.
+        data: Dict containing the target value.
+        key: Key of the target value.
+
+    Returs:
+        Typed target value, or None if it does not exist.
+    """
+    value = data.get(key)
+    return narrow(cls, value) if value is not None else None
+
+
+class FeatureType(Serializable, metaclass=ABCMeta):
+    def __init__(
+        self,
+        dtype: str | None = None,
+        description: str | None = None,
+        func: Callable[..., Any] | None = None,
+        require_training_set: bool | None = None,
+    ) -> None:
+        """Initializes FeatureType object.
+
+        Args:
+            dtype: Data type specifier.
+            description: Description of this feature.
+            func: Function to calculate this feature from other features.
+            require_training_set: Whether this feature relies on the training samples.
+        """
+        self._dtype = dtype
+        self._description = description
+        self._func = func
+        self._require_training_set = (
+            require_training_set if require_training_set is not None else False
         )
-    else:
-        return copy.deepcopy(obj)
+
+    @property
+    def dtype(self) -> str | None:
+        return self._dtype
+
+    @property
+    def description(self) -> str | None:
+        return self._description
+
+    @property
+    def func(self) -> Callable[..., Any] | None:
+        return self._func
+
+    @property
+    def require_training_set(self) -> bool:
+        return self._require_training_set
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        if self.func is not None:
+            # TODO(odashi): FeatureTypes with `func` can't be restored correctly from
+            # the serialized data. If you met this warning, it seems there could be
+            # potential bugs.
+            # Remove `func` member from FeatureType to correctly serialize these
+            # objects.
+            get_logger(__name__).warning("`func` member is not serializable.")
+        return {
+            "dtype": self._dtype,
+            "description": self._description,
+            "require_training_set": self._require_training_set,
+        }
 
 
-@dataclass
-class FeatureType:
-    # dtype: declare the data type of a feature, e.g. dict, list, float
-    dtype: Optional[str] = None
-    # cls_name: declare the class type of the feature: Sequence, Position
-    cls_name: Optional[str] = None
-    # description: descriptive information of a feature
-    description: Optional[str] = None
-    # func: the function that is used to calculate the feature
-    func: Optional[Callable] = None
-    # require_training_set: whether calculating this feature
-    # relies on the training samples
-    require_training_set: bool = False
+@final
+@_feature_type_registry.register("Sequence")
+class Sequence(FeatureType):
+    def __init__(
+        self,
+        feature: FeatureType,
+        description: str | None = None,
+        func: Callable[..., Any] | None = None,
+        require_training_set: bool | None = None,
+    ) -> None:
+        """Initializes Sequence object.
+
+        Args:
+            feature: Feature type of elements.
+            description: See FeatureType.__init__.
+            func: See FeatureType.__init__.
+            require_training_set: See FeatureType.__init__.
+        """
+        super().__init__("list", description, func, require_training_set)
+        self._feature = feature
+
+    @property
+    def feature(self) -> FeatureType:
+        return self._feature
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        data = super().serialize()
+        data["feature"] = self._feature
+        return data
 
     @classmethod
-    def from_dict(cls, obj: dict) -> FeatureType:
-        # If the type is not specified use Value by default
-        if not isinstance(obj, dict):
-            raise ValueError(f'called from_dict on non-dict object "{obj}"')
-        elif not is_dataclass_dict(obj):
-            obj = copy.deepcopy(obj)
-            obj['cls_name'] = 'Value'
-        return _fromdict_inner(obj)
-
-    def __post_init__(self):
-        self.cls_name: str = self.__class__.__name__
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        return cls(
+            # See https://github.com/python/mypy/issues/4717
+            narrow(FeatureType, data["feature"]),  # type: ignore
+            description=_get_value(str, data, "description"),
+            func=None,
+            require_training_set=_get_value(bool, data, "require_training_set"),
+        )
 
 
-@dataclass
-class Sequence(FeatureType):
-    feature: FeatureType = field(default_factory=FeatureType)
-
-    def __post_init__(self):
-        super().__post_init__()
-        self.dtype = "list"
-
-
-@dataclass
+@final
+@_feature_type_registry.register("Dict")
 class Dict(FeatureType):
-    feature: dict[str, FeatureType] = field(default_factory=dict)
+    def __init__(
+        self,
+        feature: dict[str, FeatureType],
+        description: str | None = None,
+        func: Callable[..., Any] | None = None,
+        require_training_set: bool | None = None,
+    ) -> None:
+        """Initializes Dict object.
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.dtype = "dict"
+        Args:
+            feature: Definitions of member types.
+            description: See FeatureType.__init__.
+            func: See FeatureType.__init__.
+            require_training_set: See FeatureType.__init__.
+        """
+        super().__init__("dict", description, func, require_training_set)
+        self._feature = feature
+
+    @property
+    def feature(self) -> dict[str, FeatureType]:
+        return self._feature
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        data = super().serialize()
+        data["feature"] = self._feature
+        return data
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        feature = {
+            # See https://github.com/python/mypy/issues/4717
+            k: narrow(FeatureType, v)  # type: ignore
+            for k, v in narrow(dict, data["feature"]).items()
+        }
+
+        return cls(
+            feature,
+            description=_get_value(str, data, "description"),
+            func=None,
+            require_training_set=_get_value(bool, data, "require_training_set"),
+        )
 
 
-@dataclass
-class Position(FeatureType):
-    positions: Optional[list] = None
+# @dataclass
+# class Position(FeatureType):
+#    positions: Optional[list] = None
+#
+#    def __post_init__(self):
+#        super().__post_init__()
+#        self.cls_name: str = "Position"
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.cls_name: str = "Position"
 
-
-@dataclass
+@final
+@_feature_type_registry.register("Value")
 class Value(FeatureType):
+    def __init__(
+        self,
+        max_value: int | float | None = None,
+        min_value: int | float | None = None,
+        dtype: str | None = None,
+        description: str | None = None,
+        func: Callable[..., Any] | None = None,
+        require_training_set: bool | None = None,
+    ) -> None:
+        """Initializes Value object.
 
-    # the maximum value (inclusive) of a feature with the
-    # dtype of `float` or `int`
-    max_value: Optional[float | int] = None
-    # the minimum value (inclusive) of a feature with the
-    # dtype of `float` or `int`
-    min_value: Optional[float | int] = None
+        Args:
+            max_value: The maximum value (inclusive) of values with int/float dtype.
+            min_value: The minimum value (inclusive) of values with int/float dtype.
+            dtype: See FeatureType.__init__.
+            description: See FeatureType.__init__.
+            func: See FeatureType.__init__.
+            require_training_set: See FeatureType.__init__.
+        """
+        # Fix inferred types.
+        if dtype == "double":
+            dtype = "float64"
+        elif dtype == "float":
+            dtype = "float32"
 
-    def __post_init__(self):
-        super().__post_init__()
-        if self.dtype == "double":  # fix inferred type
-            self.dtype = "float64"
-        if self.dtype == "float":  # fix inferred type
-            self.dtype = "float32"
+        super().__init__(dtype, description, func, require_training_set)
+        self._max_value = max_value
+        self._min_value = min_value
 
+    @property
+    def max_value(self) -> int | float | None:
+        return self._max_value
 
-FEATURETYPE_REGISTRY = {
-    "FeatureType": FeatureType,
-    "Sequence": Sequence,
-    "Dict": Dict,
-    "Position": Position,
-    "Value": Value,
-}
+    @property
+    def min_value(self) -> int | float | None:
+        return self._min_value
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        data = super().serialize()
+        data["max_value"] = self._max_value
+        data["min_value"] = self._min_value
+        return data
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        max_value = data.get("max_value")
+        min_value = data.get("min_value")
+        if max_value is not None and not isinstance(max_value, (int, float)):
+            raise ValueError(
+                f"Unexpected type of `max_value`: {type(max_value).__name__}"
+            )
+        if min_value is not None and not isinstance(min_value, (int, float)):
+            raise ValueError(
+                f"Unexpected type of `min_value`: {type(min_value).__name__}"
+            )
+
+        return cls(
+            max_value,
+            min_value,
+            dtype=_get_value(str, data, "dtype"),
+            description=_get_value(str, data, "description"),
+            func=None,
+            require_training_set=_get_value(bool, data, "require_training_set"),
+        )

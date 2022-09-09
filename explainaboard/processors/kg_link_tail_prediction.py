@@ -30,13 +30,13 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "true_head": feature.Value("string"),
-            "true_head_decipher": feature.Value("string"),
+            "true_head": feature.Value(dtype="string"),
+            "true_head_decipher": feature.Value(dtype="string"),
             "true_link": feature.Value(dtype="string", description="the relation type"),
             "true_tail": feature.Value(dtype="string"),
-            "true_tail_decipher": feature.Value("string"),
-            "predict": feature.Value("string"),
-            "predictions": feature.Sequence(feature=feature.Value("string")),
+            "true_tail_decipher": feature.Value(dtype="string"),
+            "predict": feature.Value(dtype="string"),
+            "predictions": feature.Sequence(feature=feature.Value(dtype="string")),
             "tail_entity_length": feature.Value(
                 dtype="float",
                 description="length of the tail entity in tokens",
