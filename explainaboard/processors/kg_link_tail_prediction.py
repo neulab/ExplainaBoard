@@ -144,8 +144,9 @@ class KGLinkTailPredictionProcessor(Processor):
         super().__init__()
         self.entity_type_level_map = None
         file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
-            'pre_computed/kg/entity_type_level_map.json',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)

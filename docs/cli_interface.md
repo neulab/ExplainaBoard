@@ -101,7 +101,7 @@ Note that this uses two different metrics separated by a space.
 You could also load the `cnn_dailymail` dataset from DataLab.
 Because the test set is large we don't include it directly in the explainaboard repository, but you can get an example by downloading with wget:
 ```shell
-wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart-output.txt
+wget -P ./data/system_outputs/cnndm/ https://storage.googleapis.com/inspired-public-data/explainaboard/task_data/summarization/cnndm-bart-output.txt
 ```
 
 Then run the below command and it should work:
