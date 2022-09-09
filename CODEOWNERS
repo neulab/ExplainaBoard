@@ -1,5 +1,5 @@
 # Global owner
 * @neubig @pfliu-nlp
 
-# Code quality maintainer
+# Code maintainer
 *.py @odashi
