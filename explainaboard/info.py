@@ -13,8 +13,8 @@ from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
+from explainaboard.serialization.legacy import general_to_dict
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.serialization import general_to_dict
 from explainaboard.utils.tokenizer import get_tokenizer_serializer, Tokenizer
 
 logger = get_logger(__name__)
