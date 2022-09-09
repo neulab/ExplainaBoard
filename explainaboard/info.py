@@ -161,7 +161,7 @@ class SysOutputInfo:
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
         try:
-            json.dump(data_dict, fp=file, indent=2, default=lambda x: x.json_repr())
+            json.dump(data_dict, fp=file, indent=2)
         except TypeError as e:
             raise e
 
@@ -169,11 +169,7 @@ class SysOutputInfo:
         """SystemOutputInfo => JSON"""
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
-        file.write(
-            json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()).encode(
-                "utf-8"
-            )
-        )
+        file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
 
     @classmethod
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
