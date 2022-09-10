@@ -9,10 +9,12 @@ from explainaboard.metrics.sql_em_ex import SQLEmConfig, SQLExConfig
 
 
 class TextToSQLTest(unittest.TestCase):
+
     artifact_path = os.path.join(test_artifacts_path, "text_to_sql")
     json_dataset = os.path.join(artifact_path, "questions.json")
     txt_output = os.path.join(artifact_path, "pred.sql")
 
+    @unittest.skip(reason="dependency libs are not installed")
     def test_load_custom_dataset_json(self):
         loader = get_loader_class(TaskType.text_to_sql)(
             self.json_dataset,
@@ -24,6 +26,7 @@ class TextToSQLTest(unittest.TestCase):
         print(data[0])
         self.assertEqual(len(data), 1034)
 
+    @unittest.skip(reason="dependency libs are not installed")
     def test_evaluation_metric(self):
         loader = get_loader_class(TaskType.text_to_sql)(
             self.json_dataset,
