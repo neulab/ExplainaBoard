@@ -37,6 +37,10 @@ class ExternalEvalConfig(MetricConfig):
     n_annotators: int = 3
     categories: int = 5
     instruction: str = "Annotation instruction"
+    # The row size is the number of test samples, the column size is equal to
+    # `n_annotators`. NOTE: Use of list rather than np.ndarray is to make this
+    # class serializable.
+    external_stats: list[list[int]] | None = None
 
     def to_metric(self):
         return ExternalEval(self)
@@ -65,7 +69,7 @@ class ExternalEval(Metric):
     ) -> MetricStats:
 
         config = cast(ExternalEvalConfig, self._get_config(config))
-        return SimpleMetricStats(config.external_stats)
+        return SimpleMetricStats(np.array(config.external_stats))
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -73,19 +77,19 @@ class ExternalEval(Metric):
         config = cast(ExternalEvalConfig, self._get_config(config))
 
         if config.external_stats is not None:
-            n_sample, n_annotators = config.external_stats.shape
+            n_sample = len(config.external_stats)
             if n_sample != len(true_data):
                 raise ValueError(
                     f"the row number of `external_stats` should be equal "
                     f"to the number of test samples: {len(true_data)}"
                 )
-            if n_annotators != config.n_annotators:
+            if n_sample > 0 and len(config.external_stats[0]) != config.n_annotators:
                 raise ValueError(
                     f"the column number of `external_stats`"
                     f"should be equal to n_annotators: "
                     f"{config.n_annotators}"
                 )
-            return SimpleMetricStats(config.external_stats)
+            return SimpleMetricStats(np.array(config.external_stats))
         else:
             # "-1" indicates samples to be evaluated
             return SimpleMetricStats(
