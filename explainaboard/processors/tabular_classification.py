@@ -1,3 +1,5 @@
+"""A processor for the tabular classification task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -21,11 +23,15 @@ from explainaboard.processors.processor_registry import register_processor
 
 @register_processor(TaskType.tabular_classification)
 class TextClassificationProcessor(Processor):
+    """A processor for the tabular classification task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.tabular_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "true_label": feature.Value(
                 dtype="string",
@@ -46,6 +52,7 @@ class TextClassificationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -72,4 +79,5 @@ class TextClassificationProcessor(Processor):
     def default_metrics(
         cls, level="example", source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name='Accuracy')]

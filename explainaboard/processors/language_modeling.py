@@ -1,3 +1,5 @@
+"""A processor for the language modeling task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -28,11 +30,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.language_modeling)
 class LanguageModelingProcessor(Processor):
+    """A processor for the language modeling task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.language_modeling
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
             "text": feature.Value(dtype="string"),
             "log_probs": feature.Value(dtype="string"),
@@ -129,6 +135,7 @@ class LanguageModelingProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         analyses: list[Analysis] = []
         analysis_levels = self.default_analysis_levels()
         for lev in analysis_levels:
@@ -200,15 +207,18 @@ class LanguageModelingProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             LogProbConfig(name='Perplexity', ppl=True),
             LogProbConfig(name='LogProb', ppl=False),
         ]
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return None
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return [float(x) for x in data_point["log_probs"].split(' ')]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):

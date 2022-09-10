@@ -1,3 +1,5 @@
+"""A processor for the text pair classification task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -29,11 +31,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.text_pair_classification)
 class TextPairClassificationProcessor(Processor):
+    """A processor for the text pair classification task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.text_pair_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "text1": feature.Value(
                 dtype="string",
@@ -108,6 +114,7 @@ class TextPairClassificationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -131,6 +138,7 @@ class TextPairClassificationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name='Accuracy')]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):

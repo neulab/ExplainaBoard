@@ -1,3 +1,5 @@
+"""A processor for the summarization task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -23,11 +25,15 @@ sum_attr = SUMAttribute()
 
 @register_processor(TaskType.summarization)
 class SummarizationProcessor(ConditionalGenerationProcessor):
+    """A processor for the summarization task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.summarization
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         f = super().default_analysis_levels()
         new_examp_features = {
             "sum_attributes": feature.Value(

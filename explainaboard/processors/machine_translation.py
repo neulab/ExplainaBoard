@@ -1,3 +1,5 @@
+"""A processor for the machine translation task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -18,11 +20,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.machine_translation)
 class MachineTranslationProcessor(ConditionalGenerationProcessor):
+    """A processor for the machine translation task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.machine_translation
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         f = super().default_analysis_levels()
         f = copy.deepcopy(f)
         f[0].features["attr_compression"] = feature.Value(

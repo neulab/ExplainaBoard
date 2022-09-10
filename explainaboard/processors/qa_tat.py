@@ -1,3 +1,5 @@
+"""A processor for the TAT-QA dataset."""
+
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -24,11 +26,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.qa_tat)
 class QATatProcessor(Processor):
+    """A processor for the TAT-QA dataset."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.qa_tat
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
             "question": feature.Value(dtype="string"),
             "context": feature.Sequence(feature=feature.Value(dtype="string")),
@@ -84,6 +90,7 @@ class QATatProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -109,6 +116,7 @@ class QATatProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             ExactMatchQATatConfig(
                 name='QATatExactMatch',
@@ -123,11 +131,7 @@ class QATatProcessor(Processor):
         ]
 
     def _get_true_label(self, data_point):
-        """
-        Get the true label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See processor._get_true_label."""
         return {
             "true_answer": data_point["true_answer"],
             "answer_type": data_point["answer_type"],
@@ -135,11 +139,7 @@ class QATatProcessor(Processor):
         }
 
     def _get_predicted_label(self, data_point):
-        """
-        Get the predicted label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See processor._get_predicted_label."""
         return {
             "predicted_answer": data_point["predicted_answer"],
             "predicted_answer_scale": data_point["predicted_answer_scale"],
