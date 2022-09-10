@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable
-from typing import Any, final, Optional
+from typing import Any, cast, Dict, final, List, Optional
 
 from eaas.async_client import AsyncClient
 from eaas.config import Config
@@ -199,12 +199,13 @@ class Processor(metaclass=abc.ABCMeta):
         """
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
-        example_metric_names = [x.name for x in analysis_levels[0].metric_configs]
         for level in analysis_levels:
-            if metric_configs and level.name in metric_configs:
-                for metric_config in metric_configs[level.name]:
-                    # if customized metric is not in the default_metric list
-                    if metric_config.name not in example_metric_names:
+            configs = cast(Dict[str, List], metric_configs)
+            if level.name in configs:
+                for ind, metric_config in enumerate(configs[level.name]):
+                    if ind == 0:
+                        level.metric_configs = [metric_config]
+                    else:
                         level.metric_configs.append(metric_config)
             for config in level.metric_configs:
                 config.source_language = sys_info.source_language
