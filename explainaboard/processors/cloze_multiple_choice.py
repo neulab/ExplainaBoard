@@ -31,14 +31,14 @@ class ClozeMultipleChoiceProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
-            "context": feature.Value("string"),
-            "question_mark": feature.Value("string"),
-            "options": feature.Sequence(feature=feature.Value("string")),
+            "context": feature.Value(dtype="string"),
+            "question_mark": feature.Value(dtype="string"),
+            "options": feature.Sequence(feature=feature.Value(dtype="string")),
             "answers": feature.Sequence(
                 feature=feature.Dict(
                     feature={
-                        "text": feature.Value("string"),
-                        "option_index": feature.Value("int32"),
+                        "text": feature.Value(dtype="string"),
+                        "option_index": feature.Value(dtype="int32"),
                     }
                 )
             ),

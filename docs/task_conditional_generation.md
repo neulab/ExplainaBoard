@@ -38,7 +38,7 @@ You can load the`cnn_dailymail` dataset but because the test set is large we don
 include it directly in the explainaboard repository, but you can get an example by
 downloading with wget:
 ```shell
-wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart-output.txt
+wget -P ./data/system_outputs/cnndm/ https://storage.googleapis.com/inspired-public-data/explainaboard/task_data/summarization/cnndm-bart-output.txt
 ```
 
 Then run the below command and it should work:
@@ -73,6 +73,9 @@ Try it out for translation as below. The examples use a custom dataset that is n
 ```shell
 explainaboard --task machine-translation --custom-dataset-paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system-outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
 ```
+Note 1: The number of `--custom-dataset-paths` need to match the number of `system-outputs`
+
+Note 2: If you want to perform **pair-wise analysis** for two system outputs on the same reference, you can pass in the paths separated by space, for example, `--system-outputs system1 system2`. Please also pass in the same paths twice for `--custom-dataset-paths`, for example, `--custom-dataset-paths path1 path1`. 
 
 ### Code Generation
 

@@ -28,11 +28,11 @@ class QAExtractiveProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "context": feature.Value("string"),
-            "question": feature.Value("string"),
-            "id": feature.Value("string"),
-            "answers": feature.Sequence(feature=feature.Value("string")),
-            "predicted_answers": feature.Value("string"),
+            "context": feature.Value(dtype="string"),
+            "question": feature.Value(dtype="string"),
+            "id": feature.Value(dtype="string"),
+            "answers": feature.Sequence(feature=feature.Value(dtype="string")),
+            "predicted_answers": feature.Value(dtype="string"),
             "context_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
