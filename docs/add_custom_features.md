@@ -2,54 +2,21 @@
 
 If you want to perform custom analysis with your custom features that are not supported in the original task processors, and these features are only related to one particular system/dataset instead of the task itself, you can define the custom features and analysis in the `metadata` section in the output JSON file. 
 
-## Example of bucket analysis with discrete feature
-Here is the output json format for bucket analysis with custom discrete features with `"dtype": "string"`, such as the subject of the sentence, etc.
+## Example of bucket analysis
+Here is the output json format for bucket analysis with custom features. Discrete features should have `"dtype": "string"`, such as the subject of the sentence, etc. Continuous features should have `"dtype": "float"`, such as the count of particular words, the output logits/probability, etc.
+
 ```
 {
   "metadata": {
     "custom_features": {
       "feature-level": {
-        "custom-feature-name": {
+        "discrete-custom-feature-name": {
+          "cls_name": "Value",
           "dtype": "string",
           "description": "(optional) description of the feature"
-        }
-      }
-    },
-    "custom_analyses": [
-      {
-        "cls_name": "BucketAnalysis",
-        "level": "feature-level",
-        "feature": "custom-feature-name",
-        "num_buckets": 15,
-        "method": "discrete"
-        "sample_limit": 50
-      }
-    ]
-  },
-  "examples": [
-    {
-      "predicted_label": "true",
-      "custom-feature-name": "feature-value"
-    }
-  ]
-}
-```
-where
-* `feature-level` represents the fine-grained level of the analysis
-    * `example` for sentence-level analysis
-    * `span` for span-level analysis (e.g. in named entity recognition analysis)
-    * `token` for token-level analysis (e.g. in named entity conditional text generation)
-* `num_bucket`: the number of buckets to be used
-* `sample_limit`: if the number of examples are larger than sample_limit, randomly select sample_limit examples for analysis
-
-## Example of bucket analysis with continuous feature
-Here is the output json format for bucket analysis with custom continuous features with `"dtype": "float"`, such as the count of particular words, the output logits/probability, etc.
-```
-{
-  "metadata": {
-    "custom_features": {
-      "feature-level": {
-        "custom-feature-name": {
+        },
+        "continuous-custom-feature-name": {
+          "cls_name": "Value",
           "dtype": "float",
           "description": "(optional) description of the feature"
         }
@@ -59,7 +26,15 @@ Here is the output json format for bucket analysis with custom continuous featur
       {
         "cls_name": "BucketAnalysis",
         "level": "feature-level",
-        "feature": "custom-feature-name",
+        "feature": "discrete-custom-feature-name",
+        "num_buckets": 15,
+        "method": "discrete"
+        "sample_limit": 50
+      },
+      {
+        "cls_name": "BucketAnalysis",
+        "level": "feature-level",
+        "feature": "continuous-custom-feature-name",
         "num_buckets": 15,
         "method": "continuous"
         "sample_limit": 50
@@ -69,7 +44,8 @@ Here is the output json format for bucket analysis with custom continuous featur
   "examples": [
     {
       "predicted_label": "true",
-      "custom-feature-name": "feature-value"
+      "discrete-custom-feature-name": "discrete-feature-value",
+      "continuous-custom-feature-name": "continuous-feature-value"
     }
   ]
 }

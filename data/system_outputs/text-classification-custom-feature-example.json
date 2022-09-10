@@ -3,18 +3,22 @@
     "custom_features": {
       "example": {
         "verb": {
+          "cls_name": "Value",
           "dtype": "string",
           "description": "the verb in the example"
         },
         "subject": {
+          "cls_name": "Value",
           "dtype": "string",
           "description": "the subject in the example"
         },
         "adverb": {
+          "cls_name": "Value",
           "dtype": "string",
           "description": "the adverb in the example"
         },
         "LL_delta": {
+          "cls_name": "Value",
           "dtype": "float",
           "description": "log likelihood / confidence"
         }
