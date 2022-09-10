@@ -8,12 +8,12 @@ import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import metric_config_from_dict
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.typing_utils import unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
 @dataclass
@@ -59,7 +59,7 @@ class Analysis:
         metrics: list[Metric],
         stats: list[MetricStats],
         conf_value: float,
-    ) -> AnalysisResult | None:
+    ) -> AnalysisResult:
         """
         A super-class for analyses, which take in examples and analyze their features in
         some way. The exact analysis performed will vary depending on the inheriting
@@ -68,7 +68,7 @@ class Analysis:
           These could be examples, spans, tokens, etc.
         :param metrics: The metrics used to evaluate the cases.
         :param stats: The statistics calculated by each metric.
-        :conf_value: In the case that any significance analysis is performed, the
+        :param conf_value: In the case that any significance analysis is performed, the
           confidence level.
         """
         raise NotImplementedError
@@ -124,10 +124,15 @@ class BucketAnalysisResult(AnalysisResult):
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
         for i, metric_name in enumerate(metric_names):
             get_logger('report').info(f"the information of #{self.name}#")
-            get_logger('report').info(f"bucket_interval\t{metric_name}\t#samples")
+            get_logger('report').info(f"bucket_name\t{metric_name}\t#samples")
             for bucket_perf in self.bucket_performances:
+                if bucket_perf.bucket_interval is not None:
+                    bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
+                else:
+                    bucket_name = unwrap(bucket_perf.bucket_name)
+
                 get_logger('report').info(
-                    f"{bucket_perf.bucket_interval}\t"
+                    f"{bucket_name}\t"
                     f"{bucket_perf.performances[i].value}\t"
                     f"{bucket_perf.n_samples}"
                 )
@@ -175,17 +180,16 @@ class BucketAnalysis(Analysis):
         metrics: list[Metric],
         stats: list[MetricStats],
         conf_value: float,
-    ) -> AnalysisResult | None:
+    ) -> AnalysisResult:
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
             self.method,
         )
+
         if len(cases) == 0 or self.feature not in cases[0].features:
-            get_logger().warning(
-                f'bucket analysis: feature {self.feature} not found, ' f'skipping'
-            )
-            return None
+            raise RuntimeError(f"bucket analysis: feature {self.feature} not found.")
+
         samples_over_bucket = bucket_func(
             sample_features=[(x, x.features[self.feature]) for x in cases],
             bucket_number=self.number,
@@ -198,9 +202,10 @@ class BucketAnalysis(Analysis):
             subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
 
             bucket_performance = BucketPerformance(
-                bucket_interval=bucket_collection.interval,
-                n_samples=len(bucket_collection.samples),
+                n_samples=float(len(bucket_collection.samples)),
                 bucket_samples=subsampled_ids,
+                bucket_interval=bucket_collection.interval,
+                bucket_name=bucket_collection.name,
             )
 
             for metric_func, metric_stat in zip(
@@ -294,15 +299,11 @@ class ComboCountAnalysis(Analysis):
         metrics: list[Metric],
         stats: list[MetricStats],
         conf_value: float,
-    ) -> AnalysisResult | None:
-        if len(cases) == 0:
-            return None
+    ) -> AnalysisResult:
         for x in self.features:
             if x not in cases[0].features:
-                get_logger().warning(
-                    f'combo analysis: feature {x} not found, ' f'skipping'
-                )
-                return None
+                raise RuntimeError(f"combo analysis: feature {x} not found.")
+
         combo_map: dict[tuple, int] = {}
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
@@ -324,7 +325,13 @@ class AnalysisLevel:
 
     @staticmethod
     def from_dict(dikt: dict):
-        features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
+        ft_serializer = get_feature_type_serializer()
+
+        features = {
+            # See https://github.com/python/mypy/issues/4717
+            k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+            for k, v in dikt['features'].items()
+        }
         metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
         return AnalysisLevel(
             name=dikt['name'],

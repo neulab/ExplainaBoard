@@ -24,7 +24,7 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.analysis.analyses import Analysis
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.constants import Source
 from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.preprocessor import Preprocessor
@@ -65,12 +65,6 @@ class FileLoaderField:
     def __post_init__(self):
         if self.strip_before_parsing is None:
             self.strip_before_parsing = self.dtype == str
-
-        # # validation
-        # if not any([isinstance(self.src_name, x) for x in [str, int, Iterable[str]]]):
-        #     raise ValueError("src_name must be str, int, or Iterable[str]")
-        # if not any([isinstance(self.target_name, x) for x in [str, int]]):
-        #     raise ValueError("src_name must be str or int")
 
         if self.dtype is None and self.strip_before_parsing:
             raise ValueError(
@@ -140,12 +134,19 @@ class FileLoaderMetadata:
         custom_features: dict[str, dict[str, FeatureType]] | None = None
         custom_analyses: list[Analysis] | None = None
         if 'custom_features' in data:
+            ft_serializer = get_feature_type_serializer()
             custom_features = {
-                k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
+                k1: {
+                    # See https://github.com/python/mypy/issues/4717
+                    k2: narrow(
+                        FeatureType, ft_serializer.deserialize(v2)  # type: ignore
+                    )
+                    for k2, v2 in v1.items()
+                }
                 for k1, v1 in data['custom_features'].items()
             }
         if 'custom_analyses' in data:
-            custom_analyses = [Analysis.from_dict(v) for v in data['custom_analyses']]
+            custom_analyses = data['custom_analyses']
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
@@ -549,6 +550,7 @@ class DatalabFileLoader(FileLoader):
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
         config = narrow(DatalabLoaderOption, data)
+        ft_serializer = get_feature_type_serializer()
 
         # load customized features from global config files
         customized_features_from_config = get_customized_features()
@@ -564,14 +566,13 @@ class DatalabFileLoader(FileLoader):
                         f'{level_name}'
                     )
                 parsed_level_feats = {
-                    k: FeatureType.from_dict(v) for k, v in level_feats.items()
+                    # See https://github.com/python/mypy/issues/4717
+                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                    for k, v in level_feats.items()
                 }
                 new_features = config.custom_features.get(level_name, {})
                 new_features.update(parsed_level_feats)
                 config.custom_features[level_name] = new_features
-            config.custom_analyses = [
-                Analysis.from_dict(x) for x in ds_feats['custom_analyses']
-            ]
 
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
@@ -596,6 +597,7 @@ class DatalabFileLoader(FileLoader):
         )
         # load customized features from global config files
         if config.dataset in customized_features_from_config:
+
             if metadata.custom_features is None:
                 metadata.custom_features = {}
             metadata.custom_features.update(

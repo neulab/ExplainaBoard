@@ -25,7 +25,8 @@ class QAOpenDomainTest(unittest.TestCase):
             "task_name": TaskType.qa_open_domain.value,
             "dataset_name": "natural_questions_comp_gen",
             "metric_names": ["ExactMatchQA"],
+            "source_language": "en",
         }
         processor = get_processor(TaskType.qa_open_domain.value)
-        sys_info = processor.process(metadata, data.samples)
+        sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
         self.assertIsNotNone(sys_info.results.analyses)

@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-from functools import lru_cache
+from collections.abc import Iterable
+from typing import Any
 
-from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
-from datalabs.operations.featurize.summarization import get_oracle_summary
-import numpy
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -19,39 +16,9 @@ from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.py_utils import hash_dict
 from explainaboard.utils.typing_utils import unwrap
 
 sum_attr = SUMAttribute()
-
-
-@hash_dict
-@lru_cache(maxsize=10)
-def get_oracle(existing_features: dict):
-    """
-    oracle_info =
-        {
-        "source":src,
-        "reference":ref,
-        "oracle_summary":oracle,
-        "oracle_labels":labels,
-        "oracle_score":max_score
-        }
-    """
-
-    sample = {
-        "text": existing_features["source"],
-        "summary": existing_features["reference"],
-    }
-    oracle_info = get_oracle_summary.func(sample)
-
-    index_of_oracles = [i for i, e in enumerate(oracle_info["oracle_labels"]) if e != 0]
-    oracle_position = numpy.mean(index_of_oracles)
-
-    return {
-        "oracle_position": oracle_position,
-        "oracle_score": oracle_info["oracle_score"],
-    }
 
 
 @register_processor(TaskType.summarization)
@@ -99,14 +66,14 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def _get_default_eaas_strs(cls):
         return ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
         )
         return {
             'source_vocab': source_vocab,

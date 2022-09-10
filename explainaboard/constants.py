@@ -12,6 +12,7 @@ class TaskType(str, Enum):
     kg_link_tail_prediction = "kg-link-tail-prediction"
     qa_multiple_choice = "qa-multiple-choice"
     qa_open_domain = "qa-open-domain"
+    qa_tat = "qa-tat"
     conditional_generation = "conditional-generation"
     word_segmentation = "word-segmentation"
     language_modeling = "language-modeling"
@@ -22,6 +23,7 @@ class TaskType(str, Enum):
     nlg_meta_evaluation = "nlg-meta-evaluation"
     tabular_regression = "tabular-regression"
     tabular_classification = "tabular-classification"
+    argument_pair_extraction = "argument-pair-extraction"
 
     @staticmethod
     def list():

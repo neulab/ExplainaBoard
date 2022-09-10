@@ -50,13 +50,12 @@ class MachineTranslationTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.machine_translation.value,
-            "dataset_name": "ted_multi",
             "metric_names": ["bleu"],
         }
 
         processor = get_processor(TaskType.machine_translation.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -105,7 +104,9 @@ class MachineTranslationTest(unittest.TestCase):
 
         processor = get_processor(TaskType.machine_translation.value)
 
-        sys_info = processor.process(dataclasses.asdict(data.metadata), data.samples)
+        sys_info = processor.process(
+            dataclasses.asdict(data.metadata), data.samples, skip_failed_analyses=True
+        )
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
         self.assertTrue('num_capital_letters' in analysis_map)
 

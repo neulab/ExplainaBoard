@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Iterable
 import copy
 from typing import Any, cast, List
-
-from datalabs import aggregating, Dataset
 
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import (
@@ -17,7 +16,6 @@ from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledSpan
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import feat_freq_rank, feat_num_oov
 from explainaboard.info import SysOutputInfo
-from explainaboard.loaders.file_loader import DatalabFileLoader
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils.logging import progress
@@ -40,9 +38,9 @@ class SeqLabProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
-            "tokens": feature.Sequence(feature=feature.Value("string")),
-            "true_tags": feature.Sequence(feature=feature.Value("string")),
-            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "tokens": feature.Sequence(feature=feature.Value(dtype="string")),
+            "true_tags": feature.Sequence(feature=feature.Value(dtype="string")),
+            "pred_tags": feature.Sequence(feature=feature.Value(dtype="string")),
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
@@ -172,9 +170,7 @@ class SeqLabProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return data_point["pred_tags"]
 
-    @aggregating()
-    def _statistics_func(self, samples: Dataset, sys_info: SysOutputInfo):
-        dl_features = samples.info.features
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
 
         tokens_sequences = []
         tags_sequences = []
@@ -182,8 +178,7 @@ class SeqLabProcessor(Processor):
         vocab: dict[str, int] = {}
         tag_vocab: dict[str, int] = {}
         for sample in progress(samples):
-            rep_sample = DatalabFileLoader.replace_labels(dl_features, sample)
-            tokens, tags = rep_sample["tokens"], rep_sample["tags"]
+            tokens, tags = sample["tokens"], sample["true_tags"]
 
             # update vocabulary
             for token, tag in zip(tokens, tags):

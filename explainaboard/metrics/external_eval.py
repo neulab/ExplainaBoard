@@ -13,7 +13,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.agreement import fleiss_kappa
 from explainaboard.utils.typing_utils import unwrap
 
@@ -31,7 +31,7 @@ class ExternalEvalResult(AuxiliaryMetricResult):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("ExternalEvalConfig")
 class ExternalEvalConfig(MetricConfig):
     aspect: str = "fluency"
     n_annotators: int = 3

@@ -3,6 +3,7 @@
     "custom_features": {
       "example": {
         "num_capital_letters": {
+          "cls_name": "Value",
           "dtype": "float"
         }
       }

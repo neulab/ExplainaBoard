@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import itertools
-from typing import cast, Optional
+from typing import cast, Optional, Tuple
 
 import numpy as np
 
@@ -12,13 +12,18 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
-from explainaboard.utils.span_utils import BIOSpanOps, BMESSpanOps, SpanOps
+from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.utils.span_utils import (
+    BIOSpanOps,
+    BMESSpanOps,
+    gen_argument_pairs,
+    SpanOps,
+)
 from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("F1ScoreConfig")
 class F1ScoreConfig(MetricConfig):
     average: str = 'micro'
     separate_match: bool = False
@@ -119,7 +124,75 @@ class F1Score(Metric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("APEF1ScoreConfig")
+class APEF1ScoreConfig(MetricConfig):
+    def to_metric(self):
+        return APEF1Score(self)
+
+
+class APEF1Score(Metric):
+    """
+    Calculate F1 score w.r.t argument pair extraction task
+    Note that this task is kinda special compared with common sequence labeling tasks
+    (such as NER), For example, this is one example's tags:
+    'tags': ['Review-B-5',
+      'Review-I-5', 'Review-I-5', 'Review-I-5', 'Review-B-7', 'Review-I-7',
+      'Review-I-7', 'Review-B-4', 'Review-B-2', 'Review-B-1', 'Review-B-8',
+      'Review-I-8', 'Review-I-8', 'Review-I-8', 'Reply-O', 'Reply-B-3', 'Reply-I-3',
+      'Reply-I-3', 'Reply-B-5', 'Reply-I-5', 'Reply-I-5', 'Reply-I-5', 'Reply-B-4']
+    where
+    (Review-B-5, Review-I-5, Review-I-5, Review-I-5, Reply-B-5, Reply-I-5, Reply-I-5,
+     Reply-I-5) is one successful identification.
+    """
+
+    def is_simple_average(self, stats: MetricStats):
+        return False
+
+    def calc_stats_from_data(
+        self,
+        true_data: list[list[str]],
+        pred_data: list[list[str]],
+        config: Optional[MetricConfig] = None,
+    ) -> MetricStats:
+
+        stats = []
+
+        for tags, pred_tags in zip(true_data, pred_data):
+            gold_spans, pred_spans = cast(
+                Tuple[set, set], gen_argument_pairs(tags, pred_tags)
+            )
+            stats.append(
+                [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]
+            )
+        return SimpleMetricStats(np.array(stats))
+
+    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """
+        Aggregate sufficient statistics from multiple examples into a single example
+        :param stats: stats for every example
+        :return: aggregated stats
+        """
+        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
+        if data.size == 0:
+            return np.array(0.0)
+        else:
+            """
+            when data.ndim == 3, e.g.,
+            * 1000 * 100 * 3 -> 1000 * 3
+            """
+            data_sum = np.sum(data, axis=(-2))
+            total_gold = data_sum[0] if data.ndim == 2 else data_sum[:, 0]
+            total_pred = data_sum[1] if data.ndim == 2 else data_sum[:, 1]
+            correct_num = data_sum[2] if data.ndim == 2 else data_sum[:, 2]
+
+            precision = correct_num * 1.0 / total_pred
+            recall = correct_num * 1.0 / total_gold
+            fscore = 2.0 * precision * recall / (precision + recall)
+            return np.array(fscore)
+
+
+@dataclass
+@metric_config_registry.register("SeqF1ScoreConfig")
 class SeqF1ScoreConfig(F1ScoreConfig):
     tag_schema: str = 'bio'
 

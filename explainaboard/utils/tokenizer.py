@@ -1,10 +1,15 @@
+"""Definition of tokenizers."""
+
 from __future__ import annotations
 
 import abc
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from functools import lru_cache
 import re
 import string
 import sys
+from typing import final, overload
 import unicodedata
 
 from sacrebleu.tokenizers import BaseTokenizer
@@ -13,6 +18,10 @@ from sacrebleu.tokenizers.tokenizer_ja_mecab import TokenizerJaMecab
 from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
 
 from explainaboard import TaskType
+from explainaboard.serialization.registry import TypeRegistry
+from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable, SerializableData
+from explainaboard.utils.typing_utils import narrow
 
 
 def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
@@ -34,22 +43,65 @@ def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
         return SingleSpaceTokenizer()
 
 
-class TokenSeq:
-    def __init__(self, strs: list[str] = None, positions: list[int] = None):
-        self.strs: list[str] = strs or []
-        self.positions: list[int] = positions or []
+@final
+@dataclass(frozen=True)
+class TokenSeq(Sequence):
+    """Dataclass representing a list of tokens and its original positions."""
 
-    def __getitem__(self, item) -> str:
-        return self.strs.__getitem__(item)
+    strs: list[str]
+    positions: list[int]
+
+    def __post_init__(self):
+        if len(self.strs) != len(self.positions):
+            raise ValueError("strs and positions must be the same length.")
+
+    @overload
+    def __getitem__(self, item: int) -> str:
+        ...
+
+    @overload
+    def __getitem__(self, item: slice) -> Sequence[str]:
+        ...
+
+    def __getitem__(self, item: int | slice) -> str | Sequence[str]:
+        return self.strs[item]
 
     def __len__(self) -> int:
-        return self.strs.__len__()
+        return len(self.strs)
 
     def __iter__(self):
-        return self.strs.__iter__()
+        return iter(self.strs)
+
+    @staticmethod
+    def from_orig_and_tokens(orig: str, tokens: list[str]) -> TokenSeq:
+        """Helper to generate TokenSeq from given string and tokens.
+
+        Args:
+            orig: Original text.
+            tokens: List of tokens. Elements must be sorted by the same order in `orig`.
+
+        Returns:
+            TokenSeq constructed from given arguments.
+        """
+        start = 0
+        strs: list[str] = []
+        positions: list[int] = []
+
+        for x in tokens:
+            next_start = orig.find(x, start)
+            if next_start == -1:
+                raise ValueError(
+                    "Could not find a token in the original text. "
+                    f"orig={orig}, tokens={tokens}"
+                )
+            strs.append(x)
+            positions.append(next_start)
+            start = next_start
+
+        return TokenSeq(strs, positions)
 
 
-class Tokenizer:
+class Tokenizer(Serializable, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def __call__(self, text: str) -> TokenSeq:
         """
@@ -68,34 +120,30 @@ class Tokenizer:
         """
         ...
 
-    @abc.abstractmethod
-    def to_dict(self) -> dict:
-        """
-        Return a representation of this class that is serializable in json
-        """
-        ...
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        return {}
 
     @classmethod
-    def from_dict(cls, v: dict) -> Tokenizer:
-        new_v = dict(v)
-        cls_name = new_v.pop('cls_name')
-        thismodule = sys.modules[__name__]
-        return getattr(thismodule, cls_name)(**new_v)
-
-    @staticmethod
-    def find_spans(orig_str: str, str_list: list[str]) -> TokenSeq:
-        start = 0
-        ret = TokenSeq()
-        for x in str_list:
-            next_start = orig_str.find(x, start)
-            if next_start == -1:
-                raise ValueError(f'could not "{orig_str}".find({x}, {start})')
-            ret.strs.append(x)
-            ret.positions.append(next_start)
-            start = next_start
-        return ret
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        return cls()
 
 
+_tokenizer_registry = TypeRegistry[Serializable]()
+
+
+def get_tokenizer_serializer() -> PrimitiveSerializer:
+    """Create a serializer for tokenizers.
+
+    Returns:
+        A serializer object for tokenizer classes.
+    """
+    return PrimitiveSerializer(_tokenizer_registry)
+
+
+@final
+@_tokenizer_registry.register("SingleSpaceTokenizer")
 class SingleSpaceTokenizer(Tokenizer):
     """
     Split a string on a single ascii space
@@ -103,19 +151,19 @@ class SingleSpaceTokenizer(Tokenizer):
 
     @lru_cache(maxsize=20)
     def __call__(self, text: str) -> TokenSeq:
-        ret = TokenSeq()
         start = 0
+        strs: list[str] = []
+        positions: list[int] = []
+
         for x in text.split(' '):
-            ret.strs.append(x)
-            ret.positions.append(start)
+            strs.append(x)
+            positions.append(start)
             start = start + len(x) + 1
-        return ret
+
+        return TokenSeq(strs, positions)
 
     def detokenize(self, tokens: list[str]) -> str:
         return ' '.join(tokens)
-
-    def to_dict(self):
-        return {'cls_name': 'SingleSpaceTokenizer'}
 
 
 class TokenizerConala(BaseTokenizer):
@@ -142,55 +190,82 @@ class TokenizerConala(BaseTokenizer):
         return text
 
 
-def _no_normalizer(text: str) -> str:
-    return text
-
-
-def _conala_normalizer(text: str) -> str:
-    text = text.replace('"', '`')
-    text = text.replace('\'', '`')
-    return text
-
-
+@final
+@_tokenizer_registry.register("SacreBleuTokenizer")
 class SacreBleuTokenizer(Tokenizer):
     """
     Split a string based on the strategy in SacreBLEU
     """
 
-    def __init__(self, variety: str = 'intl'):
-        self.normalizer = _no_normalizer
-        self.variety = variety
+    @staticmethod
+    def _get_normalizer(variety: str) -> Callable[[str], str]:
+        """Helper to obtain a normalizer function associated to the variety.
+
+        Args:
+            variety: Name of the tokenization toolchain.
+
+        Returns:
+            Function to normalize texts.
+        """
+        if variety == 'conala':
+            trdict = str.maketrans("'\"", "``")
+            return lambda text: text.translate(trdict)
+        else:
+            return lambda text: text
+
+    @staticmethod
+    def _get_tokenizer(variety: str) -> Callable[[str], str]:
+        """Helper to obtain an inner tokenizer function. associated to the variety.
+
+        Args:
+            variety: Name of the tokenization toolchain.
+
+        Returns:
+            Runction to tokenize texts to space-joined tokens.
+        """
         if variety == 'intl':
-            self.tokenizer: BaseTokenizer = TokenizerV14International()
+            return TokenizerV14International()
         elif variety == 'zh':
-            self.tokenizer = TokenizerZh()
+            return TokenizerZh()
         elif variety == 'ja-mecab':
-            self.tokenizer = TokenizerJaMecab()
+            return TokenizerJaMecab()
         elif variety == 'conala':
-            self.tokenizer = TokenizerConala()
-            self.normalizer = _conala_normalizer
+            return TokenizerConala()
         else:
             raise ValueError(f'Illegal variety of SacreBleuTokenizer: {variety}')
 
+    def __init__(self, variety: str = 'intl'):
+        self._variety = variety
+        self._normalizer = self._get_normalizer(self._variety)
+        self._tokenizer = self._get_tokenizer(self._variety)
+
     @lru_cache(maxsize=20)
     def __call__(self, text: str) -> TokenSeq:
-        return self.find_spans(self.normalizer(text), self.tokenizer(text).split(' '))
+        return TokenSeq.from_orig_and_tokens(
+            self._normalizer(text), self._tokenizer(text).split(' ')
+        )
 
     def detokenize(self, tokens: list[str]) -> str:
         raise NotImplementedError
 
-    def to_dict(self):
-        return {'cls_name': 'SacreBleuTokenizer', 'variety': self.variety}
+    def serialize(self) -> dict[str, SerializableData]:
+        return {"variety": self._variety}
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        return cls(variety=narrow(str, data["variety"]))
 
 
+@final
+@_tokenizer_registry.register("MLQAMixTokenizer")
 class MLQAMixTokenizer(Tokenizer):
-
-    ss_tokenizer = SingleSpaceTokenizer()
-    PUNCT = {
-        chr(i)
-        for i in range(sys.maxunicode)
-        if unicodedata.category(chr(i)).startswith('P')
-    }.union(string.punctuation)
+    def __init__(self) -> None:
+        self._ss_tokenizer = SingleSpaceTokenizer()
+        self._punct = {
+            chr(i)
+            for i in range(sys.maxunicode)
+            if unicodedata.category(chr(i)).startswith('P')
+        }.union(string.punctuation)
 
     @lru_cache(maxsize=20)
     def __call__(self, text: str) -> TokenSeq:
@@ -198,9 +273,9 @@ class MLQAMixTokenizer(Tokenizer):
         segs_out: list[str] = []
         temp_str = ""
         for char in text:
-            if re.search(r'[\u4e00-\u9fa5]', char) or char in self.PUNCT:
+            if re.search(r'[\u4e00-\u9fa5]', char) or char in self._punct:
                 if temp_str != "":
-                    ss = self.ss_tokenizer(temp_str)
+                    ss = self._ss_tokenizer(temp_str)
                     segs_out.extend(ss)
                     temp_str = ""
                 segs_out.append(char)
@@ -208,13 +283,10 @@ class MLQAMixTokenizer(Tokenizer):
                 temp_str += char
 
         if temp_str != "":
-            ss = self.ss_tokenizer(temp_str)
+            ss = self._ss_tokenizer(temp_str)
             segs_out.extend(ss)
 
-        return self.find_spans(text, segs_out)
+        return TokenSeq.from_orig_and_tokens(text, segs_out)
 
     def detokenize(self, tokens: list[str]) -> str:
         raise NotImplementedError
-
-    def to_dict(self):
-        return {'cls_name': 'MLQAMixTokenizer'}

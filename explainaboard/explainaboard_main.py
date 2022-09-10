@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 
@@ -16,7 +17,7 @@ from explainaboard.loaders.file_loader import (
 )
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.registry import get_metric_config_class
+from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
@@ -299,6 +300,12 @@ def create_parser():
         type=str,
         help="file types for custom datasets",
     )
+
+    parser.add_argument(
+        '--skip-failed-analyses',
+        action='store_true',
+        help="whether to skip failed analyses or report errors.",
+    )
     return parser
 
 
@@ -315,7 +322,7 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
         ValueError: `name` is not registered in neither the registry nor EaaS.
     """
     try:
-        return get_metric_config_class(name)
+        return metric_config_registry.get_type(name)
     except ValueError:
         if name in eaas.endpoint.EndpointConfig().valid_metrics:
             return EaaSMetricConfig
@@ -450,8 +457,8 @@ def main():
             "conf_value": args.conf_value,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
+            "custom_analyses": system_datasets[0].metadata.custom_analyses,
         }
-
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
@@ -471,11 +478,14 @@ def main():
             # metadata[
             #     "user_defined_features_configs"
             # ] = loader.user_defined_features_configs
-            metadata["task_name"] = task
+            metadata_copied = copy.deepcopy(metadata)
+            metadata_copied["task_name"] = task
 
             processor = get_processor(task=task)
             report = processor.process(
-                metadata=metadata, sys_output=system_dataset.samples
+                metadata=metadata_copied,
+                sys_output=system_dataset.samples,
+                skip_failed_analyses=args.skip_failed_analyses,
             )
             reports.append(report)
 

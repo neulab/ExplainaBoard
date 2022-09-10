@@ -3,6 +3,7 @@
     "custom_features": {
       "example": {
         "commonsense_category": {
+          "cls_name": "Value",
           "dtype": "string",
           "description": "common sense category"
         }

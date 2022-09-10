@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-from datalabs import aggregating
+from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -29,11 +28,11 @@ class QAExtractiveProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "context": feature.Value("string"),
-            "question": feature.Value("string"),
-            "id": feature.Value("string"),
-            "answers": feature.Sequence(feature=feature.Value("string")),
-            "predicted_answers": feature.Value("string"),
+            "context": feature.Value(dtype="string"),
+            "question": feature.Value(dtype="string"),
+            "id": feature.Value(dtype="string"),
+            "answers": feature.Sequence(feature=feature.Value(dtype="string")),
+            "predicted_answers": feature.Value(dtype="string"),
             "context_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
@@ -108,8 +107,7 @@ class QAExtractiveProcessor(Processor):
             ),
         ]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import abc
-from typing import Any, cast, Optional
+from collections.abc import Iterable
+from typing import Any, final, Optional
 
-from datalabs import aggregating, Dataset, DatasetDict, load_dataset
 from eaas.async_client import AsyncClient
 from eaas.config import Config
 
@@ -16,10 +16,11 @@ from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
+from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -27,7 +28,7 @@ from explainaboard.utils.cache_api import (
 )
 from explainaboard.utils.logging import get_logger, progress
 from explainaboard.utils.tokenizer import get_default_tokenizer
-from explainaboard.utils.typing_utils import unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
 class Processor(metaclass=abc.ABCMeta):
@@ -110,18 +111,15 @@ class Processor(metaclass=abc.ABCMeta):
         """
         return {"cls": self, "sys_info": sys_info}  #
 
-    @aggregating
-    def _statistics_func(self):
-        return {}
+    @abc.abstractmethod
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        ...
 
-    def _gen_external_stats(
-        self, sys_info: SysOutputInfo, statistics_func: aggregating
-    ):
+    def _gen_external_stats(self, sys_info: SysOutputInfo):
         """Generate external statistics that are gathered from a relatively costly
         source, such as the training set.
         These are gathered once and then cached for future use.
         :param sys_info: Information about the system outputs
-        :param statistics_func: The function used to get the statistics
         :return: Statistics from, usually, the training set that are used to calculate
             other features
         """
@@ -139,36 +137,23 @@ class Processor(metaclass=abc.ABCMeta):
                     sys_info.dataset_name, sub_dataset
                 )
             if statistics is None:
+                dataset = None
                 try:
-                    dataset = load_dataset(sys_info.dataset_name, sub_dataset)
-                except Exception:
-                    dataset = None
-                if dataset is None:
+                    loader = get_loader_class(self.task_type()).from_datalab(
+                        DatalabLoaderOption(
+                            sys_info.dataset_name, sub_dataset, split=split_name
+                        ),
+                        output_data=None,
+                    )
+                    dataset = loader.load()
+                except ValueError as e:
                     get_logger().warning(
-                        f"{sys_info.dataset_name} hasn't been supported by DataLab so"
+                        f"{sys_info.dataset_name} could not be loaded by DataLab so"
                         " no training set dependent features will be supported by"
-                        " ExplainaBoard. You can add the dataset by: https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md"  # noqa
+                        f" ExplainaBoard. Error: {e}"
                     )
-                elif not (
-                    isinstance(dataset, Dataset) or isinstance(dataset, DatasetDict)
-                ):
-                    raise ValueError(
-                        'Expecting type Dataset or DatasetDict, '
-                        f'but got {type(dataset)}'
-                    )
-                elif split_name not in dataset:
-                    get_logger().warning(
-                        f"{sys_info.dataset_name} has no {split_name} split in DataLab "
-                        "so training set dependent features will not be calculated"
-                    )
-                else:
-                    self._statistics_func.resources = self._get_statistics_resources(
-                        sys_info
-                    )
-                    new_train = dataset[split_name].apply(  # type: ignore
-                        self._statistics_func, mode="local"
-                    )
-                    statistics = new_train._stat
+                if dataset is not None:
+                    statistics = self._statistics_func(dataset.samples, sys_info)
                     get_logger().info(
                         f"caching stats for {sys_info.dataset_name} {sub_dataset}"
                     )
@@ -225,26 +210,33 @@ class Processor(metaclass=abc.ABCMeta):
         if custom_analyses is not None:
             analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
         if custom_features is not None:
+            ft_serializer = get_feature_type_serializer()
+
             for level_name, feature_content in custom_features.items():
-                level_map[level_name].features.update(
-                    {
-                        k: (FeatureType.from_dict(v) if isinstance(v, dict) else v)
-                        for k, v in feature_content.items()
-                    }
-                )
+                additional_features = {
+                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                    if isinstance(v, dict)
+                    else v
+                    for k, v in feature_content.items()
+                }
+                level_map[level_name].features.update(additional_features)
         return analysis_levels, analyses
 
+    @final
     def perform_analyses(
         self,
         sys_info: SysOutputInfo,
         analysis_cases: list[list[AnalysisCase]],
         metric_stats: list[list[MetricStats]],
+        skip_failed_analyses: bool = False,
     ) -> list[AnalysisResult]:
         """
         Perform fine-grained analyses
         :param sys_info: Information about the system output
         :param analysis_cases: They cases to analyze
         :param metric_stats: The stats from which to calculate performance
+        :param skip_failed_analyses: Whether to skip analyses when they encountered some
+            errors.
         :return:
             performances_over_bucket:
                 a dictionary of feature name -> list of performances by bucket
@@ -258,8 +250,8 @@ class Processor(metaclass=abc.ABCMeta):
         ]
         for my_analysis in progress(unwrap(sys_info.analyses)):
             level_id = level_map[my_analysis.level]
-            all_results.append(
-                unwrap(
+            try:
+                all_results.append(
                     my_analysis.perform(
                         cases=analysis_cases[level_id],
                         metrics=metrics[level_id],
@@ -267,7 +259,10 @@ class Processor(metaclass=abc.ABCMeta):
                         conf_value=sys_info.conf_value,
                     )
                 )
-            )
+            except Exception as ex:
+                if not skip_failed_analyses:
+                    raise
+                get_logger().warning(f"Analysis failed, skipped. Reason: {ex}")
 
         return all_results
 
@@ -408,13 +403,16 @@ class Processor(metaclass=abc.ABCMeta):
         for analysis_result in analysis_results:
             if not isinstance(analysis_result, BucketAnalysisResult):
                 continue
-            bucket_result = cast(
-                BucketAnalysisResult, analysis_result
-            ).bucket_performances
+            bucket_result = analysis_result.bucket_performances
 
             # based on alphabetical order of the bucket lower boundary; low to high
             if sort_by == 'key':
-                bucket_result.sort(key=lambda x: x.bucket_interval)
+                if bucket_result[0].bucket_interval is not None:
+                    # Sort by intervals.
+                    bucket_result.sort(key=lambda x: unwrap(x.bucket_interval))
+                else:
+                    # Sort by names.
+                    bucket_result.sort(key=lambda x: unwrap(x.bucket_name))
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
             elif sort_by == 'performance_value':
@@ -462,7 +460,7 @@ class Processor(metaclass=abc.ABCMeta):
         )
 
         # get scoring statistics
-        external_stats = self._gen_external_stats(sys_info, self._statistics_func)
+        external_stats = self._gen_external_stats(sys_info)
 
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []
@@ -481,14 +479,20 @@ class Processor(metaclass=abc.ABCMeta):
         sys_info.results = Result(overall=overall_results, analyses=None)
         return OverallStatistics(sys_info, analysis_cases, metric_stats)
 
-    def process(self, metadata: dict, sys_output: list[dict]) -> SysOutputInfo:
+    @final
+    def process(
+        self, metadata: dict, sys_output: list[dict], skip_failed_analyses: bool = False
+    ) -> SysOutputInfo:
+        """"""
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = unwrap(overall_statistics.sys_info)
         analyses = self.perform_analyses(
             sys_info,
             overall_statistics.analysis_cases,
             metric_stats=overall_statistics.metric_stats,
+            skip_failed_analyses=skip_failed_analyses,
         )
+
         self.sort_bucket_info(
             analyses,
             sort_by=metadata.get('sort_by', 'key'),

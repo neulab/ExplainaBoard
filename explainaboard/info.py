@@ -13,9 +13,9 @@ from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
+from explainaboard.serialization.legacy import general_to_dict
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.serialization import general_to_dict
-from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.tokenizer import get_tokenizer_serializer, Tokenizer
 
 logger = get_logger(__name__)
 
@@ -161,7 +161,7 @@ class SysOutputInfo:
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
         try:
-            json.dump(data_dict, fp=file, indent=2, default=lambda x: x.json_repr())
+            json.dump(data_dict, fp=file, indent=2)
         except TypeError as e:
             raise e
 
@@ -169,11 +169,7 @@ class SysOutputInfo:
         """SystemOutputInfo => JSON"""
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
-        file.write(
-            json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()).encode(
-                "utf-8"
-            )
-        )
+        file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
 
     @classmethod
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
@@ -208,7 +204,7 @@ class SysOutputInfo:
         if k == 'results':
             return Result.from_dict(v)
         elif k.endswith('tokenizer'):
-            return Tokenizer.from_dict(v)
+            return get_tokenizer_serializer().deserialize(v)
         elif k == 'analysis_levels':
             return [AnalysisLevel.from_dict(v1) for v1 in v]
         elif k == 'analyses':

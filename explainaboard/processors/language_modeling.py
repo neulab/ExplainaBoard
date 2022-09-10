@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any
 
-from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
@@ -34,8 +34,8 @@ class LanguageModelingProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
-            "text": feature.Value("string"),
-            "log_probs": feature.Value("string"),
+            "text": feature.Value(dtype="string"),
+            "log_probs": feature.Value(dtype="string"),
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
@@ -211,8 +211,7 @@ class LanguageModelingProcessor(Processor):
     def _get_predicted_label(self, data_point: dict):
         return [float(x) for x in data_point["log_probs"].split(' ')]
 
-    @aggregating()
-    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datalabs import aggregating
+from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -30,7 +31,7 @@ from explainaboard.utils.typing_utils import unwrap
 class TextPairClassificationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.text_classification
+        return TaskType.text_pair_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
@@ -132,17 +133,17 @@ class TextPairClassificationProcessor(Processor):
     ) -> list[MetricConfig]:
         return [AccuracyConfig(name='Accuracy')]
 
-    @aggregating()
-    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
 
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples,
+            samples_list,
             lambda x: x['text1'],
             unwrap(sys_info.source_tokenizer),
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples,
+            samples_list,
             lambda x: x["text2"],
             unwrap(sys_info.target_tokenizer),
         )

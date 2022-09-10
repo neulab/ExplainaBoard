@@ -11,11 +11,11 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
+from explainaboard.metrics.registry import metric_config_registry
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("AccuracyConfig")
 class AccuracyConfig(MetricConfig):
     def to_metric(self):
         return Accuracy(self)
@@ -41,7 +41,7 @@ class Accuracy(Metric):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("CorrectCountConfig")
 class CorrectCountConfig(MetricConfig):
     def to_metric(self):
         return CorrectCount(self)
@@ -82,7 +82,7 @@ class CorrectCount(Accuracy):
 
 
 @dataclass
-@register_metric_config
+@metric_config_registry.register("SeqCorrectCountConfig")
 class SeqCorrectCountConfig(MetricConfig):
     def to_metric(self):
         return SeqCorrectCount(self)

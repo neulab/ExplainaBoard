@@ -57,11 +57,12 @@ for analyses in fine_grained_res:
             confidence_score_high = bucket_performance.confidence_score_high
 
             print("------------------------------------------------------")
+
+            bucket_name = unwrap(bucket_info.bucket_name)
+            print(f"feature_name:{buckets.name} bucket_name:{bucket_name}")
+
             print(
-                f"feature_name:{buckets.name} "
-                f"bucket_name:{bucket_info.bucket_interval}"
-            )
-            print(
+                "\n"
                 f"metric_name:{metric_name}\n"
                 f"value:{value}\n"
                 f"confidence_score_low:{confidence_score_low}\n"

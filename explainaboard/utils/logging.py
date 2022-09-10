@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import logging
 import os
 from typing import Optional, TypeVar
@@ -14,16 +13,7 @@ hide_progress = 'EXPLAINABOARD_HIDE_PROGRESS' in os.environ
 T = TypeVar("T")
 
 
-def progress(gen: Iterable[T], desc: Optional[str] = None) -> Iterable[T]:
-    """Wrap the given iterable with possibly the progress bar.
-
-    Args:
-        gen: Iterable to be wrapped.
-        desc: Prefix string of the progress bar.
-
-    Returns:
-        `gen` itself, or a wrapped iterable.
-    """
+def progress(gen, desc: str = None):
     return gen if hide_progress else tqdm(gen, desc=desc)
 
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
+from typing import Any
 
-from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
@@ -33,9 +33,9 @@ class ClozeGenerativeProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
-            "context": feature.Value("string"),
-            "question_mark": feature.Value("string"),
-            "hint": feature.Value("string"),
+            "context": feature.Value(dtype="string"),
+            "question_mark": feature.Value(dtype="string"),
+            "hint": feature.Value(dtype="string"),
             "answers": feature.Sequence(feature=feature.Value(dtype="string")),
             "context_length": feature.Value(
                 dtype="float",
@@ -125,8 +125,7 @@ class ClozeGenerativeProcessor(Processor):
         """
         return data_point["predicted_answers"][0]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )

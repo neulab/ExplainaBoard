@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-from datalabs import aggregating
+from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -29,9 +28,9 @@ class QAOpenDomainProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "question": feature.Value("string"),
+            "question": feature.Value(dtype="string"),
             # "question_types": feature.Sequence(feature=feature.Value("string")),
-            "answers": feature.Sequence(feature=feature.Value("string")),
+            "answers": feature.Sequence(feature=feature.Value(dtype="string")),
             "question_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
@@ -108,8 +107,7 @@ class QAOpenDomainProcessor(Processor):
         """
         return data_point["predicted_answer"]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['question'], unwrap(sys_info.source_tokenizer)
         )

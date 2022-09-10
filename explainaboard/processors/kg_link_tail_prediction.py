@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
 import json
 from typing import Any
-
-from datalabs import aggregating
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -32,13 +30,13 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "true_head": feature.Value("string"),
-            "true_head_decipher": feature.Value("string"),
+            "true_head": feature.Value(dtype="string"),
+            "true_head_decipher": feature.Value(dtype="string"),
             "true_link": feature.Value(dtype="string", description="the relation type"),
             "true_tail": feature.Value(dtype="string"),
-            "true_tail_decipher": feature.Value("string"),
-            "predict": feature.Value("string"),
-            "predictions": feature.Sequence(feature=feature.Value("string")),
+            "true_tail_decipher": feature.Value(dtype="string"),
+            "predict": feature.Value(dtype="string"),
+            "predictions": feature.Sequence(feature=feature.Value(dtype="string")),
             "tail_entity_length": feature.Value(
                 dtype="float",
                 description="length of the tail entity in tokens",
@@ -57,7 +55,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 dtype="float",
                 description="average frequency of the tail entity",
                 require_training_set=True,
-                func=lambda info, x, stat: stat['tail_fre'].get(
+                func=lambda info, x, c, stat: stat['tail_fre'].get(
                     x['true_tail_decipher'], 0
                 ),
             ),
@@ -65,13 +63,13 @@ class KGLinkTailPredictionProcessor(Processor):
                 dtype="float",
                 description="frequency of relation in training set",
                 require_training_set=True,
-                func=lambda info, x, stat: stat['link_fre'].get(x['true_link'], 0),
+                func=lambda info, x, c, stat: stat['link_fre'].get(x['true_link'], 0),
             ),
             "head_fre": feature.Value(
                 dtype="float",
                 description="frequency of head entity in training set",
                 require_training_set=True,
-                func=lambda info, x, stat: stat['head_fre'].get(
+                func=lambda info, x, c, stat: stat['head_fre'].get(
                     x['true_head_decipher'], 0
                 ),
             ),
@@ -146,14 +144,14 @@ class KGLinkTailPredictionProcessor(Processor):
         super().__init__()
         self.entity_type_level_map = None
         file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
-            'pre_computed/kg/entity_type_level_map.json',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         """
         `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
         # pip install datalabs
@@ -164,44 +162,16 @@ class KGLinkTailPredictionProcessor(Processor):
         dict_link: dict[str, int] = {}
         dict_tail: dict[str, int] = {}
 
-        file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
-            'pre_computed/kg/entity2wikidata.json',
-        )
-        with open(file_path, 'r') as file:
-            entity_dic = json.loads(file.read())
-
         for sample in progress(samples):
 
-            tail = (
-                sample['tail']
-                if sample['tail'] not in entity_dic.keys()
-                else entity_dic[sample['tail']]['label']
-            )
-            if tail not in dict_tail.keys():
-                dict_tail[tail] = 1
-            else:
-                dict_tail[tail] += 1
+            tail = sample['true_tail_decipher']
+            dict_tail[tail] = dict_tail.get(tail, 0) + 1
 
-            head = (
-                sample['head']
-                if sample['head'] not in entity_dic.keys()
-                else entity_dic[sample['head']]['label']
-            )
-            if head not in dict_head.keys():
-                dict_head[head] = 1
-            else:
-                dict_head[head] += 1
+            head = sample['true_head_decipher']
+            dict_head[head] = dict_head.get(head, 0) + 1
 
-            link = (
-                sample['link']
-                if sample['link'] not in entity_dic.keys()
-                else entity_dic[sample['link']]['label']
-            )
-            if link not in dict_link.keys():
-                dict_link[link] = 1
-            else:
-                dict_link[link] += 1
+            link = sample['true_link']
+            dict_link[link] = dict_link.get(link, 0) + 1
 
         return {
             "head_fre": dict_head,
