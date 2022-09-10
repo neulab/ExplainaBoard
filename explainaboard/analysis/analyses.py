@@ -35,7 +35,7 @@ class AnalysisResult(metaclass=abc.ABCMeta):
         Returns:
             Multi-lined string representing the report of this result.
         """
-        raise NotImplementedError
+        ...
 
     @staticmethod
     def from_dict(dikt):
