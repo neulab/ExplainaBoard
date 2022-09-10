@@ -11,7 +11,6 @@ from sklearn.metrics import f1_score
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_loader_class
-from explainaboard.utils import cache_api
 import explainaboard.metrics.accuracy
 import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
@@ -22,25 +21,25 @@ import explainaboard.metrics.sql_em_ex
 class MetricTest(unittest.TestCase):
     def test_accuracy(self):
         metric = explainaboard.metrics.accuracy.AccuracyConfig(
-            name='Accuracy'
+            name="Accuracy"
         ).to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a']
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = ["a", "b", "a", "b", "b", "a"]
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_correct_score(self):
         metric = explainaboard.metrics.accuracy.CorrectCountConfig(
-            name='CorrectCount'
+            name="CorrectCount"
         ).to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a']
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = ["a", "b", "a", "b", "b", "a"]
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 4)
 
     def test_seq_correct_score(self):
         metric = explainaboard.metrics.accuracy.SeqCorrectCountConfig(
-            name='SeqCorrectCount'
+            name="SeqCorrectCount"
         ).to_metric()
         true = [
             {
@@ -76,60 +75,60 @@ class MetricTest(unittest.TestCase):
 
     def test_f1_micro(self):
         metric = explainaboard.metrics.f1_score.F1ScoreConfig(
-            name='F1', average='micro'
+            name="F1", average="micro"
         ).to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
+        true = ["a", "b", "a", "b", "a", "a", "c", "c"]
+        pred = ["a", "b", "a", "b", "b", "a", "c", "a"]
 
-        sklearn_f1 = f1_score(true, pred, average='micro')
+        sklearn_f1 = f1_score(true, pred, average="micro")
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_f1_macro(self):
         metric = explainaboard.metrics.f1_score.F1ScoreConfig(
-            name='F1', average='macro'
+            name="F1", average="macro"
         ).to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
-        sklearn_f1 = f1_score(true, pred, average='macro')
+        true = ["a", "b", "a", "b", "a", "a", "c", "c"]
+        pred = ["a", "b", "a", "b", "b", "a", "c", "a"]
+        sklearn_f1 = f1_score(true, pred, average="macro")
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_hits(self):
-        metric = explainaboard.metrics.ranking.HitsConfig(name='Hits').to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
+        metric = explainaboard.metrics.ranking.HitsConfig(name="Hits").to_metric()
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = [["a", "b"], ["c", "d"], ["c", "a"], ["a", "c"], ["b", "a"], ["a", "b"]]
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 4.0 / 6.0)
 
     def test_mrr(self):
         metric = explainaboard.metrics.ranking.MeanReciprocalRankConfig(
-            name='MRR'
+            name="MRR"
         ).to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = [["a", "b"], ["c", "d"], ["c", "a"], ["a", "c"], ["b", "a"], ["a", "b"]]
         result = metric.evaluate(true, pred, conf_value=0.05)
         self.assertAlmostEqual(result.value, 2.5 / 6.0)
 
     def test_ner_f1(self):
 
         true = [
-            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'O', 'O'],
-            ['B-PER', 'I-PER', 'O'],
+            ["O", "O", "B-MISC", "I-MISC", "B-MISC", "O", "O"],
+            ["B-PER", "I-PER", "O"],
         ]
         pred = [
-            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
-            ['B-PER', 'I-PER', 'O'],
+            ["O", "O", "B-MISC", "I-MISC", "B-MISC", "I-MISC", "O"],
+            ["B-PER", "I-PER", "O"],
         ]
 
         metric = explainaboard.metrics.f1_score.SeqF1ScoreConfig(
-            name='MicroF1', average='micro', tag_schema='bio'
+            name="MicroF1", average="micro", tag_schema="bio"
         ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
         metric = explainaboard.metrics.f1_score.SeqF1ScoreConfig(
-            name='MacroF1', average='macro', tag_schema='bio'
+            name="MacroF1", average="macro", tag_schema="bio"
         ).to_metric()
         result = metric.evaluate(true, pred, conf_value=None)
         self.assertAlmostEqual(result.value, 3.0 / 4.0)
@@ -151,7 +150,7 @@ class MetricTest(unittest.TestCase):
                 }
             )
         return eaas_client.async_score(
-            inputs, metrics=metric_names.copy(), calculate=['corpus', 'stats']
+            inputs, metrics=metric_names.copy(), calculate=["corpus", "stats"]
         )
 
     def test_eaas_decomposabiltiy(self):
@@ -174,7 +173,7 @@ class MetricTest(unittest.TestCase):
 
         # Initialize client and decide which metrics to test
         eaas_client = AsyncClient(Config())
-        metric_names = ['rouge1', 'bleu', 'chrf', 'length_ratio']
+        metric_names = ["rouge1", "bleu", "chrf", "length_ratio"]
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics
@@ -204,11 +203,11 @@ class MetricTest(unittest.TestCase):
                 split_stats = full_stats.filter(half_ids)
                 # EaaS-returned value should be same as explainaboard-calculated value
                 self.assertAlmostEqual(
-                    full_result['scores'][i]['corpus'],
+                    full_result["scores"][i]["corpus"],
                     metric.evaluate_from_stats(full_stats).value,
                 )
                 self.assertAlmostEqual(
-                    half_result['scores'][i]['corpus'],
+                    half_result["scores"][i]["corpus"],
                     metric.evaluate_from_stats(half_stats).value,
                 )
                 # Stats calculated over half corpus should be the same as the stats
@@ -262,23 +261,25 @@ class MetricTest(unittest.TestCase):
             2,
             "almost equal",
         )
+
     def test_sql_em(self):
         # python -m unittest integration_tests.metric_test.MetricTest.test_sql_em
         metric = explainaboard.metrics.sql_em_ex.SQLEmConfig(
-            name='SQLEm',
-            db_dir='https://expressai-xlab.s3.amazonaws.com/large_data/database',
-            table_path='https://expressai-xlab.s3.amazonaws.com/large_data/table/tables.json',
-            etype='match'
+            name="SQLEm",
+            db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
+            table_path="https://expressai-xlab.s3.amazonaws.com/"
+            "large_data/table/tables.json",
+            etype="match",
         ).to_metric()
         true = [
-            ["select distinct country from singer where age > 20","concert_singer"],
-            ["select distinct country from singer where age > 20","concert_singer"],
-            ["select distinct country from singer where age > 20", "concert_singer"]
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
         ]
         pred = [
             ["select distinct country from singer where age > 20", "concert_singer"],
             ["select distinct country from singer where age > 25", "concert_singer"],
-            ["select distinct country from singer where age = 20", "concert_singer"]
+            ["select distinct country from singer where age = 20", "concert_singer"],
         ]
         result = metric.evaluate(true, pred)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
@@ -286,20 +287,21 @@ class MetricTest(unittest.TestCase):
     def test_sql_ex(self):
         # python -m unittest integration_tests.metric_test.MetricTest.test_sql_ex
         metric = explainaboard.metrics.sql_em_ex.SQLExConfig(
-            name='SQLEx',
-            db_dir='https://expressai-xlab.s3.amazonaws.com/large_data/database',
-            table_path='https://expressai-xlab.s3.amazonaws.com/large_data/table/tables.json',
-            etype='exec'
+            name="SQLEx",
+            db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
+            table_path="https://expressai-xlab.s3.amazonaws.com/"
+            "large_data/table/tables.json",
+            etype="exec",
         ).to_metric()
         true = [
-            ["select distinct country from singer where age > 20","concert_singer"],
-            ["select distinct country from singer where age > 20","concert_singer"],
-            ["select distinct country from singer where age > 20", "concert_singer"]
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
         ]
         pred = [
             ["select distinct country from singer where age > 20", "concert_singer"],
             ["select distinct country from singer where age > 25", "concert_singer"],
-            ["select distinct country from singer where age = 20", "concert_singer"]
+            ["select distinct country from singer where age = 20", "concert_singer"],
         ]
         result = metric.evaluate(true, pred)
         self.assertAlmostEqual(result.value, 1.0 / 3.0)
