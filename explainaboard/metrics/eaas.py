@@ -19,6 +19,7 @@ _eaas_client = None
 
 
 def get_eaas_client():
+    """Get a global client for EaaS."""
     global _eaas_config, _eaas_client
     if not _eaas_client:
         _eaas_config = Config()
@@ -91,9 +92,7 @@ class EaaSMetricConfig(MetricConfig):
 
 
 class EaaSMetric(Metric):
-    """
-    A metric that calculates evaluation scores using EaaS.
-    """
+    """A metric that calculates evaluation scores using EaaS."""
 
     _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
 
@@ -127,11 +126,7 @@ class EaaSMetric(Metric):
         return self.config.name not in self._NOT_SIMPLE_METRICS
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """See: Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if self.config.name in {'bleu', 'chrf'}:
             return np.sum(data, axis=-2)

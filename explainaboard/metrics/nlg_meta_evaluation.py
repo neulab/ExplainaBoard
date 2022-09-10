@@ -39,6 +39,8 @@ class CorrelationConfig(MetricConfig):
 
 
 class CorrelationMetric(Metric):
+    """A metric that calculates correlations."""
+
     def is_simple_average(self, stats: MetricStats):
         """See Metric.is_simple_average."""
         return False
@@ -64,6 +66,15 @@ class CorrelationMetric(Metric):
     def get_scores_from_stats(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> dict[str, list]:
+        """Get scores from stats.
+
+        Args:
+            agg_stats: The aggregate stats.
+            config: Configuration for this metric.
+
+        Returns:
+            The score.
+        """
         config = narrow(CorrelationConfig, unwrap_or(config, self.config))
         scores: dict[str, list] = {}
         for stat in agg_stats:
@@ -97,11 +108,7 @@ class CorrelationMetric(Metric):
         return scores
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """See Metric.aggregate_stats."""
         return stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
     def calc_metric_from_aggregate(

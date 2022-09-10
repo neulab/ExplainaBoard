@@ -11,6 +11,7 @@ metric_config_registry = TypeRegistry[MetricConfig]()
 
 
 def metric_config_from_dict(dikt: dict):
+    """Create a metric config from a dictionary."""
     type = dikt.pop('cls_name')
     config_cls = metric_config_registry.get_type(type)
     field_names = set(f.name for f in dataclasses.fields(config_cls))

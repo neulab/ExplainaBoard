@@ -14,27 +14,35 @@ from explainaboard.utils.typing_utils import unwrap_or
 
 @dataclass
 class AuxiliaryMetricResult:
+    """Extra information specific to individual metrics."""
+
     pass
 
 
 @dataclass
 class MetricResult:
-    """
-    A result of computing a metric over some data
+    """A result of computing a metric over some data.
+
+    Args:
+        config: Configuration with which it was calculated
+        value: Metric value
+        conf_interval: Confidence interval of the metric values
+        conf_value: The p-value of the confidence interval
+        auxiliary_result: Extra data for
     """
 
-    # Configuration with which it was calculated
     config: MetricConfig
-    # Metric value
     value: float
-    # Confidence interval of the metric values
     conf_interval: Optional[tuple[float, float]] = None
-    # The p-value of the confidence interval
     conf_value: Optional[float] = None
-    # Extra data for
     auxiliary_result: AuxiliaryMetricResult | None = None
 
     def to_dict(self):
+        """Return the metric result as a serializable dictionary.
+
+        Returns:
+            The dictionary containing the requisite information.
+        """
         ret = {
             'config': self.config.__dict__,
             'value': self.value,
@@ -48,21 +56,28 @@ class MetricResult:
 
 @dataclass
 class MetricConfig(dict):
-    """
-    The configuration for the metric. This can be passed in to the metric either in
+    """The configuration for a metric.
+
+    This can be passed in to the metric either in
     the constructor (e.g. for compute-intensive operations such as model loading),
     or when performing individual metric computation.
+
+    Args:
+        name: The metric name
+        source_language: The source language
+        target_language: The target language
+        cls_name: The class name
+        external_stats: Any external statistics
     """
 
     name: str
     source_language: str | None = None
     target_language: str | None = None
     cls_name: str | None = None
-    # The external statistics for metrics
     external_stats: np.ndarray | None = None
 
     def __post_init__(self):
-        # Save the class name
+        """Set the class name for the metric config."""
         self.cls_name = type(self).__name__
 
     def to_metric(self):
@@ -71,6 +86,7 @@ class MetricConfig(dict):
 
     @classmethod
     def dict_conv(cls, k, v):
+        """Conversion for serialization."""
         return v
 
 
@@ -238,16 +254,14 @@ class SimpleMetricStats(MetricStats):
 
 
 class Metric:
-    """
-    A class representing an evaluation metric
-    """
+    """A class representing an evaluation metric."""
 
     def __init__(
         self,
         config: MetricConfig,
     ):
-        """
-        Initialize the metric
+        """Initialize the metric.
+
         :param config: The configuration for the metric
         """
         self.config: MetricConfig = config
@@ -271,12 +285,14 @@ class Metric:
         ...
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """Aggregate sufficient statistics from multiple examples into a single example.
 
+        Args:
+            stats: stats for every example
+
+        Returns:
+            Aggregated stats
+        """
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
             return np.array(0.0)
@@ -286,18 +302,22 @@ class Metric:
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
-        """From aggregated sufficient statistics, calculate the metric value
-        :param agg_stats: aggregated statistics, either:
-          one-dimensional [metric_size]
-          two-dimensional [batch_size, metric_size]
-        :param config: a configuration to over-ride the default for this object
-        :return: calculated metric of size 1, or metrics of size [batch_size]
+        """From aggregated sufficient statistics, calculate the metric value.
+
+        Args:
+            agg_stats: aggregated statistics, either:
+                one-dimensional [metric_size]
+                two-dimensional [batch_size, metric_size]
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            calculated metric of size 1, or metrics of size [batch_size]
         """
         return agg_stats
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
+        """Whether the eval score is a simple average of the sufficient statistics.
+
         If so the t-test is applicable, which is much more efficient. Otherwise we do
         bootstrapping to calculate confidence interval, which is slower and potentially
         less effective.
@@ -312,12 +332,14 @@ class Metric:
         prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
-        """
-        :param stats: sufficient statistics as calculated by calc_stats_from_data
-        :param conf_value: the p-value of the interval
-        :param n_samples: the number of bootstrapping samples
-        :param prop_samples: the proportion of samples to sample each time
-        :param config: a configuration to over-ride the default for this object
+        """Calculate the confidence interval of a statistics function.
+
+        Args:
+            stats: sufficient statistics as calculated by calc_stats_from_data
+            conf_value: the p-value of the interval
+            n_samples: the number of bootstrapping samples
+            prop_samples: the proportion of samples to sample each time
+            config: a configuration to over-ride the default for this object
         """
         if conf_value <= 0.0 or conf_value >= 1.0:
             raise ValueError(f'Bad confidence value {conf_value}')
@@ -369,11 +391,15 @@ class Metric:
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
-        :param stats: pre-computed metric stats
-        :param conf_value: if set to not None, must be a number between 0 and 1,
-            indicating the p-value of confidence intervals
-        :param config: a configuration to over-ride the default for this object
-        :return: a resulting metric value
+
+        Args:
+            stats: pre-computed metric stats
+            conf_value: if set to not None, must be a number between 0 and 1,
+                indicating the p-value of confidence intervals
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            a resulting metric value
         """
         actual_config = unwrap_or(config, self.config)
         agg_stats = self.aggregate_stats(stats)
@@ -391,12 +417,16 @@ class Metric:
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over true data and predicted data.
-        :param true_data: gold-standard data
-        :param pred_data: predicted data
-        :param conf_value: if set to not None, must be a number between 0 and 1,
-            indicating the p-value of confidence intervals
-        :param config: a configuration to over-ride the default for this object
-        :return: a resulting metric value
+
+        Args:
+            true_data: gold-standard data
+            pred_data: predicted data
+            conf_value: if set to not None, must be a number between 0 and 1,
+                indicating the p-value of confidence intervals
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            a resulting metric value
         """
         stats = self.calc_stats_from_data(true_data, pred_data, config)
         return self.evaluate_from_stats(stats, conf_value, config)
