@@ -1,3 +1,5 @@
+"""Implements methods for bucketing."""
+
 from __future__ import annotations
 
 from collections.abc import Hashable, Iterable
@@ -33,6 +35,21 @@ def continuous(
     bucket_number: int = 4,
     bucket_setting: Any = None,
 ) -> list[AnalysisCaseCollection]:
+    """Bucketing based on continuous features.
+
+    Takes in examples and attempts to split them into `bucket_number` approximately
+    equal-sized buckets.
+
+    Args:
+        sample_features: A list of tuples including an analysis case, and a feature
+          value.
+        bucket_number: The number of buckets to generate.
+        bucket_setting: Not used by this bucketing method, so it will fail if this is
+          set to anything other than none.
+
+    Returns:
+        A list of AnalysisCaseCollections corresponding to the buckets.
+    """
     if len(sample_features) == 0:
         return [AnalysisCaseCollection(samples=[], interval=_INFINITE_INTERVAL)]
     if bucket_setting is not None and len(bucket_setting) > 0:
@@ -92,11 +109,17 @@ def discrete(
     bucket_number: int = int(1e10),
     bucket_setting: Any = 1,
 ) -> list[AnalysisCaseCollection]:
-    """
-    Bucket attributes by discrete value.
-    :param sample_features: Pairs of a bucket case and feature value.
-    :param bucket_number: Maximum number of buckets
-    :param bucket_setting: Minimum number of examples per bucket
+    """Bucket attributes by discrete value.
+
+    It will return buckets for the `bucket_number` most frequent discrete values.
+
+    Args:
+        sample_features: Pairs of a analysis case and feature value.
+        bucket_number: Maximum number of buckets
+        bucket_setting: Minimum number of examples per bucket
+
+    Returns:
+        A list of AnalysisCaseCollections corresponding to the buckets.
     """
     feat2idx = {}
     if bucket_setting is None:
@@ -122,6 +145,17 @@ def fixed(
     bucket_number: int,
     bucket_setting: Any,
 ) -> list[AnalysisCaseCollection]:
+    """Bucketing based on pre-determined buckets.
+
+    Args:
+        sample_features: A list of tuples including an analysis case, and a feature
+          value.
+        bucket_number: Ignored by this function.
+        bucket_setting: A list of bucket names or intervals, depending on the type.
+
+    Returns:
+        A list of AnalysisCaseCollections corresponding to the buckets.
+    """
     interval_or_names = cast(List[Hashable], bucket_setting)
     if len(interval_or_names) == 0:
         raise ValueError("Can not determine bucket keys.")
