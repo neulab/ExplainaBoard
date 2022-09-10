@@ -1,3 +1,7 @@
+"""
+Evaluation metrics for hybrid table-text QA.
+"""
+
 from __future__ import annotations
 
 import abc
@@ -89,6 +93,7 @@ class QATatMetric(Metric):
 @metric_config_registry.register("ExactMatchQATatConfig")
 class ExactMatchQATatConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return ExactMatchQATat(self)
 
 
@@ -119,6 +124,7 @@ class ExactMatchQATat(QATatMetric):
 @metric_config_registry.register("F1ScoreQATatConfig")
 class F1ScoreQATatConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return F1ScoreQATat(self)
 
 

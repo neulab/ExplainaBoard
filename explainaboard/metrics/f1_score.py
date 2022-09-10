@@ -1,3 +1,5 @@
+"""Evaluation metrics to measure F-score."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,18 +27,27 @@ from explainaboard.utils.typing_utils import unwrap_or
 @dataclass
 @metric_config_registry.register("F1ScoreConfig")
 class F1ScoreConfig(MetricConfig):
+    """Configuration for F1Score metrics.
+
+    Args:
+        average: The averaging method, "micro" or "macro".
+        separate_match: Whether to use different match counts for precision and recall.
+        ignore_classes: Classes for which we should not calculate precision/recall.
+    """
+
     average: str = 'micro'
     separate_match: bool = False
     ignore_classes: Optional[list] = None
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return F1Score(self)
 
 
 class F1Score(Metric):
-    """
-    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's
-    implementation.
+    """Calculate F1 score, micro- or macro-averaged over classes.
+
+    The numbers calculated should match sklearn's implementation.
     """
 
     def is_simple_average(self, stats: MetricStats):
@@ -45,8 +56,8 @@ class F1Score(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        """
-        Return sufficient statistics necessary to compute f-score.
+        """Return sufficient statistics necessary to compute f-score.
+
         :param true_data: True outputs
         :param pred_data: Predicted outputs
         :param config: Configuration, if overloading the default for this object
@@ -127,6 +138,7 @@ class F1Score(Metric):
 @metric_config_registry.register("APEF1ScoreConfig")
 class APEF1ScoreConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return APEF1Score(self)
 
 
@@ -197,6 +209,7 @@ class SeqF1ScoreConfig(F1ScoreConfig):
     tag_schema: str = 'bio'
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return SeqF1Score(self)
 
 

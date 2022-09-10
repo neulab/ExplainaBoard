@@ -1,3 +1,7 @@
+"""
+Evaluation metrics using the "Evaluation as a Service" library.
+"""
+
 from __future__ import annotations
 
 import copy
@@ -82,6 +86,7 @@ class EaaSMetricStats(MetricStats):
 @metric_config_registry.register("EaaSMetricConfig")
 class EaaSMetricConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return EaaSMetric(self)
 
 

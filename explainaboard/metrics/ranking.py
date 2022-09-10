@@ -1,3 +1,5 @@
+"""Evaluation metrics for ranking-based problems."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -21,6 +23,7 @@ class HitsConfig(MetricConfig):
     hits_k: int = 5
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return Hits(self)
 
 

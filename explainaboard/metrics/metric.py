@@ -1,3 +1,7 @@
+"""
+Base classes and interfaces used to implement evaluation metrics.
+"""
+
 from __future__ import annotations
 
 import abc
@@ -64,6 +68,7 @@ class MetricConfig(dict):
         self.cls_name = type(self).__name__
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         raise NotImplementedError
 
     @classmethod

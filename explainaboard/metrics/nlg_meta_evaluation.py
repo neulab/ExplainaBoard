@@ -1,3 +1,7 @@
+"""
+Evaluation metrics for meta evaluation of natural language generation.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -145,6 +149,7 @@ class KtauCorrelationConfig(CorrelationConfig):
     threshold: float = 25
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return KtauCorrelation(self)
 
 
@@ -191,6 +196,7 @@ class KtauCorrelation(CorrelationMetric):
 @metric_config_registry.register("PearsonCorrelationConfig")
 class PearsonCorrelationConfig(CorrelationConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return PearsonCorrelation(self)
 
 

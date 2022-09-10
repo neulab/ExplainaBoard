@@ -1,3 +1,7 @@
+"""
+Evaluation metrics for extractive question answering.
+"""
+
 from __future__ import annotations
 
 import abc
@@ -57,6 +61,7 @@ class ExtractiveQAMetric(Metric):
 @metric_config_registry.register("ExactMatchQAConfig")
 class ExactMatchQAConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return ExactMatchQA(self)
 
 
@@ -75,6 +80,7 @@ class ExactMatchQA(ExtractiveQAMetric):
 @metric_config_registry.register("F1ScoreQAConfig")
 class F1ScoreQAConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return F1ScoreQA(self)
 
 

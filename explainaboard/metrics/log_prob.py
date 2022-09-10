@@ -1,3 +1,7 @@
+"""
+Evaluation metrics to measure log probabilities for language modeling.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -18,10 +22,10 @@ from explainaboard.utils.typing_utils import unwrap_or
 @dataclass
 @metric_config_registry.register("LogProbConfig")
 class LogProbConfig(MetricConfig):
-    # If false, return log probability, if true return perplexity
     ppl: bool = False
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return LogProb(self)
 
 

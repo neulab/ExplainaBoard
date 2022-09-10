@@ -1,3 +1,7 @@
+"""
+Evaluation metrics for continuous prediction tasks such as regression.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -18,6 +22,7 @@ from explainaboard.metrics.registry import metric_config_registry
 @metric_config_registry.register("RootMeanSquaredErrorConfig")
 class RootMeanSquaredErrorConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return RootMeanSquaredError(self)
 
 
@@ -46,6 +51,7 @@ class RootMeanSquaredError(Metric):
 @metric_config_registry.register("AbsoluteErrorConfig")
 class AbsoluteErrorConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return AbsoluteError(self)
 
 

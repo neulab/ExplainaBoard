@@ -1,3 +1,7 @@
+"""
+Evaluation metrics measuring accuracy.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -17,7 +21,10 @@ from explainaboard.metrics.registry import metric_config_registry
 @dataclass
 @metric_config_registry.register("AccuracyConfig")
 class AccuracyConfig(MetricConfig):
+    """Configuration for the Accuracy metric."""
+
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return Accuracy(self)
 
 
@@ -44,6 +51,7 @@ class Accuracy(Metric):
 @metric_config_registry.register("CorrectCountConfig")
 class CorrectCountConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return CorrectCount(self)
 
 
@@ -85,6 +93,7 @@ class CorrectCount(Accuracy):
 @metric_config_registry.register("SeqCorrectCountConfig")
 class SeqCorrectCountConfig(MetricConfig):
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return SeqCorrectCount(self)
 
 

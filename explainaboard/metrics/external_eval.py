@@ -1,3 +1,7 @@
+"""
+Evaluation metrics with externally provided statistics.
+"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -39,6 +43,7 @@ class ExternalEvalConfig(MetricConfig):
     instruction: str = "Annotation instruction"
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return ExternalEval(self)
 
 
