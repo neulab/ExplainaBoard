@@ -1,32 +1,14 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
-from typing import Any
-
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import (
-    Analysis,
-    AnalysisLevel,
-    BucketAnalysis,
-    ComboCountAnalysis,
-)
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
-from explainaboard.analysis.feature_funcs import (
-    count_tokens,
-    feat_freq_rank,
-    feat_length_freq,
-    feat_num_oov,
-    get_basic_words,
-    get_lexical_richness,
-)
-from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.accuracy import AccuracyConfig
+from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.metrics.metric import MetricConfig
+from explainaboard.metrics.sql_em_ex import SQLEmConfig, SQLExConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
-from explainaboard.utils.logging import progress
-from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.text_to_sql)
@@ -37,64 +19,26 @@ class TextToSQLProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
-            "text": feature.Value(
+            "question": feature.Value(
                 dtype="string",
-                description="the text of the example",
+                description="the input question",
             ),
-            "true_label": feature.Value(
+            "true_sql": feature.Value(
                 dtype="string",
-                description="the true label of the input",
+                description="the true sql",
             ),
-            "predicted_label": feature.Value(
+            "predicted_sql": feature.Value(
                 dtype="string",
-                description="the predicted label",
+                description="the predicted sql",
+            ),
+            "db_id": feature.Value(
+                dtype="string",
+                description="the database id",
             ),
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['text']),
-            ),
-            "text_chars": feature.Value(
-                dtype="float",
-                description="text length in characters",
-                func=lambda info, x, c: len(x['text']),
-            ),
-            "basic_words": feature.Value(
-                dtype="float",
-                description="the ratio of basic words",
-                func=lambda info, x, c: get_basic_words(x['text']),
-            ),
-            "lexical_richness": feature.Value(
-                dtype="float",
-                description="lexical diversity",
-                func=lambda info, x, c: get_lexical_richness(x['text']),
-            ),
-            "num_oov": feature.Value(
-                dtype="float",
-                description="the number of out-of-vocabulary words",
-                require_training_set=True,
-                func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['text'], stat['vocab']
-                ),
-            ),
-            "fre_rank": feature.Value(
-                dtype="float",
-                description=(
-                    "the average rank of each word based on its frequency in "
-                    "training set"
-                ),
-                require_training_set=True,
-                func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['text'], stat['vocab_rank']
-                ),
-            ),
-            "length_fre": feature.Value(
-                dtype="float",
-                description="the frequency of text length in training set",
-                require_training_set=True,
-                func=lambda info, x, c, stat: feat_length_freq(
-                    info, x['text'], stat['length_fre']
-                ),
+                func=lambda info, x, c: count_tokens(info, x['question']),
             ),
         }
 
@@ -107,57 +51,37 @@ class TextToSQLProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
-        features = self.default_analysis_levels()[0].features
-        # Create analyses
-        analyses: list[Analysis] = [
-            BucketAnalysis(
-                level="example",
-                description=features["true_label"].description,
-                feature="true_label",
-                method="discrete",
-                number=15,
-            ),
-            ComboCountAnalysis(
-                level="example",
-                description="confusion matrix",
-                features=("true_label", "predicted_label"),
-            ),
-        ]
-        analyses.extend(self.continuous_feature_analyses())
-        return analyses
+        return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        return [AccuracyConfig(name='Accuracy')]
+        return [
+            SQLEmConfig(
+                name='Em',
+                source_language=source_language,
+                target_language=target_language,
+            ),
+            SQLExConfig(
+                name='Ex',
+                source_language=source_language,
+                target_language=target_language,
+            ),
+        ]
 
-    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
-        vocab: dict[str, float] = {}
-        length_fre: dict[int, float] = {}
-        total_samps = 0
-        tokenizer = unwrap(sys_info.source_tokenizer)
-        for sample in progress(samples):
-            text = sample["text"]
-            tokens = tokenizer(text)
-            length = len(tokens)
+    def _get_true_label(self, data_point):
+        """
+        Get the true label from a data point. Overloaded from parent class.
+        :param data_point: the data point under consideration
+        :return: the true label for the output
+        """
+        return data_point["true_sql"]
 
-            length_fre[length] = length_fre.get(length, 0.0) + 1.0
-
-            # update vocabulary
-            for w in tokens:
-                vocab[w] = vocab.get(w, 0.0) + 1.0
-
-            total_samps += 1
-
-        # the rank of each word based on its frequency
-        sorted_dict = {
-            key: rank
-            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
-        }
-        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
-
-        for k, v in length_fre.items():
-            length_fre[k] = v * 1.0 / total_samps
-
-        return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}
+    def _get_predicted_label(self, data_point):
+        """
+        Get the predicted label from a data point. Overloaded from parent class.
+        :param data_point: the data point under consideration
+        :return: the predicted label for the output
+        """
+        return data_point["predicted_sql"]

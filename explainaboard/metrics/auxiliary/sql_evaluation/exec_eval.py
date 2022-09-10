@@ -1,31 +1,31 @@
-import os
-import re
 import asyncio
+from collections import defaultdict
+from itertools import chain, product
+import os
+import random
+import re
 import sqlite3
 import threading
-from typing import Tuple, Any, List, Set
-from itertools import product
-from collections import defaultdict
+from typing import Any
+
 import tqdm
-import random
-from explainaboard.metrics.auxiliary.sql_evaluation.parse import get_all_preds_for_execution, remove_distinct
-import time
-import pickle as pkl
-import subprocess
-from itertools import chain
 
-
+from explainaboard.metrics.auxiliary.sql_evaluation.parse import (
+    get_all_preds_for_execution,
+    remove_distinct,
+)
 
 threadLock = threading.Lock()
 TIMEOUT = 60
 EXEC_TMP_DIR = 'tmp/'
 
-def permute_tuple(element: Tuple, perm: Tuple) -> Tuple:
+
+def permute_tuple(element: tuple, perm: tuple) -> tuple:
     assert len(element) == len(perm)
     return tuple([element[i] for i in perm])
 
 
-def unorder_row(row: Tuple) -> Tuple:
+def unorder_row(row: tuple) -> tuple:
     return tuple(sorted(row, key=lambda x: str(x) + str(type(x))))
 
 
@@ -33,7 +33,7 @@ def unorder_row(row: Tuple) -> Tuple:
 # [result_1 and result_2 has the same bag of unordered row]
 # is a necessary condition of
 # [result_1 and result_2 are equivalent in denotation]
-def quick_rej(result1: List[Tuple], result2: List[Tuple], order_matters: bool) -> bool:
+def quick_rej(result1: list[tuple], result2: list[tuple], order_matters: bool) -> bool:
     s1 = [unorder_row(row) for row in result1]
     s2 = [unorder_row(row) for row in result2]
     if order_matters:
@@ -43,9 +43,10 @@ def quick_rej(result1: List[Tuple], result2: List[Tuple], order_matters: bool) -
 
 
 # return whether two bag of relations are equivalent
-def multiset_eq(l1: List, l2: List) -> bool:
+def multiset_eq(l1: list, l2: list) -> bool:
     if len(l1) != len(l2):
         return False
+    d: defaultdict
     d = defaultdict(int)
     for e in l1:
         d[e] = d[e] + 1
@@ -56,7 +57,7 @@ def multiset_eq(l1: List, l2: List) -> bool:
     return True
 
 
-def get_constraint_permutation(tab1_sets_by_columns: List[Set], result2: List[Tuple]):
+def get_constraint_permutation(tab1_sets_by_columns: list[set], result2: list[tuple]):
     num_cols = len(result2[0])
     perm_constraints = [{i for i in range(num_cols)} for _ in range(num_cols)]
     if num_cols <= 3:
@@ -74,7 +75,7 @@ def get_constraint_permutation(tab1_sets_by_columns: List[Set], result2: List[Tu
 
 
 # check whether two denotations are correct
-def result_eq(result1: List[Tuple], result2: List[Tuple], order_matters: bool) -> bool:
+def result_eq(result1: list[tuple], result2: list[tuple], order_matters: bool) -> bool:
     if len(result1) == 0 and len(result2) == 0:
         return True
 
@@ -100,9 +101,12 @@ def result_eq(result1: List[Tuple], result2: List[Tuple], order_matters: bool) -
     # and false if we cannot
     tab1_sets_by_columns = [{row[i] for row in result1} for i in range(num_cols)]
 
-    # on a high level, we enumerate all possible column permutations that might make result_1 == result_2
-    # we decrease the size of the column permutation space by the function get_constraint_permutation
-    # if one of the permutation make result_1, result_2 equivalent, then they are equivalent
+    # on a high level, we enumerate all possible column permutations
+    # that might make result_1 == result_2
+    # we decrease the size of the column permutation space by
+    # the function get_constraint_permutation
+    # if one of the permutation make result_1, result_2 equivalent,
+    # then they are equivalent
     for perm in get_constraint_permutation(tab1_sets_by_columns, result2):
         if len(perm) != len(set(perm)):
             continue
@@ -124,7 +128,7 @@ def result_eq(result1: List[Tuple], result2: List[Tuple], order_matters: bool) -
 
 def replace_cur_year(query: str) -> str:
     return re.sub(
-        "YEAR\s*\(\s*CURDATE\s*\(\s*\)\s*\)\s*", "2020", query, flags=re.IGNORECASE
+        r"YEAR\s*\(\s*CURDATE\s*\(\s*\)\s*\)\s*", "2020", query, flags=re.IGNORECASE
     )
 
 
@@ -142,7 +146,7 @@ def get_cursor_from_path(sqlite_path: str):
     return cursor
 
 
-async def exec_on_db_(sqlite_path: str, query: str) -> Tuple[str, Any]:
+async def exec_on_db_(sqlite_path: str, query: str) -> tuple[str, Any]:
     query = replace_cur_year(query)
     cursor = get_cursor_from_path(sqlite_path)
     try:
@@ -156,9 +160,10 @@ async def exec_on_db_(sqlite_path: str, query: str) -> Tuple[str, Any]:
         cursor.connection.close()
         return "exception", e
 
+
 async def exec_on_db(
     sqlite_path: str, query: str, process_id: str = "", timeout: int = TIMEOUT
-) -> Tuple[str, Any]:
+) -> tuple[str, Any]:
     try:
         return await asyncio.wait_for(exec_on_db_(sqlite_path, query), timeout)
     except asyncio.TimeoutError:
@@ -180,8 +185,16 @@ def postprocess(query: str) -> str:
 # that are in the same directory as db
 # 0 if denotationally equivalent
 # 1 otherwise
-# the meaning of each auxillary argument can be seen in the parser definition in evaluation.py
-def eval_exec_match(db: str, p_str: str, g_str: str, plug_value: bool, keep_distinct: bool, progress_bar_for_each_datapoint: bool) -> int:
+# the meaning of each auxillary argument can
+# be seen in the parser definition in evaluation.py
+def eval_exec_match(
+    db: str,
+    p_str: str,
+    g_str: str,
+    plug_value: bool,
+    keep_distinct: bool,
+    progress_bar_for_each_datapoint: bool,
+) -> int:
     # post-process the prediction.
     # e.g. removing spaces between ">" and "="
     p_str, g_str = postprocess(p_str), postprocess(g_str)
@@ -193,23 +206,29 @@ def eval_exec_match(db: str, p_str: str, g_str: str, plug_value: bool, keep_dist
     # https://courses.cs.washington.edu/courses/cse444/10sp/lectures/lecture16.pdf
     # if there is order by in query, then we assume order of the rows matter
     # order by might also be used to find the max/min instead of sorting,
-    # but in that case the result mostly only contains one row and hence order_matters does not make a difference
+    # but in that case the result mostly only contains one row
+    # and hence order_matters does not make a difference
     order_matters = 'order by' in g_str.lower()
 
     # find all databases in the same directory
     db_dir = os.path.dirname(db)
-    db_paths = [os.path.join(db_dir, basename) for basename in os.listdir(db_dir) if '.sqlite' in basename]
+    db_paths = [
+        os.path.join(db_dir, basename)
+        for basename in os.listdir(db_dir)
+        if '.sqlite' in basename
+    ]
 
-    preds = [p_str]
     # if plug in value (i.e. we do not consider value prediction correctness)
     # enumerate all ways to plug in values in the gold query to the model predictions
     # otherwise, we only evaluate the predicted query with its own value prediction
     if plug_value:
-        _, preds = get_all_preds_for_execution(g_str, p_str)
+        _, preds_2 = get_all_preds_for_execution(g_str, p_str)
         # we did not add this line in our EMNLP work
         # this reduces "false negatives" when value is substituted
-        preds = chain([p_str], preds)
-
+        # preds: chain[str]
+        preds = list(chain([p_str], preds_2))
+    else:
+        preds = [p_str]
     for pred in preds:
 
         pred_passes = 1
@@ -227,7 +246,9 @@ def eval_exec_match(db: str, p_str: str, g_str: str, plug_value: bool, keep_dist
             # we should expect the gold to be succesfully executed on the database
             if g_flag == 'exception':
                 return 1
-            assert g_flag != 'exception', 'gold query %s has error on database file %s' % (g_str, db_path)
+            assert (
+                g_flag != 'exception'
+            ), 'gold query %s has error on database file %s' % (g_str, db_path)
 
             # wrong if execution fails
             if p_flag == 'exception':
