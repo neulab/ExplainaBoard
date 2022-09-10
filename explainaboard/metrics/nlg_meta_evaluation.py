@@ -23,8 +23,7 @@ from explainaboard.utils.typing_utils import narrow, unwrap_or
 @dataclass
 @metric_config_registry.register("CorrelationConfig")
 class CorrelationConfig(MetricConfig):
-    """
-    Configuration for a correlation.
+    """Configuration for a correlation.
 
     :param group_by: Can be 'system' to group by system, 'segment' to group by segment
       or anything else (typically 'none') to not perform any grouping at all.
@@ -43,12 +42,7 @@ class CorrelationConfig(MetricConfig):
 
 class CorrelationMetric(Metric):
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
-        If so the t-test is applicable, which is much more efficient. Otherwise we do
-        bootstrapping to calculate confidence interval, which is slower and potentially
-        less effective.
-        """
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_data(
@@ -115,6 +109,7 @@ class CorrelationMetric(Metric):
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
+        """See Metric.calc_metric_from_aggregate."""
         if len(agg_stats.shape) == 2:
             val = self.calc_metric_from_aggregate_single(agg_stats, config)
             return np.array([val])
@@ -129,6 +124,15 @@ class CorrelationMetric(Metric):
     def calc_metric_from_aggregate_single(
         self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
+        """Calculate an aggregate correlation metric from a single segment or system.
+
+        Args:
+            single_stat: The stats for the single segment or system
+            config: The configuration used in calculating the metric
+
+        Returns:
+            The aggregated metric value.
+        """
         raise NotImplementedError
 
 
@@ -136,7 +140,8 @@ class CorrelationMetric(Metric):
 @dataclass
 @metric_config_registry.register("KtauCorrelationConfig")
 class KtauCorrelationConfig(CorrelationConfig):
-    """
+    """A configuration for KtauCorrelation.
+
     :param threshold: Following ‘Results of the WMT20 Metrics Shared Task
         (https://aclanthology.org/2020.wmt-1.77.pdf)’, to calculate segment level ktau
          score, we generate pairs of DA judgments attributed to distinct
@@ -155,7 +160,9 @@ class KtauCorrelationConfig(CorrelationConfig):
 
 
 class KtauCorrelation(CorrelationMetric):
-    def count(self, score: list, config: Optional[MetricConfig] = None):
+    """A metric to calculate Kendall's Tau rank correlation."""
+
+    def _count(self, score: list, config: Optional[MetricConfig] = None):
         config = narrow(KtauCorrelationConfig, unwrap_or(config, self.config))
         conc = 0
         disc = 0
@@ -175,13 +182,14 @@ class KtauCorrelation(CorrelationMetric):
     def calc_metric_from_aggregate_single(
         self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
+        """See CorrelationMetric.calc_metric_from_aggregate_single."""
         scores = self.get_scores_from_stats(single_stat, config)
         total_seg_num = 0
         total_conc = 0
         total_disc = 0
 
         for score in scores.values():
-            conc, disc, num = self.count(score, config)
+            conc, disc, num = self._count(score, config)
             total_seg_num += num
             total_conc += conc
             total_disc += disc
@@ -196,15 +204,20 @@ class KtauCorrelation(CorrelationMetric):
 @dataclass
 @metric_config_registry.register("PearsonCorrelationConfig")
 class PearsonCorrelationConfig(CorrelationConfig):
+    """A configuration for the PearsonCorrelation metric."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return PearsonCorrelation(self)
 
 
 class PearsonCorrelation(CorrelationMetric):
+    """A metric to calculate Pearson's correlation."""
+
     def calc_metric_from_aggregate_single(
         self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
     ) -> float:
+        """See CorrelationMetric.calc_metric_from_aggregate_single."""
         config = narrow(PearsonCorrelationConfig, unwrap_or(config, self.config))
         scores = self.get_scores_from_stats(single_stat, config)
 

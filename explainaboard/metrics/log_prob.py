@@ -22,6 +22,12 @@ from explainaboard.utils.typing_utils import unwrap_or
 @dataclass
 @metric_config_registry.register("LogProbConfig")
 class LogProbConfig(MetricConfig):
+    """Configuration for LogProb metrics.
+
+    Args:
+        ppl: Whether to exponente the log prob into perplexity.
+    """
+
     ppl: bool = False
 
     def to_metric(self):
@@ -30,11 +36,10 @@ class LogProbConfig(MetricConfig):
 
 
 class LogProb(Metric):
-    """
-    Calculate the log probability
-    """
+    """Calculate the log probability or perplexity."""
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return stats.num_statistics() == 1
 
     def calc_stats_from_data(
@@ -56,12 +61,7 @@ class LogProb(Metric):
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
-        """From aggregated sufficient statistics, calculate the metric value
-
-        :param agg_stats: aggregated statistics
-        :param config: a configuration to over-ride the default for this object
-        :return: a single scalar metric value
-        """
+        """See Metric.calc_metric_from_aggregate."""
         if agg_stats.ndim == 1:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
         config = cast(LogProbConfig, unwrap_or(config, self.config))

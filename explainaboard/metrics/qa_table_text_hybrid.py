@@ -104,12 +104,7 @@ class ExactMatchQATat(QATatMetric):
     """
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
-        If so the t-test is applicable, which is much more efficient. Otherwise we do
-        bootstrapping to calculate confidence interval, which is slower and potentially
-        less effective.
-        """
+        """See Metric.is_simple_average."""
         return True
 
     def sample_level_metric(
@@ -124,23 +119,18 @@ class ExactMatchQATat(QATatMetric):
 @dataclass
 @metric_config_registry.register("F1ScoreQATatConfig")
 class F1ScoreQATatConfig(MetricConfig):
+    """Configuration for F1ScoreQATat."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return F1ScoreQATat(self)
 
 
 class F1ScoreQATat(QATatMetric):
-    """
-    Calculate a score for extractive QA based on F1 score.
-    """
+    """Calculate a score for the TAT-QA dataset."""
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
-        If so the t-test is applicable, which is much more efficient. Otherwise we do
-        bootstrapping to calculate confidence interval, which is slower and potentially
-        less effective.
-        """
+        """See Metric.is_simple_average."""
         return True
 
     def sample_level_metric(

@@ -85,6 +85,8 @@ class EaaSMetricStats(MetricStats):
 @dataclass
 @metric_config_registry.register("EaaSMetricConfig")
 class EaaSMetricConfig(MetricConfig):
+    """Configuration for EaaSMetric."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return EaaSMetric(self)
@@ -100,6 +102,7 @@ class EaaSMetric(Metric):
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
+        """See Metric.calc_metric_from_aggregate."""
         if agg_stats.ndim == 1:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
         n_samples = agg_stats.shape[0]
@@ -122,6 +125,7 @@ class EaaSMetric(Metric):
             return agg_stats
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return self.config.name not in self._NOT_SIMPLE_METRICS
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:

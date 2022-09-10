@@ -51,6 +51,8 @@ class Accuracy(Metric):
 @dataclass
 @metric_config_registry.register("CorrectCountConfig")
 class CorrectCountConfig(MetricConfig):
+    """Configuration for CorrectCount."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return CorrectCount(self)
@@ -62,6 +64,7 @@ class CorrectCount(Accuracy):
     """
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_data(
@@ -94,6 +97,8 @@ class CorrectCount(Accuracy):
 @dataclass
 @metric_config_registry.register("SeqCorrectCountConfig")
 class SeqCorrectCountConfig(MetricConfig):
+    """Configuration for SeqCorrectCount."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return SeqCorrectCount(self)

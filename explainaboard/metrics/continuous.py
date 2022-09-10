@@ -21,6 +21,8 @@ from explainaboard.metrics.registry import metric_config_registry
 @dataclass
 @metric_config_registry.register("RootMeanSquaredErrorConfig")
 class RootMeanSquaredErrorConfig(MetricConfig):
+    """Configuration for RootMeanSquaredError."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return RootMeanSquaredError(self)
@@ -40,17 +42,21 @@ class RootMeanSquaredError(Metric):
         return SimpleMetricStats(squared_error)
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
+        """See Metric.calc_metric_from_aggregate."""
         return np.sqrt(agg_stats)
 
 
 @dataclass
 @metric_config_registry.register("AbsoluteErrorConfig")
 class AbsoluteErrorConfig(MetricConfig):
+    """Configuration for AbsoluteError."""
+
     def to_metric(self):
         """See MetricConfig.to_metric."""
         return AbsoluteError(self)

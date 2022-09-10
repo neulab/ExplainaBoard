@@ -37,6 +37,16 @@ class ExternalEvalResult(AuxiliaryMetricResult):
 @dataclass
 @metric_config_registry.register("ExternalEvalConfig")
 class ExternalEvalConfig(MetricConfig):
+    """Configuration for ExternalEval.
+
+    Args:
+        aspect: The name of the external score being calculated.
+        n_annotators: The number of annotators doing annotation (in the case of human
+                      human annotators).
+        categories: The number of categories in the human evaluation.
+        instruction: The instructions given to the annotators.
+    """
+
     aspect: str = "fluency"
     n_annotators: int = 3
     categories: int = 5
@@ -63,6 +73,7 @@ class ExternalEval(Metric):
         return ret_config
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_external(

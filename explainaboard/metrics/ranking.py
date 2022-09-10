@@ -20,6 +20,12 @@ from explainaboard.utils.typing_utils import unwrap_or
 @dataclass
 @metric_config_registry.register("HitsConfig")
 class HitsConfig(MetricConfig):
+    """Configuration for Hits.
+
+    Args:
+        hits_k: the number of top-k answers to consider in calculation.
+    """
+
     hits_k: int = 5
 
     def to_metric(self):
@@ -60,14 +66,17 @@ class Hits(Metric):
 @dataclass
 @metric_config_registry.register("MeanReciprocalRankConfig")
 class MeanReciprocalRankConfig(MetricConfig):
+    """Configuration for MeanReciprocalRank."""
+
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return MeanReciprocalRank(self)
 
 
 class MeanReciprocalRank(Metric):
-    """
-    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is
-    the rank of the true output in the predicted n-best list.
+    """Calculates the mean reciprocal rank, 1/rank(true_output).
+
+    rank(true_output) is the rank of the true output in the predicted n-best list.
     """
 
     @classmethod
@@ -100,7 +109,10 @@ class MeanReciprocalRank(Metric):
 @dataclass
 @metric_config_registry.register("MeanRankConfig")
 class MeanRankConfig(MetricConfig):
+    """Configuration for MeanReciprocalRank."""
+
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return MeanRank(self)
 
 
