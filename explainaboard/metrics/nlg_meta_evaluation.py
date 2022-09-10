@@ -37,7 +37,7 @@ class CorrelationConfig(MetricConfig):
     no_human: bool = True
 
     def to_metric(self):
-        pass
+        raise NotImplementedError
 
 
 class CorrelationMetric(Metric):
