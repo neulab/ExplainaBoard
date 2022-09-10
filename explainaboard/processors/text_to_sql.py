@@ -38,13 +38,13 @@ class TextToSQLProcessor(Processor):
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['question']),
+                func=lambda info, x, c: count_tokens(info, x["question"]),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -55,16 +55,16 @@ class TextToSQLProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
+        cls, level="example", source_language=None, target_language=None
     ) -> list[MetricConfig]:
         return [
             SQLEmConfig(
-                name='Em',
+                name="Em",
                 source_language=source_language,
                 target_language=target_language,
             ),
             SQLExConfig(
-                name='Ex',
+                name="Ex",
                 source_language=source_language,
                 target_language=target_language,
             ),

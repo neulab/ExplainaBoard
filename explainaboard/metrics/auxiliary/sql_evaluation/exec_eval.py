@@ -17,7 +17,7 @@ from explainaboard.metrics.auxiliary.sql_evaluation.parse import (
 
 threadLock = threading.Lock()
 TIMEOUT = 60
-EXEC_TMP_DIR = 'tmp/'
+EXEC_TMP_DIR = "tmp/"
 
 
 def permute_tuple(element: tuple, perm: tuple) -> tuple:
@@ -167,7 +167,7 @@ async def exec_on_db(
     try:
         return await asyncio.wait_for(exec_on_db_(sqlite_path, query), timeout)
     except asyncio.TimeoutError:
-        return ('exception', TimeoutError)
+        return ("exception", TimeoutError)
     except Exception as e:
         return ("exception", e)
 
@@ -175,7 +175,7 @@ async def exec_on_db(
 # postprocess the model predictions to avoid execution errors
 # e.g. removing spaces between ">" and "="
 def postprocess(query: str) -> str:
-    query = query.replace('> =', '>=').replace('< =', '<=').replace('! =', '!=')
+    query = query.replace("> =", ">=").replace("< =", "<=").replace("! =", "!=")
     return query
 
 
@@ -208,14 +208,14 @@ def eval_exec_match(
     # order by might also be used to find the max/min instead of sorting,
     # but in that case the result mostly only contains one row
     # and hence order_matters does not make a difference
-    order_matters = 'order by' in g_str.lower()
+    order_matters = "order by" in g_str.lower()
 
     # find all databases in the same directory
     db_dir = os.path.dirname(db)
     db_paths = [
         os.path.join(db_dir, basename)
         for basename in os.listdir(db_dir)
-        if '.sqlite' in basename
+        if ".sqlite" in basename
     ]
 
     # if plug in value (i.e. we do not consider value prediction correctness)
@@ -244,14 +244,14 @@ def eval_exec_match(
             p_flag, p_denotation = asyncio.run(exec_on_db(db_path, pred))
 
             # we should expect the gold to be succesfully executed on the database
-            if g_flag == 'exception':
+            if g_flag == "exception":
                 return 1
             assert (
-                g_flag != 'exception'
-            ), 'gold query %s has error on database file %s' % (g_str, db_path)
+                g_flag != "exception"
+            ), "gold query %s has error on database file %s" % (g_str, db_path)
 
             # wrong if execution fails
-            if p_flag == 'exception':
+            if p_flag == "exception":
                 pred_passes = 0
 
             # if denotations are not equivalent, the prediction must be wrong

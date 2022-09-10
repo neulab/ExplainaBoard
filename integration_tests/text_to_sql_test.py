@@ -1,14 +1,12 @@
-import dataclasses
 import os
 import unittest
 
-from integration_tests.utils import load_file_as_str, test_artifacts_path
+from integration_tests.utils import test_artifacts_path
 
-from explainaboard.metrics.sql_em_ex import SQLExConfig, SQLEmConfig
-from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.file_loader import DatalabLoaderOption, FileLoaderMetadata
+from explainaboard import FileType, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
-from explainaboard.utils import cache_api
+from explainaboard.metrics.sql_em_ex import SQLEmConfig, SQLExConfig
+
 
 class TextToSQLTest(unittest.TestCase):
     artifact_path = os.path.join(test_artifacts_path, "text_to_sql")
@@ -37,21 +35,21 @@ class TextToSQLTest(unittest.TestCase):
         true = [[d["true_sql"], d["db_id"]] for d in data]
         pred = [[d["predicted_sql"], d["db_id"]] for d in data]
         metric = SQLExConfig(
-            name='SQLEx',
-            db_dir='https://expressai-xlab.s3.amazonaws.com/large_data/database',
-
-            table_path='https://expressai-xlab.s3.amazonaws.com/large_data/table/tables.json',
-            etype='exec'
+            name="SQLEx",
+            db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
+            table_path="https://expressai-xlab.s3.amazonaws.com/"
+            "large_data/table/tables.json",
+            etype="exec",
         ).to_metric()
         result = metric.evaluate(true, pred)
         self.assertAlmostEqual(result.value, 0.793036750483559)
 
         metric = SQLEmConfig(
-            name='SQLEm',
-            db_dir='https://expressai-xlab.s3.amazonaws.com/large_data/database',
-            table_path='https://expressai-xlab.s3.amazonaws.com/large_data/table/tables.json',
-            etype='match'
+            name="SQLEm",
+            db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
+            table_path="https://expressai-xlab.s3.amazonaws.com/"
+            "large_data/table/tables.json",
+            etype="match",
         ).to_metric()
         result = metric.evaluate(true, pred)
         self.assertAlmostEqual(result.value, 0.7572533849129593)
-

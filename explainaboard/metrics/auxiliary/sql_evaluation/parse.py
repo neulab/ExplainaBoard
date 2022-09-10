@@ -8,9 +8,9 @@ import sqlparse
 from sqlparse.sql import Comparison, Identifier
 from sqlparse.tokens import Whitespace
 
-Token = namedtuple('Token', ['ttype', 'value'])
-VALUE_NUM_SYMBOL = 'VALUERARE'
-QUOTE_CHARS = {'`', '\'', '"'}
+Token = namedtuple("Token", ["ttype", "value"])
+VALUE_NUM_SYMBOL = "VALUERARE"
+QUOTE_CHARS = {"`", "'", '"'}
 
 
 def tokenize(query: str) -> list[Token]:
@@ -19,17 +19,17 @@ def tokenize(query: str) -> list[Token]:
 
 
 def join_tokens(tokens: list[Token]) -> str:
-    return ''.join([x.value for x in tokens]).strip().replace('  ', ' ')
+    return "".join([x.value for x in tokens]).strip().replace("  ", " ")
 
 
 def round_trip_test(query: str) -> None:
     tokens = tokenize(query)
-    reconstructed = ''.join([token.value for token in tokens])
+    reconstructed = "".join([token.value for token in tokens])
     assert query == reconstructed, "Round trip test fails for string %s" % query
 
 
 def postprocess(query: str) -> str:
-    query = query.replace('> =', '>=').replace('< =', '<=').replace('! =', '!=')
+    query = query.replace("> =", ">=").replace("< =", "<=").replace("! =", "!=")
     return query
 
 
@@ -93,7 +93,7 @@ def strip_query(query: str) -> tuple[list[str], list[str]]:
 
 def reformat_query(query: str) -> str:
     query = query.strip().replace(";", "").replace("\t", "")
-    query = ' '.join(
+    query = " ".join(
         [t.value for t in tokenize(query) if t.ttype != sqlparse.tokens.Whitespace]
     )
     t_stars = ["t1.*", "t2.*", "t3.*", "T1.*", "T2.*", "T3.*"]
@@ -103,7 +103,7 @@ def reformat_query(query: str) -> str:
 
 
 def replace_values(sql: str) -> tuple[list[str], set[str]]:
-    sql = sqlparse.format(sql, reindent=False, keyword_case='upper')
+    sql = sqlparse.format(sql, reindent=False, keyword_case="upper")
     # sql = re.sub(r"(<=|>=|!=|=|<|>|,)", r" \1 ", sql)
     sql = re.sub(r"(T\d+\.)\s", r"\1", sql)
     query_toks_no_value, values = strip_query(sql)
@@ -131,7 +131,7 @@ def plugin(query_value_replaced: list[str], values_in_order: list[str]) -> str:
 
     for idx, value in zip(value_idx, values_in_order):
         query_w_values[idx] = value
-    return ' '.join(query_w_values)
+    return " ".join(query_w_values)
 
 
 # a generator generating all possible ways of
@@ -162,7 +162,7 @@ def get_all_preds_for_execution(gold: str, pred: str) -> tuple[int, Iterator[str
 
 def remove_distinct(s: str) -> str:
     toks = [t.value for t in list(sqlparse.parse(s)[0].flatten())]
-    return ''.join([t for t in toks if t.lower() != 'distinct'])
+    return "".join([t for t in toks if t.lower() != "distinct"])
 
 
 def extract_all_comparison_from_node(node: Token) -> list[Comparison]:
@@ -190,13 +190,13 @@ def extract_info_from_comparison(comparison_node: Comparison) -> dict[str, Any]:
     tokens = extract_toks_from_comparison(comparison_node)
     left, op, right = tokens
 
-    returned_dict = {'left': left, 'op': op.value, 'right': right}
+    returned_dict = {"left": left, "op": op.value, "right": right}
 
     if type(left) != Identifier:
         return returned_dict
 
     table = None
-    if len(left.tokens) == 3 and re.match('^[tT][0-9]$', left.tokens[0].value) is None:
+    if len(left.tokens) == 3 and re.match("^[tT][0-9]$", left.tokens[0].value) is None:
         table = left.tokens[0].value.lower()
     col = left.tokens[-1].value
 
@@ -210,7 +210,7 @@ def extract_info_from_comparison(comparison_node: Comparison) -> dict[str, Any]:
     else:
         return returned_dict
 
-    returned_dict['table_col'], returned_dict['val'] = (
+    returned_dict["table_col"], returned_dict["val"] = (
         table,
         col.upper(),
     ), process_str_value(right_val)
@@ -228,14 +228,14 @@ def extract_typed_value_in_comparison_from_query(
 ) -> list[tuple[tuple[Union[str, None], str], str]]:
     cmps = extract_all_comparison_from_query(query)
     typed_values = [
-        (cmp['table_col'], cmp['val']) for cmp in cmps if 'table_col' in cmp
+        (cmp["table_col"], cmp["val"]) for cmp in cmps if "table_col" in cmp
     ]
     for table, col, val1, val2 in re.findall(
-        r'(?:([^\.\s]*)\.)?([^\.\s]+) between ([^\s;]+) and ([^\s;]+)',
+        r"(?:([^\.\s]*)\.)?([^\.\s]+) between ([^\s;]+) and ([^\s;]+)",
         query,
         re.IGNORECASE,
     ):
-        if table == '':
+        if table == "":
             table = None
         else:
             table = table.lower()
