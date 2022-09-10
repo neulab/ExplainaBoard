@@ -37,6 +37,7 @@ class Accuracy(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array(
                 [
@@ -66,6 +67,7 @@ class CorrectCount(Accuracy):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
 
         return SimpleMetricStats(
             np.array(
@@ -104,6 +106,8 @@ class SeqCorrectCount(CorrectCount):
         pred_edits_ldl: list[dict[str, list]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
+
         def _get_flatten_edits(edits: list[dict]):
             flatten_edits = []
             for edit in edits:

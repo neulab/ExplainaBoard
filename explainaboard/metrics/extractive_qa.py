@@ -35,6 +35,7 @@ class ExtractiveQAMetric(Metric):
         pred_data: list[str],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
         config = unwrap_or(config, self.config)
         preprocessor = ExtractiveQAPreprocessor(language=config.source_language)

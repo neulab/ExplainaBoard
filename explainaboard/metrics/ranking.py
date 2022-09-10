@@ -35,7 +35,9 @@ class Hits(Metric):
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+    ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
+
         config = cast(HitsConfig, unwrap_or(config, self.config))
         return SimpleMetricStats(
             np.array(
@@ -82,6 +84,7 @@ class MeanReciprocalRank(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
@@ -117,6 +120,7 @@ class MeanRank(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array([self.mr_val(t, p) for t, p in zip(true_data, pred_data)])
         )

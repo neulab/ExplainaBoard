@@ -166,6 +166,7 @@ class APEF1Score(Metric):
         pred_data: list[list[str]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
 
         stats = []
 

@@ -46,6 +46,7 @@ class QATatMetric(Metric):
         pred_data: list,
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
 
         stat_list = []
         for true_answer_info, pred_answer_info in zip(true_data, pred_data):

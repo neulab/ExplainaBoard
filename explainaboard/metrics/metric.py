@@ -258,10 +258,12 @@ class Metric:
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        """From a list of true data and predicted data, calculate the sufficient
-        statistics for each data example so that the evaluation metric can be calculated
-        later. In the simplest form, this is just the evaluation metric value for each
-        example.
+        """From a list of true data and predicted data, calculate sufficient statistics.
+
+        These statistics are the numbers necessary for each data example so that the
+        evaluation metric can be calculated later. In the simplest form, this is just
+        the evaluation metric value for each example.
+
         :param true_data: gold-standard data
         :param pred_data: predicted data
         :param config: a configuration to over-ride the default for this object

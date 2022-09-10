@@ -139,8 +139,12 @@ class EaaSMetric(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        # Note that it's better to batch requests when possible, e.g. as in
-        # `processors/conditional_generation.py`
+        """See Metric.calc_stats_from_data.
+
+        Note that specifically for EaaSMetric, it's better to batch requests when
+        possible, so they can be sent in a single API call. For example, see
+        `processors/conditional_generation.py`.
+        """
         inputs = []
         for td, pd in zip(true_data, pred_data):
             ntd = copy.deepcopy(td)

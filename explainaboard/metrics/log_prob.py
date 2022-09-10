@@ -40,8 +40,9 @@ class LogProb(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        """
-        Take in a list of floats (token-level), or list of lists of floats (sentence
+        """See Metric.calc_stats_from_data.
+
+        Takes in a list of floats (token-level), or list of lists of floats (sentence
         level) and either one float for each or float+length rows
         """
         if len(pred_data) == 0 or isinstance(pred_data[0], float):
@@ -56,6 +57,7 @@ class LogProb(Metric):
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """From aggregated sufficient statistics, calculate the metric value
+
         :param agg_stats: aggregated statistics
         :param config: a configuration to over-ride the default for this object
         :return: a single scalar metric value

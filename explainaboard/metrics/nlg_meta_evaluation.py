@@ -57,6 +57,7 @@ class CorrelationMetric(Metric):
         pred_data: list[str],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         config = narrow(CorrelationConfig, unwrap_or(config, self.config))
 
         return SimpleMetricStats(

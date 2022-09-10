@@ -75,6 +75,7 @@ class ExternalEval(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         config = cast(ExternalEvalConfig, self._get_config(config))
 
         if config.external_stats is not None:

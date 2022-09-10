@@ -34,6 +34,7 @@ class RootMeanSquaredError(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         error = np.array([(x - y) for x, y in zip(true_data, pred_data)])
         squared_error = error * error
         return SimpleMetricStats(squared_error)
@@ -63,5 +64,6 @@ class AbsoluteError(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         error = np.array([abs(x - y) for x, y in zip(true_data, pred_data)])
         return SimpleMetricStats(error)
