@@ -1,3 +1,5 @@
+"""Abstract classes to implement loaders."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -56,18 +58,30 @@ class Loader:
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """Return the default file type for the dataset in this loader.
+
+        Returns:
+            A FileType of the default file type.
+        """
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """Return the default file type for the output in this loader."""
         return FileType.text
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-        return {}
+        """Return file loaders for the dataset.
+
+        The dictionary maps from FileType -> FileLoader."""
+        raise NotImplementedError
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """Return a dictionary of default file loaders for the ouptut.
+
+        The dictionary maps from FileType -> FileLoader."""
         return {FileType.text: TextFileLoader()}
 
     @classmethod
