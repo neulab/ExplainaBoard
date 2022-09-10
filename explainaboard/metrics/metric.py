@@ -63,7 +63,7 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
     external_stats: np.ndarray | None = None
 
     @abc.abstractmethod
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         ...
 
 
