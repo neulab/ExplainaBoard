@@ -1,6 +1,4 @@
-"""
-Evaluation metrics for meta evaluation of natural language generation.
-"""
+"""Evaluation metrics for meta evaluation of natural language generation."""
 
 from __future__ import annotations
 

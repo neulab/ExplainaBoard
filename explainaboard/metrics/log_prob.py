@@ -1,6 +1,4 @@
-"""
-Evaluation metrics to measure log probabilities for language modeling.
-"""
+"""Evaluation metrics to measure log probabilities for language modeling."""
 
 from __future__ import annotations
 

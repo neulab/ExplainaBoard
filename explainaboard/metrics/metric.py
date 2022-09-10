@@ -1,6 +1,4 @@
-"""
-Base classes and interfaces used to implement evaluation metrics.
-"""
+"""Base classes and interfaces used to implement evaluation metrics."""
 
 from __future__ import annotations
 

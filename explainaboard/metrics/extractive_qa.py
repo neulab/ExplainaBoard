@@ -1,6 +1,4 @@
-"""
-Evaluation metrics for extractive question answering.
-"""
+"""Evaluation metrics for extractive question answering."""
 
 from __future__ import annotations
 
@@ -23,8 +21,8 @@ from explainaboard.utils.typing_utils import unwrap_or
 
 
 class ExtractiveQAMetric(Metric):
-    """
-    An abstract class for extractive QA tasks that measures scores after normalization.
+    """An abstract class for extractive QA tasks that measures scores after normalization.
+
     The actual metric must inherit this class and implement the sample_level_metric()
     function.
     """

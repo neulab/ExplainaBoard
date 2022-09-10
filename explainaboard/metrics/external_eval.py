@@ -1,6 +1,4 @@
-"""
-Evaluation metrics with externally provided statistics.
-"""
+"""Evaluation metrics with externally provided statistics."""
 
 from __future__ import annotations
 
@@ -31,6 +29,12 @@ UNANNOTATED_SYMBOL = -1
 
 @dataclass
 class ExternalEvalResult(AuxiliaryMetricResult):
+    """The result of an external evaluation metric.
+
+    Args:
+        agreement: The agreement according to some measure (e.g. Fleiss's Kappa).
+    """
+
     agreement: float
 
 
@@ -58,16 +62,19 @@ class ExternalEvalConfig(MetricConfig):
 
 
 class ExternalEval(Metric):
-    """
-    Calculates the hits metric, telling whether the predicted output is in a set of true
-    outputs.
+    """Calculates the Hits metric.
+
+    This tells whether the predicted output is in a set of true outputs.
     """
 
     def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
-        """
-        Get the configuration or overwritten configuration
-        :param config: Optional configuration to override the default configuration
-        :return: Either the default or overridden configuration
+        """Get the configuration or overwritten configuration.
+
+        Args:
+            config: Optional configuration to override the default configuration
+
+        Returns:
+            Either the default or overridden configuration
         """
         ret_config: MetricConfig = unwrap(config) if config is not None else self.config
         return ret_config
@@ -79,7 +86,14 @@ class ExternalEval(Metric):
     def calc_stats_from_external(
         self, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """Calculate statistics from external data.
 
+        Args:
+            config: The configuration under which to calculate the statistics.
+
+        Returns:
+            The calculated statistics.
+        """
         config = cast(ExternalEvalConfig, self._get_config(config))
         return SimpleMetricStats(config.external_stats)
 
@@ -115,6 +129,14 @@ class ExternalEval(Metric):
             )
 
     def calc_agreement(self, stats: MetricStats) -> float:
+        """Calculate the agreement between annotators in metric statistics.
+
+        Args:
+            stats: The statistics to calculate over.
+
+        Returns:
+            Fleiss's Kappa agreement statistic.
+        """
         if stats.is_batched():
             raise ValueError("Unsupported for batched statistics.")
 
@@ -137,11 +159,7 @@ class ExternalEval(Metric):
         return fleiss_kappa(mat_kappa)
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
         if data.size == 0:
@@ -157,11 +175,15 @@ class ExternalEval(Metric):
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
-        :param stats: pre-computed metric stats
-        :param conf_value: if set to not None, must be a number between 0 and 1,
-            indicating the p-value of confidence intervals
-        :param config: a configuration to over-ride the default for this object
-        :return: a resulting metric value
+
+        Args:
+                stats: pre-computed metric stats
+                conf_value: if set to not None, must be a number between 0 and 1,
+                    indicating the p-value of confidence intervals
+                config: a configuration to over-ride the default for this object
+
+        Returns:
+            a resulting metric value
         """
         config = self._get_config(config)
         agg_stats = self.aggregate_stats(stats)

@@ -1,6 +1,4 @@
-"""
-Evaluation metrics for continuous prediction tasks such as regression.
-"""
+"""Evaluation metrics for continuous prediction tasks such as regression."""
 
 from __future__ import annotations
 
@@ -29,9 +27,7 @@ class RootMeanSquaredErrorConfig(MetricConfig):
 
 
 class RootMeanSquaredError(Metric):
-    """
-    Calculate the squared error
-    """
+    """Calculate the root mean squared error of continuous values."""
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
@@ -63,9 +59,7 @@ class AbsoluteErrorConfig(MetricConfig):
 
 
 class AbsoluteError(Metric):
-    """
-    Calculate the squared error
-    """
+    """Calculate the absolute error of continuous values."""
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None

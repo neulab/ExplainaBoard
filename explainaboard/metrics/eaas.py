@@ -1,6 +1,4 @@
-"""
-Evaluation metrics using the "Evaluation as a Service" library.
-"""
+"""Evaluation metrics using the "Evaluation as a Service" library."""
 
 from __future__ import annotations
 

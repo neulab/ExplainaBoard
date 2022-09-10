@@ -1,6 +1,4 @@
-"""
-Evaluation metrics for hybrid table-text QA.
-"""
+"""Evaluation metrics for hybrid table-text QA."""
 
 from __future__ import annotations
 
