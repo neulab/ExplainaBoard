@@ -28,23 +28,23 @@ class TextToSQLProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "question": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the input question",
             ),
             "true_sql": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true sql",
             ),
             "predicted_sql": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted sql",
             ),
             "db_id": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the database id",
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
                 func=lambda info, x, c: count_tokens(info, x["question"]),
             ),
