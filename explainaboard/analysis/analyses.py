@@ -213,7 +213,7 @@ class BucketAnalysis(Analysis):
                 unwrap_generator(metrics),
                 unwrap_generator(stats),
             ):
-                # Samples may be empty when user defined a bucket interval that 
+                # Samples may be empty when user defined a bucket interval that
                 # has no samples
                 if n_samples == 0.0:
                     value, conf_low, conf_high = 0.0, 0.0, 0.0
@@ -229,7 +229,7 @@ class BucketAnalysis(Analysis):
                         if metric_result.conf_interval
                         else (None, None)
                     )
-                    
+
                     value = metric_result.value
 
                 performance = Performance(
