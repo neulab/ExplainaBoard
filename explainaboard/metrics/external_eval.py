@@ -37,6 +37,9 @@ class ExternalEvalConfig(MetricConfig):
     n_annotators: int = 3
     categories: int = 5
     instruction: str = "Annotation instruction"
+    # The external statistics for metrics. The row size is equal to the number
+    # of test samples, the column size is equal to `n_annotators`.
+    external_stats: np.ndarray | None = None
 
     def to_metric(self):
         return ExternalEval(self)
