@@ -259,14 +259,14 @@ def create_parser():
 
     parser.add_argument(
         '--conf-value',
-        dest="confidence_level",
+        dest="confidence_alpha",
         type=float,
         required=False,
-        help="Deprecated. use --confidence-level instead.",
+        help="Deprecated. use --confidence-alpha instead.",
     )
 
     parser.add_argument(
-        '--confidence-level',
+        '--confidence-alpha',
         type=float,
         required=False,
         default=0.05,
@@ -465,7 +465,7 @@ def main():
             "source_language": source_language,
             "target_language": target_language,
             "reload_stat": reload_stat,
-            "confidence_level": args.confidence_level,
+            "confidence_alpha": args.confidence_alpha,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
             "custom_analyses": system_datasets[0].metadata.custom_analyses,

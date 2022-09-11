@@ -136,12 +136,12 @@ class ExternalEval(Metric):
     def evaluate_from_stats(
         self,
         stats: MetricStats,
-        confidence_level: Optional[float] = None,
+        confidence_alpha: Optional[float] = None,
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
-        :param confidence_level: if set to not None, must be a number between 0 and 1,
+        :param confidence_alpha: if set to not None, must be a number between 0 and 1,
             indicating the inverse confidence level of the confidence interval
         :param config: a configuration to over-ride the default for this object
         :return: a resulting metric value
@@ -151,14 +151,14 @@ class ExternalEval(Metric):
         agreement = self.calc_agreement(stats)
         value = self.calc_metric_from_aggregate(agg_stats, config)
         confidence_interval = (
-            self.calc_confidence_interval(stats, confidence_level)
-            if confidence_level
+            self.calc_confidence_interval(stats, confidence_alpha)
+            if confidence_alpha
             else None
         )
         return MetricResult(
             config,
             float(value),
             confidence_interval,
-            confidence_level,
+            confidence_alpha,
             ExternalEvalResult(agreement),
         )

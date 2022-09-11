@@ -28,7 +28,7 @@ class MetricResult:
     # Confidence interval of the metric values
     confidence_interval: Optional[tuple[float, float]] = None
     # The inverse confidence level of the confidence interval
-    confidence_level: Optional[float] = None
+    confidence_alpha: Optional[float] = None
     # Extra data for
     auxiliary_result: AuxiliaryMetricResult | None = None
 
@@ -39,8 +39,8 @@ class MetricResult:
         }
         if self.confidence_interval is not None:
             ret['confidence_interval'] = self.confidence_interval
-        if self.confidence_level is not None:
-            ret['confidence_level'] = self.confidence_level
+        if self.confidence_alpha is not None:
+            ret['confidence_alpha'] = self.confidence_alpha
         return ret
 
 
@@ -302,20 +302,20 @@ class Metric:
     def calc_confidence_interval(
         self,
         stats: MetricStats,
-        confidence_level: float,
+        confidence_alpha: float,
         n_samples: int = 1000,
         prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
         """
         :param stats: sufficient statistics as calculated by calc_stats_from_data
-        :param confidence_level: the inverse confidence level of the confidence interval
+        :param confidence_alpha: the inverse confidence level of the confidence interval
         :param n_samples: the number of bootstrapping samples
         :param prop_samples: the proportion of samples to sample each time
         :param config: a configuration to over-ride the default for this object
         """
-        if confidence_level <= 0.0 or confidence_level >= 1.0:
-            raise ValueError(f'Bad confidence value {confidence_level}')
+        if confidence_alpha <= 0.0 or confidence_alpha >= 1.0:
+            raise ValueError(f'Bad confidence value {confidence_alpha}')
 
         stats_data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         num_stats = stats.num_statistics()
@@ -336,7 +336,7 @@ class Metric:
             if my_std == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
-                alpha=confidence_level,
+                alpha=confidence_alpha,
                 df=stats_data.shape[-2] - 1,
                 loc=my_mean,
                 scale=my_std,
@@ -353,19 +353,19 @@ class Metric:
             agg_stats = self.aggregate_stats(filt_stats)
             samp_results = self.calc_metric_from_aggregate(agg_stats, config)
             samp_results.sort()
-            low = int(n_samples * confidence_level / 2.0)
-            high = int(n_samples * (1.0 - confidence_level / 2.0))
+            low = int(n_samples * confidence_alpha / 2.0)
+            high = int(n_samples * (1.0 - confidence_alpha / 2.0))
             return float(samp_results[low]), float(samp_results[high])
 
     def evaluate_from_stats(
         self,
         stats: MetricStats,
-        confidence_level: Optional[float] = None,
+        confidence_alpha: Optional[float] = None,
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
         :param stats: pre-computed metric stats
-        :param confidence_level: if set to not None, must be a number between 0 and 1,
+        :param confidence_alpha: if set to not None, must be a number between 0 and 1,
             indicating the inverse confidence level of confidence intervals
         :param config: a configuration to over-ride the default for this object
         :return: a resulting metric value
@@ -374,28 +374,28 @@ class Metric:
         agg_stats = self.aggregate_stats(stats)
         value = self.calc_metric_from_aggregate(agg_stats, actual_config)
         confidence_interval = (
-            self.calc_confidence_interval(stats, confidence_level)
-            if confidence_level
+            self.calc_confidence_interval(stats, confidence_alpha)
+            if confidence_alpha
             else None
         )
         return MetricResult(
-            actual_config, float(value), confidence_interval, confidence_level
+            actual_config, float(value), confidence_interval, confidence_alpha
         )
 
     def evaluate(
         self,
         true_data: list,
         pred_data: list,
-        confidence_level: Optional[float] = None,
+        confidence_alpha: Optional[float] = None,
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over true data and predicted data.
         :param true_data: gold-standard data
         :param pred_data: predicted data
-        :param confidence_level: if set to not None, must be a number between 0 and 1,
+        :param confidence_alpha: if set to not None, must be a number between 0 and 1,
             indicating the inverse confidence level of confidence intervals
         :param config: a configuration to over-ride the default for this object
         :return: a resulting metric value
         """
         stats = self.calc_stats_from_data(true_data, pred_data, config)
-        return self.evaluate_from_stats(stats, confidence_level, config)
+        return self.evaluate_from_stats(stats, confidence_alpha, config)

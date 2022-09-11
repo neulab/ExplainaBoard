@@ -9,7 +9,7 @@
     "reload_stat": true,
     "is_print_case": true,
     "language": "fr",
-    "confidence_level": 0.05,
+    "confidence_alpha": 0.05,
     "features": {
         "text": {
             "dtype": "string",

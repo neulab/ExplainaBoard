@@ -261,7 +261,7 @@ class Processor(metaclass=abc.ABCMeta):
                         cases=analysis_cases[level_id],
                         metrics=metrics[level_id],
                         stats=metric_stats[level_id],
-                        confidence_level=sys_info.confidence_level,
+                        confidence_alpha=sys_info.confidence_alpha,
                     )
                 )
             except Exception as ex:
@@ -333,7 +333,7 @@ class Processor(metaclass=abc.ABCMeta):
             ):
                 metric_result = metric_cfg.to_metric().evaluate_from_stats(
                     metric_stat,
-                    confidence_level=sys_info.confidence_level,
+                    confidence_alpha=sys_info.confidence_alpha,
                 )
 
                 confidence_low, confidence_high = (

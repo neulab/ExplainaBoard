@@ -65,7 +65,7 @@ class Analysis:
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        confidence_level: float,
+        confidence_alpha: float,
     ) -> AnalysisResult:
         """
         A super-class for analyses, which take in examples and analyze their features in
@@ -75,7 +75,7 @@ class Analysis:
           These could be examples, spans, tokens, etc.
         :param metrics: The metrics used to evaluate the cases.
         :param stats: The statistics calculated by each metric.
-        :param confidence_level: In the case that any significance analysis is
+        :param confidence_alpha: In the case that any significance analysis is
             performed, the inverse confidence level.
         """
         raise NotImplementedError
@@ -211,7 +211,7 @@ class BucketAnalysis(Analysis):
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        confidence_level: float,
+        confidence_alpha: float,
     ) -> AnalysisResult:
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
@@ -247,7 +247,7 @@ class BucketAnalysis(Analysis):
                 bucket_stats = metric_stat.filter(bucket_collection.samples)
                 metric_result = metric_func.evaluate_from_stats(
                     bucket_stats,
-                    confidence_level=confidence_level,
+                    confidence_alpha=confidence_alpha,
                 )
 
                 conf_low, conf_high = (
@@ -346,7 +346,7 @@ class ComboCountAnalysis(Analysis):
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        confidence_level: float,
+        confidence_alpha: float,
     ) -> AnalysisResult:
         for x in self.features:
             if x not in cases[0].features:
