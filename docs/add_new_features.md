@@ -34,12 +34,12 @@ class TextClassificationProcessor(Processor):
         # ---- Features ----
         features: dict[str, FeatureType] = {
             "chars_per_word": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="character count divided by token count",
                 func=lambda info, x, c: float(len(x['text'])) / count_tokens(info, x['text']),
             ),
             "contains_question": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="",
                 func=lambda info, x, c: "yes" if "?" in x['text'] else "no",
             ),

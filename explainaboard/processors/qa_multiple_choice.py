@@ -34,36 +34,38 @@ class QAMultipleChoiceProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
         features = {
-            "context": feature.Value(dtype="string"),
-            "question": feature.Value(dtype="string"),
-            "options": feature.Sequence(feature=feature.Value(dtype="string")),
+            "context": feature.Value(dtype=feature.DataType.STRING),
+            "question": feature.Value(dtype=feature.DataType.STRING),
+            "options": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "answers": feature.Sequence(
                 feature=feature.Dict(
                     feature={
-                        "text": feature.Value(dtype="string"),
-                        "option_index": feature.Value(dtype="int32"),
+                        "text": feature.Value(dtype=feature.DataType.STRING),
+                        "option_index": feature.Value(dtype=feature.DataType.INT),
                     }
                 )
             ),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "question_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
             "answer_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
                     info, x['answers']['text'], side='target'
                 ),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -71,7 +73,7 @@ class QAMultipleChoiceProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "average rank of context words based on training set freq"
                 ),

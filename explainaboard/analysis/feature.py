@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
+from enum import Enum
 from typing import Any, final, TypeVar
 
 from explainaboard.serialization.registry import TypeRegistry
@@ -47,7 +48,6 @@ class FeatureType(Serializable, metaclass=ABCMeta):
     def __init__(
         self,
         *,
-        dtype: str | None = None,
         description: str | None = None,
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
@@ -55,12 +55,10 @@ class FeatureType(Serializable, metaclass=ABCMeta):
         """Initializes FeatureType object.
 
         Args:
-            dtype: Data type specifier.
             description: Description of this feature.
             func: Function to calculate this feature from other features.
             require_training_set: Whether this feature relies on the training samples.
         """
-        self._dtype = dtype
         self._description = description
         self._func = func
         self._require_training_set = (
@@ -91,36 +89,30 @@ class FeatureType(Serializable, metaclass=ABCMeta):
             True if `other` has the same base members with `self`, False otherwise.
         """
         return (
-            self._dtype == other._dtype
-            and self._description == other._description
+            self._description == other._description
             and self._func is other._func
             and self._require_training_set == other._require_training_set
         )
 
     @final
     @property
-    def dtype(self) -> str | None:
-        """The data type of the feature."""
-        return self._dtype
-
-    @final
-    @property
     def description(self) -> str | None:
-        """A human-comprehensible description of the feature."""
+        """Returns the description of this feature."""
         return self._description
 
     @final
     @property
     def func(self) -> Callable[..., Any] | None:
-        """A function that can be used to calculate the feature."""
+        """Returns the callable to calculate this feature."""
         return self._func
 
     @final
     @property
     def require_training_set(self) -> bool:
-        """Whether the feature requires the training set to calculate."""
+        """Returns whether this feature requires training set or not."""
         return self._require_training_set
 
+    @final
     def _serialize_base(self) -> dict[str, SerializableData]:
         """Helper to serialize base members.
 
@@ -136,7 +128,6 @@ class FeatureType(Serializable, metaclass=ABCMeta):
             get_logger(__name__).warning("`func` member is not serializable.")
 
         return {
-            "dtype": self._dtype,
             "description": self._description,
             "require_training_set": self._require_training_set,
         }
@@ -164,7 +155,6 @@ class Sequence(FeatureType):
             feature: Feature type of elements.
         """
         super().__init__(
-            dtype="list",
             description=description,
             func=func,
             require_training_set=require_training_set,
@@ -181,7 +171,7 @@ class Sequence(FeatureType):
 
     @property
     def feature(self) -> FeatureType:
-        """A feature type defining the features in the sequence."""
+        """Returns the element type of this sequence."""
         return self._feature
 
     def serialize(self) -> dict[str, SerializableData]:
@@ -224,7 +214,6 @@ class Dict(FeatureType):
             feature: Definitions of member types.
         """
         super().__init__(
-            dtype="dict",
             description=description,
             func=func,
             require_training_set=require_training_set,
@@ -241,7 +230,7 @@ class Dict(FeatureType):
 
     @property
     def feature(self) -> dict[str, FeatureType]:
-        """A feature type defining the type of the feature stored in the dict."""
+        """Returns the types of underlying members in this dict."""
         return self._feature
 
     def serialize(self) -> dict[str, SerializableData]:
@@ -267,15 +256,29 @@ class Dict(FeatureType):
         )
 
 
+# TODO(odashi): Follow well-known schema to define this struct, e.g., JSON Schema.
+@final
+class DataType(Enum):
+    """Data types for Value FeatureType."""
+
+    INT = "int"
+    FLOAT = "float"
+    STRING = "string"
+
+
 @final
 @_feature_type_registry.register("Value")
 class Value(FeatureType):
     """A feature representing a value such as an int, float, or string."""
 
+    _dtype: DataType
+    _max_value: int | float | None
+    _min_value: int | float | None
+
     def __init__(
         self,
         *,
-        dtype: str | None = None,
+        dtype: DataType,
         description: str | None = None,
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
@@ -285,52 +288,81 @@ class Value(FeatureType):
         """Initializes Value object.
 
         Args:
-            dtype: See FeatureType.__init__.
+            dtype: Data type of this value.
             description: See FeatureType.__init__.
             func: See FeatureType.__init__.
             require_training_set: See FeatureType.__init__.
             max_value: The maximum value (inclusive) of values with int/float dtype.
             min_value: The minimum value (inclusive) of values with int/float dtype.
         """
-        # Fix inferred types.
-        if dtype == "double":
-            dtype = "float64"
-        elif dtype == "float":
-            dtype = "float32"
-
         super().__init__(
-            dtype=dtype,
             description=description,
             func=func,
             require_training_set=require_training_set,
         )
-        self._max_value = max_value
-        self._min_value = min_value
+
+        self._dtype = dtype
+
+        if max_value is not None and min_value is not None and max_value < min_value:
+            raise ValueError("max_value must be greater than or equal to min_value.")
+
+        if self._dtype == DataType.INT:
+            if isinstance(max_value, float):
+                raise ValueError("max_value must be an int when the dtype is integer.")
+            if isinstance(min_value, float):
+                raise ValueError("min_value must be an int when the dtype is integer.")
+            self._max_value = max_value
+            self._min_value = min_value
+        elif self._dtype == DataType.FLOAT:
+            self._max_value = float(max_value) if max_value is not None else None
+            self._min_value = float(min_value) if min_value is not None else None
+        else:
+            if max_value is not None:
+                raise ValueError(
+                    "max_value must not be specified when dtype is not a numeric type."
+                )
+            if min_value is not None:
+                raise ValueError(
+                    "min_value must not be specified when dtype is not a numeric type."
+                )
+            self._max_value = max_value
+            self._min_value = min_value
 
     def __eq__(self, other: object) -> bool:
         """See FeatureType.__eq__."""
         return (
             isinstance(other, Value)
             and self._eq_base(other)
+            and self._dtype == other._dtype
             and self._max_value == other._max_value
             and self._min_value == other._min_value
         )
 
     @property
+    def dtype(self) -> DataType:
+        """Returns the data type of this value."""
+        return self._dtype
+
+    @property
     def max_value(self) -> int | float | None:
-        """The maximum value of the feature."""
+        """Returns the maximum value (inclusive) of this value."""
         return self._max_value
 
     @property
     def min_value(self) -> int | float | None:
-        """The minimum value of the feature."""
+        """Returns the minimum value (inclusive) of this value."""
         return self._min_value
 
     def serialize(self) -> dict[str, SerializableData]:
         """See Serializable.serialize."""
         data = self._serialize_base()
-        data["max_value"] = self._max_value
-        data["min_value"] = self._min_value
+        data.update(
+            {
+                "dtype": str(self._dtype.value),
+                "max_value": self._max_value,
+                "min_value": self._min_value,
+            }
+        )
         return data
 
     @classmethod
@@ -338,17 +370,14 @@ class Value(FeatureType):
         """See Serializable.deserialize."""
         max_value = data.get("max_value")
         min_value = data.get("min_value")
+
         if max_value is not None and not isinstance(max_value, (int, float)):
-            raise ValueError(
-                f"Unexpected type of `max_value`: {type(max_value).__name__}"
-            )
+            raise ValueError("max_value must be either int, float, or None.")
         if min_value is not None and not isinstance(min_value, (int, float)):
-            raise ValueError(
-                f"Unexpected type of `min_value`: {type(min_value).__name__}"
-            )
+            raise ValueError("min_value must be either int, float, or None.")
 
         return cls(
-            dtype=_get_value(str, data, "dtype"),
+            dtype=DataType(data["dtype"]),
             description=_get_value(str, data, "description"),
             func=None,
             require_training_set=_get_value(bool, data, "require_training_set"),

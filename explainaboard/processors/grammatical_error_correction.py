@@ -29,18 +29,24 @@ class GrammaticalErrorCorrection(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
-            "text": feature.Value(dtype="string"),
+            "text": feature.Value(dtype=feature.DataType.STRING),
             "edits": feature.Dict(
                 feature={
-                    "start_idx": feature.Sequence(feature=feature.Value(dtype="int32")),
-                    "end_idx": feature.Sequence(feature=feature.Value(dtype="int32")),
+                    "start_idx": feature.Sequence(
+                        feature=feature.Value(dtype=feature.DataType.INT)
+                    ),
+                    "end_idx": feature.Sequence(
+                        feature=feature.Value(dtype=feature.DataType.INT)
+                    ),
                     "corrections": feature.Sequence(
-                        feature=feature.Sequence(feature=feature.Value(dtype="string"))
+                        feature=feature.Sequence(
+                            feature=feature.Value(dtype=feature.DataType.STRING)
+                        )
                     ),
                 }
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the text",
                 func=lambda info, x, c: count_tokens(info, x['text']),
             ),

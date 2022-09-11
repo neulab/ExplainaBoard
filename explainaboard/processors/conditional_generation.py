@@ -52,30 +52,30 @@ class ConditionalGenerationProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
-            "source": feature.Value(dtype="string"),
-            "reference": feature.Value(dtype="string"),
-            "hypothesis": feature.Value(dtype="string"),
+            "source": feature.Value(dtype=feature.DataType.STRING),
+            "reference": feature.Value(dtype=feature.DataType.STRING),
+            "hypothesis": feature.Value(dtype=feature.DataType.STRING),
             "source_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the source",
                 func=lambda info, x, c: count_tokens(info, x['source'], side='source'),
             ),
             "reference_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the reference",
                 func=lambda info, x, c: count_tokens(
                     info, x['reference'], side='target'
                 ),
             ),
             "hypothesis_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the hypothesis",
                 func=lambda info, x, c: count_tokens(
                     info, x['hypothesis'], side='target'
                 ),
             ),
             "src_num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="OOV words in the source",
                 func=lambda info, x, c, stat: feat_num_oov(
                     info, x['source'], stat['source_vocab'], side='source'
@@ -83,7 +83,7 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
             "src_fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="average training-set frequency rank of words in source",
                 func=lambda info, x, c, stat: feat_freq_rank(
                     info, x['source'], stat['source_vocab_rank'], side='source'
@@ -91,7 +91,7 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
             "ref_num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="number of OOV words in reference",
                 func=lambda info, x, c, stat: feat_num_oov(
                     info, x['reference'], stat['target_vocab'], side='target'
@@ -99,7 +99,7 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
             "ref_fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "average training-set frequency rank of words in reference"
                 ),
@@ -112,28 +112,28 @@ class ConditionalGenerationProcessor(Processor):
 
         tok_features: dict[str, FeatureType] = {
             "tok_text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="text of the token",
                 func=lambda info, x, c: self._get_tok_text(c),
             ),
             "tok_capitalness": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="whether the token is capitalized",
                 func=lambda info, x, c: cap_feature(c.features['tok_text']),
             ),
             "tok_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="relative position of token in sentence",
                 func=self._get_tok_position,
             ),
             "tok_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="number of characters in the token",
                 func=lambda info, x, c: len(c.features['tok_text']),
             ),
             # TODO(gneubig): commented out because less important and harder to impl
             # "tok_test_freq": feature.Value(
-            #     dtype="float",
+            #     dtype=feature.DataType.FLOAT,
             #     description="tok frequency in the test set",
             #     is_bucket=True,
             #     require_training_set=False,
@@ -144,7 +144,7 @@ class ConditionalGenerationProcessor(Processor):
             #     ),
             # ),
             "tok_train_freq": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="tok frequency in the training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['target_vocab'].get(

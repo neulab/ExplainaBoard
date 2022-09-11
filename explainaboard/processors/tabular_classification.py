@@ -34,11 +34,11 @@ class TextClassificationProcessor(Processor):
         """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true label of the input",
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
         }

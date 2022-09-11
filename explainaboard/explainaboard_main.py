@@ -490,17 +490,17 @@ def main():
             reports.append(report)
 
             # print to the console
-            get_logger('report').info('--- Overall Performance')
+            logger = get_logger('report')
+
+            logger.info('--- Overall Performance')
             for overall_level in report.results.overall:
                 for metric_stat in overall_level:
-                    get_logger('report').info(
-                        f'{metric_stat.metric_name}\t{metric_stat.value}'
-                    )
-            get_logger('report').info('')
-            get_logger('report').info('--- Fine-grained Analyses')
+                    logger.info(f'{metric_stat.metric_name}\t{metric_stat.value}')
+            logger.info('')
+            logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:
                 if analysis is not None:
-                    analysis.print()
+                    logger.info(analysis.generate_report())
 
             if output_dir:
 

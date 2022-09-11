@@ -33,64 +33,64 @@ class NLGMetaEvaluationProcessor(Processor):
         """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "sys_name": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the name of the system",
             ),
             "seg_id": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the ID of the segment",
             ),
             "test_set": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the set from which the example came from",
             ),
             "src": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the source sentence",
             ),
             "ref": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the reference sentence",
             ),
             "sys": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the system output",
             ),
             "manual_raw": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the raw score provided by annotators",
             ),
             "manual_z": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the z-normalized score provided by annotators",
             ),
             "auto_score": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the score provided by the automatic system",
             ),
             "src_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="source length",
                 func=lambda info, x, c: count_tokens(info, x['src']),
             ),
             "ref_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="reference length",
                 func=lambda info, x, c: count_tokens(info, x['ref'], side='target'),
             ),
             "sys_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="system output length",
                 func=lambda info, x, c: count_tokens(info, x['ref'], side='target'),
             ),
             "src_divided_ref": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="ratio of source length to reference length",
                 func=lambda info, x, c: c.features['src_length']
                 / c.features['ref_length'],
             ),
             "sys_divided_ref": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="ratio of system output length to reference length",
                 func=lambda info, x, c: c.features['sys_length']
                 / c.features['ref_length'],
