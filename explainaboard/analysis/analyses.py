@@ -216,7 +216,9 @@ class BucketAnalysis(Analysis):
                 # Samples may be empty when user defined a bucket interval that
                 # has no samples
                 if n_samples == 0.0:
-                    value, conf_low, conf_high = 0.0, 0.0, 0.0
+                    value = 0.0
+                    conf_low: Optional[float] = 0.0
+                    conf_high: Optional[float] = 0.0
                 else:
                     bucket_stats = metric_stat.filter(bucket_collection.samples)
                     metric_result = metric_func.evaluate_from_stats(
