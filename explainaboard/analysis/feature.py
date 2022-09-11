@@ -1,3 +1,5 @@
+"""Classes to express features."""
+
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -40,6 +42,8 @@ def _get_value(cls: type[T], data: dict[str, SerializableData], key: str) -> T |
 
 
 class FeatureType(Serializable, metaclass=ABCMeta):
+    """An object specifying the type of features."""
+
     def __init__(
         self,
         *,
@@ -96,21 +100,25 @@ class FeatureType(Serializable, metaclass=ABCMeta):
     @final
     @property
     def dtype(self) -> str | None:
+        """The data type of the feature."""
         return self._dtype
 
     @final
     @property
     def description(self) -> str | None:
+        """A human-comprehensible description of the feature."""
         return self._description
 
     @final
     @property
     def func(self) -> Callable[..., Any] | None:
+        """A function that can be used to calculate the feature."""
         return self._func
 
     @final
     @property
     def require_training_set(self) -> bool:
+        """Whether the feature requires the training set to calculate."""
         return self._require_training_set
 
     def _serialize_base(self) -> dict[str, SerializableData]:
@@ -137,6 +145,8 @@ class FeatureType(Serializable, metaclass=ABCMeta):
 @final
 @_feature_type_registry.register("Sequence")
 class Sequence(FeatureType):
+    """A feature consisting of a sequence of features."""
+
     def __init__(
         self,
         *,
@@ -171,6 +181,7 @@ class Sequence(FeatureType):
 
     @property
     def feature(self) -> FeatureType:
+        """A feature type defining the features in the sequence."""
         return self._feature
 
     def serialize(self) -> dict[str, SerializableData]:
@@ -194,6 +205,8 @@ class Sequence(FeatureType):
 @final
 @_feature_type_registry.register("Dict")
 class Dict(FeatureType):
+    """A feature that consists of a dictionary of features."""
+
     def __init__(
         self,
         *,
@@ -228,6 +241,7 @@ class Dict(FeatureType):
 
     @property
     def feature(self) -> dict[str, FeatureType]:
+        """A feature type defining the type of the feature stored in the dict."""
         return self._feature
 
     def serialize(self) -> dict[str, SerializableData]:
@@ -256,6 +270,8 @@ class Dict(FeatureType):
 @final
 @_feature_type_registry.register("Value")
 class Value(FeatureType):
+    """A feature representing a value such as an int, float, or string."""
+
     def __init__(
         self,
         *,
@@ -302,10 +318,12 @@ class Value(FeatureType):
 
     @property
     def max_value(self) -> int | float | None:
+        """The maximum value of the feature."""
         return self._max_value
 
     @property
     def min_value(self) -> int | float | None:
+        """The minimum value of the feature."""
         return self._min_value
 
     def serialize(self) -> dict[str, SerializableData]:
