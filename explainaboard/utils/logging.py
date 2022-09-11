@@ -14,6 +14,15 @@ T = TypeVar("T")
 
 
 def progress(gen, desc: str = None):
+    """Create a progress bar.
+
+    Args:
+        gen: An iterator
+        desc: The description on the progress bar
+
+    Returns:
+        An iterator with a progress bar unless hide_progress is on.
+    """
     return gen if hide_progress else tqdm(gen, desc=desc)
 
 
