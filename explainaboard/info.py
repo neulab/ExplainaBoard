@@ -72,7 +72,7 @@ class SysOutputInfo:
     source_language: str | None = None
     target_language: str | None = None
     reload_stat: bool = True
-    conf_value: float = 0.05
+    confidence_level: float = 0.05
     system_details: Optional[dict] = None
     source_tokenizer: Optional[Tokenizer] = None
     target_tokenizer: Optional[Tokenizer] = None

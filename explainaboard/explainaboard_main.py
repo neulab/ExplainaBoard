@@ -259,10 +259,21 @@ def create_parser():
 
     parser.add_argument(
         '--conf-value',
+        dest="confidence_level",
+        type=float,
+        required=False,
+        help="Deprecated. use --confidence-level instead.",
+    )
+
+    parser.add_argument(
+        '--confidence-level',
         type=float,
         required=False,
         default=0.05,
-        help="the p-value with which to calculate the confidence interval",
+        help=(
+            "the *inverse* confidence level of confidence intervals. If you need to "
+            "set the confidence level to 0.95, set this value to 0.05."
+        ),
     )
 
     parser.add_argument(
@@ -454,7 +465,7 @@ def main():
             "source_language": source_language,
             "target_language": target_language,
             "reload_stat": reload_stat,
-            "conf_value": args.conf_value,
+            "confidence_level": args.confidence_level,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
             "custom_analyses": system_datasets[0].metadata.custom_analyses,

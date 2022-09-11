@@ -65,7 +65,7 @@ class Analysis:
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        conf_value: float,
+        confidence_level: float,
     ) -> AnalysisResult:
         """
         A super-class for analyses, which take in examples and analyze their features in
@@ -75,8 +75,8 @@ class Analysis:
           These could be examples, spans, tokens, etc.
         :param metrics: The metrics used to evaluate the cases.
         :param stats: The statistics calculated by each metric.
-        :param conf_value: In the case that any significance analysis is performed, the
-          confidence level.
+        :param confidence_level: In the case that any significance analysis is
+            performed, the inverse confidence level.
         """
         raise NotImplementedError
 
@@ -211,7 +211,7 @@ class BucketAnalysis(Analysis):
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        conf_value: float,
+        confidence_level: float,
     ) -> AnalysisResult:
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
@@ -247,12 +247,12 @@ class BucketAnalysis(Analysis):
                 bucket_stats = metric_stat.filter(bucket_collection.samples)
                 metric_result = metric_func.evaluate_from_stats(
                     bucket_stats,
-                    conf_value=conf_value,
+                    confidence_level=confidence_level,
                 )
 
                 conf_low, conf_high = (
-                    metric_result.conf_interval
-                    if metric_result.conf_interval
+                    metric_result.confidence_interval
+                    if metric_result.confidence_interval
                     else (None, None)
                 )
 
@@ -346,7 +346,7 @@ class ComboCountAnalysis(Analysis):
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        conf_value: float,
+        confidence_level: float,
     ) -> AnalysisResult:
         for x in self.features:
             if x not in cases[0].features:

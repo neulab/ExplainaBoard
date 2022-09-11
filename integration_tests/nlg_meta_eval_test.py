@@ -16,7 +16,7 @@ class NLGMetaEvalTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.nlg_meta_evaluation.value,
             "metric_names": ["SysPearsonCorr"],
-            "conf_value": None,
+            "confidence_level": None,
         }
         loader = get_loader_class(TaskType.nlg_meta_evaluation)(
             self.tsv_dataset,
