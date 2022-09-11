@@ -38,39 +38,39 @@ class TextClassificationProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the text of the example",
             ),
             "true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true label of the input",
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['text']),
             ),
             "text_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in characters",
                 func=lambda info, x, c: len(x['text']),
             ),
             "basic_words": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the ratio of basic words",
                 func=lambda info, x, c: get_basic_words(x['text']),
             ),
             "lexical_richness": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="lexical diversity",
                 func=lambda info, x, c: get_lexical_richness(x['text']),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -78,7 +78,7 @@ class TextClassificationProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "the average rank of each word based on its frequency in "
                     "training set"
@@ -89,7 +89,7 @@ class TextClassificationProcessor(Processor):
                 ),
             ),
             "length_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the frequency of text length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(

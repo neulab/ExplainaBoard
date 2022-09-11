@@ -28,11 +28,11 @@ class TextClassificationProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true label of the input",
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
         }

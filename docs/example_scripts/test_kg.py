@@ -24,7 +24,7 @@ overall_res = unwrap(sys_info.results.overall)
 # print bucket information
 for analysis in fine_grained_res:
     if analysis is not None:
-        analysis.print()
+        print(analysis.generate_report())
 
 # save analysis report locally
 sys_info.print_as_json(file=open("./report.json", 'w'))

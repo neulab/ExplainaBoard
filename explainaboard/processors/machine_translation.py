@@ -26,7 +26,7 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         f = super().default_analysis_levels()
         f = copy.deepcopy(f)
         f[0].features["attr_compression"] = feature.Value(
-            dtype="float",
+            dtype=feature.DataType.FLOAT,
             description="the ratio between source and reference length",
             func=lambda info, x, c: c.features['source_length']
             / c.features['reference_length'],

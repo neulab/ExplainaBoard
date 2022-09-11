@@ -59,8 +59,6 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    # The external statistics for metrics
-    external_stats: np.ndarray | None = None
 
     @abc.abstractmethod
     def to_metric(self) -> Metric:
