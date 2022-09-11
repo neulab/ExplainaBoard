@@ -43,12 +43,12 @@ class ExternalEvalTest(unittest.TestCase):
             true_data,
             pred_data,
             ExternalEvalConfig(
-                "ExternalEval", n_annotators=1, external_stats=np.array([[1], [2]])
+                "ExternalEval", n_annotators=1, external_stats=np.array([[1], [0]])
             ),
         )
         self.assertEqual(len(stats), 2)
         self.assertEqual(stats.num_statistics(), 1)
-        np.testing.assert_array_equal(stats.get_data(), np.array([[1], [2]]))
+        np.testing.assert_array_equal(stats.get_data(), np.array([[1], [0]]))
 
     def test_calc_stats_from_data_without_external_stats(self) -> None:
         metric = ExternalEvalConfig("ExternalEval", n_annotators=2).to_metric()
