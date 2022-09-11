@@ -226,7 +226,7 @@ class BucketAnalysis(Analysis):
             subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
 
             bucket_performance = BucketPerformance(
-                n_samples=float(len(bucket_collection.samples)),
+                n_samples=len(bucket_collection.samples),
                 bucket_samples=subsampled_ids,
                 bucket_interval=bucket_collection.interval,
                 bucket_name=bucket_collection.name,
