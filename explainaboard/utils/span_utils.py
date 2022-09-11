@@ -1,26 +1,24 @@
+"""Utilities for calculating things with respect to spans."""
+
 from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
 from typing import Any, cast, List, Optional
 
+from explainaboard.analysis.feature_funcs import cap_feature
 
-def cap_feature(s):
-    """
-    Capitalization feature:
-    0 = low caps
-    1 = all caps
-    2 = first letter caps
-    3 = one capital (not first letter)
-    """
-    if s.lower() == s:
-        return "low_caps"
-    elif s.upper() == s:
-        return "full_caps"
-    elif s[0].upper() == s[0]:
-        return "first_caps"
-    else:
-        return "not_first_caps"
+
+def _get_argument_label(token: str) -> str:
+    return (
+        token.split("-")[1] + "-" + token.split("-")[2]
+        if len(token.split("-")) == 3
+        else token.split("-")[1]
+    )
+
+
+def _get_argument_tokens(sentences, start, end):
+    return sum([len(sentences[i].split(" ")) for i in range(start, end)])
 
 
 def gen_argument_pairs(
@@ -28,6 +26,18 @@ def gen_argument_pairs(
     pred_tags: list[str],
     sentences: Optional[list[str]] = None,
 ) -> tuple[set[str], set[str]] | tuple[list[ArgumentPair], list[ArgumentPair]]:
+    """Generate argument pairs for argument pair extraction tasks.
+
+    Args:
+        true_tags: The true tags
+        pred_tags: The predicted tags
+        sentences: A list of sentences
+
+    Returns:
+        A tuple of gold spans and predicted spans.
+    """
+    # TODO(gneubig): Because this has two return types, it'd probably be better to
+    #                have two different functions for the different cases.
     reply_dict: dict[int, str] = {}
     reply_pred_dict: dict[int, str] = {}
     gold_spans = []
@@ -35,23 +45,13 @@ def gen_argument_pairs(
     gold_spans_set = set()
     pred_spans_set = set()
 
-    def _get_label(token):
-        return (
-            token.split("-")[1] + "-" + token.split("-")[2]
-            if len(token.split("-")) == 3
-            else token.split("-")[1]
-        )
-
-    def _get_tokens(sentences, start, end):
-        return sum([len(sentences[i].split(" ")) for i in range(start, end)])
-
     for token_idx, token in enumerate(true_tags):
 
-        gold_label = _get_label(token)
+        gold_label = _get_argument_label(token)
         prefix = token.split("-")[0]
 
         next_label = (
-            _get_label(true_tags[token_idx + 1])
+            _get_argument_label(true_tags[token_idx + 1])
             if token_idx + 1 < len(true_tags)
             else 'O'
         )
@@ -90,10 +90,10 @@ def gen_argument_pairs(
 
     for token_idx, token in enumerate(true_tags):
 
-        gold_label = _get_label(token)
+        gold_label = _get_argument_label(token)
         prefix = token.split("-")[0]
         next_label = (
-            _get_label(true_tags[token_idx + 1])
+            _get_argument_label(true_tags[token_idx + 1])
             if token_idx + 1 < len(true_tags)
             else 'O'
         )
@@ -130,10 +130,12 @@ def gen_argument_pairs(
                                 block_tag="1",
                                 block_pos=block_pos,
                                 block_review_sentences=end - start + 1,
-                                block_review_tokens=_get_tokens(sentences, start, end),
+                                block_review_tokens=_get_argument_tokens(
+                                    sentences, start, end
+                                ),
                                 block_review_position=start * 1.0 / len(sentences),
                                 block_reply_sentences=reply_end - reply_start + 1,
-                                block_reply_tokens=_get_tokens(
+                                block_reply_tokens=_get_argument_tokens(
                                     sentences, reply_start, reply_end
                                 ),
                                 block_reply_position=reply_start * 1.0 / len(sentences),
@@ -174,14 +176,14 @@ def gen_argument_pairs(
                                 block_tag="1",
                                 block_pos=block_pos,
                                 block_review_sentences=end_pred - start_pred + 1,
-                                block_review_tokens=_get_tokens(
+                                block_review_tokens=_get_argument_tokens(
                                     sentences, start_pred, end_pred
                                 ),
                                 block_review_position=start_pred * 1.0 / len(sentences),
                                 block_reply_sentences=reply_end_pred
                                 - reply_start_pred
                                 + 1,
-                                block_reply_tokens=_get_tokens(
+                                block_reply_tokens=_get_argument_tokens(
                                     sentences, reply_start_pred, reply_end_pred
                                 ),
                                 block_reply_position=reply_start_pred
@@ -203,32 +205,45 @@ def gen_argument_pairs(
 
 @dataclass
 class ArgumentPair:
-    # surface string a block of text
+    """A data structure for the argument pair extraction task.
+
+    Args:
+        block_text: surface string a block of text
+        block_tag: the tag of a block
+        block_pos: the position of a block
+        block_review_sentences: the number of review sentence
+        block_review_tokens: the number of review tokens
+        block_review_position: the relative position of review block
+        block_reply_sentences: the number of reply sentence
+        block_reply_tokens: the number of reply tokens
+        block_reply_position: the relative position of reply block
+        sample_id: the id of samples where a span is located
+    """
+
     block_text: Optional[str] = None
-    # the tag of a block
     block_tag: Optional[str] = None
-    # the position of a block
     block_pos: Optional[tuple[int, int, int, int]] = None
-    # the number of review sentence
     block_review_sentences: Optional[float] = None
-    # the number of review tokens
     block_review_tokens: Optional[float] = None
-    # the relative position of review block
     block_review_position: Optional[float] = None
-    # the number of reply sentence
     block_reply_sentences: Optional[float] = None
-    # the number of reply tokens
     block_reply_tokens: Optional[float] = None
-    # the relative position of reply block
     block_reply_position: Optional[float] = None
-    # the id of samples where a span is located
     sample_id: Optional[int] = None
 
 
 class ArgumentPairOps:
+    """Operations over argument pairs."""
+
     def __init__(
         self, resources: dict[str, Any] | None = None, match_type: Optional[str] = None
     ) -> None:
+        """Operations over argument pair.
+
+        Args:
+            resources: Resources to be used in calculation.
+            match_type: Not used by this class.
+        """
         self.resources = resources or {}
         self.match_type: Optional[str] = None
         self.match_func = None
@@ -239,7 +254,16 @@ class ArgumentPairOps:
         pred_tags: list[str],
         sentences: list[str],
     ) -> tuple[list[ArgumentPair], list[ArgumentPair]]:
+        """Generate argument pairs.
 
+        Args:
+            true_tags: The actual tags.
+            pred_tags: Predicted tags.
+            sentences: Sentences.
+
+        Returns:
+            A list of gold spans and predicted spans.
+        """
         gold_spans, pred_spans = gen_argument_pairs(true_tags, pred_tags, sentences)
         gold_spans_list = cast(List[ArgumentPair], gold_spans)
         pred_spans_list = cast(List[ArgumentPair], pred_spans)
@@ -248,72 +272,99 @@ class ArgumentPairOps:
 
 @dataclass
 class Span:
+    """A data structure representing a span in a sentence.
 
-    # surface string a span
+    Args:
+        span_text: surface string a span
+        span_tag: the tag of a span
+        span_matched: whether span could be matched
+        span_pos: the position of a span
+        span_char_pos: the position of a span in characters in the string
+        span_capitalness: span capital features
+        span_rel_pos: the relative position of a span in a sequence
+        span_chars: the number of characters of a span
+        span_tokens: the number of tokens of a span
+        span_econ: the consistency of span label in training set
+        span_efre: the frequency of a span in training set
+        sample_id: the id of samples where a span is located
+        span_test_freq: the frequency of span in test set
+        span_train_freq:  the frequency of span in training set (TODO: duplicated?)
+    """
+
     span_text: Optional[str] = None
-    # the tag of a span
     span_tag: Optional[str] = None
-    # whether span could be matched
     span_matched: int = 0
-    # the position of a span
     span_pos: Optional[tuple[int, int]] = None
-    # the position of a span in characters in the string
     span_char_pos: Optional[tuple[int, int]] = None
-    # span capital features
     span_capitalness: Optional[str] = None
-    # the relative position of a span in a sequence
     span_rel_pos: Optional[float] = None
-    # the number of characters of a span
     span_chars: Optional[int] = None
-    # the number of tokens of a span
     span_tokens: Optional[int] = None
-    # the consistency of span label in training set
     span_econ: Optional[float] = None
-    # the frequency of a span in training set
     span_efre: Optional[float] = None
-    # the id of samples where a span is located
     sample_id: Optional[int] = None
-    # the frequency of span in test set
     span_test_freq: Optional[float] = None
-    # the frequency of span in training set (TODO: duplicated?)
     span_train_freq: Optional[float] = None
 
     @property
     def get_span_tag(self):
+        """Get the tag of the span."""
         return self.span_tag
 
     @property
     def get_span_text(self):
+        """Get the text of the span."""
         return self.span_text
 
 
 class SpanOps:
+    """Operations over spans."""
+
     def __init__(
         self, resources: dict[str, Any] | None = None, match_type: Optional[str] = None
     ):
+        """Constructor.
+
+        Args:
+            resources: Resources used in performing the operations (e.g. statistics).
+            match_type: The type of matching to be performed when checking whether spans
+              match for the purpose of measuring accuracy, etc.
+              * "tag": match tags between spans
+              * "text": match text between spans
+              * "text_tag": match both the text and the tag
+              * "position": match only the position
+              * "position_tag": match both the position and the tag
+        """
         self.resources = resources or {}
         self.match_type: str = (
             self.default_match_type() if match_type is None else match_type
         )
-        self.match_func = self.get_match_funcs()[self.match_type]
+        self.match_func = self._get_match_funcs()[self.match_type]
 
-    def set_resources(self, resources: dict[str, Any]):
+    def set_resources(self, resources: dict[str, Any]) -> dict[str, Any]:
+        """Set the resources used for span operations.
+
+        Args:
+            resources: A dictionary of resources to be used
+
+        Returns:
+            The resources that are set
+        """
         self.resources = resources
         return resources
 
     @classmethod
     def default_match_type(cls) -> str:
+        """Which matching type to use by default."""
         return "tag"
 
     def set_match_type(self, match_type) -> str:
+        """Set the matching type to be used."""
         self.match_type = match_type
-        self.match_func = self.get_match_funcs()[self.match_type]
+        self.match_func = self._get_match_funcs()[self.match_type]
         return self.match_type
 
-    def get_match_funcs(self):
-
-        match_funcs = {}
-
+    def _get_match_funcs(self):
         def span_tag_match(span_a: Span, span_b: Span):
             return span_a.span_tag == span_b.span_tag
 
@@ -335,15 +386,15 @@ class SpanOps:
                 and span_a.span_pos == span_b.span_pos
             )
 
-        match_funcs["tag"] = span_tag_match
-        match_funcs["text"] = span_text_match
-        match_funcs["text_tag"] = span_text_tag_match
-        match_funcs["position"] = span_position_match
-        match_funcs["position_tag"] = span_position_tag_match
+        return {
+            "tag": span_tag_match,
+            "text": span_text_match,
+            "text_tag": span_text_tag_match,
+            "position": span_position_match,
+            "position_tag": span_position_tag_match,
+        }
 
-        return match_funcs
-
-    def create_span(
+    def _create_span(
         self,
         tags: list[str],
         toks: list[str],
@@ -372,7 +423,15 @@ class SpanOps:
         return span
 
     def get_spans(self, tags: list[str], toks: list[str]) -> list[Span]:
-        """Return spans from a sequence of tags and tokens"""
+        """Return spans from a sequence of tags and tokens.
+
+        Args:
+            tags: A list of tags on each token.
+            toks: A list of tokens.
+
+        Returns:
+            A list of spans extracted from the tags.
+        """
         if len(tags) != len(toks):
             raise ValueError(f'length of tags and toks not same\n{tags}\n{toks}')
         spans = []
@@ -381,19 +440,28 @@ class SpanOps:
         for i, (tag, tok) in enumerate(zip(tags, toks)):
             char_starts.append(char_starts[-1] + len(tok) + 1)
             if self._span_ends(tags, i):
-                spans.append(self.create_span(tags, toks, char_starts, (span_start, i)))
+                spans.append(
+                    self._create_span(tags, toks, char_starts, (span_start, i))
+                )
                 span_start = -1
             if self._span_starts(tags, i):
                 span_start = i
         # end condition
         if span_start != -1:
             spans.append(
-                self.create_span(tags, toks, char_starts, (span_start, len(toks)))
+                self._create_span(tags, toks, char_starts, (span_start, len(toks)))
             )
         return spans
 
     def get_spans_simple(self, tags: list[str]) -> list[tuple[str, int, int]]:
-        """Return spans from a sequence of tags and tokens"""
+        """Return spans from a sequence of tags only, no tokens needed.
+
+        Args:
+            tags: The tags from which to extract the spans.
+
+        Returns:
+            A list of tuples of "tag, start_position, end_position"
+        """
         spans = []
         span_start = -1
         for i, tag in enumerate(tags):
@@ -411,24 +479,59 @@ class SpanOps:
 
     @abc.abstractmethod
     def _span_ends(self, tags: list[str], i: int) -> bool:
+        """Check whether a span ends at position i.
+
+        Args:
+            tags: The tags
+            i: The position
+
+        Returns:
+            Whether a span ends there
+        """
         ...
 
     @abc.abstractmethod
     def _span_starts(self, tags: list[str], i: int) -> bool:
+        """Check whether a span starts at position i.
+
+        Args:
+            tags: The tags
+            i: The position
+
+        Returns:
+            Whether a span starts there
+        """
         ...
 
     @abc.abstractmethod
     def _span_type(self, tags: list[str], pos: tuple[int, int]) -> str:
+        """Check the type of span that spans over positions pos.
+
+        Args:
+            tags: The tags used in the input
+            pos: The span start and end
+
+        Returns:
+            The tag of the span
+        """
         ...
 
     def get_matched_spans(
         self, spans_a: list[Span], spans_b: list[Span]
     ) -> tuple[list[int], list[int], list[Span], list[Span]]:
+        """Get the spans that match between two lists of spans.
 
-        # # TODO(Pengfei): add more matched condition
-        # def is_equal(dict_a, dict_b, key):
-        #     return True if getattr(dict_a, key) == getattr(dict_b, key) else False
+        Args:
+            spans_a: One list.
+            spans_b: The other list.
 
+        Returns:
+            A tuple consisting of:
+            * "a" matched indices
+            * "b" matched indices
+            * "a" matched spans
+            * "b" matched spans
+        """
         matched_a_index = []
         matched_b_index = []
         matched_spans_a = []
@@ -448,88 +551,12 @@ class SpanOps:
         return matched_a_index, matched_b_index, matched_spans_a, matched_spans_b
 
 
-# TODO(gneubig): this is not used anywhere, so decide to keep or delete
-# class NgramSpanOps(SpanOps):
-#     def __init__(
-#         self,
-#         resources: dict[str, Any] | None = None,
-#         match_type: str = "tag",
-#         n_grams: list | None = None,
-#     ):
-#         super().__init__(resources, match_type)
-#         self.n_grams = n_grams or list([1, 2])
-#
-#     @classmethod
-#     def default_match_type(cls) -> str:
-#         return "tag"
-#
-#     def get_spans_and_match(self, tags: list, tags_other: list):
-#         def get_ngrams(tags, n_grams: list[int]):
-#             spans = []
-#             for k in n_grams:
-#                 for i, tok in enumerate(tags):
-#                     if i + k > len(tags):
-#                         break
-#                     span = " ".join(tags[i : i + k])
-#                     spans.append((span, i, i + k))
-#             return spans
-#
-#         def get_span_from_ngrams(ngrams, tags_other_table, tags_length):
-#             span_dics = []
-#             for ngram in ngrams:
-#                 span = ngram[0]
-#
-#                 # match
-#                 my_other = tags_other_table.get(span, list())
-#                 matched = my_other.pop(0) if len(my_other) > 0 else -1
-#
-#                 span_dic = Span(
-#                     span_text=span,
-#                     span_tag=span
-#                     if "span_tag" not in self.resources.keys()
-#                     else self.resources["span_tag"](span),
-#                     span_pos=(ngram[1], ngram[2]),
-#                     span_matched=matched,
-#                     span_capitalness=cap_feature(span),  # type: ignore
-#                     span_rel_pos=ngram[2] * 1.0 / tags_length,  # type: ignore
-#                     span_chars=len(span),
-#                     span_tokens=len(span.split(" ")),
-#                     span_test_freq=0
-#                     if "ref_test_freq" not in self.resources.keys()
-#                     else self.resources["ref_test_freq"].get(span, 0),  # type: ignore
-#                     span_train_freq=0
-#                     if "fre_dic" not in self.resources.keys()
-#                     or self.resources["fre_dic"] is None
-#                     else self.resources["fre_dic"].get(span, 0),  # type: ignore
-#                 )
-#                 # Save the features
-#                 span_dics.append(span_dic)
-#             return span_dics
-#
-#         tags_ngrams = get_ngrams(tags, self.n_grams)
-#         tags_other_ngrams = get_ngrams(tags_other, self.n_grams)
-#
-#         # Find tokens in other set
-#         tags_other_table = defaultdict(list)
-#         for i, tok in enumerate(tags_other_ngrams):
-#             tags_other_table[tok[0]].append(i)
-#
-#         # Find tokens in other set
-#         tags_table = defaultdict(list)
-#         for i, tok in enumerate(tags_ngrams):
-#             tags_table[tok[0]].append(i)
-#
-#         span_dics = get_span_from_ngrams(tags_ngrams, tags_other_table, len(tags))
-#         span_dics_other = get_span_from_ngrams(
-#             tags_other_ngrams, tags_table, len(tags_other)
-#         )
-#
-#         return span_dics, span_dics_other
-
-
 class BMESSpanOps(SpanOps):
+    """SpanOps for BMES tagging schemes."""
+
     @classmethod
     def default_match_type(cls) -> str:
+        """See SpanOps.default_match_type."""
         return "position_tag"
 
     def _span_ends(self, tags: list[str], i: int) -> bool:
@@ -543,11 +570,13 @@ class BMESSpanOps(SpanOps):
 
 
 class BIOSpanOps(SpanOps):
+    """SpanOps for BIO tagging schemes."""
 
     _DEFAULT = 'O'
 
     @classmethod
     def default_match_type(cls) -> str:
+        """See SpanOps.default_match_type."""
         return "position_tag"
 
     def _span_ends(self, tags: list[str], i: int) -> bool:
