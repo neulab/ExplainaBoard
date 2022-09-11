@@ -31,24 +31,26 @@ class ClozeMultipleChoiceProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
-            "context": feature.Value(dtype="string"),
-            "question_mark": feature.Value(dtype="string"),
-            "options": feature.Sequence(feature=feature.Value(dtype="string")),
+            "context": feature.Value(dtype=feature.DataType.STRING),
+            "question_mark": feature.Value(dtype=feature.DataType.STRING),
+            "options": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "answers": feature.Sequence(
                 feature=feature.Dict(
                     feature={
-                        "text": feature.Value(dtype="string"),
-                        "option_index": feature.Value(dtype="int32"),
+                        "text": feature.Value(dtype=feature.DataType.STRING),
+                        "option_index": feature.Value(dtype=feature.DataType.INT),
                     }
                 )
             ),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the length of context",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "relative_blank_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the relative position of blank (question mark)"
                 " in the whole context",
                 func=lambda info, x, c: relative_position(
@@ -56,7 +58,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                 ),
             ),
             "absolute_blank_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the absolute position of blank (question mark)"
                 " in the whole context",
                 func=lambda info, x, c: absolute_position(
@@ -64,12 +66,12 @@ class ClozeMultipleChoiceProcessor(Processor):
                 ),
             ),
             "answer_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the length of answer",
                 func=lambda info, x, c: count_tokens(info, x['answers']['text']),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -77,7 +79,7 @@ class ClozeMultipleChoiceProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "the average rank of each word based on its frequency in "
                     "training set"

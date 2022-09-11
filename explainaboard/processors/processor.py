@@ -16,7 +16,12 @@ from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
-from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
+from explainaboard.analysis.feature import (
+    DataType,
+    FeatureType,
+    get_feature_type_serializer,
+    Value,
+)
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
@@ -61,7 +66,7 @@ class Processor(metaclass=abc.ABCMeta):
         for lev in analysis_levels:
             # Continuous features
             for k, v in lev.features.items():
-                if v.dtype == 'float32':
+                if isinstance(v, Value) and v.dtype == DataType.FLOAT:
                     analyses.append(
                         BucketAnalysis(
                             level=lev.name,
