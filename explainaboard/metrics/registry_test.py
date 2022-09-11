@@ -27,7 +27,6 @@ class RegistryTest(unittest.TestCase):
                 "name": "Foo",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
             },
         )
 

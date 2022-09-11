@@ -20,7 +20,6 @@ class RootMeanSquaredErrorConfigTest(unittest.TestCase):
                 "name": "RootMeanSquaredError",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
             },
         )
 
@@ -47,7 +46,6 @@ class AbsoluteErrorConfigTest(unittest.TestCase):
                 "name": "AbsoluteError",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
             },
         )
 

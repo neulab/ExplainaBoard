@@ -15,7 +15,6 @@ class LogProbConfigTest(unittest.TestCase):
                 "name": "LogProb",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
                 "ppl": True,
             },
         )

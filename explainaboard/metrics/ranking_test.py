@@ -22,7 +22,6 @@ class HitsConfigTest(unittest.TestCase):
                 "name": "Hits",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
                 "hits_k": 5,
             },
         )
@@ -45,7 +44,6 @@ class MeanReciprocalRankConfigTest(unittest.TestCase):
                 "name": "MeanReciprocalRank",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
             },
         )
 
@@ -70,7 +68,6 @@ class MeanRankConfigTest(unittest.TestCase):
                 "name": "MeanRank",
                 "source_language": None,
                 "target_language": None,
-                "external_stats": None,
             },
         )
 
