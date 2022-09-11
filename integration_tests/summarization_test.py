@@ -2,6 +2,7 @@ import os
 import unittest
 
 from integration_tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
+import numpy as np
 
 from explainaboard import FileType, get_processor, Source, TaskType
 from explainaboard.loaders import get_loader_class
@@ -125,7 +126,7 @@ class SummarizationTest(unittest.TestCase):
                         aspect="fluency",
                         n_annotators=2,
                         categories=5,
-                        external_stats=[[2, 2], [1, 1], [3, 3]],
+                        external_stats=np.array([[2, 2], [1, 1], [3, 3]]),
                     )
                 ]
             },
