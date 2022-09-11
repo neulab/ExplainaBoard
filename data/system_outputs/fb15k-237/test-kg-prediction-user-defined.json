@@ -2,6 +2,7 @@
   "metadata": {
     "custom_features": {
       "rel_type": {
+        "cls_name": "Value",
         "dtype": "string",
         "description": "symmetric or asymmetric",
         "num_buckets": 2

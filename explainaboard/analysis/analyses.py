@@ -1,23 +1,24 @@
 from __future__ import annotations
 
+import abc
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Optional, TypeVar
+from typing import Any, final, Optional, TypeVar
 
 import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.metrics.registry import metric_config_from_dict
-from explainaboard.utils.logging import get_logger
-from explainaboard.utils.typing_utils import unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
-@dataclass
-class AnalysisResult:
+# See https://github.com/python/mypy/issues/5374
+@dataclass  # type: ignore
+class AnalysisResult(metaclass=abc.ABCMeta):
     """
     A result of an analysis, where the actual details of the result will be implemented
     by the inheriting class.
@@ -27,8 +28,14 @@ class AnalysisResult:
     name: str
     level: str
 
-    def print(self):
-        raise NotImplementedError
+    @abc.abstractmethod
+    def generate_report(self) -> str:
+        """Generate human-readable report.
+
+        Returns:
+            Multi-lined string representing the report of this result.
+        """
+        ...
 
     @staticmethod
     def from_dict(dikt):
@@ -94,6 +101,7 @@ class Analysis:
             )
 
 
+@final
 @dataclass
 class BucketAnalysisResult(AnalysisResult):
     """
@@ -118,27 +126,51 @@ class BucketAnalysisResult(AnalysisResult):
         )
 
     def __post_init__(self):
+        metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
+        num_metrics = len(metric_names)
+        for bucket_perf in self.bucket_performances:
+            if len(bucket_perf.performances) != num_metrics:
+                raise ValueError(
+                    "Inconsistent number of metrics. "
+                    f"Required: {num_metrics}, got: {len(bucket_perf.performances)}"
+                )
+            for metric_name, perf in zip(metric_names, bucket_perf.performances):
+                if perf.metric_name != metric_name:
+                    raise ValueError(
+                        "Inconsistent metric names. "
+                        f"Required: {metric_name}, got: {perf.metric_name}"
+                    )
+
         self.cls_name: str = self.__class__.__name__
 
-    def print(self):
+    def generate_report(self) -> str:
+        """See AnalysisResult.generate_report"""
+        texts: list[str] = []
+
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
+
         for i, metric_name in enumerate(metric_names):
-            get_logger('report').info(f"the information of #{self.name}#")
-            get_logger('report').info(f"bucket_name\t{metric_name}\t#samples")
+            texts.append(f"the information of #{self.name}#")
+            texts.append(f"bucket_name\t{metric_name}\t#samples")
+
             for bucket_perf in self.bucket_performances:
+                perf = bucket_perf.performances[i]
+
                 if bucket_perf.bucket_interval is not None:
                     bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
                 else:
                     bucket_name = unwrap(bucket_perf.bucket_name)
 
-                get_logger('report').info(
-                    f"{bucket_name}\t"
-                    f"{bucket_perf.performances[i].value}\t"
-                    f"{bucket_perf.n_samples}"
+                texts.append(
+                    f"{bucket_name}\t" f"{perf.value}\t" f"{bucket_perf.n_samples}"
                 )
-            get_logger('report').info('')
+
+            texts.append('')
+
+        return "\n".join(texts)
 
 
+@final
 @dataclass
 class BucketAnalysis(Analysis):
     """
@@ -240,6 +272,7 @@ class BucketAnalysis(Analysis):
         )
 
 
+@final
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
     """
@@ -251,8 +284,8 @@ class ComboCountAnalysisResult(AnalysisResult):
       the count of that feature combination in the corpus.
     """
 
-    features: tuple
-    combo_counts: list[tuple[tuple, int]] | None = None
+    features: tuple[str, ...]
+    combo_counts: list[tuple[tuple[str, ...], int]]
     cls_name: Optional[str] = None
 
     @staticmethod
@@ -265,16 +298,31 @@ class ComboCountAnalysisResult(AnalysisResult):
         )
 
     def __post_init__(self):
+        num_features = len(self.features)
+        for k, _ in self.combo_counts:
+            if len(k) != num_features:
+                raise ValueError(
+                    "Inconsistent number of features. "
+                    f"Required: {num_features}, got: {len(k)}"
+                )
+
         self.cls_name: str = self.__class__.__name__
 
-    def print(self):
-        get_logger('report').info('feature combos for ' + ', '.join(self.features))
-        get_logger('report').info('\t'.join(self.features + ('#',)))
+    def generate_report(self) -> str:
+        """See AnalysisResult.generate_report."""
+        texts: list[str] = []
+
+        texts.append('feature combos for ' + ', '.join(self.features))
+        texts.append('\t'.join(self.features + ('#',)))
+
         for k, v in sorted(self.combo_counts):
-            get_logger('report').info('\t'.join(k + (str(v),)))
-        get_logger('report').info('')
+            texts.append('\t'.join(k + (str(v),)))
+
+        texts.append('')
+        return "\n".join(texts)
 
 
+@final
 @dataclass
 class ComboCountAnalysis(Analysis):
     """
@@ -285,7 +333,7 @@ class ComboCountAnalysis(Analysis):
         features: the name of the features over which to perform the analysis
     """
 
-    features: tuple
+    features: tuple[str, ...]
     cls_name: Optional[str] = None
 
     def __post_init__(self):
@@ -304,7 +352,7 @@ class ComboCountAnalysis(Analysis):
             if x not in cases[0].features:
                 raise RuntimeError(f"combo analysis: feature {x} not found.")
 
-        combo_map: dict[tuple, int] = {}
+        combo_map: dict[tuple[str, ...], int] = {}
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
             combo_map[feat_vals] = combo_map.get(feat_vals, 0) + 1
@@ -325,7 +373,13 @@ class AnalysisLevel:
 
     @staticmethod
     def from_dict(dikt: dict):
-        features = {k: FeatureType.from_dict(v) for k, v in dikt['features'].items()}
+        ft_serializer = get_feature_type_serializer()
+
+        features = {
+            # See https://github.com/python/mypy/issues/4717
+            k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+            for k, v in dikt['features'].items()
+        }
         metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
         return AnalysisLevel(
             name=dikt['name'],

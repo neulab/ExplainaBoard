@@ -238,6 +238,7 @@ class MetricTest(unittest.TestCase):
             "task_name": TaskType.qa_extractive.value,
             "dataset_name": "squad",
             "metric_names": ["F1ScoreQA", "ExactMatchQA"],
+            "source_language": "en",
         }
 
         processor = get_processor(TaskType.qa_extractive)

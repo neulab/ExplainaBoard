@@ -62,6 +62,7 @@ class TextClassificationTest(unittest.TestCase):
             output_file_type=FileType.text,
         )
         data = loader.load()
+        self.assertEqual(len(data), 1821)
 
         metadata = {
             "task_name": TaskType.text_classification.value,
@@ -75,9 +76,7 @@ class TextClassificationTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples)
         for analysis in sys_info.results.analyses:
-            analysis.print()
-
-        self.assertEqual(len(data), 1821)
+            analysis.generate_report()  # Discard generated reports
 
     def test_process(self):
         metadata = {

@@ -56,16 +56,22 @@ class ArgumentPairExtractionProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "sentences": feature.Sequence(feature=feature.Value("string")),
-            "true_tags": feature.Sequence(feature=feature.Value("string")),
-            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "sentences": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "true_tags": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "pred_tags": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "num_sent": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of sentences",
                 func=lambda info, x, c: len(x['sentences']),
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the length of all sentences",
                 func=lambda info, x, c: len(" ".join(x['sentences'])),
             ),
@@ -73,37 +79,37 @@ class ArgumentPairExtractionProcessor(Processor):
 
         block_features: dict[str, FeatureType] = {
             "text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="text of the block",
                 func=lambda info, x, c: c.text,
             ),
             "n_review_sentences": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of review sentence",
                 func=lambda info, x, c: c.block_review_sentences,
             ),
             "n_review_tokens": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of review tokens",
                 func=lambda info, x, c: c.block_review_tokens,
             ),
             "n_review_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the relative position of review sentence",
                 func=lambda info, x, c: c.block_review_position,
             ),
             "n_reply_sentences": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of reply sentence",
                 func=lambda info, x, c: c.block_reply_sentences,
             ),
             "n_reply_tokens": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of reply tokens",
                 func=lambda info, x, c: c.block_reply_tokens,
             ),
             "n_reply_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the relative position of reply sentence",
                 func=lambda info, x, c: c.block_reply_position,
             ),

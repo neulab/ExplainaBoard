@@ -16,7 +16,12 @@ from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import (
+    DataType,
+    FeatureType,
+    get_feature_type_serializer,
+    Value,
+)
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
@@ -28,7 +33,7 @@ from explainaboard.utils.cache_api import (
 )
 from explainaboard.utils.logging import get_logger, progress
 from explainaboard.utils.tokenizer import get_default_tokenizer
-from explainaboard.utils.typing_utils import unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
 class Processor(metaclass=abc.ABCMeta):
@@ -61,7 +66,7 @@ class Processor(metaclass=abc.ABCMeta):
         for lev in analysis_levels:
             # Continuous features
             for k, v in lev.features.items():
-                if v.dtype == 'float32':
+                if isinstance(v, Value) and v.dtype == DataType.FLOAT:
                     analyses.append(
                         BucketAnalysis(
                             level=lev.name,
@@ -210,13 +215,16 @@ class Processor(metaclass=abc.ABCMeta):
         if custom_analyses is not None:
             analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
         if custom_features is not None:
+            ft_serializer = get_feature_type_serializer()
+
             for level_name, feature_content in custom_features.items():
-                level_map[level_name].features.update(
-                    {
-                        k: (FeatureType.from_dict(v) if isinstance(v, dict) else v)
-                        for k, v in feature_content.items()
-                    }
-                )
+                additional_features = {
+                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                    if isinstance(v, dict)
+                    else v
+                    for k, v in feature_content.items()
+                }
+                level_map[level_name].features.update(additional_features)
         return analysis_levels, analyses
 
     @final

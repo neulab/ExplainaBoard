@@ -30,29 +30,33 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "true_head": feature.Value("string"),
-            "true_head_decipher": feature.Value("string"),
-            "true_link": feature.Value(dtype="string", description="the relation type"),
-            "true_tail": feature.Value(dtype="string"),
-            "true_tail_decipher": feature.Value("string"),
-            "predict": feature.Value("string"),
-            "predictions": feature.Sequence(feature=feature.Value("string")),
+            "true_head": feature.Value(dtype=feature.DataType.STRING),
+            "true_head_decipher": feature.Value(dtype=feature.DataType.STRING),
+            "true_link": feature.Value(
+                dtype=feature.DataType.STRING, description="the relation type"
+            ),
+            "true_tail": feature.Value(dtype=feature.DataType.STRING),
+            "true_tail_decipher": feature.Value(dtype=feature.DataType.STRING),
+            "predict": feature.Value(dtype=feature.DataType.STRING),
+            "predictions": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "tail_entity_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the tail entity in tokens",
                 func=lambda info, x, c: count_tokens(
                     info, x['true_tail_decipher'], side='target'
                 ),
             ),
             "head_entity_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the head entity in tokens",
                 func=lambda info, x, c: count_tokens(
                     info, x['true_head_decipher'], side='target'
                 ),
             ),
             "tail_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="average frequency of the tail entity",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['tail_fre'].get(
@@ -60,13 +64,13 @@ class KGLinkTailPredictionProcessor(Processor):
                 ),
             ),
             "link_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="frequency of relation in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['link_fre'].get(x['true_link'], 0),
             ),
             "head_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="frequency of head entity in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['head_fre'].get(
@@ -74,14 +78,14 @@ class KGLinkTailPredictionProcessor(Processor):
                 ),
             ),
             "symmetry": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="whether the relation is symmetric",
                 func=lambda info, x, c: 'symmetric'
                 if x['true_link'] in self._symmetric_relations
                 else 'asymmetric',
             ),
             "entity_type_level": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="most specific entity type level of the true tail entity",
                 func=lambda info, x, c: self._get_entity_type_level(x),
             ),
@@ -144,8 +148,9 @@ class KGLinkTailPredictionProcessor(Processor):
         super().__init__()
         self.entity_type_level_map = None
         file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
-            'pre_computed/kg/entity_type_level_map.json',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)
