@@ -3,8 +3,6 @@ The code is adapted from https://github.com/taoyds/test-suite-sql-eval
 """
 import json
 import os
-
-# import signal
 import sqlite3
 
 from explainaboard.metrics.auxiliary.sql_evaluation.exec_eval import eval_exec_match
@@ -812,17 +810,6 @@ def sql_evaluate(glist, plist, config):
 
             if etype in ["all", "exec"]:
 
-                # class Timeout(Exception):
-                #     pass
-                #
-                # def handler(sig, frame):
-                #     raise Timeout
-                #
-                # signal.signal(
-                #     signal.SIGALRM, handler
-                # )  # register interest in SIGALRM events
-                # signal.alarm(10)  # timeout in 10 seconds
-
                 # sqlite has error for some illegal sqls. add a trick to avoid it
                 if (
                     "players.player_id = players.player_id" in p_str
@@ -842,8 +829,6 @@ def sql_evaluate(glist, plist, config):
                             keep_distinct=keep_distinct,
                             progress_bar_for_each_datapoint=tmp,
                         )
-                    # except Timeout:
-                    #     exec_score = 0
                     except Exception:
                         exec_score = 0
                 score_match.append(int(exact_score))
