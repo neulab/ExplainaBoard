@@ -64,6 +64,8 @@ class SQLEx(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+
+
         config = cast(SQLExConfig, config or self.config)
         ex_list = sql_evaluate(true_data, pred_data, config)
         return SimpleMetricStats(np.array(ex_list))

@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, TaskType
+from explainaboard import FileType, get_processor, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.metrics.sql_em_ex import SQLEmConfig, SQLExConfig
 
@@ -14,7 +14,6 @@ class TextToSQLTest(unittest.TestCase):
     json_dataset = os.path.join(artifact_path, "questions.json")
     txt_output = os.path.join(artifact_path, "pred.sql")
 
-    @unittest.skip(reason="dependency libs are not installed")
     def test_load_custom_dataset_json(self):
         loader = get_loader_class(TaskType.text_to_sql)(
             self.json_dataset,
@@ -26,7 +25,6 @@ class TextToSQLTest(unittest.TestCase):
         print(data[0])
         self.assertEqual(len(data), 1034)
 
-    @unittest.skip(reason="dependency libs are not installed")
     def test_evaluation_metric(self):
         loader = get_loader_class(TaskType.text_to_sql)(
             self.json_dataset,
@@ -56,3 +54,13 @@ class TextToSQLTest(unittest.TestCase):
         ).to_metric()
         result = metric.evaluate(true, pred)
         self.assertAlmostEqual(result.value, 0.7572533849129593)
+
+        metadata = {
+            "task_name": TaskType.text_to_sql.value,
+            "dataset_name": "spider",
+        }
+        processor = get_processor(TaskType.text_to_sql.value)
+
+        sys_info = processor.process(metadata, data.samples)
+        for analysis in sys_info.results.analyses:
+            analysis.print()

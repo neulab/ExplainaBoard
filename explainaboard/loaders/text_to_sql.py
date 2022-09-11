@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from explainaboard import TaskType
 from explainaboard.constants import FileType
-from explainaboard.loaders.file_loader import (  # DatalabFileLoader,
+from explainaboard.loaders.file_loader import (
     FileLoader,
     FileLoaderField,
     JSONFileLoader,

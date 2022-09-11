@@ -4,6 +4,40 @@ import os
 from setuptools import find_packages, setup
 from version import __version__
 
+REQUIRED_PKGS = [
+    "datalabs>=0.4.9",
+    "eaas>=0.3.9",
+    "lexicalrichness!=0.1.6",
+    "matplotlib",
+    "nltk>=3.2",
+    "numpy",
+    "sacrebleu",
+    "scikit-learn",
+    "scipy",
+    "seqeval",
+    "spacy",
+    "tqdm",
+    "wheel",
+]
+
+
+# For text-to-sql task
+TEXT2SQL_REQUIRE = [
+    "pysqlite3",
+    "sqlparse>=0.4.2",
+]
+
+
+# For code code quality checking
+DEV_REQUIRE: list[str] = ["pre-commit"]
+DEV_REQUIRE = DEV_REQUIRE + TEXT2SQL_REQUIRE
+
+
+# For test
+TESTS_REQUIRE: list[str] = []
+TESTS_REQUIRE = TESTS_REQUIRE + TEXT2SQL_REQUIRE
+
+
 setup(
     name="explainaboard",
     version=__version__,
@@ -29,25 +63,11 @@ setup(
             "explainaboard=explainaboard.explainaboard_main:main",
         ],
     },
-    install_requires=[
-        "datalabs>=0.4.9",
-        "eaas>=0.3.9",
-        "lexicalrichness!=0.1.6",
-        "matplotlib",
-        "nltk>=3.2",
-        "numpy",
-        "sacrebleu",
-        "scikit-learn",
-        "scipy",
-        "seqeval",
-        "spacy",
-        "tqdm",
-        "wheel",
-    ],
+    install_requires=REQUIRED_PKGS,
     extras_require={
-        "dev": [
-            "pre-commit",
-        ],
+        "dev": DEV_REQUIRE,
+        "test": TESTS_REQUIRE,
+        "text2sql": TEXT2SQL_REQUIRE,
     },
     include_package_data=True,
 )

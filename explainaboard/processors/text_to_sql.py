@@ -1,21 +1,29 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
+from typing import Any
+
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
-from explainaboard.analysis.feature_funcs import count_tokens
+from explainaboard.analysis.feature_funcs import (
+    accumulate_vocab_from_samples,
+    count_tokens,
+)
+from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.sql_em_ex import SQLEmConfig, SQLExConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
+from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.text_to_sql)
 class TextToSQLProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
-        return TaskType.text_classification
+        return TaskType.text_to_sql
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
@@ -76,7 +84,7 @@ class TextToSQLProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the true label for the output
         """
-        return data_point["true_sql"]
+        return [data_point["true_sql"], data_point["db_id"]]
 
     def _get_predicted_label(self, data_point):
         """
@@ -84,4 +92,11 @@ class TextToSQLProcessor(Processor):
         :param data_point: the data point under consideration
         :return: the predicted label for the output
         """
-        return data_point["predicted_sql"]
+        return [data_point["predicted_sql"], data_point["db_id"]]
+
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
+            samples, lambda x: x['question'], unwrap(sys_info.source_tokenizer)
+        )
+
+        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}

@@ -285,7 +285,6 @@ class MetricTest(unittest.TestCase):
         result = metric.evaluate(true, pred)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
-    @unittest.skip(reason="dependency libs are not installed")
     def test_sql_ex(self):
         # python -m unittest integration_tests.metric_test.MetricTest.test_sql_ex
         metric = explainaboard.metrics.sql_em_ex.SQLExConfig(
