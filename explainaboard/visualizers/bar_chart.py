@@ -1,3 +1,5 @@
+"""Utility functions to create bar charts."""
+
 from __future__ import annotations
 
 import logging
@@ -12,16 +14,19 @@ mlogger = logging.getLogger('matplotlib')
 mlogger.setLevel(logging.WARNING)
 
 
-def get_ylim(y_list: list) -> list:
-    """
-    get the upper/lower bound for y axis
-    :param y_list:
-    :return:
+def get_ylim(y_list: list) -> tuple[float, float]:
+    """Get the upper/lower bound for y axis.
+
+    Args:
+        y_list: A list of y axis values.
+
+    Returns:
+        A two-element tuple of the bottom and top of the range
     """
     low = min(y_list)
     high = max(y_list)
     delta = high - low
-    return [low - 0.1 * delta, min(1, high + 0.1 * delta)]
+    return (low - 0.1 * delta, min(1, high + 0.1 * delta))
 
 
 bar_colors = [
@@ -37,18 +42,33 @@ bar_colors = [
 
 
 def make_bar_chart(
-    datas,
-    output_directory,
-    output_fig_file,
-    output_fig_format='png',
-    fig_size=300,
-    sys_names=None,
-    errs=None,
-    title=None,
-    xlabel=None,
-    xticklabels=None,
-    ylabel=None,
-):
+    datas: list[list[float]],
+    output_directory: str,
+    output_fig_file: str,
+    output_fig_format: str = 'png',
+    fig_size: tuple[int, int] = (8, 6),
+    sys_names: list[str] | None = None,
+    errs: list[tuple[list[float], list[float]]] | None = None,
+    title: str | None = None,
+    xlabel: str | None = None,
+    xticklabels: list[str] | None = None,
+    ylabel: str | None = None,
+) -> None:
+    """Create a bar chart given the inputs.
+
+    Args:
+        datas: A list of lists of floats containing the data of the bar chart
+        output_directory: The directory to write the outputs to
+        output_fig_file: The name of the figure file
+        output_fig_format: The format/file extension (e.g. png or pdf)
+        fig_size: The size of the figure
+        sys_names: The names of the systems to put in the legend
+        errs: Bounds for error bars above and below the actual data value
+        title: The title of the figure
+        xlabel: The label of the x axis
+        xticklabels: The label of each group of bars on the x axis
+        ylabel: The label of the y axis
+    """
     fig, ax = plt.subplots(figsize=fig_size)
     ind = np.arange(len(datas[0]))
     width = 0.7 / len(datas)
