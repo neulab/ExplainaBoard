@@ -217,8 +217,8 @@ class BucketAnalysis(Analysis):
                 # has no samples
                 if n_samples == 0.0:
                     value = 0.0
-                    conf_low: Optional[float] = 0.0
-                    conf_high: Optional[float] = 0.0
+                    conf_low: Optional[float] = None
+                    conf_high: Optional[float] = None
                 else:
                     bucket_stats = metric_stat.filter(bucket_collection.samples)
                     metric_result = metric_func.evaluate_from_stats(
