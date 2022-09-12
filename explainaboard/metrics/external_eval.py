@@ -17,11 +17,6 @@ from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.agreement import fleiss_kappa
 from explainaboard.utils.typing_utils import unwrap
 
-EXTERNAL_METRICS = [
-    "LikertScore_fluency",
-    "LikertScore_coherence",
-    "LikertScore_factuality",
-]
 UNANNOTATED_SYMBOL = -1
 
 
