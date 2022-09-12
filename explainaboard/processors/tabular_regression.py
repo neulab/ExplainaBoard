@@ -26,11 +26,11 @@ class TabularRegressionProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
             "true_value": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the true value of the input",
             ),
             "predicted_value": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the predicted value",
             ),
         }

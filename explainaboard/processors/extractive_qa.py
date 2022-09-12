@@ -28,23 +28,25 @@ class QAExtractiveProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "context": feature.Value(dtype="string"),
-            "question": feature.Value(dtype="string"),
-            "id": feature.Value(dtype="string"),
-            "answers": feature.Sequence(feature=feature.Value(dtype="string")),
-            "predicted_answers": feature.Value(dtype="string"),
+            "context": feature.Value(dtype=feature.DataType.STRING),
+            "question": feature.Value(dtype=feature.DataType.STRING),
+            "id": feature.Value(dtype=feature.DataType.STRING),
+            "answers": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "predicted_answers": feature.Value(dtype=feature.DataType.STRING),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "question_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
             "answer_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
                     info,
@@ -55,7 +57,7 @@ class QAExtractiveProcessor(Processor):
                 ),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -63,7 +65,7 @@ class QAExtractiveProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "average rank of context words based on training set freq"
                 ),

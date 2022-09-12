@@ -30,46 +30,54 @@ class QATatProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "question": feature.Value(dtype="string"),
-            "context": feature.Sequence(feature=feature.Value(dtype="string")),
-            "table": feature.Sequence(feature=feature.Value(dtype="string")),
-            "true_answer": feature.Sequence(feature=feature.Value(dtype="string")),
-            "predicted_answer": feature.Sequence(feature=feature.Value(dtype="string")),
-            "predicted_answer_scale": feature.Value(dtype="string"),
+            "question": feature.Value(dtype=feature.DataType.STRING),
+            "context": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "table": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "true_answer": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "predicted_answer": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "predicted_answer_scale": feature.Value(dtype=feature.DataType.STRING),
             "answer_type": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="type of answer",
             ),
             "answer_scale": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="scale of answer",
             ),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: sum(
                     [count_tokens(info, text) for text in x['context']["text"]]
                 ),
             ),
             "table_rows": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of table row",
                 func=lambda info, x, c: len(x['table']),
             ),
             "table_columns": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of table column",
                 func=lambda info, x, c: len(x['table'][0])
                 if len(x['table']) > 0
                 else 0,
             ),
             "question_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
             "answer_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the length of answer",
                 func=lambda info, x, c: len(x['true_answer']),
             ),
@@ -111,12 +119,12 @@ class QATatProcessor(Processor):
     ) -> list[MetricConfig]:
         return [
             ExactMatchQATatConfig(
-                name='QATatExactMatch',
+                name='ExactMatchQATat',
                 source_language=source_language,
                 target_language=target_language,
             ),
             F1ScoreQATatConfig(
-                name='QATatF1',
+                name='F1ScoreQATat',
                 source_language=source_language,
                 target_language=target_language,
             ),
