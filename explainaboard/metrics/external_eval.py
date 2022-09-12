@@ -19,11 +19,6 @@ from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.agreement import fleiss_kappa
 from explainaboard.utils.typing_utils import unwrap
 
-EXTERNAL_METRICS = [
-    "LikertScore_fluency",
-    "LikertScore_coherence",
-    "LikertScore_factuality",
-]
 UNANNOTATED_SYMBOL = -1
 
 
@@ -55,6 +50,9 @@ class ExternalEvalConfig(MetricConfig):
     n_annotators: int = 3
     categories: int = 5
     instruction: str = "Annotation instruction"
+    # The external statistics for metrics. The row size is equal to the number
+    # of test samples, the column size is equal to `n_annotators`.
+    external_stats: np.ndarray | None = None
 
     def to_metric(self):
         """See MetricConfig.to_metric."""
@@ -171,14 +169,14 @@ class ExternalEval(Metric):
     def evaluate_from_stats(
         self,
         stats: MetricStats,
-        conf_value: Optional[float] = None,
+        confidence_alpha: Optional[float] = None,
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
 
         Args:
                 stats: pre-computed metric stats
-                conf_value: if set to not None, must be a number between 0 and 1,
+                confidence_alpha: if set to not None, must be a number between 0 and 1,
                     indicating the p-value of confidence intervals
                 config: a configuration to over-ride the default for this object
 
@@ -189,13 +187,15 @@ class ExternalEval(Metric):
         agg_stats = self.aggregate_stats(stats)
         agreement = self.calc_agreement(stats)
         value = self.calc_metric_from_aggregate(agg_stats, config)
-        conf_interval = (
-            self.calc_confidence_interval(stats, conf_value) if conf_value else None
+        confidence_interval = (
+            self.calc_confidence_interval(stats, confidence_alpha)
+            if confidence_alpha
+            else None
         )
         return MetricResult(
             config,
             float(value),
-            conf_interval,
-            conf_value,
+            confidence_interval,
+            confidence_alpha,
             ExternalEvalResult(agreement),
         )
