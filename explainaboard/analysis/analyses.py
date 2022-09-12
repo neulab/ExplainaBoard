@@ -25,7 +25,7 @@ class AnalysisResult(metaclass=abc.ABCMeta):
 
     The actual details of the result will be implemented by the inheriting class.
 
-    Args:
+    Attributes:
         name: The name of the analysis.
         level: The level that the analysis belongs to.
     """
@@ -62,7 +62,7 @@ class Analysis:
     some way. The exact analysis performed will vary depending on the inheriting
     class.
 
-    Args:
+    Attributes:
         description: a textual description of the analysis to be performed
         level: The level that the analysis belongs to.
     """
@@ -119,7 +119,7 @@ class Analysis:
 class BucketAnalysisResult(AnalysisResult):
     """A result of running a `BucketAnalysis`.
 
-    Args:
+    Attributes:
         bucket_performances: A list of performances bucket-by-bucket, including the
           interval over which the bucket is calculated, the performance itself, etc.
           See `BucketPerformance` for more details.
@@ -196,7 +196,7 @@ class BucketAnalysis(Analysis):
     different. See the documentation of each function in the
     `explainaboard.analysis.bucketing` package for more details.
 
-    Args:
+    Attributes:
         feature: the name of the feature to bucket
         method: the bucket strategy, can be "continuous", "discrete", or "fixed"
         number: the number of buckets to be used
@@ -299,7 +299,7 @@ class BucketAnalysis(Analysis):
 class ComboCountAnalysisResult(AnalysisResult):
     """A result of running a `ComboCountAnalysis`.
 
-    Args:
+    Attributes:
         features: A tuple of strings, representing the feature names that were
           analyzed
         combo_counts: A list of tuples. The first tuple element is the feature

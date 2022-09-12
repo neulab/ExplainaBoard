@@ -14,7 +14,7 @@ from explainaboard.analysis.performance import Performance
 class Result:
     """A class to store results.
 
-    Args:
+    Attributes:
         overall: Overall results. The first list is over analysis levels, and the second
           is over metrics applicable to that analysis level.
         analyses: The results of various analyses.

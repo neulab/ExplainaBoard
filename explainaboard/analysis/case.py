@@ -11,7 +11,7 @@ from typing import Optional
 class AnalysisCase:
     """A class to represent cases to display to users for analysis.
 
-    Args:
+    Attributes:
         sample_id: The ID of a single sample
         features: A dictionary of features associated with the case
     """
@@ -49,10 +49,10 @@ class AnalysisCase:
 class AnalysisCaseSpan(AnalysisCase):
     """A bucket case that highlights a span in text.
 
-    Args:
-        text: The text that should be highlighted
+    Attributes:
         token_span: The span of tokens to be highlighted
         char_span: The span of characters to be highlighted
+        text: The text that should be highlighted
         location: The name of the feature (e.g. "text", "source", "reference") over
           which this span is calculated
     """
@@ -67,7 +67,7 @@ class AnalysisCaseSpan(AnalysisCase):
 class AnalysisCaseMultiSpan(AnalysisCase):
     """A bucket case that highlights multiple spans in text.
 
-    Args:
+    Attributes:
         spans: The spans that are highlighted
     """
 
@@ -78,7 +78,7 @@ class AnalysisCaseMultiSpan(AnalysisCase):
 class AnalysisCaseLabeledSpan(AnalysisCaseSpan):
     """A bucket case that highlights a span in text along with a label.
 
-    Args:
+    Attributes:
         true_label: The actual label
         predicted_label: The label that is predicted
     """
@@ -93,7 +93,7 @@ class AnalysisCaseLabeledArgumentPair(AnalysisCase):
 
     This is specifically designed for argument pair extraction task.
 
-    Args:
+    Attributes:
         text: the text
         orig_str: the original string
         true_label: the true label of the output
@@ -124,7 +124,7 @@ class AnalysisCaseLabeledArgumentPair(AnalysisCase):
 class AnalysisCaseCollection:
     """A collection of analysis cases.
 
-    Args:
+    Attributes:
         samples: a list of integer IDs indexing back to the analysis cases in the level.
         interval: the bucket interval that this collection may refer to
         name: the name that the collection may refer to

@@ -13,7 +13,7 @@ from explainaboard.metrics.metric import AuxiliaryMetricResult
 class BucketPerformance:
     """A class containing information about performance over buckets.
 
-    Args:
+    Attributes:
         n_samples: Number of samples in the bucket
         bucket_samples: IDs of the samples in the bucket
         performances: A list of performances for each metric
@@ -61,7 +61,7 @@ class BucketPerformance:
 class Performance:
     """A performance value along with other information.
 
-    Args:
+    Attributes:
         metric_name: The name of the metric
         value: The mean value of the metric
         confidence_score_low: The lower confidence bound

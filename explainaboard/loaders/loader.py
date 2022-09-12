@@ -200,7 +200,7 @@ class Loader:
 class CustomFeature:
     """A data class expressing information about custom features.
 
-    Args:
+    Attributes:
         name: The name of the feature
         dtype: The datatype
         description: A human-understandable description of the feature

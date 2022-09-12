@@ -40,7 +40,7 @@ T = TypeVar('T')
 class FileLoaderField:
     """A filed in a file loader.
 
-    Args:
+    Attributes:
         src_name: field name in the source file. use int for tsv column indices,
             str for dict keys, or tuple for hierarchical dict keys
         target_name: field name expected in the loaded data
@@ -85,7 +85,7 @@ class FileLoaderField:
 class FileLoaderMetadata:
     """Metadata populated in the process of loading the dataset or output files.
 
-    Args:
+    Attributes:
         source_language: The language of the input
         target_language: The language of the output
         supported_languages: All languages supported by the dataset at all
@@ -194,7 +194,7 @@ class FileLoaderMetadata:
 class FileLoaderReturn(Sized):
     """Data returned by a FileLoader.
 
-    Args:
+    Attributes:
         samples: A list of samples from the dataset
         metadata: Metadata regarding the samples or the dataset
     """
@@ -598,7 +598,7 @@ class JSONFileLoader(FileLoader):
 class DatalabLoaderOption:
     """A class representing the options when using DataLabLoader.
 
-    Args:
+    Attributes:
         dataset: The name of the dataset
         subdataset: The name of the sub dataset (optional)
         split: The name of the split
