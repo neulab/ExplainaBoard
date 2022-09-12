@@ -74,7 +74,6 @@ class MetricConfig(dict):
     source_language: str | None = None
     target_language: str | None = None
     cls_name: str | None = None
-    # The external statistics for metrics
     external_stats: np.ndarray | None = None
 
     def __post_init__(self):
@@ -333,11 +332,11 @@ class Metric:
         prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
-        """Calculate a confidence interval.
+        """Calculate the confidence interval of a statistics function.
 
         Args:
             stats: sufficient statistics as calculated by calc_stats_from_data
-            conf_value: the p-value of the interval
+            confidence_alpha: the inverse confidence level of the confidence interval
             n_samples: the number of bootstrapping samples
             prop_samples: the proportion of samples to sample each time
             config: a configuration to over-ride the default for this object
@@ -398,8 +397,8 @@ class Metric:
 
         Args:
             stats: pre-computed metric stats
-            conf_value: if set to not None, must be a number between 0 and 1,
-                indicating the p-value of confidence intervals
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of confidence intervals
             config: a configuration to over-ride the default for this object
 
         Returns:
@@ -429,8 +428,8 @@ class Metric:
         Args:
             true_data: gold-standard data
             pred_data: predicted data
-            conf_value: if set to not None, must be a number between 0 and 1,
-                indicating the p-value of confidence intervals
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of confidence intervals
             config: a configuration to over-ride the default for this object
 
         Returns:

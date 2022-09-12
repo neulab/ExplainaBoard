@@ -175,10 +175,10 @@ class ExternalEval(Metric):
         """Return an evaluation result over stats.
 
         Args:
-                stats: pre-computed metric stats
-                confidence_alpha: if set to not None, must be a number between 0 and 1,
-                    indicating the p-value of confidence intervals
-                config: a configuration to over-ride the default for this object
+            stats: pre-computed metric stats
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of the confidence interval
+            config: a configuration to over-ride the default for this object
 
         Returns:
             a resulting metric value

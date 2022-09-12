@@ -85,7 +85,7 @@ class Analysis:
             metrics: The metrics used to evaluate the cases.
             stats: The statistics calculated by each metric.
             confidence_alpha: In the case that any significance analysis is performed,
-              the confidence level.
+                      the inverse confidence level.
 
         Returns:
             The result of the analysis.
