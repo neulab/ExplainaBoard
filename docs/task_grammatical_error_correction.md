@@ -15,6 +15,26 @@ In what follows, we will describe how to analyze grammatical error correction sy
 
 ## Data Preparation
 
+To perform analysis of your results, usually two types of files should be pre-trained, which we will
+detailed below.
+
+### Format of `Dataset` File
+`Dataset` file usually consists of test samples together with true labels (or references in text generation
+tasks). 
+In this task, the following specific formats are supported 
+ 
+* (1) `datalab`
+    * if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+    Instead, you just need to remember the dataset name for later use.
+    * if your datasets haven't been supported by datalab but you want it supported, you can follow this 
+    [doc](https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md) to add them.
+
+
+### Format of `System Output` File
+
+`System output` file usually only composed of predicted labels (or hypothesis, e.g., system-generated text),
+but sometimes `system output` will also contains test samples, such as `CoNLL` format in sequence labeling tasks.
 In order to perform an analysis of your results, your system outputs should be arranged into following
 format:
 

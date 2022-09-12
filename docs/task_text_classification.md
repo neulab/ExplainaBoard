@@ -5,9 +5,43 @@ We will give an example using the `text-classification` [sst2](https://github.co
 can be analyzed in a similar way.
 
 ## Data Preparation
+To perform analysis of your results, usually two types of files should be pre-trained, which we will
+detailed below.
 
-In order to perform analysis of your results, your system outputs should be one
-predicted label per line:
+### Format of `Dataset` File
+`Dataset` file usually consists of test samples together with true labels (or references in text generation
+tasks). 
+In this task, the following specific formats are supported 
+(the first two are also called custom datasets)
+
+* (1) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
+```python
+I love this movie   positive
+The movie is too long   negative
+...
+```
+* (2) `json` (basically, it's a list of dictionaries with two keys: `text` and `true_label`)
+```json
+[
+  {"text": "I love this movie", "true_label": "positive"},
+  {"text": "The movie is too long", "true_label": "negative"}
+  ...
+]
+```
+
+* (3) `datalab`
+    * if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+    Instead, you just need to remember the dataset name for later use.
+    * if your datasets haven't been supported by datalab but you want it supported, you can follow this 
+    [doc](https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md) to add them.
+
+
+### Format of `System Output` File
+
+`System output` file usually only composed of predicted labels (or hypothesis, e.g., system-generated text),
+but sometimes `system output` will also contains test samples, such as `CoNLL` format in sequence labeling tasks.
+In this task, your system outputs should be as follows:
 
 ```
 predicted_label
