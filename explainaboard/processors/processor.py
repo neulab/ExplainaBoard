@@ -205,12 +205,17 @@ class Processor(metaclass=abc.ABCMeta):
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
         for level in analysis_levels:
-            if metric_configs and level.name in metric_configs:
-                for metric_config in metric_configs[level.name]:
+            configs = unwrap(metric_configs)
+            metric_gen = unwrap_generator(configs.get(level.name))
+            for ind, metric_config in enumerate(metric_gen):
+                if ind == 0:
+                    level.metric_configs = [metric_config]
+                else:
                     level.metric_configs.append(metric_config)
             for config in level.metric_configs:
                 config.source_language = sys_info.source_language
                 config.target_language = sys_info.target_language
+
         level_map = {x.name: x for x in analysis_levels}
         if custom_analyses is not None:
             analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
@@ -459,7 +464,11 @@ class Processor(metaclass=abc.ABCMeta):
         # declare customized features: _features will be updated
         custom_features: dict = metadata.get('custom_features', {})
         custom_analyses: list = metadata.get('custom_analyses', [])
-        metric_configs: dict = metadata.get('metric_configs', {})
+
+        metric_configs: dict[str, list[MetricConfig]] = {
+            "example": metadata.get('metric_configs', [])
+        }
+
         sys_info.analysis_levels, sys_info.analyses = self._customize_analyses(
             sys_info, custom_features, metric_configs, custom_analyses
         )

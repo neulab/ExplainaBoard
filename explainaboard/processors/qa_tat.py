@@ -119,12 +119,12 @@ class QATatProcessor(Processor):
     ) -> list[MetricConfig]:
         return [
             ExactMatchQATatConfig(
-                name='QATatExactMatch',
+                name='ExactMatchQATat',
                 source_language=source_language,
                 target_language=target_language,
             ),
             F1ScoreQATatConfig(
-                name='QATatF1',
+                name='F1ScoreQATat',
                 source_language=source_language,
                 target_language=target_language,
             ),
