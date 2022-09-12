@@ -7,11 +7,12 @@ import numpy as np
 import pandas as pd
 
 from explainaboard.info import SysOutputInfo
+from explainaboard.meta_analyses.meta_analysis import MetaAnalysis
 from explainaboard.meta_analyses.utils import report_to_sysout
 from explainaboard.utils.typing_utils import unwrap
 
 
-class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
+class RankingMetaAnalysis(MetaAnalysis):
     def __init__(self, model_reports: dict[str, SysOutputInfo]):
         self.model_names = list(model_reports.keys())
         self.num_models = len(self.model_names)
@@ -19,9 +20,9 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         self.model_reports = list(model_reports.values())
 
     def run_meta_analysis(self):
-        '''
+        """
         This method is what the user will call.
-        '''
+        """
 
         # construct the new "metadata", treating each metric as a "feature"
         metadata = self._metrics_to_metadata()
@@ -51,10 +52,10 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         return aggregated_sysout
 
     def get_ranking_table(self, metric: str):
-        '''
+        """
         Returns the ranking table for a given metric as a pandas DataFrame.
         Ranking is 1-indexed.
-        '''
+        """
         if metric not in self.feature_names:
             raise ValueError(f'metric {metric} does not exist in original model report')
         metric_id = self.feature_names.index(metric)
@@ -66,21 +67,21 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
 
     @staticmethod
     def _get_ranks_of(values: list[float], ids: list[Union[int, str]]) -> list[int]:
-        '''
+        """
         Returns the rank of each element of `ids` based on `values`, high-to-low.
         0-indexed.
-        '''
+        """
         values_np = np.array(values)
         sort_idx = (np.argsort(values_np)[::-1]).tolist()
         return [sort_idx.index(i) for i in ids]
 
     def _metrics_to_metadata(self) -> dict:
-        '''
+        """
         Turns a `metric_configs` object into a metadata object suitable
         for use as metadata in a system output file.
 
         Uses the metric configs of `self.model1_report` as metadata.
-        '''
+        """
         model1 = self.model_reports[0]
         metadata = {
             'custom_features': {
@@ -97,7 +98,7 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         return metadata
 
     def _get_reference_info(self, metadata: dict) -> dict:
-        '''
+        """
         Returns a dictionary indicating, for each metric, whether model1's value
         for that metric is higher than model2's value. Here, as in most cases,
         we use the overall results to establish this expectation.
@@ -107,7 +108,7 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
 
         The rank-flipping meta-analysis will then reveal which buckets, and how
         many, subvert this expectation.
-        '''
+        """
         model_overall_results = [
             list(itertools.chain.from_iterable(unwrap(r.results.overall)))
             for r in self.model_reports
@@ -130,7 +131,7 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
     def _get_aggregated_sysout(
         self, model_sysouts: list[dict], reference_dict: dict, metadata: dict
     ) -> list[dict]:
-        '''
+        """
         Many meta-analyses require a quantity which is based on the relationship
         between the metrics of the two models we want to compare.
 
@@ -140,7 +141,7 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
 
         The expectation between the relationship between model1 and model2 is passed in
         through `reference_dict`.
-        '''
+        """
 
         # check that each model's meta-level system outputs has the same length
         num_buckets = len(model_sysouts[0])
