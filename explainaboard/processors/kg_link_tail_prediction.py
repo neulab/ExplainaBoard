@@ -30,13 +30,13 @@ class KGLinkTailPredictionProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "true_head": feature.Value("string"),
-            "true_head_decipher": feature.Value("string"),
+            "true_head": feature.Value(dtype="string"),
+            "true_head_decipher": feature.Value(dtype="string"),
             "true_link": feature.Value(dtype="string", description="the relation type"),
             "true_tail": feature.Value(dtype="string"),
-            "true_tail_decipher": feature.Value("string"),
-            "predict": feature.Value("string"),
-            "predictions": feature.Sequence(feature=feature.Value("string")),
+            "true_tail_decipher": feature.Value(dtype="string"),
+            "predict": feature.Value(dtype="string"),
+            "predictions": feature.Sequence(feature=feature.Value(dtype="string")),
             "tail_entity_length": feature.Value(
                 dtype="float",
                 description="length of the tail entity in tokens",
@@ -144,8 +144,9 @@ class KGLinkTailPredictionProcessor(Processor):
         super().__init__()
         self.entity_type_level_map = None
         file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity_type_level_map.json',  # noqa
-            'pre_computed/kg/entity_type_level_map.json',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
             self.entity_type_level_map = json.load(file)

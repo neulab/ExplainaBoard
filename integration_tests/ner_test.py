@@ -20,8 +20,9 @@ class NERTest(unittest.TestCase):
     conll_output_full = os.path.join(artifact_path, "conll2003-elmo-output.conll")
 
     json_output_customized = cache_api.cache_online_file(
-        'https://phontron.com/download/explainaboard/test-conll03.json',
-        'predictions/ner/test-conll03.json',
+        'https://storage.googleapis.com/inspired-public-data/'
+        'explainaboard/task_data/named_entity_recognition/test-conll03.json',
+        'explainaboard/task_data/named_entity_recognition/test-conll03.json',
     )
 
     def test_generate_system_analysis(self):

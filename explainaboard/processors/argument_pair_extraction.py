@@ -56,9 +56,9 @@ class ArgumentPairExtractionProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "sentences": feature.Sequence(feature=feature.Value("string")),
-            "true_tags": feature.Sequence(feature=feature.Value("string")),
-            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "sentences": feature.Sequence(feature=feature.Value(dtype="string")),
+            "true_tags": feature.Sequence(feature=feature.Value(dtype="string")),
+            "pred_tags": feature.Sequence(feature=feature.Value(dtype="string")),
             "num_sent": feature.Value(
                 dtype="float",
                 description="the number of sentences",

@@ -38,9 +38,9 @@ class SeqLabProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
-            "tokens": feature.Sequence(feature=feature.Value("string")),
-            "true_tags": feature.Sequence(feature=feature.Value("string")),
-            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "tokens": feature.Sequence(feature=feature.Value(dtype="string")),
+            "true_tags": feature.Sequence(feature=feature.Value(dtype="string")),
+            "pred_tags": feature.Sequence(feature=feature.Value(dtype="string")),
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",

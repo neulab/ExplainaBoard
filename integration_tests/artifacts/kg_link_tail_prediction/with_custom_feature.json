@@ -3,6 +3,7 @@
     "custom_features": {
       "example": {
         "rel_type": {
+          "cls_name": "Value",
           "dtype": "string",
           "description": "symmetric or asymmetric"
         }

@@ -24,7 +24,7 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.analysis.analyses import Analysis
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
 from explainaboard.constants import Source
 from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.preprocessor import Preprocessor
@@ -134,8 +134,15 @@ class FileLoaderMetadata:
         custom_features: dict[str, dict[str, FeatureType]] | None = None
         custom_analyses: list[Analysis] | None = None
         if 'custom_features' in data:
+            ft_serializer = get_feature_type_serializer()
             custom_features = {
-                k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
+                k1: {
+                    # See https://github.com/python/mypy/issues/4717
+                    k2: narrow(
+                        FeatureType, ft_serializer.deserialize(v2)  # type: ignore
+                    )
+                    for k2, v2 in v1.items()
+                }
                 for k1, v1 in data['custom_features'].items()
             }
         if 'custom_analyses' in data:
@@ -543,6 +550,7 @@ class DatalabFileLoader(FileLoader):
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
         config = narrow(DatalabLoaderOption, data)
+        ft_serializer = get_feature_type_serializer()
 
         # load customized features from global config files
         customized_features_from_config = get_customized_features()
@@ -558,7 +566,9 @@ class DatalabFileLoader(FileLoader):
                         f'{level_name}'
                     )
                 parsed_level_feats = {
-                    k: FeatureType.from_dict(v) for k, v in level_feats.items()
+                    # See https://github.com/python/mypy/issues/4717
+                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                    for k, v in level_feats.items()
                 }
                 new_features = config.custom_features.get(level_name, {})
                 new_features.update(parsed_level_feats)

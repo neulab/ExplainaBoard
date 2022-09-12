@@ -34,8 +34,8 @@ class LanguageModelingProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {
-            "text": feature.Value("string"),
-            "log_probs": feature.Value("string"),
+            "text": feature.Value(dtype="string"),
+            "log_probs": feature.Value(dtype="string"),
             "text_length": feature.Value(
                 dtype="float",
                 description="text length in tokens",

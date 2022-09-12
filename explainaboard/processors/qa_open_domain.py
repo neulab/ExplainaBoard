@@ -28,9 +28,9 @@ class QAOpenDomainProcessor(Processor):
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features = {
-            "question": feature.Value("string"),
+            "question": feature.Value(dtype="string"),
             # "question_types": feature.Sequence(feature=feature.Value("string")),
-            "answers": feature.Sequence(feature=feature.Value("string")),
+            "answers": feature.Sequence(feature=feature.Value(dtype="string")),
             "question_length": feature.Value(
                 dtype="float",
                 description="context length in tokens",
