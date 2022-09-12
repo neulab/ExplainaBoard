@@ -261,7 +261,7 @@ class Processor(metaclass=abc.ABCMeta):
                         cases=analysis_cases[level_id],
                         metrics=metrics[level_id],
                         stats=metric_stats[level_id],
-                        conf_value=sys_info.conf_value,
+                        confidence_alpha=sys_info.confidence_alpha,
                     )
                 )
             except Exception as ex:
@@ -333,20 +333,20 @@ class Processor(metaclass=abc.ABCMeta):
             ):
                 metric_result = metric_cfg.to_metric().evaluate_from_stats(
                     metric_stat,
-                    conf_value=sys_info.conf_value,
+                    confidence_alpha=sys_info.confidence_alpha,
                 )
 
-                conf_low, conf_high = (
-                    metric_result.conf_interval
-                    if metric_result.conf_interval
+                confidence_low, confidence_high = (
+                    metric_result.confidence_interval
+                    if metric_result.confidence_interval
                     else (None, None)
                 )
 
                 overall_performance = Performance(
                     metric_name=metric_cfg.name,
                     value=metric_result.value,
-                    confidence_score_low=conf_low,
-                    confidence_score_high=conf_high,
+                    confidence_score_low=confidence_low,
+                    confidence_score_high=confidence_high,
                 )
                 my_results.append(overall_performance)
             overall_results.append(my_results)
