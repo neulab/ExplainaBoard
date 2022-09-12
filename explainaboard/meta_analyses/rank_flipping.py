@@ -23,7 +23,7 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
         self.model1_report = model1_report
         self.model2_report = model2_report
 
-    def run_meta_analysis(self) -> dict:
+    def run_meta_analysis(self) -> dict | list:
         """Return the result of the meta-analysis."""
         # construct the new "metadata", treating each metric as a "feature"
         metadata = self._metrics_to_metadata()

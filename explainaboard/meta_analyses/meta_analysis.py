@@ -8,7 +8,7 @@ class MetaAnalysis:
     """Abstract class for meta-analysis."""
 
     @abc.abstractmethod
-    def run_meta_analysis(self) -> dict:
+    def run_meta_analysis(self) -> dict | list:
         """Calculate the result of a meta-analysis.
 
         Returns:
