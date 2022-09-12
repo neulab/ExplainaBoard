@@ -84,17 +84,19 @@ def plot_combo_counts(
                 f'plot_combo_counts currently only supports feature combinations of '
                 f'size 2, but got {feature_names}'
             )
-        conf_matrix = np.zeros([len(x) for x in feature_maps])
+        confusion_matrix = np.zeros([len(x) for x in feature_maps])
         for feats, count in unwrap(combo_result.combo_counts):
-            conf_matrix[feature_maps[0][feats[0]], feature_maps[1][feats[1]]] = count
+            confusion_matrix[
+                feature_maps[0][feats[0]], feature_maps[1][feats[1]]
+            ] = count
         fig, ax = plt.subplots(figsize=(7.5, 7.5))
-        ax.matshow(conf_matrix, cmap=plt.cm.Blues, alpha=0.3)
-        for i in range(conf_matrix.shape[0]):
-            for j in range(conf_matrix.shape[1]):
+        ax.matshow(confusion_matrix, cmap=plt.cm.Blues, alpha=0.3)
+        for i in range(confusion_matrix.shape[0]):
+            for j in range(confusion_matrix.shape[1]):
                 ax.text(
                     x=j,
                     y=i,
-                    s=conf_matrix[i, j],
+                    s=confusion_matrix[i, j],
                     va='center',
                     ha='center',
                     size='xx-large',

@@ -75,7 +75,7 @@ class Analysis:
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        conf_value: float,
+        confidence_alpha: float,
     ) -> AnalysisResult:
         """Perform the analysis.
 
@@ -84,8 +84,8 @@ class Analysis:
               These could be examples, spans, tokens, etc.
             metrics: The metrics used to evaluate the cases.
             stats: The statistics calculated by each metric.
-            conf_value: In the case that any significance analysis is performed, the
-              confidence level.
+            confidence_alpha: In the case that any significance analysis is performed,
+              the inverse confidence level.
 
         Returns:
             The result of the analysis.
@@ -232,7 +232,7 @@ class BucketAnalysis(Analysis):
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        conf_value: float,
+        confidence_alpha: float,
     ) -> AnalysisResult:
         """See Analysis.perform."""
         # Preparation for bucketing
@@ -269,12 +269,12 @@ class BucketAnalysis(Analysis):
                 bucket_stats = metric_stat.filter(bucket_collection.samples)
                 metric_result = metric_func.evaluate_from_stats(
                     bucket_stats,
-                    conf_value=conf_value,
+                    confidence_alpha=confidence_alpha,
                 )
 
                 conf_low, conf_high = (
-                    metric_result.conf_interval
-                    if metric_result.conf_interval
+                    metric_result.confidence_interval
+                    if metric_result.confidence_interval
                     else (None, None)
                 )
 
@@ -374,7 +374,7 @@ class ComboCountAnalysis(Analysis):
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
-        conf_value: float,
+        confidence_alpha: float,
     ) -> AnalysisResult:
         """See Analysis.perform."""
         for x in self.features:
