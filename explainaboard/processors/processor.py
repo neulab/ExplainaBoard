@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable
-from typing import Any, cast, Dict, final, List, Optional
+from typing import Any, final, Optional
 
 from eaas.async_client import AsyncClient
 from eaas.config import Config
@@ -200,13 +200,13 @@ class Processor(metaclass=abc.ABCMeta):
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
         for level in analysis_levels:
-            configs = cast(Dict[str, List], metric_configs)
-            if level.name in configs:
-                for ind, metric_config in enumerate(configs[level.name]):
-                    if ind == 0:
-                        level.metric_configs = [metric_config]
-                    else:
-                        level.metric_configs.append(metric_config)
+            configs = unwrap(metric_configs)
+            metric_gen = unwrap_generator(configs.get(level.name))
+            for ind, metric_config in enumerate(metric_gen):
+                if ind == 0:
+                    level.metric_configs = [metric_config]
+                else:
+                    level.metric_configs.append(metric_config)
             for config in level.metric_configs:
                 config.source_language = sys_info.source_language
                 config.target_language = sys_info.target_language
@@ -457,7 +457,9 @@ class Processor(metaclass=abc.ABCMeta):
         custom_features: dict = metadata.get('custom_features', {})
         custom_analyses: list = metadata.get('custom_analyses', [])
 
-        metric_configs: dict = {"example": metadata.get('metric_configs', [])}
+        metric_configs: dict[str, list[MetricConfig]] = {
+            "example": metadata.get('metric_configs', [])
+        }
 
         sys_info.analysis_levels, sys_info.analyses = self._customize_analyses(
             sys_info, custom_features, metric_configs, custom_analyses
