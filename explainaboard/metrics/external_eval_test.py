@@ -11,6 +11,7 @@ from explainaboard.metrics.external_eval import (
     ExternalEvalConfig,
     UNANNOTATED_SYMBOL,
 )
+from explainaboard.utils.typing_utils import narrow
 
 
 class ExternalEvalConfigTest(unittest.TestCase):
@@ -23,7 +24,10 @@ class ExternalEvalConfigTest(unittest.TestCase):
 
 class ExternalEvalTest(unittest.TestCase):
     def test_calc_stats_from_external(self) -> None:
-        metric = ExternalEvalConfig("ExternalEval", n_annotators=2).to_metric()
+        metric = narrow(
+            ExternalEval, ExternalEvalConfig("ExternalEval", n_annotators=2).to_metric()
+        )
+
         stats = metric.calc_stats_from_external(
             ExternalEvalConfig(
                 "ExternalEval",
