@@ -22,11 +22,11 @@ If you decided to upload a third-party to this directory, please follow the step
 2. Put code and license file onto the directory.
 3. If the code contains `README.md`, rename it to `README.orig.md`.
 4. Add `README.md`. It have to contain following information:
-  - The place where the original code is distributed.
-  - The date when the original code is obtained.
-  - If you applied some patch, please add details of it.
+   - The place where the original code is distributed.
+   - The date when the original code is obtained.
+   - If you applied some patch, please add details of it.
 5. Request a code review:
-  - If you are adding a new third-party code, please create a separate pull request from
-    any other changes.
-  - If you are updating an existing third-party code, the pull request may contain
-    related changes under other parts of this repository.
+   - If you are adding a new third-party code, please create a separate pull request from
+     any other changes.
+   - If you are updating an existing third-party code, the pull request may contain
+     related changes under other parts of this repository.
