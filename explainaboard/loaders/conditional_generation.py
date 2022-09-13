@@ -1,3 +1,5 @@
+"""Loaders for conditional generation tasks."""
+
 from __future__ import annotations
 
 from explainaboard.constants import FileType, TaskType
@@ -16,9 +18,7 @@ from explainaboard.loaders.loader_registry import register_loader
 @register_loader(TaskType.conditional_generation)
 @register_loader(TaskType.machine_translation)
 class ConditionalGenerationLoader(Loader):
-    """
-    Validate and Reformat system output file with tsv format:
-    text \t true_label \t predicted_label
+    """Loader for the conditional generation task.
 
     usage:
         please refer to `test_loaders.py`
@@ -33,10 +33,12 @@ class ConditionalGenerationLoader(Loader):
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.tsv
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         return {
             FileType.tsv: TSVFileLoader(
                 [
@@ -64,6 +66,7 @@ class ConditionalGenerationLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         field_name = "hypothesis"
         return {
             FileType.text: TextFileLoader(field_name, str),
@@ -75,6 +78,8 @@ class ConditionalGenerationLoader(Loader):
 
 @register_loader(TaskType.summarization)
 class SummarizationLoader(ConditionalGenerationLoader):
+    """A loader for summarization."""
+
     JSON_FIELDS_DATALAB: list[str | tuple[str, str]] = [
         'source_column',
         'reference_column',
@@ -83,6 +88,8 @@ class SummarizationLoader(ConditionalGenerationLoader):
 
 @register_loader(TaskType.machine_translation)
 class MachineTranslationLoader(ConditionalGenerationLoader):
+    """A loader for machine translation."""
+
     JSON_FIELDS_DATALAB = [
         ('translation', FileLoaderField.SOURCE_LANGUAGE),
         ('translation', FileLoaderField.TARGET_LANGUAGE),

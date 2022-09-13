@@ -1,4 +1,4 @@
-"""Definition of DictSerializer"""
+"""Definition of DictSerializer."""
 
 from __future__ import annotations
 

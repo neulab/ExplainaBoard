@@ -1,3 +1,5 @@
+"""Evaluation metrics with externally provided statistics."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -22,12 +24,28 @@ UNANNOTATED_SYMBOL = -1
 
 @dataclass
 class ExternalEvalResult(AuxiliaryMetricResult):
+    """The result of an external evaluation metric.
+
+    Args:
+        agreement: The agreement according to some measure (e.g. Fleiss's Kappa).
+    """
+
     agreement: float
 
 
 @dataclass
 @metric_config_registry.register("ExternalEvalConfig")
 class ExternalEvalConfig(MetricConfig):
+    """Configuration for ExternalEval.
+
+    Args:
+        aspect: The name of the external score being calculated.
+        n_annotators: The number of annotators doing annotation (in the case of human
+                      human annotators).
+        categories: The number of categories in the human evaluation.
+        instruction: The instructions given to the annotators.
+    """
+
     aspect: str = "fluency"
     n_annotators: int = 3
     categories: int = 5
@@ -37,37 +55,50 @@ class ExternalEvalConfig(MetricConfig):
     external_stats: np.ndarray | None = None
 
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return ExternalEval(self)
 
 
 class ExternalEval(Metric):
-    """
-    Calculates the hits metric, telling whether the predicted output is in a set of true
-    outputs.
+    """Calculates the Hits metric.
+
+    This tells whether the predicted output is in a set of true outputs.
     """
 
     def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
-        """
-        Get the configuration or overwritten configuration
-        :param config: Optional configuration to override the default configuration
-        :return: Either the default or overridden configuration
+        """Get the configuration or overwritten configuration.
+
+        Args:
+            config: Optional configuration to override the default configuration
+
+        Returns:
+            Either the default or overridden configuration
         """
         ret_config: MetricConfig = unwrap(config) if config is not None else self.config
         return ret_config
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_external(
         self, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """Calculate statistics from external data.
 
+        Args:
+            config: The configuration under which to calculate the statistics.
+
+        Returns:
+            The calculated statistics.
+        """
         config = cast(ExternalEvalConfig, self._get_config(config))
         return SimpleMetricStats(config.external_stats)
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         config = cast(ExternalEvalConfig, self._get_config(config))
 
         if config.external_stats is not None:
@@ -96,6 +127,14 @@ class ExternalEval(Metric):
             )
 
     def calc_agreement(self, stats: MetricStats) -> float:
+        """Calculate the agreement between annotators in metric statistics.
+
+        Args:
+            stats: The statistics to calculate over.
+
+        Returns:
+            Fleiss's Kappa agreement statistic.
+        """
         if stats.is_batched():
             raise ValueError("Unsupported for batched statistics.")
 
@@ -118,11 +157,7 @@ class ExternalEval(Metric):
         return fleiss_kappa(mat_kappa)
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
         if data.size == 0:
@@ -138,11 +173,15 @@ class ExternalEval(Metric):
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
-        :param stats: pre-computed metric stats
-        :param confidence_alpha: if set to not None, must be a number between 0 and 1,
-            indicating the inverse confidence level of the confidence interval
-        :param config: a configuration to over-ride the default for this object
-        :return: a resulting metric value
+
+        Args:
+            stats: pre-computed metric stats
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of the confidence interval
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            a resulting metric value
         """
         config = self._get_config(config)
         agg_stats = self.aggregate_stats(stats)

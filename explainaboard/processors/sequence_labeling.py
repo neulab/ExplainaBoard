@@ -1,3 +1,5 @@
+"""A processor for the sequence labeling task."""
+
 from __future__ import annotations
 
 import abc
@@ -24,19 +26,23 @@ from explainaboard.utils.typing_utils import unwrap
 
 
 class SeqLabProcessor(Processor):
+    """A processor for the sequence labeling task."""
+
     @classmethod
     @abc.abstractmethod
-    def default_span_ops(cls) -> SpanOps:
+    def _default_span_ops(cls) -> SpanOps:
         """Returns the default metrics of this processor."""
         ...
 
     _DEFAULT_TAG = 'O'
 
     def __init__(self):
+        """Constructor."""
         super().__init__()
-        self._span_ops: SpanOps = self.default_span_ops()
+        self._span_ops: SpanOps = self._default_span_ops()
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
             "tokens": feature.Sequence(
                 feature=feature.Value(dtype=feature.DataType.STRING)
@@ -144,6 +150,7 @@ class SeqLabProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         analysis_levels = self.default_analysis_levels()
         span_features = analysis_levels[1].features
         analyses: list[Analysis] = [
@@ -171,9 +178,11 @@ class SeqLabProcessor(Processor):
         return analyses
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return data_point["true_tags"]
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["pred_tags"]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
@@ -285,12 +294,16 @@ class SeqLabProcessor(Processor):
     def get_econ_efre_dic(
         self, words: list[str], bio_tags: list[str]
     ) -> tuple[dict[str, float], dict[str, int]]:
-        """
-        Calculate the entity label consistency and frequency features from this paper
+        """Calculates entity label consistency and frequency features.
+
+        Reference this paper:
         https://aclanthology.org/2020.emnlp-main.489.pdf
-        :param words: a list of all words in the corpus
-        :param bio_tags: a list of all tags in the corpus
-        :return: Returns two dictionaries:
+
+        Args:
+            words: a list of all words in the corpus
+            bio_tags: a list of all tags in the corpus
+
+        Returns: two dictionaries:
                     econ: 'span|||tag' pointing to entity consistency values
                     efre: 'span' pointing to entity frequency values
         """
@@ -338,6 +351,7 @@ class SeqLabProcessor(Processor):
         return econ_dic, efre_dic
 
     def deserialize_system_output(self, output: dict) -> dict:
+        """See Processor.deserialize_system_output."""
         new_output = copy.deepcopy(output)
         if "span_info" in new_output:
             new_output["span_info"] = [

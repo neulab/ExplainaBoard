@@ -1,3 +1,5 @@
+"""Evaluation metrics for hybrid table-text QA."""
+
 from __future__ import annotations
 
 import abc
@@ -20,20 +22,15 @@ from explainaboard.utils.typing_utils import unwrap_or
 
 
 class QATatMetric(Metric):
-    """
-    An abstract class for HybridQA tasks (see more details about this task:
-    https://nextplusplus.github.io/TAT-QA/ ) that measures scores after normalization.
+    """An abstract class for HybridQA tasks that measures scores after normalization.
+
+    See more details about this task: https://nextplusplus.github.io/TAT-QA/
     The actual metric must inherit this class and implement the sample_level_metric()
     function.
     """
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
-        If so the t-test is applicable, which is much more efficient. Otherwise we do
-        bootstrapping to calculate confidence interval, which is slower and potentially
-        less effective.
-        """
+        """See Metric.is_simple_average."""
         return True
 
     def calc_stats_from_data(
@@ -42,7 +39,7 @@ class QATatMetric(Metric):
         pred_data: list,
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
-
+        """See Metric.calc_stats_from_data."""
         stat_list = []
         for true_answer_info, pred_answer_info in zip(true_data, pred_data):
 
@@ -79,36 +76,31 @@ class QATatMetric(Metric):
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ) -> float:
-        """
-        Calculate a score given a ground truth answer string and a prediction.
-        """
+        """Calculate a score given a ground truth answer string and a prediction."""
         ...
 
 
 @dataclass
 @metric_config_registry.register("ExactMatchQATatConfig")
 class ExactMatchQATatConfig(MetricConfig):
+    """Configuration for ExactMatchQATat."""
+
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return ExactMatchQATat(self)
 
 
 class ExactMatchQATat(QATatMetric):
-    """
-    Calculate a score for extractive QA based on exact match.
-    """
+    """Calculate a score for extractive QA based on exact match."""
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
-        If so the t-test is applicable, which is much more efficient. Otherwise we do
-        bootstrapping to calculate confidence interval, which is slower and potentially
-        less effective.
-        """
+        """See Metric.is_simple_average."""
         return True
 
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ) -> float:
+        """See QATatMetric.sample_level_metric."""
         ground_truths = eval_util._answer_to_bags(ground_truth)
         predictions = eval_util._answer_to_bags(prediction)
 
@@ -118,27 +110,24 @@ class ExactMatchQATat(QATatMetric):
 @dataclass
 @metric_config_registry.register("F1ScoreQATatConfig")
 class F1ScoreQATatConfig(MetricConfig):
+    """Configuration for F1ScoreQATat."""
+
     def to_metric(self):
+        """See MetricConfig.to_metric."""
         return F1ScoreQATat(self)
 
 
 class F1ScoreQATat(QATatMetric):
-    """
-    Calculate a score for extractive QA based on F1 score.
-    """
+    """Calculate a score for the TAT-QA dataset."""
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
-        If so the t-test is applicable, which is much more efficient. Otherwise we do
-        bootstrapping to calculate confidence interval, which is slower and potentially
-        less effective.
-        """
+        """See Metric.is_simple_average."""
         return True
 
     def sample_level_metric(
         self, ground_truth: str, prediction: str, preprocessor: Preprocessor
     ):
+        """See QATatMetric.sample_level_metric."""
         ground_truths = eval_util._answer_to_bags(ground_truth)
         predictions = eval_util._answer_to_bags(prediction)
         f1_per_bag = eval_util._align_bags(predictions[1], ground_truths[1])

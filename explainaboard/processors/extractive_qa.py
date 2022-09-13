@@ -1,3 +1,5 @@
+"""A processor for the extractive QA task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -22,11 +24,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.qa_extractive)
 class QAExtractiveProcessor(Processor):
+    """A processor for the extractive QA task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.qa_extractive
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
             "context": feature.Value(dtype=feature.DataType.STRING),
             "question": feature.Value(dtype=feature.DataType.STRING),
@@ -85,12 +91,14 @@ class QAExtractiveProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         if source_language != target_language:
             raise ValueError(
                 'Source and target language must be equal for extractive '
@@ -117,7 +125,9 @@ class QAExtractiveProcessor(Processor):
         return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return data_point["answers"]["text"]
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["predicted_answers"]["text"]
