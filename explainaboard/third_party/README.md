@@ -6,13 +6,16 @@ that code is maintained under the same maintenance policy we applied to other pa
 this repository.
 We also don't guarantee that the code is up-to-date.
 
-Before considering to upload any code to this directory, you have to make sure that the
-change satisfies **all** of following conditions:
+Before uploading any code to this directory, you have to make sure that the change
+satisfies **all** of the following conditions:
 
 - If the code is trivial enough, consider implementing a similar logic to our main
   component.
-- Code is distributed under a valid open-source license. The license have to be
-  compatible with the MIT license, which we applied to this repository.
+- Code is distributed under a valid open-source license. The license has to be
+  [compatible with the MIT license](https://en.wikipedia.org/wiki/Permissive_software_license)
+  or [public domain](https://en.wikipedia.org/wiki/Public_domain).
+  If you couldn't judge if the license is compatible with MIT or not, please consult
+  with us before making any changes.
 - Code is not able to be obtained from the PyPI.
 
 If you decided to upload a third-party to this directory, please follow the steps below:
@@ -21,7 +24,7 @@ If you decided to upload a third-party to this directory, please follow the step
 1. Make an individual directory to store the new third-party.
 2. Put code and license file onto the directory.
 3. If the code contains `README.md`, rename it to `README.orig.md`.
-4. Add `README.md`. It have to contain following information:
+4. Add `README.md`. It has to contain the following information:
    - The place where the original code is distributed.
    - The date when the original code is obtained.
    - If you applied some patch, please add details of it.
