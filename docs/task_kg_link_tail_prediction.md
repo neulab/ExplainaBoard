@@ -30,8 +30,10 @@ In this file we describe how to analyze models trained to predict the tail entit
 
 #### Format of `Dataset` File
 
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
 
-* (1) `json` (basically, it's a list of dictionaries with two keys: `gold_head`,
+* (2) `json` (basically, it's a list of dictionaries with two keys: `gold_head`,
         `gold_predicate`, and `gold_tail`)
 ```json
 [
@@ -40,8 +42,7 @@ In this file we describe how to analyze models trained to predict the tail entit
 ]
 ```
 
-* (2) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
+
 
 
 #### Format of `System Output` File

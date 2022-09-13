@@ -13,13 +13,16 @@ We will give an example using the `nature-language-inference`
 
 ### Format of `Dataset` File
 
-* (1) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/snli/snli-dataset.tsv)
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/snli/snli-dataset.tsv)
 ```python
 A man playing an electric guitar on stage.   A man playing banjo on the floor.  contradiction
 A man playing an electric guitar on stage.   A man is performing for cash.  neutral
 ...
 ```
-* (2) `json` (basically, it's a list of dictionaries with three keys: `text1`, `text2` and `true_label`)
+* (3) `json` (basically, it's a list of dictionaries with three keys: `text1`, `text2` and `true_label`)
 ```json
 [
   {"text1": "A man playing an electric guitar on stage.", "text2": "A man playing banjo on the floor.", "true_label": "contradiction"},
@@ -28,8 +31,7 @@ A man playing an electric guitar on stage.   A man is performing for cash.  neut
 ]
 ```
 
-* (3) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
+
 
 ### Format of `System Output` File
 

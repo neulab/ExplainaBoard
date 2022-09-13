@@ -15,7 +15,11 @@ can be analyzed in a similar way.
 ### Format of `Dataset` File
 
 
-* (1) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/absa-dataset.tsv)
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/absa-dataset.tsv)
 ```python
 Boot time	 Boot time  is super fast, around anywhere from 35 seconds to 1 minute.	positive
 Windows 8	Did not enjoy the new  Windows 8  and  touchscreen functions .	negative
@@ -24,7 +28,7 @@ Windows 8	Did not enjoy the new  Windows 8  and  touchscreen functions .	negativ
 where the first 1st, 2nd, 3rd column represent aspect text, sentence and true label respectively.
 
 
-* (2) `json` (basically, it's a list of dictionaries with three keys: `aspect`, `text` and `true_label`)
+* (3) `json` (basically, it's a list of dictionaries with three keys: `aspect`, `text` and `true_label`)
 ```json
 [
   {"aspect":"Boot time", "text": "Boot time  is super fast, around anywhere from 35 seconds to 1 minute.", "true_label": "positive"},
@@ -32,8 +36,6 @@ where the first 1st, 2nd, 3rd column represent aspect text, sentence and true la
 ]
 ```
 
-* (3) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
 
 
 ### Format of `System Output` File

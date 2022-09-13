@@ -13,7 +13,10 @@ can be analyzed in a similar way.
 
 ### Format of `Dataset` File
 
-* (1) `json` (basically, it's a list of dictionaries with two keys: `question` and `answers`)
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `json` (basically, it's a list of dictionaries with two keys: `question` and `answers`)
 ```json
 [
   {'question': 'who got the first nobel prize in physics', 'answers': ['Wilhelm Conrad Röntgen']},
@@ -22,8 +25,7 @@ can be analyzed in a similar way.
 ]
 ```
 
-* (2) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
+
 
 ### Format of `System Output` File
 

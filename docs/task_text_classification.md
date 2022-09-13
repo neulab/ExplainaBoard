@@ -12,13 +12,16 @@ can be analyzed in a similar way.
  
 ### Format of `Dataset` File
 
-* (1) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+  
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
 ```python
 I love this movie   positive
 The movie is too long   negative
 ...
 ```
-* (2) `json` (basically, it's a list of dictionaries with two keys: `text` and `true_label`)
+* (3) `json` (basically, it's a list of dictionaries with two keys: `text` and `true_label`)
 ```json
 [
   {"text": "I love this movie", "true_label": "positive"},
@@ -27,9 +30,7 @@ The movie is too long   negative
 ]
 ```
 
-* (3) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
-  
+
 
 
 ### Format of `System Output` File

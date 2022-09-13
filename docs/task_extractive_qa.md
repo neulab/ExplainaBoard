@@ -15,9 +15,10 @@ In this file we describe how to analyze models trained on extractive QA datasets
 
 ### Format of `Dataset` File
 
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
 
-
-* (1) `json` (basically, it's a list of dictionaries with three keys: `context`, `question`, and `answers`)
+* (2) `json` (basically, it's a list of dictionaries with three keys: `context`, `question`, and `answers`)
 ```json
 [
   {"context": "Super Bowl 50 was an American footb", "question": "Which NFL team represented the AFC at Super Bowl 50?", 'answers': {'text': ['Denver Broncos', 'Denver Broncos', 'Denver Broncos'], 'answer_start': [177, 177, 177]}},
@@ -25,8 +26,7 @@ In this file we describe how to analyze models trained on extractive QA datasets
 ]
 ```
 
-* (2) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
+
 
 ### Format of `System Output` File
 In order to perform analysis of your results, they should be in the following

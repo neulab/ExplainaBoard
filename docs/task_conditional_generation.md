@@ -21,14 +21,17 @@ This can include a wide variety of tasks, such as:
 ### Format of `Dataset` File
 
 
-* (1) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/cnndm/cnndm_mini-dataset.tsv)
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/cnndm/cnndm_mini-dataset.tsv)
 ```python
 This is a good movie    这是一部好电影
 ...
 ```
 where the first column represents source text and the 2nd column denotes gold reference.
 
-* (2) `json` (basically, it's a list of dictionaries with two keys: `source` and `reference`)
+* (3) `json` (basically, it's a list of dictionaries with two keys: `source` and `reference`)
 ```json
 [
   {"source": "This is a good movie", "reference": "这是一部好电影"},
@@ -36,8 +39,7 @@ where the first column represents source text and the 2nd column denotes gold re
 ]
 ```
 
-* (3) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
+
 
 
 ### Format of `System Output` File
