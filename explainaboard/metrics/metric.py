@@ -37,7 +37,7 @@ class MetricResult:
     confidence_alpha: Optional[float] = None
     auxiliary_result: AuxiliaryMetricResult | None = None
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         """Return the metric result as a serializable dictionary.
 
         Returns:
@@ -76,16 +76,16 @@ class MetricConfig(dict):
     cls_name: str | None = None
     external_stats: np.ndarray | None = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Set the class name for the metric config."""
         self.cls_name = type(self).__name__
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         raise NotImplementedError
 
     @classmethod
-    def dict_conv(cls, k, v):
+    def dict_conv(cls, k: str, v: Any) -> Any:
         """Conversion for serialization."""
         return v
 

@@ -18,7 +18,7 @@ from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.typing_utils import unwrap_or
 
 
-class RankingMetric(Metric):
+class RankingMetric(Metric, metaclass=abc.ABCMeta):
     """A metric for ranking."""
 
     @abc.abstractmethod
@@ -48,7 +48,7 @@ class HitsConfig(MetricConfig):
 
     hits_k: int = 5
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return Hits(self)
 
@@ -88,7 +88,7 @@ class Hits(RankingMetric):
 class MeanReciprocalRankConfig(MetricConfig):
     """Configuration for MeanReciprocalRank."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return MeanReciprocalRank(self)
 
@@ -128,7 +128,7 @@ class MeanReciprocalRank(RankingMetric):
 class MeanRankConfig(MetricConfig):
     """Configuration for MeanReciprocalRank."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return MeanRank(self)
 

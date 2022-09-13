@@ -159,7 +159,7 @@ class KtauCorrelationConfig(CorrelationConfig):
 
     threshold: float = 25
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return KtauCorrelation(self)
 
@@ -211,7 +211,7 @@ class KtauCorrelation(CorrelationMetric):
 class PearsonCorrelationConfig(CorrelationConfig):
     """A configuration for the PearsonCorrelation metric."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return PearsonCorrelation(self)
 

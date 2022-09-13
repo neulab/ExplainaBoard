@@ -39,7 +39,7 @@ class F1ScoreConfig(MetricConfig):
     separate_match: bool = False
     ignore_classes: Optional[list] = None
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return F1Score(self)
 
@@ -143,7 +143,7 @@ class F1Score(Metric):
 class APEF1ScoreConfig(MetricConfig):
     """Configuration for APEF1Score."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return APEF1Score(self)
 
@@ -211,7 +211,7 @@ class SeqF1ScoreConfig(F1ScoreConfig):
 
     tag_schema: str = 'bio'
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return SeqF1Score(self)
 

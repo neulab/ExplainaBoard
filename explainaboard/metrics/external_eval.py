@@ -54,7 +54,7 @@ class ExternalEvalConfig(MetricConfig):
     # of test samples, the column size is equal to `n_annotators`.
     external_stats: np.ndarray | None = None
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return ExternalEval(self)
 

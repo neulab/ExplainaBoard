@@ -21,7 +21,7 @@ from explainaboard.metrics.registry import metric_config_registry
 class AccuracyConfig(MetricConfig):
     """Configuration for the Accuracy metric."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return Accuracy(self)
 
@@ -51,7 +51,7 @@ class Accuracy(Metric):
 class CorrectCountConfig(MetricConfig):
     """Configuration for CorrectCount."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return CorrectCount(self)
 
@@ -90,7 +90,7 @@ class CorrectCount(Accuracy):
 class SeqCorrectCountConfig(MetricConfig):
     """Configuration for SeqCorrectCount."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return SeqCorrectCount(self)
 

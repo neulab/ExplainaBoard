@@ -21,7 +21,7 @@ from explainaboard.metrics.registry import metric_config_registry
 class RootMeanSquaredErrorConfig(MetricConfig):
     """Configuration for RootMeanSquaredError."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return RootMeanSquaredError(self)
 
@@ -53,7 +53,7 @@ class RootMeanSquaredError(Metric):
 class AbsoluteErrorConfig(MetricConfig):
     """Configuration for AbsoluteError."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return AbsoluteError(self)
 

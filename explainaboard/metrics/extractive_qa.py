@@ -68,7 +68,7 @@ class ExtractiveQAMetric(Metric):
 class ExactMatchQAConfig(MetricConfig):
     """Configuration for ExactMatchQA."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return ExactMatchQA(self)
 
@@ -88,7 +88,7 @@ class ExactMatchQA(ExtractiveQAMetric):
 class F1ScoreQAConfig(MetricConfig):
     """Configuration for F1ScoreQA."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return F1ScoreQA(self)
 
