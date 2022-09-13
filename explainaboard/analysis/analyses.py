@@ -255,8 +255,9 @@ class BucketAnalysis(Analysis):
             # Subsample examples to save
             subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
 
+            n_samples = len(bucket_collection.samples)
             bucket_performance = BucketPerformance(
-                n_samples=len(bucket_collection.samples),
+                n_samples=n_samples,
                 bucket_samples=subsampled_ids,
                 bucket_interval=bucket_collection.interval,
                 bucket_name=bucket_collection.name,
@@ -266,21 +267,30 @@ class BucketAnalysis(Analysis):
                 unwrap_generator(metrics),
                 unwrap_generator(stats),
             ):
-                bucket_stats = metric_stat.filter(bucket_collection.samples)
-                metric_result = metric_func.evaluate_from_stats(
-                    bucket_stats,
-                    confidence_alpha=confidence_alpha,
-                )
+                # Samples may be empty when user defined a bucket interval that
+                # has no samples
+                if n_samples == 0.0:
+                    value = 0.0
+                    conf_low: Optional[float] = None
+                    conf_high: Optional[float] = None
+                else:
+                    bucket_stats = metric_stat.filter(bucket_collection.samples)
+                    metric_result = metric_func.evaluate_from_stats(
+                        bucket_stats,
+                        confidence_alpha=confidence_alpha,
+                    )
 
-                conf_low, conf_high = (
-                    metric_result.confidence_interval
-                    if metric_result.confidence_interval
-                    else (None, None)
-                )
+                    conf_low, conf_high = (
+                        metric_result.confidence_interval
+                        if metric_result.confidence_interval
+                        else (None, None)
+                    )
+
+                    value = metric_result.value
 
                 performance = Performance(
                     metric_name=metric_func.config.name,
-                    value=metric_result.value,
+                    value=value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
                 )
