@@ -1,3 +1,5 @@
+"""A processor for the multiple-choice QA task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -22,11 +24,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.qa_multiple_choice)
 class QAMultipleChoiceProcessor(Processor):
+    """A processor for the multiple-choice QA task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.qa_multiple_choice
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
             "context": feature.Value(dtype=feature.DataType.STRING),
             "question": feature.Value(dtype=feature.DataType.STRING),
@@ -87,12 +93,14 @@ class QAMultipleChoiceProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             AccuracyConfig(
                 name='Accuracy',
@@ -107,19 +115,11 @@ class QAMultipleChoiceProcessor(Processor):
         ]
 
     def _get_true_label(self, data_point):
-        """
-        Get the true label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See processor._get_true_label."""
         return data_point["answers"]["option_index"]
 
     def _get_predicted_label(self, data_point):
-        """
-        Get the predicted label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See processor._get_predicted_label."""
         return data_point["predicted_answers"]["option_index"]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):

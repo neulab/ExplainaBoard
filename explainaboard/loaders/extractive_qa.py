@@ -1,3 +1,5 @@
+"""Loaders for the extractive QA task."""
+
 from __future__ import annotations
 
 from explainaboard.constants import FileType, TaskType
@@ -13,16 +15,21 @@ from explainaboard.loaders.loader_registry import register_loader
 
 @register_loader(TaskType.qa_extractive)
 class QAExtractiveLoader(Loader):
+    """Loader for the extractive QA task."""
+
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """See Loader.default_output_file_type."""
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         target_field_names = ["context", "question", "answers"]
         return {
             FileType.json: JSONFileLoader(
@@ -63,6 +70,7 @@ class QAExtractiveLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         return {
             FileType.json: JSONFileLoader(
                 [FileLoaderField("predicted_answers", "predicted_answers")]

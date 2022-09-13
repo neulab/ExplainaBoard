@@ -1,3 +1,5 @@
+"""A processor for the natural language generation meta-evaluation task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -20,11 +22,15 @@ from explainaboard.processors.processor_registry import register_processor
 
 @register_processor(TaskType.nlg_meta_evaluation)
 class NLGMetaEvaluationProcessor(Processor):
+    """A processor for the natural language generation meta-evaluation task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.nlg_meta_evaluation
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "sys_name": feature.Value(
                 dtype=feature.DataType.STRING,
@@ -100,6 +106,7 @@ class NLGMetaEvaluationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
@@ -109,6 +116,7 @@ class NLGMetaEvaluationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             KtauCorrelationConfig(name='SegKtauCorr', group_by='segment'),
             PearsonCorrelationConfig(name='SysPearsonCorr', group_by='system'),
@@ -116,12 +124,7 @@ class NLGMetaEvaluationProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_true_label(self, data_point: dict):
-        """
-        Get the true label from a data point. Returns "true_label" by default, but can
-        be overloaded.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See processor._get_true_label."""
         return [
             data_point["sys_name"],
             data_point["seg_id"],
@@ -130,10 +133,5 @@ class NLGMetaEvaluationProcessor(Processor):
         ]
 
     def _get_predicted_label(self, data_point: dict):
-        """
-        Get the predicted label from a data point. Returns "predicted_label" by default,
-        but can be overloaded.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See processor._get_predicted_label."""
         return data_point["auto_score"]

@@ -1,3 +1,5 @@
+"""A processor for the knowledge graph link tail prediction task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -15,20 +17,26 @@ from explainaboard.metrics.ranking import (
     HitsConfig,
     MeanRankConfig,
     MeanReciprocalRankConfig,
+    RankingMetric,
 )
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
+from explainaboard.utils.typing_utils import narrow
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
 class KGLinkTailPredictionProcessor(Processor):
+    """A processor for the knowledge graph link tail prediction task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.kg_link_tail_prediction
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
             "true_head": feature.Value(dtype=feature.DataType.STRING),
             "true_head_decipher": feature.Value(dtype=feature.DataType.STRING),
@@ -100,6 +108,7 @@ class KGLinkTailPredictionProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         analysis_levels = self.default_analysis_levels()
         features = analysis_levels[0].features
         discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
@@ -120,6 +129,7 @@ class KGLinkTailPredictionProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             HitsConfig(name='Hits1', hits_k=1),
             HitsConfig(name='Hits2', hits_k=2),
@@ -144,24 +154,19 @@ class KGLinkTailPredictionProcessor(Processor):
         '/people/person/sibling_s./people/sibling relationship/sibling',
     }
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Constructor."""
         super().__init__()
-        self.entity_type_level_map = None
         file_path = cache_api.cache_online_file(
             'https://storage.googleapis.com/inspired-public-data/'
             'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
             'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
-            self.entity_type_level_map = json.load(file)
+            self.entity_type_level_map: dict = json.load(file)
 
-    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
-        """
-        `Samples` is a dataset iterator: List[Dict], to know more about it, you can:
-        # pip install datalabs
-        dataset = load_dataset("fb15k_237", 'readable')
-        print(dataset['train'])
-        """
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo) -> dict:
+        """See Processor._statistics_func."""
         dict_head: dict[str, int] = {}
         dict_link: dict[str, int] = {}
         dict_tail: dict[str, int] = {}
@@ -194,14 +199,14 @@ class KGLinkTailPredictionProcessor(Processor):
         cases = []
         true_data = [self._get_true_label(x) for x in sys_output]
         pred_data = [self._get_predicted_label(x) for x in sys_output]
-        rank_data = [x.get('true_rank') for x in sys_output]
+        rank_data = [narrow(int, x.get('true_rank')) for x in sys_output]
         if any(item is None for item in rank_data):
             raise ValueError(
                 'Some data points do not have rank information; check system outputs.'
             )
         metric_stats = []
         for metric in [x.to_metric() for x in analysis_level.metric_configs]:
-            if hasattr(metric, 'calc_stats_from_rank'):
+            if isinstance(metric, RankingMetric):
                 metric_stats.append(metric.calc_stats_from_rank(rank_data))
             else:
                 metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
@@ -291,7 +296,9 @@ class KGLinkTailPredictionProcessor(Processor):
     # --- End feature functions
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return data_point["true_" + data_point["predict"]]
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["predictions"]

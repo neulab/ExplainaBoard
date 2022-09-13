@@ -1,3 +1,5 @@
+"""A parent class to represent processors."""
+
 from __future__ import annotations
 
 import abc
@@ -37,7 +39,7 @@ from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
 class Processor(metaclass=abc.ABCMeta):
-    """Base case for task-based processor"""
+    """Base case for task-based processor."""
 
     @classmethod
     @abc.abstractmethod
@@ -47,10 +49,12 @@ class Processor(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def default_analysis_levels(self) -> list[AnalysisLevel]:
-        """Returns a list of analysis levels, indicating analyses that can be
-        applied to different views of the higher-level example. For instance, a task may
-        perform 'example'-level analysis, and 'token'-level analysis in which case this
-        list would have one level for each."""
+        """Returns a list of analysis levels.
+
+        These indicate different views of the higher-level example. For instance, a task
+        may perform 'example'-level analysis, and 'token'-level analysis in which case
+        this list would have one level for each.
+        """
         ...
 
     @abc.abstractmethod
@@ -59,8 +63,7 @@ class Processor(metaclass=abc.ABCMeta):
         ...
 
     def continuous_feature_analyses(self) -> list[Analysis]:
-        """Return analyses over
-        all continuous features specified in the analysis levels."""
+        """Return analyses over all continuous features in the analysis levels."""
         analyses: list[Analysis] = []
         analysis_levels = self.default_analysis_levels()
         for lev in analysis_levels:
@@ -98,10 +101,11 @@ class Processor(metaclass=abc.ABCMeta):
 
     @classmethod
     def metric_is_valid(cls, metric_config: MetricConfig) -> bool:
-        """Checks if a particular metric is valid for a particular task"""
+        """Checks if a particular metric is valid for a particular task."""
         return True
 
     def __init__(self) -> None:
+        """Constructor."""
         # Things to use only if necessary
         self._eaas_config: Optional[Config] = None
         self._eaas_client: Optional[AsyncClient] = None
@@ -111,9 +115,7 @@ class Processor(metaclass=abc.ABCMeta):
         self._bucket_sample_limit = 50
 
     def _get_statistics_resources(self, sys_info: SysOutputInfo) -> dict[str, Any]:
-        """
-        From a DataLab dataset split, get resources necessary to calculate statistics
-        """
+        """From a DataLab dataset split, get resources to calculate statistics."""
         return {"cls": self, "sys_info": sys_info}  #
 
     @abc.abstractmethod
@@ -121,11 +123,16 @@ class Processor(metaclass=abc.ABCMeta):
         ...
 
     def _gen_external_stats(self, sys_info: SysOutputInfo):
-        """Generate external statistics that are gathered from a relatively costly
-        source, such as the training set.
-        These are gathered once and then cached for future use.
-        :param sys_info: Information about the system outputs
-        :return: Statistics from, usually, the training set that are used to calculate
+        """Generate external statistics.
+
+        These are gathered from a relatively costly source, such as the training set,
+        then cached for future use.
+
+        Args:
+            sys_info: Information about the system outputs
+
+        Returns:
+            Statistics from, usually, the training set that are used to calculate
             other features
         """
         statistics = None
@@ -168,20 +175,28 @@ class Processor(metaclass=abc.ABCMeta):
         return statistics
 
     def _get_true_label(self, data_point: dict):
-        """
-        Get the true label from a data point. Returns "true_label" by default, but can
-        be overloaded.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
+        """Get the true label from a data point.
+
+        Returns "true_label" by default, but can be overloaded.
+
+        Args:
+            data_point: the data point under consideration
+
+        Returns:
+            the true label for the output
         """
         return data_point["true_label"]
 
     def _get_predicted_label(self, data_point: dict):
-        """
-        Get the predicted label from a data point. Returns "predicted_label" by default,
-        but can be overloaded.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
+        """Get the predicted label from a data point.
+
+        Returns "predicted_label" by default, but can be overloaded.
+
+        Args:
+            data_point: the data point under consideration
+
+        Returns:
+            the predicted label for the output
         """
         return data_point["predicted_label"]
 
@@ -192,15 +207,15 @@ class Processor(metaclass=abc.ABCMeta):
         metric_configs: dict[str, list[MetricConfig]] | None,
         custom_analyses: list[dict] | None,
     ) -> tuple[list[AnalysisLevel], list[Analysis]]:
-        """
-        Customize analyses for this processor
+        """Customize analyses for this processor.
+
         Args:
             custom_features: the features to customize
             metric_configs: additional metric configurations
             custom_analyses: the analyses to customize
 
         Returns:
-
+            Customized analyses.
         """
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
@@ -240,18 +255,18 @@ class Processor(metaclass=abc.ABCMeta):
         metric_stats: list[list[MetricStats]],
         skip_failed_analyses: bool = False,
     ) -> list[AnalysisResult]:
-        """
-        Perform fine-grained analyses
-        :param sys_info: Information about the system output
-        :param analysis_cases: They cases to analyze
-        :param metric_stats: The stats from which to calculate performance
-        :param skip_failed_analyses: Whether to skip analyses when they encountered some
-            errors.
-        :return:
-            performances_over_bucket:
-                a dictionary of feature name -> list of performances by bucket
-        """
+        """Perform fine-grained analyses.
 
+        Args:
+            sys_info: Information about the system output
+            analysis_cases: They cases to analyze
+            metric_stats: The stats from which to calculate performance
+            skip_failed_analyses: Whether to skip analyses when they encountered some
+                errors.
+
+        Returns:
+            a dictionary of feature name -> list of performances by bucket
+        """
         all_results: list[AnalysisResult] = []
         level_map = {v.name: i for i, v in enumerate(unwrap(sys_info.analysis_levels))}
         metrics = [
@@ -318,14 +333,16 @@ class Processor(metaclass=abc.ABCMeta):
         analysis_cases: list[list[AnalysisCase]],
         metric_stats: list[list[MetricStats]],
     ) -> list[list[Performance]]:
-        """
-        Get the overall performance according to metrics
-        :param sys_info: Information about the system output
-        :param analysis_cases: The cases to analyze
-        :param metric_stats: any statistics useful to performing scoring
-        :return: a dictionary of metrics to overall performance numbers
-        """
+        """Get the overall performance according to metrics.
 
+        Args:
+            sys_info: Information about the system output
+            analysis_cases: The cases to analyze
+            metric_stats: any statistics useful to performing scoring
+
+        Returns:
+            a dictionary of metrics to overall performance numbers
+        """
         overall_results = []
         for my_level, my_cases, my_stats in zip(
             unwrap(sys_info.analysis_levels), analysis_cases, metric_stats
@@ -358,11 +375,21 @@ class Processor(metaclass=abc.ABCMeta):
         return overall_results
 
     def deserialize_system_output(self, output: dict):
-        """
+        """Deserialize the ystem output.
+
         Take a system output where the constituent data structures have been converted
         to serializable values and deserialize. By default do nothing.
         """
         return output
+
+    @staticmethod
+    def _value_by_name(bucket_perf: BucketPerformance, sort_by_metric: str) -> float:
+        if sort_by_metric == 'first':
+            return bucket_perf.performances[0].value
+        for bp in bucket_perf.performances:
+            if bp.metric_name == sort_by_metric:
+                return bp.value
+        raise ValueError(f'could not find metric {sort_by_metric}')
 
     def sort_bucket_info(
         self,
@@ -371,8 +398,9 @@ class Processor(metaclass=abc.ABCMeta):
         sort_by_metric: str = 'first',
         sort_ascending: bool = False,
     ) -> None:
-        """
-        Sorts the `performance_over_bucket` dictionary, which should be of the format
+        """Sorts the `performance_over_bucket` dictionary.
+
+        It should be of the format
         {
             feature_name_1: {
                 (bucket_1_interval_low, bucket_1_interval_up): BucketPerformance(
@@ -387,29 +415,23 @@ class Processor(metaclass=abc.ABCMeta):
             ...
         }
 
-        :param sort_by: 'key' or 'value';
-            if 'key', sort by the bucket's lower boundary, alphabetically, low-to-high;
-            if 'performance_value', sort by the `value` attribute of the
-            BucketPerformance objects. Since each bucket has multiple metrics
-            associated with it, see param sort_by_metric to choose which metric to
-            sort on.
-            if 'n_bucket_samples', sort by the number of samples in each bucket.
-        :param sort_by_metric: 'first' or any string matching the metrics associated
-        with this task.
-            if 'first', sort by the value of the first BucketPerformance object,
-            whichever that may be, high-to-low
-            else, sort by the value of that metric.
-        :param sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
+        Args:
+            analysis_results: A list of analysis results.
+            sort_by: 'key' or 'value';
+                if 'key', sort by the bucket's lower boundary, alphabetically,
+                low-to-high.
+                if 'performance_value', sort by the `value` attribute of the
+                BucketPerformance objects. Since each bucket has multiple metrics
+                associated with it, see param sort_by_metric to choose which metric to
+                sort on.
+                if 'n_bucket_samples', sort by the number of samples in each bucket.
+            sort_by_metric: 'first' or any string matching the metrics associated
+                with this task.
+                if 'first', sort by the value of the first BucketPerformance object,
+                whichever that may be, high-to-low
+                else, sort by the value of that metric.
+            sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
         """
-
-        def value_by_name(bucket_perf: BucketPerformance) -> float:
-            if sort_by_metric == 'first':
-                return bucket_perf.performances[0].value
-            for bp in bucket_perf.performances:
-                if bp.metric_name == sort_by_metric:
-                    return bp.value
-            raise ValueError(f'could not find metric {sort_by_metric}')
-
         for analysis_result in analysis_results:
             if not isinstance(analysis_result, BucketAnalysisResult):
                 continue
@@ -426,7 +448,10 @@ class Processor(metaclass=abc.ABCMeta):
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
             elif sort_by == 'performance_value':
-                bucket_result.sort(key=value_by_name, reverse=not sort_ascending)
+                bucket_result.sort(
+                    key=lambda x: self._value_by_name(x, sort_by_metric),
+                    reverse=not sort_ascending,
+                )
             # sort by the number of samples in each bucket
             elif sort_by == 'n_bucket_samples':
                 bucket_result.sort(
@@ -436,11 +461,11 @@ class Processor(metaclass=abc.ABCMeta):
     def get_overall_statistics(
         self, metadata: dict, sys_output: list[dict]
     ) -> OverallStatistics:
-        """
-        Get the overall statistics information, including performance, of the system
-        output
-        :param metadata: The metadata of the system
-        :param sys_output: The system output itself
+        """Get the overall statistics information of the system output.
+
+        Args:
+            metadata: The metadata of the system
+            sys_output: The system output itself
         """
         if metadata is None:
             metadata = {}
@@ -497,7 +522,16 @@ class Processor(metaclass=abc.ABCMeta):
     def process(
         self, metadata: dict, sys_output: list[dict], skip_failed_analyses: bool = False
     ) -> SysOutputInfo:
-        """"""
+        """Run the whole process of processing the output.
+
+        Args:
+            metadata: The metadata used to specify information about processing.
+            sys_output: They list of system outputs.
+            skip_failed_analyses: Whether to skip failed analyses.
+
+        Returns:
+            Information about the processed system output.
+        """
         overall_statistics = self.get_overall_statistics(metadata, sys_output)
         sys_info = unwrap(overall_statistics.sys_info)
         analyses = self.perform_analyses(

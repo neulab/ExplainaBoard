@@ -1,12 +1,35 @@
 # Analyzing Open-domain QA
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
 In this file we describe how to analyze open-domain QA models.
 We will give an example using the  [natural_questions_comp_gen](https://github.com/ExpressAI/DataLab/blob/main/datasets/natural_questions_comp_gen/natural_questions_comp_gen.py) dataset, but other datasets
 can be analyzed in a similar way.
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following json format:
+ 
+
+### Format of `Dataset` File
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `json` (basically, it's a list of dictionaries with two keys: `question` and `answers`)
+```json
+[
+  {'question': 'who got the first nobel prize in physics', 'answers': ['Wilhelm Conrad Röntgen']},
+  {'question': 'when is the next deadpool movie being released', 'answers': ['May 18 , 2018']},
+  ...
+]
+```
+
+
+
+### Format of `System Output` File
+
+In this task, your system outputs should be as follows:
 
 ```text
 william henry bragg

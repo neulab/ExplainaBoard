@@ -1,3 +1,5 @@
+"""The main entry point for running ExplainaBoard."""
+
 from __future__ import annotations
 
 import argparse
@@ -31,12 +33,15 @@ from explainaboard.visualizers.draw_charts import draw_charts_from_reports
 
 
 def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
-    """
-    Get the task for each system output.
-    :param task: Explicitly specified task. Use if present
-    :param system_outputs: System output files, load from metadata in these files if
-      an explicit task is not set
-    :return: A list of task types for each system
+    """Get the task for each system output.
+
+    Args:
+        task: Explicitly specified task. Use if present
+        system_outputs: System output files, load from metadata in these files if
+          an explicit task is not set
+
+    Returns:
+        A list of task types for each system
     """
     real_tasks: list[TaskType] = []
     if task:
@@ -68,7 +73,8 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
 
 
 def analyze_reports(args):
-    """
+    """Analyze reports based on the input arguments.
+
     score_tensor is a nested dict, for example
     score_tensor[system_name][dataset_name][language] =
     {
@@ -123,6 +129,11 @@ def analyze_reports(args):
 
 
 def create_parser():
+    """Create the parser with argparse.
+
+    Returns:
+        The parser.
+    """
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
     parser.add_argument('--task', type=str, required=False, help="the task name")
     parser.add_argument(
@@ -345,6 +356,7 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
 
 # TODO(Pengfei): The overall implementation of this script should be deduplicated
 def main():
+    """The main function to be executed."""
     args = create_parser().parse_args()
 
     reload_stat: bool = False if args.reload_stat == "0" else True

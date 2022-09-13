@@ -1,3 +1,5 @@
+"""A processor for the aspect based sentiment classification task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -23,11 +25,15 @@ from explainaboard.utils.spacy_loader import get_named_entities
 
 @register_processor(TaskType.aspect_based_sentiment_classification)
 class AspectBasedSentimentClassificationProcessor(Processor):
+    """A processor for the aspect based sentiment classification task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.aspect_based_sentiment_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "aspect": feature.Value(
                 dtype=feature.DataType.STRING,
@@ -82,6 +88,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -109,4 +116,5 @@ class AspectBasedSentimentClassificationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name="Accuracy")]

@@ -91,11 +91,11 @@ class BaseLoaderTests(TestCase):
         spaces_pred = loader_pred.load(spaces_path, Source.local_filesystem)
         self.assertEqual(tabs_pred, spaces_pred)
 
-    def test_raise_value_error_for_missing_tsv_file_loader(self):
-        # Given a tsv file type, should raise ValueError because the loader is
+    def test_raise_error_for_missing_tsv_file_loader(self):
+        # Given a tsv file type, should raise NotImplementedError because the loader is
         # not provided by default.
         self.assertRaises(
-            ValueError,
+            NotImplementedError,
             lambda: Loader(
                 dataset_data=self.dataset,
                 output_data=self.dataset,

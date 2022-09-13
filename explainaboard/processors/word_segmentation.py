@@ -1,3 +1,5 @@
+"""A processor for the word segmentation task."""
+
 from __future__ import annotations
 
 from explainaboard import TaskType
@@ -10,14 +12,18 @@ from explainaboard.utils.span_utils import BMESSpanOps
 
 @register_processor(TaskType.word_segmentation)
 class CWSProcessor(SeqLabProcessor):
+    """A processor for the word segmentation task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.word_segmentation
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         defaults: dict[str, list[MetricConfig]] = {
             'example': [
                 SeqF1ScoreConfig(
@@ -39,5 +45,5 @@ class CWSProcessor(SeqLabProcessor):
         return defaults[level]
 
     @classmethod
-    def default_span_ops(cls) -> BMESSpanOps:
+    def _default_span_ops(cls) -> BMESSpanOps:
         return BMESSpanOps()

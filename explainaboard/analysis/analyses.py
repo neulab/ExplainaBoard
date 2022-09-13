@@ -1,3 +1,5 @@
+"""Base classes to specify analyses."""
+
 from __future__ import annotations
 
 import abc
@@ -19,10 +21,13 @@ from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 # See https://github.com/python/mypy/issues/5374
 @dataclass  # type: ignore
 class AnalysisResult(metaclass=abc.ABCMeta):
-    """
-    A result of an analysis, where the actual details of the result will be implemented
-    by the inheriting class.
-    :param name: The name of the analysis.
+    """A base class specifying the result of an analysis.
+
+    The actual details of the result will be implemented by the inheriting class.
+
+    Attributes:
+        name: The name of the analysis.
+        level: The level that the analysis belongs to.
     """
 
     name: str
@@ -39,6 +44,7 @@ class AnalysisResult(metaclass=abc.ABCMeta):
 
     @staticmethod
     def from_dict(dikt):
+        """Deserialization method."""
         type = dikt.pop('cls_name')
         if type == 'BucketAnalysisResult':
             return BucketAnalysisResult.from_dict(dikt)
@@ -50,11 +56,15 @@ class AnalysisResult(metaclass=abc.ABCMeta):
 
 @dataclass
 class Analysis:
-    """
-    A super-class for analyses, which take in examples and analyze their features in
+    """A super-class for analyses.
+
+    Analyses take in examples and analyze their features in
     some way. The exact analysis performed will vary depending on the inheriting
     class.
-    :param description: a textual description of the analysis to be performed
+
+    Attributes:
+        description: a textual description of the analysis to be performed
+        level: The level that the analysis belongs to.
     """
 
     description: str | None
@@ -67,21 +77,24 @@ class Analysis:
         stats: list[MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
-        """
-        A super-class for analyses, which take in examples and analyze their features in
-        some way. The exact analysis performed will vary depending on the inheriting
-        class.
-        :param cases: The list of analysis cases over which to perform the analysis.
-          These could be examples, spans, tokens, etc.
-        :param metrics: The metrics used to evaluate the cases.
-        :param stats: The statistics calculated by each metric.
-        :param confidence_alpha: In the case that any significance analysis is
-            performed, the inverse confidence level.
+        """Perform the analysis.
+
+        Args:
+            cases: The list of analysis cases over which to perform the analysis.
+              These could be examples, spans, tokens, etc.
+            metrics: The metrics used to evaluate the cases.
+            stats: The statistics calculated by each metric.
+            confidence_alpha: In the case that any significance analysis is performed,
+                      the inverse confidence level.
+
+        Returns:
+            The result of the analysis.
         """
         raise NotImplementedError
 
     @staticmethod
     def from_dict(dikt: dict):
+        """Deserialization method."""
         type = dikt.pop('cls_name')
         if type == 'BucketAnalysis':
             return BucketAnalysis(
@@ -104,11 +117,13 @@ class Analysis:
 @final
 @dataclass
 class BucketAnalysisResult(AnalysisResult):
-    """
-    A result of running a `BucketAnalysis`.
-    :param bucket_performances: A list of performances bucket-by-bucket, including the
-      interval over which the bucket is calculated, the performance itself, etc.
-      See `BucketPerformance` for more details.
+    """A result of running a `BucketAnalysis`.
+
+    Attributes:
+        bucket_performances: A list of performances bucket-by-bucket, including the
+          interval over which the bucket is calculated, the performance itself, etc.
+          See `BucketPerformance` for more details.
+        cls_name: The name of the class.
     """
 
     bucket_performances: list[BucketPerformance]
@@ -116,6 +131,7 @@ class BucketAnalysisResult(AnalysisResult):
 
     @staticmethod
     def from_dict(dikt: dict) -> BucketAnalysisResult:
+        """Deserialization method."""
         bucket_performances = [
             BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
         ]
@@ -126,6 +142,7 @@ class BucketAnalysisResult(AnalysisResult):
         )
 
     def __post_init__(self):
+        """Set the class name and validate."""
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
         num_metrics = len(metric_names)
         for bucket_perf in self.bucket_performances:
@@ -144,7 +161,7 @@ class BucketAnalysisResult(AnalysisResult):
         self.cls_name: str = self.__class__.__name__
 
     def generate_report(self) -> str:
-        """See AnalysisResult.generate_report"""
+        """See AnalysisResult.generate_report."""
         texts: list[str] = []
 
         metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
@@ -173,16 +190,19 @@ class BucketAnalysisResult(AnalysisResult):
 @final
 @dataclass
 class BucketAnalysis(Analysis):
-    """
-    Perform an analysis of various examples bucketed by features.
+    """Perform an analysis of various examples bucketed by features.
+
     Depending on which `method` is chosen here, the way bucketing is performed will be
     different. See the documentation of each function in the
     `explainaboard.analysis.bucketing` package for more details.
-    Args:
+
+    Attributes:
         feature: the name of the feature to bucket
         method: the bucket strategy, can be "continuous", "discrete", or "fixed"
         number: the number of buckets to be used
         setting: parameters of bucketing, varying by `method`
+        sample_limit: an upper limit on the number of samples saved in each bucket.
+        cls_name: the name of the class.
     """
 
     feature: str
@@ -193,6 +213,7 @@ class BucketAnalysis(Analysis):
     cls_name: Optional[str] = None
 
     def __post_init__(self):
+        """Set the class name."""
         self.cls_name: str = self.__class__.__name__
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
@@ -213,6 +234,7 @@ class BucketAnalysis(Analysis):
         stats: list[MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
+        """See Analysis.perform."""
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
@@ -233,7 +255,7 @@ class BucketAnalysis(Analysis):
             # Subsample examples to save
             subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
 
-            n_samples = float(len(bucket_collection.samples))
+            n_samples = len(bucket_collection.samples)
             bucket_performance = BucketPerformance(
                 n_samples=n_samples,
                 bucket_samples=subsampled_ids,
@@ -285,13 +307,14 @@ class BucketAnalysis(Analysis):
 @final
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
-    """
-    A result of running a `ComboCountAnalysis`.
-    :param features: A tuple of strings, representing the feature names that were
-      analyzed
-    :param combo_counts: A list of tuples. The first tuple element is the feature
-      values corresponding to the feature names in `features`. The second element is
-      the count of that feature combination in the corpus.
+    """A result of running a `ComboCountAnalysis`.
+
+    Attributes:
+        features: A tuple of strings, representing the feature names that were
+          analyzed
+        combo_counts: A list of tuples. The first tuple element is the feature
+          values corresponding to the feature names in `features`. The second element is
+          the count of that feature combination in the corpus.
     """
 
     features: tuple[str, ...]
@@ -300,6 +323,7 @@ class ComboCountAnalysisResult(AnalysisResult):
 
     @staticmethod
     def from_dict(dikt: dict) -> ComboCountAnalysisResult:
+        """Deserialization method."""
         return ComboCountAnalysisResult(
             name=dikt['name'],
             level=dikt['level'],
@@ -308,6 +332,7 @@ class ComboCountAnalysisResult(AnalysisResult):
         )
 
     def __post_init__(self):
+        """Set the class name and validate."""
         num_features = len(self.features)
         for k, _ in self.combo_counts:
             if len(k) != num_features:
@@ -335,18 +360,21 @@ class ComboCountAnalysisResult(AnalysisResult):
 @final
 @dataclass
 class ComboCountAnalysis(Analysis):
-    """
-    A class used to count feature combinations (e.g. for confusion matrices). It will
-    return counts of each combination of values for the features named in `features`.
+    """A class used to count feature combinations (e.g. for confusion matrices).
+
+    It will return counts of each combination of values for the features named in
+    `features`.
+
     Args:
-        level: the level to which this analysis should be applied
         features: the name of the features over which to perform the analysis
+        cls_name: the name of the class
     """
 
     features: tuple[str, ...]
     cls_name: Optional[str] = None
 
     def __post_init__(self):
+        """Set the class name."""
         self.cls_name: str = self.__class__.__name__
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
@@ -358,6 +386,7 @@ class ComboCountAnalysis(Analysis):
         stats: list[MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
+        """See Analysis.perform."""
         for x in self.features:
             if x not in cases[0].features:
                 raise RuntimeError(f"combo analysis: feature {x} not found.")
@@ -377,12 +406,21 @@ class ComboCountAnalysis(Analysis):
 
 @dataclass
 class AnalysisLevel:
+    """Specifies the features of a particular level at which analysis is performed.
+
+    Args:
+        name: the name of the analysis level
+        features: the features specified for the analysis level
+        metric_configs: configurations of the metrics to be applied to the level
+    """
+
     name: str
     features: dict[str, FeatureType]
     metric_configs: list[MetricConfig]
 
     @staticmethod
     def from_dict(dikt: dict):
+        """Deserialization method."""
         ft_serializer = get_feature_type_serializer()
 
         features = {

@@ -1,3 +1,5 @@
+"""A processor for the open-domain QA task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -22,11 +24,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.qa_open_domain)
 class QAOpenDomainProcessor(Processor):
+    """A processor for the open-domain QA task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.qa_open_domain
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
             "question": feature.Value(dtype=feature.DataType.STRING),
             # "question_types": feature.Sequence(feature=feature.Value("string")),
@@ -74,12 +80,14 @@ class QAOpenDomainProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             ExactMatchQAConfig(
                 name='ExactMatch',
@@ -94,19 +102,11 @@ class QAOpenDomainProcessor(Processor):
         ]
 
     def _get_true_label(self, data_point):
-        """
-        Get the true label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See processor._get_true_label."""
         return data_point["answers"]
 
     def _get_predicted_label(self, data_point):
-        """
-        Get the predicted label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See processor._get_predicted_label."""
         return data_point["predicted_answer"]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
