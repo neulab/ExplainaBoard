@@ -1,5 +1,9 @@
 # Analyzing Conditional Text Generation Tasks
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
+
 Conditional text generation is a class of tasks where you generate text based on some conditioning context.
 This can include a wide variety of tasks, such as:
 
@@ -13,8 +17,34 @@ This can include a wide variety of tasks, such as:
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following
-text format:
+ 
+### Format of `Dataset` File
+
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/cnndm/cnndm_mini-dataset.tsv)
+```python
+This is a good movie    这是一部好电影
+...
+```
+where the first column represents source text and the 2nd column denotes gold reference.
+
+* (3) `json` (basically, it's a list of dictionaries with two keys: `source` and `reference`)
+```json
+[
+  {"source": "This is a good movie", "reference": "这是一部好电影"},
+  ...
+]
+```
+
+
+
+
+### Format of `System Output` File
+In this task, your system outputs should be as follows:
+
 
 ```
 predicted_output_text

@@ -1,12 +1,26 @@
 # Analyzing QA over Hybrid Tabular/Textual Content
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
+
+
 In this file we describe how to analyze QA models trained on datasets 
 with a hybrid of tabular and textual context.
 
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following json format:
+ 
+### Format of `Dataset` File
+In this task, only the `datalab` format is supported so far:
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+### Format of `System Output` File
+
+In this task, your system outputs should be:
 
 ```json
 [
