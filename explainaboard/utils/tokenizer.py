@@ -39,6 +39,8 @@ def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
             return SacreBleuTokenizer(variety='conala')
         else:
             return SacreBleuTokenizer(variety='intl')
+    elif lang == 'zh':
+        return SacreBleuTokenizer(variety='zh')
     else:
         return SingleSpaceTokenizer()
 
