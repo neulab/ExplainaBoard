@@ -67,14 +67,12 @@ class MetricConfig(dict):
         source_language: The source language
         target_language: The target language
         cls_name: The class name
-        external_stats: Any external statistics
     """
 
     name: str
     source_language: str | None = None
     target_language: str | None = None
     cls_name: str | None = None
-    external_stats: np.ndarray | None = None
 
     def __post_init__(self):
         """Set the class name for the metric config."""
