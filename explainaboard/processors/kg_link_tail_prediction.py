@@ -17,11 +17,13 @@ from explainaboard.metrics.ranking import (
     HitsConfig,
     MeanRankConfig,
     MeanReciprocalRankConfig,
+    RankingMetric,
 )
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
+from explainaboard.utils.typing_utils import narrow
 
 
 @register_processor(TaskType.kg_link_tail_prediction)
@@ -197,14 +199,14 @@ class KGLinkTailPredictionProcessor(Processor):
         cases = []
         true_data = [self._get_true_label(x) for x in sys_output]
         pred_data = [self._get_predicted_label(x) for x in sys_output]
-        rank_data = [x.get('true_rank') for x in sys_output]
+        rank_data = [narrow(int, x.get('true_rank')) for x in sys_output]
         if any(item is None for item in rank_data):
             raise ValueError(
                 'Some data points do not have rank information; check system outputs.'
             )
         metric_stats = []
         for metric in [x.to_metric() for x in analysis_level.metric_configs]:
-            if hasattr(metric, 'calc_stats_from_rank'):
+            if isinstance(metric, RankingMetric):
                 metric_stats.append(metric.calc_stats_from_rank(rank_data))
             else:
                 metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))

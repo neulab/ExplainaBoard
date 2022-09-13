@@ -86,7 +86,7 @@ class EaaSMetricStats(MetricStats):
 class EaaSMetricConfig(MetricConfig):
     """Configuration for EaaSMetric."""
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return EaaSMetric(self)
 

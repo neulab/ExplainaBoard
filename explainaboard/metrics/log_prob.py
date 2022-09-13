@@ -28,7 +28,7 @@ class LogProbConfig(MetricConfig):
 
     ppl: bool = False
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
         return LogProb(self)
 
