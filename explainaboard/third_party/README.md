@@ -15,7 +15,7 @@ satisfies **all** of the following conditions:
   [compatible with the MIT license](https://en.wikipedia.org/wiki/Permissive_software_license)
   or [public domain](https://en.wikipedia.org/wiki/Public_domain).
   If you couldn't judge if the license is compatible with MIT or not, please consult
-  with us before making any changes.
+  with the maintainers before making any changes.
 - Code is not able to be obtained from the PyPI.
 
 If you decided to upload a third-party to this directory, please follow the steps below:
