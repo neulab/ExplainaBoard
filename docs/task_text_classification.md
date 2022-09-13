@@ -1,18 +1,16 @@
 # Analyzing Text Classification
 
+
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
 In this file we describe how to analyze text classification models.
 We will give an example using the `text-classification` [sst2](https://github.com/ExpressAI/ExplainaBoard/tree/main/data/datasets/sst2) dataset, but other datasets
 can be analyzed in a similar way.
 
 ## Data Preparation
-To perform analysis of your results, usually two types of files should be pre-trained, which we will
-detailed below.
-
+ 
 ### Format of `Dataset` File
-`Dataset` file usually consists of test samples together with true labels (or references in text generation
-tasks). 
-In this task, the following specific formats are supported 
-(the first two are also called custom datasets)
 
 * (1) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
 ```python
@@ -29,18 +27,13 @@ The movie is too long   negative
 ]
 ```
 
-* (3) `datalab`
-    * if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+* (3) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
     you fortunately don't need to prepare the dataset. 
-    Instead, you just need to remember the dataset name for later use.
-    * if your datasets haven't been supported by datalab but you want it supported, you can follow this 
-    [doc](https://github.com/ExpressAI/DataLab/blob/main/docs/SDK/add_new_datasets_into_sdk.md) to add them.
+  
 
 
 ### Format of `System Output` File
 
-`System output` file usually only composed of predicted labels (or hypothesis, e.g., system-generated text),
-but sometimes `system output` will also contains test samples, such as `CoNLL` format in sequence labeling tasks.
 In this task, your system outputs should be as follows:
 
 ```
