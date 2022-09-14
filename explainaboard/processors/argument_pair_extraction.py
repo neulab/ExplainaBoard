@@ -1,3 +1,5 @@
+"""A processor for the argument pair extraction task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -21,11 +23,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.argument_pair_extraction)
 class ArgumentPairExtractionProcessor(Processor):
+    """A processor for the argument pair extraction task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.argument_pair_extraction
 
     def __init__(self):
+        """Constructor."""
         super().__init__()
         self._argument_pair_ops: ArgumentPairOps = ArgumentPairOps()
 
@@ -35,6 +41,7 @@ class ArgumentPairExtractionProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         defaults: dict[str, list[MetricConfig]] = {
             'example': [
                 APEF1ScoreConfig(
@@ -55,17 +62,24 @@ class ArgumentPairExtractionProcessor(Processor):
         return defaults[level]
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
-            "sentences": feature.Sequence(feature=feature.Value("string")),
-            "true_tags": feature.Sequence(feature=feature.Value("string")),
-            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "sentences": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "true_tags": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "pred_tags": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "num_sent": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of sentences",
                 func=lambda info, x, c: len(x['sentences']),
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the length of all sentences",
                 func=lambda info, x, c: len(" ".join(x['sentences'])),
             ),
@@ -73,37 +87,37 @@ class ArgumentPairExtractionProcessor(Processor):
 
         block_features: dict[str, FeatureType] = {
             "text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="text of the block",
                 func=lambda info, x, c: c.text,
             ),
             "n_review_sentences": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of review sentence",
                 func=lambda info, x, c: c.block_review_sentences,
             ),
             "n_review_tokens": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of review tokens",
                 func=lambda info, x, c: c.block_review_tokens,
             ),
             "n_review_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the relative position of review sentence",
                 func=lambda info, x, c: c.block_review_position,
             ),
             "n_reply_sentences": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of reply sentence",
                 func=lambda info, x, c: c.block_reply_sentences,
             ),
             "n_reply_tokens": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of reply tokens",
                 func=lambda info, x, c: c.block_reply_tokens,
             ),
             "n_reply_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the relative position of reply sentence",
                 func=lambda info, x, c: c.block_reply_position,
             ),
@@ -123,24 +137,17 @@ class ArgumentPairExtractionProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         analyses: list[Analysis] = []
         analyses.extend(self.continuous_feature_analyses())
         return analyses
 
     def _get_true_label(self, data_point):
-        """
-        Get the true label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See Processor._get_true_label."""
         return data_point["true_tags"]
 
     def _get_predicted_label(self, data_point):
-        """
-        Get the predicted label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See Processor._get_predicted_label."""
         return data_point["pred_tags"]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):

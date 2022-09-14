@@ -1,10 +1,29 @@
 # Analyzing the Argument Pair Extraction (APE) Task
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
 In this file we describe how to analyze APE models.
 We will give an example using the  [ape](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset, but other datasets
 can be analyzed in a similar way.
 
 ## Data Preparation
+
+ 
+
+### Format of `Dataset` File
+ 
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. For example, you can examine the specific format organized in datalab by following commands:
+    ```python
+    from datalabs import load_dataset
+    dataset = load_dataset("ape")
+    print(dataset["test"][0])
+
+    ```
+
+### Format of `System Output` File
 
 In order to perform analysis of your results, they should be in the following conll format:
 

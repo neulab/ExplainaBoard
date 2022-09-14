@@ -107,8 +107,8 @@ class MachineTranslationTest(unittest.TestCase):
         sys_info = processor.process(
             dataclasses.asdict(data.metadata), data.samples, skip_failed_analyses=True
         )
-        analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
-        self.assertTrue('num_capital_letters' in analysis_map)
+        analysis_names = [x.name for x in sys_info.results.analyses if x is not None]
+        self.assertIn('num_capital_letters', analysis_names)
 
 
 if __name__ == '__main__':

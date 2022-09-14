@@ -1,3 +1,5 @@
+"""A processor for the tabular regression task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -19,18 +21,22 @@ from explainaboard.processors.processor_registry import register_processor
 
 @register_processor(TaskType.tabular_regression)
 class TabularRegressionProcessor(Processor):
+    """A processor for the tabular regression task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.tabular_regression
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "true_value": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the true value of the input",
             ),
             "predicted_value": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the predicted value",
             ),
         }
@@ -44,12 +50,14 @@ class TabularRegressionProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             RootMeanSquaredErrorConfig(name='RMSE'),
             AbsoluteErrorConfig(name='AbsoluteError'),
@@ -60,7 +68,9 @@ class TabularRegressionProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_true_label(self, data_point):
+        """See processor._get_true_label."""
         return data_point["true_value"]
 
     def _get_predicted_label(self, data_point):
+        """See processor._get_predicted_label."""
         return data_point["predicted_value"]

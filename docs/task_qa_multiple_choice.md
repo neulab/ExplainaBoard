@@ -1,10 +1,34 @@
 # Analyzing Multiple Choices QA
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
 In this file we describe how to analyze multiple-choice QA models.
 We will give an example using the  [fig_qa](http://datalab.nlpedia.ai/normal_dataset/62139f3dc5fa557614d36df2/dataset_metadata) dataset, but other datasets
 can be analyzed in a similar way.
 
 ## Data Preparation
+
+ 
+
+### Format of `Dataset` File
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `json` (basically, it's a list of dictionaries with two keys: `context`
+               , `options`, `question`, and `answers`)
+```json
+[
+  {'context': 'The girl had the flightiness of a sparrow', 'question': '', 'answers': {'text': 'The girl was very fickle.', 'option_index': 0}, 'options': ['The girl was very fickle.', 'The girl was very stable.']},
+  {'context': 'The girl had the flightiness of a rock', 'question': '', 'answers': {'text': 'The girl was very stable.', 'option_index': 1}, 'options': ['The girl was very fickle.', 'The girl was very stable.']}
+  ...
+]
+```
+
+
+### Format of `System Output` File
+
 
 In order to perform analysis of your results, they should be in the following json format:
 

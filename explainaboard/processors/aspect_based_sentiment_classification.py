@@ -1,3 +1,5 @@
+"""A processor for the aspect based sentiment classification task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -23,50 +25,54 @@ from explainaboard.utils.spacy_loader import get_named_entities
 
 @register_processor(TaskType.aspect_based_sentiment_classification)
 class AspectBasedSentimentClassificationProcessor(Processor):
+    """A processor for the aspect based sentiment classification task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.aspect_based_sentiment_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "aspect": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the aspect to analyze",
             ),
             "text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the text regarding the aspect",
             ),
             "true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true label of the input",
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['text'], side='source'),
             ),
             "text_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in characters",
                 func=lambda info, x, c: len(x['text']),
             ),
             "entity_number": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="number of named entities in the text",
                 func=lambda info, x, c: len(get_named_entities(x['text'])),
             ),
             "aspect_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="aspect length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['aspect'], side='source'),
             ),
             "aspect_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="relative position of the aspect in the text",
                 func=lambda info, x, c: float(x["text"].find(x["aspect"]))
                 / len(x["text"]),
@@ -82,6 +88,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -109,4 +116,5 @@ class AspectBasedSentimentClassificationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name="Accuracy")]

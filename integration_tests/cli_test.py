@@ -188,8 +188,9 @@ class CLITest(TestCase):
     @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_summ_datalab(self):
         filename = cache_online_file(
-            'http://www.phontron.com/download/cnndm-bart-output.txt',
-            'tests/cnndm-bart-output.txt',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
         )
         args = [
             'explainaboard.explainaboard_main',

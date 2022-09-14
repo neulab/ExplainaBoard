@@ -1,3 +1,4 @@
+"""A registry for Loader classes to look them up by class name."""
 from __future__ import annotations
 
 from explainaboard import TaskType
@@ -20,8 +21,8 @@ def get_loader_class(task: TaskType | str) -> type[Loader]:
 
 
 def register_loader(task_type: TaskType):
-    """
-    a register for different data loaders, for example
+    """A register for different data loaders.
+
     For example, `@register_loader(TaskType.text_classification)`
     """
 

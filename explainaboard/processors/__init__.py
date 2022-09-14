@@ -1,4 +1,8 @@
-# when a new processor is implemented, remember to import it here so it gets registered
+"""A package for processors for each test.
+
+When a new processor is implemented, remember to import it here so it gets registered.
+"""
+
 from explainaboard.processors import (
     argument_pair_extraction,
     aspect_based_sentiment_classification,

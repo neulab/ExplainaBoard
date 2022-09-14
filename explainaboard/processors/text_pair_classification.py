@@ -1,3 +1,5 @@
+"""A processor for the text pair classification task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -29,53 +31,57 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.text_pair_classification)
 class TextPairClassificationProcessor(Processor):
+    """A processor for the text pair classification task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.text_pair_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "text1": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the first text",
             ),
             "text2": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the second text",
             ),
             "true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true label of the input",
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
             "text1_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text1 length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['text1'], side='source'),
             ),
             "text2_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text2 length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['text2'], side='target'),
             ),
             "similarity": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the two texts' similarity",
                 func=lambda info, x, c: get_similarity_by_sacrebleu(
                     x['text1'], x['text2']
                 ),
             ),
             "text1_divided_text2": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="ratio of two texts' lengths",
                 func=lambda info, x, c: c.features['text1_length']
                 / c.features['text2_length'],
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -84,7 +90,7 @@ class TextPairClassificationProcessor(Processor):
                 + feat_num_oov(info, x['text2'], stat['target_vocab'], side='target'),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "the average rank of each word based on its frequency in "
                     "training set"
@@ -108,6 +114,7 @@ class TextPairClassificationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -131,6 +138,7 @@ class TextPairClassificationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name='Accuracy')]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):

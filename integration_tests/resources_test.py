@@ -12,7 +12,11 @@ class ResourcesTest(unittest.TestCase):
             {
                 "custom_features": {
                     "example": {
-                        "label": {"dtype": "string", "description": "the true label"}
+                        "label": {
+                            "cls_name": "Value",
+                            "dtype": "string",
+                            "description": "the true label",
+                        }
                     }
                 },
                 "custom_analyses": [

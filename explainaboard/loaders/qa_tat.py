@@ -1,3 +1,5 @@
+"""Loaders for the TAT-QA dataset."""
+
 from __future__ import annotations
 
 from explainaboard import TaskType
@@ -14,16 +16,21 @@ from explainaboard.loaders.loader_registry import register_loader
 
 @register_loader(TaskType.qa_tat)
 class QATatLoader(Loader):
+    """Loader for the TAT-QA class."""
+
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """See Loader.default_output_file_type."""
         return FileType.text
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         return {
             FileType.datalab: DatalabFileLoader(
                 [
@@ -39,6 +46,7 @@ class QATatLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         return {
             FileType.json: JSONFileLoader(
                 [
