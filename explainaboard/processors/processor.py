@@ -47,8 +47,15 @@ class Processor(metaclass=abc.ABCMeta):
         """Returns the task type of this processor."""
         ...
 
-    def get_tokenizer(self, lang) -> Tokenizer:
-        """Returns a tokenizer."""
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
+        """Return a tokenizer based on the language.
+
+        Args:
+            lang: the name of a language code.
+
+        Returns:
+            A suitable tokenizer for the specified language.
+        """
         return get_default_tokenizer(lang)
 
     @abc.abstractmethod

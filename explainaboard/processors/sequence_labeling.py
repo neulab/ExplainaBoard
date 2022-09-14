@@ -42,7 +42,7 @@ class SeqLabProcessor(Processor):
         super().__init__()
         self._span_ops: SpanOps = self._default_span_ops()
 
-    def get_tokenizer(self, lang) -> Tokenizer:
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
         """Get a tokenizer based on the language."""
         return SingleSpaceTokenizer()
 
