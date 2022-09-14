@@ -1,3 +1,5 @@
+"""Load information about a task mapping."""
+
 from __future__ import annotations
 
 import enum
@@ -7,12 +9,22 @@ PATH_OF_TASKS_JSON = "./tasks.json"
 
 
 def get_task_mapping() -> dict:
+    """Get the mapping between tasks.
+
+    Returns:
+        A dictionary specifying the task mapping.
+    """
     with open(PATH_OF_TASKS_JSON, "r") as fin:
         task_infos = json.load(fin)
     return task_infos
 
 
 def get_all_tasks() -> list[str]:
+    """Get all tasks that are available.
+
+    Returns:
+        A list of tasks.
+    """
     task_infos = get_task_mapping()
     all_tasks = []
     for task_category, description in task_infos.items():

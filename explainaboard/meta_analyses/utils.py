@@ -1,3 +1,5 @@
+"""Utility functions for performing meta-analyses."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -8,13 +10,13 @@ from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 def report_to_sysout(report: SysOutputInfo) -> list[dict]:
-    '''
-    Loops through all the buckets in a report, converts them to "examples"
-    as if they were a system output file.
+    """Loops through all the buckets in a report, converts them to "examples".
+
+    This is to mimic a system output file.
 
     The metrics that describe each bucket become the "features" of this new
     system output.
-    '''
+    """
     results_fine_grained = [
         narrow(BucketAnalysisResult, x)
         for x in unwrap(report.results.analyses)

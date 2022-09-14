@@ -1,3 +1,5 @@
+"""Classes to express features."""
+
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
@@ -41,6 +43,8 @@ def _get_value(cls: type[T], data: dict[str, SerializableData], key: str) -> T |
 
 
 class FeatureType(Serializable, metaclass=ABCMeta):
+    """An object specifying the type of features."""
+
     def __init__(
         self,
         *,
@@ -132,6 +136,8 @@ class FeatureType(Serializable, metaclass=ABCMeta):
 @final
 @_feature_type_registry.register("Sequence")
 class Sequence(FeatureType):
+    """A feature consisting of a sequence of features."""
+
     def __init__(
         self,
         *,
@@ -189,6 +195,8 @@ class Sequence(FeatureType):
 @final
 @_feature_type_registry.register("Dict")
 class Dict(FeatureType):
+    """A feature that consists of a dictionary of features."""
+
     def __init__(
         self,
         *,
@@ -261,6 +269,8 @@ class DataType(Enum):
 @final
 @_feature_type_registry.register("Value")
 class Value(FeatureType):
+    """A feature representing a value such as an int, float, or string."""
+
     _dtype: DataType
     _max_value: int | float | None
     _min_value: int | float | None

@@ -1,6 +1,9 @@
 # Analyzing Knowledge Graph Link Tail Prediction Task
 
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
 In this file we describe how to analyze models trained to predict the tail entity on knowledge graph link prediction tasks, for example
 [`fb15k-237`](https://www.microsoft.com/en-us/download/details.aspx?id=52312).
 
@@ -22,8 +25,29 @@ In this file we describe how to analyze models trained to predict the tail entit
 
 
 ### Data Preparation
-In order to perform analysis of your results, they should be in the following
-JSON format:
+
+
+
+#### Format of `Dataset` File
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `json` (basically, it's a list of dictionaries with two keys: `gold_head`,
+        `gold_predicate`, and `gold_tail`)
+```json
+[
+  {"gold_head": "abc", "gold_predicate": "dummy relation", "gold_tail":"cde"},
+  ...
+]
+```
+
+
+
+
+#### Format of `System Output` File
+
+In this task, your system outputs should be as follows:
 
 ```json
 [

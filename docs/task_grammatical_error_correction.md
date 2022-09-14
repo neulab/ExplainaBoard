@@ -1,5 +1,9 @@
 # Analyzing Grammatical Error Correction
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
+
 Grammatical error correction is the task of correcting different kinds of errors in text, such as spelling errors. If you're interested in how datasets for this task look like, you can
 perform the following command after installing [`DataLab`](https://github.com/ExpressAI/DataLab#installation)
 ```python
@@ -15,6 +19,15 @@ In what follows, we will describe how to analyze grammatical error correction sy
 
 ## Data Preparation
 
+
+### Format of `Dataset` File
+
+ 
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+
+### Format of `System Output` File
 In order to perform an analysis of your results, your system outputs should be arranged into following
 format:
 

@@ -1,3 +1,5 @@
+"""Tests for agreement.py."""
+
 import unittest
 
 import numpy as np

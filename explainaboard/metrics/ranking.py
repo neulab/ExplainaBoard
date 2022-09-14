@@ -1,5 +1,8 @@
+"""Evaluation metrics for ranking-based problems."""
+
 from __future__ import annotations
 
+import abc
 from dataclasses import dataclass
 from typing import Any, cast, Optional
 
@@ -15,24 +18,51 @@ from explainaboard.metrics.registry import metric_config_registry
 from explainaboard.utils.typing_utils import unwrap_or
 
 
+class RankingMetric(Metric, metaclass=abc.ABCMeta):
+    """A metric for ranking."""
+
+    @abc.abstractmethod
+    def calc_stats_from_rank(
+        self, rank_data: list[int], config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        """Calculate statistics from rank data.
+
+        Args:
+            rank_data: A list of integer ranks.
+            config: The configuration for this metric.
+
+        Returns:
+            The aggregate statistics for this metric.
+        """
+        ...
+
+
 @dataclass
 @metric_config_registry.register("HitsConfig")
 class HitsConfig(MetricConfig):
+    """Configuration for Hits.
+
+    Args:
+        hits_k: the number of top-k answers to consider in calculation.
+    """
+
     hits_k: int = 5
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return Hits(self)
 
 
-class Hits(Metric):
-    """
-    Calculates the hits metric, telling whether the predicted output is in a set of true
-    outputs.
+class Hits(RankingMetric):
+    """Calculates the hits metric.
+
+    The metric calculates whether the predicted output is in a set of true outputs.
     """
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+    ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         config = cast(HitsConfig, unwrap_or(config, self.config))
         return SimpleMetricStats(
             np.array(
@@ -44,8 +74,9 @@ class Hits(Metric):
         )
 
     def calc_stats_from_rank(
-        self, rank_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:  # TODO(Pengfei): why do we need the 3rd argument?
+        self, rank_data: list[int], config: Optional[MetricConfig] = None
+    ) -> MetricStats:
+        """See RankingMetric.calc_stats_from_rank."""
         config = cast(HitsConfig, unwrap_or(config, self.config))
         return SimpleMetricStats(
             np.array([(1.0 if rank <= config.hits_k else 0.0) for rank in rank_data])
@@ -55,21 +86,20 @@ class Hits(Metric):
 @dataclass
 @metric_config_registry.register("MeanReciprocalRankConfig")
 class MeanReciprocalRankConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for MeanReciprocalRank."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return MeanReciprocalRank(self)
 
 
-class MeanReciprocalRank(Metric):
-    """
-    Calculates the mean reciprocal rank, 1/rank(true_output) where rank(true_output) is
-    the rank of the true output in the predicted n-best list.
+class MeanReciprocalRank(RankingMetric):
+    """Calculates the mean reciprocal rank, 1/rank(true_output).
+
+    rank(true_output) is the rank of the true output in the predicted n-best list.
     """
 
-    @classmethod
-    def default_name(cls) -> str:
-        return 'MRR'
-
-    def mrr_val(self, true: Any, preds: list):
+    def _mrr_val(self, true: Any, preds: list):
         if true not in preds:
             return 0.0
         else:
@@ -79,13 +109,15 @@ class MeanReciprocalRank(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
-            np.array([self.mrr_val(t, p) for t, p in zip(true_data, pred_data)])
+            np.array([self._mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
     def calc_stats_from_rank(
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See RankingMetric.calc_stats_from_rank."""
         if any([rank is None for rank in rank_data]):
             raise ValueError('cannot calculate statistics when rank is none')
         return SimpleMetricStats(np.array([1.0 / rank for rank in rank_data]))
@@ -94,17 +126,17 @@ class MeanReciprocalRank(Metric):
 @dataclass
 @metric_config_registry.register("MeanRankConfig")
 class MeanRankConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for MeanReciprocalRank."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return MeanRank(self)
 
 
-class MeanRank(Metric):
-    """
-    Calculates the mean rank, rank(true_output), the rank of the true output in the
-    predicted n-best list.
-    """
+class MeanRank(RankingMetric):
+    """Calculates the mean rank of the true output in a predicted n-best list."""
 
-    def mr_val(self, true: Any, preds: list):
+    def _mr_val(self, true: Any, preds: list):
         if true not in preds:
             return -1  # placeholder for "infinity"; when `true` is not in `preds`
         else:
@@ -114,13 +146,15 @@ class MeanRank(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
-            np.array([self.mr_val(t, p) for t, p in zip(true_data, pred_data)])
+            np.array([self._mr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
     def calc_stats_from_rank(
         self, rank_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See RankingMetric.calc_stats_from_rank."""
         return SimpleMetricStats(
             np.array([rank for rank in rank_data if rank is not None])
         )

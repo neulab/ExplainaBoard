@@ -1,3 +1,5 @@
+"""Evaluation metrics measuring accuracy."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -17,19 +19,23 @@ from explainaboard.metrics.registry import metric_config_registry
 @dataclass
 @metric_config_registry.register("AccuracyConfig")
 class AccuracyConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for the Accuracy metric."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return Accuracy(self)
 
 
 class Accuracy(Metric):
-    """
-    Calculate zero-one accuracy, where score is 1 iff the prediction equals the ground
-    truth
+    """Calculate zero-one accuracy.
+
+    The score is 1 iff the prediction equals the ground truth.
     """
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array(
                 [
@@ -43,22 +49,24 @@ class Accuracy(Metric):
 @dataclass
 @metric_config_registry.register("CorrectCountConfig")
 class CorrectCountConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for CorrectCount."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return CorrectCount(self)
 
 
 class CorrectCount(Accuracy):
-    """
-    Calculate the absolute value of correct number
-    """
+    """Calculate the absolute value of correct answers."""
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-
+        """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array(
                 [
@@ -69,11 +77,7 @@ class CorrectCount(Accuracy):
         )
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
             return np.array(0.0)
@@ -84,29 +88,36 @@ class CorrectCount(Accuracy):
 @dataclass
 @metric_config_registry.register("SeqCorrectCountConfig")
 class SeqCorrectCountConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for SeqCorrectCount."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return SeqCorrectCount(self)
 
 
 class SeqCorrectCount(CorrectCount):
+    """A count of the total number of times a sequence is correct."""
+
+    @staticmethod
+    def _get_flatten_edits(edits: list[dict]):
+        flatten_edits = []
+        for edit in edits:
+            start_idx, end_idx, corrections = (
+                edit["start_idx"],
+                edit["end_idx"],
+                edit["corrections"],
+            )
+            for correction in corrections:
+                flatten_edits.append((start_idx, end_idx, correction))
+        return flatten_edits
+
     def calc_stats_from_data(
         self,
         true_edits_ldl: list[dict[str, list]],
         pred_edits_ldl: list[dict[str, list]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
-        def _get_flatten_edits(edits: list[dict]):
-            flatten_edits = []
-            for edit in edits:
-                start_idx, end_idx, corrections = (
-                    edit["start_idx"],
-                    edit["end_idx"],
-                    edit["corrections"],
-                )
-                for correction in corrections:
-                    flatten_edits.append((start_idx, end_idx, correction))
-            return flatten_edits
-
+        """See Metric.calc_stats_from_data."""
         recall = []
         for true_edits_dl, pred_edits_dl in zip(true_edits_ldl, pred_edits_ldl):
             true_edits_ld = [
@@ -115,8 +126,8 @@ class SeqCorrectCount(CorrectCount):
             pred_dicts_ld = [
                 dict(zip(pred_edits_dl, t)) for t in zip(*pred_edits_dl.values())
             ]
-            gold_flatten_edits = _get_flatten_edits(true_edits_ld)
-            pred_flatten_edits = _get_flatten_edits(pred_dicts_ld)
+            gold_flatten_edits = self._get_flatten_edits(true_edits_ld)
+            pred_flatten_edits = self._get_flatten_edits(pred_dicts_ld)
             for gold_flatten_edit in gold_flatten_edits:
                 if gold_flatten_edit in pred_flatten_edits:
                     recall.append(1.0)

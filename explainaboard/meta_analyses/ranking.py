@@ -1,37 +1,42 @@
+"""A class for meta-analysis of rankings."""
+
 from __future__ import annotations
 
 import itertools
-from typing import Any, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from explainaboard.info import SysOutputInfo
+from explainaboard.meta_analyses.meta_analysis import MetaAnalysis
 from explainaboard.meta_analyses.utils import report_to_sysout
 from explainaboard.utils.typing_utils import unwrap
 
 
-class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
+class RankingMetaAnalysis(MetaAnalysis):
+    """A class for meta-analysis of rankings."""
+
     def __init__(self, model_reports: dict[str, SysOutputInfo]):
-        self.model_names = list(model_reports.keys())
-        self.num_models = len(self.model_names)
-        self.model_ids = np.arange(self.num_models).tolist()  # (0, ..., n_models-1)
-        self.model_reports = list(model_reports.values())
+        """Initialize the meta-analysis with model reports."""
+        self.model_names: list[str] = list(model_reports.keys())
+        self.num_models: int = len(self.model_names)
+        self.model_ids: list[int] = list(
+            np.arange(self.num_models)
+        )  # (0, ..., n_models-1)
+        self.model_reports: list[SysOutputInfo] = list(model_reports.values())
 
-    def run_meta_analysis(self):
-        '''
-        This method is what the user will call.
-        '''
-
+    def run_meta_analysis(self) -> dict | list:
+        """Run a meta analysis over the ranking over different buckets."""
         # construct the new "metadata", treating each metric as a "feature"
         metadata = self._metrics_to_metadata()
         self.metadata = metadata
 
         # construct the new "system outputs", treating each bucket from each
         # report as an "example/observation" to be bucketed further
-        buckets_per_model = []
+        buckets_per_model: list[list[dict]] = []
         for model_report in self.model_reports:
-            model_buckets = report_to_sysout(model_report)
+            model_buckets: list[dict] = report_to_sysout(model_report)
             buckets_per_model.append(model_buckets)
 
         # overall performance comparison (on dataset-level), which will be a
@@ -50,11 +55,15 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
 
         return aggregated_sysout
 
-    def get_ranking_table(self, metric: str):
-        '''
-        Returns the ranking table for a given metric as a pandas DataFrame.
-        Ranking is 1-indexed.
-        '''
+    def get_ranking_table(self, metric: str) -> pd.DataFrame:
+        """Returns the ranking table for a given metric as a pandas DataFrame.
+
+        Args:
+            metric: The name of the metric for which to calculate.
+
+        Returns:
+            The ranking table.
+        """
         if metric not in self.feature_names:
             raise ValueError(f'metric {metric} does not exist in original model report')
         metric_id = self.feature_names.index(metric)
@@ -65,22 +74,29 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         return metric_ranking_df
 
     @staticmethod
-    def _get_ranks_of(values: list[float], ids: list[Union[int, str]]) -> list[int]:
-        '''
-        Returns the rank of each element of `ids` based on `values`, high-to-low.
-        0-indexed.
-        '''
+    def _get_ranks_of(values: list[float], ids: list[int] | list[str]) -> list[int]:
+        """Returns the rank of each element in `ids`.
+
+        Rankings are high-to-low and zero-indexed.
+
+        Args:
+            values: The values to use for the ranking.
+            ids: The IDs over which to perform ranking.
+
+        Returns:
+            A list of the ranks.
+        """
         values_np = np.array(values)
         sort_idx = (np.argsort(values_np)[::-1]).tolist()
         return [sort_idx.index(i) for i in ids]
 
     def _metrics_to_metadata(self) -> dict:
-        '''
-        Turns a `metric_configs` object into a metadata object suitable
-        for use as metadata in a system output file.
+        """Turns a `metric_configs` object into a metadata object.
+
+        This metadata object is suitable for use as metadata in a system output file.
 
         Uses the metric configs of `self.model1_report` as metadata.
-        '''
+        """
         model1 = self.model_reports[0]
         metadata = {
             'custom_features': {
@@ -97,17 +113,7 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         return metadata
 
     def _get_reference_info(self, metadata: dict) -> dict:
-        '''
-        Returns a dictionary indicating, for each metric, whether model1's value
-        for that metric is higher than model2's value. Here, as in most cases,
-        we use the overall results to establish this expectation.
-
-        Interpretation: this tells us which model (model1 or model2) we should
-        expect to outperform the other, for each metric.
-
-        The rank-flipping meta-analysis will then reveal which buckets, and how
-        many, subvert this expectation.
-        '''
+        """Return ranks of each bucket for each feature."""
         model_overall_results = [
             list(itertools.chain.from_iterable(unwrap(r.results.overall)))
             for r in self.model_reports
@@ -128,20 +134,9 @@ class RankingMetaAnalysis:  # (can inherit from an abstract MetaAnalysis class)
         return reference_info
 
     def _get_aggregated_sysout(
-        self, model_sysouts: list[dict], reference_dict: dict, metadata: dict
+        self, model_sysouts: list[list[dict]], reference_dict: dict, metadata: dict
     ) -> list[dict]:
-        '''
-        Many meta-analyses require a quantity which is based on the relationship
-        between the metrics of the two models we want to compare.
-
-        For example, in rank-flipping, we are interested in whether, for each bucket,
-        the relationship between model1's bucket-level metrics and model2's bucket-level
-        metrics is the opposite from what is expected.
-
-        The expectation between the relationship between model1 and model2 is passed in
-        through `reference_dict`.
-        '''
-
+        """Aggregate multiple system outputs into one."""
         # check that each model's meta-level system outputs has the same length
         num_buckets = len(model_sysouts[0])
         for model_sysout in model_sysouts:

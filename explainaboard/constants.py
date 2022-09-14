@@ -1,7 +1,12 @@
+"""Definition of constants used in the whole library."""
+from __future__ import annotations
+
 from enum import Enum
 
 
 class TaskType(str, Enum):
+    """Task types available in this tool."""
+
     text_classification = "text-classification"
     named_entity_recognition = "named-entity-recognition"
     qa_extractive = "qa-extractive"
@@ -26,11 +31,18 @@ class TaskType(str, Enum):
     argument_pair_extraction = "argument-pair-extraction"
 
     @staticmethod
-    def list():
+    def list() -> list[str]:
+        """Obtains string representations of all values.
+
+        Returns:
+            List of all values in str.
+        """
         return list(map(lambda c: c.value, TaskType))
 
 
 class Source(str, Enum):
+    """Types of data sources."""
+
     in_memory = "in_memory"  # content has been loaded in memory
     local_filesystem = "local_filesystem"
     s3 = "s3"
@@ -38,6 +50,8 @@ class Source(str, Enum):
 
 
 class FileType(str, Enum):
+    """Types of file formats."""
+
     json = "json"
     tsv = "tsv"
     csv = "csv"
@@ -46,5 +60,10 @@ class FileType(str, Enum):
     text = "text"
 
     @staticmethod
-    def list():
+    def list() -> list[str]:
+        """Obtains string representations of all values.
+
+        Returns:
+            List of all values in str.
+        """
         return list(map(lambda c: c.value, FileType))

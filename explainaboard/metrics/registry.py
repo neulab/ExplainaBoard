@@ -1,3 +1,5 @@
+"""A registry for evaluation metrics, so they can be looked up by string."""
+
 from __future__ import annotations
 
 from explainaboard.metrics.metric import MetricConfig

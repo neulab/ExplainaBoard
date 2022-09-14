@@ -1,3 +1,5 @@
+"""A processor for the generative cloze task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -27,11 +29,15 @@ from explainaboard.utils.typing_utils import unwrap
 
 @register_processor(TaskType.cloze_generative)
 class ClozeGenerativeProcessor(Processor):
+    """A processor for the generative cloze task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.cloze_generative
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "context": feature.Value(dtype=feature.DataType.STRING),
             "question_mark": feature.Value(dtype=feature.DataType.STRING),
@@ -97,12 +103,14 @@ class ClozeGenerativeProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             CorrectCountConfig(
                 name='CorrectCount',
@@ -112,19 +120,11 @@ class ClozeGenerativeProcessor(Processor):
         ]
 
     def _get_true_label(self, data_point):
-        """
-        Get the true label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See Processor._get_true_label."""
         return data_point["answers"]
 
     def _get_predicted_label(self, data_point):
-        """
-        Get the predicted label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See Processor._get_predicted_label."""
         return data_point["predicted_answers"][0]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):

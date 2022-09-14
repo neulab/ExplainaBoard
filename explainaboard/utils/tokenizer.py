@@ -9,7 +9,7 @@ from functools import lru_cache
 import re
 import string
 import sys
-from typing import final, overload
+from typing import final
 import unicodedata
 
 from sacrebleu.tokenizers import BaseTokenizer
@@ -25,6 +25,15 @@ from explainaboard.utils.typing_utils import narrow
 
 
 def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
+    """Get the default tokenizer by task and language.
+
+    Args:
+        task_type: The task
+        lang: The language
+
+    Returns:
+        A tokenizer
+    """
     cond_gen_tasks = {
         TaskType.conditional_generation,
         TaskType.machine_translation,
@@ -52,24 +61,20 @@ class TokenSeq(Sequence):
     positions: list[int]
 
     def __post_init__(self):
+        """Perform checks of validity."""
         if len(self.strs) != len(self.positions):
             raise ValueError("strs and positions must be the same length.")
 
-    @overload
-    def __getitem__(self, item: int) -> str:
-        ...
-
-    @overload
-    def __getitem__(self, item: slice) -> Sequence[str]:
-        ...
-
     def __getitem__(self, item: int | slice) -> str | Sequence[str]:
+        """Get an item or slice from the sequence."""
         return self.strs[item]
 
     def __len__(self) -> int:
+        """Get the length of the string sequence."""
         return len(self.strs)
 
     def __iter__(self):
+        """Get an iterator over the strings."""
         return iter(self.strs)
 
     @staticmethod
@@ -102,21 +107,29 @@ class TokenSeq(Sequence):
 
 
 class Tokenizer(Serializable, metaclass=abc.ABCMeta):
+    """A class representing tokenization methods."""
+
     @abc.abstractmethod
     def __call__(self, text: str) -> TokenSeq:
-        """
-        Tokenize a string into a list of tokens
-        :param text: The string to tokenize
-        :returns: The list of tokens
+        """Tokenize a string into a list of tokens.
+
+        Args:
+            text: The string to tokenize
+
+        Returns:
+            The list of tokens
         """
         ...
 
     @abc.abstractmethod
     def detokenize(self, tokens: list[str]) -> str:
-        """
-        Detokenize a list of tokens into a string
-        :param tokens: A list of tokens
-        :returns: The detokenized string
+        """Detokenize a list of tokens into a string.
+
+        Args:
+            tokens: A list of tokens
+
+        Returns:
+            The detokenized string
         """
         ...
 
@@ -145,12 +158,18 @@ def get_tokenizer_serializer() -> PrimitiveSerializer:
 @final
 @_tokenizer_registry.register("SingleSpaceTokenizer")
 class SingleSpaceTokenizer(Tokenizer):
-    """
-    Split a string on a single ascii space
-    """
+    """Split a string on a single ascii space."""
 
     @lru_cache(maxsize=20)
     def __call__(self, text: str) -> TokenSeq:
+        """Perform tokenization.
+
+        Args:
+            text: The string to tokenize
+
+        Returns:
+            The tokenized sequence
+        """
         start = 0
         strs: list[str] = []
         positions: list[int] = []
@@ -163,22 +182,35 @@ class SingleSpaceTokenizer(Tokenizer):
         return TokenSeq(strs, positions)
 
     def detokenize(self, tokens: list[str]) -> str:
+        """Detokenize the string by joining the strings together with white space.
+
+        Args:
+            tokens: The tokens to merge together.
+
+        Returns:
+            The detokenized strings.
+        """
         return ' '.join(tokens)
 
 
 class TokenizerConala(BaseTokenizer):
-    """
-    A SacreBLEU style tokenizer of the tokenizer that we use for BLEU score over Python
-    code, as used by the CoNaLa corpus.
+    """A SacreBLEU style tokenizer for BLEU score over Python code.
+
+    This is as used by the CoNaLa corpus.
     Originally from Wang Ling et al., Latent Predictor Networks for Code Generation
     """
 
     def __call__(self, text: str) -> str:
-        """
-        The tokenizer that we use for BLEU score over code, used by the CoNaLa corpus.
+        """The tokenizer that we use for BLEU score over code.
+
+        This is as used by the CoNaLa corpus.
         Originally from Wang Ling et al., Latent Predictor Networks for Code Generation
-        :param text: string containing a code snippet
-        :return: space-separated tokens
+
+        Args:
+            text: string containing a code snippet
+
+        Returns:
+            space-separated tokens
         """
         text = re.sub(r'([^A-Za-z0-9_])', r' \1 ', text)
         text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
@@ -193,9 +225,7 @@ class TokenizerConala(BaseTokenizer):
 @final
 @_tokenizer_registry.register("SacreBleuTokenizer")
 class SacreBleuTokenizer(Tokenizer):
-    """
-    Split a string based on the strategy in SacreBLEU
-    """
+    """Split a string based on the strategy in SacreBLEU."""
 
     @staticmethod
     def _get_normalizer(variety: str) -> Callable[[str], str]:
@@ -235,31 +265,50 @@ class SacreBleuTokenizer(Tokenizer):
             raise ValueError(f'Illegal variety of SacreBleuTokenizer: {variety}')
 
     def __init__(self, variety: str = 'intl'):
+        """Constructor function.
+
+        Args:
+            variety: What variety of tokenizer to create, matching SacreBLEU.
+        """
         self._variety = variety
         self._normalizer = self._get_normalizer(self._variety)
         self._tokenizer = self._get_tokenizer(self._variety)
 
     @lru_cache(maxsize=20)
     def __call__(self, text: str) -> TokenSeq:
+        """Perform tokenization.
+
+        Args:
+            text: The string to tokenize
+
+        Returns:
+            The tokenized sequence
+        """
         return TokenSeq.from_orig_and_tokens(
             self._normalizer(text), self._tokenizer(text).split(' ')
         )
 
     def detokenize(self, tokens: list[str]) -> str:
+        """Detokenization (not implemented for this tokenizer)."""
         raise NotImplementedError
 
     def serialize(self) -> dict[str, SerializableData]:
+        """Serialize all information about the tokenizer."""
         return {"variety": self._variety}
 
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Create a tokenizer from serialized information."""
         return cls(variety=narrow(str, data["variety"]))
 
 
 @final
 @_tokenizer_registry.register("MLQAMixTokenizer")
 class MLQAMixTokenizer(Tokenizer):
+    """A tokenizers that is used for QA, based on the MLQA corpus."""
+
     def __init__(self) -> None:
+        """Constructor."""
         self._ss_tokenizer = SingleSpaceTokenizer()
         self._punct = {
             chr(i)
@@ -269,7 +318,14 @@ class MLQAMixTokenizer(Tokenizer):
 
     @lru_cache(maxsize=20)
     def __call__(self, text: str) -> TokenSeq:
+        """Perform tokenization.
 
+        Args:
+            text: The string to tokenize
+
+        Returns:
+            The tokenized sequence
+        """
         segs_out: list[str] = []
         temp_str = ""
         for char in text:
@@ -289,4 +345,5 @@ class MLQAMixTokenizer(Tokenizer):
         return TokenSeq.from_orig_and_tokens(text, segs_out)
 
     def detokenize(self, tokens: list[str]) -> str:
+        """Detokenization (not implemented for this Tokenizer)."""
         raise NotImplementedError

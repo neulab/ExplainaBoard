@@ -1,5 +1,9 @@
 # Analyzing Extractive QA Task
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
+
 
 In this file we describe how to analyze models trained on extractive QA datasets, for example
 [`squad`](http://datalab.nlpedia.ai/#/normal_dataset/6163a29beb9872f33252b01b/dataset_samples).
@@ -7,6 +11,24 @@ In this file we describe how to analyze models trained on extractive QA datasets
 
 ## Data Preparation
 
+ 
+
+### Format of `Dataset` File
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `json` (basically, it's a list of dictionaries with three keys: `context`, `question`, and `answers`)
+```json
+[
+  {"context": "Super Bowl 50 was an American footb", "question": "Which NFL team represented the AFC at Super Bowl 50?", 'answers': {'text': ['Denver Broncos', 'Denver Broncos', 'Denver Broncos'], 'answer_start': [177, 177, 177]}},
+  ...
+]
+```
+
+
+
+### Format of `System Output` File
 In order to perform analysis of your results, they should be in the following
 JSON format:
 
