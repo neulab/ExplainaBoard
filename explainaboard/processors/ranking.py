@@ -1,3 +1,5 @@
+"""A processor for the ranking task."""
+
 from __future__ import annotations
 
 from collections.abc import Iterable
@@ -25,39 +27,42 @@ from explainaboard.utils.typing_utils import unwrap
 @register_processor(TaskType.argument_pair_identification)
 @register_processor(TaskType.ranking)
 class RankingProcessor(Processor):
+    """A processor for the ranking task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.ranking
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "context": feature.Value(
-                dtype="string",
-                description="the context information",
+                dtype=feature.DataType.STRING
             ),
-            "utterance": feature.Sequence("string"),
+            "utterance": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)),
             "true_label": feature.Value(
-                dtype="string",
-                description="the true label of the input",
+                dtype=feature.DataType.STRING
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "utterance_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the length in tokens of true utterance",
                 func=lambda info, x, c: count_tokens(
                     info, x['utterance'][int(x['true_label'])]
                 ),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -65,7 +70,7 @@ class RankingProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "the average rank of each word based on its frequency in "
                     "training set"
@@ -76,7 +81,7 @@ class RankingProcessor(Processor):
                 ),
             ),
             "length_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the frequency of context length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(
@@ -94,7 +99,7 @@ class RankingProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
-        # Create analyses
+        """See Processor.default_analyses."""
         analyses: list[Analysis] = []
         analyses.extend(self.continuous_feature_analyses())
         return analyses
@@ -103,9 +108,11 @@ class RankingProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name='Accuracy')]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        """See Processor._statistics_func."""
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

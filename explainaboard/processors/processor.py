@@ -230,7 +230,6 @@ class Processor(metaclass=abc.ABCMeta):
         """
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
-        example_metric_names = [x.name for x in analysis_levels[0].metric_configs]
         for level in analysis_levels:
             configs = unwrap(metric_configs)
             metric_gen = unwrap_generator(configs.get(level.name))
@@ -498,7 +497,6 @@ class Processor(metaclass=abc.ABCMeta):
         # declare customized features: _features will be updated
         custom_features: dict = metadata.get('custom_features', {})
         custom_analyses: list = metadata.get('custom_analyses', [])
-
 
         metric_configs: dict[str, list[MetricConfig]] = {
             "example": metadata.get('metric_configs', [])
