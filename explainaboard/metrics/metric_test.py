@@ -6,45 +6,53 @@ import unittest
 
 from explainaboard.metrics.metric import (
     ConfidenceInterval,
-    get_serializer,
+    Metric,
     MetricConfig,
     MetricResult,
     Score,
 )
+from explainaboard.serialization.types import SerializableData
+from explainaboard.utils.typing_utils import narrow
+
+
+class DummyMetricConfig(MetricConfig):
+    def to_metric(self) -> Metric:
+        raise NotImplementedError
 
 
 class ScoreTest(unittest.TestCase):
     def test_serialize(self) -> None:
         value = Score(42.0)
-        serialized = {"cls_name": "Score", "value": 42.0}
-        self.assertEqual(get_serializer().serialize(value), serialized)
+        serialized: dict[str, SerializableData] = {"value": 42.0}
+        self.assertEqual(value.serialize(), serialized)
 
     def test_deserialize(self) -> None:
         value = Score(42.0)
-        serialized = {"cls_name": "Score", "value": 42.0}
-        self.assertEqual(get_serializer().deserialize(serialized), value)
+        serialized: dict[str, SerializableData] = {"value": 42.0}
+        self.assertEqual(narrow(Score, Score.deserialize(serialized)), value)
 
 
 class ConfidenceIntervalTest(unittest.TestCase):
     def test_serialize(self) -> None:
         value = ConfidenceInterval(1.0, 2.0, 0.5)
-        serialized = {
-            "cls_name": "ConfidenceInterval",
+        serialized: dict[str, SerializableData] = {
             "low": 1.0,
             "high": 2.0,
             "alpha": 0.5,
         }
-        self.assertEqual(get_serializer().serialize(value), serialized)
+        self.assertEqual(value.serialize(), serialized)
 
     def test_deserialize(self) -> None:
         value = ConfidenceInterval(1.0, 2.0, 0.5)
-        serialized = {
-            "cls_name": "ConfidenceInterval",
+        serialized: dict[str, SerializableData] = {
             "low": 1.0,
             "high": 2.0,
             "alpha": 0.5,
         }
-        self.assertEqual(get_serializer().deserialize(serialized), value)
+        self.assertEqual(
+            narrow(ConfidenceInterval, ConfidenceInterval.deserialize(serialized)),
+            value,
+        )
 
     def test_invalid_values(self) -> None:
         with self.assertRaisesRegex(ValueError, r"^`high` must be"):
@@ -63,20 +71,33 @@ class ConfidenceIntervalTest(unittest.TestCase):
 
 class MetricResultTest(unittest.TestCase):
     def test_serialize(self) -> None:
-        result = MetricResult(MetricConfig(name="foo"), {"bar": Score(1.25)})
-        serialized = {
-            "config": {},
-            "values": {
-                "foo": {"cls_name": "Score", "value": 1.25},
-            },
+        score = Score(1.0)
+        ci = ConfidenceInterval(1.0, 2.0, 0.5)
+        config = DummyMetricConfig(name="foo")
+        result = MetricResult(config, {"bar": score, "baz": ci})
+        serialized: dict[str, SerializableData] = {
+            "config": config,
+            "values": {"bar": score, "baz": ci},
         }
-        self.assertEqual(get_serializer().serialize(result), serialized)
+        self.assertEqual(result.serialize(), serialized)
+
+    def test_deserialize(self) -> None:
+        score = Score(1.0)
+        ci = ConfidenceInterval(1.0, 2.0, 0.5)
+        config = DummyMetricConfig(name="foo")
+        serialized: dict[str, SerializableData] = {
+            "config": config,
+            "values": {"bar": score, "baz": ci},
+        }
+        restored = narrow(MetricResult, MetricResult.deserialize(serialized))
+        self.assertIs(restored.config, config)
+        self.assertEqual(restored._values, {"bar": score, "baz": ci})
 
     def test_get_value(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
 
-        result = MetricResult(MetricConfig(name="foo"), {"bar": score, "baz": ci})
+        result = MetricResult(DummyMetricConfig(name="foo"), {"bar": score, "baz": ci})
 
         # get_value() should return existing objects.
         self.assertIsNone(result.get_value(Score, "foo"))
@@ -85,9 +106,3 @@ class MetricResultTest(unittest.TestCase):
         self.assertIsNone(result.get_value(ConfidenceInterval, "foo"))
         self.assertIsNone(result.get_value(ConfidenceInterval, "bar"))
         self.assertIs(result.get_value(ConfidenceInterval, "baz"), ci)
-
-
-class MetricConfigTest(unittest.TestCase):
-    def test_to_metric(self) -> None:
-        with self.assertRaises(NotImplementedError):
-            MetricConfig("foo").to_metric()

@@ -37,6 +37,9 @@ class CorrelationConfig(MetricConfig):
     use_z_score: bool = True
     no_human: bool = True
 
+    def to_metric(self) -> Metric:
+        raise NotImplementedError
+
 
 class CorrelationMetric(Metric):
     """A metric that calculates correlations."""

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import abc
-import dataclasses
 from dataclasses import dataclass
 from typing import Any, final, Optional, TypeVar
 
@@ -12,7 +11,11 @@ from scipy.stats import t as stats_t
 
 from explainaboard.serialization.registry import TypeRegistry
 from explainaboard.serialization.serializers import PrimitiveSerializer
-from explainaboard.serialization.types import Serializable, SerializableData
+from explainaboard.serialization.types import (
+    Serializable,
+    SerializableData,
+    SerializableDataclass,
+)
 from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 _metric_registry = TypeRegistry[Serializable]()
@@ -158,19 +161,34 @@ class MetricResult(Serializable):
     def serialize(self) -> dict[str, SerializableData]:
         """See Serializable.serialize."""
         return {
-            "config": dataclasses.asdict(self.config),
+            "config": self.config,
             "values": self._values,
         }
 
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
         """See Serializable.deserialize."""
-        # TODO(odahsi): implement Serializable interface for MetricConfig.
-        raise NotImplementedError("MetricResult can't be deserialized at this point.")
+        values = data["values"]
+
+        # TODO(odashi): Implement TypeGuard.
+        if not (
+            isinstance(values, dict)
+            and all(
+                isinstance(k, str) and isinstance(v, MetricValue)
+                for k, v in values.items()
+            )
+        ):
+            raise ValueError("`values` has incompatible data.")
+
+        # See mypy/issues/4717
+        return cls(narrow(MetricConfig, data["config"]), values)  # type: ignore
 
 
-@dataclass
-class MetricConfig(dict):
+# TODO(tetsuok): Remove the following type-ignore annotation when we update
+# mypy version to 0.980 or newer.
+# See https://github.com/python/mypy/issues/5374 for details.
+@dataclass  # type:ignore
+class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
     """The configuration for a metric.
 
     This can be passed in to the metric either in
@@ -187,20 +205,11 @@ class MetricConfig(dict):
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    cls_name: str | None = None
 
-    def __post_init__(self) -> None:
-        """Set the class name for the metric config."""
-        self.cls_name = type(self).__name__
-
+    @abc.abstractmethod
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        raise NotImplementedError
-
-    @classmethod
-    def dict_conv(cls, k: str, v: Any) -> Any:
-        """Conversion for serialization."""
-        return v
+        ...
 
 
 class MetricStats(metaclass=abc.ABCMeta):

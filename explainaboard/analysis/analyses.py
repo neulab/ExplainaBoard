@@ -20,7 +20,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     Score,
 )
-from explainaboard.metrics.registry import metric_config_from_dict
+from explainaboard.metrics.registry import get_metric_config_serializer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
@@ -431,7 +431,15 @@ class AnalysisLevel:
             k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
             for k, v in dikt['features'].items()
         }
-        metric_configs = [metric_config_from_dict(v) for v in dikt['metric_configs']]
+        metric_config_serializer = get_metric_config_serializer()
+        metric_configs = [
+            narrow(
+                # See mypy/issues/4717
+                MetricConfig,  # type: ignore
+                metric_config_serializer.deserialize(v),
+            )
+            for v in dikt['metric_configs']
+        ]
         return AnalysisLevel(
             name=dikt['name'],
             features=features,

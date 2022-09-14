@@ -13,6 +13,24 @@ from explainaboard.metrics.continuous import (
 
 
 class RootMeanSquaredErrorConfigTest(unittest.TestCase):
+    def test_serialize(self) -> None:
+        self.assertEqual(
+            RootMeanSquaredErrorConfig("RootMeanSquaredError").serialize(),
+            {
+                "name": "RootMeanSquaredError",
+                "source_language": None,
+                "target_language": None,
+            },
+        )
+
+    def test_deserialize(self) -> None:
+        self.assertEqual(
+            RootMeanSquaredErrorConfig.deserialize(
+                {"name": "RootMeanSquaredError"},
+            ),
+            RootMeanSquaredErrorConfig("RootMeanSquaredError"),
+        )
+
     def test_to_metric(self) -> None:
         self.assertIsInstance(
             RootMeanSquaredErrorConfig("RootMeanSquaredError").to_metric(),
@@ -21,6 +39,22 @@ class RootMeanSquaredErrorConfigTest(unittest.TestCase):
 
 
 class AbsoluteErrorConfigTest(unittest.TestCase):
+    def test_serialize(self) -> None:
+        self.assertEqual(
+            AbsoluteErrorConfig("AbsoluteError").serialize(),
+            {
+                "name": "AbsoluteError",
+                "source_language": None,
+                "target_language": None,
+            },
+        )
+
+    def test_deserialize(self) -> None:
+        self.assertEqual(
+            AbsoluteErrorConfig.deserialize({"name": "AbsoluteError"}),
+            AbsoluteErrorConfig("AbsoluteError"),
+        )
+
     def test_to_metric(self) -> None:
         self.assertIsInstance(
             AbsoluteErrorConfig("AbsoluteError").to_metric(),
