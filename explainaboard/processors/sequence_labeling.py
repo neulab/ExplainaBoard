@@ -22,6 +22,7 @@ from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils.logging import progress
 from explainaboard.utils.span_utils import cap_feature, Span, SpanOps
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer, Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -40,6 +41,10 @@ class SeqLabProcessor(Processor):
         """Constructor."""
         super().__init__()
         self._span_ops: SpanOps = self._default_span_ops()
+
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
+        """Get a tokenizer based on the language."""
+        return SingleSpaceTokenizer()
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""

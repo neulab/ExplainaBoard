@@ -34,7 +34,7 @@ from explainaboard.utils.cache_api import (
     write_statistics_to_cache,
 )
 from explainaboard.utils.logging import get_logger, progress
-from explainaboard.utils.tokenizer import get_default_tokenizer
+from explainaboard.utils.tokenizer import get_default_tokenizer, Tokenizer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
@@ -46,6 +46,17 @@ class Processor(metaclass=abc.ABCMeta):
     def task_type(cls) -> TaskType:
         """Returns the task type of this processor."""
         ...
+
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
+        """Return a tokenizer based on the language.
+
+        Args:
+            lang: the name of a language code.
+
+        Returns:
+            A suitable tokenizer for the specified language.
+        """
+        return get_default_tokenizer(lang)
 
     @abc.abstractmethod
     def default_analysis_levels(self) -> list[AnalysisLevel]:
@@ -474,16 +485,13 @@ class Processor(metaclass=abc.ABCMeta):
 
         sys_info = SysOutputInfo.from_dict(metadata)
         if sys_info.target_tokenizer is None:
-            sys_info.target_tokenizer = get_default_tokenizer(
-                task_type=self.task_type(), lang=sys_info.target_language
-            )
+            sys_info.target_tokenizer = self.get_tokenizer(sys_info.target_language)
+
         if sys_info.source_tokenizer is None:
             sys_info.source_tokenizer = (
                 sys_info.target_tokenizer
                 if sys_info.source_language == sys_info.target_language
-                else get_default_tokenizer(
-                    task_type=self.task_type(), lang=sys_info.source_language
-                )
+                else self.get_tokenizer(sys_info.source_language)
             )
 
         # declare customized features: _features will be updated

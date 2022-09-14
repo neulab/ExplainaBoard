@@ -17,37 +17,31 @@ from sacrebleu.tokenizers.tokenizer_intl import TokenizerV14International
 from sacrebleu.tokenizers.tokenizer_ja_mecab import TokenizerJaMecab
 from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
 
-from explainaboard import TaskType
 from explainaboard.serialization.registry import TypeRegistry
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
+from explainaboard.utils.language_utils import (
+    is_chinese_lang_code,
+    is_japanese_lang_code,
+)
 from explainaboard.utils.typing_utils import narrow
 
 
-def get_default_tokenizer(task_type: TaskType, lang: str | None) -> Tokenizer:
-    """Get the default tokenizer by task and language.
+def get_default_tokenizer(lang: str | None) -> Tokenizer:
+    """Get the default tokenizer by language.
 
     Args:
-        task_type: The task
         lang: The language
 
     Returns:
         A tokenizer
     """
-    cond_gen_tasks = {
-        TaskType.conditional_generation,
-        TaskType.machine_translation,
-        TaskType.summarization,
-    }
-    if task_type in cond_gen_tasks or task_type == TaskType.nlg_meta_evaluation:
-        if lang == 'zh':
-            return SacreBleuTokenizer(variety='zh')
-        elif lang == 'ja':
-            return SacreBleuTokenizer(variety='ja-mecab')
-        elif lang == 'python':
-            return SacreBleuTokenizer(variety='conala')
-        else:
-            return SacreBleuTokenizer(variety='intl')
+    if is_chinese_lang_code(lang):
+        return SacreBleuTokenizer(variety='zh')
+    elif is_japanese_lang_code(lang):
+        return SacreBleuTokenizer(variety='ja-mecab')
+    elif lang == 'python':
+        return SacreBleuTokenizer(variety='conala')
     else:
         return SingleSpaceTokenizer()
 
