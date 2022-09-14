@@ -152,7 +152,7 @@ class ComboCountAnalysisResultTest(unittest.TestCase):
                 name="foo",
                 level="bar",
                 features=("feat1", "feat2"),
-                combo_counts=[(("xyz",), 123)],
+                combo_counts=[(("xyz",), 123, list(range(123)))],
             )
 
     def test_generate_report(self) -> None:
@@ -161,9 +161,9 @@ class ComboCountAnalysisResultTest(unittest.TestCase):
             level="bar",
             features=("feat1", "feat2"),
             combo_counts=[
-                (("aaa", "bbb"), 123),
-                (("iii", "jjj"), 456),
-                (("xxx", "yyy"), 789),
+                (("aaa", "bbb"), 123, list(range(123))),
+                (("iii", "jjj"), 456, list(range(123, 123 + 456))),
+                (("xxx", "yyy"), 789, list(range(123 + 456, 123 + 456 + 789))),
             ],
         )
         report = textwrap.dedent(

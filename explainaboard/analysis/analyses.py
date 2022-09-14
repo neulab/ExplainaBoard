@@ -100,6 +100,16 @@ class Analysis:
                 features=dikt['features'],
             )
 
+    @staticmethod
+    def _subsample_analysis_cases(
+        sample_limit: int, analysis_cases: list[int]
+    ) -> list[int]:
+        if len(analysis_cases) > sample_limit:
+            sample_ids = np.random.choice(analysis_cases, sample_limit, replace=False)
+            return [int(x) for x in sample_ids]
+        else:
+            return analysis_cases
+
 
 @final
 @dataclass
@@ -197,15 +207,6 @@ class BucketAnalysis(Analysis):
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
-    def _subsample_analysis_cases(self, analysis_cases: list[int]) -> list[int]:
-        if len(analysis_cases) > self.sample_limit:
-            sample_ids = np.random.choice(
-                analysis_cases, self.sample_limit, replace=False
-            )
-            return [int(x) for x in sample_ids]
-        else:
-            return analysis_cases
-
     def perform(
         self,
         cases: list[AnalysisCase],
@@ -231,7 +232,9 @@ class BucketAnalysis(Analysis):
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             # Subsample examples to save
-            subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
+            subsampled_ids = self._subsample_analysis_cases(
+                self.sample_limit, bucket_collection.samples
+            )
 
             bucket_performance = BucketPerformance(
                 n_samples=float(len(bucket_collection.samples)),
@@ -285,7 +288,7 @@ class ComboCountAnalysisResult(AnalysisResult):
     """
 
     features: tuple[str, ...]
-    combo_counts: list[tuple[tuple[str, ...], int]]
+    combo_counts: list[tuple[tuple[str, ...], int, list[int]]]
     cls_name: Optional[str] = None
 
     @staticmethod
@@ -299,7 +302,7 @@ class ComboCountAnalysisResult(AnalysisResult):
 
     def __post_init__(self):
         num_features = len(self.features)
-        for k, _ in self.combo_counts:
+        for k, _, _ in self.combo_counts:
             if len(k) != num_features:
                 raise ValueError(
                     "Inconsistent number of features. "
@@ -315,7 +318,7 @@ class ComboCountAnalysisResult(AnalysisResult):
         texts.append('feature combos for ' + ', '.join(self.features))
         texts.append('\t'.join(self.features + ('#',)))
 
-        for k, v in sorted(self.combo_counts):
+        for k, v, _ in sorted(self.combo_counts):
             texts.append('\t'.join(k + (str(v),)))
 
         texts.append('')
@@ -335,6 +338,8 @@ class ComboCountAnalysis(Analysis):
 
     features: tuple[str, ...]
     cls_name: Optional[str] = None
+    method: str = "discrete"
+    sample_limit: int = 50
 
     def __post_init__(self):
         self.cls_name: str = self.__class__.__name__
@@ -348,15 +353,23 @@ class ComboCountAnalysis(Analysis):
         stats: list[MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
+
         for x in self.features:
             if x not in cases[0].features:
                 raise RuntimeError(f"combo analysis: feature {x} not found.")
 
-        combo_map: dict[tuple[str, ...], int] = {}
+        combo_map: dict[tuple[str, ...], list] = {}
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
-            combo_map[feat_vals] = combo_map.get(feat_vals, 0) + 1
-        combo_list = list(combo_map.items())
+            if feat_vals not in combo_map:
+                combo_map[feat_vals] = [0, []]
+            combo_map[feat_vals][0] += 1
+            combo_map[feat_vals][1].append(case.sample_id)
+
+        combo_list = [
+            (k, v[0], self._subsample_analysis_cases(self.sample_limit, v[1]))
+            for k, v in combo_map.items()
+        ]
         return ComboCountAnalysisResult(
             name='combo(' + ','.join(self.features) + ')',
             level=self.level,
