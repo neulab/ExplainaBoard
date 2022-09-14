@@ -1,3 +1,5 @@
+"""Loaders for the multiple choice cloze task."""
+
 from __future__ import annotations
 
 from explainaboard import TaskType
@@ -14,16 +16,21 @@ from explainaboard.loaders.loader_registry import register_loader
 
 @register_loader(TaskType.cloze_mutiple_choice)
 class ClozeMultipleChoiceLoader(Loader):
+    """Loader for the multiple choice cloze task."""
+
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """See Loader.default_output_file_type."""
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         target_field_names = ["context", "options", "question_mark", "answers"]
         return {
             FileType.json: JSONFileLoader(
@@ -46,6 +53,7 @@ class ClozeMultipleChoiceLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         return {
             FileType.json: JSONFileLoader(
                 [FileLoaderField("predicted_answers", "predicted_answers", dict)]

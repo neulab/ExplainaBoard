@@ -1,3 +1,5 @@
+"""A processor for the chunking task."""
+
 from __future__ import annotations
 
 from explainaboard import TaskType
@@ -10,14 +12,18 @@ from explainaboard.utils.span_utils import BIOSpanOps
 
 @register_processor(TaskType.chunking)
 class ChunkingProcessor(SeqLabProcessor):
+    """A processor for the chunking task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.chunking
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         defaults: dict[str, list[MetricConfig]] = {
             'example': [
                 SeqF1ScoreConfig(
@@ -39,5 +45,5 @@ class ChunkingProcessor(SeqLabProcessor):
         return defaults[level]
 
     @classmethod
-    def default_span_ops(cls) -> BIOSpanOps:
+    def _default_span_ops(cls) -> BIOSpanOps:
         return BIOSpanOps()

@@ -1,8 +1,11 @@
-"""Pre-processing functions for qa-table_text_hybrid task
+"""Pre-processing functions for qa-table_text_hybrid task.
+
 The pre-processing is so complicated that I put most of the original processing code
 here. The official evaluation script can be found here:
 https://github.com/NExTplusplus/L2I/blob/main/evaluate.py
 """
+# Because this is essentially third-party code, ignore linting errors
+# flake8: noqa
 
 from __future__ import annotations
 

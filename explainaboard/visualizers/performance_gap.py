@@ -1,3 +1,5 @@
+"""Measure the gap between two models."""
+
 import copy
 
 from explainaboard.analysis.analyses import BucketAnalysisResult
@@ -8,7 +10,15 @@ from explainaboard.utils.typing_utils import unwrap
 def get_pairwise_performance_gap(
     sys1: SysOutputInfo, sys2: SysOutputInfo
 ) -> SysOutputInfo:
+    """Measure the performance gap between two models.
 
+    Args:
+        sys1: Information from the first system.
+        sys2: Information from the second system.
+
+    Returns:
+        A SystemOutputInfo object that has the difference between the performances.
+    """
     sys = copy.deepcopy(sys1)
 
     orm, or1, or2 = (unwrap(x.results.overall) for x in (sys, sys1, sys2))

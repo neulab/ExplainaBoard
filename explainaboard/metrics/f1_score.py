@@ -1,3 +1,5 @@
+"""Evaluation metrics to measure F-score."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,38 +27,51 @@ from explainaboard.utils.typing_utils import unwrap_or
 @dataclass
 @metric_config_registry.register("F1ScoreConfig")
 class F1ScoreConfig(MetricConfig):
+    """Configuration for F1Score metrics.
+
+    Args:
+      average: The averaging method, "micro" or "macro".
+      separate_match: Whether to use different match counts for precision and recall.
+      ignore_classes: Classes for which we should not calculate precision/recall.
+    """
+
     average: str = 'micro'
     separate_match: bool = False
     ignore_classes: Optional[list] = None
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return F1Score(self)
 
 
 class F1Score(Metric):
-    """
-    Calculate F1 score, micro- or macro-averaged over classes. Should match sklearn's
-    implementation.
+    """Calculate F1 score, micro- or macro-averaged over classes.
+
+    The numbers calculated should match sklearn's implementation.
     """
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        """
-        Return sufficient statistics necessary to compute f-score.
-        :param true_data: True outputs
-        :param pred_data: Predicted outputs
-        :param config: Configuration, if overloading the default for this object
-        :return: Returns stats for each class (integer id c) in the following columns of
-            MetricStats
-            * c*stat_mult + 0: occurrences in the true output
-            * c*stat_mult + 1: occurrences in the predicted output
-            * c*stat_mult + 2: number of matches with the true output
-            * c*stat_mult + 3: number of matches with the predicted output
-                (when self.separate_match=True only)
+        """Return sufficient statistics necessary to compute f-score.
+
+        Args:
+          true_data: True outputs
+          pred_data: Predicted outputs
+          config: Configuration, if overloading the default for this object
+
+        Returns:
+          Returns stats for each class (integer id c) in the following columns of
+          MetricStats
+          * c*stat_mult + 0: occurrences in the true output
+          * c*stat_mult + 1: occurrences in the predicted output
+          * c*stat_mult + 2: number of matches with the true output
+          * c*stat_mult + 3: number of matches with the predicted output
+          (when self.separate_match=True only)
         """
         config = cast(F1ScoreConfig, unwrap_or(config, self.config))
         stat_mult: int = 4 if config.separate_match else 3
@@ -88,7 +103,7 @@ class F1Score(Metric):
     def calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
-
+        """See Metric.calc_metric_from_aggregate."""
         if agg_stats.size == 1:
             return agg_stats
 
@@ -126,14 +141,17 @@ class F1Score(Metric):
 @dataclass
 @metric_config_registry.register("APEF1ScoreConfig")
 class APEF1ScoreConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for APEF1Score."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return APEF1Score(self)
 
 
 class APEF1Score(Metric):
-    """
-    Calculate F1 score w.r.t argument pair extraction task
-    Note that this task is kinda special compared with common sequence labeling tasks
+    """Calculate F1 score w.r.t the argument pair extraction task.
+
+    Note that this task is different than common sequence labeling tasks
     (such as NER), For example, this is one example's tags:
     'tags': ['Review-B-5',
       'Review-I-5', 'Review-I-5', 'Review-I-5', 'Review-B-7', 'Review-I-7',
@@ -146,6 +164,7 @@ class APEF1Score(Metric):
     """
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return False
 
     def calc_stats_from_data(
@@ -154,7 +173,7 @@ class APEF1Score(Metric):
         pred_data: list[list[str]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
-
+        """See Metric.calc_stats_from_data."""
         stats = []
 
         for tags, pred_tags in zip(true_data, pred_data):
@@ -167,19 +186,13 @@ class APEF1Score(Metric):
         return SimpleMetricStats(np.array(stats))
 
     def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+        """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
             return np.array(0.0)
         else:
-            """
-            when data.ndim == 3, e.g.,
-            * 1000 * 100 * 3 -> 1000 * 3
-            """
+            # when data.ndim == 3, e.g.,
+            # * 1000 * 100 * 3 -> 1000 * 3
             data_sum = np.sum(data, axis=(-2))
             total_gold = data_sum[0] if data.ndim == 2 else data_sum[:, 0]
             total_pred = data_sum[1] if data.ndim == 2 else data_sum[:, 1]
@@ -194,16 +207,17 @@ class APEF1Score(Metric):
 @dataclass
 @metric_config_registry.register("SeqF1ScoreConfig")
 class SeqF1ScoreConfig(F1ScoreConfig):
+    """Configuration for SeqF1Score."""
+
     tag_schema: str = 'bio'
 
-    def to_metric(self):
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return SeqF1Score(self)
 
 
 class SeqF1Score(F1Score):
-    """
-    Calculate F1 score over BIO-tagged spans.
-    """
+    """Calculate F1 score over BIO-tagged spans."""
 
     def calc_stats_from_data(
         self,
@@ -211,18 +225,23 @@ class SeqF1Score(F1Score):
         pred_data: list[list[str]],
         config: Optional[MetricConfig] = None,
     ) -> MetricStats:
-        """
-        Return sufficient statistics necessary to compute f-score.
-        :param true_data: True outputs
-        :param pred_data: Predicted outputs
-        :param config: Configuration, if over-riding the default
-        :return: Returns stats for each class (integer id c) in the following columns of
-            MetricStats
-            * c*stat_mult + 0: occurrences in the true output
-            * c*stat_mult + 1: occurrences in the predicted output
-            * c*stat_mult + 2: number of matches with the true output
-        """
+        """Return sufficient statistics necessary to compute f-score.
 
+        Args:
+          true_data: True outputs
+          pred_data: Predicted outputs
+          config: Configuration, if over-riding the default
+          true_data: list[list[str]]:
+          pred_data: list[list[str]]:
+          config: Optional[MetricConfig]:  (Default value = None)
+
+        Returns:
+          Returns stats for each class (integer id c) in the following columns of
+          MetricStats
+          * c*stat_mult + 0: occurrences in the true output
+          * c*stat_mult + 1: occurrences in the predicted output
+          * c*stat_mult + 2: number of matches with the true output
+        """
         # Get span ops
         seq_config = cast(SeqF1ScoreConfig, config or self.config)
         if seq_config.tag_schema == 'bio':
