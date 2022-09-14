@@ -48,7 +48,7 @@ class Processor(metaclass=abc.ABCMeta):
         ...
 
     def get_tokenizer(self, lang) -> Tokenizer:
-        """Returns a tokenizer"""
+        """Returns a tokenizer."""
         return get_default_tokenizer(lang)
 
     @abc.abstractmethod

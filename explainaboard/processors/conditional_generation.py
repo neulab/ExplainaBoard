@@ -54,6 +54,7 @@ class ConditionalGenerationProcessor(Processor):
         return TaskType.conditional_generation
 
     def get_tokenizer(self, lang) -> Tokenizer:
+        """Get a tokenizer based on the language."""
         if is_chinese_lang_code(lang):
             return SacreBleuTokenizer(variety='zh')
         elif is_japanese_lang_code(lang):

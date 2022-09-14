@@ -43,6 +43,7 @@ class SeqLabProcessor(Processor):
         self._span_ops: SpanOps = self._default_span_ops()
 
     def get_tokenizer(self, lang) -> Tokenizer:
+        """Get a tokenizer based on the language."""
         return SingleSpaceTokenizer()
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
