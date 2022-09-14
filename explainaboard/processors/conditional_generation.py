@@ -33,8 +33,12 @@ from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
+from explainaboard.utils.language_utils import (
+    is_chinese_lang_code,
+    is_japanese_lang_code,
+)
 from explainaboard.utils.logging import progress
-from explainaboard.utils.tokenizer import TokenSeq
+from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer, TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
@@ -43,6 +47,16 @@ class ConditionalGenerationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
         return TaskType.conditional_generation
+
+    def get_tokenizer(self, lang) -> Tokenizer:
+        if is_chinese_lang_code(lang):
+            return SacreBleuTokenizer(variety='zh')
+        elif is_japanese_lang_code(lang):
+            return SacreBleuTokenizer(variety='ja-mecab')
+        elif lang == 'python':
+            return SacreBleuTokenizer(variety='conala')
+        else:
+            return SacreBleuTokenizer(variety='intl')
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         examp_features: dict[str, FeatureType] = {

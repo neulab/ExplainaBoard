@@ -16,6 +16,11 @@ from explainaboard.metrics.nlg_meta_evaluation import (
 )
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
+from explainaboard.utils.language_utils import (
+    is_chinese_lang_code,
+    is_japanese_lang_code,
+)
+from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer
 
 
 @register_processor(TaskType.nlg_meta_evaluation)
@@ -23,6 +28,16 @@ class NLGMetaEvaluationProcessor(Processor):
     @classmethod
     def task_type(cls) -> TaskType:
         return TaskType.nlg_meta_evaluation
+
+    def get_tokenizer(self, lang) -> Tokenizer:
+        if is_chinese_lang_code(lang):
+            return SacreBleuTokenizer(variety='zh')
+        elif is_japanese_lang_code(lang):
+            return SacreBleuTokenizer(variety='ja-mecab')
+        elif lang == 'python':
+            return SacreBleuTokenizer(variety='conala')
+        else:
+            return SacreBleuTokenizer(variety='intl')
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         features: dict[str, FeatureType] = {
