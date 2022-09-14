@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.serialization.registry import TypeRegistry
 from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable
 
-metric_config_registry = TypeRegistry[MetricConfig]()
+metric_config_registry = TypeRegistry[Serializable]()
 
 
 def get_metric_config_serializer() -> PrimitiveSerializer:

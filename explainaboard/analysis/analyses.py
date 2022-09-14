@@ -430,7 +430,11 @@ class AnalysisLevel:
         }
         metric_config_serializer = get_metric_config_serializer()
         metric_configs = [
-            metric_config_serializer.deserialize(v) for v in dikt['metric_configs']
+            # See mypy/issues/4717
+            narrow(
+                MetricConfig, metric_config_serializer.deserialize(v)  # type: ignore
+            )
+            for v in dikt['metric_configs']
         ]
         return AnalysisLevel(
             name=dikt['name'],
