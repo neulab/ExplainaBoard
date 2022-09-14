@@ -37,14 +37,11 @@ class RankingProcessor(Processor):
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
-            "context": feature.Value(
-                dtype=feature.DataType.STRING
-            ),
+            "context": feature.Value(dtype=feature.DataType.STRING),
             "utterance": feature.Sequence(
-                feature=feature.Value(dtype=feature.DataType.STRING)),
-            "true_label": feature.Value(
-                dtype=feature.DataType.STRING
+                feature=feature.Value(dtype=feature.DataType.STRING)
             ),
+            "true_label": feature.Value(dtype=feature.DataType.STRING),
             "predicted_label": feature.Value(
                 dtype=feature.DataType.STRING,
                 description="the predicted label",
