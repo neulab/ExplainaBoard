@@ -28,7 +28,12 @@ from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
-from explainaboard.metrics.metric import MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    ConfidenceInterval,
+    MetricConfig,
+    MetricStats,
+    Score,
+)
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -358,17 +363,14 @@ class Processor(metaclass=abc.ABCMeta):
                     confidence_alpha=sys_info.confidence_alpha,
                 )
 
-                confidence_low, confidence_high = (
-                    metric_result.confidence_interval
-                    if metric_result.confidence_interval
-                    else (None, None)
-                )
+                value = unwrap(metric_result.get_value(Score, "score")).value
+                ci = unwrap(metric_result.get_value(ConfidenceInterval, "score_ci"))
 
                 overall_performance = Performance(
                     metric_name=metric_cfg.name,
-                    value=metric_result.value,
-                    confidence_score_low=confidence_low,
-                    confidence_score_high=confidence_high,
+                    value=value,
+                    confidence_score_low=ci.low,
+                    confidence_score_high=ci.high,
                 )
                 my_results.append(overall_performance)
             overall_results.append(my_results)
