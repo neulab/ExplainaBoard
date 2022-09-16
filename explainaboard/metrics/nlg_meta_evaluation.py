@@ -38,6 +38,7 @@ class CorrelationConfig(MetricConfig):
     no_human: bool = True
 
     def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         raise NotImplementedError
 
 
