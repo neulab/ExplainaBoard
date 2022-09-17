@@ -1,3 +1,5 @@
+"""A processor for the conditional generation task."""
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -33,18 +35,37 @@ from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import register_processor
+from explainaboard.utils.language_utils import (
+    is_chinese_lang_code,
+    is_japanese_lang_code,
+)
 from explainaboard.utils.logging import progress
-from explainaboard.utils.tokenizer import TokenSeq
+from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer, TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 @register_processor(TaskType.conditional_generation)
 class ConditionalGenerationProcessor(Processor):
+    """A processor for the conditional generation task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.conditional_generation
 
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
+        """Get a tokenizer based on the language."""
+        if is_chinese_lang_code(lang):
+            return SacreBleuTokenizer(variety='zh')
+        elif is_japanese_lang_code(lang):
+            return SacreBleuTokenizer(variety='ja-mecab')
+        elif lang == 'python':
+            return SacreBleuTokenizer(variety='conala')
+        else:
+            return SacreBleuTokenizer(variety='intl')
+
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
             "source": feature.Value(dtype=feature.DataType.STRING),
             "reference": feature.Value(dtype=feature.DataType.STRING),
@@ -161,6 +182,7 @@ class ConditionalGenerationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
@@ -171,6 +193,7 @@ class ConditionalGenerationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         eaas_defaults = cls._get_default_eaas_strs()
         metric_configs: list[Any] = []
         for metric_name in eaas_defaults:
@@ -198,6 +221,7 @@ class ConditionalGenerationProcessor(Processor):
     def full_metric_list(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.full_metric_list."""
         full_metrics_eaas = [
             "bleu",
             "bart_score_summ",
@@ -269,9 +293,11 @@ class ConditionalGenerationProcessor(Processor):
             raise ValueError(f'bad type {type(c)}')
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return {'references': [data_point["reference"]], 'source': data_point["source"]}
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["hypothesis"]
 
     def _gen_cases_and_stats(

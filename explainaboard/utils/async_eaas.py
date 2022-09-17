@@ -1,3 +1,5 @@
+"""Asynchronous client for EaaS."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -9,12 +11,25 @@ from eaas import Client, Config
 
 
 class AsyncEaaSRequest:
-    def __init__(self, eaas_client: AsyncEaaSClient, request_id: str):
-        self._eaas_client = eaas_client
-        self._request_id = request_id
-        self._result = None
+    """An asynchronous request to EaaS."""
 
-    def get_result(self):
+    def __init__(self, eaas_client: AsyncEaaSClient, request_id: str):
+        """Constructor.
+
+        Args:
+            eaas_client: The client that was used in making the request.
+            request_id: The ID of the request.
+        """
+        self._eaas_client: AsyncEaaSClient = eaas_client
+        self._request_id: str = request_id
+        self._result: dict | None = None
+
+    def get_result(self) -> dict | None:
+        """Fetch the result from a request that was made previously.
+
+        Returns:
+            A dictionary containing the result.
+        """
         if self._result is None:
             self._result = self._eaas_client.wait_and_get_result(self._request_id)
         return self._result
@@ -22,8 +37,9 @@ class AsyncEaaSRequest:
 
 # TODO(odashi): Use async concurrency to implement this functionaliry.
 class AsyncEaaSClient(Client):
-    """
-    A wrapper class to support async requests for EaaS. It uses threads so there is a
+    """A wrapper class to support async requests for EaaS.
+
+    It uses threads so there is a
     limit to the maximum number of parallel requests it can make.
     Example usage:
       1. `request_id = client.score([])` to start a new thread and make a request
@@ -32,6 +48,11 @@ class AsyncEaaSClient(Client):
     """
 
     def __init__(self, config: Config):
+        """Constructor.
+
+        Args:
+            config: The configuration for the EaaS server.
+        """
         super().__init__(config)
         self._threads: dict[str, Thread] = {}
         self._results: dict[str, Any] = {}
@@ -49,18 +70,33 @@ class AsyncEaaSClient(Client):
     def async_score(
         self,
         inputs: list[dict],
-        task="sum",
-        metrics=None,
-        lang="en",
-        cal_attributes=False,
+        metrics: list[str | dict],
+        calculate: list[str],
     ):
+        """Score generated text asynchronously.
+
+        Args:
+            inputs: The texts to score in the dictionary form
+              {"source": ..., "hypothesis": ..., "references": [..., ...]}
+            metrics: The metrics to be used in scoring
+            calculate: Whether to calculate on the "corpus", "stats", "sentence" level
+
+        Returns:
+            A thread ID corresponding to the thread doing the calculation
+        """
         return self._run_thread(
-            lambda: super(AsyncEaaSClient, self).score(
-                inputs, metrics, task, lang, cal_attributes
-            )
+            lambda: super(AsyncEaaSClient, self).score(inputs, metrics, calculate)
         )
 
-    def wait_and_get_result(self, request_id: str):
+    def wait_and_get_result(self, request_id: str) -> dict:
+        """Wait for the request to complete and get the result.
+
+        Args:
+            request_id: The ID of the request
+
+        Returns:
+            A dictionary of results from the request.
+        """
         if request_id not in self._threads:
             raise Exception(f"thread_id {request_id} doesn't exist")
         self._threads[request_id].join()

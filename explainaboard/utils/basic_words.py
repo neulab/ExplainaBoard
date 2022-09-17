@@ -1,3 +1,5 @@
+"""Definition of English basic words."""
+
 BASIC_WORDS = [
     'a',
     'about',

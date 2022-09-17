@@ -1,13 +1,46 @@
 # Analyzing Aspect-based Sentiment Classification
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
+
 In this file we describe how to analyze aspect-based sentiment classification models.
 We will give an example using the `aspect-based-sentiment-classification` [laptop](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv) dataset, but other datasets
 can be analyzed in a similar way.
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following
-text format with one predicted label per line.
+ 
+
+### Format of `Dataset` File
+
+
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/absa-dataset.tsv)
+```python
+Boot time	 Boot time  is super fast, around anywhere from 35 seconds to 1 minute.	positive
+Windows 8	Did not enjoy the new  Windows 8  and  touchscreen functions .	negative
+...
+```
+where the first 1st, 2nd, 3rd column represent aspect text, sentence and true label respectively.
+
+
+* (3) `json` (basically, it's a list of dictionaries with three keys: `aspect`, `text` and `true_label`)
+```json
+[
+  {"aspect":"Boot time", "text": "Boot time  is super fast, around anywhere from 35 seconds to 1 minute.", "true_label": "positive"},
+  ...
+]
+```
+
+
+
+### Format of `System Output` File
+In this task, your system outputs should be as follows:
+
 
 ```
 predicted_label

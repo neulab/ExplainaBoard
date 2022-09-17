@@ -8,11 +8,22 @@ repos:
     rev: 4.0.1
     hooks:
       - id: flake8
+        name: flake8
         additional_dependencies:
           - flake8-absolute-import
           - flake8-black>=0.1.1
         entry: flake8
         files: '\.py$'
+      - id: flake8
+        name: docstring
+        additional_dependencies:
+          - flake8-docstrings>=1.6
+        args:
+          - --docstring-convention=google
+          - --select=D
+        entry: flake8
+        exclude: '_test\.py$'
+        files: '^explainaboard\/.*\.py$'
   - repo: https://github.com/pycqa/isort.git
     rev: 5.6.4
     hooks:
