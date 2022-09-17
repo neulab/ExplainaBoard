@@ -57,7 +57,7 @@ def plot_combo_counts(
     feature_names = combo_results[0].features
     feature_maps: list[dict[str, int]] = [dict() for _ in feature_names]
     for combo_result in combo_results:
-        for feats, count in unwrap(combo_result.combo_counts):
+        for feats, count, _ in unwrap(combo_result.combo_counts):
             for feat, featmap in zip(feats, feature_maps):
                 featmap[feat] = featmap.get(feat, 0) + count
     # sort in descending order of frequency of each feature map
@@ -83,7 +83,7 @@ def plot_combo_counts(
                 f'size 2, but got {feature_names}'
             )
         confusion_matrix = np.zeros([len(x) for x in feature_maps])
-        for feats, count in unwrap(combo_result.combo_counts):
+        for feats, count, _ in unwrap(combo_result.combo_counts):
             confusion_matrix[
                 feature_maps[0][feats[0]], feature_maps[1][feats[1]]
             ] = count
