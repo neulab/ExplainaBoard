@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import abc
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, final, Optional, TypeVar
@@ -117,9 +118,18 @@ class Analysis:
     def _subsample_analysis_cases(
         sample_limit: int, analysis_cases: list[int]
     ) -> list[int]:
+        """Sample a subset from a list.
+
+        Args:
+            sample_limit: The maximum number to sample
+            analysis_cases: A list of sample IDs
+
+        Returns:
+            Subsampled list of sample IDs
+        """
         if len(analysis_cases) > sample_limit:
             sample_ids = np.random.choice(analysis_cases, sample_limit, replace=False)
-            return [int(x) for x in sample_ids]
+            return sample_ids.tolist()
         else:
             return analysis_cases
 
@@ -307,6 +317,28 @@ class BucketAnalysis(Analysis):
         )
 
 
+@dataclass(frozen=True)
+class ComboOccurence:
+    """A struct representing occurences of the string tuples.
+
+    Args:
+        features: The feature values that the occurence is counted.
+        sample_ids: List of sample IDs that contain the feature.
+    """
+
+    features: tuple[str, ...]
+    sample_ids: list[int]
+
+    @staticmethod
+    def from_dict(dikt: dict) -> ComboOccurence:
+        """Deserialization method."""
+        return ComboOccurence(features=dikt['features'], sample_ids=dikt['sample_ids'])
+
+    def __lt__(self, other: ComboOccurence):
+        """Implement__lt__ to allow natural sorting."""
+        return (self.features, self.sample_ids) < (other.features, other.sample_ids)
+
+
 @final
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
@@ -321,7 +353,7 @@ class ComboCountAnalysisResult(AnalysisResult):
     """
 
     features: tuple[str, ...]
-    combo_counts: list[tuple[tuple[str, ...], int, list[int]]]
+    combo_counts: list[ComboOccurence]
     cls_name: Optional[str] = None
 
     @staticmethod
@@ -331,17 +363,17 @@ class ComboCountAnalysisResult(AnalysisResult):
             name=dikt['name'],
             level=dikt['level'],
             features=dikt['features'],
-            combo_counts=dikt['combo_counts'],
+            combo_counts=[ComboOccurence.from_dict(d) for d in dikt['combo_counts']],
         )
 
     def __post_init__(self):
         """Set the class name and validate."""
         num_features = len(self.features)
-        for k, _, _ in self.combo_counts:
-            if len(k) != num_features:
+        for occ in self.combo_counts:
+            if len(occ.features) != num_features:
                 raise ValueError(
                     "Inconsistent number of features. "
-                    f"Required: {num_features}, got: {len(k)}"
+                    f"Required: {num_features}, got: {len(occ.features)}"
                 )
 
         self.cls_name: str = self.__class__.__name__
@@ -353,8 +385,8 @@ class ComboCountAnalysisResult(AnalysisResult):
         texts.append('feature combos for ' + ', '.join(self.features))
         texts.append('\t'.join(self.features + ('#',)))
 
-        for k, v, _ in sorted(self.combo_counts):
-            texts.append('\t'.join(k + (str(v),)))
+        for occ in sorted(self.combo_counts):
+            texts.append('\t'.join(occ.features + (str(occ.sample_ids),)))
 
         texts.append('')
         return "\n".join(texts)
@@ -371,6 +403,9 @@ class ComboCountAnalysis(Analysis):
     Args:
         features: the name of the features over which to perform the analysis
         cls_name: the name of the class
+        method: the bucket strategy, only supports "discrete" for now
+        sample_limit: an upper limit on the number of samples saved
+          in each combo occurrence.
     """
 
     features: tuple[str, ...]
@@ -396,18 +431,16 @@ class ComboCountAnalysis(Analysis):
             if x not in cases[0].features:
                 raise RuntimeError(f"combo analysis: feature {x} not found.")
 
-        combo_map: dict[tuple[str, ...], list] = {}
+        combo_map: defaultdict[tuple[str, ...], list[int]] = defaultdict(list)
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
-            if feat_vals not in combo_map:
-                combo_map[feat_vals] = [0, []]
-            combo_map[feat_vals][0] += 1
-            combo_map[feat_vals][1].append(case.sample_id)
+            combo_map[feat_vals].append(case.sample_id)
 
         combo_list = [
-            (k, v[0], self._subsample_analysis_cases(self.sample_limit, v[1]))
+            ComboOccurence(k, self._subsample_analysis_cases(self.sample_limit, v))
             for k, v in combo_map.items()
         ]
+
         return ComboCountAnalysisResult(
             name='combo(' + ','.join(self.features) + ')',
             level=self.level,

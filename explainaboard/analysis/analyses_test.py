@@ -6,6 +6,7 @@ import unittest
 from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
     ComboCountAnalysisResult,
+    ComboOccurence,
 )
 from explainaboard.analysis.performance import BucketPerformance, Performance
 
@@ -152,7 +153,7 @@ class ComboCountAnalysisResultTest(unittest.TestCase):
                 name="foo",
                 level="bar",
                 features=("feat1", "feat2"),
-                combo_counts=[(("xyz",), 123, list(range(123)))],
+                combo_counts=[ComboOccurence(("xyz",), list(range(3)))],
             )
 
     def test_generate_report(self) -> None:
@@ -161,18 +162,18 @@ class ComboCountAnalysisResultTest(unittest.TestCase):
             level="bar",
             features=("feat1", "feat2"),
             combo_counts=[
-                (("aaa", "bbb"), 123, list(range(123))),
-                (("iii", "jjj"), 456, list(range(123, 123 + 456))),
-                (("xxx", "yyy"), 789, list(range(123 + 456, 123 + 456 + 789))),
+                ComboOccurence(("aaa", "bbb"), list(range(3))),
+                ComboOccurence(("iii", "jjj"), list(range(3, 6))),
+                ComboOccurence(("xxx", "yyy"), list(range(6, 9))),
             ],
         )
         report = textwrap.dedent(
             """\
             feature combos for feat1, feat2
             feat1\tfeat2\t#
-            aaa\tbbb\t123
-            iii\tjjj\t456
-            xxx\tyyy\t789
+            aaa\tbbb\t[0, 1, 2]
+            iii\tjjj\t[3, 4, 5]
+            xxx\tyyy\t[6, 7, 8]
             """
         )
         self.assertEqual(result.generate_report(), report)

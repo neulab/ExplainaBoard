@@ -55,12 +55,12 @@ Sentiment Treebank, a set of sentiment tags over English reviews.
 
 The below example loads the `sst2` dataset from DataLab:
 ```shell
-explainaboard --task text-classification --dataset sst2 --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task text-classification --dataset sst2 --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 The below example loads a dataset from an existing file:
 ```shell
-explainaboard --task text-classification --custom-dataset-paths ./data/system_outputs/sst2/sst2-dataset.tsv --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
+explainaboard --task text-classification --custom-dataset-paths ./data/system_outputs/sst2/sst2-dataset.tsv --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt
 ```
 
 
