@@ -9,6 +9,7 @@ from typing import Any, final, Optional
 import numpy as np
 from scipy.stats import t as stats_t
 
+from explainaboard.serialization.types import SerializableDataclass
 from explainaboard.utils.typing_utils import unwrap_or
 
 
@@ -54,8 +55,11 @@ class MetricResult:
         return ret
 
 
-@dataclass
-class MetricConfig(dict):
+# TODO(tetsuok): Remove the following type-ignore annotation when we update
+# mypy version to 0.980 or newer.
+# See https://github.com/python/mypy/issues/5374 for details.
+@dataclass  # type:ignore
+class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
     """The configuration for a metric.
 
     This can be passed in to the metric either in
@@ -72,20 +76,11 @@ class MetricConfig(dict):
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    cls_name: str | None = None
 
-    def __post_init__(self) -> None:
-        """Set the class name for the metric config."""
-        self.cls_name = type(self).__name__
-
+    @abc.abstractmethod
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        raise NotImplementedError
-
-    @classmethod
-    def dict_conv(cls, k: str, v: Any) -> Any:
-        """Conversion for serialization."""
-        return v
+        ...
 
 
 class MetricStats(metaclass=abc.ABCMeta):

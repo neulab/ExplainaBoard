@@ -5,7 +5,7 @@ import unittest
 
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.registry import (
-    metric_config_from_dict,
+    get_metric_config_serializer,
     metric_config_registry,
 )
 
@@ -13,12 +13,26 @@ from explainaboard.metrics.registry import (
 @dataclass
 @metric_config_registry.register("FooConfig")
 class FooConfig(MetricConfig):
-    pass
+    def to_metric(self):
+        pass
 
 
 class RegistryTest(unittest.TestCase):
-    def test_metric_config_from_dict(self) -> None:
+    def test_serialize(self):
+        serializer = get_metric_config_serializer()
         self.assertEqual(
-            metric_config_from_dict({"cls_name": "FooConfig", "name": "Foo"}),
-            FooConfig("Foo"),
+            serializer.serialize(FooConfig('Foo')),
+            {
+                "cls_name": "FooConfig",
+                "name": "Foo",
+                "source_language": None,
+                "target_language": None,
+            },
+        )
+
+    def test_deserialize(self):
+        serializer = get_metric_config_serializer()
+        self.assertEqual(
+            serializer.deserialize({"cls_name": "FooConfig", "name": "Foo"}),
+            FooConfig('Foo'),
         )

@@ -344,7 +344,7 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
         ValueError: `name` is not registered in neither the registry nor EaaS.
     """
     try:
-        return metric_config_registry.get_type(name)
+        return metric_config_registry.get_type(name)  # type: ignore
     except ValueError:
         if name in eaas.endpoint.EndpointConfig().valid_metrics:
             return EaaSMetricConfig
