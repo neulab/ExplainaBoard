@@ -81,7 +81,7 @@ class QATatMetric(Metric):
 
 
 @dataclass
-@metric_config_registry.register("ExactMatchQATat")
+@metric_config_registry.register("ExactMatchQATatConfig")
 class ExactMatchQATatConfig(MetricConfig):
     """Configuration for ExactMatchQATat."""
 
@@ -108,7 +108,7 @@ class ExactMatchQATat(QATatMetric):
 
 
 @dataclass
-@metric_config_registry.register("F1ScoreQATat")
+@metric_config_registry.register("F1ScoreQATatConfig")
 class F1ScoreQATatConfig(MetricConfig):
     """Configuration for F1ScoreQATat."""
 

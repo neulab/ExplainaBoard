@@ -17,7 +17,7 @@ In order to perform analysis of your results, they should be in the following te
 0
 0
 ```
-where the number represent the index of predicted reply.
+where the number represents the index of the predicted reply.
 
 
 
@@ -35,8 +35,8 @@ explainaboard --task argument-pair-identification --dataset iapi --system-output
 ```
 where
 * `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
-* `--system-outputs`: denote the path of system outputs. Multiple one should be 
-  separated by space, for example, system1 system2
+* `--system-outputs`: denote the path of system outputs. Multiple paths should be 
+  separated by a space, for example, system1 system2
 * `--dataset`: denotes the dataset name
 * `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer
                   like [this one](http://jsonviewer.stack.hu/) for better interpretation.

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Iterable
 from typing import Any
 
@@ -108,10 +109,13 @@ class RankingProcessor(Processor):
         """See Processor.default_metrics."""
         return [AccuracyConfig(name='Accuracy')]
 
-    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+    def _statistics_func(
+        self, samples: Iterable[Any], sys_info: SysOutputInfo
+    ) -> dict[str, Any]:
         """See Processor._statistics_func."""
-        vocab: dict[str, float] = {}
-        length_fre: dict[int, float] = {}
+        vocab: Counter = Counter()
+        length_counts: Counter = Counter()
+
         total_samps = 0
         tokenizer = unwrap(sys_info.source_tokenizer)
         for sample in progress(samples):
@@ -119,22 +123,21 @@ class RankingProcessor(Processor):
             tokens = tokenizer(text)
             length = len(tokens)
 
-            length_fre[length] = length_fre.get(length, 0.0) + 1.0
+            length_counts[length] += 1.0
 
             # update vocabulary
             for w in tokens:
-                vocab[w] = vocab.get(w, 0.0) + 1.0
+                vocab[w] += 1.0
 
             total_samps += 1
 
         # the rank of each word based on its frequency
-        sorted_dict = {
-            key: rank
-            for rank, key in enumerate(sorted(set(vocab.values()), reverse=True), 1)
+        vocab_uniq_counts = sorted(set(vocab.values()), reverse=True)
+        vocab_count_ranks = {
+            count: rank for rank, count in enumerate(vocab_uniq_counts, 1)
         }
-        vocab_rank = {k: sorted_dict[v] for k, v in vocab.items()}
+        vocab_rank = {k: vocab_count_ranks[count] for k, count in vocab.items()}
 
-        for k, v in length_fre.items():
-            length_fre[k] = v * 1.0 / total_samps
+        length_fre = {k: v / total_samps for k, v in length_counts.items()}
 
         return {"vocab": vocab, "vocab_rank": vocab_rank, "length_fre": length_fre}

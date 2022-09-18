@@ -346,7 +346,7 @@ Given an argument, the task aims to identify one matched argument from a list of
 
 **CLI Examples**
 
-The below example loads the [`iapi`](https://github.com/ExpressAI/DataLab/blob/main/datasets/iapi/iapi.py) dataset from DataLab: 
+The example below loads the [`iapi`](https://github.com/ExpressAI/DataLab/blob/main/datasets/iapi/iapi.py) dataset from DataLab: 
 ```shell
 explainaboard --task argument-pair-identification --dataset iapi --system-outputs data/system_outputs/iapi/predictions.txt > report.json
 ```
