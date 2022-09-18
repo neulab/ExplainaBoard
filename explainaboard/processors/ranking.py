@@ -123,11 +123,11 @@ class RankingProcessor(Processor):
             tokens = tokenizer(text)
             length = len(tokens)
 
-            length_counts[length] += 1.0
+            length_counts[length] += 1
 
             # update vocabulary
             for w in tokens:
-                vocab[w] += 1.0
+                vocab[w] += 1
 
             total_samps += 1
 
