@@ -90,8 +90,11 @@ class ConfidenceInterval(MetricValue):
 
     def __post_init__(self) -> None:
         """Validate values of members."""
-        if self.high <= self.low:
-            raise ValueError("`high` must be greater than `low`.")
+        if self.high < self.low:
+            raise ValueError(
+                "`high` must be greater than or equal to `low`. "
+                f"high={self.high}, low={self.low}"
+            )
         if not (0.0 < self.alpha < 1.0):
             raise ValueError("`alpha` must be in between 0.0 and 1.0.")
 
@@ -375,7 +378,7 @@ class SimpleMetricStats(MetricStats):
         return self._data
 
 
-class Metric:
+class Metric(metaclass=abc.ABCMeta):
     """A class representing an evaluation metric."""
 
     def __init__(
@@ -504,7 +507,12 @@ class Metric:
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
             samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+
+            if len(samp_results.shape) != 1:
+                raise ValueError("Invalid sampling results.")
+
             samp_results.sort()
+
             low = int(n_samples * confidence_alpha / 2.0)
             high = int(n_samples * (1.0 - confidence_alpha / 2.0))
             return float(samp_results[low]), float(samp_results[high])
