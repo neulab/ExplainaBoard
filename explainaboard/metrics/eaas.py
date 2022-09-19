@@ -100,7 +100,8 @@ class EaaSMetric(Metric):
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.ndim == 1:
+        is_batched = agg_stats.ndim != 1
+        if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
         n_samples = agg_stats.shape[0]
         if self.config.name in {'bleu', 'chrf'}:
@@ -113,13 +114,14 @@ class EaaSMetric(Metric):
                     metric_class._compute_score_from_stats(list(single_stat)).score
                     / 100.0
                 )
-            return ret_metric
+            calc_result = ret_metric
         elif self.config.name == 'length_ratio':
-            return agg_stats[:, 0] / agg_stats[:, 1]
-        elif self.config.name == 'length':
-            return agg_stats[:, 0]
+            calc_result = agg_stats[:, 0] / agg_stats[:, 1]
         else:
-            return agg_stats
+            calc_result = agg_stats[:, 0]
+        if not is_batched:
+            calc_result = np.squeeze(calc_result, axis=0)
+        return calc_result
 
     def is_simple_average(self, stats: MetricStats):
         """See Metric.is_simple_average."""

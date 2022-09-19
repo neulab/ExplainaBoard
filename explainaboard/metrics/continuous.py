@@ -45,7 +45,9 @@ class RootMeanSquaredError(Metric):
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        return np.sqrt(agg_stats)
+        if agg_stats.shape[-1] != 1:
+            raise ValueError("Invalid shape for aggregate stats {agg_stats.shape}")
+        return np.sqrt(np.squeeze(agg_stats, axis=-1))
 
 
 @dataclass

@@ -60,10 +60,17 @@ class LogProb(Metric):
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.ndim == 1:
+        is_batched = agg_stats.ndim != 1
+        if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
         config = cast(LogProbConfig, unwrap_or(config, self.config))
-        val = agg_stats if agg_stats.size == 1 else agg_stats[:, 0] / agg_stats[:, 1]
+        val = (
+            agg_stats[:, 0]
+            if agg_stats.size == 1
+            else agg_stats[:, 0] / agg_stats[:, 1]
+        )
         if config.ppl:
             val = np.exp(-val)
+        if not is_batched:
+            val = val[0]
         return val
