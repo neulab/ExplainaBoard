@@ -96,7 +96,7 @@ class EaaSMetric(Metric):
 
     _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
@@ -125,7 +125,7 @@ class EaaSMetric(Metric):
         """See Metric.is_simple_average."""
         return self.config.name not in self._NOT_SIMPLE_METRICS
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See: Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if self.config.name in {'bleu', 'chrf'}:

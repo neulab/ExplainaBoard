@@ -269,44 +269,107 @@ class Metric:
         evaluation metric can be calculated later. In the simplest form, this is just
         the evaluation metric value for each example.
 
-        :param true_data: gold-standard data
-        :param pred_data: predicted data
-        :param config: a configuration to over-ride the default for this object
-        :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest
-            case of decomposable eval metrics
+        Args:
+            true_data: gold-standard data
+            pred_data: predicted data
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            A numpy array of shape [len(true_data), X] where X=1 in the simplest case of
+            decomposable eval metrics
         """
         ...
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    @final
+    def aggregate_stats(
+        self, stats: MetricStats
+    ) -> np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any]:
         """Aggregate sufficient statistics from multiple examples into a single example.
 
         Args:
             stats: stats for every example
 
         Returns:
-            Aggregated stats
+            Aggregated stats. Shape must be:
+                - Non-batched data: [num_stats]
+                - Batched data: [batch_size, num_stats]
         """
+        result = self._aggregate_stats(stats)
+
+        if stats.is_batched():
+            stats_shape = stats.get_batch_data().shape
+            result_shape: tuple[int, ...] = (stats_shape[0], stats_shape[2])
+        else:
+            result_shape = (stats.num_statistics(),)
+
+        if result.shape != result_shape:
+            raise RuntimeError(
+                "Detected invalid operation: "
+                f"{type(self).__name__}._aggregate_stats(): "
+                f"Expected shape {result_shape}, but got {result.shape}."
+            )
+
+        return result
+
+    def _aggregate_stats(
+        self, stats: MetricStats
+    ) -> np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any]:
+        """Inner function of aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
-        if data.size == 0:
-            return np.array(0.0)
+        if data.shape[-2] == 0:
+            return np.zeros(
+                shape=data.shape[:-2] + (data.shape[-1],),
+                dtype=np.float32,
+            )
         else:
             return np.mean(data, axis=-2)
 
+    @final
     def calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
+        self,
+        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+        config: Optional[MetricConfig] = None,
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
         """From aggregated sufficient statistics, calculate the metric value.
 
         Args:
             agg_stats: aggregated statistics, either:
-                one-dimensional [metric_size]
-                two-dimensional [batch_size, metric_size]
+                one-dimensional [num_stats]
+                two-dimensional [batch_size, num_stats]
             config: a configuration to over-ride the default for this object
 
         Returns:
-            calculated metric of size 1, or metrics of size [batch_size]
+            Calculated metrics. Shape must be:
+                - Non-batched data: []
+                - Batched data: [batch_size]
         """
-        return agg_stats
+        if agg_stats.ndim not in (1, 2):
+            raise ValueError(f"Invalid shape size: {agg_stats.shape}")
+
+        result = self._calc_metric_from_aggregate(agg_stats, config)
+        result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
+
+        if result.shape != result_shape:
+            raise RuntimeError(
+                "Detected invalid operation: "
+                f"{type(self).__name__}._calc_metric_from_aggregate(): "
+                f"Expected shape {result_shape}, but got {result.shape}."
+            )
+
+        return result
+
+    def _calc_metric_from_aggregate(
+        self,
+        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+        config: Optional[MetricConfig] = None,
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """Inner function of calc_metric_from_aggregate."""
+        if agg_stats.shape[-1] != 1:
+            raise ValueError(
+                "Multiple aggregates can't be integrated without specific algorithms."
+            )
+
+        return agg_stats.squeeze(-1)
 
     def is_simple_average(self, stats: MetricStats):
         """Whether the eval score is a simple average of the sufficient statistics.
@@ -337,8 +400,13 @@ class Metric:
         Returns:
             A confidence interval or `None` if one cannot be calculated.
         """
-        if confidence_alpha <= 0.0 or confidence_alpha >= 1.0:
-            raise ValueError(f'Bad confidence value {confidence_alpha}')
+        if not (0.0 < confidence_alpha < 1.0):
+            raise ValueError(f'Invalid confidence_alpha: {confidence_alpha}')
+
+        if stats.is_batched():
+            raise ValueError(
+                "Confidence interval can't be calculated for batched data."
+            )
 
         stats_data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         num_stats = stats.num_statistics()
@@ -375,6 +443,12 @@ class Metric:
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
             samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+
+            if samp_results.ndim != 1:
+                raise ValueError(
+                    f"Invalid shape of sampled metrics: {samp_results.shape}"
+                )
+
             samp_results.sort()
             low = int(n_samples * confidence_alpha / 2.0)
             high = int(n_samples * (1.0 - confidence_alpha / 2.0))

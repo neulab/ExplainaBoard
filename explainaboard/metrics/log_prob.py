@@ -56,7 +56,7 @@ class LogProb(Metric):
             t = type(pred_data[0])
             raise ValueError(f'Invalid type of pred_data for calc_stats_from_data {t}')
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""

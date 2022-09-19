@@ -41,7 +41,7 @@ class RootMeanSquaredError(Metric):
         """See Metric.is_simple_average."""
         return False
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""

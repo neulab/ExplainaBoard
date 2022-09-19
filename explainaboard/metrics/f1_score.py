@@ -100,7 +100,7 @@ class F1Score(Metric):
                         stats[i, tid * stat_mult + 3] += 1
         return SimpleMetricStats(stats)
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
@@ -185,7 +185,7 @@ class APEF1Score(Metric):
             )
         return SimpleMetricStats(np.array(stats))
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
