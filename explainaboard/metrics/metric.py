@@ -438,7 +438,9 @@ class Metric(metaclass=abc.ABCMeta):
         Returns:
             calculated metric of size 1, or metrics of size [batch_size]
         """
-        return agg_stats
+        if agg_stats.shape[-1] != 1:
+            raise ValueError("Multiple aggregates can't be simply integrated.")
+        return agg_stats.squeeze(-1)
 
     def is_simple_average(self, stats: MetricStats):
         """Whether the eval score is a simple average of the sufficient statistics.
