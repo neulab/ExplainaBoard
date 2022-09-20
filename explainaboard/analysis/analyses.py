@@ -327,16 +327,25 @@ class ComboOccurence:
     """
 
     features: tuple[str, ...]
+    sample_count: int
     sample_ids: list[int]
 
     @staticmethod
     def from_dict(dikt: dict) -> ComboOccurence:
         """Deserialization method."""
-        return ComboOccurence(features=dikt['features'], sample_ids=dikt['sample_ids'])
+        return ComboOccurence(
+            features=dikt['features'],
+            sample_count=dikt['sample_count'],
+            sample_ids=dikt['sample_ids'],
+        )
 
     def __lt__(self, other: ComboOccurence):
         """Implement__lt__ to allow natural sorting."""
-        return (self.features, self.sample_ids) < (other.features, other.sample_ids)
+        return (self.features, self.sample_count, self.sample_ids) < (
+            other.features,
+            self.sample_count,
+            other.sample_ids,
+        )
 
 
 @final
@@ -347,13 +356,13 @@ class ComboCountAnalysisResult(AnalysisResult):
     Attributes:
         features: A tuple of strings, representing the feature names that were
           analyzed
-        combo_counts: A list of tuples. The first tuple element is the feature
+        combo_occurrences: A list of tuples. The first tuple element is the feature
           values corresponding to the feature names in `features`. The second element is
           the count of that feature combination in the corpus.
     """
 
     features: tuple[str, ...]
-    combo_counts: list[ComboOccurence]
+    combo_occurrences: list[ComboOccurence]
     cls_name: Optional[str] = None
 
     @staticmethod
@@ -363,13 +372,15 @@ class ComboCountAnalysisResult(AnalysisResult):
             name=dikt['name'],
             level=dikt['level'],
             features=dikt['features'],
-            combo_counts=[ComboOccurence.from_dict(d) for d in dikt['combo_counts']],
+            combo_occurrences=[
+                ComboOccurence.from_dict(d) for d in dikt['combo_occurrences']
+            ],
         )
 
     def __post_init__(self):
         """Set the class name and validate."""
         num_features = len(self.features)
-        for occ in self.combo_counts:
+        for occ in self.combo_occurrences:
             if len(occ.features) != num_features:
                 raise ValueError(
                     "Inconsistent number of features. "
@@ -385,8 +396,8 @@ class ComboCountAnalysisResult(AnalysisResult):
         texts.append('feature combos for ' + ', '.join(self.features))
         texts.append('\t'.join(self.features + ('#',)))
 
-        for occ in sorted(self.combo_counts):
-            texts.append('\t'.join(occ.features + (str(occ.sample_ids),)))
+        for occ in sorted(self.combo_occurrences):
+            texts.append('\t'.join(occ.features + (str(occ.sample_count),)))
 
         texts.append('')
         return "\n".join(texts)
@@ -437,7 +448,9 @@ class ComboCountAnalysis(Analysis):
             combo_map[feat_vals].append(case.sample_id)
 
         combo_list = [
-            ComboOccurence(k, self._subsample_analysis_cases(self.sample_limit, v))
+            ComboOccurence(
+                k, len(v), self._subsample_analysis_cases(self.sample_limit, v)
+            )
             for k, v in combo_map.items()
         ]
 
@@ -445,7 +458,7 @@ class ComboCountAnalysis(Analysis):
             name='combo(' + ','.join(self.features) + ')',
             level=self.level,
             features=self.features,
-            combo_counts=combo_list,
+            combo_occurrences=combo_list,
         )
 
 
