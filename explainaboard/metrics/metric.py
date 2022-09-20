@@ -211,7 +211,11 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def to_metric(self) -> Metric:
-        """See MetricConfig.to_metric."""
+        """Instantiate a corresponding Metric object.
+
+        Returns:
+            Instantiated Metric object.
+        """
         ...
 
 
@@ -604,11 +608,17 @@ class Metric(metaclass=abc.ABCMeta):
         Returns:
             a resulting metric value
         """
+        if stats.is_batched():
+            raise ValueError("Batched stats can't be evaluated.")
+
         actual_config = unwrap_or(config, self.config)
         agg_stats = self.aggregate_stats(stats)
+        score = self.calc_metric_from_aggregate(agg_stats, actual_config)
+
+        assert score.ndim == 0, "BUG: obtained batched data."
 
         metric_values: dict[str, MetricValue] = {
-            "score": Score(self.calc_metric_from_aggregate(agg_stats, actual_config))
+            "score": Score(float(score)),
         }
 
         if confidence_alpha is not None:

@@ -287,9 +287,13 @@ class BucketAnalysis(Analysis):
                     )
 
                     value = unwrap(metric_result.get_value(Score, "score")).value
-                    ci = unwrap(metric_result.get_value(ConfidenceInterval, "score_ci"))
-                    ci_low = ci.low
-                    ci_high = ci.high
+                    ci = metric_result.get_value(ConfidenceInterval, "score_ci")
+                    if ci is not None:
+                        ci_low = ci.low
+                        ci_high = ci.high
+                    else:
+                        ci_low = None
+                        ci_high = None
 
                 performance = Performance(
                     metric_name=metric_func.config.name,

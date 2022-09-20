@@ -375,13 +375,13 @@ class Processor(metaclass=abc.ABCMeta):
                 )
 
                 value = unwrap(metric_result.get_value(Score, "score")).value
-                ci = unwrap(metric_result.get_value(ConfidenceInterval, "score_ci"))
+                ci = metric_result.get_value(ConfidenceInterval, "score_ci")
 
                 overall_performance = Performance(
                     metric_name=metric_cfg.name,
                     value=value,
-                    confidence_score_low=ci.low,
-                    confidence_score_high=ci.high,
+                    confidence_score_low=ci.low if ci is not None else None,
+                    confidence_score_high=ci.high if ci is not None else None,
                 )
                 my_results.append(overall_performance)
             overall_results.append(my_results)
