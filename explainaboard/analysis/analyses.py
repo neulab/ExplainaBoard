@@ -344,7 +344,7 @@ class ComboOccurence:
 
     def __lt__(self, other: ComboOccurence) -> bool:
         """Implement __lt__ to allow natural sorting."""
-        return (self.features, self.sample_count) < (other.features, self.sample_count)
+        return (self.features, self.sample_count) < (other.features, other.sample_count)
 
 
 @final
