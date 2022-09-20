@@ -323,7 +323,10 @@ class ComboOccurence:
 
     Args:
         features: The feature values that the occurence is counted.
-        sample_ids: List of sample IDs that contain the feature.
+        sample_count: Number of occurrences of the feature.
+        sample_ids: List of sample IDs that has the given feature values
+            This list may contain subsampled IDs to suppress memory
+            efficiency, so `len(sample_ids) <= sample_count`.
     """
 
     features: tuple[str, ...]
@@ -339,13 +342,9 @@ class ComboOccurence:
             sample_ids=dikt['sample_ids'],
         )
 
-    def __lt__(self, other: ComboOccurence):
-        """Implement__lt__ to allow natural sorting."""
-        return (self.features, self.sample_count, self.sample_ids) < (
-            other.features,
-            self.sample_count,
-            other.sample_ids,
-        )
+    def __lt__(self, other: ComboOccurence) -> bool:
+        """Implement __lt__ to allow natural sorting."""
+        return (self.features, self.sample_count) < (other.features, self.sample_count)
 
 
 @final
