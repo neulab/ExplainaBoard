@@ -120,7 +120,7 @@ class EaaSMetric(Metric):
         else:
             calc_result = agg_stats[:, 0]
         if not is_batched:
-            calc_result = np.squeeze(calc_result, axis=0)
+            calc_result = calc_result[0]
         return calc_result
 
     def is_simple_average(self, stats: MetricStats):
