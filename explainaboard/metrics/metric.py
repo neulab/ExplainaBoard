@@ -332,9 +332,9 @@ class Metric:
         """From aggregated sufficient statistics, calculate the metric value.
 
         Args:
-            agg_stats: aggregated statistics, either:
-                one-dimensional [num_stats]
-                two-dimensional [batch_size, num_stats]
+            agg_stats: aggregated statistics. Shape must be:
+                - Non-batched data: [num_stats]
+                - Batched data: [batch_size, num_stats]
             config: a configuration to over-ride the default for this object
 
         Returns:
