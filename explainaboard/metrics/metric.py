@@ -292,7 +292,7 @@ class Metric:
         Returns:
             Aggregated stats. Shape must be:
                 - Non-batched data: [num_stats]
-                - Batched data: [batch_size, num_stats]
+                - Batched data: [num_batches, num_stats]
         """
         result = self._aggregate_stats(stats)
 
@@ -334,13 +334,13 @@ class Metric:
         Args:
             agg_stats: aggregated statistics. Shape must be:
                 - Non-batched data: [num_stats]
-                - Batched data: [batch_size, num_stats]
+                - Batched data: [num_batches, num_stats]
             config: a configuration to over-ride the default for this object
 
         Returns:
             Calculated metrics. Shape must be:
                 - Non-batched data: []
-                - Batched data: [batch_size]
+                - Batched data: [num_batches]
         """
         if agg_stats.ndim not in (1, 2):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
