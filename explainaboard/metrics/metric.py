@@ -302,12 +302,11 @@ class Metric:
         else:
             result_shape = (stats.num_statistics(),)
 
-        if result.shape != result_shape:
-            raise RuntimeError(
-                "Detected invalid operation: "
-                f"{type(self).__name__}._aggregate_stats(): "
-                f"Expected shape {result_shape}, but got {result.shape}."
-            )
+        assert result.shape == result_shape, (
+            "BUG: invalid operation: "
+            f"{type(self).__name__}._aggregate_stats(): "
+            f"Expected shape {result_shape}, but got {result.shape}."
+        )
 
         return result
 
@@ -349,12 +348,11 @@ class Metric:
         result = self._calc_metric_from_aggregate(agg_stats, config)
         result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
 
-        if result.shape != result_shape:
-            raise RuntimeError(
-                "Detected invalid operation: "
-                f"{type(self).__name__}._calc_metric_from_aggregate(): "
-                f"Expected shape {result_shape}, but got {result.shape}."
-            )
+        assert result.shape == result_shape, (
+            "BUG: invalid operation: "
+            f"{type(self).__name__}._calc_metric_from_aggregate(): "
+            f"Expected shape {result_shape}, but got {result.shape}."
+        )
 
         return result
 
