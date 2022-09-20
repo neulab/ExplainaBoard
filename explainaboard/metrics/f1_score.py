@@ -100,14 +100,12 @@ class F1Score(Metric):
                         stats[i, tid * stat_mult + 3] += 1
         return SimpleMetricStats(stats)
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.size == 1:
-            return agg_stats
-
-        if agg_stats.ndim == 1:
+        is_batched = agg_stats.ndim != 1
+        if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
 
         config = cast(F1ScoreConfig, unwrap_or(config, self.config))
@@ -134,6 +132,9 @@ class F1Score(Metric):
 
         if config.average == 'macro':
             f1 = np.mean(f1, axis=1)
+
+        if not is_batched:
+            f1 = f1[0]
 
         return f1
 
@@ -185,7 +186,7 @@ class APEF1Score(Metric):
             )
         return SimpleMetricStats(np.array(stats))
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:

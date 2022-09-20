@@ -159,7 +159,7 @@ class ExternalEval(Metric):
         # self.config.agreement = fleiss_kappa(mat_kappa)
         return fleiss_kappa(mat_kappa)
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
