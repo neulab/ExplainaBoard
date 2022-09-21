@@ -322,7 +322,6 @@ class Metric:
         stats: MetricStats,
         confidence_alpha: float,
         n_samples: int = 1000,
-        prop_samples: float = 0.5,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
         """Calculate the confidence interval of a statistics function.
@@ -331,7 +330,6 @@ class Metric:
             stats: sufficient statistics as calculated by calc_stats_from_data
             confidence_alpha: the inverse confidence level of the confidence interval
             n_samples: the number of bootstrapping samples
-            prop_samples: the proportion of samples to sample each time
             config: a configuration to over-ride the default for this object
 
         Returns:
@@ -366,7 +364,7 @@ class Metric:
             )
         # Do bootstrapping otherwise
         else:
-            n_elems = max(int(prop_samples * len(stats)), 1)
+            n_elems = len(stats)
             all_indices = np.array(range(len(stats)))
             rng = np.random.default_rng()
             all_indices = rng.choice(
