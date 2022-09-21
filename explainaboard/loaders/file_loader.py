@@ -26,8 +26,9 @@ from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
 
 from explainaboard.analysis.analyses import Analysis
-from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.constants import Source
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
@@ -145,7 +146,7 @@ class FileLoaderMetadata:
         custom_features: dict[str, dict[str, FeatureType]] | None = None
         custom_analyses: list[Analysis] | None = None
         if 'custom_features' in data:
-            ft_serializer = get_feature_type_serializer()
+            ft_serializer = PrimitiveSerializer()
             custom_features = {
                 k1: {
                     # See https://github.com/python/mypy/issues/4717
@@ -649,7 +650,7 @@ class DatalabFileLoader(FileLoader):
     ) -> FileLoaderReturn:
         """See FileLoader.load_raw."""
         config = narrow(DatalabLoaderOption, data)
-        ft_serializer = get_feature_type_serializer()
+        ft_serializer = PrimitiveSerializer()
 
         # load customized features from global config files
         customized_features_from_config = get_customized_features()

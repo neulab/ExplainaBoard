@@ -13,12 +13,12 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@metric_config_registry.register("LogProbConfig")
+@common_registry.register("LogProbConfig")
 class LogProbConfig(MetricConfig):
     """Configuration for LogProb metrics.
 

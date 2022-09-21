@@ -14,12 +14,12 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 
 @dataclass
-@metric_config_registry.register("CorrelationConfig")
+@common_registry.register("CorrelationConfig")
 class CorrelationConfig(MetricConfig):
     """Configuration for a correlation.
 
@@ -147,7 +147,7 @@ class CorrelationMetric(Metric):
 
 # TODO: (1) Make Segment/System level configurable (2) Document this function
 @dataclass
-@metric_config_registry.register("KtauCorrelationConfig")
+@common_registry.register("KtauCorrelationConfig")
 class KtauCorrelationConfig(CorrelationConfig):
     """A configuration for KtauCorrelation.
 
@@ -211,7 +211,7 @@ class KtauCorrelation(CorrelationMetric):
 
 
 @dataclass
-@metric_config_registry.register("PearsonCorrelationConfig")
+@common_registry.register("PearsonCorrelationConfig")
 class PearsonCorrelationConfig(CorrelationConfig):
     """A configuration for the PearsonCorrelation metric."""
 

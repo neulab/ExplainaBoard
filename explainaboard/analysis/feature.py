@@ -7,24 +7,12 @@ from collections.abc import Callable
 from enum import Enum
 from typing import Any, final, TypeVar
 
-from explainaboard.serialization.registry import TypeRegistry
-from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.typing_utils import narrow
 
-_feature_type_registry = TypeRegistry[Serializable]()
-
 T = TypeVar("T")
-
-
-def get_feature_type_serializer() -> PrimitiveSerializer:
-    """Returns a serializer object for FeatureTypes.
-
-    Returns:
-        A serializer object.
-    """
-    return PrimitiveSerializer(_feature_type_registry)
 
 
 def _get_value(cls: type[T], data: dict[str, SerializableData], key: str) -> T | None:
@@ -134,7 +122,7 @@ class FeatureType(Serializable, metaclass=ABCMeta):
 
 
 @final
-@_feature_type_registry.register("Sequence")
+@common_registry.register("Sequence")
 class Sequence(FeatureType):
     """A feature consisting of a sequence of features."""
 
@@ -193,7 +181,7 @@ class Sequence(FeatureType):
 
 
 @final
-@_feature_type_registry.register("Dict")
+@common_registry.register("Dict")
 class Dict(FeatureType):
     """A feature that consists of a dictionary of features."""
 
@@ -267,7 +255,7 @@ class DataType(Enum):
 
 
 @final
-@_feature_type_registry.register("Value")
+@common_registry.register("Value")
 class Value(FeatureType):
     """A feature representing a value such as an int, float, or string."""
 
