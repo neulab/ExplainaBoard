@@ -2,13 +2,8 @@
 
 import unittest
 
-from explainaboard.analysis.feature import (
-    DataType,
-    Dict,
-    get_feature_type_serializer,
-    Sequence,
-    Value,
-)
+from explainaboard.analysis.feature import DataType, Dict, Sequence, Value
+from explainaboard.serialization.serializers import PrimitiveSerializer
 
 
 class SequenceTest(unittest.TestCase):
@@ -28,7 +23,7 @@ class SequenceTest(unittest.TestCase):
         self.assertEqual(feature.feature, Value(dtype=DataType.STRING))
 
     def test_serialize(self) -> None:
-        serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
         feature = Sequence(
             feature=Value(dtype=DataType.STRING),
             description="test",
@@ -50,7 +45,7 @@ class SequenceTest(unittest.TestCase):
         self.assertEqual(serializer.serialize(feature), serialized)
 
     def test_deserialize(self) -> None:
-        serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
         feature = Sequence(
             feature=Value(dtype=DataType.STRING),
             description="test",
@@ -89,7 +84,7 @@ class DictTest(unittest.TestCase):
         self.assertEqual(feature.feature, {"foo": Value(dtype=DataType.STRING)})
 
     def test_serialize(self) -> None:
-        serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
         feature = Dict(
             feature={"foo": Value(dtype=DataType.STRING)},
             description="test",
@@ -113,7 +108,7 @@ class DictTest(unittest.TestCase):
         self.assertEqual(serializer.serialize(feature), serialized)
 
     def test_deserialize(self) -> None:
-        serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
         feature = Dict(
             feature={"foo": Value(dtype=DataType.STRING)},
             description="test",
@@ -170,7 +165,7 @@ class ValueTest(unittest.TestCase):
             Value(dtype=DataType.STRING, min_value=1.0)
 
     def test_serialize(self) -> None:
-        serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
         feature = Value(
             dtype=DataType.INT,
             description="test",
@@ -189,7 +184,7 @@ class ValueTest(unittest.TestCase):
         self.assertEqual(serializer.serialize(feature), serialized)
 
     def test_deserialize(self) -> None:
-        serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
         feature = Value(
             dtype=DataType.INT,
             description="test",

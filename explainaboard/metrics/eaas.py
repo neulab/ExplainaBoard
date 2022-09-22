@@ -12,7 +12,7 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 
 _eaas_config = None
 _eaas_client = None
@@ -82,7 +82,7 @@ class EaaSMetricStats(MetricStats):
 
 
 @dataclass
-@metric_config_registry.register("EaaSMetricConfig")
+@common_registry.register("EaaSMetricConfig")
 class EaaSMetricConfig(MetricConfig):
     """Configuration for EaaSMetric."""
 
