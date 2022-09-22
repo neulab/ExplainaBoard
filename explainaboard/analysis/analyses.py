@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import abc
+from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, final, Optional, TypeVar
@@ -11,10 +12,10 @@ import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
-from explainaboard.metrics.registry import get_metric_config_serializer
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
@@ -112,6 +113,25 @@ class Analysis:
                 level=dikt['level'],
                 features=tuple(dikt['features']),
             )
+
+    @staticmethod
+    def _subsample_analysis_cases(
+        sample_limit: int, analysis_cases: list[int]
+    ) -> list[int]:
+        """Sample a subset from a list.
+
+        Args:
+            sample_limit: The maximum number to sample
+            analysis_cases: A list of sample IDs
+
+        Returns:
+            Subsampled list of sample IDs
+        """
+        if len(analysis_cases) > sample_limit:
+            sample_ids = np.random.choice(analysis_cases, sample_limit, replace=False)
+            return sample_ids.tolist()
+        else:
+            return analysis_cases
 
 
 @final
@@ -218,15 +238,6 @@ class BucketAnalysis(Analysis):
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
-    def _subsample_analysis_cases(self, analysis_cases: list[int]) -> list[int]:
-        if len(analysis_cases) > self.sample_limit:
-            sample_ids = np.random.choice(
-                analysis_cases, self.sample_limit, replace=False
-            )
-            return [int(x) for x in sample_ids]
-        else:
-            return analysis_cases
-
     def perform(
         self,
         cases: list[AnalysisCase],
@@ -253,7 +264,9 @@ class BucketAnalysis(Analysis):
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             # Subsample examples to save
-            subsampled_ids = self._subsample_analysis_cases(bucket_collection.samples)
+            subsampled_ids = self._subsample_analysis_cases(
+                self.sample_limit, bucket_collection.samples
+            )
 
             n_samples = len(bucket_collection.samples)
             bucket_performance = BucketPerformance(
@@ -304,6 +317,36 @@ class BucketAnalysis(Analysis):
         )
 
 
+@dataclass(frozen=True)
+class ComboOccurence:
+    """A struct representing occurences of the string tuples.
+
+    Args:
+        features: The feature values that the occurence is counted.
+        sample_count: Number of occurrences of the feature.
+        sample_ids: List of sample IDs that has the given feature values
+            This list may contain subsampled IDs to suppress memory
+            efficiency, so `len(sample_ids) <= sample_count`.
+    """
+
+    features: tuple[str, ...]
+    sample_count: int
+    sample_ids: list[int]
+
+    @staticmethod
+    def from_dict(dikt: dict) -> ComboOccurence:
+        """Deserialization method."""
+        return ComboOccurence(
+            features=dikt['features'],
+            sample_count=dikt['sample_count'],
+            sample_ids=dikt['sample_ids'],
+        )
+
+    def __lt__(self, other: ComboOccurence) -> bool:
+        """Implement __lt__ to allow natural sorting."""
+        return (self.features, self.sample_count) < (other.features, other.sample_count)
+
+
 @final
 @dataclass
 class ComboCountAnalysisResult(AnalysisResult):
@@ -312,13 +355,13 @@ class ComboCountAnalysisResult(AnalysisResult):
     Attributes:
         features: A tuple of strings, representing the feature names that were
           analyzed
-        combo_counts: A list of tuples. The first tuple element is the feature
+        combo_occurrences: A list of tuples. The first tuple element is the feature
           values corresponding to the feature names in `features`. The second element is
           the count of that feature combination in the corpus.
     """
 
     features: tuple[str, ...]
-    combo_counts: list[tuple[tuple[str, ...], int]]
+    combo_occurrences: list[ComboOccurence]
     cls_name: Optional[str] = None
 
     @staticmethod
@@ -328,17 +371,19 @@ class ComboCountAnalysisResult(AnalysisResult):
             name=dikt['name'],
             level=dikt['level'],
             features=dikt['features'],
-            combo_counts=dikt['combo_counts'],
+            combo_occurrences=[
+                ComboOccurence.from_dict(d) for d in dikt['combo_occurrences']
+            ],
         )
 
     def __post_init__(self):
         """Set the class name and validate."""
         num_features = len(self.features)
-        for k, _ in self.combo_counts:
-            if len(k) != num_features:
+        for occ in self.combo_occurrences:
+            if len(occ.features) != num_features:
                 raise ValueError(
                     "Inconsistent number of features. "
-                    f"Required: {num_features}, got: {len(k)}"
+                    f"Required: {num_features}, got: {len(occ.features)}"
                 )
 
         self.cls_name: str = self.__class__.__name__
@@ -350,8 +395,8 @@ class ComboCountAnalysisResult(AnalysisResult):
         texts.append('feature combos for ' + ', '.join(self.features))
         texts.append('\t'.join(self.features + ('#',)))
 
-        for k, v in sorted(self.combo_counts):
-            texts.append('\t'.join(k + (str(v),)))
+        for occ in sorted(self.combo_occurrences):
+            texts.append('\t'.join(occ.features + (str(occ.sample_count),)))
 
         texts.append('')
         return "\n".join(texts)
@@ -368,10 +413,15 @@ class ComboCountAnalysis(Analysis):
     Args:
         features: the name of the features over which to perform the analysis
         cls_name: the name of the class
+        method: the bucket strategy, only supports "discrete" for now
+        sample_limit: an upper limit on the number of samples saved
+          in each combo occurrence.
     """
 
     features: tuple[str, ...]
     cls_name: Optional[str] = None
+    method: str = "discrete"
+    sample_limit: int = 50
 
     def __post_init__(self):
         """Set the class name."""
@@ -391,16 +441,23 @@ class ComboCountAnalysis(Analysis):
             if x not in cases[0].features:
                 raise RuntimeError(f"combo analysis: feature {x} not found.")
 
-        combo_map: dict[tuple[str, ...], int] = {}
+        combo_map: defaultdict[tuple[str, ...], list[int]] = defaultdict(list)
         for case in cases:
             feat_vals = tuple([case.features[x] for x in self.features])
-            combo_map[feat_vals] = combo_map.get(feat_vals, 0) + 1
-        combo_list = list(combo_map.items())
+            combo_map[feat_vals].append(case.sample_id)
+
+        combo_list = [
+            ComboOccurence(
+                k, len(v), self._subsample_analysis_cases(self.sample_limit, v)
+            )
+            for k, v in combo_map.items()
+        ]
+
         return ComboCountAnalysisResult(
             name='combo(' + ','.join(self.features) + ')',
             level=self.level,
             features=self.features,
-            combo_counts=combo_list,
+            combo_occurrences=combo_list,
         )
 
 
@@ -421,19 +478,16 @@ class AnalysisLevel:
     @staticmethod
     def from_dict(dikt: dict):
         """Deserialization method."""
-        ft_serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
 
         features = {
             # See https://github.com/python/mypy/issues/4717
-            k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+            k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
             for k, v in dikt['features'].items()
         }
-        metric_config_serializer = get_metric_config_serializer()
         metric_configs = [
             # See mypy/issues/4717
-            narrow(
-                MetricConfig, metric_config_serializer.deserialize(v)  # type: ignore
-            )
+            narrow(MetricConfig, serializer.deserialize(v))  # type: ignore
             for v in dikt['metric_configs']
         ]
         return AnalysisLevel(

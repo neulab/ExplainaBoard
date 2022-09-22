@@ -16,7 +16,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
 from explainaboard.utils.typing_utils import unwrap_or
 
@@ -81,7 +81,7 @@ class QATatMetric(Metric):
 
 
 @dataclass
-@metric_config_registry.register("ExactMatchQATatConfig")
+@common_registry.register("ExactMatchQATatConfig")
 class ExactMatchQATatConfig(MetricConfig):
     """Configuration for ExactMatchQATat."""
 
@@ -108,7 +108,7 @@ class ExactMatchQATat(QATatMetric):
 
 
 @dataclass
-@metric_config_registry.register("F1ScoreQATatConfig")
+@common_registry.register("F1ScoreQATatConfig")
 class F1ScoreQATatConfig(MetricConfig):
     """Configuration for F1ScoreQATat."""
 

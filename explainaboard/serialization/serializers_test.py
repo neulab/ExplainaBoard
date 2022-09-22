@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import unittest
 
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.registry import TypeRegistry
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import (
@@ -110,6 +111,10 @@ class WithClsName(Serializable):
 
 
 class PrimitiveSerializerTest(unittest.TestCase):
+    def test_init_with_default_registry(self) -> None:
+        s = PrimitiveSerializer()
+        self.assertIs(s._registry, common_registry)
+
     def test_serialize_primitives(self) -> None:
         s = PrimitiveSerializer(test_registry)
 

@@ -14,7 +14,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap_or
 
 
@@ -38,7 +38,7 @@ class RankingMetric(Metric, metaclass=abc.ABCMeta):
 
 
 @dataclass
-@metric_config_registry.register("HitsConfig")
+@common_registry.register("HitsConfig")
 class HitsConfig(MetricConfig):
     """Configuration for Hits.
 
@@ -84,7 +84,7 @@ class Hits(RankingMetric):
 
 
 @dataclass
-@metric_config_registry.register("MeanReciprocalRankConfig")
+@common_registry.register("MeanReciprocalRankConfig")
 class MeanReciprocalRankConfig(MetricConfig):
     """Configuration for MeanReciprocalRank."""
 
@@ -124,7 +124,7 @@ class MeanReciprocalRank(RankingMetric):
 
 
 @dataclass
-@metric_config_registry.register("MeanRankConfig")
+@common_registry.register("MeanRankConfig")
 class MeanRankConfig(MetricConfig):
     """Configuration for MeanReciprocalRank."""
 
