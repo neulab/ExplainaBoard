@@ -10,6 +10,7 @@ from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.utils import cache_api
+from explainaboard.utils.typing_utils import unwrap
 
 
 class NERTest(unittest.TestCase):
@@ -19,8 +20,9 @@ class NERTest(unittest.TestCase):
     conll_output_full = os.path.join(artifact_path, "conll2003-elmo-output.conll")
 
     json_output_customized = cache_api.cache_online_file(
-        'https://phontron.com/download/explainaboard/test-conll03.json',
-        'predictions/ner/test-conll03.json',
+        'https://storage.googleapis.com/inspired-public-data/'
+        'explainaboard/task_data/named_entity_recognition/test-conll03.json',
+        'explainaboard/task_data/named_entity_recognition/test-conll03.json',
     )
 
     def test_generate_system_analysis(self):
@@ -41,7 +43,7 @@ class NERTest(unittest.TestCase):
             "metric_names": ["F1Score"],
         }
         processor = get_processor(TaskType.named_entity_recognition)
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -94,14 +96,15 @@ class NERTest(unittest.TestCase):
         # 3. Unittest: test detailed bucket information: bucket interval
         # [0.007462686567164179,0.9565217391304348]
         second_bucket = span_econ_analysis.bucket_performances[1]
+        second_bucket_interval = unwrap(second_bucket.bucket_interval)
         self.assertAlmostEqual(
-            second_bucket.bucket_interval[0],
+            second_bucket_interval[0],
             0.007462686567164179,
             4,
             "almost equal",
         )
         self.assertAlmostEqual(
-            second_bucket.bucket_interval[1],
+            second_bucket_interval[1],
             0.8571428571428571,
             4,
             "almost equal",
@@ -118,7 +121,7 @@ class NERTest(unittest.TestCase):
         for bucket_vals in sys_info.results.analyses:
             if not isinstance(bucket_vals, BucketAnalysisResult):
                 continue
-            for bucket in cast(BucketAnalysisResult, bucket_vals).bucket_performances:
+            for bucket in bucket_vals.bucket_performances:
                 for performance in bucket.performances:
                     if performance.confidence_score_low is not None:
                         self.assertGreaterEqual(

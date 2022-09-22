@@ -1,3 +1,5 @@
+"""Classes to hold information from analyses, etc."""
+
 from __future__ import annotations
 
 import copy
@@ -6,15 +8,16 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from explainaboard import config
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
+from explainaboard.serialization.legacy import general_to_dict
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.logging import get_logger
-from explainaboard.utils.serialization import general_to_dict
 from explainaboard.utils.tokenizer import Tokenizer
 
 logger = get_logger(__name__)
@@ -22,18 +25,26 @@ logger = get_logger(__name__)
 
 @dataclass
 class Table:
+    """A table of information.
+
+    Attributes:
+        table: A dictionary holding the table.
+    """
+
     table: Optional[dict] = None
 
 
 @dataclass
 class PaperInfo:
-    """
-    "year": "xx",
-    "venue": "xx",
-    "title": "xx",
-    "author": "xx",
-    "url": "xx",
-    "bib": "xx"
+    """Information about a paper.
+
+    Attributes:
+        year: the year the paper was published
+        venue: where the paper was published
+        title: the title of the paper
+        author: the author(s) of the paper
+        url: the url where the paper can be found
+        bib: bibliography information
     """
 
     year: Optional[str] = None
@@ -46,7 +57,7 @@ class PaperInfo:
 
 @dataclass
 class SysOutputInfo:
-    """Information about a system output and its analysis settings
+    """Information about a system output and its analysis settings.
 
     Attributes:
         task_name (str): the name of the task.
@@ -72,7 +83,7 @@ class SysOutputInfo:
     source_language: str | None = None
     target_language: str | None = None
     reload_stat: bool = True
-    conf_value: float = 0.05
+    confidence_alpha: float = 0.05
     system_details: Optional[dict] = None
     source_tokenizer: Optional[Tokenizer] = None
     target_tokenizer: Optional[Tokenizer] = None
@@ -83,6 +94,7 @@ class SysOutputInfo:
     results: Result = field(default_factory=lambda: Result())
 
     def to_dict(self) -> dict:
+        """Serialization function."""
         ret_dict = {}
         for f in dataclasses.fields(self):
             obj = getattr(self, f.name)
@@ -91,6 +103,7 @@ class SysOutputInfo:
         return ret_dict
 
     def replace_nonstring_keys(self, data):
+        """Function to replace keys that are not strings for serialization to JSON."""
         if isinstance(data, list):
             for value in data:
                 if isinstance(value, dict):
@@ -155,29 +168,31 @@ class SysOutputInfo:
         with open(file_path, "wb") as f:
             self._dump_info(f)
 
-    def print_as_json(self, file=None):
+    def print_as_json(self, file=None) -> None:
+        """Print as json to the specified file.
+
+        Args:
+            file: The file stream to print to, or None for stdout.
+
+        Raises:
+            TypeError: If the data dict can not be written to.
+        """
         if file is None:
             file = sys.stdout
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
-        try:
-            json.dump(data_dict, fp=file, indent=2, default=lambda x: x.json_repr())
-        except TypeError as e:
-            raise e
+        json.dump(data_dict, fp=file, indent=2)
 
     def _dump_info(self, file):
-        """SystemOutputInfo => JSON"""
+        """Convert SystemOutputInfo => JSON."""
         data_dict = self.to_dict()
         self.replace_nonstring_keys(data_dict)
-        file.write(
-            json.dumps(data_dict, indent=2, default=lambda x: x.json_repr()).encode(
-                "utf-8"
-            )
-        )
+        file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
 
     @classmethod
     def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
         """Create SysOutputInfo from the JSON file in `sys_output_info_dir`.
+
         Args:
             sys_output_info_dir (`str`): The directory containing the metadata file.
                 This should be the root directory of a specific dataset version.
@@ -197,18 +212,24 @@ class SysOutputInfo:
         return cls.from_dict(data_dict)
 
     @classmethod
-    def dict_conv(cls, k: str, v: dict):
-        """
+    def dict_conv(cls, k: str, v: Any) -> Any:
+        """Deserialization utility function.
+
         A deserialization utility function that takes in a key corresponding to a
         parameter name, and dictionary corresponding to a serialized version of that
         parameter's value, then return the deserialized version of the value.
-        :param k: the parameter name
-        :param v: the parameter's value
+
+        Args:
+            k: the parameter name
+            v: the parameter's value
+
+        Returns:
+            The modified parameter value
         """
         if k == 'results':
             return Result.from_dict(v)
         elif k.endswith('tokenizer'):
-            return Tokenizer.from_dict(v)
+            return PrimitiveSerializer().deserialize(v)
         elif k == 'analysis_levels':
             return [AnalysisLevel.from_dict(v1) for v1 in v]
         elif k == 'analyses':
@@ -218,12 +239,14 @@ class SysOutputInfo:
 
     @classmethod
     def from_dict(cls, data_dict: dict) -> SysOutputInfo:
+        """Deserialization function."""
         field_names = set(f.name for f in dataclasses.fields(cls))
         return cls(
             **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
         )
 
-    def update(self, other_sys_output_info: "SysOutputInfo", ignore_none=True):
+    def update(self, other_sys_output_info: SysOutputInfo, ignore_none=True):
+        """Update with another SysOutputInfo."""
         self_dict = self.__dict__
         self_dict.update(
             **{
@@ -233,12 +256,21 @@ class SysOutputInfo:
             }
         )
 
-    def copy(self) -> "SysOutputInfo":
+    def copy(self) -> SysOutputInfo:
+        """Create a new copy of the SysOutputInfo."""
         return self.__class__(**{k: copy.deepcopy(v) for k, v in self.__dict__.items()})
 
 
 @dataclass
 class OverallStatistics:
+    """Overall statistics calculated by the processor.
+
+    Attributes:
+        sys_info: The system info
+        analysis_cases: The extracted analysis cases
+        metric_stats: The statistics needed to calculate each metric
+    """
+
     sys_info: SysOutputInfo
     analysis_cases: list[list[AnalysisCase]]
     metric_stats: list[list[MetricStats]]

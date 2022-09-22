@@ -37,7 +37,7 @@ class ExtractiveQATest(unittest.TestCase):
             "task_name": TaskType.qa_extractive,
             "dataset_name": "squad",
             "metric_names": ["F1ScoreQA", "ExactMatchQA"],
-            # "language":"en"
+            "source_language": "en",
         }
 
         processor = get_processor(TaskType.qa_extractive)

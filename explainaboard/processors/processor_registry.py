@@ -1,7 +1,8 @@
+"""A registry for processors."""
+
 from __future__ import annotations
 
 from explainaboard import TaskType
-from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.serialization.registry import TypeRegistry
 
@@ -9,9 +10,15 @@ processor_registry = TypeRegistry[Processor]()
 
 
 def get_processor(task: TaskType | str) -> Processor:
-    """
-    return a processor based on the task type
+    """Return a processor based on the task type.
+
     TODO: error handling
+
+    Args:
+        task: The type of task
+
+    Returns:
+        The processor for that task
     """
     processor_class = processor_registry.get_type(task.name)
     return processor_class()

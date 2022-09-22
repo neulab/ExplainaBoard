@@ -12,7 +12,6 @@
             "is_bucket": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "text": {
@@ -21,7 +20,6 @@
             "is_bucket": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "true_label": {
@@ -32,7 +30,6 @@
             ],
             "description": null,
             "names_file": null,
-            "id": null,
             "is_bucket": false,
             "is_pre_computed": false,
             "bucket_info": null,
@@ -46,7 +43,6 @@
             ],
             "description": null,
             "names_file": null,
-            "id": null,
             "is_bucket": false,
             "is_pre_computed": false,
             "bucket_info": null,
@@ -62,7 +58,6 @@
                 "_number": 4,
                 "_setting": 1
             },
-            "id": null,
             "_type": "Value"
         },
         "sentence_length": {
@@ -75,7 +70,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "token_number": {
@@ -88,7 +82,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "entity_number": {
@@ -101,7 +94,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "aspect_length": {
@@ -114,7 +106,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "aspect_index": {
@@ -127,7 +118,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         }
     },

@@ -1,6 +1,5 @@
-from explainaboard import TaskType
+"""A list of table schemas.
 
-"""
 Each schema is a list of dictionary, which is used to instruct how to print bucket-level
 cases in the frontend table (the number of list denotes the number of table columns)
 Currently, the table schema is characterized by:
@@ -30,6 +29,9 @@ nested dict, for example supposing we have `system_output` file and `sample_id`,
 can get "answer"
 answer = system_output[A][B]
 """
+
+
+from explainaboard import TaskType
 
 table_schemas = {}
 """Text Classification

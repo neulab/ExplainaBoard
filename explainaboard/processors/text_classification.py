@@ -1,8 +1,9 @@
+"""A processor for the text classification task."""
+
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-from datalabs import aggregating
+from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -32,46 +33,50 @@ from explainaboard.utils.typing_utils import unwrap
 
 @processor_registry.register("text_classification")
 class TextClassificationProcessor(Processor):
+    """A processor for the text classification task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.text_classification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the text of the example",
             ),
             "true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the true label of the input",
             ),
             "predicted_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="the predicted label",
             ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['text']),
             ),
             "text_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in characters",
                 func=lambda info, x, c: len(x['text']),
             ),
             "basic_words": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the ratio of basic words",
                 func=lambda info, x, c: get_basic_words(x['text']),
             ),
             "lexical_richness": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="lexical diversity",
                 func=lambda info, x, c: get_lexical_richness(x['text']),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -79,7 +84,7 @@ class TextClassificationProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "the average rank of each word based on its frequency in "
                     "training set"
@@ -90,7 +95,7 @@ class TextClassificationProcessor(Processor):
                 ),
             ),
             "length_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the frequency of text length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(
@@ -108,6 +113,7 @@ class TextClassificationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         features = self.default_analysis_levels()[0].features
         # Create analyses
         analyses: list[Analysis] = [
@@ -131,10 +137,10 @@ class TextClassificationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [AccuracyConfig(name='Accuracy')]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

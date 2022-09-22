@@ -34,12 +34,12 @@ class TextClassificationProcessor(Processor):
         # ---- Features ----
         features: dict[str, FeatureType] = {
             "chars_per_word": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="character count divided by token count",
                 func=lambda info, x, c: float(len(x['text'])) / count_tokens(info, x['text']),
             ),
             "contains_question": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="",
                 func=lambda info, x, c: "yes" if "?" in x['text'] else "no",
             ),
@@ -91,3 +91,7 @@ If you want to add features that are dependent on the training set, you will nee
 
 It is probably best to learn by example, so you can take a look at `get_num_oov` in
 `processors/text_classification.py`.
+
+## Add Custom Features
+
+If you want to add system/dataset-related features that don't apply to the task itself, check [add_custom_features](add_custom_features.md)

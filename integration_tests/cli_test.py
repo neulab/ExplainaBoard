@@ -73,7 +73,7 @@ class CLITest(TestCase):
                     '--dataset',
                     'sst2',
                     '--report-json',
-                    str(reports_dir / f'sst2-{sysname}-output.json'),  # noqa
+                    str(reports_dir / f'sst2-{sysname}-output.json'),
                 ]
                 with patch('sys.argv', args):
                     explainaboard.explainaboard_main.main()
@@ -99,6 +99,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/sst2/sst2-dataset.tsv',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -160,6 +161,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/snli/snli-dataset.tsv',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -178,6 +180,7 @@ class CLITest(TestCase):
             'chrf',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -185,8 +188,9 @@ class CLITest(TestCase):
     @unittest.skipUnless('cli_all' in OPTIONAL_TEST_SUITES, reason='time consuming')
     def test_summ_datalab(self):
         filename = cache_online_file(
-            'http://www.phontron.com/download/cnndm-bart-output.txt',
-            'tests/cnndm-bart-output.txt',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
         )
         args = [
             'explainaboard.explainaboard_main',
@@ -217,6 +221,7 @@ class CLITest(TestCase):
             'bleu',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -236,6 +241,7 @@ class CLITest(TestCase):
             f"{top_path}/data/system_outputs/conala/conala-baseline-output.json",
             "--report-json",
             "report.json",
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -268,6 +274,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/wikitext/wikitext-sys1-output.txt',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -300,6 +307,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/conll2003/conll2003-elmo-output.conll',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -332,6 +340,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/fig_qa/fig_qa-gptneo-output.json',  # noqa
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -347,6 +356,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/squad/squad_mini-example-output.json',
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()
@@ -381,6 +391,7 @@ class CLITest(TestCase):
             f'{top_path}/data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json',  # noqa
             '--report-json',
             '/dev/null',
+            '--skip-failed-analyses',
         ]
         with patch('sys.argv', args):
             explainaboard.explainaboard_main.main()

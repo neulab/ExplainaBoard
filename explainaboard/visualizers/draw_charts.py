@@ -1,5 +1,4 @@
-"""
-draw_charts.py
+"""draw_charts.py.
 
 This is a program that takes in an ExplainaBoard report or reports and outputs visual
 summaries of the included analyses.
@@ -22,6 +21,9 @@ import argparse
 import json
 import os
 
+# NOTE(odashi): List is required to set the first argument of cast() in Python 3.8.
+from typing import cast, List
+
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -40,13 +42,12 @@ from explainaboard.visualizers.bar_chart import make_bar_chart
 def plot_combo_counts(
     combo_results: list[ComboCountAnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
-    """
-    Plot combo count results
-    :param combo_results: The analyses to write out
-    :param output_dir: The directory to write to
-    :param sys_names: The names of the systems
-    """
+    """Plot combo count results.
 
+    combo_results: The analyses to write out
+    output_dir: The directory to write to
+    sys_names: The names of the systems
+    """
     # get feature maps
     if any(x.features != combo_results[0].features for x in combo_results):
         raise ValueError(
@@ -56,9 +57,10 @@ def plot_combo_counts(
     feature_names = combo_results[0].features
     feature_maps: list[dict[str, int]] = [dict() for _ in feature_names]
     for combo_result in combo_results:
-        for feats, count in unwrap(combo_result.combo_counts):
+        for occ in combo_result.combo_occurrences:
+            feats = occ.features
             for feat, featmap in zip(feats, feature_maps):
-                featmap[feat] = featmap.get(feat, 0) + count
+                featmap[feat] = featmap.get(feat, 0) + occ.sample_count
     # sort in descending order of frequency of each feature map
     sorted_names = [
         [v[0] for v in sorted(x.items(), key=lambda y: -y[1])] for x in feature_maps
@@ -81,17 +83,20 @@ def plot_combo_counts(
                 f'plot_combo_counts currently only supports feature combinations of '
                 f'size 2, but got {feature_names}'
             )
-        conf_matrix = np.zeros([len(x) for x in feature_maps])
-        for feats, count in unwrap(combo_result.combo_counts):
-            conf_matrix[feature_maps[0][feats[0]], feature_maps[1][feats[1]]] = count
+        confusion_matrix = np.zeros([len(x) for x in feature_maps])
+        for occ in combo_result.combo_occurrences:
+            feats = occ.features
+            confusion_matrix[
+                feature_maps[0][feats[0]], feature_maps[1][feats[1]]
+            ] = occ.sample_count
         fig, ax = plt.subplots(figsize=(7.5, 7.5))
-        ax.matshow(conf_matrix, cmap=plt.cm.Blues, alpha=0.3)
-        for i in range(conf_matrix.shape[0]):
-            for j in range(conf_matrix.shape[1]):
+        ax.matshow(confusion_matrix, cmap=plt.cm.Blues, alpha=0.3)
+        for i in range(confusion_matrix.shape[0]):
+            for j in range(confusion_matrix.shape[1]):
                 ax.text(
                     x=j,
                     y=i,
-                    s=conf_matrix[i, j],
+                    s=confusion_matrix[i, j],
                     va='center',
                     ha='center',
                     size='xx-large',
@@ -109,19 +114,35 @@ def plot_combo_counts(
         plt.savefig(out_file, format='png', bbox_inches='tight')
 
 
+def render_interval_to_tick_label(interval: tuple[float, float]) -> str:
+    """Render a bucket interval (tuple of floats) to a tick label to display.
+
+    Args:
+        interval: the input value range
+
+    Returns:
+        a string-rendered tick label
+    """
+    return f'[{interval[0]:.2f},{interval[0]:.2f}]'
+
+
 def plot_buckets(
     bucket_results: list[BucketAnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
-    """
-    Plot bucket results in a bar chart
-    :param bucket_results: The analyses to write out
-    :param output_dir: The directory to write to
-    :param sys_names: The names of the systems
+    """Plot bucket results in a bar chart.
+
+    Args:
+        bucket_results: The analyses to write out
+        output_dir: The directory to write to
+        sys_names: The names of the systems
     """
     feature_name = bucket_results[0].name
 
-    bucket0_intervals = [
-        x.bucket_interval for x in bucket_results[0].bucket_performances
+    bucket0_ticklabels: list[str] = [
+        x.bucket_name
+        if x.bucket_name is not None
+        else render_interval_to_tick_label(unwrap(x.bucket_interval))
+        for x in bucket_results[0].bucket_performances
     ]
     bucket0_names = [
         x.metric_name for x in bucket_results[0].bucket_performances[0].performances
@@ -154,7 +175,7 @@ def plot_buckets(
             errs=y_errs,
             title=None,
             xlabel=feature_name,
-            xticklabels=bucket0_intervals,
+            xticklabels=bucket0_ticklabels,
             ylabel=metric_name,
         )
 
@@ -162,13 +183,13 @@ def plot_buckets(
 def draw_charts_from_reports(
     reports: list[str], output_dir: str, sys_names: list[str] | None = None
 ) -> None:
-    """
-    Draw bar charts from report file generated from ExplainaBoard
-    :param reports: Reports to plot
-    :param output_dir:
-    :return:
-    """
+    """Draw bar charts from report file generated from ExplainaBoard.
 
+    Args:
+        reports: Reports to plot
+        output_dir: The directory where the plots should be written
+        sys_names: The names of the systems to write in the plots
+    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -231,16 +252,26 @@ def draw_charts_from_reports(
                 f'mismatched analyses: {[x.name for x in analysis_result]}'
             )
 
+        analysis_result_list = list(analysis_result)
+
         if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
-            plot_buckets(analysis_result, output_dir, sys_names)
+            plot_buckets(
+                cast(List[BucketAnalysisResult], analysis_result_list),
+                output_dir,
+                sys_names,
+            )
         elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
-            plot_combo_counts(analysis_result, output_dir, sys_names)
+            plot_combo_counts(
+                cast(List[ComboCountAnalysisResult], analysis_result_list),
+                output_dir,
+                sys_names,
+            )
         else:
             raise ValueError('illegal types of analyses')
 
 
 def main():
-
+    """Main function."""
     parser = argparse.ArgumentParser(
         description='Draw Histogram for ExplainaBoard Report'
     )

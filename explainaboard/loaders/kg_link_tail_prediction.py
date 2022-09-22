@@ -1,3 +1,5 @@
+"""Loaders for knowledge graph link prediction tasks."""
+
 from __future__ import annotations
 
 import json
@@ -18,9 +20,7 @@ from explainaboard.utils.preprocessor import KGMapPreprocessor
 
 @register_loader(TaskType.kg_link_tail_prediction)
 class KgLinkTailPredictionLoader(Loader):
-    """
-    Validate and Reformat system output file with json format:
-    "head \t relation \t trueTail": [predTail1, predTail2, ..., predTail5],
+    """Loader for the knowledge graph link prediction task.
 
     usage:
         please refer to `test_loaders.py`
@@ -35,18 +35,21 @@ class KgLinkTailPredictionLoader(Loader):
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """See Loader.default_output_file_type."""
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
-
+        """See Loader.default_dataset_file_loaders."""
         file_path = cache_api.cache_online_file(
-            'http://phontron.com/download/explainaboard/pre_computed/kg/entity2wikidata.json',  # noqa
-            'pre_computed/kg/entity2wikidata.json',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
             entity_dic = json.loads(file.read())
@@ -97,6 +100,7 @@ class KgLinkTailPredictionLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         target_field_names = ["predict", "predictions", "true_rank"]
         return {
             FileType.json: JSONFileLoader(

@@ -24,7 +24,7 @@ overall_res = unwrap(sys_info.results.overall)
 # print bucket information
 for analysis in fine_grained_res:
     if analysis is not None:
-        analysis.print()
+        print(analysis.generate_report())
 
 # save analysis report locally
 sys_info.print_as_json(file=open("./report.json", 'w'))
@@ -57,11 +57,12 @@ for analyses in fine_grained_res:
             confidence_score_high = bucket_performance.confidence_score_high
 
             print("------------------------------------------------------")
+
+            bucket_name = unwrap(bucket_info.bucket_name)
+            print(f"feature_name:{buckets.name} bucket_name:{bucket_name}")
+
             print(
-                f"feature_name:{buckets.name} "
-                f"bucket_name:{bucket_info.bucket_interval}"
-            )
-            print(
+                "\n"
                 f"metric_name:{metric_name}\n"
                 f"value:{value}\n"
                 f"confidence_score_low:{confidence_score_low}\n"

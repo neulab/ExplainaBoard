@@ -9,7 +9,7 @@
     "reload_stat": true,
     "is_print_case": true,
     "language": "es",
-    "conf_value": 0.05,
+    "confidence_alpha": 0.05,
     "features": {
         "text": {
             "dtype": "string",
@@ -18,7 +18,6 @@
             "require_training_set": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "true_label": {
@@ -29,7 +28,6 @@
             ],
             "description": null,
             "names_file": null,
-            "id": null,
             "is_bucket": false,
             "require_training_set": false,
             "is_pre_computed": false,
@@ -44,7 +42,6 @@
             ],
             "description": null,
             "names_file": null,
-            "id": null,
             "is_bucket": false,
             "require_training_set": false,
             "is_pre_computed": false,
@@ -62,7 +59,6 @@
                 "number": 4,
                 "setting": 1
             },
-            "id": null,
             "_type": "Value"
         },
         "text1_length": {
@@ -76,7 +72,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "text2_length": {
@@ -90,7 +85,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "similarity": {
@@ -104,7 +98,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "text1_divided_text2": {
@@ -118,7 +111,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "num_oov": {
@@ -132,7 +124,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "fre_rank": {
@@ -146,7 +137,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         }
     },

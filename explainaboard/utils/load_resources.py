@@ -1,3 +1,5 @@
+"""Code for loading resources."""
+
 import json
 import os
 from typing import Optional
@@ -6,9 +8,10 @@ from explainaboard.config import CUSTOMIZED_FEATURES_CONFIG_FILE
 
 
 def get_customized_features(path_file: Optional[str] = None) -> dict:
-    """
-    get customized features from configure file
-    :return: a dict
+    """Get customized features from configuration file.
+
+    Returns:
+        A dictionary of customized features.
     """
     customized_feature_config_file = (
         os.path.join(

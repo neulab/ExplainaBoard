@@ -24,7 +24,7 @@ class MetricTest(unittest.TestCase):
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
     def test_correct_score(self):
@@ -33,7 +33,7 @@ class MetricTest(unittest.TestCase):
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.value, 4)
 
     def test_seq_correct_score(self):
@@ -80,7 +80,7 @@ class MetricTest(unittest.TestCase):
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
 
         sklearn_f1 = f1_score(true, pred, average='micro')
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_f1_macro(self):
@@ -90,14 +90,14 @@ class MetricTest(unittest.TestCase):
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
         sklearn_f1 = f1_score(true, pred, average='macro')
-        result = metric.evaluate(true, pred, conf_value=None)
+        result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(result.value, sklearn_f1)
 
     def test_hits(self):
         metric = explainaboard.metrics.ranking.HitsConfig(name='Hits').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.value, 4.0 / 6.0)
 
     def test_mrr(self):
@@ -106,7 +106,7 @@ class MetricTest(unittest.TestCase):
         ).to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
-        result = metric.evaluate(true, pred, conf_value=0.05)
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.value, 2.5 / 6.0)
 
     def test_ner_f1(self):
@@ -123,13 +123,13 @@ class MetricTest(unittest.TestCase):
         metric = explainaboard.metrics.f1_score.SeqF1ScoreConfig(
             name='MicroF1', average='micro', tag_schema='bio'
         ).to_metric()
-        result = metric.evaluate(true, pred, conf_value=None)
+        result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(result.value, 2.0 / 3.0)
 
         metric = explainaboard.metrics.f1_score.SeqF1ScoreConfig(
             name='MacroF1', average='macro', tag_schema='bio'
         ).to_metric()
-        result = metric.evaluate(true, pred, conf_value=None)
+        result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(result.value, 3.0 / 4.0)
 
     def _get_eaas_request(
@@ -237,6 +237,7 @@ class MetricTest(unittest.TestCase):
             "task_name": TaskType.qa_extractive.value,
             "dataset_name": "squad",
             "metric_names": ["F1ScoreQA", "ExactMatchQA"],
+            "source_language": "en",
         }
 
         processor = get_processor(TaskType.qa_extractive)

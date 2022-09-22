@@ -46,13 +46,13 @@ class SummarizationTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.summarization.value,
-            "dataset_name": "cnndm",
+            "dataset_name": "cnn_dailymail",
             "metric_names": ["bleu"],
         }
 
         processor = get_processor(TaskType.summarization.value)
 
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)
@@ -79,8 +79,9 @@ class SummarizationTest(unittest.TestCase):
     def test_datalab_loader(self):
 
         json_output_customized = cache_api.cache_online_file(
-            'http://www.phontron.com/download/cnndm-bart-output.txt',
-            'predictions/summarization/cnndm-bart-output.txt',
+            'https://storage.googleapis.com/inspired-public-data/'
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
+            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
         )
 
         loader = get_loader_class(TaskType.summarization).from_datalab(

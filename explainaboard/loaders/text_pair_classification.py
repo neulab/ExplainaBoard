@@ -1,3 +1,5 @@
+"""Loaders for the text pair classification task."""
+
 from __future__ import annotations
 
 from explainaboard import TaskType
@@ -16,9 +18,7 @@ from explainaboard.loaders.loader_registry import register_loader
 
 @register_loader(TaskType.text_pair_classification)
 class TextPairClassificationLoader(Loader):
-    """
-    Validate and Reformat system output file with tsv format:
-    text \t true_label \t predicted_label
+    """Loader for the text pair classification task.
 
     usage:
         please refer to `test_loaders.py`
@@ -26,10 +26,12 @@ class TextPairClassificationLoader(Loader):
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.tsv
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         target_names = ["text1", "text2", "true_label"]
         return {
             FileType.tsv: TSVFileLoader(
@@ -57,6 +59,7 @@ class TextPairClassificationLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         field_name = "predicted_label"
         return {
             FileType.text: TextFileLoader(field_name, str),
