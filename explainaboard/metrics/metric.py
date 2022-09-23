@@ -291,16 +291,21 @@ class Metric:
 
         Returns:
             Aggregated stats. Shape must be:
-                - Non-batched data: [num_stats]
-                - Batched data: [num_batches, num_stats]
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
         """
         result = self._aggregate_stats(stats)
 
-        if stats.is_batched():
-            stats_shape = stats.get_batch_data().shape
-            result_shape: tuple[int, ...] = (stats_shape[0], stats_shape[2])
-        else:
-            result_shape = (stats.num_statistics(),)
+        num_stats = (
+            result.shape[-1]
+            if self.uses_customized_aggregate()
+            else stats.num_statistics()
+        )
+        result_shape = (
+            (stats.get_batch_data().shape[0], num_stats)
+            if stats.is_batched()
+            else (num_stats,)
+        )
 
         assert result.shape == result_shape, (
             "BUG: invalid operation: "
@@ -333,8 +338,8 @@ class Metric:
 
         Args:
             agg_stats: aggregated statistics. Shape must be:
-                - Non-batched data: [num_stats]
-                - Batched data: [num_batches, num_stats]
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
             config: a configuration to over-ride the default for this object
 
         Returns:
@@ -377,6 +382,14 @@ class Metric:
         less effective.
         """
         return True
+
+    def uses_customized_aggregate(self) -> bool:
+        """Whether the metric uses other aggregated stats than example-level stats.
+
+        If this function returns True, aggregate_stats() skips to check the size of the
+        last dimension of the returned ndarray.
+        """
+        return False
 
     def calc_confidence_interval(
         self,
