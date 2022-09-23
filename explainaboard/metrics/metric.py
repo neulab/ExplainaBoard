@@ -321,8 +321,7 @@ class Metric:
         self,
         stats: MetricStats,
         confidence_alpha: float,
-        n_samples: int = 1000,
-        prop_samples: float = 0.5,
+        num_iterations: int = 1000,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
         """Calculate the confidence interval of a statistics function.
@@ -330,8 +329,7 @@ class Metric:
         Args:
             stats: sufficient statistics as calculated by calc_stats_from_data
             confidence_alpha: the inverse confidence level of the confidence interval
-            n_samples: the number of bootstrapping samples
-            prop_samples: the proportion of samples to sample each time
+            num_iterations: the number of iterations to perform resampling
             config: a configuration to over-ride the default for this object
 
         Returns:
@@ -366,18 +364,18 @@ class Metric:
             )
         # Do bootstrapping otherwise
         else:
-            n_elems = max(int(prop_samples * len(stats)), 1)
-            all_indices = np.array(range(len(stats)))
+            sample_size = len(stats)
+            all_indices = np.array(range(sample_size))
             rng = np.random.default_rng()
             all_indices = rng.choice(
-                all_indices, size=(n_samples, n_elems), replace=True
+                all_indices, size=(num_iterations, sample_size), replace=True
             )
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
             samp_results = self.calc_metric_from_aggregate(agg_stats, config)
             samp_results.sort()
-            low = int(n_samples * confidence_alpha / 2.0)
-            high = int(n_samples * (1.0 - confidence_alpha / 2.0))
+            low = int(num_iterations * confidence_alpha / 2.0)
+            high = int(num_iterations * (1.0 - confidence_alpha / 2.0))
             return float(samp_results[low]), float(samp_results[high])
 
     def evaluate_from_stats(
