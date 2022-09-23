@@ -14,7 +14,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.span_utils import (
     BIOSpanOps,
     BMESSpanOps,
@@ -25,7 +25,7 @@ from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@metric_config_registry.register("F1ScoreConfig")
+@common_registry.register("F1ScoreConfig")
 class F1ScoreConfig(MetricConfig):
     """Configuration for F1Score metrics.
 
@@ -139,7 +139,7 @@ class F1Score(Metric):
 
 
 @dataclass
-@metric_config_registry.register("APEF1ScoreConfig")
+@common_registry.register("APEF1ScoreConfig")
 class APEF1ScoreConfig(MetricConfig):
     """Configuration for APEF1Score."""
 
@@ -205,7 +205,7 @@ class APEF1Score(Metric):
 
 
 @dataclass
-@metric_config_registry.register("SeqF1ScoreConfig")
+@common_registry.register("SeqF1ScoreConfig")
 class SeqF1ScoreConfig(F1ScoreConfig):
     """Configuration for SeqF1Score."""
 

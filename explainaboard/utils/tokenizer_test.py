@@ -2,8 +2,8 @@
 
 import unittest
 
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.tokenizer import (
-    get_tokenizer_serializer,
     MLQAMixTokenizer,
     SacreBleuTokenizer,
     SingleSpaceTokenizer,
@@ -45,7 +45,7 @@ class TokenSeqTest(unittest.TestCase):
 
 class TokenizerSerializerTest(unittest.TestCase):
     def test_serialize(self) -> None:
-        serializer = get_tokenizer_serializer()
+        serializer = PrimitiveSerializer()
         self.assertEqual(
             serializer.serialize(SingleSpaceTokenizer()),
             {"cls_name": "SingleSpaceTokenizer"},
@@ -60,7 +60,7 @@ class TokenizerSerializerTest(unittest.TestCase):
         )
 
     def test_deserialize(self) -> None:
-        serializer = get_tokenizer_serializer()
+        serializer = PrimitiveSerializer()
         self.assertIsInstance(
             serializer.deserialize({"cls_name": "SingleSpaceTokenizer"}),
             SingleSpaceTokenizer,

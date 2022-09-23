@@ -73,7 +73,7 @@ class CLITest(TestCase):
                     '--dataset',
                     'sst2',
                     '--report-json',
-                    str(reports_dir / f'sst2-{sysname}-output.json'),  # noqa
+                    str(reports_dir / f'sst2-{sysname}-output.json'),
                 ]
                 with patch('sys.argv', args):
                     explainaboard.explainaboard_main.main()

@@ -187,8 +187,9 @@ class Loader:
             dataset_loaded_data.metadata.merge(output_loaded_data.metadata)
             if len(dataset_loaded_data) != len(output_loaded_data):
                 raise ValueError(
-                    "dataset and output are of different length"
-                    + f"({len(dataset_loaded_data)} != {len(output_loaded_data)})"
+                    "the number of examples in the system output "
+                    f"({len(output_loaded_data)}) does not match the number of "
+                    f"examples in the dataset ({len(dataset_loaded_data)})"
                 )
             data_list: list[dict] = output_loaded_data.samples
             for i, output in enumerate(data_list):
