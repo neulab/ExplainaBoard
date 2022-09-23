@@ -364,11 +364,11 @@ class Metric:
             )
         # Do bootstrapping otherwise
         else:
-            n_elems = len(stats)
+            sample_size = len(stats)
             all_indices = np.array(range(len(stats)))
             rng = np.random.default_rng()
             all_indices = rng.choice(
-                all_indices, size=(n_samples, n_elems), replace=True
+                all_indices, size=(n_samples, sample_size), replace=True
             )
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
