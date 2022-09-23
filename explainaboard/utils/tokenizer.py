@@ -17,8 +17,7 @@ from sacrebleu.tokenizers.tokenizer_intl import TokenizerV14International
 from sacrebleu.tokenizers.tokenizer_ja_mecab import TokenizerJaMecab
 from sacrebleu.tokenizers.tokenizer_zh import TokenizerZh
 
-from explainaboard.serialization.registry import TypeRegistry
-from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.language_utils import (
     is_chinese_lang_code,
@@ -137,20 +136,8 @@ class Tokenizer(Serializable, metaclass=abc.ABCMeta):
         return cls()
 
 
-_tokenizer_registry = TypeRegistry[Serializable]()
-
-
-def get_tokenizer_serializer() -> PrimitiveSerializer:
-    """Create a serializer for tokenizers.
-
-    Returns:
-        A serializer object for tokenizer classes.
-    """
-    return PrimitiveSerializer(_tokenizer_registry)
-
-
 @final
-@_tokenizer_registry.register("SingleSpaceTokenizer")
+@common_registry.register("SingleSpaceTokenizer")
 class SingleSpaceTokenizer(Tokenizer):
     """Split a string on a single ascii space."""
 
@@ -217,7 +204,7 @@ class TokenizerConala(BaseTokenizer):
 
 
 @final
-@_tokenizer_registry.register("SacreBleuTokenizer")
+@common_registry.register("SacreBleuTokenizer")
 class SacreBleuTokenizer(Tokenizer):
     """Split a string based on the strategy in SacreBLEU."""
 
@@ -297,7 +284,7 @@ class SacreBleuTokenizer(Tokenizer):
 
 
 @final
-@_tokenizer_registry.register("MLQAMixTokenizer")
+@common_registry.register("MLQAMixTokenizer")
 class MLQAMixTokenizer(Tokenizer):
     """A tokenizers that is used for QA, based on the MLQA corpus."""
 

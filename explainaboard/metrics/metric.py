@@ -427,16 +427,21 @@ class Metric(metaclass=abc.ABCMeta):
 
         Returns:
             Aggregated stats. Shape must be:
-                - Non-batched data: [num_stats]
-                - Batched data: [batch_size, num_stats]
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
         """
         result = self._aggregate_stats(stats)
 
-        if stats.is_batched():
-            stats_shape = stats.get_batch_data().shape
-            result_shape: tuple[int, ...] = (stats_shape[0], stats_shape[2])
-        else:
-            result_shape = (stats.num_statistics(),)
+        num_stats = (
+            result.shape[-1]
+            if self.uses_customized_aggregate()
+            else stats.num_statistics()
+        )
+        result_shape = (
+            (stats.get_batch_data().shape[0], num_stats)
+            if stats.is_batched()
+            else (num_stats,)
+        )
 
         assert result.shape == result_shape, (
             "BUG: invalid operation: "
@@ -468,15 +473,15 @@ class Metric(metaclass=abc.ABCMeta):
         """From aggregated sufficient statistics, calculate the metric value.
 
         Args:
-            agg_stats: aggregated statistics, either:
-                one-dimensional [num_stats]
-                two-dimensional [batch_size, num_stats]
+            agg_stats: aggregated statistics. Shape must be:
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
             config: a configuration to over-ride the default for this object
 
         Returns:
             Calculated metrics. Shape must be:
                 - Non-batched data: []
-                - Batched data: [batch_size]
+                - Batched data: [num_batches]
         """
         if agg_stats.ndim not in (1, 2):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
@@ -514,12 +519,19 @@ class Metric(metaclass=abc.ABCMeta):
         """
         return True
 
+    def uses_customized_aggregate(self) -> bool:
+        """Whether the metric uses other aggregated stats than example-level stats.
+
+        If this function returns True, aggregate_stats() skips to check the size of the
+        last dimension of the returned ndarray.
+        """
+        return False
+
     def calc_confidence_interval(
         self,
         stats: MetricStats,
         confidence_alpha: float,
-        n_samples: int = 1000,
-        prop_samples: float = 0.5,
+        num_iterations: int = 1000,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
         """Calculate the confidence interval of a statistics function.
@@ -527,8 +539,7 @@ class Metric(metaclass=abc.ABCMeta):
         Args:
             stats: sufficient statistics as calculated by calc_stats_from_data
             confidence_alpha: the inverse confidence level of the confidence interval
-            n_samples: the number of bootstrapping samples
-            prop_samples: the proportion of samples to sample each time
+            num_iterations: the number of iterations to perform resampling
             config: a configuration to over-ride the default for this object
 
         Returns:
@@ -568,11 +579,11 @@ class Metric(metaclass=abc.ABCMeta):
             )
         # Do bootstrapping otherwise
         else:
-            n_elems = max(int(prop_samples * len(stats)), 1)
-            all_indices = np.array(range(len(stats)))
+            sample_size = len(stats)
+            all_indices = np.array(range(sample_size))
             rng = np.random.default_rng()
             all_indices = rng.choice(
-                all_indices, size=(n_samples, n_elems), replace=True
+                all_indices, size=(num_iterations, sample_size), replace=True
             )
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
@@ -584,9 +595,8 @@ class Metric(metaclass=abc.ABCMeta):
                 )
 
             samp_results.sort()
-
-            low = int(n_samples * confidence_alpha / 2.0)
-            high = int(n_samples * (1.0 - confidence_alpha / 2.0))
+            low = int(num_iterations * confidence_alpha / 2.0)
+            high = int(num_iterations * (1.0 - confidence_alpha / 2.0))
             return float(samp_results[low]), float(samp_results[high])
 
     def evaluate_from_stats(

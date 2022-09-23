@@ -12,7 +12,7 @@ import numpy as np
 
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
-from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
+from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.metrics.metric import (
     ConfidenceInterval,
@@ -21,7 +21,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     Score,
 )
-from explainaboard.metrics.registry import get_metric_config_serializer
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
@@ -485,19 +485,16 @@ class AnalysisLevel:
     @staticmethod
     def from_dict(dikt: dict):
         """Deserialization method."""
-        ft_serializer = get_feature_type_serializer()
+        serializer = PrimitiveSerializer()
 
         features = {
             # See https://github.com/python/mypy/issues/4717
-            k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+            k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
             for k, v in dikt['features'].items()
         }
-        metric_config_serializer = get_metric_config_serializer()
         metric_configs = [
             # See mypy/issues/4717
-            narrow(
-                MetricConfig, metric_config_serializer.deserialize(v)  # type: ignore
-            )
+            narrow(MetricConfig, serializer.deserialize(v))  # type: ignore
             for v in dikt['metric_configs']
         ]
         return AnalysisLevel(

@@ -5,20 +5,14 @@ import dataclasses
 from inspect import getsource
 from typing import Any
 
-from explainaboard.analysis.feature import FeatureType, get_feature_type_serializer
-from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.registry import get_metric_config_serializer
-from explainaboard.utils.tokenizer import get_tokenizer_serializer, Tokenizer
+from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable
 
 
 def general_to_dict(data: Any) -> Any:
     """DEPRECATED: do not use this function for new implementations."""
-    if isinstance(data, FeatureType):
-        return get_feature_type_serializer().serialize(data)
-    if isinstance(data, MetricConfig):
-        return get_metric_config_serializer().serialize(data)
-    if isinstance(data, Tokenizer):
-        return get_tokenizer_serializer().serialize(data)
+    if isinstance(data, Serializable):
+        return PrimitiveSerializer().serialize(data)
     elif hasattr(data, 'to_dict'):
         return general_to_dict(getattr(data, 'to_dict')())
     elif dataclasses.is_dataclass(data):

@@ -18,7 +18,7 @@ from explainaboard.metrics.metric import (
     Score,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.agreement import fleiss_kappa
 from explainaboard.utils.typing_utils import unwrap
 
@@ -37,7 +37,7 @@ class ExternalEvalResult(AuxiliaryMetricResult):
 
 
 @dataclass
-@metric_config_registry.register("ExternalEvalConfig")
+@common_registry.register("ExternalEvalConfig")
 class ExternalEvalConfig(MetricConfig):
     """Configuration for ExternalEval.
 

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import dataclasses
+from typing import Any
 import unittest
 
 import numpy as np
@@ -20,8 +22,36 @@ from explainaboard.serialization.types import SerializableData
 from explainaboard.utils.typing_utils import narrow, unwrap
 
 
-class DummyMetricConfig(MetricConfig):
+@dataclasses.dataclass
+class _DummyMetricConfig(MetricConfig):
+    is_simple_average: bool = True
+    uses_customized_aggregate: bool = False
+    aggregate_stats_fn: Callable[[MetricStats], np.ndarray[Any, Any]] | None = None
+
     def to_metric(self) -> Metric:
+        return _DummyMetric(self)
+
+
+class _DummyMetric(Metric):
+    def is_simple_average(self, stats: MetricStats) -> bool:
+        return narrow(_DummyMetricConfig, self.config).is_simple_average
+
+    def uses_customized_aggregate(self) -> bool:
+        return narrow(_DummyMetricConfig, self.config).uses_customized_aggregate
+
+    def _aggregate_stats(
+        self, stats: MetricStats
+    ) -> np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any]:
+        user_agg_fn = narrow(_DummyMetricConfig, self.config).aggregate_stats_fn
+        agg_fn = user_agg_fn if user_agg_fn is not None else super()._aggregate_stats
+        return agg_fn(stats)
+
+    def calc_stats_from_data(
+        self,
+        true_data: list,
+        pred_data: list,
+        config: MetricConfig | None = None,
+    ) -> MetricStats:
         raise NotImplementedError
 
 
@@ -79,7 +109,7 @@ class MetricResultTest(unittest.TestCase):
     def test_serialize(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
-        config = DummyMetricConfig(name="foo")
+        config = _DummyMetricConfig(name="foo")
         result = MetricResult(config, {"bar": score, "baz": ci})
         serialized: dict[str, SerializableData] = {
             "config": config,
@@ -90,7 +120,7 @@ class MetricResultTest(unittest.TestCase):
     def test_deserialize(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
-        config = DummyMetricConfig(name="foo")
+        config = _DummyMetricConfig(name="foo")
         serialized: dict[str, SerializableData] = {
             "config": config,
             "values": {"bar": score, "baz": ci},
@@ -103,7 +133,7 @@ class MetricResultTest(unittest.TestCase):
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
 
-        result = MetricResult(DummyMetricConfig(name="foo"), {"bar": score, "baz": ci})
+        result = MetricResult(_DummyMetricConfig(name="foo"), {"bar": score, "baz": ci})
 
         # get_value() should return existing objects.
         self.assertIsNone(result.get_value(Score, "foo"))
@@ -112,27 +142,6 @@ class MetricResultTest(unittest.TestCase):
         self.assertIsNone(result.get_value(ConfidenceInterval, "foo"))
         self.assertIsNone(result.get_value(ConfidenceInterval, "bar"))
         self.assertIs(result.get_value(ConfidenceInterval, "baz"), ci)
-
-
-@dataclasses.dataclass
-class _DummyMetricConfig(MetricConfig):
-    is_simple_average: bool = True
-
-    def to_metric(self) -> Metric:
-        return _DummyMetric(self)
-
-
-class _DummyMetric(Metric):
-    def is_simple_average(self, stats: MetricStats):
-        return narrow(_DummyMetricConfig, self.config).is_simple_average
-
-    def calc_stats_from_data(
-        self,
-        true_data: list,
-        pred_data: list,
-        config: MetricConfig | None = None,
-    ) -> MetricStats:
-        raise NotImplementedError
 
 
 class MetricTest(unittest.TestCase):
@@ -167,6 +176,58 @@ class MetricTest(unittest.TestCase):
         stats = SimpleMetricStats(np.zeros((2, 0, 3)))
         aggregate = metric.aggregate_stats(stats)
         self.assertTrue(np.array_equal(aggregate, np.zeros((2, 3))))
+
+    def test_aggregate_stats_customized_nonbatch(self) -> None:
+        def agg_fn(stats: MetricStats) -> np.ndarray[Any, Any]:
+            return stats.get_data().max(axis=-2).max(axis=-1, keepdims=True)
+
+        metric = _DummyMetric(
+            _DummyMetricConfig(
+                "test", uses_customized_aggregate=True, aggregate_stats_fn=agg_fn
+            )
+        )
+        stats = SimpleMetricStats(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]))
+        aggregate = metric.aggregate_stats(stats)
+        self.assertTrue(np.array_equal(aggregate, np.array([6.0])))
+
+    def test_aggregate_stats_customized_nonbatch_invalid(self) -> None:
+        def agg_fn(stats: MetricStats) -> np.ndarray[Any, Any]:
+            return stats.get_data().max(axis=-2).max(axis=-1, keepdims=True)
+
+        metric = _DummyMetric(_DummyMetricConfig("test", aggregate_stats_fn=agg_fn))
+        stats = SimpleMetricStats(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]))
+        with self.assertRaisesRegex(
+            AssertionError, r"Expected shape \(2,\), but got \(1,\)\.$"
+        ):
+            metric.aggregate_stats(stats)
+
+    def test_aggregate_stats_customized_batch(self) -> None:
+        def agg_fn(stats: MetricStats) -> np.ndarray[Any, Any]:
+            return stats.get_batch_data().max(axis=-2).max(axis=-1, keepdims=True)
+
+        metric = _DummyMetric(
+            _DummyMetricConfig(
+                "test", uses_customized_aggregate=True, aggregate_stats_fn=agg_fn
+            )
+        )
+        stats = SimpleMetricStats(
+            np.array([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
+        )
+        aggregate = metric.aggregate_stats(stats)
+        self.assertTrue(np.array_equal(aggregate, np.array([[4.0], [8.0]])))
+
+    def test_aggregate_stats_customized_batch_invalid(self) -> None:
+        def agg_fn(stats: MetricStats) -> np.ndarray[Any, Any]:
+            return stats.get_batch_data().max(axis=-2).max(axis=-1, keepdims=True)
+
+        metric = _DummyMetric(_DummyMetricConfig("test", aggregate_stats_fn=agg_fn))
+        stats = SimpleMetricStats(
+            np.array([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
+        )
+        with self.assertRaisesRegex(
+            AssertionError, r"Expected shape \(2, 2\), but got \(2, 1\)\.$"
+        ):
+            metric.aggregate_stats(stats)
 
     def test_calc_metric_from_aggregate_0dim(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))

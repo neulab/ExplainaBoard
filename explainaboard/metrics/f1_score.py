@@ -14,7 +14,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.span_utils import (
     BIOSpanOps,
     BMESSpanOps,
@@ -25,7 +25,7 @@ from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
-@metric_config_registry.register("F1ScoreConfig")
+@common_registry.register("F1ScoreConfig")
 class F1ScoreConfig(MetricConfig):
     """Configuration for F1Score metrics.
 
@@ -140,7 +140,7 @@ class F1Score(Metric):
 
 
 @dataclass
-@metric_config_registry.register("APEF1ScoreConfig")
+@common_registry.register("APEF1ScoreConfig")
 class APEF1ScoreConfig(MetricConfig):
     """Configuration for APEF1Score."""
 
@@ -186,27 +186,23 @@ class APEF1Score(Metric):
             )
         return SimpleMetricStats(np.array(stats))
 
-    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """See Metric.aggregate_stats."""
-        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
-        if data.size == 0:
-            return np.array(0.0)
-        else:
-            # when data.ndim == 3, e.g.,
-            # * 1000 * 100 * 3 -> 1000 * 3
-            data_sum = np.sum(data, axis=(-2))
-            total_gold = data_sum[0] if data.ndim == 2 else data_sum[:, 0]
-            total_pred = data_sum[1] if data.ndim == 2 else data_sum[:, 1]
-            correct_num = data_sum[2] if data.ndim == 2 else data_sum[:, 2]
-
-            precision = correct_num * 1.0 / total_pred
-            recall = correct_num * 1.0 / total_gold
-            fscore = 2.0 * precision * recall / (precision + recall)
-            return np.array(fscore)
+    def _calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> np.ndarray:
+        """See Metric._calc_metric_from_aggregate."""
+        is_batched = agg_stats.ndim == 2
+        if not is_batched:
+            agg_stats = agg_stats.reshape((1, -1))
+        precision = agg_stats[:, 2] * 1.0 / agg_stats[:, 1]
+        recall = agg_stats[:, 2] * 1.0 / agg_stats[:, 0]
+        fscore = 2.0 * precision * recall / (precision + recall)
+        if not is_batched:
+            fscore = fscore[0]
+        return fscore
 
 
 @dataclass
-@metric_config_registry.register("SeqF1ScoreConfig")
+@common_registry.register("SeqF1ScoreConfig")
 class SeqF1ScoreConfig(F1ScoreConfig):
     """Configuration for SeqF1Score."""
 

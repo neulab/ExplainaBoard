@@ -19,7 +19,7 @@ from explainaboard.loaders.file_loader import (
 )
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
@@ -344,7 +344,10 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
         ValueError: `name` is not registered in neither the registry nor EaaS.
     """
     try:
-        return metric_config_registry.get_type(name)  # type: ignore
+        cls = common_registry.get_type(name)
+        if not issubclass(cls, MetricConfig):
+            raise TypeError(f"Obtained class is not a MetricConfig: {cls.__name__}")
+        return cls
     except ValueError:
         if name in eaas.endpoint.EndpointConfig().valid_metrics:
             return EaaSMetricConfig

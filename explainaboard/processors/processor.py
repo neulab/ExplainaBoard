@@ -18,12 +18,7 @@ from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
 )
 from explainaboard.analysis.case import AnalysisCase
-from explainaboard.analysis.feature import (
-    DataType,
-    FeatureType,
-    get_feature_type_serializer,
-    Value,
-)
+from explainaboard.analysis.feature import DataType, FeatureType, Value
 from explainaboard.analysis.performance import BucketPerformance, Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
@@ -34,6 +29,7 @@ from explainaboard.metrics.metric import (
     MetricStats,
     Score,
 )
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -251,7 +247,7 @@ class Processor(metaclass=abc.ABCMeta):
         if custom_analyses is not None:
             analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
         if custom_features is not None:
-            ft_serializer = get_feature_type_serializer()
+            ft_serializer = PrimitiveSerializer()
 
             for level_name, feature_content in custom_features.items():
                 additional_features = {
