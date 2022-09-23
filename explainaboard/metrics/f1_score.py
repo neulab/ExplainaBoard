@@ -100,14 +100,12 @@ class F1Score(Metric):
                         stats[i, tid * stat_mult + 3] += 1
         return SimpleMetricStats(stats)
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.size == 1:
-            return agg_stats
-
-        if agg_stats.ndim == 1:
+        is_batched = agg_stats.ndim != 1
+        if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
 
         config = cast(F1ScoreConfig, unwrap_or(config, self.config))
@@ -134,6 +132,9 @@ class F1Score(Metric):
 
         if config.average == 'macro':
             f1 = np.mean(f1, axis=1)
+
+        if not is_batched:
+            f1 = f1[0]
 
         return f1
 
@@ -185,23 +186,19 @@ class APEF1Score(Metric):
             )
         return SimpleMetricStats(np.array(stats))
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """See Metric.aggregate_stats."""
-        data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
-        if data.size == 0:
-            return np.array(0.0)
-        else:
-            # when data.ndim == 3, e.g.,
-            # * 1000 * 100 * 3 -> 1000 * 3
-            data_sum = np.sum(data, axis=(-2))
-            total_gold = data_sum[0] if data.ndim == 2 else data_sum[:, 0]
-            total_pred = data_sum[1] if data.ndim == 2 else data_sum[:, 1]
-            correct_num = data_sum[2] if data.ndim == 2 else data_sum[:, 2]
-
-            precision = correct_num * 1.0 / total_pred
-            recall = correct_num * 1.0 / total_gold
-            fscore = 2.0 * precision * recall / (precision + recall)
-            return np.array(fscore)
+    def _calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
+    ) -> np.ndarray:
+        """See Metric._calc_metric_from_aggregate."""
+        is_batched = agg_stats.ndim == 2
+        if not is_batched:
+            agg_stats = agg_stats.reshape((1, -1))
+        precision = agg_stats[:, 2] * 1.0 / agg_stats[:, 1]
+        recall = agg_stats[:, 2] * 1.0 / agg_stats[:, 0]
+        fscore = 2.0 * precision * recall / (precision + recall)
+        if not is_batched:
+            fscore = fscore[0]
+        return fscore
 
 
 @dataclass

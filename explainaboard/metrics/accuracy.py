@@ -76,7 +76,7 @@ class CorrectCount(Accuracy):
             )
         )
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if data.size == 0:
