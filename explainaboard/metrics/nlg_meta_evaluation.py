@@ -45,9 +45,13 @@ class CorrelationConfig(MetricConfig):
 class CorrelationMetric(Metric):
     """A metric that calculates correlations."""
 
-    def is_simple_average(self, stats: MetricStats):
+    def is_simple_average(self, stats: MetricStats) -> bool:
         """See Metric.is_simple_average."""
         return False
+
+    def uses_customized_aggregate(self) -> bool:
+        """See Metric.uses_customized_aggregate."""
+        return True
 
     def calc_stats_from_data(
         self,
@@ -113,17 +117,28 @@ class CorrelationMetric(Metric):
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
-        return stats.get_batch_data() if stats.is_batched() else stats.get_data()
+        if stats.is_batched():
+            data = stats.get_batch_data()
+            assert data.shape[-1] == 4
+            return data.reshape((data.shape[0], data.shape[-2] * data.shape[-1]))
+        else:
+            data = stats.get_data()
+            assert data.shape[-1] == 4
+            return data.reshape((data.shape[-2] * data.shape[-1]))
 
     def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if len(agg_stats.shape) == 2:
+        if agg_stats.ndim == 1:
+            agg_stats = agg_stats.reshape((int(agg_stats.shape[0] / 4), 4))
             val = self.calc_metric_from_aggregate_single(agg_stats, config)
-            return np.array([val])
+            return np.array(val)
         else:
             n_samples = agg_stats.shape[0]
+            agg_stats = agg_stats.reshape(
+                (agg_stats.shape[0], int(agg_stats.shape[1] / 4), 4)
+            )
             ret_metric = np.zeros(n_samples)
             for i, single_stat in enumerate(agg_stats):
                 val = self.calc_metric_from_aggregate_single(single_stat, config)
