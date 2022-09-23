@@ -38,7 +38,7 @@ class RankingMetric(Metric, metaclass=abc.ABCMeta):
 
 
 @dataclass
-@metric_config_registry.register("Hits")
+@metric_config_registry.register("HitsConfig")
 class HitsConfig(MetricConfig):
     """Configuration for Hits.
 
@@ -84,7 +84,7 @@ class Hits(RankingMetric):
 
 
 @dataclass
-@metric_config_registry.register("MeanReciprocalRank")
+@metric_config_registry.register("MeanReciprocalRankConfig")
 class MeanReciprocalRankConfig(MetricConfig):
     """Configuration for MeanReciprocalRank."""
 
@@ -124,7 +124,7 @@ class MeanReciprocalRank(RankingMetric):
 
 
 @dataclass
-@metric_config_registry.register("MeanRank")
+@metric_config_registry.register("MeanRankConfig")
 class MeanRankConfig(MetricConfig):
     """Configuration for MeanReciprocalRank."""
 

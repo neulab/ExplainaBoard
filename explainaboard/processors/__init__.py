@@ -5,6 +5,7 @@ When a new processor is implemented, remember to import it here so it gets regis
 
 from explainaboard.processors import (
     argument_pair_extraction,
+    argument_pair_identification,
     aspect_based_sentiment_classification,
     chunking,
     cloze_generative,
@@ -20,7 +21,6 @@ from explainaboard.processors import (
     qa_multiple_choice,
     qa_open_domain,
     qa_tat,
-    ranking,
     summarization,
     tabular_classification,
     tabular_regression,
@@ -54,5 +54,5 @@ __all__ = [
     'nlg_meta_evaluation',
     'qa_tat',
     'argument_pair_extraction',
-    'ranking',
+    'argument_pair_identification',
 ]

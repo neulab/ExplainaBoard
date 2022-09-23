@@ -1,4 +1,4 @@
-"""A processor for the ranking task."""
+"""A processor for the argument pair identification."""
 
 from __future__ import annotations
 
@@ -26,9 +26,8 @@ from explainaboard.utils.typing_utils import unwrap
 
 
 @register_processor(TaskType.argument_pair_identification)
-@register_processor(TaskType.ranking)
-class RankingProcessor(Processor):
-    """A processor for the ranking task."""
+class ArgumentPairIdentificationProcessor(Processor):
+    """A processor for the argument pair identification task."""
 
     @classmethod
     def task_type(cls) -> TaskType:

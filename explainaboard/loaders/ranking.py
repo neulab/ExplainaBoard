@@ -18,7 +18,7 @@ from explainaboard.loaders.loader_registry import register_loader
 @register_loader(TaskType.argument_pair_identification)
 @register_loader(TaskType.ranking)
 class RankingLoader(Loader):
-    """Loaders for the open domain QA task."""
+    """Loaders for the ranking tasks, such as argument pair identification."""
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
