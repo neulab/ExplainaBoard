@@ -365,7 +365,7 @@ class Metric:
         # Do bootstrapping otherwise
         else:
             sample_size = len(stats)
-            all_indices = np.array(range(len(stats)))
+            all_indices = np.array(range(sample_size))
             rng = np.random.default_rng()
             all_indices = rng.choice(
                 all_indices, size=(num_iterations, sample_size), replace=True
