@@ -22,7 +22,7 @@ from explainaboard.processors.processor_registry import register_processor
 
 
 @register_processor(TaskType.tabular_classification)
-class TextClassificationProcessor(Processor):
+class TabularClassificationProcessor(Processor):
     """A processor for the tabular classification task."""
 
     @classmethod
