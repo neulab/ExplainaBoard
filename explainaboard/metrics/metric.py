@@ -9,8 +9,8 @@ from typing import Any, final, Optional, TypeVar
 import numpy as np
 from scipy.stats import t as stats_t
 
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.registry import TypeRegistry
-from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import (
     Serializable,
     SerializableData,
@@ -19,15 +19,6 @@ from explainaboard.serialization.types import (
 from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 _metric_registry = TypeRegistry[Serializable]()
-
-
-def get_serializer() -> PrimitiveSerializer:
-    """Obtains a serializer object for this module.
-
-    Returns:
-        A serializer object.
-    """
-    return PrimitiveSerializer(_metric_registry)
 
 
 @dataclass
@@ -49,7 +40,7 @@ class MetricValue(Serializable, metaclass=abc.ABCMeta):
     pass
 
 
-@_metric_registry.register("Score")
+@common_registry.register("Score")
 @final
 @dataclass(frozen=True)
 class Score(MetricValue):
@@ -71,7 +62,7 @@ class Score(MetricValue):
         return cls(value=narrow(float, data["value"]))
 
 
-@_metric_registry.register("ConfidenceInterval")
+@common_registry.register("ConfidenceInterval")
 @final
 @dataclass(frozen=True)
 class ConfidenceInterval(MetricValue):
@@ -119,7 +110,7 @@ class ConfidenceInterval(MetricValue):
 MetricValueT = TypeVar("MetricValueT", bound=MetricValue)
 
 
-@_metric_registry.register("MetricResult")
+@common_registry.register("MetricResult")
 @final
 class MetricResult(Serializable):
     """A result of computing a metric over some data."""
