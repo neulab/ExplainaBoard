@@ -52,6 +52,7 @@ def get_processor_class(task: TaskType) -> type[Processor]:
         A Processor class associated with the given task type.
 
     Raises:
+        ValueError: if the given task is not supported.
         TypeError: if the obtained class is not a subclass of Processor class.
     """
     task_to_procesor = {
@@ -78,7 +79,10 @@ def get_processor_class(task: TaskType) -> type[Processor]:
         TaskType.tabular_classification: TabularClassificationProcessor,
         TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
     }
-    cls = task_to_procesor[task]
+    try:
+        cls = task_to_procesor[task]
+    except KeyError:
+        raise ValueError(f"{task} is not a supported task type.")
     if not issubclass(cls, Processor):
         raise TypeError(f"Obtained class is not a Processor: {cls.__name__}")
     return cls
