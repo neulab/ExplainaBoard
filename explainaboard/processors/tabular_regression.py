@@ -16,10 +16,10 @@ from explainaboard.metrics.continuous import (
 )
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import processor_registry
+from explainaboard.serialization import common_registry
 
 
-@processor_registry.register("tabular_regression")
+@common_registry.register("TabularRegressionProcessor")
 class TabularRegressionProcessor(Processor):
     """A processor for the tabular regression task."""
 

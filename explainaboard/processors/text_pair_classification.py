@@ -25,11 +25,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import processor_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@processor_registry.register("text_pair_classification")
+@common_registry.register("TextPairClassificationProcessor")
 class TextPairClassificationProcessor(Processor):
     """A processor for the text pair classification task."""
 

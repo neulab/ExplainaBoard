@@ -19,11 +19,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import processor_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.spacy_loader import get_named_entities
 
 
-@processor_registry.register("aspect_based_sentiment_classification")
+@common_registry.register("AspectBasedSentimentClassificationProcessor")
 class AspectBasedSentimentClassificationProcessor(Processor):
     """A processor for the aspect based sentiment classification task."""
 

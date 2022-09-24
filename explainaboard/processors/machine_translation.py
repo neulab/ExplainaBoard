@@ -14,11 +14,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
-from explainaboard.processors.processor_registry import processor_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@processor_registry.register("machine_translation")
+@common_registry.register("MachineTranslationProcessor")
 class MachineTranslationProcessor(ConditionalGenerationProcessor):
     """A processor for the machine translation task."""
 

@@ -18,11 +18,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import processor_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@processor_registry.register("qa_extractive")
+@common_registry.register("QAExtractiveProcessor")
 class QAExtractiveProcessor(Processor):
     """A processor for the extractive QA task."""
 
