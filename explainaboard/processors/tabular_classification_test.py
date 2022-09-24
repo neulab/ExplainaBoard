@@ -11,7 +11,7 @@ from explainaboard.processors.tabular_classification import (
 )
 
 
-class TextClassificationProcessorTest(unittest.TestCase):
+class TabularClassificationProcessorTest(unittest.TestCase):
     def test_get_processor(self) -> None:
         self.assertIsInstance(
             get_processor(TaskType.tabular_classification.value),
