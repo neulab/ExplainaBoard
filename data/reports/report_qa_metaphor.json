@@ -12,7 +12,6 @@
             "is_bucket": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "question": {
@@ -21,7 +20,6 @@
             "is_bucket": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "options": {
@@ -31,11 +29,9 @@
                 "is_bucket": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
-                "id": null,
                 "_type": "Value"
             },
             "length": -1,
-            "id": null,
             "is_bucket": false,
             "_type": "Sequence"
         },
@@ -46,7 +42,6 @@
                 "is_bucket": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
-                "id": null,
                 "_type": "Value"
             },
             "option_index": {
@@ -55,7 +50,6 @@
                 "is_bucket": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
-                "id": null,
                 "_type": "Value"
             }
         },
@@ -69,7 +63,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "question_length": {
@@ -82,7 +75,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "answer_length": {
@@ -95,7 +87,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         }
     },

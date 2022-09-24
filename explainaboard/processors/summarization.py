@@ -1,8 +1,10 @@
+"""A processor for the summarization task."""
+
 from __future__ import annotations
 
-from collections.abc import Iterator
+from collections.abc import Iterable
+from typing import Any
 
-from datalabs import aggregating
 from datalabs.operations.featurize.plugins.summarization.sum_attribute import (
     SUMAttribute,
 )
@@ -23,38 +25,51 @@ sum_attr = SUMAttribute()
 
 @processor_registry.register("summarization")
 class SummarizationProcessor(ConditionalGenerationProcessor):
+    """A processor for the summarization task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.summarization
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         f = super().default_analysis_levels()
         new_examp_features = {
-            "sum_attributes": feature.Value(
-                dtype="dict",
+            "sum_attributes": feature.Dict(
+                feature={
+                    "attr_density": feature.Value(dtype=feature.DataType.FLOAT),
+                    "attr_coverage": feature.Value(dtype=feature.DataType.FLOAT),
+                    "attr_compression": feature.Value(dtype=feature.DataType.FLOAT),
+                    "attr_repetition": feature.Value(dtype=feature.DataType.FLOAT),
+                    "attr_novelty": feature.Value(dtype=feature.DataType.FLOAT),
+                    "attr_copy_len": feature.Value(dtype=feature.DataType.FLOAT),
+                    "attr_source_len": feature.Value(dtype=feature.DataType.INT),
+                    "attr_hypothesis_len": feature.Value(dtype=feature.DataType.INT),
+                },
                 func=lambda info, x, c: sum_attr.cal_attributes_each(
                     x["source"], x["reference"]
                 ),
             ),
             "attr_compression": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="compression",
                 func=lambda info, x, c: c.features['sum_attributes'][
                     "attr_compression"
                 ],
             ),
             "attr_copy_len": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="copy length",
                 func=lambda info, x, c: c.features['sum_attributes']["attr_copy_len"],
             ),
             "attr_coverage": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="coverage",
                 func=lambda info, x, c: c.features['sum_attributes']["attr_coverage"],
             ),
             "attr_novelty": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="novelty",
                 func=lambda info, x, c: c.features['sum_attributes']["attr_novelty"],
             ),
@@ -66,14 +81,14 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
     def _get_default_eaas_strs(cls):
         return ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['text'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['summary'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
         )
         return {
             'source_vocab': source_vocab,

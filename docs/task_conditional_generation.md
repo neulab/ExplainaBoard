@@ -1,5 +1,9 @@
 # Analyzing Conditional Text Generation Tasks
 
+Before diving into the detail of this doc, you're strongly recommended to know [some
+important concepts about system analyses](concepts_about_system_analysis.md).
+
+
 Conditional text generation is a class of tasks where you generate text based on some conditioning context.
 This can include a wide variety of tasks, such as:
 
@@ -13,8 +17,34 @@ This can include a wide variety of tasks, such as:
 
 ## Data Preparation
 
-In order to perform analysis of your results, they should be in the following
-text format:
+ 
+### Format of `Dataset` File
+
+
+* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
+    you fortunately don't need to prepare the dataset. 
+
+* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/cnndm/cnndm_mini-dataset.tsv)
+```python
+This is a good movie    这是一部好电影
+...
+```
+where the first column represents source text and the 2nd column denotes gold reference.
+
+* (3) `json` (basically, it's a list of dictionaries with two keys: `source` and `reference`)
+```json
+[
+  {"source": "This is a good movie", "reference": "这是一部好电影"},
+  ...
+]
+```
+
+
+
+
+### Format of `System Output` File
+In this task, your system outputs should be as follows:
+
 
 ```
 predicted_output_text
@@ -38,7 +68,7 @@ You can load the`cnn_dailymail` dataset but because the test set is large we don
 include it directly in the explainaboard repository, but you can get an example by
 downloading with wget:
 ```shell
-wget -P ./data/system_outputs/cnndm/ http://www.phontron.com/download/cnndm-bart-output.txt
+wget -P ./data/system_outputs/cnndm/ https://storage.googleapis.com/inspired-public-data/explainaboard/task_data/summarization/cnndm-bart-output.txt
 ```
 
 Then run the below command and it should work:
@@ -73,6 +103,9 @@ Try it out for translation as below. The examples use a custom dataset that is n
 ```shell
 explainaboard --task machine-translation --custom-dataset-paths ./data/system_outputs/ted_multi/ted_multi_slk_eng-dataset.tsv --system-outputs ./data/system_outputs/ted_multi/ted_multi_slk_eng-nmt-output.txt --metrics bleu comet
 ```
+Note 1: The number of `--custom-dataset-paths` need to match the number of `system-outputs`
+
+Note 2: If you want to perform **pair-wise analysis** for two system outputs on the same reference, you can pass in the paths separated by space, for example, `--system-outputs system1 system2`. Please also pass in the same paths twice for `--custom-dataset-paths`, for example, `--custom-dataset-paths path1 path1`. 
 
 ### Code Generation
 

@@ -1,3 +1,5 @@
+"""Base classes and interfaces used to implement evaluation metrics."""
+
 from __future__ import annotations
 
 import abc
@@ -7,68 +9,78 @@ from typing import Any, final, Optional
 import numpy as np
 from scipy.stats import t as stats_t
 
+from explainaboard.serialization.types import SerializableDataclass
 from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
 class AuxiliaryMetricResult:
+    """Extra information specific to individual metrics."""
+
     pass
 
 
 @dataclass
 class MetricResult:
-    """
-    A result of computing a metric over some data
+    """A result of computing a metric over some data.
+
+    Args:
+        config: Configuration with which it was calculated
+        value: Metric value
+        confidence_interval: Confidence interval of the metric values
+        confidence_alpha: The p-value of the confidence interval
+        auxiliary_result: Extra data for
     """
 
-    # Configuration with which it was calculated
     config: MetricConfig
-    # Metric value
     value: float
-    # Confidence interval of the metric values
-    conf_interval: Optional[tuple[float, float]] = None
-    # The p-value of the confidence interval
-    conf_value: Optional[float] = None
-    # Extra data for
+    confidence_interval: Optional[tuple[float, float]] = None
+    confidence_alpha: Optional[float] = None
     auxiliary_result: AuxiliaryMetricResult | None = None
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
+        """Return the metric result as a serializable dictionary.
+
+        Returns:
+            The dictionary containing the requisite information.
+        """
         ret = {
             'config': self.config.__dict__,
             'value': self.value,
         }
-        if self.conf_interval is not None:
-            ret['conf_interval'] = self.conf_interval
-        if self.conf_value is not None:
-            ret['conf_value'] = self.conf_value
+        if self.confidence_interval is not None:
+            ret['confidence_interval'] = self.confidence_interval
+        if self.confidence_alpha is not None:
+            ret['confidence_alpha'] = self.confidence_alpha
         return ret
 
 
-@dataclass
-class MetricConfig(dict):
-    """
-    The configuration for the metric. This can be passed in to the metric either in
+# TODO(tetsuok): Remove the following type-ignore annotation when we update
+# mypy version to 0.980 or newer.
+# See https://github.com/python/mypy/issues/5374 for details.
+@dataclass  # type:ignore
+class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
+    """The configuration for a metric.
+
+    This can be passed in to the metric either in
     the constructor (e.g. for compute-intensive operations such as model loading),
     or when performing individual metric computation.
+
+    Args:
+        name: The metric name
+        source_language: The source language
+        target_language: The target language
+        cls_name: The class name
     """
 
     name: str
     source_language: str | None = None
     target_language: str | None = None
-    cls_name: str | None = None
-    # The external statistics for metrics
-    external_stats: np.ndarray | None = None
 
-    def __post_init__(self):
-        # Save the class name
-        self.cls_name = type(self).__name__
-
-    def to_metric(self):
-        raise NotImplementedError
-
-    @classmethod
-    def dict_conv(cls, k, v):
-        return v
+    @abc.abstractmethod
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
+        ...
 
 
 class MetricStats(metaclass=abc.ABCMeta):
@@ -235,16 +247,14 @@ class SimpleMetricStats(MetricStats):
 
 
 class Metric:
-    """
-    A class representing an evaluation metric
-    """
+    """A class representing an evaluation metric."""
 
     def __init__(
         self,
         config: MetricConfig,
     ):
-        """
-        Initialize the metric
+        """Initialize the metric.
+
         :param config: The configuration for the metric
         """
         self.config: MetricConfig = config
@@ -253,69 +263,159 @@ class Metric:
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        """From a list of true data and predicted data, calculate the sufficient
-        statistics for each data example so that the evaluation metric can be calculated
-        later. In the simplest form, this is just the evaluation metric value for each
-        example.
-        :param true_data: gold-standard data
-        :param pred_data: predicted data
-        :param config: a configuration to over-ride the default for this object
-        :return: a numpy array of shape [len(true_data), X] where X=1 in the simplest
-            case of decomposable eval metrics
+        """From a list of true data and predicted data, calculate sufficient statistics.
+
+        These statistics are the numbers necessary for each data example so that the
+        evaluation metric can be calculated later. In the simplest form, this is just
+        the evaluation metric value for each example.
+
+        Args:
+            true_data: gold-standard data
+            pred_data: predicted data
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            A numpy array of shape [len(true_data), X] where X=1 in the simplest case of
+            decomposable eval metrics
         """
         ...
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+    @final
+    def aggregate_stats(
+        self, stats: MetricStats
+    ) -> np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any]:
+        """Aggregate sufficient statistics from multiple examples into a single example.
 
+        Args:
+            stats: stats for every example
+
+        Returns:
+            Aggregated stats. Shape must be:
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
+        """
+        result = self._aggregate_stats(stats)
+
+        num_stats = (
+            result.shape[-1]
+            if self.uses_customized_aggregate()
+            else stats.num_statistics()
+        )
+        result_shape = (
+            (stats.get_batch_data().shape[0], num_stats)
+            if stats.is_batched()
+            else (num_stats,)
+        )
+
+        assert result.shape == result_shape, (
+            "BUG: invalid operation: "
+            f"{type(self).__name__}._aggregate_stats(): "
+            f"Expected shape {result_shape}, but got {result.shape}."
+        )
+
+        return result
+
+    def _aggregate_stats(
+        self, stats: MetricStats
+    ) -> np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any]:
+        """Inner function of aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
-        if data.size == 0:
-            return np.array(0.0)
+        if data.shape[-2] == 0:
+            return np.zeros(
+                shape=data.shape[:-2] + (data.shape[-1],),
+                dtype=np.float32,
+            )
         else:
             return np.mean(data, axis=-2)
 
+    @final
     def calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
-        """From aggregated sufficient statistics, calculate the metric value
-        :param agg_stats: aggregated statistics, either:
-          one-dimensional [metric_size]
-          two-dimensional [batch_size, metric_size]
-        :param config: a configuration to over-ride the default for this object
-        :return: calculated metric of size 1, or metrics of size [batch_size]
+        self,
+        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+        config: Optional[MetricConfig] = None,
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """From aggregated sufficient statistics, calculate the metric value.
+
+        Args:
+            agg_stats: aggregated statistics. Shape must be:
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            Calculated metrics. Shape must be:
+                - Non-batched data: []
+                - Batched data: [num_batches]
         """
-        return agg_stats
+        if agg_stats.ndim not in (1, 2):
+            raise ValueError(f"Invalid shape size: {agg_stats.shape}")
+
+        result = self._calc_metric_from_aggregate(agg_stats, config)
+        result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
+
+        assert result.shape == result_shape, (
+            "BUG: invalid operation: "
+            f"{type(self).__name__}._calc_metric_from_aggregate(): "
+            f"Expected shape {result_shape}, but got {result.shape}."
+        )
+
+        return result
+
+    def _calc_metric_from_aggregate(
+        self,
+        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+        config: Optional[MetricConfig] = None,
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """Inner function of calc_metric_from_aggregate."""
+        if agg_stats.shape[-1] != 1:
+            raise ValueError(
+                "Multiple aggregates can't be integrated without specific algorithms."
+            )
+
+        return agg_stats.squeeze(-1)
 
     def is_simple_average(self, stats: MetricStats):
-        """
-        Whether the evaluation score is a simple average of the sufficient statistics.
+        """Whether the eval score is a simple average of the sufficient statistics.
+
         If so the t-test is applicable, which is much more efficient. Otherwise we do
         bootstrapping to calculate confidence interval, which is slower and potentially
         less effective.
         """
         return True
 
+    def uses_customized_aggregate(self) -> bool:
+        """Whether the metric uses other aggregated stats than example-level stats.
+
+        If this function returns True, aggregate_stats() skips to check the size of the
+        last dimension of the returned ndarray.
+        """
+        return False
+
     def calc_confidence_interval(
         self,
         stats: MetricStats,
-        conf_value: float,
-        n_samples: int = 1000,
-        prop_samples: float = 0.5,
+        confidence_alpha: float,
+        num_iterations: int = 1000,
         config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
+        """Calculate the confidence interval of a statistics function.
+
+        Args:
+            stats: sufficient statistics as calculated by calc_stats_from_data
+            confidence_alpha: the inverse confidence level of the confidence interval
+            num_iterations: the number of iterations to perform resampling
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            A confidence interval or `None` if one cannot be calculated.
         """
-        :param stats: sufficient statistics as calculated by calc_stats_from_data
-        :param conf_value: the p-value of the interval
-        :param n_samples: the number of bootstrapping samples
-        :param prop_samples: the proportion of samples to sample each time
-        :param config: a configuration to over-ride the default for this object
-        """
-        if conf_value <= 0.0 or conf_value >= 1.0:
-            raise ValueError(f'Bad confidence value {conf_value}')
+        if not (0.0 < confidence_alpha < 1.0):
+            raise ValueError(f'Invalid confidence_alpha: {confidence_alpha}')
+
+        if stats.is_batched():
+            raise ValueError(
+                "Confidence interval can't be calculated for batched data."
+            )
 
         stats_data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         num_stats = stats.num_statistics()
@@ -336,62 +436,80 @@ class Metric:
             if my_std == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
-                alpha=conf_value,
+                alpha=confidence_alpha,
                 df=stats_data.shape[-2] - 1,
                 loc=my_mean,
                 scale=my_std,
             )
         # Do bootstrapping otherwise
         else:
-            n_elems = max(int(prop_samples * len(stats)), 1)
-            all_indices = np.array(range(len(stats)))
+            sample_size = len(stats)
+            all_indices = np.array(range(sample_size))
             rng = np.random.default_rng()
             all_indices = rng.choice(
-                all_indices, size=(n_samples, n_elems), replace=True
+                all_indices, size=(num_iterations, sample_size), replace=True
             )
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
             samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+
+            if samp_results.ndim != 1:
+                raise ValueError(
+                    f"Invalid shape of sampled metrics: {samp_results.shape}"
+                )
+
             samp_results.sort()
-            low = int(n_samples * conf_value / 2.0)
-            high = int(n_samples * (1.0 - conf_value / 2.0))
+            low = int(num_iterations * confidence_alpha / 2.0)
+            high = int(num_iterations * (1.0 - confidence_alpha / 2.0))
             return float(samp_results[low]), float(samp_results[high])
 
     def evaluate_from_stats(
         self,
         stats: MetricStats,
-        conf_value: Optional[float] = None,
+        confidence_alpha: Optional[float] = None,
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
-        :param stats: pre-computed metric stats
-        :param conf_value: if set to not None, must be a number between 0 and 1,
-            indicating the p-value of confidence intervals
-        :param config: a configuration to over-ride the default for this object
-        :return: a resulting metric value
+
+        Args:
+            stats: pre-computed metric stats
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of confidence intervals
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            a resulting metric value
         """
         actual_config = unwrap_or(config, self.config)
         agg_stats = self.aggregate_stats(stats)
         value = self.calc_metric_from_aggregate(agg_stats, actual_config)
-        conf_interval = (
-            self.calc_confidence_interval(stats, conf_value) if conf_value else None
+        confidence_interval = (
+            self.calc_confidence_interval(stats, confidence_alpha)
+            if confidence_alpha
+            else None
         )
-        return MetricResult(actual_config, float(value), conf_interval, conf_value)
+        return MetricResult(
+            actual_config, float(value), confidence_interval, confidence_alpha
+        )
 
     def evaluate(
         self,
         true_data: list,
         pred_data: list,
-        conf_value: Optional[float] = None,
+        confidence_alpha: Optional[float] = None,
         config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over true data and predicted data.
-        :param true_data: gold-standard data
-        :param pred_data: predicted data
-        :param conf_value: if set to not None, must be a number between 0 and 1,
-            indicating the p-value of confidence intervals
-        :param config: a configuration to over-ride the default for this object
-        :return: a resulting metric value
+
+        Args:
+            true_data: gold-standard data
+            pred_data: predicted data
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of confidence intervals
+            config: a configuration to over-ride the default for this object
+
+        Returns:
+            a resulting metric value
         """
         stats = self.calc_stats_from_data(true_data, pred_data, config)
-        return self.evaluate_from_stats(stats, conf_value, config)
+        return self.evaluate_from_stats(stats, confidence_alpha, config)

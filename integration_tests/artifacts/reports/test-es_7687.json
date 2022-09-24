@@ -10,7 +10,7 @@
     "reload_stat": true,
     "is_print_case": true,
     "language": "es",
-    "conf_value": 0.05,
+    "confidence_alpha": 0.05,
     "features": {
         "title": {
             "dtype": "string",
@@ -19,7 +19,6 @@
             "require_training_set": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "context": {
@@ -29,7 +28,6 @@
             "require_training_set": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "question": {
@@ -39,7 +37,6 @@
             "require_training_set": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "id": {
@@ -49,7 +46,6 @@
             "require_training_set": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "answers": {
@@ -60,11 +56,9 @@
                 "require_training_set": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
-                "id": null,
                 "_type": "Value"
             },
             "length": -1,
-            "id": null,
             "is_bucket": false,
             "require_training_set": false,
             "_type": "Sequence"
@@ -76,7 +70,6 @@
             "require_training_set": false,
             "is_pre_computed": false,
             "bucket_info": null,
-            "id": null,
             "_type": "Value"
         },
         "context_length": {
@@ -90,7 +83,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "question_length": {
@@ -104,7 +96,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "answer_length": {
@@ -118,7 +109,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "num_oov": {
@@ -132,7 +122,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "fre_rank": {
@@ -146,7 +135,6 @@
                 "number": 4,
                 "setting": []
             },
-            "id": null,
             "_type": "Value"
         }
     },

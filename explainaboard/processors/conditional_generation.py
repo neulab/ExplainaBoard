@@ -1,10 +1,11 @@
+"""A processor for the conditional generation task."""
+
 from __future__ import annotations
 
 from collections import defaultdict
-from collections.abc import Iterator
+from collections.abc import Iterable
 from typing import Any, cast
 
-from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
@@ -34,43 +35,62 @@ from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.processor_registry import processor_registry
+from explainaboard.utils.language_utils import (
+    is_chinese_lang_code,
+    is_japanese_lang_code,
+)
 from explainaboard.utils.logging import progress
-from explainaboard.utils.tokenizer import TokenSeq
+from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer, TokenSeq
 from explainaboard.utils.typing_utils import unwrap, unwrap_generator
 
 
 @processor_registry.register("conditional_generation")
 class ConditionalGenerationProcessor(Processor):
+    """A processor for the conditional generation task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.conditional_generation
 
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
+        """Get a tokenizer based on the language."""
+        if is_chinese_lang_code(lang):
+            return SacreBleuTokenizer(variety='zh')
+        elif is_japanese_lang_code(lang):
+            return SacreBleuTokenizer(variety='ja-mecab')
+        elif lang == 'python':
+            return SacreBleuTokenizer(variety='conala')
+        else:
+            return SacreBleuTokenizer(variety='intl')
+
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
-            "source": feature.Value("string"),
-            "reference": feature.Value("string"),
-            "hypothesis": feature.Value("string"),
+            "source": feature.Value(dtype=feature.DataType.STRING),
+            "reference": feature.Value(dtype=feature.DataType.STRING),
+            "hypothesis": feature.Value(dtype=feature.DataType.STRING),
             "source_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the source",
                 func=lambda info, x, c: count_tokens(info, x['source'], side='source'),
             ),
             "reference_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the reference",
                 func=lambda info, x, c: count_tokens(
                     info, x['reference'], side='target'
                 ),
             ),
             "hypothesis_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="length of the hypothesis",
                 func=lambda info, x, c: count_tokens(
                     info, x['hypothesis'], side='target'
                 ),
             ),
             "src_num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="OOV words in the source",
                 func=lambda info, x, c, stat: feat_num_oov(
                     info, x['source'], stat['source_vocab'], side='source'
@@ -78,7 +98,7 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
             "src_fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="average training-set frequency rank of words in source",
                 func=lambda info, x, c, stat: feat_freq_rank(
                     info, x['source'], stat['source_vocab_rank'], side='source'
@@ -86,7 +106,7 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
             "ref_num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="number of OOV words in reference",
                 func=lambda info, x, c, stat: feat_num_oov(
                     info, x['reference'], stat['target_vocab'], side='target'
@@ -94,7 +114,7 @@ class ConditionalGenerationProcessor(Processor):
                 require_training_set=True,
             ),
             "ref_fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "average training-set frequency rank of words in reference"
                 ),
@@ -107,28 +127,28 @@ class ConditionalGenerationProcessor(Processor):
 
         tok_features: dict[str, FeatureType] = {
             "tok_text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="text of the token",
                 func=lambda info, x, c: self._get_tok_text(c),
             ),
             "tok_capitalness": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="whether the token is capitalized",
                 func=lambda info, x, c: cap_feature(c.features['tok_text']),
             ),
             "tok_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="relative position of token in sentence",
                 func=self._get_tok_position,
             ),
             "tok_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="number of characters in the token",
                 func=lambda info, x, c: len(c.features['tok_text']),
             ),
             # TODO(gneubig): commented out because less important and harder to impl
             # "tok_test_freq": feature.Value(
-            #     dtype="float",
+            #     dtype=feature.DataType.FLOAT,
             #     description="tok frequency in the test set",
             #     is_bucket=True,
             #     require_training_set=False,
@@ -139,7 +159,7 @@ class ConditionalGenerationProcessor(Processor):
             #     ),
             # ),
             "tok_train_freq": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="tok frequency in the training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['target_vocab'].get(
@@ -162,6 +182,7 @@ class ConditionalGenerationProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
@@ -172,16 +193,20 @@ class ConditionalGenerationProcessor(Processor):
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         eaas_defaults = cls._get_default_eaas_strs()
-        defaults: dict[str, list[MetricConfig]] = {
-            'example': [
+        metric_configs: list[Any] = []
+        for metric_name in eaas_defaults:
+            metric_configs.append(
                 EaaSMetricConfig(
-                    name=x,
+                    name=metric_name,
                     source_language=source_language,
                     target_language=target_language,
                 )
-                for x in eaas_defaults
-            ],
+            )
+
+        defaults: dict[str, list] = {
+            'example': metric_configs,
             'token': [
                 F1ScoreConfig(
                     name='F1',
@@ -196,7 +221,8 @@ class ConditionalGenerationProcessor(Processor):
     def full_metric_list(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
-        full_metrics_automated = [
+        """See Processor.full_metric_list."""
+        full_metrics_eaas = [
             "bleu",
             "bart_score_summ",
             "bart_score_mt",
@@ -220,7 +246,7 @@ class ConditionalGenerationProcessor(Processor):
             "LikertScore_factuality",
         ]
         example_configs: list[MetricConfig] = []
-        for x in full_metrics_automated:
+        for x in full_metrics_eaas:
             example_configs.append(
                 EaaSMetricConfig(
                     name=x,
@@ -267,9 +293,11 @@ class ConditionalGenerationProcessor(Processor):
             raise ValueError(f'bad type {type(c)}')
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return {'references': [data_point["reference"]], 'source': data_point["source"]}
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["hypothesis"]
 
     def _gen_cases_and_stats(
@@ -283,26 +311,48 @@ class ConditionalGenerationProcessor(Processor):
         if analysis_level.name == 'example':
             # Note that this is over-ridden to accommodate efficient calculation of
             # EaaS-style metrics
-            inputs = [
-                {
-                    'source': x['source'],
-                    'references': [x['reference']],
-                    'hypothesis': x['hypothesis'],
-                }
-                for x in sys_output
-            ]
-            metric_names = [
-                x.name for x in unwrap_generator(analysis_level.metric_configs)
-            ]
+
+            inputs = []
+            true_data = []
+            pred_data = []
+            for _id, feature_table in enumerate(sys_output):
+                inputs.append(
+                    {
+                        "source": feature_table["source"],
+                        "references": [feature_table["reference"]],
+                        "hypothesis": feature_table["hypothesis"],
+                    }
+                )
+                true_data.append(feature_table["reference"])
+                pred_data.append(feature_table["hypothesis"])
+
+            metric_names_eaas = []
+            metric_configs_noneaas = []
+            for metric_config in unwrap_generator(analysis_level.metric_configs):
+                if isinstance(metric_config, EaaSMetricConfig):
+                    metric_names_eaas.append(metric_config.name)
+                else:
+                    metric_configs_noneaas.append(metric_config)
+
             async_request = get_eaas_client().async_score(
                 inputs,
-                metrics=metric_names,
+                metrics=metric_names_eaas,
                 calculate=['corpus', 'stats'],
             )
-            metric_stats: list[MetricStats] = [
+
+            metric_stats: list[Any] = [
                 EaaSMetricStats(name=name, pos=i, eaas_request=async_request)
-                for i, name in enumerate(metric_names)
+                for i, name in enumerate(metric_names_eaas)
             ]
+
+            # For non-EaaS metrics
+            for metric_config in metric_configs_noneaas:
+                metric_stats.append(
+                    metric_config.to_metric().calc_stats_from_data(
+                        true_data, pred_data, metric_config
+                    )
+                )
+
             # Calculate features
             for i, output in progress(
                 enumerate(sys_output), desc='calculating example-level features'
@@ -422,14 +472,14 @@ class ConditionalGenerationProcessor(Processor):
 
         return tok_dics
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+        samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
         )
         return {
             'source_vocab': source_vocab,

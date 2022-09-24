@@ -13,11 +13,9 @@
                 "is_bucket": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
-                "id": null,
                 "_type": "Value"
             },
             "length": -1,
-            "id": null,
             "is_bucket": false,
             "_type": "Sequence"
         },
@@ -37,14 +35,12 @@
                 ],
                 "description": null,
                 "names_file": null,
-                "id": null,
                 "is_bucket": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
                 "_type": "ClassLabel"
             },
             "length": -1,
-            "id": null,
             "is_bucket": false,
             "_type": "Sequence"
         },
@@ -64,14 +60,12 @@
                 ],
                 "description": null,
                 "names_file": null,
-                "id": null,
                 "is_bucket": false,
                 "is_pre_computed": false,
                 "bucket_info": null,
                 "_type": "ClassLabel"
             },
             "length": -1,
-            "id": null,
             "is_bucket": false,
             "_type": "Sequence"
         },
@@ -85,7 +79,6 @@
                 "_number": 4,
                 "_setting": []
             },
-            "id": null,
             "_type": "Value"
         },
         "true_entity_info": {
@@ -97,7 +90,6 @@
                         "is_bucket": false,
                         "is_pre_computed": false,
                         "bucket_info": null,
-                        "id": null,
                         "_type": "Value"
                     },
                     "span_len": {
@@ -110,7 +102,6 @@
                             "_number": 4,
                             "_setting": []
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "span_pos": {
@@ -122,7 +113,6 @@
                         "is_pre_computed": false,
                         "bucket_info": null,
                         "_type": "Position",
-                        "id": null
                     },
                     "span_tag": {
                         "dtype": "string",
@@ -134,7 +124,6 @@
                             "_number": 4,
                             "_setting": 1
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "span_capitalness": {
@@ -147,7 +136,6 @@
                             "_number": 4,
                             "_setting": 1
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "span_position": {
@@ -160,7 +148,6 @@
                             "_number": 4,
                             "_setting": []
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "span_chars": {
@@ -173,7 +160,6 @@
                             "_number": 4,
                             "_setting": []
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "span_density": {
@@ -186,7 +172,6 @@
                             "_number": 4,
                             "_setting": []
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "eCon": {
@@ -199,7 +184,6 @@
                             "_number": 4,
                             "_setting": []
                         },
-                        "id": null,
                         "_type": "Value"
                     },
                     "eFre": {
@@ -212,7 +196,6 @@
                             "_number": 4,
                             "_setting": []
                         },
-                        "id": null,
                         "_type": "Value"
                     }
                 },
@@ -220,10 +203,8 @@
                 "is_pre_computed": false,
                 "bucket_info": null,
                 "_type": "Set",
-                "id": null
             },
             "length": -1,
-            "id": null,
             "is_bucket": false,
             "_type": "Sequence"
         }

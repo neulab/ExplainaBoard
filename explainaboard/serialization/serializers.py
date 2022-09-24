@@ -1,7 +1,8 @@
-"""Definition of DictSerializer"""
+"""Definition of DictSerializer."""
 
 from __future__ import annotations
 
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.registry import TypeRegistry
 from explainaboard.serialization.types import (
     PrimitiveData,
@@ -21,13 +22,14 @@ class PrimitiveSerializer:
     with name "cls_name".
     """
 
-    def __init__(self, registry: TypeRegistry[Serializable]) -> None:
+    def __init__(self, registry: TypeRegistry[Serializable] | None = None) -> None:
         """Initializes DictSerializer.
 
         Args:
-            registry: TypeRegistry to lookup type information.
+            registry: TypeRegistry to lookup type information. If None, the common
+                registry is used instead.
         """
-        self._registry = registry
+        self._registry = registry if registry is not None else common_registry
 
     def serialize(self, data: SerializableData) -> PrimitiveData:
         """Serialize given data to a primitive object.

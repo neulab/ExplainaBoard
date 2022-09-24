@@ -1,6 +1,9 @@
+"""The main entry point for running ExplainaBoard."""
+
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 
@@ -16,7 +19,7 @@ from explainaboard.loaders.file_loader import (
 )
 from explainaboard.metrics.eaas import EaaSMetricConfig
 from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.registry import metric_config_registry
+from explainaboard.serialization import common_registry
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
@@ -30,12 +33,15 @@ from explainaboard.visualizers.draw_charts import draw_charts_from_reports
 
 
 def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
-    """
-    Get the task for each system output.
-    :param task: Explicitly specified task. Use if present
-    :param system_outputs: System output files, load from metadata in these files if
-      an explicit task is not set
-    :return: A list of task types for each system
+    """Get the task for each system output.
+
+    Args:
+        task: Explicitly specified task. Use if present
+        system_outputs: System output files, load from metadata in these files if
+          an explicit task is not set
+
+    Returns:
+        A list of task types for each system
     """
     real_tasks: list[TaskType] = []
     if task:
@@ -67,7 +73,8 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
 
 
 def analyze_reports(args):
-    """
+    """Analyze reports based on the input arguments.
+
     score_tensor is a nested dict, for example
     score_tensor[system_name][dataset_name][language] =
     {
@@ -122,6 +129,11 @@ def analyze_reports(args):
 
 
 def create_parser():
+    """Create the parser with argparse.
+
+    Returns:
+        The parser.
+    """
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
     parser.add_argument('--task', type=str, required=False, help="the task name")
     parser.add_argument(
@@ -258,10 +270,21 @@ def create_parser():
 
     parser.add_argument(
         '--conf-value',
+        dest="confidence_alpha",
+        type=float,
+        required=False,
+        help="Deprecated. use --confidence-alpha instead.",
+    )
+
+    parser.add_argument(
+        '--confidence-alpha',
         type=float,
         required=False,
         default=0.05,
-        help="the p-value with which to calculate the confidence interval",
+        help=(
+            "the *inverse* confidence level of confidence intervals. If you need to "
+            "set the confidence level to 0.95, set this value to 0.05."
+        ),
     )
 
     parser.add_argument(
@@ -299,6 +322,12 @@ def create_parser():
         type=str,
         help="file types for custom datasets",
     )
+
+    parser.add_argument(
+        '--skip-failed-analyses',
+        action='store_true',
+        help="whether to skip failed analyses or report errors.",
+    )
     return parser
 
 
@@ -315,7 +344,10 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
         ValueError: `name` is not registered in neither the registry nor EaaS.
     """
     try:
-        return metric_config_registry.get_type(name)
+        cls = common_registry.get_type(name)
+        if not issubclass(cls, MetricConfig):
+            raise TypeError(f"Obtained class is not a MetricConfig: {cls.__name__}")
+        return cls
     except ValueError:
         if name in eaas.endpoint.EndpointConfig().valid_metrics:
             return EaaSMetricConfig
@@ -327,6 +359,7 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
 
 # TODO(Pengfei): The overall implementation of this script should be deduplicated
 def main():
+    """The main function to be executed."""
     args = create_parser().parse_args()
 
     reload_stat: bool = False if args.reload_stat == "0" else True
@@ -447,11 +480,11 @@ def main():
             "source_language": source_language,
             "target_language": target_language,
             "reload_stat": reload_stat,
-            "conf_value": args.conf_value,
+            "confidence_alpha": args.confidence_alpha,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
+            "custom_analyses": system_datasets[0].metadata.custom_analyses,
         }
-
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
@@ -471,26 +504,29 @@ def main():
             # metadata[
             #     "user_defined_features_configs"
             # ] = loader.user_defined_features_configs
-            metadata["task_name"] = task
+            metadata_copied = copy.deepcopy(metadata)
+            metadata_copied["task_name"] = task
 
             processor = get_processor(task=task)
             report = processor.process(
-                metadata=metadata, sys_output=system_dataset.samples
+                metadata=metadata_copied,
+                sys_output=system_dataset.samples,
+                skip_failed_analyses=args.skip_failed_analyses,
             )
             reports.append(report)
 
             # print to the console
-            get_logger('report').info('--- Overall Performance')
+            logger = get_logger('report')
+
+            logger.info('--- Overall Performance')
             for overall_level in report.results.overall:
                 for metric_stat in overall_level:
-                    get_logger('report').info(
-                        f'{metric_stat.metric_name}\t{metric_stat.value}'
-                    )
-            get_logger('report').info('')
-            get_logger('report').info('--- Fine-grained Analyses')
+                    logger.info(f'{metric_stat.metric_name}\t{metric_stat.value}')
+            logger.info('')
+            logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:
                 if analysis is not None:
-                    analysis.print()
+                    logger.info(analysis.generate_report())
 
             if output_dir:
 

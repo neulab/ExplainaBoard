@@ -1,8 +1,9 @@
+"""A processor for the extractive QA task."""
+
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-from datalabs import aggregating
+from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -23,29 +24,35 @@ from explainaboard.utils.typing_utils import unwrap
 
 @processor_registry.register("qa_extractive")
 class QAExtractiveProcessor(Processor):
+    """A processor for the extractive QA task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.qa_extractive
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
-            "context": feature.Value("string"),
-            "question": feature.Value("string"),
-            "id": feature.Value("string"),
-            "answers": feature.Sequence(feature=feature.Value("string")),
-            "predicted_answers": feature.Value("string"),
+            "context": feature.Value(dtype=feature.DataType.STRING),
+            "question": feature.Value(dtype=feature.DataType.STRING),
+            "id": feature.Value(dtype=feature.DataType.STRING),
+            "answers": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "predicted_answers": feature.Value(dtype=feature.DataType.STRING),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "question_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
             "answer_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
                     info,
@@ -56,7 +63,7 @@ class QAExtractiveProcessor(Processor):
                 ),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -64,7 +71,7 @@ class QAExtractiveProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "average rank of context words based on training set freq"
                 ),
@@ -84,12 +91,14 @@ class QAExtractiveProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         if source_language != target_language:
             raise ValueError(
                 'Source and target language must be equal for extractive '
@@ -108,8 +117,7 @@ class QAExtractiveProcessor(Processor):
             ),
         ]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )
@@ -117,7 +125,9 @@ class QAExtractiveProcessor(Processor):
         return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return data_point["answers"]["text"]
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["predicted_answers"]["text"]

@@ -1,8 +1,9 @@
+"""A processor for the multiple-choice QA task."""
+
 from __future__ import annotations
 
-from collections.abc import Iterator
-
-from datalabs import aggregating
+from collections.abc import Iterable
+from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -23,42 +24,48 @@ from explainaboard.utils.typing_utils import unwrap
 
 @processor_registry.register("qa_multiple_choice")
 class QAMultipleChoiceProcessor(Processor):
+    """A processor for the multiple-choice QA task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.qa_multiple_choice
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         features = {
-            "context": feature.Value("string"),
-            "question": feature.Value("string"),
-            "options": feature.Sequence(feature=feature.Value("string")),
+            "context": feature.Value(dtype=feature.DataType.STRING),
+            "question": feature.Value(dtype=feature.DataType.STRING),
+            "options": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "answers": feature.Sequence(
                 feature=feature.Dict(
                     feature={
-                        "text": feature.Value("string"),
-                        "option_index": feature.Value("int32"),
+                        "text": feature.Value(dtype=feature.DataType.STRING),
+                        "option_index": feature.Value(dtype=feature.DataType.INT),
                     }
                 )
             ),
             "context_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
             "question_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['question']),
             ),
             "answer_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
                     info, x['answers']['text'], side='target'
                 ),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -66,7 +73,7 @@ class QAMultipleChoiceProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "average rank of context words based on training set freq"
                 ),
@@ -86,12 +93,14 @@ class QAMultipleChoiceProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         return self.continuous_feature_analyses()
 
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
     ) -> list[MetricConfig]:
+        """See Processor.default_metrics."""
         return [
             AccuracyConfig(
                 name='Accuracy',
@@ -106,23 +115,14 @@ class QAMultipleChoiceProcessor(Processor):
         ]
 
     def _get_true_label(self, data_point):
-        """
-        Get the true label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the true label for the output
-        """
+        """See processor._get_true_label."""
         return data_point["answers"]["option_index"]
 
     def _get_predicted_label(self, data_point):
-        """
-        Get the predicted label from a data point. Overloaded from parent class.
-        :param data_point: the data point under consideration
-        :return: the predicted label for the output
-        """
+        """See processor._get_predicted_label."""
         return data_point["predicted_answers"]["option_index"]
 
-    @aggregating()
-    def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
         )

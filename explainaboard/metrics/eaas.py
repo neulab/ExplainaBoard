@@ -1,3 +1,5 @@
+"""Evaluation metrics using the "Evaluation as a Service" library."""
+
 from __future__ import annotations
 
 import copy
@@ -10,12 +12,14 @@ import numpy as np
 import sacrebleu
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.serialization import common_registry
 
 _eaas_config = None
 _eaas_client = None
 
 
 def get_eaas_client():
+    """Get a global client for EaaS."""
     global _eaas_config, _eaas_client
     if not _eaas_client:
         _eaas_config = Config()
@@ -77,25 +81,27 @@ class EaaSMetricStats(MetricStats):
         raise NotImplementedError
 
 
-# NOTE(odashi): Not register this config to the registry.
-# This metric class has different usage than other metrics.
 @dataclass
+@common_registry.register("EaaSMetricConfig")
 class EaaSMetricConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for EaaSMetric."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return EaaSMetric(self)
 
 
 class EaaSMetric(Metric):
-    """
-    A metric that calculates evaluation scores using EaaS.
-    """
+    """A metric that calculates evaluation scores using EaaS."""
 
     _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
-        if agg_stats.ndim == 1:
+        """See Metric.calc_metric_from_aggregate."""
+        is_batched = agg_stats.ndim != 1
+        if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
         n_samples = agg_stats.shape[0]
         if self.config.name in {'bleu', 'chrf'}:
@@ -108,23 +114,21 @@ class EaaSMetric(Metric):
                     metric_class._compute_score_from_stats(list(single_stat)).score
                     / 100.0
                 )
-            return ret_metric
+            calc_result = ret_metric
         elif self.config.name == 'length_ratio':
-            return agg_stats[:, 0] / agg_stats[:, 1]
-        elif self.config.name == 'length':
-            return agg_stats[:, 0]
+            calc_result = agg_stats[:, 0] / agg_stats[:, 1]
         else:
-            return agg_stats
+            calc_result = agg_stats[:, 0]
+        if not is_batched:
+            calc_result = calc_result[0]
+        return calc_result
 
     def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
         return self.config.name not in self._NOT_SIMPLE_METRICS
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
-        """
-        Aggregate sufficient statistics from multiple examples into a single example
-        :param stats: stats for every example
-        :return: aggregated stats
-        """
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """See: Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         if self.config.name in {'bleu', 'chrf'}:
             return np.sum(data, axis=-2)
@@ -134,8 +138,12 @@ class EaaSMetric(Metric):
     def calc_stats_from_data(
         self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
     ) -> MetricStats:
-        # Note that it's better to batch requests when possible, e.g. as in
-        # `processors/conditional_generation.py`
+        """See Metric.calc_stats_from_data.
+
+        Note that specifically for EaaSMetric, it's better to batch requests when
+        possible, so they can be sent in a single API call. For example, see
+        `processors/conditional_generation.py`.
+        """
         inputs = []
         for td, pd in zip(true_data, pred_data):
             ntd = copy.deepcopy(td)
