@@ -18,7 +18,7 @@ from explainaboard.processors.processor_registry import register_processor
 
 
 @register_processor(TaskType.grammatical_error_correction)
-class GrammaticalErrorCorrection(Processor):
+class GrammaticalErrorCorrectionProcessor(Processor):
     """A processor for the grammatical error correction task."""
 
     @classmethod
