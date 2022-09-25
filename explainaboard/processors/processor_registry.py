@@ -17,7 +17,7 @@ from explainaboard.processors.conditional_generation import (
 )
 from explainaboard.processors.extractive_qa import QAExtractiveProcessor
 from explainaboard.processors.grammatical_error_correction import (
-    GrammaticalErrorCorrection,
+    GrammaticalErrorCorrectionProcessor,
 )
 from explainaboard.processors.kg_link_tail_prediction import (
     KGLinkTailPredictionProcessor,
@@ -73,7 +73,7 @@ def get_processor_class(task: TaskType) -> type[Processor]:
         TaskType.chunking: ChunkingProcessor,
         TaskType.cloze_mutiple_choice: ClozeMultipleChoiceProcessor,
         TaskType.cloze_generative: ClozeGenerativeProcessor,
-        TaskType.grammatical_error_correction: GrammaticalErrorCorrection,
+        TaskType.grammatical_error_correction: GrammaticalErrorCorrectionProcessor,
         TaskType.nlg_meta_evaluation: NLGMetaEvaluationProcessor,
         TaskType.tabular_regression: TabularRegressionProcessor,
         TaskType.tabular_classification: TabularClassificationProcessor,

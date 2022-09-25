@@ -17,8 +17,8 @@ from explainaboard.processors.processor import Processor
 from explainaboard.serialization import common_registry
 
 
-@common_registry.register("GrammaticalErrorCorrection")
-class GrammaticalErrorCorrection(Processor):
+@common_registry.register("GrammaticalErrorCorrectionProcessor")
+class GrammaticalErrorCorrectionProcessor(Processor):
     """A processor for the grammatical error correction task."""
 
     @classmethod
