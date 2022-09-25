@@ -99,5 +99,6 @@ def get_processor(task: TaskType | str) -> Processor:
     Returns:
         The processor for that task
     """
-    cls = get_processor_class(task)
+    task_type = task if isinstance(task, TaskType) else TaskType(task)
+    cls = get_processor_class(task_type)
     return cls()
