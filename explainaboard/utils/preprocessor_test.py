@@ -24,4 +24,4 @@ class MapPreprocessorTest(unittest.TestCase):
         dictionary = {"aaaa": "a", "bbbb": "b"}
         preprocessor = MapPreprocessor(dictionary=dictionary)
         self.assertEqual(preprocessor("aaaa"), "a")
-        self.assertEqual(preprocessor("ab"), "ab")
+        self.assertEqual(preprocessor("xbbbb"), "xbbbb")
