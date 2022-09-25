@@ -47,7 +47,7 @@ def get_default_tokenizer(lang: str | None) -> Tokenizer:
 
 @final
 @dataclass(frozen=True)
-class TokenSeq(Sequence[str]):
+class TokenSeq:
     """Dataclass representing a list of tokens and its original positions."""
 
     strs: list[str]
