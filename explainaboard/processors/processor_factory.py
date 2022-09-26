@@ -41,7 +41,7 @@ from explainaboard.processors.text_pair_classification import (
 )
 from explainaboard.processors.word_segmentation import CWSProcessor
 
-_TASK_TYPE_TO_PROCESSOR = {
+_TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
     TaskType.text_classification: TextClassificationProcessor,
     TaskType.named_entity_recognition: NERProcessor,
     TaskType.qa_extractive: QAExtractiveProcessor,
