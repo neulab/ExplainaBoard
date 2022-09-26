@@ -555,10 +555,12 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
         return sys_info
 
+    @final
     def serialize(self) -> dict[str, SerializableData]:
         """See Serializable.serialize."""
         return {}
 
+    @final
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
         """See Serializable.deserialize."""
