@@ -82,7 +82,7 @@ def get_processor_class(task: TaskType) -> type[Processor]:
     try:
         cls = task_to_procesor[task]
     except KeyError:
-        raise ValueError(f"{task} is not a supported task type.")
+        raise ValueError(f"No Processor is defined for the task: {task}")
     if not issubclass(cls, Processor):
         raise TypeError(f"Obtained class is not a Processor: {cls.__name__}")
     return cls
