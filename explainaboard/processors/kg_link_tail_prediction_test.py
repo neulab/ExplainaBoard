@@ -8,7 +8,7 @@ from explainaboard import TaskType
 from explainaboard.processors.kg_link_tail_prediction import (
     KGLinkTailPredictionProcessor,
 )
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor
 from explainaboard.serialization.serializers import PrimitiveSerializer
 
 

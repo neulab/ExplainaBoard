@@ -8,7 +8,7 @@ from explainaboard import TaskType
 from explainaboard.processors.argument_pair_extraction import (
     ArgumentPairExtractionProcessor,
 )
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor
 from explainaboard.serialization.serializers import PrimitiveSerializer
 
 

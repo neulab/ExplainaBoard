@@ -6,7 +6,7 @@ import unittest
 
 from explainaboard import TaskType
 from explainaboard.processors.extractive_qa import QAExtractiveProcessor
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor
 
 
 class QAExtractiveProcessorTest(unittest.TestCase):

@@ -6,7 +6,7 @@ import unittest
 
 from explainaboard import TaskType
 from explainaboard.processors.language_modeling import LanguageModelingProcessor
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor
 from explainaboard.serialization.serializers import PrimitiveSerializer
 
 

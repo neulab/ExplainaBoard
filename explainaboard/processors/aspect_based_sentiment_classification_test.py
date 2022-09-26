@@ -8,7 +8,7 @@ from explainaboard import TaskType
 from explainaboard.processors.aspect_based_sentiment_classification import (
     AspectBasedSentimentClassificationProcessor,
 )
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor
 from explainaboard.serialization.serializers import PrimitiveSerializer
 
 

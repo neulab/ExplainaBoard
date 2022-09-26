@@ -6,7 +6,7 @@ import unittest
 
 from explainaboard import TaskType
 from explainaboard.processors.chunking import ChunkingProcessor
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor
 from explainaboard.serialization.serializers import PrimitiveSerializer
 
 

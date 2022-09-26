@@ -1,4 +1,4 @@
-"""A registry for processors."""
+"""A factory for processors."""
 
 from __future__ import annotations
 
