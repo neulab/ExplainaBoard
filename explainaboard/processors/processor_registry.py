@@ -41,6 +41,31 @@ from explainaboard.processors.text_pair_classification import (
 )
 from explainaboard.processors.word_segmentation import CWSProcessor
 
+_TASK_TYPE_TO_PROCESSOR = {
+    TaskType.text_classification: TextClassificationProcessor,
+    TaskType.named_entity_recognition: NERProcessor,
+    TaskType.qa_extractive: QAExtractiveProcessor,
+    TaskType.summarization: SummarizationProcessor,
+    TaskType.machine_translation: MachineTranslationProcessor,
+    TaskType.text_pair_classification: TextPairClassificationProcessor,
+    TaskType.aspect_based_sentiment_classification: AspectBasedSentimentClassificationProcessor,  # noqa: E501
+    TaskType.kg_link_tail_prediction: KGLinkTailPredictionProcessor,
+    TaskType.qa_multiple_choice: QAMultipleChoiceProcessor,
+    TaskType.qa_open_domain: QAOpenDomainProcessor,
+    TaskType.qa_tat: QATatProcessor,
+    TaskType.conditional_generation: ConditionalGenerationProcessor,
+    TaskType.word_segmentation: CWSProcessor,
+    TaskType.language_modeling: LanguageModelingProcessor,
+    TaskType.chunking: ChunkingProcessor,
+    TaskType.cloze_mutiple_choice: ClozeMultipleChoiceProcessor,
+    TaskType.cloze_generative: ClozeGenerativeProcessor,
+    TaskType.grammatical_error_correction: GrammaticalErrorCorrectionProcessor,
+    TaskType.nlg_meta_evaluation: NLGMetaEvaluationProcessor,
+    TaskType.tabular_regression: TabularRegressionProcessor,
+    TaskType.tabular_classification: TabularClassificationProcessor,
+    TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
+}
+
 
 def get_processor_class(task: TaskType) -> type[Processor]:
     """Returns a Processor class from the given task type.
@@ -55,36 +80,10 @@ def get_processor_class(task: TaskType) -> type[Processor]:
         ValueError: if the given task is not supported.
         TypeError: if the obtained class is not a subclass of Processor class.
     """
-    task_to_procesor = {
-        TaskType.text_classification: TextClassificationProcessor,
-        TaskType.named_entity_recognition: NERProcessor,
-        TaskType.qa_extractive: QAExtractiveProcessor,
-        TaskType.summarization: SummarizationProcessor,
-        TaskType.machine_translation: MachineTranslationProcessor,
-        TaskType.text_pair_classification: TextPairClassificationProcessor,
-        TaskType.aspect_based_sentiment_classification: AspectBasedSentimentClassificationProcessor,  # noqa: E501
-        TaskType.kg_link_tail_prediction: KGLinkTailPredictionProcessor,
-        TaskType.qa_multiple_choice: QAMultipleChoiceProcessor,
-        TaskType.qa_open_domain: QAOpenDomainProcessor,
-        TaskType.qa_tat: QATatProcessor,
-        TaskType.conditional_generation: ConditionalGenerationProcessor,
-        TaskType.word_segmentation: CWSProcessor,
-        TaskType.language_modeling: LanguageModelingProcessor,
-        TaskType.chunking: ChunkingProcessor,
-        TaskType.cloze_mutiple_choice: ClozeMultipleChoiceProcessor,
-        TaskType.cloze_generative: ClozeGenerativeProcessor,
-        TaskType.grammatical_error_correction: GrammaticalErrorCorrectionProcessor,
-        TaskType.nlg_meta_evaluation: NLGMetaEvaluationProcessor,
-        TaskType.tabular_regression: TabularRegressionProcessor,
-        TaskType.tabular_classification: TabularClassificationProcessor,
-        TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
-    }
     try:
-        cls = task_to_procesor[task]
+        cls = _TASK_TYPE_TO_PROCESSOR[task]
     except KeyError:
         raise ValueError(f"No Processor is defined for the task: {task}")
-    if not issubclass(cls, Processor):
-        raise TypeError(f"Obtained class is not a Processor: {cls.__name__}")
     return cls
 
 
