@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
 
 
@@ -30,7 +30,7 @@ class WordSegmentationTest(unittest.TestCase):
             "metric_names": ["F1Score"],
         }
 
-        processor = get_processor(TaskType.word_segmentation)
+        processor = get_processor_class(TaskType.word_segmentation)()
 
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 

@@ -4,7 +4,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
 
 
@@ -53,7 +53,7 @@ class MachineTranslationTest(unittest.TestCase):
             "metric_names": ["bleu"],
         }
 
-        processor = get_processor(TaskType.machine_translation.value)
+        processor = get_processor_class(TaskType.machine_translation)()
 
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
@@ -62,8 +62,8 @@ class MachineTranslationTest(unittest.TestCase):
 
     def test_default_features_dont_modify_condgen(self):
 
-        condgen_processor = get_processor(TaskType.conditional_generation.value)
-        mt_processor = get_processor(TaskType.machine_translation.value)
+        condgen_processor = get_processor_class(TaskType.conditional_generation)()
+        mt_processor = get_processor_class(TaskType.machine_translation)()
 
         condgen_features_1 = condgen_processor.default_analysis_levels()
         mt_features = mt_processor.default_analysis_levels()
@@ -102,7 +102,7 @@ class MachineTranslationTest(unittest.TestCase):
             },
         )
 
-        processor = get_processor(TaskType.machine_translation.value)
+        processor = get_processor_class(TaskType.machine_translation)()
 
         sys_info = processor.process(
             dataclasses.asdict(data.metadata), data.samples, skip_failed_analyses=True

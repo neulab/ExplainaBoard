@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_registry import get_loader_class
 
@@ -27,7 +27,7 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
             "sub_dataset_name": "writing-grammar",
             "metric_names": ["SeqCorrectCount"],
         }
-        processor = get_processor(TaskType.grammatical_error_correction.value)
+        processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
         overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
         self.assertAlmostEqual(overall_map["SeqCorrectCount"].value, 8)

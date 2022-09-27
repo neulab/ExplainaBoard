@@ -4,7 +4,7 @@ import unittest
 
 from integration_tests.utils import load_file_as_str, test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption, FileLoaderMetadata
 from explainaboard.loaders.loader_registry import get_loader_class
 
@@ -72,7 +72,7 @@ class TextClassificationTest(unittest.TestCase):
             "custom_features": data.metadata.custom_features,
         }
 
-        processor = get_processor(TaskType.text_classification.value)
+        processor = get_processor_class(TaskType.text_classification)()
 
         sys_info = processor.process(metadata, data.samples)
         for analysis in sys_info.results.analyses:
@@ -92,7 +92,7 @@ class TextClassificationTest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load()
-        processor = get_processor(TaskType.text_classification)
+        processor = get_processor_class(TaskType.text_classification)()
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -115,7 +115,7 @@ class TextClassificationTest(unittest.TestCase):
         )
         data = loader.load()
 
-        processor = get_processor(TaskType.text_classification)
+        processor = get_processor_class(TaskType.text_classification)()
         sys_info = processor.process(metadata, data)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -133,7 +133,7 @@ class TextClassificationTest(unittest.TestCase):
         data = loader.load()
         self.assertNotEqual(data.metadata, FileLoaderMetadata)
         metadata = dataclasses.asdict(data.metadata)
-        processor = get_processor(TaskType.text_classification)
+        processor = get_processor_class(TaskType.text_classification)()
 
         sys_info = processor.process(metadata, data.samples)
 
