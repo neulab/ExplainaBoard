@@ -5,7 +5,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_registry import get_loader_class
@@ -42,7 +42,7 @@ class NERTest(unittest.TestCase):
             # "sub_dataset_name":"ner",
             "metric_names": ["F1Score"],
         }
-        processor = get_processor(TaskType.named_entity_recognition)
+        processor = get_processor_class(TaskType.named_entity_recognition)()
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -71,7 +71,7 @@ class NERTest(unittest.TestCase):
             "sub_dataset_name": "ner",
             "metric_names": ["F1Score"],
         }
-        processor = get_processor(TaskType.named_entity_recognition)
+        processor = get_processor_class(TaskType.named_entity_recognition)()
         sys_info = processor.process(metadata, data)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -159,7 +159,7 @@ class NERTest(unittest.TestCase):
                 "task_name": TaskType.named_entity_recognition.value,
             }
         )
-        processor = get_processor(TaskType.named_entity_recognition)
+        processor = get_processor_class(TaskType.named_entity_recognition)()
         sys_info = processor.process(metadata, data.samples)
         self.assertIsNotNone(sys_info.results.analyses)
         self.assertGreater(len(sys_info.results.overall), 0)

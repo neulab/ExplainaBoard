@@ -3,7 +3,13 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_loader_class, get_processor, Source, TaskType
+from explainaboard import (
+    FileType,
+    get_loader_class,
+    get_processor_class,
+    Source,
+    TaskType,
+)
 
 
 class NLGMetaEvalTest(unittest.TestCase):
@@ -27,7 +33,7 @@ class NLGMetaEvalTest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load().samples
-        processor = get_processor(TaskType.nlg_meta_evaluation)
+        processor = get_processor_class(TaskType.nlg_meta_evaluation)()
 
         sys_info = processor.process(metadata, data)
 

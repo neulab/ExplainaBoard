@@ -4,18 +4,11 @@ from __future__ import annotations
 
 import unittest
 
-from explainaboard import TaskType
-from explainaboard.processors.processor_factory import get_processor
 from explainaboard.processors.word_segmentation import CWSProcessor
 from explainaboard.serialization.serializers import PrimitiveSerializer
 
 
 class CWSProcessorTest(unittest.TestCase):
-    def test_get_processor(self) -> None:
-        self.assertIsInstance(
-            get_processor(TaskType.word_segmentation.value), CWSProcessor
-        )
-
     def test_serialize(self) -> None:
         serializer = PrimitiveSerializer()
         self.assertEqual(

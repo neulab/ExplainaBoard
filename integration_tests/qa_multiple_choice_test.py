@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
 
 
@@ -40,7 +40,7 @@ class QAMultipleChoiceTest(unittest.TestCase):
             "metric_names": ["Accuracy"],
         }
 
-        processor = get_processor(TaskType.qa_multiple_choice.value)
+        processor = get_processor_class(TaskType.qa_multiple_choice)()
         sys_info = processor.process(metadata, data)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -71,7 +71,7 @@ class QAMultipleChoiceTest(unittest.TestCase):
             "user_defined_features_configs": data.metadata.custom_features,
         }
 
-        processor = get_processor(TaskType.qa_multiple_choice.value)
+        processor = get_processor_class(TaskType.qa_multiple_choice)()
 
         sys_info = processor.process(metadata, data.samples)
 

@@ -9,7 +9,7 @@ from integration_tests.utils import test_artifacts_path
 import numpy as np
 from sklearn.metrics import f1_score
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders import get_loader_class
 import explainaboard.metrics.accuracy
 import explainaboard.metrics.eaas
@@ -240,7 +240,7 @@ class MetricTest(unittest.TestCase):
             "source_language": "en",
         }
 
-        processor = get_processor(TaskType.qa_extractive)
+        processor = get_processor_class(TaskType.qa_extractive)()
 
         sys_info = processor.process(metadata, data)
 

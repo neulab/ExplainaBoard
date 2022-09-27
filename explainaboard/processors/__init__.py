@@ -27,13 +27,13 @@ from explainaboard.processors import (
     text_pair_classification,
     word_segmentation,
 )
-from explainaboard.processors.processor_factory import get_processor
+from explainaboard.processors.processor_factory import get_processor_class
 
 __all__ = [
     'aspect_based_sentiment_classification',
     'conditional_generation',
     'extractive_qa',
-    'get_processor',
+    'get_processor_class',
     'kg_link_tail_prediction',
     'language_modeling',
     'machine_translation',

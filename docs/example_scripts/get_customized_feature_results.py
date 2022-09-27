@@ -1,4 +1,4 @@
-from explainaboard import get_loader_class, get_processor, TaskType
+from explainaboard import get_loader_class, get_processor_class, TaskType
 
 
 # This code details (1) how to evaluate your systems using ExplainaBoard
@@ -11,7 +11,7 @@ def get_customized_results(dataset, customized_features):
     loader = get_loader_class(task)(dataset, dataset)
     data = loader.load()
     # Initialize the processor and perform the processing
-    processor = get_processor(TaskType.kg_link_tail_prediction.value)
+    processor = get_processor_class(TaskType.kg_link_tail_prediction)()
     metadata = {
         "task_name": TaskType.kg_link_tail_prediction.value,
         "custom_features": data.metadata.custom_features,

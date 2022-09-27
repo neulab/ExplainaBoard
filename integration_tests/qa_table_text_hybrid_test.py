@@ -1,6 +1,6 @@
 import unittest
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.utils import cache_api
@@ -27,7 +27,7 @@ class QATableTextHybridTest(unittest.TestCase):
             "dataset_name": "tat_qa",
             "metric_names": ["ExactMatchQATat", "F1ScoreQATat"],
         }
-        processor = get_processor(TaskType.qa_tat)
+        processor = get_processor_class(TaskType.qa_tat)()
         sys_info = processor.process(metadata, data)
         self.assertIsNotNone(sys_info.results.analyses)
 

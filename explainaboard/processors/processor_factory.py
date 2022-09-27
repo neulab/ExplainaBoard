@@ -85,19 +85,3 @@ def get_processor_class(task: TaskType) -> type[Processor]:
     except KeyError:
         raise ValueError(f"No Processor is defined for the task: {task}")
     return cls
-
-
-def get_processor(task: TaskType | str) -> Processor:
-    """Return a processor based on the task type.
-
-    TODO: error handling
-
-    Args:
-        task: The type of task
-
-    Returns:
-        The processor for that task
-    """
-    task_type = task if isinstance(task, TaskType) else TaskType(task)
-    cls = get_processor_class(task_type)
-    return cls()

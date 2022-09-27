@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import load_file_as_str, test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
 
 
@@ -41,7 +41,9 @@ class AspectBasedSentimentClassificationTest(unittest.TestCase):
             "task_name": TaskType.aspect_based_sentiment_classification,
             "metric_names": ["Accuracy", "F1Score"],
         }
-        processor = get_processor(TaskType.aspect_based_sentiment_classification)
+        processor = get_processor_class(
+            TaskType.aspect_based_sentiment_classification
+        )()
 
         sys_info = processor.process(metadata, data)
 

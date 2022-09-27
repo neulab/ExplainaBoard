@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
 from explainaboard.utils.logging import get_logger
 
@@ -40,7 +40,7 @@ class ExtractiveQATest(unittest.TestCase):
             "source_language": "en",
         }
 
-        processor = get_processor(TaskType.qa_extractive)
+        processor = get_processor_class(TaskType.qa_extractive)()
         sys_info = processor.process(metadata, data)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -82,7 +82,7 @@ class ExtractiveQATest(unittest.TestCase):
             "target_language": "zh",
         }
 
-        processor = get_processor(TaskType.qa_extractive)
+        processor = get_processor_class(TaskType.qa_extractive)()
 
         sys_info = processor.process(metadata, data)
 

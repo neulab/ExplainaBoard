@@ -9,7 +9,7 @@ import os
 
 import eaas.endpoint
 
-from explainaboard import get_loader_class, get_processor, TaskType
+from explainaboard import get_loader_class, get_processor_class, TaskType
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (
@@ -507,7 +507,7 @@ def main():
             metadata_copied = copy.deepcopy(metadata)
             metadata_copied["task_name"] = task
 
-            processor = get_processor(task=task)
+            processor = get_processor_class(task=task)()
             report = processor.process(
                 metadata=metadata_copied,
                 sys_output=system_dataset.samples,
