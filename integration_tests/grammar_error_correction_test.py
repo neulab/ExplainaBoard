@@ -29,8 +29,7 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
         }
         processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
-        overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
-        self.assertAlmostEqual(overall_map["SeqCorrectCount"].value, 8)
+        self.assertAlmostEqual(sys_info.results.overall[0]["SeqCorrectCount"].value, 8)
         self.assertIsNotNone(sys_info.results.analyses)
 
 

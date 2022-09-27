@@ -144,18 +144,17 @@ def plot_buckets(
         else render_interval_to_tick_label(unwrap(x.bucket_interval))
         for x in bucket_results[0].bucket_performances
     ]
-    bucket0_names = [
-        x.metric_name for x in bucket_results[0].bucket_performances[0].performances
-    ]
-    for metric_id, metric_name in enumerate(bucket0_names):
 
+    bucket0_names = sorted(bucket_results[0].bucket_performances[0].performances.keys())
+
+    for metric_name in bucket0_names:
+        # indices: [analysis_id][bucket_id]
         performances: list[list[Performance]] = [
-            [x.performances[metric_id] for x in y.bucket_performances]
+            [x.performances[metric_name] for x in y.bucket_performances]
             for y in bucket_results
         ]
         ys = [[x.value for x in y] for y in performances]
 
-        y_errs = None
         if performances[0][0].confidence_score_low is not None:
             y_errs = [
                 (
@@ -164,6 +163,8 @@ def plot_buckets(
                 )
                 for y in performances
             ]
+        else:
+            y_errs = None
 
         make_bar_chart(
             ys,
@@ -207,18 +208,24 @@ def draw_charts_from_reports(
     # --- Overall results
     num_levels = len(unwrap(report_info[0].analysis_levels))
     for level_id in range(num_levels):
-        overall_results: list[list[Performance]] = [
-            list(unwrap(x.results.overall)[level_id]) for x in report_info
+        overall_results: list[dict[str, Performance]] = [
+            x.results.overall[level_id] for x in report_info
         ]
-        overall_metric_names = [x.metric_name for x in overall_results[0]]
+        overall_metric_names = sorted((overall_results[0].keys()))
 
-        ys = [[x.value for x in y] for y in overall_results]
+        ys = [[y[name].value for name in overall_metric_names] for y in overall_results]
         y_errs = None
-        if overall_results[0][0].confidence_score_low is not None:
+        if overall_results[0][overall_metric_names[0]].confidence_score_low is not None:
             y_errs = [
                 (
-                    [x.value - unwrap(x.confidence_score_low) for x in y],
-                    [unwrap(x.confidence_score_high) - x.value for x in y],
+                    [
+                        y[name].value - unwrap(y[name].confidence_score_low)
+                        for name in overall_metric_names
+                    ],
+                    [
+                        unwrap(y[name].confidence_score_high) - y[name].value
+                        for name in overall_metric_names
+                    ],
                 )
                 for y in overall_results
             ]

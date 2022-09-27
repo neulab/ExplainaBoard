@@ -515,7 +515,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         overall_results = self.get_overall_performance(
             sys_info, analysis_cases, metric_stats
         )
-        sys_info.results = Result(overall=overall_results, analyses=None)
+        sys_info.results = Result(overall=overall_results, analyses=[])
         return OverallStatistics(sys_info, analysis_cases, metric_stats)
 
     @final

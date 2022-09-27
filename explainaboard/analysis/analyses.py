@@ -163,20 +163,15 @@ class BucketAnalysisResult(AnalysisResult):
 
     def __post_init__(self):
         """Set the class name and validate."""
-        metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
-        num_metrics = len(metric_names)
+        metric_names = self.bucket_performances[0].performances.keys()
+
         for bucket_perf in self.bucket_performances:
-            if len(bucket_perf.performances) != num_metrics:
+            if bucket_perf.performances.keys() != metric_names:
                 raise ValueError(
-                    "Inconsistent number of metrics. "
-                    f"Required: {num_metrics}, got: {len(bucket_perf.performances)}"
+                    "Inconsistent metrics. "
+                    f"Required: {set(metric_names)}, "
+                    f"got: {set(bucket_perf.performances.keys())}"
                 )
-            for metric_name, perf in zip(metric_names, bucket_perf.performances):
-                if perf.metric_name != metric_name:
-                    raise ValueError(
-                        "Inconsistent metric names. "
-                        f"Required: {metric_name}, got: {perf.metric_name}"
-                    )
 
         self.cls_name: str = self.__class__.__name__
 

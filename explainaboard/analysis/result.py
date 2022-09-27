@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from explainaboard.analysis.analyses import AnalysisResult
 from explainaboard.analysis.performance import Performance
@@ -20,20 +20,16 @@ class Result:
         analyses: The results of various analyses.
     """
 
-    overall: Optional[list[dict[str, Performance]]] = None
-    analyses: Optional[list[AnalysisResult]] = None
+    overall: list[dict[str, Performance]]
+    analyses: list[AnalysisResult]
 
     @classmethod
-    def dict_conv(cls, k: str, v: Any | None):
+    def dict_conv(cls, k: str, v: Any):
         """A utility function for deserialization."""
         if k == 'overall':
-            return (
-                [{k: Performance.from_dict(v2) for k, v2 in v1.items()} for v1 in v]
-                if v
-                else None
-            )
+            return [{k: Performance.from_dict(v2) for k, v2 in v1.items()} for v1 in v]
         elif k == 'analyses':
-            return [AnalysisResult.from_dict(v1) for v1 in v] if v else None
+            return [AnalysisResult.from_dict(v1) for v1 in v]
         else:
             raise NotImplementedError
 

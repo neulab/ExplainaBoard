@@ -44,7 +44,7 @@ class BucketPerformance:
             The value corresponding to the key
         """
         if k == 'performances':
-            return [Performance.from_dict(v1) for v1 in v]
+            return {name: Performance.from_dict(v1) for name, v1 in v.items()}
         else:
             return v
 

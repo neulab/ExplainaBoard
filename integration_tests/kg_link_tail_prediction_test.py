@@ -124,8 +124,8 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
-            first_item = symmetry_performances[i].performances[0].value
-            second_item = symmetry_performances[i + 1].performances[0].value
+            first_item = symmetry_performances[i].performances["Hits4"].value
+            second_item = symmetry_performances[i + 1].performances["Hits4"].value
             self.assertGreater(first_item, second_item)
 
     def test_sort_buckets_by_key(self):
