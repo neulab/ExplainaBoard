@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import dataclasses
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from explainaboard.metrics.metric import AuxiliaryMetricResult
 
 
-@dataclass
+@dataclass(frozen=True)
 class BucketPerformance:
     """A class containing information about performance over buckets.
 
@@ -23,8 +23,8 @@ class BucketPerformance:
     """
 
     n_samples: int
-    bucket_samples: list[int] = field(default_factory=list)
-    performances: list[Performance] = field(default_factory=list)
+    bucket_samples: list[int]
+    performances: dict[str, Performance]
     bucket_interval: tuple[float, float] | None = None
     bucket_name: str | None = None
 
@@ -57,7 +57,7 @@ class BucketPerformance:
         )
 
 
-@dataclass
+@dataclass(frozen=True)
 class Performance:
     """A performance value along with other information.
 
@@ -69,7 +69,6 @@ class Performance:
         auxiliary_result: Other auxiliary information used by particular metrics
     """
 
-    metric_name: str
     value: float
     confidence_score_low: float | None = None
     confidence_score_high: float | None = None

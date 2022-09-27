@@ -108,7 +108,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
                 MeanRankConfig(name='MR'),
             ],
             "sort_by": "performance_value",
-            "sort_by_metric": "first",
+            "sort_by_metric": "Hits4",
         }
 
         processor = get_processor_class(TaskType.kg_link_tail_prediction)()

@@ -184,14 +184,14 @@ class BucketAnalysisResult(AnalysisResult):
         """See AnalysisResult.generate_report."""
         texts: list[str] = []
 
-        metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
+        metric_names = sorted(k for k in self.bucket_performances[0].performances)
 
-        for i, metric_name in enumerate(metric_names):
+        for metric_name in metric_names:
             texts.append(f"the information of #{self.name}#")
             texts.append(f"bucket_name\t{metric_name}\t#samples")
 
             for bucket_perf in self.bucket_performances:
-                perf = bucket_perf.performances[i]
+                perf = bucket_perf.performances[metric_name]
 
                 if bucket_perf.bucket_interval is not None:
                     bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
@@ -269,12 +269,8 @@ class BucketAnalysis(Analysis):
             )
 
             n_samples = len(bucket_collection.samples)
-            bucket_performance = BucketPerformance(
-                n_samples=n_samples,
-                bucket_samples=subsampled_ids,
-                bucket_interval=bucket_collection.interval,
-                bucket_name=bucket_collection.name,
-            )
+
+            performances: dict[str, Performance] = {}
 
             for metric_func, metric_stat in zip(
                 unwrap_generator(metrics),
@@ -301,16 +297,21 @@ class BucketAnalysis(Analysis):
 
                     value = metric_result.value
 
-                performance = Performance(
-                    metric_name=metric_func.config.name,
+                performances[metric_func.config.name] = Performance(
                     value=value,
                     confidence_score_low=conf_low,
                     confidence_score_high=conf_high,
                 )
 
-                bucket_performance.performances.append(performance)
-
-            bucket_performances.append(bucket_performance)
+            bucket_performances.append(
+                BucketPerformance(
+                    n_samples=n_samples,
+                    bucket_samples=subsampled_ids,
+                    performances=performances,
+                    bucket_interval=bucket_collection.interval,
+                    bucket_name=bucket_collection.name,
+                )
+            )
 
         return BucketAnalysisResult(
             name=self.feature, level=self.level, bucket_performances=bucket_performances

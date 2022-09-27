@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import abc
 from collections.abc import Iterable
-from typing import Any, final, Optional
+from typing import Any, cast, final, Optional
 
 from eaas.async_client import AsyncClient
 from eaas.config import Config
@@ -19,7 +19,7 @@ from explainaboard.analysis.analyses import (
 )
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature import DataType, FeatureType, Value
-from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.analysis.performance import Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
@@ -340,7 +340,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         sys_info: SysOutputInfo,
         analysis_cases: list[list[AnalysisCase]],
         metric_stats: list[list[MetricStats]],
-    ) -> list[list[Performance]]:
+    ) -> list[dict[str, Performance]]:
         """Get the overall performance according to metrics.
 
         Args:
@@ -351,12 +351,14 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         Returns:
             a dictionary of metrics to overall performance numbers
         """
-        overall_results = []
+        overall_results: list[dict[str, Performance]] = []
+
         for my_level, my_cases, my_stats in zip(
             unwrap(sys_info.analysis_levels), analysis_cases, metric_stats
         ):
 
-            my_results = []
+            my_results: dict[str, Performance] = {}
+
             for metric_cfg, metric_stat in zip(
                 unwrap_generator(my_level.metric_configs),
                 my_stats,
@@ -372,14 +374,14 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
                     else (None, None)
                 )
 
-                overall_performance = Performance(
-                    metric_name=metric_cfg.name,
+                my_results[metric_cfg.name] = Performance(
                     value=metric_result.value,
                     confidence_score_low=confidence_low,
                     confidence_score_high=confidence_high,
                 )
-                my_results.append(overall_performance)
+
             overall_results.append(my_results)
+
         return overall_results
 
     def deserialize_system_output(self, output: dict):
@@ -390,20 +392,11 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         """
         return output
 
-    @staticmethod
-    def _value_by_name(bucket_perf: BucketPerformance, sort_by_metric: str) -> float:
-        if sort_by_metric == 'first':
-            return bucket_perf.performances[0].value
-        for bp in bucket_perf.performances:
-            if bp.metric_name == sort_by_metric:
-                return bp.value
-        raise ValueError(f'could not find metric {sort_by_metric}')
-
     def sort_bucket_info(
         self,
         analysis_results: list[AnalysisResult],
-        sort_by: str = 'value',
-        sort_by_metric: str = 'first',
+        sort_by: str,
+        sort_by_metric: str | None = None,
         sort_ascending: bool = False,
     ) -> None:
         """Sorts the `performance_over_bucket` dictionary.
@@ -425,7 +418,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
 
         Args:
             analysis_results: A list of analysis results.
-            sort_by: 'key' or 'value';
+            sort_by: 'key', 'performance_value', or 'n_bucket_samples';
                 if 'key', sort by the bucket's lower boundary, alphabetically,
                 low-to-high.
                 if 'performance_value', sort by the `value` attribute of the
@@ -433,10 +426,8 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
                 associated with it, see param sort_by_metric to choose which metric to
                 sort on.
                 if 'n_bucket_samples', sort by the number of samples in each bucket.
-            sort_by_metric: 'first' or any string matching the metrics associated
-                with this task.
-                if 'first', sort by the value of the first BucketPerformance object,
-                whichever that may be, high-to-low
+            sort_by_metric: Key of the metric name, or None. This argument must be set
+                when and only when `sort_by` is `performance_value`.
                 else, sort by the value of that metric.
             sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
         """
@@ -456,8 +447,10 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
             elif sort_by == 'performance_value':
+                if sort_by_metric is None:
+                    raise ValueError("sort_by_metric must be set.")
                 bucket_result.sort(
-                    key=lambda x: self._value_by_name(x, sort_by_metric),
+                    key=lambda x: x.performances[cast(str, sort_by_metric)].value,
                     reverse=not sort_ascending,
                 )
             # sort by the number of samples in each bucket
@@ -465,6 +458,8 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
                 bucket_result.sort(
                     key=lambda x: x.n_samples, reverse=not sort_ascending
                 )
+            else:
+                raise ValueError(f"Invalid sort_by: {sort_by}")
 
     def get_overall_statistics(
         self, metadata: dict, sys_output: list[dict]
@@ -549,7 +544,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         self.sort_bucket_info(
             analyses,
             sort_by=metadata.get('sort_by', 'key'),
-            sort_by_metric=metadata.get('sort_by_metric', 'first'),
+            sort_by_metric=metadata.get('sort_by_metric'),
             sort_ascending=metadata.get('sort_ascending', False),
         )
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
