@@ -19,8 +19,7 @@ from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
-# See https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AnalysisResult(metaclass=abc.ABCMeta):
     """A base class specifying the result of an analysis.
 

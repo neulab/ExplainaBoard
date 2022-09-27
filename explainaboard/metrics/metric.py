@@ -55,10 +55,7 @@ class MetricResult:
         return ret
 
 
-# TODO(tetsuok): Remove the following type-ignore annotation when we update
-# mypy version to 0.980 or newer.
-# See https://github.com/python/mypy/issues/5374 for details.
-@dataclass  # type:ignore
+@dataclass
 class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
     """The configuration for a metric.
 
