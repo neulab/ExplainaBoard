@@ -17,7 +17,7 @@ from explainaboard.metrics.nlg_meta_evaluation import (
     PearsonCorrelationConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.serialization import common_registry
 from explainaboard.utils.language_utils import (
     is_chinese_lang_code,
     is_japanese_lang_code,
@@ -25,7 +25,7 @@ from explainaboard.utils.language_utils import (
 from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer
 
 
-@register_processor(TaskType.nlg_meta_evaluation)
+@common_registry.register("NLGMetaEvaluationProcessor")
 class NLGMetaEvaluationProcessor(Processor):
     """A processor for the natural language generation meta-evaluation task."""
 

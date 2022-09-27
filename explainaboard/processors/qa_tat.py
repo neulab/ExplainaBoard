@@ -20,11 +20,11 @@ from explainaboard.metrics.qa_table_text_hybrid import (
     F1ScoreQATatConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_tat)
+@common_registry.register("QATatProcessor")
 class QATatProcessor(Processor):
     """A processor for the TAT-QA dataset."""
 

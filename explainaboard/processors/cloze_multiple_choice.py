@@ -21,11 +21,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.cloze_mutiple_choice)
+@common_registry.register("ClozeMultipleChoiceProcessor")
 class ClozeMultipleChoiceProcessor(Processor):
     """A processor for the multiple choice cloze task."""
 

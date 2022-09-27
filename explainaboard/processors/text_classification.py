@@ -26,12 +26,12 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
+from explainaboard.serialization import common_registry
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.text_classification)
+@common_registry.register("TextClassificationProcessor")
 class TextClassificationProcessor(Processor):
     """A processor for the text classification task."""
 

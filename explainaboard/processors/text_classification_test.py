@@ -4,14 +4,21 @@ from __future__ import annotations
 
 import unittest
 
-from explainaboard import TaskType
-from explainaboard.processors.processor_registry import get_processor
 from explainaboard.processors.text_classification import TextClassificationProcessor
+from explainaboard.serialization.serializers import PrimitiveSerializer
 
 
 class TextClassificationProcessorTest(unittest.TestCase):
-    def test_get_processor(self) -> None:
+    def test_serialize(self) -> None:
+        serializer = PrimitiveSerializer()
+        self.assertEqual(
+            serializer.serialize(TextClassificationProcessor()),
+            {"cls_name": "TextClassificationProcessor"},
+        )
+
+    def test_deserialize(self) -> None:
+        serializer = PrimitiveSerializer()
         self.assertIsInstance(
-            get_processor(TaskType.text_classification.value),
+            serializer.deserialize({"cls_name": "TextClassificationProcessor"}),
             TextClassificationProcessor,
         )

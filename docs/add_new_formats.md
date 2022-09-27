@@ -20,7 +20,7 @@ For example, suppose that you have a system output of the summarization task
 in `tsv` format:
 
 ```python
-from explainaboard import TaskType, get_dataset_class
+from explainaboard import TaskType, get_dataset_class, get_processor_class
 dataset_path = "./integration_tests/artifacts/summarization/dataset.tsv"
 output_path = "./integration_tests/artifacts/summarization/output.txt"
 loader = get_dataset_class(TaskType.summarization)(
@@ -33,7 +33,7 @@ loader = get_dataset_class(TaskType.summarization)(
 )
 data = loader.load()
 
-processor = get_processor(TaskType.summarization, data = data)
+processor = get_processor_class(TaskType.summarization)()
 analysis = processor.process()
 analysis.write_to_directory("./")
 ```

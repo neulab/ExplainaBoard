@@ -4,7 +4,7 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, TaskType
+from explainaboard import FileType, get_processor_class, TaskType
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_registry import get_loader_class
@@ -31,7 +31,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         loader = get_loader_class(task)(dataset, dataset)
         data = loader.load()
         # Initialize the processor and perform the processing
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
         sys_info = processor.process(
             metadata={}, sys_output=data.samples, skip_failed_analyses=True
         )
@@ -59,7 +59,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
             ],
         }
 
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
@@ -111,7 +111,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
             "sort_by_metric": "first",
         }
 
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
         self.assertIsNotNone(sys_info.results.analyses)
@@ -147,7 +147,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
             "sort_by": "key",
         }
 
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 

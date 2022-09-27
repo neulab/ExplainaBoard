@@ -25,6 +25,7 @@ from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -34,7 +35,7 @@ from explainaboard.utils.tokenizer import get_default_tokenizer, Tokenizer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
 
-class Processor(metaclass=abc.ABCMeta):
+class Processor(Serializable, metaclass=abc.ABCMeta):
     """Base case for task-based processor."""
 
     @classmethod
@@ -553,3 +554,14 @@ class Processor(metaclass=abc.ABCMeta):
         )
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
         return sys_info
+
+    @final
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        return {}
+
+    @final
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        return cls()
