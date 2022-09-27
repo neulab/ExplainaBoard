@@ -1,4 +1,6 @@
 """Measure the gap between two models."""
+from __future__ import annotations
+
 import copy
 
 from explainaboard.analysis.analyses import AnalysisResult, BucketAnalysisResult
