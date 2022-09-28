@@ -30,13 +30,13 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
 
             # loop through and record all the metrics that describe this bucket
             example_features: dict[str, Any] = {}
-            for perf in bucket.performances:
+            for metric_name, perf in bucket.performances.items():
 
                 example_features['feature_name'] = feature_buckets.name
                 example_features['bucket_interval'] = bucket.bucket_interval
                 example_features['bucket_name'] = bucket.bucket_name
                 example_features['bucket_size'] = bucket.n_samples
-                example_features[perf.metric_name] = perf.value
+                example_features[metric_name] = perf.value
                 # example_features[f'{perf.metric_name}_CI'] = \
                 # [perf.confidence_score_low, perf.confidence_score_high]
 
