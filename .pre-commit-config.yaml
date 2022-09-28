@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/python/black.git
-    rev: 22.3.0 
+    rev: 22.3.0
     hooks:
       - id: black
         files: '\.py$'
@@ -35,7 +35,7 @@ repos:
       - id: upgrade-type-hints
         files: '\.py$'
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v0.942'
+    rev: 'v0.981'
     hooks:
       - id: mypy
         additional_dependencies:
