@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from collections import Counter
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 
@@ -17,7 +17,6 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
-from explainaboard.utils.typing_utils import unwrap_or
 
 
 class ExtractiveQAMetric(Metric):
@@ -31,12 +30,10 @@ class ExtractiveQAMetric(Metric):
         self,
         true_data: list[Union[str, list[str]]],
         pred_data: list[str],
-        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
-        config = unwrap_or(config, self.config)
-        preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
+        preprocessor = ExtractiveQAPreprocessor(language=self.config.source_language)
         return SimpleMetricStats(
             np.array(
                 [

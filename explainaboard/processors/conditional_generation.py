@@ -326,8 +326,8 @@ class ConditionalGenerationProcessor(Processor):
                 true_data.append(feature_table["reference"])
                 pred_data.append(feature_table["hypothesis"])
 
-            metric_names_eaas = []
-            metric_configs_noneaas = []
+            metric_names_eaas: list[str] = []
+            metric_configs_noneaas: list[MetricConfig] = []
             for metric_config in unwrap_generator(analysis_level.metric_configs):
                 if isinstance(metric_config, EaaSMetricConfig):
                     metric_names_eaas.append(metric_config.name)
@@ -348,9 +348,7 @@ class ConditionalGenerationProcessor(Processor):
             # For non-EaaS metrics
             for metric_config in metric_configs_noneaas:
                 metric_stats.append(
-                    metric_config.to_metric().calc_stats_from_data(
-                        true_data, pred_data, metric_config
-                    )
+                    metric_config.to_metric().calc_stats_from_data(true_data, pred_data)
                 )
 
             # Calculate features

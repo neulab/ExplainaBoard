@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any
 
 import numpy as np
 
@@ -14,6 +14,7 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
+from explainaboard.utils.typing_utils import narrow
 
 
 @dataclass
@@ -33,7 +34,7 @@ class Accuracy(Metric):
     """
 
     def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+        self, true_data: list[Any], pred_data: list[Any]
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
@@ -64,7 +65,7 @@ class CorrectCount(Accuracy):
         return False
 
     def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+        self, true_data: list[Any], pred_data: list[Any]
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
@@ -112,14 +113,14 @@ class SeqCorrectCount(CorrectCount):
         return flatten_edits
 
     def calc_stats_from_data(
-        self,
-        true_edits_ldl: list[dict[str, list]],
-        pred_edits_ldl: list[dict[str, list]],
-        config: Optional[MetricConfig] = None,
+        self, true_data: list[Any], pred_data: list[Any]
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         recall = []
-        for true_edits_dl, pred_edits_dl in zip(true_edits_ldl, pred_edits_ldl):
+        for true_edits_dl_untyped, pred_edits_dl_untyped in zip(true_data, pred_data):
+            true_edits_dl = narrow(dict, true_edits_dl_untyped)
+            pred_edits_dl = narrow(dict, pred_edits_dl_untyped)
+
             true_edits_ld = [
                 dict(zip(true_edits_dl, t)) for t in zip(*true_edits_dl.values())
             ]

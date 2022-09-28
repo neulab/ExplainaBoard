@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass
-from typing import Any, cast, final, Optional
+from typing import Any, cast, final
 
 from eaas.async_client import AsyncClient, AsyncRequest
 from eaas.config import Config
@@ -96,9 +96,7 @@ class EaaSMetric(Metric):
 
     _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
 
-    def _calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
+    def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
         is_batched = agg_stats.ndim != 1
         if not is_batched:
@@ -135,9 +133,7 @@ class EaaSMetric(Metric):
         else:
             return np.mean(data, axis=-2)
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data.
 
         Note that specifically for EaaSMetric, it's better to batch requests when

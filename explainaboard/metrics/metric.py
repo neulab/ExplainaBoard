@@ -10,7 +10,6 @@ import numpy as np
 from scipy.stats import t as stats_t
 
 from explainaboard.serialization.types import SerializableDataclass
-from explainaboard.utils.typing_utils import unwrap_or
 
 
 @dataclass
@@ -249,19 +248,18 @@ class SimpleMetricStats(MetricStats):
 class Metric:
     """A class representing an evaluation metric."""
 
-    def __init__(
-        self,
-        config: MetricConfig,
-    ):
+    config: MetricConfig
+
+    def __init__(self, config: MetricConfig):
         """Initialize the metric.
 
         :param config: The configuration for the metric
         """
-        self.config: MetricConfig = config
+        self.config = config
 
     @abc.abstractmethod
     def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+        self, true_data: list[Any], pred_data: list[Any]
     ) -> MetricStats:
         """From a list of true data and predicted data, calculate sufficient statistics.
 
@@ -272,7 +270,6 @@ class Metric:
         Args:
             true_data: gold-standard data
             pred_data: predicted data
-            config: a configuration to over-ride the default for this object
 
         Returns:
             A numpy array of shape [len(true_data), X] where X=1 in the simplest case of
@@ -332,7 +329,6 @@ class Metric:
     def calc_metric_from_aggregate(
         self,
         agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
-        config: Optional[MetricConfig] = None,
     ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
         """From aggregated sufficient statistics, calculate the metric value.
 
@@ -340,7 +336,6 @@ class Metric:
             agg_stats: aggregated statistics. Shape must be:
                 - Non-batched data: [num_aggregate_stats]
                 - Batched data: [num_batches, num_aggregate_stats]
-            config: a configuration to over-ride the default for this object
 
         Returns:
             Calculated metrics. Shape must be:
@@ -350,7 +345,7 @@ class Metric:
         if agg_stats.ndim not in (1, 2):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
 
-        result = self._calc_metric_from_aggregate(agg_stats, config)
+        result = self._calc_metric_from_aggregate(agg_stats)
         result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
 
         assert result.shape == result_shape, (
@@ -364,7 +359,6 @@ class Metric:
     def _calc_metric_from_aggregate(
         self,
         agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
-        config: Optional[MetricConfig] = None,
     ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
         """Inner function of calc_metric_from_aggregate."""
         if agg_stats.shape[-1] != 1:
@@ -396,7 +390,6 @@ class Metric:
         stats: MetricStats,
         confidence_alpha: float,
         num_iterations: int = 1000,
-        config: Optional[MetricConfig] = None,
     ) -> tuple[float, float] | None:
         """Calculate the confidence interval of a statistics function.
 
@@ -404,7 +397,6 @@ class Metric:
             stats: sufficient statistics as calculated by calc_stats_from_data
             confidence_alpha: the inverse confidence level of the confidence interval
             num_iterations: the number of iterations to perform resampling
-            config: a configuration to over-ride the default for this object
 
         Returns:
             A confidence interval or `None` if one cannot be calculated.
@@ -451,7 +443,7 @@ class Metric:
             )
             filt_stats = stats.filter(all_indices)
             agg_stats = self.aggregate_stats(filt_stats)
-            samp_results = self.calc_metric_from_aggregate(agg_stats, config)
+            samp_results = self.calc_metric_from_aggregate(agg_stats)
 
             if samp_results.ndim != 1:
                 raise ValueError(
@@ -467,7 +459,6 @@ class Metric:
         self,
         stats: MetricStats,
         confidence_alpha: Optional[float] = None,
-        config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
 
@@ -475,21 +466,19 @@ class Metric:
             stats: pre-computed metric stats
             confidence_alpha: if set to not None, must be a number between 0 and 1,
                 indicating the inverse confidence level of confidence intervals
-            config: a configuration to over-ride the default for this object
 
         Returns:
             a resulting metric value
         """
-        actual_config = unwrap_or(config, self.config)
         agg_stats = self.aggregate_stats(stats)
-        value = self.calc_metric_from_aggregate(agg_stats, actual_config)
+        value = self.calc_metric_from_aggregate(agg_stats)
         confidence_interval = (
             self.calc_confidence_interval(stats, confidence_alpha)
             if confidence_alpha
             else None
         )
         return MetricResult(
-            actual_config, float(value), confidence_interval, confidence_alpha
+            self.config, float(value), confidence_interval, confidence_alpha
         )
 
     def evaluate(
@@ -497,7 +486,6 @@ class Metric:
         true_data: list,
         pred_data: list,
         confidence_alpha: Optional[float] = None,
-        config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over true data and predicted data.
 
@@ -506,10 +494,9 @@ class Metric:
             pred_data: predicted data
             confidence_alpha: if set to not None, must be a number between 0 and 1,
                 indicating the inverse confidence level of confidence intervals
-            config: a configuration to over-ride the default for this object
 
         Returns:
             a resulting metric value
         """
-        stats = self.calc_stats_from_data(true_data, pred_data, config)
-        return self.evaluate_from_stats(stats, confidence_alpha, config)
+        stats = self.calc_stats_from_data(true_data, pred_data)
+        return self.evaluate_from_stats(stats, confidence_alpha)

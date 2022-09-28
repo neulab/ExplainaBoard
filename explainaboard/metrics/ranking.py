@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, cast, Optional
+from typing import Any, cast
 
 import numpy as np
 
@@ -15,21 +15,17 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.utils.typing_utils import unwrap_or
 
 
 class RankingMetric(Metric, metaclass=abc.ABCMeta):
     """A metric for ranking."""
 
     @abc.abstractmethod
-    def calc_stats_from_rank(
-        self, rank_data: list[int], config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_rank(self, rank_data: list[int]) -> MetricStats:
         """Calculate statistics from rank data.
 
         Args:
             rank_data: A list of integer ranks.
-            config: The configuration for this metric.
 
         Returns:
             The aggregate statistics for this metric.
@@ -59,11 +55,9 @@ class Hits(RankingMetric):
     The metric calculates whether the predicted output is in a set of true outputs.
     """
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
-        config = cast(HitsConfig, unwrap_or(config, self.config))
+        config = cast(HitsConfig, self.config)
         return SimpleMetricStats(
             np.array(
                 [
@@ -73,11 +67,9 @@ class Hits(RankingMetric):
             )
         )
 
-    def calc_stats_from_rank(
-        self, rank_data: list[int], config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_rank(self, rank_data: list[int]) -> MetricStats:
         """See RankingMetric.calc_stats_from_rank."""
-        config = cast(HitsConfig, unwrap_or(config, self.config))
+        config = cast(HitsConfig, self.config)
         return SimpleMetricStats(
             np.array([(1.0 if rank <= config.hits_k else 0.0) for rank in rank_data])
         )
@@ -106,19 +98,15 @@ class MeanReciprocalRank(RankingMetric):
             true_rank = list(preds).index(true) + 1  # 1-indexed
             return 1.0 / true_rank
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array([self._mrr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
-    def calc_stats_from_rank(
-        self, rank_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_rank(self, rank_data: list) -> MetricStats:
         """See RankingMetric.calc_stats_from_rank."""
-        if any([rank is None for rank in rank_data]):
+        if any(rank is None for rank in rank_data):
             raise ValueError('cannot calculate statistics when rank is none')
         return SimpleMetricStats(np.array([1.0 / rank for rank in rank_data]))
 
@@ -143,17 +131,13 @@ class MeanRank(RankingMetric):
             true_rank = list(preds).index(true) + 1  # 1-indexed
             return true_rank
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
             np.array([self._mr_val(t, p) for t, p in zip(true_data, pred_data)])
         )
 
-    def calc_stats_from_rank(
-        self, rank_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_rank(self, rank_data: list) -> MetricStats:
         """See RankingMetric.calc_stats_from_rank."""
         return SimpleMetricStats(
             np.array([rank for rank in rank_data if rank is not None])

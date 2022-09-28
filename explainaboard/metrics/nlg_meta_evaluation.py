@@ -57,10 +57,9 @@ class CorrelationMetric(Metric):
         self,
         true_data: list[Union[str, list[str]]],
         pred_data: list[str],
-        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
-        config = narrow(CorrelationConfig, unwrap_or(config, self.config))
+        config = narrow(CorrelationConfig, self.config)
 
         return SimpleMetricStats(
             np.array(
@@ -71,9 +70,7 @@ class CorrelationMetric(Metric):
             )
         )
 
-    def get_scores_from_stats(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> dict[str, list]:
+    def get_scores_from_stats(self, agg_stats: np.ndarray) -> dict[str, list]:
         """Get scores from stats.
 
         Args:
@@ -83,7 +80,7 @@ class CorrelationMetric(Metric):
         Returns:
             The score.
         """
-        config = narrow(CorrelationConfig, unwrap_or(config, self.config))
+        config = narrow(CorrelationConfig, self.config)
         scores: dict[str, list] = {}
         for stat in agg_stats:
             sys_name = stat[0]
@@ -126,13 +123,11 @@ class CorrelationMetric(Metric):
             assert data.shape[-1] == 4
             return data.reshape((data.shape[-2] * data.shape[-1]))
 
-    def _calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
+    def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
         if agg_stats.ndim == 1:
             agg_stats = agg_stats.reshape((int(agg_stats.shape[0] / 4), 4))
-            val = self.calc_metric_from_aggregate_single(agg_stats, config)
+            val = self.calc_metric_from_aggregate_single(agg_stats)
             return np.array(val)
         else:
             n_samples = agg_stats.shape[0]
@@ -141,13 +136,11 @@ class CorrelationMetric(Metric):
             )
             ret_metric = np.zeros(n_samples)
             for i, single_stat in enumerate(agg_stats):
-                val = self.calc_metric_from_aggregate_single(single_stat, config)
+                val = self.calc_metric_from_aggregate_single(single_stat)
                 ret_metric[i] = val
             return ret_metric
 
-    def calc_metric_from_aggregate_single(
-        self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> float:
+    def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """Calculate an aggregate correlation metric from a single segment or system.
 
         Args:
@@ -166,14 +159,16 @@ class CorrelationMetric(Metric):
 class KtauCorrelationConfig(CorrelationConfig):
     """A configuration for KtauCorrelation.
 
-    :param threshold: Following ‘Results of the WMT20 Metrics Shared Task
-        (https://aclanthology.org/2020.wmt-1.77.pdf)’, to calculate segment level ktau
-         score, we generate pairs of DA judgments attributed to distinct
-        translations of the same source segment.  Distinct translations of the same
-        source input whose DA scores fell within a threshold (which could have been
-        deemed equal quality) were omitted from the evaluation of segment-level
-        metrics. We use threshold=25 as the minimum required difference between two
-        system scores to produce DARR judgments.
+    Args:
+        threshold: Following ‘Results of the WMT20 Metrics Shared Task
+            (https://aclanthology.org/2020.wmt-1.77.pdf)’, to calculate segment level
+            ktau
+            score, we generate pairs of DA judgments attributed to distinct
+            translations of the same source segment.  Distinct translations of the same
+            source input whose DA scores fell within a threshold (which could have been
+            deemed equal quality) were omitted from the evaluation of segment-level
+            metrics. We use threshold=25 as the minimum required difference between two
+            system scores to produce DARR judgments.
     """
 
     threshold: float = 25
@@ -203,17 +198,15 @@ class KtauCorrelation(CorrelationMetric):
                     num += 1
         return conc, disc, num
 
-    def calc_metric_from_aggregate_single(
-        self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> float:
+    def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """See CorrelationMetric.calc_metric_from_aggregate_single."""
-        scores = self.get_scores_from_stats(single_stat, config)
+        scores = self.get_scores_from_stats(single_stat)
         total_seg_num = 0
         total_conc = 0
         total_disc = 0
 
         for score in scores.values():
-            conc, disc, num = self._count(score, config)
+            conc, disc, num = self._count(score)
             total_seg_num += num
             total_conc += conc
             total_disc += disc
@@ -238,12 +231,9 @@ class PearsonCorrelationConfig(CorrelationConfig):
 class PearsonCorrelation(CorrelationMetric):
     """A metric to calculate Pearson's correlation."""
 
-    def calc_metric_from_aggregate_single(
-        self, single_stat: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> float:
+    def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """See CorrelationMetric.calc_metric_from_aggregate_single."""
-        config = narrow(PearsonCorrelationConfig, unwrap_or(config, self.config))
-        scores = self.get_scores_from_stats(single_stat, config)
+        scores = self.get_scores_from_stats(single_stat)
 
         manual_score = []
         system_score = []

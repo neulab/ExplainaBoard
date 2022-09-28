@@ -5,7 +5,6 @@ from __future__ import annotations
 import abc
 from dataclasses import dataclass
 import itertools
-from typing import Optional
 
 import numpy as np
 
@@ -18,7 +17,6 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
-from explainaboard.utils.typing_utils import unwrap_or
 
 
 class QATatMetric(Metric):
@@ -33,12 +31,7 @@ class QATatMetric(Metric):
         """See Metric.is_simple_average."""
         return True
 
-    def calc_stats_from_data(
-        self,
-        true_data: list,
-        pred_data: list,
-        config: Optional[MetricConfig] = None,
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         stat_list = []
         for true_answer_info, pred_answer_info in zip(true_data, pred_data):
@@ -59,8 +52,9 @@ class QATatMetric(Metric):
                 prediction,
             )
 
-            config = unwrap_or(config, self.config)
-            preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
+            preprocessor = ExtractiveQAPreprocessor(
+                language=self.config.source_language
+            )
 
             args_iter = itertools.product(
                 prediction_strings, ground_truth_answer_strings
