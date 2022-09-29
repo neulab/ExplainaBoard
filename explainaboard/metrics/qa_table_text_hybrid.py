@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Callable
 from dataclasses import dataclass
 import itertools
 
@@ -16,7 +17,7 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
+from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
 
 
 class QATatMetric(Metric):
@@ -68,7 +69,7 @@ class QATatMetric(Metric):
 
     @abc.abstractmethod
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
         """Calculate a score given a ground truth answer string and a prediction."""
         ...
@@ -92,7 +93,7 @@ class ExactMatchQATat(QATatMetric):
         return True
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
         """See QATatMetric.sample_level_metric."""
         ground_truths = eval_util._answer_to_bags(ground_truth)
@@ -119,7 +120,7 @@ class F1ScoreQATat(QATatMetric):
         return True
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ):
         """See QATatMetric.sample_level_metric."""
         ground_truths = eval_util._answer_to_bags(ground_truth)

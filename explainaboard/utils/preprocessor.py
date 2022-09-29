@@ -1,175 +1,109 @@
-"""Preprocessing utilities."""
+"""Preprocessing utilities.
+
+This module provides several str -> str functions, which are used to preprocess input
+texts in several tasks.
+"""
 
 from __future__ import annotations
 
-import abc
 import re
 import string
 import sys
-from typing import Any, Optional
 import unicodedata
 
-from explainaboard.utils.tokenizer import MLQAMixTokenizer, SingleSpaceTokenizer
+from explainaboard.utils.tokenizer import (
+    MLQAMixTokenizer,
+    SingleSpaceTokenizer,
+    Tokenizer,
+)
 
 
-@abc.abstractmethod
-class Preprocessor:
-    """A preprocesor that applies processing to strings."""
-
-    def __init__(
-        self, language: str | None = None, resources: Optional[dict[str, Any]] = None
-    ):
-        """Constructor.
-
-        Args:
-            language: The language of the incoming text
-            resources: Any resources necessary to do the preprocessing
-        """
-        self.language = language
-        self.resources = resources or self.default_resources()
-
-    def set_language(self, language: str) -> Preprocessor:
-        """Set the language of the preprocessor.
-
-        Args:
-            language: The language to set
-
-        Returns:
-            The preprocessor itself.
-        """
-        self.language = language
-        return self
-
-    def default_resources(self) -> dict[str, Any]:
-        """Returns default features for this processor."""
-        return {}
-
-    @abc.abstractmethod
-    def process(self, s: str, resources: dict[str, Any]) -> str:
-        """The processing function that applies some sort of processing.
-
-        Args:
-            s: The string to process.
-            resources: The resources to use in processing.
-
-        Returns:
-            The processed string.
-        """
-        ...
-
-    def __call__(self, text: str) -> str:
-        """Preprocess text.
-
-        Args:
-            text: text to be preprocessed
-
-        Returns:
-            preprocessed text
-        """
-        return self.process(text, self.resources)
-
-
-class MapPreprocessor(Preprocessor):
+class MapPreprocessor:
     """Map a single string to another string based on a dictionary."""
 
-    def default_resources(self) -> dict:
-        """Returns default features for this processor."""
-        return {"dictionary": {}}
+    def __init__(self, dictionary: dict[str, str]):
+        """Initializes MapPreprocessor.
 
-    def process(self, s: str, resources: dict[str, Any]) -> str:
+        Args:
+            dictionary: Dictionary to map a specific string to another.
+        """
+        self._dictionary = dictionary
+
+    def __call__(self, text: str) -> str:
         """Map text s into another text based on the dictionary.
 
         If the string doesn't exist in the dictionary, return the original string.
 
         Args:
-            s: The string to process.
-            resources: The resources to use in processing.
+            text: Text to be processed by this preprocessor.
 
         Returns:
-            The processed string.
+            Processed text.
         """
-        return resources['dictionary'].get(s, s)
+        return self._dictionary.get(text, text)
 
 
-class KGMapPreprocessor(Preprocessor):
-    """A mapping preprocessor specifically used in the KG link prediction processor."""
+class ExtractiveQAPreprocessor:
+    """Preprocessor to regularize answers in extractive QA tasks.
 
-    def default_resources(self) -> dict:
-        """Returns default features for this processor."""
-        return {"dictionary": {}}
-
-    def process(self, s: str, resources: dict[str, Any]) -> str:
-        """Map text s into another text based on the dictionary.
-
-        If the string doesn't exist in the dictionary, return the original string.
-
-        Args:
-            s: The string to process.
-            resources: The resources to use in processing.
-
-        Returns:
-            The processed string.
-        """
-        return (
-            resources['dictionary'][s]["label"] if s in resources['dictionary'] else s
-        )
-
-
-class ExtractiveQAPreprocessor(Preprocessor):
-    """A preprocessor to process answers in extractive QA tasks.
-
-    Currently it is based on the MLQA paper.
+    Currently the implementation is based on the MLQA paper.
     """
 
-    PUNCT = {
+    _PUNCT = {
         chr(i)
         for i in range(sys.maxunicode)
         if unicodedata.category(chr(i)).startswith('P')
     }.union(string.punctuation)
-    WHITESPACE_LANGS = ['en', 'es', 'hi', 'vi', 'de', 'ar']
-    MIXED_SEGMENTATION_LANGS = ['zh']
+    _MIXED_SEGMENTATION_LANGS = ['zh']
 
-    ss_tokenizer = SingleSpaceTokenizer()
-    mlqa_tokenizer = MLQAMixTokenizer()
+    def __init__(self, language: str | None) -> None:
+        """Initialises ExtractiveQAPreprocessor.
 
-    def default_resources(self) -> dict:
-        """Returns default features for this processor."""
-        return {"language": self.language}
-
-    def _remove_articles(self, text: str, lang: str) -> str:
-        if lang in ['en', 'eng']:
-            return re.sub(r'\b(a|an|the)\b', ' ', text)
-        elif lang in ['es', 'spa']:
-            return re.sub(r'\b(un|una|unos|unas|el|la|los|las)\b', ' ', text)
-        elif lang in ['vi', 'vie']:
-            return re.sub(r'\b(của|là|cái|chiếc|những)\b', ' ', text)
-        elif lang in ['de', 'deu']:
-            return re.sub(
-                r'\b(ein|eine|einen|einem|eines|einer|der|die|das|den|dem|' r'des)\b',
-                ' ',
-                text,
-            )
-        elif lang in ['ar', 'ara']:
-            # TODO(Pengfei): W605 invalid escape sequence '\s'
-            return re.sub('\sال^|ال', ' ', text)  # noqa
+        Args:
+            language: The language code of texts, or None for unspecified languages.
+        """
+        if language in ['en', 'eng']:
+            pattern = r"\b(a|an|the)\b"
+        elif language in ['es', 'spa']:
+            pattern = r"\b(un|una|unos|unas|el|la|los|las)\b"
+        elif language in ['vi', 'vie']:
+            pattern = r"\b(của|là|cái|chiếc|những)\b"
+        elif language in ['de', 'deu']:
+            pattern = r"\b(ein|eine|einen|einem|eines|einer|der|die|das|den|dem|des)\b"
+        elif language in ['ar', 'ara']:
+            pattern = r"\sال^|ال"
         else:
-            return text
+            pattern = None
 
-    def _white_space_fix(self, text: str, lang: str) -> str:
+        self._article_sanitizer = re.compile(pattern) if pattern is not None else None
 
-        if lang in self.MIXED_SEGMENTATION_LANGS:
-            tokens = self.mlqa_tokenizer(text)
+        if language in self._MIXED_SEGMENTATION_LANGS:
+            self._tokenizer: Tokenizer = MLQAMixTokenizer()
         else:
-            tokens = self.ss_tokenizer(text)
-        return ' '.join([t for t in tokens if t.strip() != ''])
+            self._tokenizer = SingleSpaceTokenizer()
+
+    def _remove_articles(self, text: str) -> str:
+        return (
+            self._article_sanitizer.sub(" ", text)
+            if self._article_sanitizer is not None
+            else text
+        )
+
+    def _white_space_fix(self, text: str) -> str:
+        return ' '.join(t for t in self._tokenizer(text) if t.strip() != '')
 
     def _remove_punc(self, text: str) -> str:
-        return ''.join(ch for ch in text if ch not in self.PUNCT)
+        return ''.join(ch for ch in text if ch not in self._PUNCT)
 
-    def process(self, s: str, resources: dict[str, Any]) -> str:
-        """Lowercase text and remove punctuation, articles and extra whitespace."""
-        language = resources['language']
+    def __call__(self, text: str) -> str:
+        """Process texts.
 
+        Args:
+            text: Text to be processed by this preprocessor.
+
+        Returns:
+            Processed text.
+        """
         return self._white_space_fix(
-            self._remove_articles(self._remove_punc(s.lower()), language), language
+            self._remove_articles(self._remove_punc(text.lower()))
         )

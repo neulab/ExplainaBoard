@@ -110,7 +110,7 @@ class MetricResultTest(unittest.TestCase):
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
         config = _DummyMetricConfig(name="foo")
-        result = MetricResult(config, {"bar": score, "baz": ci})
+        result = MetricResult({"bar": score, "baz": ci})
         serialized: dict[str, SerializableData] = {
             "config": config,
             "values": {"bar": score, "baz": ci},
@@ -126,14 +126,13 @@ class MetricResultTest(unittest.TestCase):
             "values": {"bar": score, "baz": ci},
         }
         restored = narrow(MetricResult, MetricResult.deserialize(serialized))
-        self.assertIs(restored.config, config)
         self.assertEqual(restored._values, {"bar": score, "baz": ci})
 
     def test_get_value(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
 
-        result = MetricResult(_DummyMetricConfig(name="foo"), {"bar": score, "baz": ci})
+        result = MetricResult({"bar": score, "baz": ci})
 
         # get_value() should return existing objects.
         self.assertIsNone(result.get_value(Score, "foo"))

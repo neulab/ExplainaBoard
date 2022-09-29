@@ -9,7 +9,7 @@ from functools import lru_cache
 import re
 import string
 import sys
-from typing import final
+from typing import final, overload
 import unicodedata
 
 from sacrebleu.tokenizers import BaseTokenizer
@@ -47,7 +47,7 @@ def get_default_tokenizer(lang: str | None) -> Tokenizer:
 
 @final
 @dataclass(frozen=True)
-class TokenSeq(Sequence):
+class TokenSeq:
     """Dataclass representing a list of tokens and its original positions."""
 
     strs: list[str]
@@ -57,6 +57,14 @@ class TokenSeq(Sequence):
         """Perform checks of validity."""
         if len(self.strs) != len(self.positions):
             raise ValueError("strs and positions must be the same length.")
+
+    @overload
+    def __getitem__(self, index: int) -> str:  # noqa: D105: suppress bug
+        ...
+
+    @overload
+    def __getitem__(self, index: slice) -> Sequence[str]:  # noqa: D105: suppress bug
+        ...
 
     def __getitem__(self, item: int | slice) -> str | Sequence[str]:
         """Get an item or slice from the sequence."""
