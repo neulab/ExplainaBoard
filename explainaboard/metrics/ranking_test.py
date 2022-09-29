@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import unittest
 
+from explainaboard.metrics.metric import Score
 from explainaboard.metrics.ranking import (
     Hits,
     HitsConfig,
@@ -12,6 +13,7 @@ from explainaboard.metrics.ranking import (
     MeanReciprocalRank,
     MeanReciprocalRankConfig,
 )
+from explainaboard.utils.typing_utils import unwrap
 
 
 class HitsConfigTest(unittest.TestCase):
@@ -36,6 +38,17 @@ class HitsConfigTest(unittest.TestCase):
         self.assertIsInstance(HitsConfig("Hits").to_metric(), Hits)
 
 
+class HitsTest(unittest.TestCase):
+    def test_evaluate(self) -> None:
+        metric = HitsConfig(name='Hits').to_metric()
+        true = ['a', 'b', 'a', 'b', 'a', 'b']
+        pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
+        self.assertAlmostEqual(
+            unwrap(result.get_value(Score, "score")).value, 4.0 / 6.0
+        )
+
+
 class MeanReciprocalRankConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
@@ -57,6 +70,17 @@ class MeanReciprocalRankConfigTest(unittest.TestCase):
         self.assertIsInstance(
             MeanReciprocalRankConfig("MeanReciprocalRank").to_metric(),
             MeanReciprocalRank,
+        )
+
+
+class MeanReciprocalRankTest(unittest.TestCase):
+    def test_evaluate(self) -> None:
+        metric = MeanReciprocalRankConfig(name='MRR').to_metric()
+        true = ['a', 'b', 'a', 'b', 'a', 'b']
+        pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
+        result = metric.evaluate(true, pred, confidence_alpha=0.05)
+        self.assertAlmostEqual(
+            unwrap(result.get_value(Score, "score")).value, 2.5 / 6.0
         )
 
 

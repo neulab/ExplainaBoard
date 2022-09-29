@@ -4,13 +4,21 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, final, Optional
+from typing import Any, final, Optional, TypeVar
 
 import numpy as np
 from scipy.stats import t as stats_t
 
-from explainaboard.serialization.types import SerializableDataclass
-from explainaboard.utils.typing_utils import unwrap_or
+from explainaboard.serialization import common_registry
+from explainaboard.serialization.registry import TypeRegistry
+from explainaboard.serialization.types import (
+    Serializable,
+    SerializableData,
+    SerializableDataclass,
+)
+from explainaboard.utils.typing_utils import narrow, unwrap_or
+
+_metric_registry = TypeRegistry[Serializable]()
 
 
 @dataclass
@@ -20,39 +28,154 @@ class AuxiliaryMetricResult:
     pass
 
 
-@dataclass
-class MetricResult:
-    """A result of computing a metric over some data.
+# TODO(odashi): See mypy/issues/4717
+@dataclass(frozen=True)  # type: ignore
+class MetricValue(Serializable, metaclass=abc.ABCMeta):
+    """Abstract class of metric values.
 
-    Args:
-        config: Configuration with which it was calculated
-        value: Metric value
-        confidence_interval: Confidence interval of the metric values
-        confidence_alpha: The p-value of the confidence interval
-        auxiliary_result: Extra data for
+    Each MetricValue represents a value of individual concept. Metrics may return
+    multiple MetricValues to represent multiple aspects of the metric.
     """
 
-    config: MetricConfig
-    value: float
-    confidence_interval: Optional[tuple[float, float]] = None
-    confidence_alpha: Optional[float] = None
-    auxiliary_result: AuxiliaryMetricResult | None = None
+    pass
 
-    def to_dict(self) -> dict[str, Any]:
-        """Return the metric result as a serializable dictionary.
+
+@common_registry.register("Score")
+@final
+@dataclass(frozen=True)
+class Score(MetricValue):
+    """MetricValue representing a real, unbound value.
+
+    Args:
+        value: The value of this object.
+    """
+
+    value: float
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        return {"value": self.value}
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        return cls(value=narrow(float, data["value"]))
+
+
+@common_registry.register("ConfidenceInterval")
+@final
+@dataclass(frozen=True)
+class ConfidenceInterval(MetricValue):
+    """MetricValue representing a confidence interval with its confidence level.
+
+    Args:
+        low: The lower bound of the interval.
+        high: The upper bound of the interval. This value must be greater than `low`.
+        alpha: The inverse confidence level of the interval. If the object represents a
+            95% confidence interval, this value must be 0.05.
+    """
+
+    low: float
+    high: float
+    alpha: float
+
+    def __post_init__(self) -> None:
+        """Validate values of members."""
+        if self.high < self.low:
+            raise ValueError(
+                "`high` must be greater than or equal to `low`. "
+                f"high={self.high}, low={self.low}"
+            )
+        if not (0.0 < self.alpha < 1.0):
+            raise ValueError("`alpha` must be in between 0.0 and 1.0.")
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        return {
+            "low": self.low,
+            "high": self.high,
+            "alpha": self.alpha,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        return cls(
+            low=narrow(float, data["low"]),
+            high=narrow(float, data["high"]),
+            alpha=narrow(float, data["alpha"]),
+        )
+
+
+MetricValueT = TypeVar("MetricValueT", bound=MetricValue)
+
+
+@common_registry.register("MetricResult")
+@final
+class MetricResult(Serializable):
+    """A result of computing a metric over some data."""
+
+    _config: MetricConfig
+    _values: dict[str, MetricValue]
+
+    def __init__(self, config: MetricConfig, values: dict[str, MetricValue]) -> None:
+        """Initializes MetricResult object.
+
+        Args:
+            config: Config of the Metric that calculated this result.
+            values: Values calculated by the Metric.
+        """
+        self._config = config
+        self._values = values
+
+    @property
+    def config(self) -> MetricConfig:
+        """Obtains underlying MetricConfig.
 
         Returns:
-            The dictionary containing the requisite information.
+            A MetricConfig object related to this MetricResult.
         """
-        ret = {
-            'config': self.config.__dict__,
-            'value': self.value,
+        return self._config
+
+    def get_value(self, cls: type[MetricValueT], name: str) -> MetricValueT | None:
+        """Obtains a value with specific type and name.
+
+        Args:
+            cls: Subtype of MetricValue that the resulting value has to be of.
+            name: Name of the value.
+
+        Returns:
+            A MetricValue with `name` and `cls`, or None if such value does not exist.
+        """
+        value = self._values.get(name)
+        if value is None:
+            return None
+        return value if isinstance(value, cls) else None
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        return {
+            "config": self.config,
+            "values": self._values,
         }
-        if self.confidence_interval is not None:
-            ret['confidence_interval'] = self.confidence_interval
-        if self.confidence_alpha is not None:
-            ret['confidence_alpha'] = self.confidence_alpha
-        return ret
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        values = data["values"]
+
+        # TODO(odashi): Implement TypeGuard.
+        if not (
+            isinstance(values, dict)
+            and all(
+                isinstance(k, str) and isinstance(v, MetricValue)
+                for k, v in values.items()
+            )
+        ):
+            raise ValueError("`values` has incompatible data.")
+
+        # See mypy/issues/4717
+        return cls(narrow(MetricConfig, data["config"]), values)  # type: ignore
 
 
 @dataclass
@@ -76,7 +199,11 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def to_metric(self) -> Metric:
-        """See MetricConfig.to_metric."""
+        """Instantiate a corresponding Metric object.
+
+        Returns:
+            Instantiated Metric object.
+        """
         ...
 
 
@@ -243,7 +370,7 @@ class SimpleMetricStats(MetricStats):
         return self._data
 
 
-class Metric:
+class Metric(metaclass=abc.ABCMeta):
     """A class representing an evaluation metric."""
 
     def __init__(
@@ -477,17 +604,27 @@ class Metric:
         Returns:
             a resulting metric value
         """
+        if stats.is_batched():
+            raise ValueError("Batched stats can't be evaluated.")
+
         actual_config = unwrap_or(config, self.config)
         agg_stats = self.aggregate_stats(stats)
-        value = self.calc_metric_from_aggregate(agg_stats, actual_config)
-        confidence_interval = (
-            self.calc_confidence_interval(stats, confidence_alpha)
-            if confidence_alpha
-            else None
-        )
-        return MetricResult(
-            actual_config, float(value), confidence_interval, confidence_alpha
-        )
+        score = self.calc_metric_from_aggregate(agg_stats, actual_config)
+
+        assert score.ndim == 0, "BUG: obtained batched data."
+
+        metric_values: dict[str, MetricValue] = {
+            "score": Score(float(score)),
+        }
+
+        if confidence_alpha is not None:
+            ci = self.calc_confidence_interval(stats, confidence_alpha)
+            if ci is not None:
+                metric_values["score_ci"] = ConfidenceInterval(
+                    ci[0], ci[1], confidence_alpha
+                )
+
+        return MetricResult(actual_config, metric_values)
 
     def evaluate(
         self,

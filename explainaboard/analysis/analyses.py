@@ -14,7 +14,13 @@ import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    ConfidenceInterval,
+    Metric,
+    MetricConfig,
+    MetricStats,
+    Score,
+)
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
 
@@ -283,8 +289,8 @@ class BucketAnalysis(Analysis):
                 # has no samples
                 if n_samples == 0.0:
                     value = 0.0
-                    conf_low: Optional[float] = None
-                    conf_high: Optional[float] = None
+                    ci_low: Optional[float] = None
+                    ci_high: Optional[float] = None
                 else:
                     bucket_stats = metric_stat.filter(bucket_collection.samples)
                     metric_result = metric_func.evaluate_from_stats(
@@ -292,19 +298,20 @@ class BucketAnalysis(Analysis):
                         confidence_alpha=confidence_alpha,
                     )
 
-                    conf_low, conf_high = (
-                        metric_result.confidence_interval
-                        if metric_result.confidence_interval
-                        else (None, None)
-                    )
-
-                    value = metric_result.value
+                    value = unwrap(metric_result.get_value(Score, "score")).value
+                    ci = metric_result.get_value(ConfidenceInterval, "score_ci")
+                    if ci is not None:
+                        ci_low = ci.low
+                        ci_high = ci.high
+                    else:
+                        ci_low = None
+                        ci_high = None
 
                 performance = Performance(
                     metric_name=metric_func.config.name,
                     value=value,
-                    confidence_score_low=conf_low,
-                    confidence_score_high=conf_high,
+                    confidence_score_low=ci_low,
+                    confidence_score_high=ci_high,
                 )
 
                 bucket_performance.performances.append(performance)
