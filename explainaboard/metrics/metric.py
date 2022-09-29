@@ -15,7 +15,7 @@ from explainaboard.serialization.types import (
     SerializableData,
     SerializableDataclass,
 )
-from explainaboard.utils.typing_utils import narrow, unwrap_or
+from explainaboard.utils.typing_utils import narrow
 
 
 @dataclass

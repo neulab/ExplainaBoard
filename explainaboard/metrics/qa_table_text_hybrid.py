@@ -17,9 +17,7 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
-from explainaboard.utils.typing_utils import unwrap_or
 
 
 class QATatMetric(Metric):

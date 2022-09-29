@@ -18,7 +18,6 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
-from explainaboard.utils.typing_utils import unwrap_or
 
 
 class ExtractiveQAMetric(Metric):

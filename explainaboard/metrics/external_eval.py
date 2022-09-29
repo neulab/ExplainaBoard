@@ -171,7 +171,7 @@ class ExternalEval(Metric):
         agg_stats = self.aggregate_stats(stats)
 
         metric_values: dict[str, MetricValue] = {
-            "score": Score(float(self.calc_metric_from_aggregate(agg_stats, config))),
+            "score": Score(float(self.calc_metric_from_aggregate(agg_stats))),
             "agreement": Score(self.calc_agreement(stats)),
         }
         if confidence_alpha is not None:
@@ -181,4 +181,4 @@ class ExternalEval(Metric):
                     ci[0], ci[1], confidence_alpha
                 )
 
-        return MetricResult(config, metric_values)
+        return MetricResult(self.config, metric_values)
