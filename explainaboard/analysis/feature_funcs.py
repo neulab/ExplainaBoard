@@ -11,7 +11,7 @@ import sacrebleu
 from explainaboard.info import SysOutputInfo
 from explainaboard.utils import basic_words
 from explainaboard.utils.logging import progress
-from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer, Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
@@ -68,17 +68,10 @@ def get_basic_words(text: str) -> float:
     Returns:
         The ratio of basic words.
     """
-    value_list = text.split(' ')
-    n_words = len(value_list)
-    n_basic_words = 0
-
-    for word in value_list:
-
-        lower = word.lower()
-        if lower in basic_words.BASIC_WORDS:
-            n_basic_words = n_basic_words + 1
-
-    return n_basic_words * 1.0 / n_words
+    tokens = SingleSpaceTokenizer()(text)
+    assert len(tokens) > 0, f"BUG: no tokens obtained from the text: '{text}'"
+    n_basic_words = sum(1 for t in tokens if t.lower() in basic_words.BASIC_WORDS)
+    return n_basic_words / len(tokens)
 
 
 def get_lexical_richness(text: str) -> float:

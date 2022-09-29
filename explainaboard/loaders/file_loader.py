@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import copy
 import csv
 import dataclasses
@@ -30,7 +31,6 @@ from explainaboard.analysis.feature import FeatureType
 from explainaboard.constants import Source
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.load_resources import get_customized_features
-from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
 
 DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
@@ -61,7 +61,7 @@ class FileLoaderField:
     target_name: int | str
     dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
-    parser: Optional[Preprocessor] = None
+    parser: Optional[Callable[[str], str]] = None
 
     # Special constants used in field mapping
     SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'
