@@ -9,10 +9,13 @@ import numpy as np
 
 from explainaboard.metrics.metric import (
     AuxiliaryMetricResult,
+    ConfidenceInterval,
     Metric,
     MetricConfig,
     MetricResult,
     MetricStats,
+    MetricValue,
+    Score,
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
@@ -166,17 +169,16 @@ class ExternalEval(Metric):
             a resulting metric value
         """
         agg_stats = self.aggregate_stats(stats)
-        agreement = self.calc_agreement(stats)
-        value = self.calc_metric_from_aggregate(agg_stats)
-        confidence_interval = (
-            self.calc_confidence_interval(stats, confidence_alpha)
-            if confidence_alpha
-            else None
-        )
-        return MetricResult(
-            self.config,
-            float(value),
-            confidence_interval,
-            confidence_alpha,
-            ExternalEvalResult(agreement),
-        )
+
+        metric_values: dict[str, MetricValue] = {
+            "score": Score(float(self.calc_metric_from_aggregate(agg_stats))),
+            "agreement": Score(self.calc_agreement(stats)),
+        }
+        if confidence_alpha is not None:
+            ci = self.calc_confidence_interval(stats, confidence_alpha)
+            if ci is not None:
+                metric_values["score_ci"] = ConfidenceInterval(
+                    ci[0], ci[1], confidence_alpha
+                )
+
+        return MetricResult(self.config, metric_values)
