@@ -109,10 +109,8 @@ class MetricResultTest(unittest.TestCase):
     def test_serialize(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
-        config = _DummyMetricConfig(name="foo")
         result = MetricResult({"bar": score, "baz": ci})
         serialized: dict[str, SerializableData] = {
-            "config": config,
             "values": {"bar": score, "baz": ci},
         }
         self.assertEqual(result.serialize(), serialized)
