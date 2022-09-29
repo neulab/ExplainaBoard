@@ -44,6 +44,38 @@ class TokenSeqTest(unittest.TestCase):
 
 
 class TokenizerSerializerTest(unittest.TestCase):
+    def test_empty(self) -> None:
+        tokens = SingleSpaceTokenizer()("")
+        self.assertEqual(len(tokens), 1)
+        self.assertEqual(tokens.strs, [""])
+        self.assertEqual(tokens.positions, [0])
+
+    def test_only_0x20(self) -> None:
+        tokens = SingleSpaceTokenizer()("   ")
+        self.assertEqual(len(tokens), 4)
+        self.assertEqual(tokens.strs, ["", "", "", ""])
+        self.assertEqual(tokens.positions, [0, 1, 2, 3])
+
+    def test_isspace(self) -> None:
+        tokens = SingleSpaceTokenizer()("\t\v \n\r\f")
+        self.assertEqual(len(tokens), 2)
+        self.assertEqual(tokens.strs, ["\t\v", "\n\r\f"])
+        self.assertEqual(tokens.positions, [0, 3])
+
+    def test_sentence(self) -> None:
+        tokens = SingleSpaceTokenizer()("May the force be with you.")
+        self.assertEqual(len(tokens), 6)
+        self.assertEqual(tokens.strs, ["May", "the", "force", "be", "with", "you."])
+        self.assertEqual(tokens.positions, [0, 4, 8, 14, 17, 22])
+
+    def test_sentence_with_extra_whitespaces(self) -> None:
+        tokens = SingleSpaceTokenizer()(" May  the force\nbe with you. ")
+        self.assertEqual(len(tokens), 8)
+        self.assertEqual(
+            tokens.strs, ["", "May", "", "the", "force\nbe", "with", "you.", ""]
+        )
+        self.assertEqual(tokens.positions, [0, 1, 5, 6, 10, 19, 24, 29])
+
     def test_serialize(self) -> None:
         serializer = PrimitiveSerializer()
         self.assertEqual(
