@@ -15,7 +15,8 @@ from explainaboard.loaders.file_loader import (
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.utils import cache_api
-from explainaboard.utils.preprocessor import KGMapPreprocessor
+from explainaboard.utils.preprocessor import MapPreprocessor
+from explainaboard.utils.typing_utils import narrow
 
 
 @register_loader(TaskType.kg_link_tail_prediction)
@@ -52,9 +53,13 @@ class KgLinkTailPredictionLoader(Loader):
             'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
         )
         with open(file_path, 'r') as file:
-            entity_dic = json.loads(file.read())
+            entity_dic = json.load(file)
 
-        map_preprocessor = KGMapPreprocessor(resources={"dictionary": entity_dic})
+        map_preprocessor = MapPreprocessor(
+            dictionary={
+                narrow(str, k): narrow(str, v["label"]) for k, v in entity_dic.items()
+            }
+        )
 
         target_field_names = [
             "true_head",
