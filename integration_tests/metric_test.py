@@ -144,17 +144,5 @@ class MetricTest(unittest.TestCase):
         self.assertIsNotNone(sys_info.results.analyses)
         overall = unwrap(sys_info.results.overall)[0]
         self.assertGreater(len(overall), 0)
-        overall_map = {x.metric_name: x for x in overall}
-        self.assertAlmostEqual(
-            overall_map["ExactMatch"].value,
-            0.6974789915966386,
-            2,
-            "almost equal",
-        )
-        # should be 0.8235975260931867
-        self.assertAlmostEqual(
-            overall_map["F1"].value,
-            0.8235975260931867,
-            2,
-            "almost equal",
-        )
+        self.assertAlmostEqual(overall["ExactMatch"].value, 0.6974789915966386, 2)
+        self.assertAlmostEqual(overall["F1"].value, 0.8235975260931867, 2)

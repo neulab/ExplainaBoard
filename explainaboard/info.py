@@ -91,7 +91,7 @@ class SysOutputInfo:
     analyses: Optional[list[Analysis]] = None
 
     # set later
-    results: Result = field(default_factory=lambda: Result())
+    results: Result = field(default_factory=lambda: Result(overall=[], analyses=[]))
 
     def to_dict(self) -> dict:
         """Serialization function."""
