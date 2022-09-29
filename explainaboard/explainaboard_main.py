@@ -520,8 +520,8 @@ def main():
 
             logger.info('--- Overall Performance')
             for overall_level in report.results.overall:
-                for metric_stat in overall_level:
-                    logger.info(f'{metric_stat.metric_name}\t{metric_stat.value}')
+                for metric_name, metric_stat in overall_level.items():
+                    logger.info(f'{metric_name}\t{metric_stat.value}')
             logger.info('')
             logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:

@@ -5,7 +5,6 @@ from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_registry import get_loader_class
-from explainaboard.utils.logging import get_logger
 
 
 class ExtractiveQATest(unittest.TestCase):
@@ -44,23 +43,10 @@ class ExtractiveQATest(unittest.TestCase):
         sys_info = processor.process(metadata, data)
 
         self.assertIsNotNone(sys_info.results.analyses)
-        self.assertGreater(len(sys_info.results.overall), 0)
-        get_logger('test').info(f'OVERALL={sys_info.results.overall}')
-        # should be 0.6974789915966386
-        overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
-        self.assertAlmostEqual(
-            overall_map["ExactMatch"].value,
-            0.6974789915966386,
-            2,
-            "almost equal",
-        )
-        # should be 0.8235975260931867
-        self.assertAlmostEqual(
-            overall_map["F1"].value,
-            0.8235975260931867,
-            2,
-            "almost equal",
-        )
+        overall = sys_info.results.overall[0]
+        self.assertGreater(len(overall), 0)
+        self.assertAlmostEqual(overall["ExactMatch"].value, 0.6974789915966386, 2)
+        self.assertAlmostEqual(overall["F1"].value, 0.8235975260931867, 2)
 
     def test_extractive_qa_zh(self):
         json_zh_dataset = os.path.join(self.artifact_path, "dataset-xquad-zh.json")
@@ -87,19 +73,7 @@ class ExtractiveQATest(unittest.TestCase):
         sys_info = processor.process(metadata, data)
 
         self.assertIsNotNone(sys_info.results.analyses)
-        self.assertGreater(len(sys_info.results.overall), 0)
-        # 0.6285714285714286
-        overall_map = {x.metric_name: x for x in sys_info.results.overall[0]}
-        self.assertAlmostEqual(
-            overall_map["ExactMatch"].value,
-            0.6285714285714286,
-            2,
-            "almost equal",
-        )
-        # 0.7559651817716333
-        self.assertAlmostEqual(
-            overall_map["F1"].value,
-            0.7559651817716333,
-            2,
-            "almost equal",
-        )
+        overall = sys_info.results.overall[0]
+        self.assertGreater(len(overall), 0)
+        self.assertAlmostEqual(overall["ExactMatch"].value, 0.6285714285714286, 2)
+        self.assertAlmostEqual(overall["F1"].value, 0.7559651817716333, 2)

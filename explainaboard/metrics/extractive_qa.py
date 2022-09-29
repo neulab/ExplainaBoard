@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import abc
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Union
 
@@ -16,7 +17,8 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
+from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
+from explainaboard.utils.typing_utils import unwrap_or
 
 
 class ExtractiveQAMetric(Metric):
@@ -45,7 +47,7 @@ class ExtractiveQAMetric(Metric):
 
     @abc.abstractmethod
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
         """Calculate the metric  for a single sample.
 
@@ -74,7 +76,7 @@ class ExactMatchQA(ExtractiveQAMetric):
     """Calculate a score for extractive QA based on exact match."""
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
         """See ExtractiveQAMetric.sample_level_metric."""
         return 1.0 if preprocessor(prediction) == preprocessor(ground_truth) else 0.0
@@ -94,7 +96,7 @@ class F1ScoreQA(ExtractiveQAMetric):
     """Calculate a score for extractive QA based on F1 score."""
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ):
         """See ExtractiveQAMetric.sample_level_metric."""
         prediction_tokens = preprocessor(prediction).split()
