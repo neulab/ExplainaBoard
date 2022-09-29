@@ -29,9 +29,7 @@ class RootMeanSquaredErrorConfig(MetricConfig):
 class RootMeanSquaredError(Metric):
     """Calculate the root mean squared error of continuous values."""
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         error = np.array([(x - y) for x, y in zip(true_data, pred_data)])
         squared_error = error * error
@@ -63,9 +61,7 @@ class AbsoluteErrorConfig(MetricConfig):
 class AbsoluteError(Metric):
     """Calculate the absolute error of continuous values."""
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         error = np.array([abs(x - y) for x, y in zip(true_data, pred_data)])
         return SimpleMetricStats(error)

@@ -21,7 +21,7 @@ from explainaboard.utils.span_utils import (
     gen_argument_pairs,
     SpanOps,
 )
-from explainaboard.utils.typing_utils import unwrap_or
+from explainaboard.utils.typing_utils import narrow
 
 
 @dataclass
@@ -54,15 +54,12 @@ class F1Score(Metric):
         """See Metric.is_simple_average."""
         return False
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """Return sufficient statistics necessary to compute f-score.
 
         Args:
           true_data: True outputs
           pred_data: Predicted outputs
-          config: Configuration, if overloading the default for this object
 
         Returns:
           Returns stats for each class (integer id c) in the following columns of
@@ -73,7 +70,7 @@ class F1Score(Metric):
           * c*stat_mult + 3: number of matches with the predicted output
           (when self.separate_match=True only)
         """
-        config = cast(F1ScoreConfig, unwrap_or(config, self.config))
+        config = narrow(F1ScoreConfig, self.config)
         stat_mult: int = 4 if config.separate_match else 3
 
         id_map: dict[str, int] = {}
@@ -100,15 +97,13 @@ class F1Score(Metric):
                         stats[i, tid * stat_mult + 3] += 1
         return SimpleMetricStats(stats)
 
-    def _calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
+    def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
         is_batched = agg_stats.ndim != 1
         if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
 
-        config = cast(F1ScoreConfig, unwrap_or(config, self.config))
+        config = cast(F1ScoreConfig, self.config)
         supported_averages = {'micro', 'macro'}
         stat_mult: int = 4 if config.separate_match else 3
         if config.average not in supported_averages:
@@ -169,10 +164,7 @@ class APEF1Score(Metric):
         return False
 
     def calc_stats_from_data(
-        self,
-        true_data: list[list[str]],
-        pred_data: list[list[str]],
-        config: Optional[MetricConfig] = None,
+        self, true_data: list[list[str]], pred_data: list[list[str]]
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         stats = []
@@ -186,9 +178,7 @@ class APEF1Score(Metric):
             )
         return SimpleMetricStats(np.array(stats))
 
-    def _calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
+    def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric._calc_metric_from_aggregate."""
         is_batched = agg_stats.ndim == 2
         if not is_batched:
@@ -220,27 +210,22 @@ class SeqF1Score(F1Score):
         self,
         true_data: list[list[str]],
         pred_data: list[list[str]],
-        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
         """Return sufficient statistics necessary to compute f-score.
 
         Args:
-          true_data: True outputs
-          pred_data: Predicted outputs
-          config: Configuration, if over-riding the default
-          true_data: list[list[str]]:
-          pred_data: list[list[str]]:
-          config: Optional[MetricConfig]:  (Default value = None)
+            true_data: True outputs
+            pred_data: Predicted outputs
 
         Returns:
-          Returns stats for each class (integer id c) in the following columns of
-          MetricStats
-          * c*stat_mult + 0: occurrences in the true output
-          * c*stat_mult + 1: occurrences in the predicted output
-          * c*stat_mult + 2: number of matches with the true output
+            Returns stats for each class (integer id c) in the following columns of
+            MetricStats
+            * c*stat_mult + 0: occurrences in the true output
+            * c*stat_mult + 1: occurrences in the predicted output
+            * c*stat_mult + 2: number of matches with the true output
         """
         # Get span ops
-        seq_config = cast(SeqF1ScoreConfig, config or self.config)
+        seq_config = narrow(SeqF1ScoreConfig, self.config)
         if seq_config.tag_schema == 'bio':
             span_ops: SpanOps = BIOSpanOps()
         elif seq_config.tag_schema == 'bmes':
