@@ -181,4 +181,4 @@ class ExternalEval(Metric):
                     ci[0], ci[1], confidence_alpha
                 )
 
-        return MetricResult(self.config, metric_values)
+        return MetricResult(metric_values)

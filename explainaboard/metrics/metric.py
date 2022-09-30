@@ -112,27 +112,16 @@ MetricValueT = TypeVar("MetricValueT", bound=MetricValue)
 class MetricResult(Serializable):
     """A result of computing a metric over some data."""
 
-    _config: MetricConfig
     _values: dict[str, MetricValue]
 
-    def __init__(self, config: MetricConfig, values: dict[str, MetricValue]) -> None:
+    def __init__(self, values: dict[str, MetricValue]) -> None:
         """Initializes MetricResult object.
 
         Args:
             config: Config of the Metric that calculated this result.
             values: Values calculated by the Metric.
         """
-        self._config = config
         self._values = values
-
-    @property
-    def config(self) -> MetricConfig:
-        """Obtains underlying MetricConfig.
-
-        Returns:
-            A MetricConfig object related to this MetricResult.
-        """
-        return self._config
 
     def get_value(self, cls: type[MetricValueT], name: str) -> MetricValueT | None:
         """Obtains a value with specific type and name.
@@ -152,7 +141,6 @@ class MetricResult(Serializable):
     def serialize(self) -> dict[str, SerializableData]:
         """See Serializable.serialize."""
         return {
-            "config": self.config,
             "values": self._values,
         }
 
@@ -171,8 +159,7 @@ class MetricResult(Serializable):
         ):
             raise ValueError("`values` has incompatible data.")
 
-        # See mypy/issues/4717
-        return cls(narrow(MetricConfig, data["config"]), values)  # type: ignore
+        return cls(values)
 
 
 @dataclass
@@ -611,7 +598,7 @@ class Metric(metaclass=abc.ABCMeta):
                     ci[0], ci[1], confidence_alpha
                 )
 
-        return MetricResult(self.config, metric_values)
+        return MetricResult(metric_values)
 
     def evaluate(
         self,
