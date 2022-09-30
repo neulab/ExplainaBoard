@@ -30,7 +30,7 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
         processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
         self.assertAlmostEqual(sys_info.results.overall[0]["SeqCorrectCount"].value, 8)
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
 
 
 if __name__ == '__main__':

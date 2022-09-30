@@ -281,12 +281,11 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
             a dictionary of feature name -> list of performances by bucket
         """
         all_results: list[AnalysisResult] = []
-        level_map = {v.name: i for i, v in enumerate(unwrap(sys_info.analysis_levels))}
+        level_map = {v.name: i for i, v in enumerate(sys_info.analysis_levels)}
         metrics = [
-            [y.to_metric() for y in x.metric_configs]
-            for x in unwrap(sys_info.analysis_levels)
+            [y.to_metric() for y in x.metric_configs] for x in sys_info.analysis_levels
         ]
-        for my_analysis in progress(unwrap(sys_info.analyses)):
+        for my_analysis in progress(sys_info.analyses):
             level_id = level_map[my_analysis.level]
             try:
                 all_results.append(
@@ -359,7 +358,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         overall_results: list[dict[str, Performance]] = []
 
         for my_level, my_cases, my_stats in zip(
-            unwrap(sys_info.analysis_levels), analysis_cases, metric_stats
+            sys_info.analysis_levels, analysis_cases, metric_stats
         ):
 
             my_results: dict[str, Performance] = {}
@@ -506,7 +505,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []
         metric_stats: list[list[MetricStats]] = []
-        for analysis_level in unwrap(sys_info.analysis_levels):
+        for analysis_level in sys_info.analysis_levels:
             my_cases, my_stats = self._gen_cases_and_stats(
                 sys_info, sys_output, external_stats, analysis_level
             )

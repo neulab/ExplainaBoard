@@ -83,10 +83,7 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
                     "num_buckets": 2,  # for rank flipping, True or False
                 }
                 for metric_config in itertools.chain.from_iterable(
-                    [
-                        x.metric_configs
-                        for x in unwrap(self.model1_report.analysis_levels)
-                    ]
+                    [x.metric_configs for x in self.model1_report.analysis_levels]
                 )
             }
         }
