@@ -6,7 +6,7 @@ from typing import Any
 
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.typing_utils import narrow, unwrap
+from explainaboard.utils.typing_utils import narrow
 
 
 def report_to_sysout(report: SysOutputInfo) -> list[dict]:
@@ -19,7 +19,7 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
     """
     results_fine_grained = [
         narrow(BucketAnalysisResult, x)
-        for x in unwrap(report.results.analyses)
+        for x in report.results.analyses
         if isinstance(x, BucketAnalysisResult)
     ]
     meta_examples = []

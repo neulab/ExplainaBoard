@@ -241,7 +241,7 @@ class KGLinkTailPredictionProcessor(Processor):
     #     """
 
     #     metrics = [
-    #         x.to_metric() for x in unwrap(sys_info.analysis_levels)[0].metric_configs
+    #         x.to_metric() for x in sys_info.analysis_levels[0].metric_configs
     #     ]
     #     true_data = [self._get_true_label(x) for x in sys_output]
     #     pred_data = [self._get_predicted_label(x) for x in sys_output]

@@ -63,7 +63,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_with_user_defined_features(self):
@@ -114,7 +114,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         processor = get_processor_class(TaskType.kg_link_tail_prediction)()
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
@@ -151,7 +151,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}

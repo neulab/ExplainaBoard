@@ -6,7 +6,7 @@ from collections.abc import Callable
 import copy
 import csv
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from io import StringIO
 import itertools
 import json
@@ -100,12 +100,12 @@ class FileLoaderMetadata:
     split: str | None = None
     source_language: str | None = None
     target_language: str | None = None
-    supported_languages: list[str] | None = None
+    supported_languages: list[str] = field(default_factory=list)
     task_name: str | None = None
-    supported_tasks: list[str] | None = None
-    custom_features: dict[str, dict[str, FeatureType]] | None = None
+    supported_tasks: list[str] = field(default_factory=list)
+    custom_features: dict[str, dict[str, FeatureType]] = field(default_factory=dict)
     # analysis level name -> list of analyses dictionary
-    custom_analyses: list[Analysis] | None = None
+    custom_analyses: list[Analysis] = field(default_factory=list)
 
     def merge(self, other: FileLoaderMetadata) -> None:
         """Merge the information from the two pieces of metadata.
@@ -143,8 +143,8 @@ class FileLoaderMetadata:
                     '"target_language"'
                 )
             source_language = target_language = data.get('language')
-        custom_features: dict[str, dict[str, FeatureType]] | None = None
-        custom_analyses: list[Analysis] | None = None
+        custom_features: dict[str, dict[str, FeatureType]] = {}
+        custom_analyses: list[Analysis] = []
         if 'custom_features' in data:
             ft_serializer = PrimitiveSerializer()
             custom_features = {
@@ -166,9 +166,9 @@ class FileLoaderMetadata:
             split=data.get('split'),
             source_language=source_language,
             target_language=target_language,
-            supported_languages=data.get('supported_languages'),
+            supported_languages=data.get('supported_languages', []),
             task_name=data.get('task_name'),
-            supported_tasks=data.get('supported_tasks'),
+            supported_tasks=data.get('supported_tasks', []),
             custom_features=custom_features,
             custom_analyses=custom_analyses,
         )
@@ -332,13 +332,11 @@ class FileLoader:
     def _map_fields(self, fields: list, field_mapping: dict[str, str] | None = None):
         new_fields = copy.deepcopy(fields)
         if field_mapping is not None:
-            for field in new_fields:
-                if isinstance(field.src_name, str):
-                    field.src_name = field_mapping.get(field.src_name, field.src_name)
-                elif isinstance(field.src_name, Iterable):
-                    field.src_name = [field_mapping.get(x, x) for x in field.src_name]
-                else:
-                    field.src_name = field.src_name
+            for f in new_fields:
+                if isinstance(f.src_name, str):
+                    f.src_name = field_mapping.get(f.src_name, f.src_name)
+                elif isinstance(f.src_name, Iterable):
+                    f.src_name = [field_mapping.get(x, x) for x in f.src_name]
         return new_fields
 
     @classmethod
@@ -440,9 +438,9 @@ class FileLoader:
         # process the actual data
         for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
-            for field in fields:  # parse data point according to fields
-                parsed_data_point[field.target_name] = self.parse_data(
-                    self.find_field(data_point, field, field_mapping), field
+            for f in fields:  # parse data point according to fields
+                parsed_data_point[f.target_name] = self.parse_data(
+                    self.find_field(data_point, f, field_mapping), f
                 )
 
             self.generate_id(parsed_data_point, idx)
@@ -456,8 +454,8 @@ class TSVFileLoader(FileLoader):
     def validate(self) -> None:
         """See FileLoader.validate."""
         super().validate()
-        for field in self._fields:
-            if not isinstance(field.src_name, int):
+        for f in self._fields:
+            if not isinstance(f.src_name, int):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
 
     def load_raw(
@@ -529,8 +527,8 @@ class CoNLLFileLoader(FileLoader):
             # uses the first field to check if data is empty
             if curr_sentence_fields.get(self._fields[0].src_name):
                 new_sample: dict = {}
-                for field in self._fields:  # parse data point according to fields
-                    new_sample[field.target_name] = curr_sentence_fields[field.src_name]
+                for f in self._fields:  # parse data point according to fields
+                    new_sample[f.target_name] = curr_sentence_fields[f.src_name]
                 new_sample["id"] = str(guid)
                 parsed_samples.append(new_sample)
                 guid += 1
@@ -552,9 +550,9 @@ class CoNLLFileLoader(FileLoader):
                         f"not enough fields for {line} (sentence index: {guid})"
                     )
 
-                for field in self._fields:
-                    curr_sentence_fields[field.src_name].append(
-                        self.parse_data(splits[narrow(int, field.src_name)], field)
+                for f in self._fields:
+                    curr_sentence_fields[f.src_name].append(
+                        self.parse_data(splits[narrow(int, f.src_name)], f)
                     )
 
         add_sample()  # add last example
@@ -610,8 +608,8 @@ class DatalabLoaderOption:
     dataset: str
     subdataset: str | None = None
     split: str = "test"
-    custom_features: dict[str, dict[str, FeatureType]] | None = None
-    custom_analyses: list[Analysis] | None = None
+    custom_features: dict[str, dict[str, FeatureType]] = field(default_factory=dict)
+    custom_analyses: list[Analysis] = field(default_factory=list)
 
 
 class DatalabFileLoader(FileLoader):

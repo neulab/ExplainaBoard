@@ -54,7 +54,7 @@ class SummarizationTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
@@ -101,7 +101,7 @@ class SummarizationTest(unittest.TestCase):
         processor = get_processor_class(TaskType.summarization)()
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     @unittest.skip('Not yet fixed in v0.11')
@@ -137,7 +137,7 @@ class SummarizationTest(unittest.TestCase):
         sys_info = processor.process(metadata, data.samples)
         # print(sys_info.results.overall)
         # print(metadata["metric_configs"][0])
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         fluency = [
             x
             for x in sys_info.results.overall[0]

@@ -206,7 +206,7 @@ def draw_charts_from_reports(
             report_info.append(SysOutputInfo.from_dict(json.load(fin)))
 
     # --- Overall results
-    num_levels = len(unwrap(report_info[0].analysis_levels))
+    num_levels = len(report_info[0].analysis_levels)
     for level_id in range(num_levels):
         overall_results: list[dict[str, Performance]] = [
             x.results.overall[level_id] for x in report_info
@@ -245,7 +245,7 @@ def draw_charts_from_reports(
 
     # --- analysis results
     analysis_results: list[list[AnalysisResult]] = [
-        unwrap(x.results.analyses) for x in report_info
+        x.results.analyses for x in report_info
     ]
     if any(len(x) != len(analysis_results[0]) for x in analysis_results):
         raise ValueError(

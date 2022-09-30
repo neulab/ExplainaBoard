@@ -34,5 +34,5 @@ class WordSegmentationTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)

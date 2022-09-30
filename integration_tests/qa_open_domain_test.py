@@ -29,4 +29,4 @@ class QAOpenDomainTest(unittest.TestCase):
         }
         processor = get_processor_class(TaskType.qa_open_domain)()
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)

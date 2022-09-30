@@ -42,7 +42,7 @@ class ExtractiveQATest(unittest.TestCase):
         processor = get_processor_class(TaskType.qa_extractive)()
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         overall = sys_info.results.overall[0]
         self.assertGreater(len(overall), 0)
         self.assertAlmostEqual(overall["ExactMatch"].value, 0.6974789915966386, 2)
@@ -72,7 +72,7 @@ class ExtractiveQATest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         overall = sys_info.results.overall[0]
         self.assertGreater(len(overall), 0)
         self.assertAlmostEqual(overall["ExactMatch"].value, 0.6285714285714286, 2)

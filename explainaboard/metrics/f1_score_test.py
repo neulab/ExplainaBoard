@@ -23,7 +23,6 @@ class F1ScoreConfigTest(unittest.TestCase):
                 "F1Score",
                 average="macro",
                 separate_match=False,
-                ignore_classes=None,
             ).serialize(),
             {
                 "name": "F1Score",
@@ -31,7 +30,7 @@ class F1ScoreConfigTest(unittest.TestCase):
                 "target_language": None,
                 "average": "macro",
                 "separate_match": False,
-                "ignore_classes": None,
+                "ignore_classes": [],
             },
         )
 
@@ -42,14 +41,12 @@ class F1ScoreConfigTest(unittest.TestCase):
                     "name": "F1Score",
                     "average": "macro",
                     "separate_match": False,
-                    "ignore_classes": None,
                 }
             ),
             F1ScoreConfig(
                 "F1Score",
                 average="macro",
                 separate_match=False,
-                ignore_classes=None,
             ),
         )
 
@@ -89,7 +86,6 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
                 "SeqF1Score",
                 average="macro",
                 separate_match=False,
-                ignore_classes=None,
                 tag_schema="bio",
             ).serialize(),
             {
@@ -98,7 +94,7 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
                 "target_language": None,
                 "average": "macro",
                 "separate_match": False,
-                "ignore_classes": None,
+                "ignore_classes": [],
                 "tag_schema": "bio",
             },
         )
@@ -110,7 +106,6 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
                     "name": "SeqF1Score",
                     "average": "macro",
                     "separate_match": False,
-                    "ignore_classes": None,
                     "tag_schema": "bio",
                 }
             ),
@@ -118,7 +113,6 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
                 "SeqF1Score",
                 average="macro",
                 separate_match=False,
-                ignore_classes=None,
                 tag_schema="bio",
             ),
         )
