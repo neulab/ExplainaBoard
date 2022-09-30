@@ -216,9 +216,9 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
     def _customize_analyses(
         self,
         sys_info: SysOutputInfo,
-        custom_features: dict[str, dict[str, dict]] | None,
-        metric_configs: dict[str, list[MetricConfig]] | None,
-        custom_analyses: list[dict] | None,
+        custom_features: dict[str, dict[str, dict]],
+        metric_configs: dict[str, list[MetricConfig]],
+        custom_analyses: list[dict],
     ) -> tuple[list[AnalysisLevel], list[Analysis]]:
         """Customize analyses for this processor.
 
@@ -233,8 +233,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
         for level in analysis_levels:
-            configs = unwrap(metric_configs)
-            metric_gen = unwrap_generator(configs.get(level.name))
+            metric_gen = unwrap_generator(metric_configs.get(level.name))
             for ind, metric_config in enumerate(metric_gen):
                 if ind == 0:
                     level.metric_configs = [metric_config]
@@ -245,19 +244,19 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
                 config.target_language = sys_info.target_language
 
         level_map = {x.name: x for x in analysis_levels}
-        if custom_analyses is not None:
-            analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
-        if custom_features is not None:
-            ft_serializer = PrimitiveSerializer()
+        analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
 
-            for level_name, feature_content in custom_features.items():
-                additional_features = {
-                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
-                    if isinstance(v, dict)
-                    else v
-                    for k, v in feature_content.items()
-                }
-                level_map[level_name].features.update(additional_features)
+        ft_serializer = PrimitiveSerializer()
+
+        for level_name, feature_content in custom_features.items():
+            additional_features = {
+                k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                if isinstance(v, dict)
+                else v
+                for k, v in feature_content.items()
+            }
+            level_map[level_name].features.update(additional_features)
+
         return analysis_levels, analyses
 
     @final
