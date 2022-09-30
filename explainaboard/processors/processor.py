@@ -216,9 +216,9 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
     def _customize_analyses(
         self,
         sys_info: SysOutputInfo,
-        custom_features: dict[str, dict[str, dict]] | None,
-        metric_configs: dict[str, list[MetricConfig]] | None,
-        custom_analyses: list[dict] | None,
+        custom_features: dict[str, dict[str, dict]],
+        metric_configs: dict[str, list[MetricConfig]],
+        custom_analyses: list[dict],
     ) -> tuple[list[AnalysisLevel], list[Analysis]]:
         """Customize analyses for this processor.
 
@@ -233,8 +233,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
         for level in analysis_levels:
-            configs = unwrap(metric_configs)
-            metric_gen = unwrap_generator(configs.get(level.name))
+            metric_gen = unwrap_generator(metric_configs.get(level.name))
             for ind, metric_config in enumerate(metric_gen):
                 if ind == 0:
                     level.metric_configs = [metric_config]
@@ -245,19 +244,19 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
                 config.target_language = sys_info.target_language
 
         level_map = {x.name: x for x in analysis_levels}
-        if custom_analyses is not None:
-            analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
-        if custom_features is not None:
-            ft_serializer = PrimitiveSerializer()
+        analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
 
-            for level_name, feature_content in custom_features.items():
-                additional_features = {
-                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
-                    if isinstance(v, dict)
-                    else v
-                    for k, v in feature_content.items()
-                }
-                level_map[level_name].features.update(additional_features)
+        ft_serializer = PrimitiveSerializer()
+
+        for level_name, feature_content in custom_features.items():
+            additional_features = {
+                k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                if isinstance(v, dict)
+                else v
+                for k, v in feature_content.items()
+            }
+            level_map[level_name].features.update(additional_features)
+
         return analysis_levels, analyses
 
     @final
@@ -281,12 +280,11 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
             a dictionary of feature name -> list of performances by bucket
         """
         all_results: list[AnalysisResult] = []
-        level_map = {v.name: i for i, v in enumerate(unwrap(sys_info.analysis_levels))}
+        level_map = {v.name: i for i, v in enumerate(sys_info.analysis_levels)}
         metrics = [
-            [y.to_metric() for y in x.metric_configs]
-            for x in unwrap(sys_info.analysis_levels)
+            [y.to_metric() for y in x.metric_configs] for x in sys_info.analysis_levels
         ]
-        for my_analysis in progress(unwrap(sys_info.analyses)):
+        for my_analysis in progress(sys_info.analyses):
             level_id = level_map[my_analysis.level]
             try:
                 all_results.append(
@@ -359,7 +357,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         overall_results: list[dict[str, Performance]] = []
 
         for my_level, my_cases, my_stats in zip(
-            unwrap(sys_info.analysis_levels), analysis_cases, metric_stats
+            sys_info.analysis_levels, analysis_cases, metric_stats
         ):
 
             my_results: dict[str, Performance] = {}
@@ -506,7 +504,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []
         metric_stats: list[list[MetricStats]] = []
-        for analysis_level in unwrap(sys_info.analysis_levels):
+        for analysis_level in sys_info.analysis_levels:
             my_cases, my_stats = self._gen_cases_and_stats(
                 sys_info, sys_output, external_stats, analysis_level
             )

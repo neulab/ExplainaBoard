@@ -106,7 +106,7 @@ class RankingMetaAnalysis(MetaAnalysis):
                     "num_buckets": len(self.model_reports),
                 }
                 for metric_config in itertools.chain.from_iterable(
-                    [x.metric_configs for x in unwrap(model1.analysis_levels)]
+                    [x.metric_configs for x in model1.analysis_levels]
                 )
             }
         }

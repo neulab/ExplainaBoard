@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import itertools
-from typing import cast, Optional, Tuple
+from typing import cast, Tuple
 
 import numpy as np
 
@@ -37,7 +37,7 @@ class F1ScoreConfig(MetricConfig):
 
     average: str = 'micro'
     separate_match: bool = False
-    ignore_classes: Optional[list] = None
+    ignore_classes: list[str] = field(default_factory=list)
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
@@ -74,9 +74,8 @@ class F1Score(Metric):
         stat_mult: int = 4 if config.separate_match else 3
 
         id_map: dict[str, int] = {}
-        if config.ignore_classes is not None:
-            for ignore_class in config.ignore_classes:
-                id_map[ignore_class] = -1
+        for ignore_class in config.ignore_classes:
+            id_map[ignore_class] = -1
 
         for word in itertools.chain(true_data, pred_data):
             if word not in id_map:

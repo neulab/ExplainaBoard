@@ -18,8 +18,8 @@ data = loader.load()
 processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 sys_info = processor.process(metadata={}, sys_output=data.samples)
 
-fine_grained_res = unwrap(sys_info.results.analyses)
-overall_res = unwrap(sys_info.results.overall)
+fine_grained_res = sys_info.results.analyses
+overall_res = sys_info.results.overall
 
 # print bucket information
 for analysis in fine_grained_res:

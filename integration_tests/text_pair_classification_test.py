@@ -61,7 +61,7 @@ class TextPairClassificationTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_paws_fra(self):
@@ -81,5 +81,5 @@ class TextPairClassificationTest(unittest.TestCase):
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)

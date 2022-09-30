@@ -30,7 +30,7 @@ class ArgumentPairExtractionTest(unittest.TestCase):
         }
         processor = get_processor_class(TaskType.argument_pair_extraction)()
         sys_info = processor.process(metadata, data)
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
 
         overall = sys_info.results.overall[0]
         self.assertGreater(len(overall), 0)

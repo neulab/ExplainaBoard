@@ -29,7 +29,7 @@ class QATableTextHybridTest(unittest.TestCase):
         }
         processor = get_processor_class(TaskType.qa_tat)()
         sys_info = processor.process(metadata, data)
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
 
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
