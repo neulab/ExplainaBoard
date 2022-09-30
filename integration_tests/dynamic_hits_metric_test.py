@@ -27,7 +27,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "metric_configs": [HitsConfig(name='Hits4', hits_k=4)],
+            "metric_configs": {"Hits4": HitsConfig(hits_k=4)},
         }
 
         processor = get_processor_class(TaskType.kg_link_tail_prediction)()

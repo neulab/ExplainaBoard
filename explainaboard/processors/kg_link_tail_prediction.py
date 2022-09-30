@@ -127,18 +127,21 @@ class KGLinkTailPredictionProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            HitsConfig(name='Hits1', hits_k=1),
-            HitsConfig(name='Hits2', hits_k=2),
-            HitsConfig(name='Hits3', hits_k=3),
-            HitsConfig(name='Hits5', hits_k=5),
-            HitsConfig(name='Hits10', hits_k=10),
-            MeanReciprocalRankConfig(name='MRR'),
-            MeanRankConfig(name='MR'),
-        ]
+        return {
+            "Hits1": HitsConfig(hits_k=1),
+            "Hits2": HitsConfig(hits_k=2),
+            "Hits3": HitsConfig(hits_k=3),
+            "Hits5": HitsConfig(hits_k=5),
+            "Hits10": HitsConfig(hits_k=10),
+            "MRR": MeanReciprocalRankConfig(),
+            "MR": MeanRankConfig(),
+        }
 
     # TODO: is this the best place to put this?
     _symmetric_relations = {
@@ -194,7 +197,7 @@ class KGLinkTailPredictionProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         # Note that this is overridden to calculate stats from rank
         cases = []
         true_data = [self._get_true_label(x) for x in sys_output]
@@ -204,12 +207,15 @@ class KGLinkTailPredictionProcessor(Processor):
             raise ValueError(
                 'Some data points do not have rank information; check system outputs.'
             )
-        metric_stats = []
-        for metric in [x.to_metric() for x in analysis_level.metric_configs]:
+
+        metric_stats: dict[str, MetricStats] = {}
+        for name, config in analysis_level.metric_configs.items():
+            metric = config.to_metric()
             if isinstance(metric, RankingMetric):
-                metric_stats.append(metric.calc_stats_from_rank(rank_data))
+                metric_stats[name] = metric.calc_stats_from_rank(rank_data)
             else:
-                metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
+                metric_stats[name] = metric.calc_stats_from_data(true_data, pred_data)
+
         # Calculate features
         for i, output in progress(
             enumerate(sys_output), desc='calculating example-level features'
@@ -226,45 +232,6 @@ class KGLinkTailPredictionProcessor(Processor):
                     )
             cases.append(case)
         return cases, metric_stats
-
-    # TODO(gneubig): this needs replaced
-    # def _gen_metric_stats(
-    #     self,
-    #     sys_info: SysOutputInfo,
-    #     sys_output: list[dict],
-    #     cases: list[list[AnalysisCase]],
-    # ) -> list[list[MetricStats]]:
-    #     """Generate sufficient statistics for scoring different metrics.
-    #     :param sys_info: Information about the system outputs
-    #     :param sys_output: The system output itself
-    #     :return: Statistics sufficient for scoring
-    #     """
-
-    #     metrics = [
-    #         x.to_metric() for x in sys_info.analysis_levels[0].metric_configs
-    #     ]
-    #     true_data = [self._get_true_label(x) for x in sys_output]
-    #     pred_data = [self._get_predicted_label(x) for x in sys_output]
-    #     rank_data = [
-    #         x.get('true_rank') for x in sys_output
-    #     ]  # rank of true entity in predictions
-
-    #     if any(item is None for item in rank_data):
-    #         raise ValueError(
-    #             'Some data points do not have rank information; check system outputs.'
-    #         )
-
-    #     metric_stats = []
-    #     for metric in metrics:
-    #         if (
-    #             isinstance(metric, MeanReciprocalRank)
-    #             or isinstance(metric, MeanRank)
-    #             or isinstance(metric, Hits)
-    #         ):
-    #             metric_stats.append(metric.calc_stats_from_rank(rank_data))
-    #         else:
-    #             metric_stats.append(metric.calc_stats_from_data(true_data, pred_data))
-    #     return [metric_stats]
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):

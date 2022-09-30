@@ -37,7 +37,7 @@ from explainaboard.utils.cache_api import (
 )
 from explainaboard.utils.logging import get_logger, progress
 from explainaboard.utils.tokenizer import get_default_tokenizer, Tokenizer
-from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class Processor(Serializable, metaclass=abc.ABCMeta):
@@ -96,16 +96,40 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
     @classmethod
     @abc.abstractmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        """Returns the default metrics of this processor."""
+        cls,
+        level: str = "example",
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
+        """Returns the default metrics of this processor.
+
+        Args:
+            level: Name of the analysis level.
+            source_language: Source language code.
+            target_language: Target language code.
+
+        Returns:
+            Mapping of metric name -> MetricConfig.
+        """
         ...
 
     @classmethod
     def full_metric_list(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        """Returns an extensive list of metrics that may be used."""
+        cls,
+        level: str = "example",
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
+        """Returns an extensive list of metrics that may be used.
+
+        Args:
+            level: Name of the analysis level.
+            source_language: Source language code.
+            target_language: Target language code.
+
+        Returns:
+            Mapping of metric name -> MetricConfig.
+        """
         return cls.default_metrics(
             level=level,
             source_language=source_language,
@@ -217,14 +241,15 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         custom_features: dict[str, dict[str, dict]],
-        metric_configs: dict[str, list[MetricConfig]],
+        metric_configs: dict[str, dict[str, MetricConfig]],
         custom_analyses: list[dict],
     ) -> tuple[list[AnalysisLevel], list[Analysis]]:
         """Customize analyses for this processor.
 
         Args:
             custom_features: the features to customize
-            metric_configs: additional metric configurations
+            metric_configs: additional metric configurations. Keys are analysis level
+                name and metric name.
             custom_analyses: the analyses to customize
 
         Returns:
@@ -233,13 +258,8 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         analysis_levels = self.default_analysis_levels()
         analyses = self.default_analyses()
         for level in analysis_levels:
-            metric_gen = unwrap_generator(metric_configs.get(level.name))
-            for ind, metric_config in enumerate(metric_gen):
-                if ind == 0:
-                    level.metric_configs = [metric_config]
-                else:
-                    level.metric_configs.append(metric_config)
-            for config in level.metric_configs:
+            for name, config in metric_configs.get(level.name, {}).items():
+                level.metric_configs[name] = config
                 config.source_language = sys_info.source_language
                 config.target_language = sys_info.target_language
 
@@ -264,7 +284,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         analysis_cases: list[list[AnalysisCase]],
-        metric_stats: list[list[MetricStats]],
+        metric_stats: list[dict[str, MetricStats]],
         skip_failed_analyses: bool = False,
     ) -> list[AnalysisResult]:
         """Perform fine-grained analyses.
@@ -282,7 +302,8 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         all_results: list[AnalysisResult] = []
         level_map = {v.name: i for i, v in enumerate(sys_info.analysis_levels)}
         metrics = [
-            [y.to_metric() for y in x.metric_configs] for x in sys_info.analysis_levels
+            {name: config.to_metric() for name, config in level.metric_configs.items()}
+            for level in sys_info.analysis_levels
         ]
         for my_analysis in progress(sys_info.analyses):
             level_id = level_map[my_analysis.level]
@@ -308,20 +329,35 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
+        """Generates analysis cases and stats.
+
+        Args:
+            sys_info: Information about the system output.
+            sys_output: TBD
+            statistics: TBD
+            analysis_level: Analysis level corresponding to the returned information.
+
+        Returns:
+            Tuple of following values:
+                - List of analysis levels.
+                - Mapping from metric name to stats.
+        """
         if analysis_level.name != 'example':
             raise NotImplementedError(
                 f'Does not support analysis level {analysis_level.name} by default'
             )
-        cases = []
+
         # Calculate metrics
         true_data = [self._get_true_label(x) for x in sys_output]
         pred_data = [self._get_predicted_label(x) for x in sys_output]
-        metric_stats = [
-            x.to_metric().calc_stats_from_data(true_data, pred_data)
-            for x in analysis_level.metric_configs
-        ]
+        metric_stats = {
+            name: config.to_metric().calc_stats_from_data(true_data, pred_data)
+            for name, config in analysis_level.metric_configs.items()
+        }
+
         # Calculate features
+        cases: list[AnalysisCase] = []
         for i, output in progress(
             enumerate(sys_output), desc='calculating example-level features'
         ):
@@ -341,8 +377,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
     def get_overall_performance(
         self,
         sys_info: SysOutputInfo,
-        analysis_cases: list[list[AnalysisCase]],
-        metric_stats: list[list[MetricStats]],
+        metric_stats: list[dict[str, MetricStats]],
     ) -> list[dict[str, Performance]]:
         """Get the overall performance according to metrics.
 
@@ -356,16 +391,11 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         """
         overall_results: list[dict[str, Performance]] = []
 
-        for my_level, my_cases, my_stats in zip(
-            sys_info.analysis_levels, analysis_cases, metric_stats
-        ):
-
+        for my_level, my_stats in zip(sys_info.analysis_levels, metric_stats):
             my_results: dict[str, Performance] = {}
 
-            for metric_cfg, metric_stat in zip(
-                unwrap_generator(my_level.metric_configs),
-                my_stats,
-            ):
+            for metric_name, metric_cfg in my_level.metric_configs.items():
+                metric_stat = my_stats[metric_name]
                 metric_result = metric_cfg.to_metric().evaluate_from_stats(
                     metric_stat,
                     confidence_alpha=sys_info.confidence_alpha,
@@ -374,7 +404,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
                 value = unwrap(metric_result.get_value(Score, "score")).value
                 ci = metric_result.get_value(ConfidenceInterval, "score_ci")
 
-                my_results[metric_cfg.name] = Performance(
+                my_results[metric_name] = Performance(
                     value=value,
                     confidence_score_low=ci.low if ci is not None else None,
                     confidence_score_high=ci.high if ci is not None else None,
@@ -490,8 +520,8 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         custom_features: dict = metadata.get('custom_features', {})
         custom_analyses: list = metadata.get('custom_analyses', [])
 
-        metric_configs: dict[str, list[MetricConfig]] = {
-            "example": metadata.get('metric_configs', [])
+        metric_configs: dict[str, dict[str, MetricConfig]] = {
+            "example": metadata.get('metric_configs', {})
         }
 
         sys_info.analysis_levels, sys_info.analyses = self._customize_analyses(
@@ -503,7 +533,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
 
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []
-        metric_stats: list[list[MetricStats]] = []
+        metric_stats: list[dict[str, MetricStats]] = []
         for analysis_level in sys_info.analysis_levels:
             my_cases, my_stats = self._gen_cases_and_stats(
                 sys_info, sys_output, external_stats, analysis_level
@@ -512,9 +542,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
             metric_stats.append(my_stats)
 
         # calculate overall results
-        overall_results = self.get_overall_performance(
-            sys_info, analysis_cases, metric_stats
-        )
+        overall_results = self.get_overall_performance(sys_info, metric_stats)
         sys_info.results = Result(overall=overall_results, analyses=[])
         return OverallStatistics(sys_info, analysis_cases, metric_stats)
 
