@@ -105,7 +105,7 @@ class EaaSMetric(Metric):
     _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
     _SACREBLEU_METRICS: dict[str, sacrebleu.metrics.base.Metric] = {
         "bleu": sacrebleu.BLEU,
-        "curf": sacrebleu.CHRF,
+        "chrf": sacrebleu.CHRF,
     }
 
     def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
