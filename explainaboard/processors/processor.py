@@ -260,6 +260,7 @@ class Processor(Serializable, metaclass=abc.ABCMeta):
         for level in analysis_levels:
             for name, config in metric_configs.get(level.name, {}).items():
                 level.metric_configs[name] = config
+            for config in level.metric_configs.values():
                 config.source_language = sys_info.source_language
                 config.target_language = sys_info.target_language
 
