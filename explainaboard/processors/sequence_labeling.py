@@ -230,7 +230,7 @@ class SeqLabProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         if analysis_level.name == 'example':
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
@@ -290,10 +290,10 @@ class SeqLabProcessor(Processor):
         # calculate metric stats
         true_data = [x.true_label for x in cases]
         pred_data = [x.predicted_label for x in cases]
-        metric_stats: list[MetricStats] = [
-            x.to_metric().calc_stats_from_data(true_data, pred_data)
-            for x in analysis_level.metric_configs
-        ]
+        metric_stats: dict[str, MetricStats] = {
+            name: config.to_metric().calc_stats_from_data(true_data, pred_data)
+            for name, config in analysis_level.metric_configs.items()
+        }
         return cast(List[AnalysisCase], cases), metric_stats
 
     def get_econ_efre_dic(

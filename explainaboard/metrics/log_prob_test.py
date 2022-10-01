@@ -10,9 +10,8 @@ from explainaboard.metrics.log_prob import LogProb, LogProbConfig
 class LogProbConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            LogProbConfig("LogProb", ppl=True).serialize(),
+            LogProbConfig(ppl=True).serialize(),
             {
-                "name": "LogProb",
                 "source_language": None,
                 "target_language": None,
                 "ppl": True,
@@ -21,9 +20,9 @@ class LogProbConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            LogProbConfig.deserialize({"name": "LogProb", "ppl": True}),
-            LogProbConfig("LogProb", ppl=True),
+            LogProbConfig.deserialize({"ppl": True}),
+            LogProbConfig(ppl=True),
         )
 
     def test_to_metric(self) -> None:
-        self.assertIsInstance(LogProbConfig("LogProb").to_metric(), LogProb)
+        self.assertIsInstance(LogProbConfig().to_metric(), LogProb)

@@ -17,14 +17,12 @@ class ExternalEvalConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
             ExternalEvalConfig(
-                "ExternalEval",
                 aspect="foo",
                 n_annotators=1,
                 categories=2,
                 instruction="instruction",
             ).serialize(),
             {
-                "name": "ExternalEval",
                 "source_language": None,
                 "target_language": None,
                 "external_stats": None,
@@ -39,7 +37,6 @@ class ExternalEvalConfigTest(unittest.TestCase):
         self.assertEqual(
             ExternalEvalConfig.deserialize(
                 {
-                    "name": "ExternalEval",
                     "aspect": "foo",
                     "n_annotators": 1,
                     "categories": 2,
@@ -47,7 +44,6 @@ class ExternalEvalConfigTest(unittest.TestCase):
                 }
             ),
             ExternalEvalConfig(
-                "ExternalEval",
                 aspect="foo",
                 n_annotators=1,
                 categories=2,
@@ -57,7 +53,7 @@ class ExternalEvalConfigTest(unittest.TestCase):
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            ExternalEvalConfig("ExternalEval").to_metric(),
+            ExternalEvalConfig().to_metric(),
             ExternalEval,
         )
 
@@ -65,7 +61,7 @@ class ExternalEvalConfigTest(unittest.TestCase):
 class ExternalEvalTest(unittest.TestCase):
     def test_calc_stats_from_external(self) -> None:
         config = ExternalEvalConfig(
-            "ExternalEval", n_annotators=2, external_stats=np.array([[1, 2], [3, 4]])
+            n_annotators=2, external_stats=np.array([[1, 2], [3, 4]])
         )
         metric = ExternalEval(config)
         stats = metric.calc_stats_from_external()
@@ -74,9 +70,7 @@ class ExternalEvalTest(unittest.TestCase):
         np.testing.assert_array_equal(stats.get_data(), np.array([[1, 2], [3, 4]]))
 
     def test_calc_stats_from_data_with_external_stats(self) -> None:
-        config = ExternalEvalConfig(
-            "ExternalEval", n_annotators=1, external_stats=np.array([[1], [0]])
-        )
+        config = ExternalEvalConfig(n_annotators=1, external_stats=np.array([[1], [0]]))
         metric = ExternalEval(config)
         true_data = [1, 0]
         pred_data = [1, 1]
@@ -86,7 +80,7 @@ class ExternalEvalTest(unittest.TestCase):
         np.testing.assert_array_equal(stats.get_data(), np.array([[1], [0]]))
 
     def test_calc_stats_from_data_without_external_stats(self) -> None:
-        config = ExternalEvalConfig("ExternalEval", n_annotators=1)
+        config = ExternalEvalConfig(n_annotators=1)
         metric = ExternalEval(config)
         true_data = [1, 0]
         pred_data = [1, 1]

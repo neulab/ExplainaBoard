@@ -108,16 +108,18 @@ class ClozeGenerativeProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            CorrectCountConfig(
-                name='CorrectCount',
+        return {
+            "CorrectCount": CorrectCountConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-        ]
+        }
 
     def _get_true_label(self, data_point):
         """See Processor._get_true_label."""

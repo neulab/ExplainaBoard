@@ -20,12 +20,10 @@ class F1ScoreConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
             F1ScoreConfig(
-                "F1Score",
                 average="macro",
                 separate_match=False,
             ).serialize(),
             {
-                "name": "F1Score",
                 "source_language": None,
                 "target_language": None,
                 "average": "macro",
@@ -38,13 +36,11 @@ class F1ScoreConfigTest(unittest.TestCase):
         self.assertEqual(
             F1ScoreConfig.deserialize(
                 {
-                    "name": "F1Score",
                     "average": "macro",
                     "separate_match": False,
                 }
             ),
             F1ScoreConfig(
-                "F1Score",
                 average="macro",
                 separate_match=False,
             ),
@@ -59,7 +55,7 @@ class F1ScoreConfigTest(unittest.TestCase):
 
 class F1ScoreTest(unittest.TestCase):
     def test_evaluate_micro(self) -> None:
-        metric = F1ScoreConfig(name='F1', average='micro').to_metric()
+        metric = F1ScoreConfig(average='micro').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
         sklearn_f1 = f1_score(true, pred, average='micro')
@@ -69,7 +65,7 @@ class F1ScoreTest(unittest.TestCase):
         )
 
     def test_evaluate_macro(self) -> None:
-        metric = F1ScoreConfig(name='F1', average='macro').to_metric()
+        metric = F1ScoreConfig(average='macro').to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
         pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
         sklearn_f1 = f1_score(true, pred, average='macro')
@@ -83,13 +79,11 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
             SeqF1ScoreConfig(
-                "SeqF1Score",
                 average="macro",
                 separate_match=False,
                 tag_schema="bio",
             ).serialize(),
             {
-                "name": "SeqF1Score",
                 "source_language": None,
                 "target_language": None,
                 "average": "macro",
@@ -103,14 +97,12 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
         self.assertEqual(
             SeqF1ScoreConfig.deserialize(
                 {
-                    "name": "SeqF1Score",
                     "average": "macro",
                     "separate_match": False,
                     "tag_schema": "bio",
                 }
             ),
             SeqF1ScoreConfig(
-                "SeqF1Score",
                 average="macro",
                 separate_match=False,
                 tag_schema="bio",
@@ -119,7 +111,7 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            SeqF1ScoreConfig("SeqF1Score").to_metric(),
+            SeqF1ScoreConfig().to_metric(),
             SeqF1Score,
         )
 
@@ -134,9 +126,7 @@ class SeqF1ScoreTest(unittest.TestCase):
             ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
             ['B-PER', 'I-PER', 'O'],
         ]
-        metric = SeqF1ScoreConfig(
-            name='MicroF1', average='micro', tag_schema='bio'
-        ).to_metric()
+        metric = SeqF1ScoreConfig(average='micro', tag_schema='bio').to_metric()
         result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(
             unwrap(result.get_value(Score, "score")).value, 2.0 / 3.0
@@ -151,9 +141,7 @@ class SeqF1ScoreTest(unittest.TestCase):
             ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
             ['B-PER', 'I-PER', 'O'],
         ]
-        metric = SeqF1ScoreConfig(
-            name='MacroF1', average='macro', tag_schema='bio'
-        ).to_metric()
+        metric = SeqF1ScoreConfig(average='macro', tag_schema='bio').to_metric()
         result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(
             unwrap(result.get_value(Score, "score")).value, 3.0 / 4.0

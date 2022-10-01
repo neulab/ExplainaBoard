@@ -55,13 +55,16 @@ class TabularRegressionProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            RootMeanSquaredErrorConfig(name='RMSE'),
-            AbsoluteErrorConfig(name='AbsoluteError'),
-        ]
+        return {
+            "RMSE": RootMeanSquaredErrorConfig(),
+            "AbsoulteError": AbsoluteErrorConfig(),
+        }
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         return {}

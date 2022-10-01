@@ -98,16 +98,21 @@ class RankingMetaAnalysis(MetaAnalysis):
         Uses the metric configs of `self.model1_report` as metadata.
         """
         model1 = self.model_reports[0]
+
+        metric_config_dict_iter = (
+            level.metric_configs for level in model1.analysis_levels
+        )
+        # TODO(odashi): This iterator may generate name collision.
+        metric_names_iter = itertools.chain.from_iterable(metric_config_dict_iter)
+
         metadata = {
             'custom_features': {
-                metric_config.name: {
+                name: {
                     "dtype": "string",
-                    "description": metric_config.name,
+                    "description": name,
                     "num_buckets": len(self.model_reports),
                 }
-                for metric_config in itertools.chain.from_iterable(
-                    [x.metric_configs for x in model1.analysis_levels]
-                )
+                for name in metric_names_iter
             }
         }
         return metadata

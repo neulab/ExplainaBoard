@@ -488,10 +488,13 @@ def main():
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
-            metric_configs = [
-                get_metric_config_or_eaas(name)(name, source_language, target_language)
+            metric_configs = {
+                name: get_metric_config_or_eaas(name)(
+                    source_language=source_language,
+                    target_language=target_language,
+                )
                 for name in metric_names
-            ]
+            }
             metadata["metric_configs"] = metric_configs
 
         # Run analysis

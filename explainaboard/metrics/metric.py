@@ -177,7 +177,6 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
         cls_name: The class name
     """
 
-    name: str
     source_language: str | None = None
     target_language: str | None = None
 
