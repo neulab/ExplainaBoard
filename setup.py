@@ -1,5 +1,4 @@
 import codecs
-import os
 
 from setuptools import find_packages, setup
 from version import __version__
@@ -51,6 +50,3 @@ setup(
     },
     include_package_data=True,
 )
-
-# TODO(odashi): Consider avoiding external invocation to install required models.
-os.system("python -m spacy download en_core_web_sm")
