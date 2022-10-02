@@ -262,4 +262,4 @@ class OverallStatistics:
 
     sys_info: SysOutputInfo
     analysis_cases: list[list[AnalysisCase]]
-    metric_stats: list[list[MetricStats]]
+    metric_stats: list[dict[str, MetricStats]]

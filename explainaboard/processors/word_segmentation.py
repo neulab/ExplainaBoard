@@ -21,26 +21,27 @@ class CWSProcessor(SeqLabProcessor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        defaults: dict[str, list[MetricConfig]] = {
-            'example': [
-                SeqF1ScoreConfig(
-                    name='F1',
+        defaults: dict[str, dict[str, MetricConfig]] = {
+            'example': {
+                "F1": SeqF1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
                     tag_schema='bmes',
                 )
-            ],
-            'span': [
-                F1ScoreConfig(
-                    name='F1',
+            },
+            'span': {
+                "F1": F1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
                     ignore_classes=[cls._DEFAULT_TAG],
                 )
-            ],
+            },
         }
         return defaults[level]
 
