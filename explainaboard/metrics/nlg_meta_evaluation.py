@@ -188,21 +188,20 @@ class KtauCorrelation(CorrelationMetric):
         num = 0
         for i in range(1, len(score)):
             for j in range(0, i):
-                if (
-                    abs(score[i][0] - score[j][0]) < config.threshold
-                    or abs(score[i][0] - score[j][0]) == 0
-                ):
+                manual_diff = score[i][0] - score[j][0]
+                system_diff = score[i][1] - score[j][1]
+                if abs(manual_diff) < config.threshold or abs(manual_diff) == 0:
                     continue
                 elif (
-                    score[i][0] - score[j][0] >= config.threshold
+                    manual_diff >= config.threshold
                 ):  # system i is better than system j
-                    if score[i][1] > score[j][1]:
+                    if system_diff > 0:
                         conc += 1
                     else:
                         disc += 1
                     num += 1
                 else:  # system i is worse than system j
-                    if score[i][1] < score[j][1]:
+                    if system_diff < 0:
                         conc += 1
                     else:
                         disc += 1
@@ -264,7 +263,9 @@ class PearsonCorrelation(CorrelationMetric):
                 manual_score.append(sum(manual_scores) / len(manual_scores))
                 system_score.append(sum(system_scores) / len(system_scores))
         else:
-            raise NotImplementedError
+            raise ValueError(
+                f"The grouping way of {config.group_by} " f"hasn't been supported"
+            )
 
         assert len(system_score) == len(manual_score)
 
