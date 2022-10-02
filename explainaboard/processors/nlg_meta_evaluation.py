@@ -137,7 +137,7 @@ class NLGMetaEvaluationProcessor(Processor):
     ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         return {
-            "SegKtauCorr": KtauCorrelationConfig(group_by="segment"),
+            "SegKtauCorr": KtauCorrelationConfig(group_by="segment", use_z_score=False),
             "SysPearsonCorr": PearsonCorrelationConfig(group_by="system"),
         }
 
