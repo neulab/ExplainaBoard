@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -13,10 +12,8 @@ from explainaboard.loaders.file_loader import (
     TSVFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.aspect_based_sentiment_classification)
 class AspectBasedSentimentClassificationLoader(Loader):
     """Loader for the aspect based sentiment classification task.
 

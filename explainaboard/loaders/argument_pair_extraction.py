@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     CoNLLFileLoader,
@@ -11,11 +10,9 @@ from explainaboard.loaders.file_loader import (
     FileLoaderField,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.argument_pair_extraction)
-class ArgumentPairExtraction(Loader):
+class ArgumentPairExtractionLoader(Loader):
     """A loader for argument pair extraction.
 
     usage:

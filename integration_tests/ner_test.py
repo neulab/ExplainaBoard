@@ -8,7 +8,7 @@ from integration_tests.utils import test_artifacts_path
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.utils import cache_api
 from explainaboard.utils.typing_utils import unwrap
 
