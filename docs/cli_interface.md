@@ -339,3 +339,15 @@ The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/ma
 ```shell
 explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
 ```
+
+
+
+## [Meta Evaluation NLG]
+Evaluating the reliability of automated metrics for general text generation tasks, such as text summarization.
+
+**CLI Examples**
+
+The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab: 
+```shell
+explainaboard --task meta-evaluation-nlg --dataset meval_summeval --sub-dataset coherence --system-outputs ./data/system_outputs/summeval/sumeval_bart.json > report.json
+```

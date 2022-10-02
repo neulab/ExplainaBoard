@@ -13,6 +13,7 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
+    meta_evaluation_nlg,
     nlg_meta_evaluation,
     qa_multiple_choice,
     qa_open_domain,
@@ -47,4 +48,5 @@ __all__ = [
     'nlg_meta_evaluation',
     'qa_tat',
     'argument_pair_extraction',
+    'meta_evaluation_nlg',
 ]

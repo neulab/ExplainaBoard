@@ -401,22 +401,19 @@ class Metric(metaclass=abc.ABCMeta):
         """
         result = self._aggregate_stats(stats)
 
-        num_stats = (
-            result.shape[-1]
-            if self.uses_customized_aggregate()
-            else stats.num_statistics()
-        )
+        num_stats = stats.num_statistics()
         result_shape = (
             (stats.get_batch_data().shape[0], num_stats)
             if stats.is_batched()
             else (num_stats,)
         )
 
-        assert result.shape == result_shape, (
-            "BUG: invalid operation: "
-            f"{type(self).__name__}._aggregate_stats(): "
-            f"Expected shape {result_shape}, but got {result.shape}."
-        )
+        if not self.uses_customized_aggregate():
+            assert result.shape == result_shape, (
+                "BUG: invalid operation: "
+                f"{type(self).__name__}._aggregate_stats(): "
+                f"Expected shape {result_shape}, but got {result.shape}."
+            )
 
         return result
 
@@ -450,17 +447,18 @@ class Metric(metaclass=abc.ABCMeta):
                 - Non-batched data: []
                 - Batched data: [num_batches]
         """
-        if agg_stats.ndim not in (1, 2):
+        if not self.uses_customized_aggregate() and agg_stats.ndim not in (1, 2):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
 
         result = self._calc_metric_from_aggregate(agg_stats)
         result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
 
-        assert result.shape == result_shape, (
-            "BUG: invalid operation: "
-            f"{type(self).__name__}._calc_metric_from_aggregate(): "
-            f"Expected shape {result_shape}, but got {result.shape}."
-        )
+        if not self.uses_customized_aggregate():
+            assert result.shape == result_shape, (
+                "BUG: invalid operation: "
+                f"{type(self).__name__}._calc_metric_from_aggregate(): "
+                f"Expected shape {result_shape}, but got {result.shape}."
+            )
 
         return result
 

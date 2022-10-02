@@ -15,6 +15,7 @@ from explainaboard.processors import (
     kg_link_tail_prediction,
     language_modeling,
     machine_translation,
+    meta_evaluation_nlg,
     named_entity_recognition,
     nlg_meta_evaluation,
     qa_multiple_choice,
@@ -53,4 +54,5 @@ __all__ = [
     'nlg_meta_evaluation',
     'qa_tat',
     'argument_pair_extraction',
+    'meta_evaluation_nlg',
 ]

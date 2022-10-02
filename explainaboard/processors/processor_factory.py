@@ -24,6 +24,7 @@ from explainaboard.processors.kg_link_tail_prediction import (
 )
 from explainaboard.processors.language_modeling import LanguageModelingProcessor
 from explainaboard.processors.machine_translation import MachineTranslationProcessor
+from explainaboard.processors.meta_evaluation_nlg import MetaEvaluationNLGProcessor
 from explainaboard.processors.named_entity_recognition import NERProcessor
 from explainaboard.processors.nlg_meta_evaluation import NLGMetaEvaluationProcessor
 from explainaboard.processors.processor import Processor
@@ -64,6 +65,7 @@ _TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
     TaskType.tabular_regression: TabularRegressionProcessor,
     TaskType.tabular_classification: TabularClassificationProcessor,
     TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
+    TaskType.meta_evaluation_nlg: MetaEvaluationNLGProcessor,
 }
 
 

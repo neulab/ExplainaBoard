@@ -103,11 +103,9 @@ class CorrelationNLG(Metric):
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
         if stats.is_batched():
-            data = stats.get_batch_data()
-            return data.reshape((data.shape[0], data.shape[-2] * data.shape[-1]))
+            return stats.get_batch_data()
         else:
-            data = stats.get_data()
-            return data.reshape((data.shape[-2] * data.shape[-1]))
+            return stats.get_data()
 
     def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """Calculate an aggregate correlation metric from a single segment or system.
@@ -126,28 +124,19 @@ class CorrelationNLG(Metric):
         elif config.level == "sample":
             val = np.mean(single_stat)
         elif config.level == "system":
-            true_scores = np.sum(single_stat[:, 0 : int(self.n_systems)], axis=0)
-            pred_scores = np.sum(single_stat[:, int(self.n_systems) :], axis=0)
+            n_systems = int(single_stat.shape[-1] / 2)
+
+            true_scores = np.sum(single_stat[:, 0:n_systems], axis=0)
+            pred_scores = np.sum(single_stat[:, n_systems:], axis=0)
             val = corr_func(true_scores, pred_scores)[0]
         return val
 
     def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.ndim == 1:
-            agg_stats = agg_stats.reshape(
-                (self.n_samples, int(agg_stats.shape[0] / self.n_samples))
-            )
+        if agg_stats.ndim == 2:
             val = self.calc_metric_from_aggregate_single(agg_stats)
             return np.array(val)
         else:
-            agg_stats = agg_stats.reshape(
-                (
-                    agg_stats.shape[0],
-                    self.n_samples,
-                    int(agg_stats.shape[1] / self.n_samples),
-                )
-            )
-
             ret_metric = np.zeros(agg_stats.shape[0])
             for i, single_stat in enumerate(agg_stats):
                 val = self.calc_metric_from_aggregate_single(single_stat)
