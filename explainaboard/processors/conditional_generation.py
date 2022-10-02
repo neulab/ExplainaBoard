@@ -34,7 +34,6 @@ from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.metrics.f1_score import F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.language_utils import (
     is_chinese_lang_code,
     is_japanese_lang_code,
@@ -44,7 +43,6 @@ from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer, TokenSe
 from explainaboard.utils.typing_utils import unwrap
 
 
-@common_registry.register("ConditionalGenerationProcessor")
 class ConditionalGenerationProcessor(Processor):
     """A processor for the conditional generation task."""
 

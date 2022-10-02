@@ -18,10 +18,8 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 
 
-@common_registry.register("TabularClassificationProcessor")
 class TabularClassificationProcessor(Processor):
     """A processor for the tabular classification task."""
 

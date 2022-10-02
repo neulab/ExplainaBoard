@@ -20,13 +20,11 @@ from explainaboard.metrics.ranking import (
     RankingMetric,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils import cache_api
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import narrow
 
 
-@common_registry.register("KGLinkTailPredictionProcessor")
 class KGLinkTailPredictionProcessor(Processor):
     """A processor for the knowledge graph link tail prediction task."""
 

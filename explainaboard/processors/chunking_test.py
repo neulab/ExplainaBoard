@@ -4,21 +4,11 @@ from __future__ import annotations
 
 import unittest
 
+from explainaboard.constants import TaskType
 from explainaboard.processors.chunking import ChunkingProcessor
-from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.processors.processor_factory import get_processor_class
 
 
 class ChunkingProcessorTest(unittest.TestCase):
-    def test_serialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertEqual(
-            serializer.serialize(ChunkingProcessor()),
-            {"cls_name": "ChunkingProcessor"},
-        )
-
-    def test_deserialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertIsInstance(
-            serializer.deserialize({"cls_name": "ChunkingProcessor"}),
-            ChunkingProcessor,
-        )
+    def test_get_processor_class(self) -> None:
+        self.assertIs(get_processor_class(TaskType.chunking), ChunkingProcessor)
