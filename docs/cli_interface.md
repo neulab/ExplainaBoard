@@ -359,3 +359,17 @@ explainaboard \
     --source-language en \
     --target-language en
 ```
+
+This is an example with a dataset supported by DataLab, for example 
+[wmt20_metrics_with_score](https://github.com/ExpressAI/DataLab/blob/main/datasets/wmt20_metrics_with_score/wmt20_metrics_with_score.py).
+
+```shell
+explainaboard \
+    --task meta-evaluation-wmt-da \
+    --dataset wmt20_metrics_with_score \
+    --sub-dataset cs-en_1.0.3 \
+    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score_1.0.3.txt \
+    --output-file-type text \
+    --source-language en \
+    --target-language en
+```
