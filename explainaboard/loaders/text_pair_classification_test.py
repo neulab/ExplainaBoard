@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.text_pair_classification."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

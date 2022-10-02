@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.language_modeling."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

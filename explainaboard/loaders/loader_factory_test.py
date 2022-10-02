@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.loader_factory."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

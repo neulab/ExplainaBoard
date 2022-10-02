@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.conditional_generation."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

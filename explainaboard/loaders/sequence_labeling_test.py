@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.sequence_labeling."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

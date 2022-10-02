@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.qa_open_domain."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

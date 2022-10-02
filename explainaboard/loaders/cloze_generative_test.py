@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.cloze_generative."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

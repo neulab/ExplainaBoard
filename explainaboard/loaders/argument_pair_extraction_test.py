@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.argument_pair_extraction."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

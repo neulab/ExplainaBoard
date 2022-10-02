@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.qa_multiple_choice."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType

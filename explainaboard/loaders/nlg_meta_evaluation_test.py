@@ -1,6 +1,5 @@
 """Tests for explainaboard.loaders.nlg_meta_evaluation."""
 
-
 import unittest
 
 from explainaboard.constants import TaskType
