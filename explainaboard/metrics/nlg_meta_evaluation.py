@@ -20,13 +20,14 @@ from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 
 @dataclass
-@common_registry.register("NLGCorrelationConfig")
-class NLGCorrelationConfig(MetricConfig):
+@common_registry.register("CorrelationNLGConfig")
+class CorrelationNLGConfig(MetricConfig):
     """Configuration of a correlation for general NLG tasks.
 
     Args:
         level: there are following levels: sample level, system level and dataset level
-        func_name: the method to calculate correlation (e.g., Spearman)
+                See more details: https://aclanthology.org/2020.emnlp-main.751.pdf
+        func_name: the method for calculating the correlation (e.g., Spearman)
     """
 
     level: str = "sample"
@@ -34,10 +35,12 @@ class NLGCorrelationConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return NLGCorrelation(self)
+        return CorrelationNLG(self)
 
     def get_correlation_func(self, name: str):
         """Get correlation function based on function name.
+
+        TODO(pengfei): organize this in a better way
 
         Args:
             name: function name
@@ -52,7 +55,7 @@ class NLGCorrelationConfig(MetricConfig):
             raise ValueError(f"The correlation function {name} hasn't been supported")
 
 
-class NLGCorrelation(Metric):
+class CorrelationNLG(Metric):
     """A metric that calculates correlations."""
 
     n_samples = 0
@@ -72,7 +75,7 @@ class NLGCorrelation(Metric):
         pred_data: list[list[float]],
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
-        config = narrow(NLGCorrelationConfig, self.config)
+        config = narrow(CorrelationNLGConfig, self.config)
         self.n_samples = len(true_data)
         self.n_systems = len(true_data[0])
 
@@ -90,13 +93,12 @@ class NLGCorrelation(Metric):
             return SimpleMetricStats(
                 np.array([true + pred for true, pred in zip(true_data, pred_data)])
             )
-        else:
+        else:  # TODO(Pengfei): better way to organize different levels
             return SimpleMetricStats(
                 np.array(
                     [[true[0], pred[0]] for true, pred in zip(true_data, pred_data)]
                 )
             )
-
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
@@ -117,7 +119,7 @@ class NLGCorrelation(Metric):
             The aggregated metric value.
         """
         val = 0
-        config = narrow(NLGCorrelationConfig, self.config)
+        config = narrow(CorrelationNLGConfig, self.config)
         corr_func = config.get_correlation_func(config.func_name)
         if config.level == "dataset":
             val = corr_func(single_stat[:, 0], single_stat[0:, 1])[0]
