@@ -52,11 +52,11 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),  # you can modify k here
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
+            "metric_configs": {
+                "Hits4": HitsConfig(hits_k=4),  # you can modify k here
+                "MRR": MeanReciprocalRankConfig(),
+                "MR": MeanRankConfig(),
+            },
         }
 
         processor = get_processor_class(TaskType.kg_link_tail_prediction)()
@@ -102,11 +102,11 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k_237",
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
+            "metric_configs": {
+                "Hits4": HitsConfig(hits_k=4),
+                "MRR": MeanReciprocalRankConfig(),
+                "MR": MeanRankConfig(),
+            },
             "sort_by": "performance_value",
             "sort_by_metric": "Hits4",
         }
@@ -139,11 +139,11 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k_237",
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
+            "metric_configs": {
+                "Hits4": HitsConfig(hits_k=4),
+                "MRR": MeanReciprocalRankConfig(),
+                "MR": MeanRankConfig(),
+            },
             "sort_by": "key",
         }
 

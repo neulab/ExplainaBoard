@@ -10,9 +10,11 @@ from eaas.async_client import AsyncClient, AsyncRequest
 from eaas.config import Config
 import numpy as np
 import sacrebleu
+import sacrebleu.metrics.base
 
 from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
 from explainaboard.serialization import common_registry
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 _eaas_config = None
 _eaas_client = None
@@ -84,7 +86,13 @@ class EaaSMetricStats(MetricStats):
 @dataclass
 @common_registry.register("EaaSMetricConfig")
 class EaaSMetricConfig(MetricConfig):
-    """Configuration for EaaSMetric."""
+    """Configuration for EaaSMetric.
+
+    Attributes:
+        name: Name of the metric in the EaaS system.
+    """
+
+    name: str | None = None
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
@@ -95,25 +103,30 @@ class EaaSMetric(Metric):
     """A metric that calculates evaluation scores using EaaS."""
 
     _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
+    _SACREBLEU_METRICS: dict[str, sacrebleu.metrics.base.Metric] = {
+        "bleu": sacrebleu.BLEU,
+        "chrf": sacrebleu.CHRF,
+    }
 
     def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
+        config = narrow(EaaSMetricConfig, self.config)
+
         is_batched = agg_stats.ndim != 1
         if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
         n_samples = agg_stats.shape[0]
-        if self.config.name in {'bleu', 'chrf'}:
+
+        if config.name in self._SACREBLEU_METRICS:
             ret_metric = np.zeros(n_samples)
-            metric_class = (
-                sacrebleu.BLEU() if self.config.name == 'bleu' else sacrebleu.CHRF()
-            )
+            sacrebleu_metric = self._SACREBLEU_METRICS[config.name]()
             for i, single_stat in enumerate(agg_stats):
                 ret_metric[i] = (
-                    metric_class._compute_score_from_stats(list(single_stat)).score
+                    sacrebleu_metric._compute_score_from_stats(list(single_stat)).score
                     / 100.0
                 )
             calc_result = ret_metric
-        elif self.config.name == 'length_ratio':
+        elif config.name == 'length_ratio':
             calc_result = agg_stats[:, 0] / agg_stats[:, 1]
         else:
             calc_result = agg_stats[:, 0]
@@ -123,12 +136,14 @@ class EaaSMetric(Metric):
 
     def is_simple_average(self, stats: MetricStats):
         """See Metric.is_simple_average."""
-        return self.config.name not in self._NOT_SIMPLE_METRICS
+        return (
+            narrow(EaaSMetricConfig, self.config).name not in self._NOT_SIMPLE_METRICS
+        )
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See: Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
-        if self.config.name in {'bleu', 'chrf'}:
+        if narrow(EaaSMetricConfig, self.config).name in {'bleu', 'chrf'}:
             return np.sum(data, axis=-2)
         else:
             return np.mean(data, axis=-2)
@@ -147,7 +162,11 @@ class EaaSMetric(Metric):
             inputs.append(ntd)
         async_request = get_eaas_client().async_score(
             inputs,
-            metrics=[self.config.name],
+            metrics=[narrow(EaaSMetricConfig, self.config).name],
             calculate=['corpus', 'stats'],
         )
-        return EaaSMetricStats(name=self.config.name, pos=0, eaas_request=async_request)
+        return EaaSMetricStats(
+            name=unwrap(narrow(EaaSMetricConfig, self.config).name),
+            pos=0,
+            eaas_request=async_request,
+        )

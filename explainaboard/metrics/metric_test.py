@@ -118,7 +118,7 @@ class MetricResultTest(unittest.TestCase):
     def test_deserialize(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)
-        config = _DummyMetricConfig(name="foo")
+        config = _DummyMetricConfig()
         serialized: dict[str, SerializableData] = {
             "config": config,
             "values": {"bar": score, "baz": ci},

@@ -130,13 +130,16 @@ class NLGMetaEvaluationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            KtauCorrelationConfig(name='SegKtauCorr', group_by='segment'),
-            PearsonCorrelationConfig(name='SysPearsonCorr', group_by='system'),
-        ]
+        return {
+            "SegKtauCorr": KtauCorrelationConfig(group_by="segment"),
+            "SysPearsonCorr": PearsonCorrelationConfig(group_by="system"),
+        }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_true_label(self, data_point: dict):

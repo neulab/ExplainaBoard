@@ -161,7 +161,7 @@ class LanguageModelingProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         if analysis_level.name == 'example':
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
@@ -202,20 +202,28 @@ class LanguageModelingProcessor(Processor):
                             sys_info, output, case, statistics
                         )
                 cases.append(case)
-        metric_stats: list[MetricStats] = [
-            SimpleMetricStats(np.array([x.features['tok_log_prob'] for x in cases]))
-        ]
+        metric_stats: dict[str, MetricStats] = {
+            "Perplexity": SimpleMetricStats(
+                np.array([x.features['tok_log_prob'] for x in cases])
+            ),
+            "LogProb": SimpleMetricStats(
+                np.array([x.features['tok_log_prob'] for x in cases])
+            ),
+        }
         return cases, metric_stats
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            LogProbConfig(name='Perplexity', ppl=True),
-            LogProbConfig(name='LogProb', ppl=False),
-        ]
+        return {
+            "Perplexity": LogProbConfig(ppl=True),
+            "LogProb": LogProbConfig(ppl=False),
+        }
 
     def _get_true_label(self, data_point: dict):
         """See processor._get_true_label."""

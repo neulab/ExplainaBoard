@@ -19,9 +19,8 @@ from explainaboard.utils.typing_utils import unwrap
 class HitsConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            HitsConfig("Hits", hits_k=5).serialize(),
+            HitsConfig(hits_k=5).serialize(),
             {
-                "name": "Hits",
                 "source_language": None,
                 "target_language": None,
                 "hits_k": 5,
@@ -30,17 +29,17 @@ class HitsConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            HitsConfig.deserialize({"name": "Hits", "hits_k": 5}),
-            HitsConfig("Hits", hits_k=5),
+            HitsConfig.deserialize({"hits_k": 5}),
+            HitsConfig(hits_k=5),
         )
 
     def test_to_metric(self) -> None:
-        self.assertIsInstance(HitsConfig("Hits").to_metric(), Hits)
+        self.assertIsInstance(HitsConfig().to_metric(), Hits)
 
 
 class HitsTest(unittest.TestCase):
     def test_evaluate(self) -> None:
-        metric = HitsConfig(name='Hits').to_metric()
+        metric = HitsConfig().to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
@@ -52,9 +51,8 @@ class HitsTest(unittest.TestCase):
 class MeanReciprocalRankConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            MeanReciprocalRankConfig("MeanReciprocalRank").serialize(),
+            MeanReciprocalRankConfig().serialize(),
             {
-                "name": "MeanReciprocalRank",
                 "source_language": None,
                 "target_language": None,
             },
@@ -62,20 +60,20 @@ class MeanReciprocalRankConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            MeanReciprocalRankConfig.deserialize({"name": "MeanReciprocalRank"}),
-            MeanReciprocalRankConfig("MeanReciprocalRank"),
+            MeanReciprocalRankConfig.deserialize({}),
+            MeanReciprocalRankConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            MeanReciprocalRankConfig("MeanReciprocalRank").to_metric(),
+            MeanReciprocalRankConfig().to_metric(),
             MeanReciprocalRank,
         )
 
 
 class MeanReciprocalRankTest(unittest.TestCase):
     def test_evaluate(self) -> None:
-        metric = MeanReciprocalRankConfig(name='MRR').to_metric()
+        metric = MeanReciprocalRankConfig().to_metric()
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
@@ -87,9 +85,8 @@ class MeanReciprocalRankTest(unittest.TestCase):
 class MeanRankConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            MeanRankConfig("MeanRank").serialize(),
+            MeanRankConfig().serialize(),
             {
-                "name": "MeanRank",
                 "source_language": None,
                 "target_language": None,
             },
@@ -97,9 +94,9 @@ class MeanRankConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            MeanRankConfig.deserialize({"name": "MeanRank"}),
-            MeanRankConfig("MeanRank"),
+            MeanRankConfig.deserialize({}),
+            MeanRankConfig(),
         )
 
     def test_to_metric(self) -> None:
-        self.assertIsInstance(MeanRankConfig("MeanRank").to_metric(), MeanRank)
+        self.assertIsInstance(MeanRankConfig().to_metric(), MeanRank)
