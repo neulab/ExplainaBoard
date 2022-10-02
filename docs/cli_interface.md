@@ -41,7 +41,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Tabular Classification](#tabular-classification)
 * [Tabular Regression](#tabular-regression)
 * [Argument Pair Extraction](argument-pair-extraction)
-
+* [Meta Evaluation WMT DA](#meta-evaluation-wmt-da)
 
 
 
@@ -338,4 +338,24 @@ This task aim to detect the argument pairs from each passage pair of review and 
 The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab: 
 ```shell
 explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
+```
+
+
+## [Meta Evaluation WMT DA](task_meta_evaluation.md)
+
+Evaluating the reliability of automated metrics for [WMT Metrics shared tasks](https://wmt-metrics-task.github.io/)
+ using [direct assessment](https://www.statmt.org/wmt16/slides/wmt16-news-da.pdf) (DA).
+
+**CLI Example**
+
+This is an example with a custom dataset.
+```shell
+explainaboard \
+    --task meta-evaluation-wmt-da \
+    --custom-dataset-paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv \
+    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt \
+    --output-file-type text \
+    --output-dir output/cs-en \
+    --source-language en \
+    --target-language en
 ```
