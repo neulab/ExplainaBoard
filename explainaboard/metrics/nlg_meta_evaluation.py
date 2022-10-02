@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Optional, Union
 
 import numpy as np
+from scipy import stats
 from scipy.stats import pearsonr
 
 from explainaboard.metrics.metric import (
@@ -16,6 +17,140 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import narrow, unwrap_or
+
+
+@dataclass
+@common_registry.register("NLGCorrelationConfig")
+class NLGCorrelationConfig(MetricConfig):
+    """Configuration of a correlation for general NLG tasks.
+
+    Args:
+        level: there are following levels: sample level, system level and dataset level
+        func_name: the method to calculate correlation (e.g., Spearman)
+    """
+
+    level: str = "sample"
+    func_name: str = "spearmanr"
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
+        return NLGCorrelation(self)
+
+    def get_correlation_func(self, name: str):
+        """Get correlation function based on function name.
+
+        Args:
+            name: function name
+        """
+        if name == "spearmanr":
+            return stats.spearmanr
+        elif name == "pearsonr":
+            return stats.pearsonr
+        elif name == "kendalltau":
+            return stats.kendalltau
+        else:
+            raise ValueError(f"The correlation function {name} hasn't been supported")
+
+
+class NLGCorrelation(Metric):
+    """A metric that calculates correlations."""
+
+    n_samples = 0
+    n_systems = 0
+
+    def is_simple_average(self, stats: MetricStats) -> bool:
+        """See Metric.is_simple_average."""
+        return False
+
+    def uses_customized_aggregate(self) -> bool:
+        """See Metric.uses_customized_aggregate."""
+        return True
+
+    def calc_stats_from_data(
+        self,
+        true_data: list[list[float]],
+        pred_data: list[list[float]],
+    ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
+        config = narrow(NLGCorrelationConfig, self.config)
+        self.n_samples = len(true_data)
+        self.n_systems = len(true_data[0])
+
+        if config.level == "sample":
+            corr_func = config.get_correlation_func(config.func_name)
+            return SimpleMetricStats(
+                np.array(
+                    [
+                        corr_func(true, pred)[0]
+                        for true, pred in zip(true_data, pred_data)
+                    ]
+                )
+            )
+        elif config.level == "system":
+            return SimpleMetricStats(
+                np.array([true + pred for true, pred in zip(true_data, pred_data)])
+            )
+        else:
+            return SimpleMetricStats(
+                np.array(
+                    [[true[0], pred[0]] for true, pred in zip(true_data, pred_data)]
+                )
+            )
+
+
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+        """See Metric.aggregate_stats."""
+        if stats.is_batched():
+            data = stats.get_batch_data()
+            return data.reshape((data.shape[0], data.shape[-2] * data.shape[-1]))
+        else:
+            data = stats.get_data()
+            return data.reshape((data.shape[-2] * data.shape[-1]))
+
+    def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
+        """Calculate an aggregate correlation metric from a single segment or system.
+
+        Args:
+            single_stat: The stats for the single segment or system
+
+        Returns:
+            The aggregated metric value.
+        """
+        val = 0
+        config = narrow(NLGCorrelationConfig, self.config)
+        corr_func = config.get_correlation_func(config.func_name)
+        if config.level == "dataset":
+            val = corr_func(single_stat[:, 0], single_stat[0:, 1])[0]
+        elif config.level == "sample":
+            val = np.mean(single_stat)
+        elif config.level == "system":
+            true_scores = np.sum(single_stat[:, 0 : int(self.n_systems)], axis=0)
+            pred_scores = np.sum(single_stat[:, int(self.n_systems) :], axis=0)
+            val = corr_func(true_scores, pred_scores)[0]
+        return val
+
+    def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
+        """See Metric.calc_metric_from_aggregate."""
+        if agg_stats.ndim == 1:
+            agg_stats = agg_stats.reshape(
+                (self.n_samples, int(agg_stats.shape[0] / self.n_samples))
+            )
+            val = self.calc_metric_from_aggregate_single(agg_stats)
+            return np.array(val)
+        else:
+            agg_stats = agg_stats.reshape(
+                (
+                    agg_stats.shape[0],
+                    self.n_samples,
+                    int(agg_stats.shape[1] / self.n_samples),
+                )
+            )
+
+            ret_metric = np.zeros(agg_stats.shape[0])
+            for i, single_stat in enumerate(agg_stats):
+                val = self.calc_metric_from_aggregate_single(single_stat)
+                ret_metric[i] = val
+            return ret_metric
 
 
 @dataclass
