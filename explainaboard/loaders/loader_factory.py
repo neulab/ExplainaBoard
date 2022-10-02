@@ -13,7 +13,6 @@ from explainaboard.loaders.conditional_generation import (
     MachineTranslationLoader,
     SummarizationLoader,
 )
-from explainaboard.loaders.extractive_qa import QAExtractiveLoader
 from explainaboard.loaders.grammatical_error_correction import (
     GrammaticalErrorCorrectionLoader,
 )
@@ -21,6 +20,7 @@ from explainaboard.loaders.kg_link_tail_prediction import KgLinkTailPredictionLo
 from explainaboard.loaders.language_modeling import LanguageModelingLoader
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.nlg_meta_evaluation import NLGMetaEvaluationLoader
+from explainaboard.loaders.qa_extractive import QAExtractiveLoader
 from explainaboard.loaders.qa_multiple_choice import QAMultipleChoiceLoader
 from explainaboard.loaders.qa_open_domain import QAOpenDomainLoader
 from explainaboard.loaders.qa_tat import QATatLoader
