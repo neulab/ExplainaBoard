@@ -195,27 +195,3 @@ class Loader:
             for i, output in enumerate(data_list):
                 dataset_loaded_data[i].update(output)
         return dataset_loaded_data
-
-
-@dataclass
-class CustomFeature:
-    """A data class expressing information about custom features.
-
-    Attributes:
-        name: The name of the feature
-        dtype: The datatype
-        description: A human-understandable description of the feature
-    """
-
-    name: str
-    dtype: str
-    description: str
-
-    @classmethod
-    def from_dict(cls, name: str, dikt: dict) -> CustomFeature:
-        """Deserialize the data from a dictionary."""
-        return CustomFeature(
-            name,
-            dtype=dikt["dtype"],
-            description=dikt["description"],
-        )
