@@ -182,7 +182,7 @@ class KtauCorrelationWMTDA(CorrelationWMTDAMetric):
     """A metric to calculate Kendall's Tau rank correlation."""
 
     def _count(self, score: list, config: Optional[MetricConfig] = None):
-        config = narrow(KtauCorrelationConfig, unwrap_or(config, self.config))
+        config = narrow(KtauCorrelationWMTDAConfig, unwrap_or(config, self.config))
         conc = 0
         disc = 0
         num = 0
@@ -242,7 +242,6 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
         scores = self.get_scores_from_stats(single_stat)
         config = narrow(CorrelationWMTDAConfig, self.config)
 
-
         manual_score = []
         system_score = []
 
@@ -263,7 +262,6 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
             raise ValueError(
                 f"The grouping way of {config.group_by} " f"hasn't been supported"
             )
-
 
         assert len(system_score) == len(manual_score)
 
