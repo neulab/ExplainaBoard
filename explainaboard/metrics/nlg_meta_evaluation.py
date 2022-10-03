@@ -22,6 +22,7 @@ from explainaboard.utils.typing_utils import narrow, unwrap_or
 @common_registry.register("CorrelationWMTDAConfig")
 class CorrelationWMTDAConfig(MetricConfig):
     """Configuration of a correlation for WMT Metrics Meta Evaluation.
+    
     :param group_by: Can be 'system' to group by system, 'segment' to group by segment
       or anything else (typically 'none') to not perform any grouping at all.
     :param use_z_score: Whether or not to use the z-normalized value for calculation of
