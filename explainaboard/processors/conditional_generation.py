@@ -41,7 +41,7 @@ from explainaboard.utils.language_utils import (
 )
 from explainaboard.utils.logging import progress
 from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer, TokenSeq
-from explainaboard.utils.typing_utils import unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import unwrap
 
 
 @common_registry.register("ConditionalGenerationProcessor")
@@ -191,38 +191,38 @@ class ConditionalGenerationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         eaas_defaults = cls._get_default_eaas_strs()
-        metric_configs: list[Any] = []
-        for metric_name in eaas_defaults:
-            metric_configs.append(
-                EaaSMetricConfig(
-                    name=metric_name,
-                    source_language=source_language,
-                    target_language=target_language,
-                )
-            )
 
-        defaults: dict[str, list] = {
-            'example': metric_configs,
-            'token': [
-                F1ScoreConfig(
-                    name='F1',
+        defaults: dict[str, dict[str, MetricConfig]] = {
+            'example': {
+                name: EaaSMetricConfig(
+                    name=name,
                     source_language=source_language,
                     target_language=target_language,
                 )
-            ],
+                for name in eaas_defaults
+            },
+            'token': {
+                "F1": F1ScoreConfig(
+                    source_language=source_language,
+                    target_language=target_language,
+                )
+            },
         }
         return defaults[level]
 
     @classmethod
     def full_metric_list(
         cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+    ) -> dict[str, MetricConfig]:
         """See Processor.full_metric_list."""
-        full_metrics_eaas = [
+        eaas_metric_names = [
             "bleu",
             "bart_score_summ",
             "bart_score_mt",
@@ -240,36 +240,33 @@ class ConditionalGenerationProcessor(Processor):
             "length",
             "length_ratio",
         ]
-        full_metrics_human = [
-            "LikertScore_fluency",
-            "LikertScore_coherence",
-            "LikertScore_factuality",
+        eaas_metrics: dict[str, MetricConfig] = {
+            name: EaaSMetricConfig(
+                name=name,
+                source_language=source_language,
+                target_language=target_language,
+            )
+            for name in eaas_metric_names
+        }
+
+        human_metric_aspects = [
+            "fluency",
+            "coherence",
+            "factuality",
         ]
-        example_configs: list[MetricConfig] = []
-        for x in full_metrics_eaas:
-            example_configs.append(
-                EaaSMetricConfig(
-                    name=x,
+        human_metrics: dict[str, MetricConfig] = {
+            f"LikertScore_{aspect}": ExternalEvalConfig(aspect=aspect)
+            for aspect in human_metric_aspects
+        }
+
+        defaults: dict[str, dict[str, MetricConfig]] = {
+            "example": {**eaas_metrics, **human_metrics},
+            "token": {
+                "F1": F1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
                 )
-            )
-        for x in full_metrics_human:
-            example_configs.append(
-                ExternalEvalConfig(
-                    name=x,
-                    aspect=x.split("LikertScore_")[1],
-                )
-            )
-        defaults: dict[str, list[MetricConfig]] = {
-            'example': example_configs,
-            'tok': [
-                F1ScoreConfig(
-                    name='F1',
-                    source_language=source_language,
-                    target_language=target_language,
-                )
-            ],
+            },
         }
         return defaults[level]
 
@@ -306,7 +303,7 @@ class ConditionalGenerationProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         cases: list[AnalysisCase] = []
         if analysis_level.name == 'example':
             # Note that this is over-ridden to accommodate efficient calculation of
@@ -327,12 +324,12 @@ class ConditionalGenerationProcessor(Processor):
                 pred_data.append(feature_table["hypothesis"])
 
             metric_names_eaas: list[str] = []
-            metric_configs_noneaas: list[MetricConfig] = []
-            for metric_config in unwrap_generator(analysis_level.metric_configs):
+            metric_configs_noneaas: dict[str, MetricConfig] = {}
+            for metric_name, metric_config in analysis_level.metric_configs.items():
                 if isinstance(metric_config, EaaSMetricConfig):
-                    metric_names_eaas.append(metric_config.name)
+                    metric_names_eaas.append(metric_name)
                 else:
-                    metric_configs_noneaas.append(metric_config)
+                    metric_configs_noneaas[metric_name] = metric_config
 
             async_request = get_eaas_client().async_score(
                 inputs,
@@ -340,16 +337,16 @@ class ConditionalGenerationProcessor(Processor):
                 calculate=['corpus', 'stats'],
             )
 
-            metric_stats: list[Any] = [
-                EaaSMetricStats(name=name, pos=i, eaas_request=async_request)
+            metric_stats: dict[str, MetricStats] = {
+                name: EaaSMetricStats(name=name, pos=i, eaas_request=async_request)
                 for i, name in enumerate(metric_names_eaas)
-            ]
+            }
 
             # For non-EaaS metrics
-            for metric_config in metric_configs_noneaas:
-                metric_stats.append(
-                    metric_config.to_metric().calc_stats_from_data(true_data, pred_data)
-                )
+            for metric_name, metric_config in metric_configs_noneaas.items():
+                metric_stats[
+                    metric_name
+                ] = metric_config.to_metric().calc_stats_from_data(true_data, pred_data)
 
             # Calculate features
             for i, output in progress(
@@ -439,7 +436,7 @@ class ConditionalGenerationProcessor(Processor):
                     stats_list.append([1.0, 0.0, 0.0])
                 else:
                     stats_list.append([0.0, 1.0, 0.0])
-            metric_stats = [SimpleMetricStats(np.array(stats_list))]
+            metric_stats = {"F1": SimpleMetricStats(np.array(stats_list))}
         else:
             raise ValueError(f'{analysis_level.name}-level analysis not supported')
 

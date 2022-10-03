@@ -41,15 +41,14 @@ You can load the dataset from an existing file using the
 
 ```shell
 explainaboard \
-    --task nlg-meta-evaluation \
+    --task meta-evaluation-wmt-da \
     --custom-dataset-paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv \
     --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt \
     --output-file-type text \
     --output-dir output/cs-en \
     --source-language en \
-    --target-language en \
-    --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
+    --target-language en
 ```
-
+ 
 
 

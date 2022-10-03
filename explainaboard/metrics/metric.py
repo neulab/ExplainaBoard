@@ -177,7 +177,6 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
         cls_name: The class name
     """
 
-    name: str
     source_language: str | None = None
     target_language: str | None = None
 
@@ -537,7 +536,7 @@ class Metric(metaclass=abc.ABCMeta):
             if my_std == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
-                alpha=confidence_alpha,
+                alpha=1.0 - confidence_alpha,  # See ExplainaBoard/issues/510
                 df=stats_data.shape[-2] - 1,
                 loc=my_mean,
                 scale=my_std,

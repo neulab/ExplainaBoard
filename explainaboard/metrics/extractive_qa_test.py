@@ -15,9 +15,8 @@ from explainaboard.metrics.extractive_qa import (
 class ExactMatchQAConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            ExactMatchQAConfig("ExactMatchQA").serialize(),
+            ExactMatchQAConfig().serialize(),
             {
-                "name": "ExactMatchQA",
                 "source_language": None,
                 "target_language": None,
             },
@@ -25,13 +24,13 @@ class ExactMatchQAConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            ExactMatchQAConfig.deserialize({"name": "ExactMatchQA"}),
-            ExactMatchQAConfig("ExactMatchQA"),
+            ExactMatchQAConfig.deserialize({}),
+            ExactMatchQAConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            ExactMatchQAConfig("ExactMatchQA").to_metric(),
+            ExactMatchQAConfig().to_metric(),
             ExactMatchQA,
         )
 
@@ -39,9 +38,8 @@ class ExactMatchQAConfigTest(unittest.TestCase):
 class F1ScoreQAConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            F1ScoreQAConfig("F1ScoreQA").serialize(),
+            F1ScoreQAConfig().serialize(),
             {
-                "name": "F1ScoreQA",
                 "source_language": None,
                 "target_language": None,
             },
@@ -49,12 +47,12 @@ class F1ScoreQAConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            F1ScoreQAConfig.deserialize({"name": "F1ScoreQA"}),
-            F1ScoreQAConfig("F1ScoreQA"),
+            F1ScoreQAConfig.deserialize({}),
+            F1ScoreQAConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            F1ScoreQAConfig("F1ScoreQA").to_metric(),
+            F1ScoreQAConfig().to_metric(),
             F1ScoreQA,
         )

@@ -12,7 +12,7 @@ from explainaboard.loaders.file_loader import (
 from explainaboard.loaders.loader import Loader
 
 
-class NLGMetaEvaluationLoader(Loader):
+class MetaEvaluationWMTDALoader(Loader):
     """Loader for the natural language generation task.
 
     usage:
