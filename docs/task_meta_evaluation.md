@@ -47,8 +47,7 @@ explainaboard \
     --output-file-type text \
     --output-dir output/cs-en \
     --source-language en \
-    --target-language en \
-    --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
+    --target-language en
 ```
 
 

@@ -36,6 +36,8 @@ class NLGMetaEvalTest(unittest.TestCase):
         processor = get_processor_class(TaskType.nlg_meta_evaluation)()
 
         sys_info = processor.process(metadata, data)
-
         self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
+        self.assertAlmostEqual(
+            sys_info.results.overall[0]["SegKtauCorr"].value, -0.0169, 3
+        )

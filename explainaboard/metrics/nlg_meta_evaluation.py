@@ -188,10 +188,16 @@ class KtauCorrelation(CorrelationMetric):
         num = 0
         for i in range(1, len(score)):
             for j in range(0, i):
-                if abs(score[i][0] - score[j][0]) >= config.threshold:
-                    manual_better = score[i][0] > score[j][0]
-                    system_better = score[i][1] > score[j][1]
-                    if manual_better == system_better:
+                manual_diff = score[i][0] - score[j][0]
+                system_diff = score[i][1] - score[j][1]
+                if manual_diff >= config.threshold:  # i is better than system j
+                    if system_diff > 0:
+                        conc += 1
+                    else:
+                        disc += 1
+                    num += 1
+                elif manual_diff <= -config.threshold:  # i is worse than j
+                    if system_diff < 0:
                         conc += 1
                     else:
                         disc += 1
@@ -234,19 +240,29 @@ class PearsonCorrelation(CorrelationMetric):
     def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """See CorrelationMetric.calc_metric_from_aggregate_single."""
         scores = self.get_scores_from_stats(single_stat)
+        config = narrow(CorrelationConfig, self.config)
 
         manual_score = []
         system_score = []
 
-        for group_idx, group_vals in scores.items():
-            if len(group_vals[0]) != 0:
-                manual_score.append(sum(group_vals[0]) / len(group_vals[0]))
-            else:
-                manual_score.append(0)
-            if len(group_vals[1]) != 0:
-                system_score.append(sum(group_vals[1]) / len(group_vals[1]))
-            else:
-                manual_score.append(0)
+        if config.group_by == "segment":
+            for _, group_vals in scores.items():
+                for val in group_vals:
+                    manual_score.append(val[0])
+                    system_score.append(val[1])
+        elif config.group_by == "system":
+            for _, group_vals in scores.items():
+                manual_scores = [val[0] for val in group_vals]
+                system_scores = [val[1] for val in group_vals]
+                if len(manual_scores) == 0 or len(system_scores) == 0:
+                    continue
+                manual_score.append(sum(manual_scores) / len(manual_scores))
+                system_score.append(sum(system_scores) / len(system_scores))
+        else:
+            raise ValueError(
+                f"The grouping way of {config.group_by} " f"hasn't been supported"
+            )
+
         assert len(system_score) == len(manual_score)
 
         val = pearsonr(system_score, manual_score)[0]
