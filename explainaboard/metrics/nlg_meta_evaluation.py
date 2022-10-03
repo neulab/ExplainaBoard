@@ -22,7 +22,6 @@ from explainaboard.utils.typing_utils import narrow, unwrap_or
 @common_registry.register("CorrelationWMTDAConfig")
 class CorrelationWMTDAConfig(MetricConfig):
     """Configuration of a correlation for WMT Metrics Meta Evaluation.
-
     :param group_by: Can be 'system' to group by system, 'segment' to group by segment
       or anything else (typically 'none') to not perform any grouping at all.
     :param use_z_score: Whether or not to use the z-normalized value for calculation of
@@ -72,11 +71,9 @@ class CorrelationWMTDAMetric(Metric):
 
     def get_scores_from_stats(self, agg_stats: np.ndarray) -> dict[str, list]:
         """Get scores from stats.
-
         Args:
             agg_stats: The aggregate stats.
             config: Configuration for this metric.
-
         Returns:
             The score.
         """
@@ -142,11 +139,9 @@ class CorrelationWMTDAMetric(Metric):
 
     def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """Calculate an aggregate correlation metric from a single segment or system.
-
         Args:
             single_stat: The stats for the single segment or system
             config: The configuration used in calculating the metric
-
         Returns:
             The aggregated metric value.
         """
@@ -158,7 +153,6 @@ class CorrelationWMTDAMetric(Metric):
 @common_registry.register("KtauCorrelationWMTDAConfig")
 class KtauCorrelationWMTDAConfig(CorrelationWMTDAConfig):
     """A configuration for KtauCorrelation.
-
     Args:
         threshold: Following ‘Results of the WMT20 Metrics Shared Task
             (https://aclanthology.org/2020.wmt-1.77.pdf)’, to calculate segment level
@@ -188,21 +182,16 @@ class KtauCorrelationWMTDA(CorrelationWMTDAMetric):
         num = 0
         for i in range(1, len(score)):
             for j in range(0, i):
-                if (
-                    abs(score[i][0] - score[j][0]) < config.threshold
-                    or abs(score[i][0] - score[j][0]) == 0
-                ):
-                    continue
-                elif (
-                    score[i][0] - score[j][0] >= config.threshold
-                ):  # system i is better than system j
-                    if score[i][1] > score[j][1]:
+                manual_diff = score[i][0] - score[j][0]
+                system_diff = score[i][1] - score[j][1]
+                if manual_diff >= config.threshold:  # i is better than system j
+                    if system_diff > 0:
                         conc += 1
                     else:
                         disc += 1
                     num += 1
-                else:  # system i is worse than system j
-                    if score[i][1] < score[j][1]:
+                elif manual_diff <= -config.threshold:  # i is worse than j
+                    if system_diff < 0:
                         conc += 1
                     else:
                         disc += 1
@@ -264,7 +253,9 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
                 manual_score.append(sum(manual_scores) / len(manual_scores))
                 system_score.append(sum(system_scores) / len(system_scores))
         else:
-            raise NotImplementedError
+            raise ValueError(
+                f"The grouping way of {config.group_by} " f"hasn't been supported"
+            )
 
         assert len(system_score) == len(manual_score)
 
