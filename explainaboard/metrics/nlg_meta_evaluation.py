@@ -190,17 +190,13 @@ class KtauCorrelation(CorrelationMetric):
             for j in range(0, i):
                 manual_diff = score[i][0] - score[j][0]
                 system_diff = score[i][1] - score[j][1]
-                if abs(manual_diff) < config.threshold or abs(manual_diff) == 0:
-                    continue
-                elif (
-                    manual_diff >= config.threshold
-                ):  # system i is better than system j
+                if manual_diff >= config.threshold:  # i is better than system j
                     if system_diff > 0:
                         conc += 1
                     else:
                         disc += 1
                     num += 1
-                else:  # system i is worse than system j
+                elif manual_diff <= -config.threshold:  # i is worse than j
                     if system_diff < 0:
                         conc += 1
                     else:
