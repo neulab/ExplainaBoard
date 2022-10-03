@@ -41,7 +41,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Tabular Classification](#tabular-classification)
 * [Tabular Regression](#tabular-regression)
 * [Argument Pair Extraction](argument-pair-extraction)
-* [Meta Evaluation WMT DA](#meta-evaluation-wmt-da)
+* [WMT Metrics Direct Assessment Meta-evaluation](#wmt-metrics-direct-assessment-meta-evaluation)
 
 
 
@@ -341,7 +341,7 @@ explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./d
 ```
 
 
-## [Meta Evaluation WMT DA](task_meta_evaluation.md)
+## [WMT Metrics Direct Assessment Meta-evaluation](task_meta_evaluation.md)
 
 Evaluating the reliability of automated metrics for [WMT Metrics shared tasks](https://wmt-metrics-task.github.io/)
  using [direct assessment](https://www.statmt.org/wmt16/slides/wmt16-news-da.pdf) (DA).
