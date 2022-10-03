@@ -49,7 +49,7 @@ First, follow the installation directions below, then take a look at our
 ```
 pip install --upgrade pip  # recommending the newest version of pip.
 pip install explainaboard
-python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
+python -m spacy download en_core_web_sm  # if you plan to use the AspectBasedSentimentClassificationProcessor
 ```
 
 **Install Method 2 - Development:** Install from the source and develop locally (Python 3 only)
@@ -61,6 +61,7 @@ cd ExplainaBoard
 
 # Install the required dependencies and dev dependencies
 pip install ."[dev]"
+python -m spacy download en_core_web_sm
 pre-commit install
 ```
 

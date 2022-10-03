@@ -182,27 +182,22 @@ class KtauCorrelationWMTDA(CorrelationWMTDAMetric):
     """A metric to calculate Kendall's Tau rank correlation."""
 
     def _count(self, score: list, config: Optional[MetricConfig] = None):
-        config = narrow(KtauCorrelationWMTDAConfig, unwrap_or(config, self.config))
+        config = narrow(KtauCorrelationConfig, unwrap_or(config, self.config))
         conc = 0
         disc = 0
         num = 0
         for i in range(1, len(score)):
             for j in range(0, i):
-                if (
-                    abs(score[i][0] - score[j][0]) < config.threshold
-                    or abs(score[i][0] - score[j][0]) == 0
-                ):
-                    continue
-                elif (
-                    score[i][0] - score[j][0] >= config.threshold
-                ):  # system i is better than system j
-                    if score[i][1] > score[j][1]:
+                manual_diff = score[i][0] - score[j][0]
+                system_diff = score[i][1] - score[j][1]
+                if manual_diff >= config.threshold:  # i is better than system j
+                    if system_diff > 0:
                         conc += 1
                     else:
                         disc += 1
                     num += 1
-                else:  # system i is worse than system j
-                    if score[i][1] < score[j][1]:
+                elif manual_diff <= -config.threshold:  # i is worse than j
+                    if system_diff < 0:
                         conc += 1
                     else:
                         disc += 1
@@ -247,6 +242,7 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
         scores = self.get_scores_from_stats(single_stat)
         config = narrow(CorrelationWMTDAConfig, self.config)
 
+
         manual_score = []
         system_score = []
 
@@ -264,7 +260,10 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
                 manual_score.append(sum(manual_scores) / len(manual_scores))
                 system_score.append(sum(system_scores) / len(system_scores))
         else:
-            raise NotImplementedError
+            raise ValueError(
+                f"The grouping way of {config.group_by} " f"hasn't been supported"
+            )
+
 
         assert len(system_score) == len(manual_score)
 
