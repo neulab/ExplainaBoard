@@ -12,7 +12,7 @@ from explainaboard import (
 )
 
 
-class NLGMetaEvalTest(unittest.TestCase):
+class MetaEvalWMTDATest(unittest.TestCase):
     artifact_path = os.path.join(test_artifacts_path, "nlg_meta_evaluation")
     tsv_dataset = os.path.join(artifact_path, "./wmt20-DA/cs-en/data.tsv")
     txt_output = os.path.join(artifact_path, "./wmt20-DA/cs-en/score.txt")
@@ -20,11 +20,11 @@ class NLGMetaEvalTest(unittest.TestCase):
     def test_da_cs_en(self):
 
         metadata = {
-            "task_name": TaskType.nlg_meta_evaluation.value,
+            "task_name": TaskType.meta_evaluation_wmt_da.value,
             "metric_names": ["SysPearsonCorr"],
             "confidence_alpha": None,
         }
-        loader = get_loader_class(TaskType.nlg_meta_evaluation)(
+        loader = get_loader_class(TaskType.meta_evaluation_wmt_da)(
             self.tsv_dataset,
             self.txt_output,
             Source.local_filesystem,
@@ -33,7 +33,7 @@ class NLGMetaEvalTest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load().samples
-        processor = get_processor_class(TaskType.nlg_meta_evaluation)()
+        processor = get_processor_class(TaskType.meta_evaluation_wmt_da)()
 
         sys_info = processor.process(metadata, data)
         self.assertGreater(len(sys_info.results.analyses), 0)
