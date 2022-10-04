@@ -192,3 +192,21 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 0.5642, 2)
         self.assertAlmostEqual(ci[1], 0.9746, 2)
+
+    def test_dataset_level_spearmanr_bootstrap(self) -> None:
+
+        true_data = [[1], [2], [3], [4], [5]]
+        pred_data = [[1], [2], [3], [4], [5]]
+
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="dataset", correlation_type="spearmanr"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
+        stats = corr_metric.calc_stats_from_data(true_data, pred_data)
+        stats_arr = corr_metric.aggregate_stats(stats)
+        val = corr_metric.calc_metric_from_aggregate(stats_arr)
+        self.assertAlmostEqual(val, 1, 3)
+
+        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
+        self.assertAlmostEqual(ci[0], 1, 2)
+        self.assertAlmostEqual(ci[1], 1, 2)
