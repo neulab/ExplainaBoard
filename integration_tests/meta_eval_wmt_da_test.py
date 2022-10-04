@@ -47,8 +47,8 @@ class MetaEvalWMTDATest(unittest.TestCase):
             sys_info.results.overall[0]["SegKtauCorr"].value, -0.0169, 3
         )
 
+class MetaEvalNLGInvalidValueTest(unittest.TestCase):
 
-class MetaEvalNLGTest(unittest.TestCase):
     true_data = [[1, 2, 3, 4, 5], [2, 1, 4, 5, 2], [5, 4, 3, 2, 1]]
     pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
 
@@ -57,14 +57,32 @@ class MetaEvalNLGTest(unittest.TestCase):
         with self.assertRaisesRegex(
             ValueError, r"^The correlation " r"function illegal hasn't been supported"
         ):
-            CorrelationNLGConfig(group_by="sample", correlation_type="illegal")
+            nlg_corr_config = CorrelationNLGConfig(group_by="sample",
+                                                   correlation_type="illegal")
+            corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
+            stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
+            stats_arr = corr_metric.aggregate_stats(stats)
+            val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
+            self.assertAlmostEqual(val, 0.8162952, 3)
 
     def test_illegal_group_type(self) -> None:
 
         with self.assertRaisesRegex(
-            ValueError, r"^`group_by` with the value " r"illegal hasn't been supported."
+            ValueError, r"^group_by with the value illegal hasn't been supported."
         ):
-            CorrelationNLGConfig(group_by="illegal", correlation_type="spearmanr")
+
+            nlg_corr_config = CorrelationNLGConfig(group_by="illegal",
+                                                   correlation_type="spearmanr")
+            corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
+            stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
+            stats_arr = corr_metric.aggregate_stats(stats)
+            val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
+            self.assertAlmostEqual(val, 0.8162952, 3)
+
+class MetaEvalNLGTest(unittest.TestCase):
+    true_data = [[1, 2, 3, 4, 5], [2, 1, 4, 5, 2], [5, 4, 3, 2, 1]]
+    pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
+
 
     def test_sample_level_spearmanr(self) -> None:
 
@@ -171,4 +189,3 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 0.5642, 2)
         self.assertAlmostEqual(ci[1], 0.9746, 2)
-

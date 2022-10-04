@@ -102,8 +102,9 @@ class CorrelationNLG(Metric):
                 )
             )
         else:
+
             raise ValueError(
-                f"`group_by` with the value {config.group_by} hasn't" f"been supported."
+                f"group_by with the value {config.group_by} hasn't been supported."
             )
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
@@ -170,7 +171,6 @@ class CorrelationNLG(Metric):
 @common_registry.register("CorrelationWMTDAConfig")
 class CorrelationWMTDAConfig(MetricConfig):
     """Configuration of a correlation for WMT Metrics Meta Evaluation.
-
 
     :param group_by: Can be 'system' to group by system, 'segment' to group by segment
       or anything else (typically 'none') to not perform any grouping at all.
