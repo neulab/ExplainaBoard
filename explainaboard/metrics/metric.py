@@ -410,15 +410,10 @@ class Metric(metaclass=abc.ABCMeta):
                     f"got {result.shape[0]}."
                 )
         else:
-            num_stats = (
-                result.shape[-1]
-                if self.uses_customized_aggregate()
-                else stats.num_statistics()
-            )
             result_shape = (
-                (stats.get_batch_data().shape[0], num_stats)
+                (stats.get_batch_data().shape[0], stats.num_statistics())
                 if stats.is_batched()
-                else (num_stats,)
+                else (stats.num_statistics(),)
             )
             assert result.shape == result_shape, (
                 "BUG: invalid operation: "
