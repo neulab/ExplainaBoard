@@ -112,7 +112,7 @@ class CorrelationWMTDAMetric(Metric):
         return scores
 
     def stats_ndim(self) -> int:
-        """See Metric.stats_dim."""
+        """See Metric.stats_ndim."""
         return 2
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
