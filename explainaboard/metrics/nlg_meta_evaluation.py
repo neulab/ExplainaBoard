@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import numpy as np
 from scipy import stats
-from scipy.stats import pearsonr
 
 from explainaboard.metrics.metric import (
     Metric,
@@ -25,13 +24,15 @@ class CorrelationNLGConfig(MetricConfig):
     """Configuration of a correlation for general NLG tasks.
 
     Args:
-        level: there are following levels: sample level, system level and dataset level
-                See more details: https://aclanthology.org/2020.emnlp-main.751.pdf
-        func_name: the method for calculating the correlation (e.g., Spearman)
+        group_by: there are different strategies in calculating correlation for meta
+                evaluation: sample level, system level and dataset level. See more
+                details: https://aclanthology.org/2020.emnlp-main.751.pdf
+        correlation_type: there are different types of correlation functions being used.
+                So far, followings are supported: spearmanr, pearsonr, kendalltau
     """
 
-    level: str = "sample"
-    func_name: str = "spearmanr"
+    group_by: str = ""
+    correlation_type: str = ""
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
@@ -69,18 +70,19 @@ class CorrelationNLG(Metric):
         """See Metric.uses_customized_aggregate."""
         return True
 
+    # TODO(Pengfei): better way to organize different strategies
     def calc_stats_from_data(
         self,
-        true_data: list[list[float]],
-        pred_data: list[list[float]],
+        true_data: list[Any],
+        pred_data: list[Any],
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         config = narrow(CorrelationNLGConfig, self.config)
         self.n_samples = len(true_data)
         self.n_systems = len(true_data[0])
 
-        if config.level == "sample":
-            corr_func = config.get_correlation_func(config.func_name)
+        if config.group_by == "sample":
+            corr_func = config.get_correlation_func(config.correlation_type)
             return SimpleMetricStats(
                 np.array(
                     [
@@ -89,15 +91,19 @@ class CorrelationNLG(Metric):
                     ]
                 )
             )
-        elif config.level == "system":
+        elif config.group_by == "system":
             return SimpleMetricStats(
                 np.array([true + pred for true, pred in zip(true_data, pred_data)])
             )
-        else:  # TODO(Pengfei): better way to organize different levels
+        elif config.group_by == "dataset":
             return SimpleMetricStats(
                 np.array(
                     [[true[0], pred[0]] for true, pred in zip(true_data, pred_data)]
                 )
+            )
+        else:
+            raise ValueError(
+                f"`group_by` with the value {config.group_by} hasn't" f"been supported."
             )
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
@@ -109,26 +115,31 @@ class CorrelationNLG(Metric):
             data = stats.get_data()
             return data.reshape((data.shape[-2] * data.shape[-1]))
 
-    def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
+    def _calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """Calculate an aggregate correlation metric from a single segment or system.
 
         Args:
-            single_stat: The stats for the single segment or system
+            single_stat: The stats for the single segment or system and its dimension
+                should be 2 or 3.
 
         Returns:
             The aggregated metric value.
         """
         val = 0
         config = narrow(CorrelationNLGConfig, self.config)
-        corr_func = config.get_correlation_func(config.func_name)
-        if config.level == "dataset":
+        corr_func = config.get_correlation_func(config.correlation_type)
+        if config.group_by == "dataset":
             val = corr_func(single_stat[:, 0], single_stat[0:, 1])[0]
-        elif config.level == "sample":
+        elif config.group_by == "sample":
             val = np.mean(single_stat)
-        elif config.level == "system":
+        elif config.group_by == "system":
             true_scores = np.sum(single_stat[:, 0 : int(self.n_systems)], axis=0)
             pred_scores = np.sum(single_stat[:, int(self.n_systems) :], axis=0)
             val = corr_func(true_scores, pred_scores)[0]
+        else:
+            raise ValueError(
+                f"`group_by` with the value {config.group_by} hasn't" f"been supported."
+            )
         return val
 
     def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
@@ -137,7 +148,7 @@ class CorrelationNLG(Metric):
             agg_stats = agg_stats.reshape(
                 (self.n_samples, int(agg_stats.shape[0] / self.n_samples))
             )
-            val = self.calc_metric_from_aggregate_single(agg_stats)
+            val = self._calc_metric_from_aggregate_single(agg_stats)
             return np.array(val)
         else:
             agg_stats = agg_stats.reshape(
@@ -150,7 +161,7 @@ class CorrelationNLG(Metric):
 
             ret_metric = np.zeros(agg_stats.shape[0])
             for i, single_stat in enumerate(agg_stats):
-                val = self.calc_metric_from_aggregate_single(single_stat)
+                val = self._calc_metric_from_aggregate_single(single_stat)
                 ret_metric[i] = val
             return ret_metric
 
@@ -386,6 +397,6 @@ class PearsonCorrelation(CorrelationMetric):
                 manual_score.append(0)
         assert len(system_score) == len(manual_score)
 
-        val = pearsonr(system_score, manual_score)[0]
+        val = stats.pearsonr(system_score, manual_score)[0]
 
         return val

@@ -10,7 +10,11 @@ from explainaboard import (
     Source,
     TaskType,
 )
-from explainaboard.metrics.nlg_meta_evaluation import CorrelationNLGConfig
+from explainaboard.metrics.nlg_meta_evaluation import (
+    CorrelationNLG,
+    CorrelationNLGConfig,
+)
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class MetaEvalWMTDATest(unittest.TestCase):
@@ -46,56 +50,85 @@ class MetaEvalNLGTest(unittest.TestCase):
     true_data = [[1, 2, 3, 4, 5], [2, 1, 4, 5, 2], [5, 4, 3, 2, 1]]
     pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
 
-    def test_sample_level_spearmanr(self):
+    def test_illegal_correlation_type(self) -> None:
 
-        nlg_corr_config = CorrelationNLGConfig(level="sample", func_name="spearmanr")
-        corr_metric = nlg_corr_config.to_metric()
+        with self.assertRaisesRegex(
+            ValueError, r"^The correlation " r"function illegal hasn't been supported"
+        ):
+            CorrelationNLGConfig(group_by="sample", correlation_type="illegal")
+
+    def test_illegal_group_type(self) -> None:
+
+        with self.assertRaisesRegex(
+            ValueError, r"^`group_by` with the value " r"illegal hasn't been supported."
+        ):
+            CorrelationNLGConfig(group_by="illegal", correlation_type="spearmanr")
+
+    def test_sample_level_spearmanr(self) -> None:
+
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="sample", correlation_type="spearmanr"
+        )
+
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
-        val = nlg_corr_config.to_metric().calc_metric_from_aggregate_single(stats_arr)
+        val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
         self.assertAlmostEqual(val, 0.8162952, 3)
 
-    def test_sample_level_kendalltau(self):
+    def test_sample_level_kendalltau(self) -> None:
 
-        nlg_corr_config = CorrelationNLGConfig(level="sample", func_name="kendalltau")
-        corr_metric = nlg_corr_config.to_metric()
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="sample", correlation_type="kendalltau"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
-        val = nlg_corr_config.to_metric().calc_metric_from_aggregate_single(stats_arr)
+        val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
         self.assertAlmostEqual(val, 0.69046817, 3)
 
-    def test_sample_level_pearsonr(self):
-        nlg_corr_config = CorrelationNLGConfig(level="sample", func_name="pearsonr")
-        corr_metric = nlg_corr_config.to_metric()
+    def test_sample_level_pearsonr(self) -> None:
+
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="sample", correlation_type="pearsonr"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
-        val = nlg_corr_config.to_metric().calc_metric_from_aggregate_single(stats_arr)
+        val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
         self.assertAlmostEqual(val, 0.820707397, 3)
 
-    def test_system_level_spearmanr(self):
+    def test_system_level_spearmanr(self) -> None:
 
-        nlg_corr_config = CorrelationNLGConfig(level="system", func_name="spearmanr")
-        corr_metric = nlg_corr_config.to_metric()
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="system", correlation_type="spearmanr"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 0.815789, 3)
 
-    def test_system_level_kendalltau(self):
+    def test_system_level_kendalltau(self) -> None:
 
-        nlg_corr_config = CorrelationNLGConfig(level="system", func_name="kendalltau")
-        corr_metric = nlg_corr_config.to_metric()
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="system", correlation_type="kendalltau"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 0.66666, 3)
 
-    def test_dataset_level_spearmanr(self):
+    def test_dataset_level_spearmanr(self) -> None:
+
         true_data = [[1], [2], [3], [4], [5]]
         pred_data = [[1], [2], [3], [4], [5]]
 
-        nlg_corr_config = CorrelationNLGConfig(level="dataset", func_name="spearmanr")
-        corr_metric = nlg_corr_config.to_metric()
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="dataset", correlation_type="spearmanr"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(true_data, pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
@@ -103,31 +136,36 @@ class MetaEvalNLGTest(unittest.TestCase):
 
 
 class MetaEvalNLGCITest(unittest.TestCase):
+
     true_data = [[1, 2, 3, 4, 5], [2, 1, 4, 5, 2], [5, 4, 3, 2, 1]]
     pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
 
-    def test_sample_level_spearmanr_bootstrap(self):
+    def test_sample_level_spearmanr_bootstrap(self) -> None:
 
-        nlg_corr_config = CorrelationNLGConfig(level="sample", func_name="spearmanr")
-        corr_metric = nlg_corr_config.to_metric()
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="sample", correlation_type="spearmanr"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
-        val = corr_metric.calc_metric_from_aggregate_single(stats_arr)
+        val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
         self.assertAlmostEqual(val, 0.8162952, 3)
 
-        ci = corr_metric.calc_confidence_interval(stats, 0.05)
-        self.assertGreater(val, ci[0])
-        self.assertGreater(ci[1], val)
+        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
+        self.assertAlmostEqual(ci[0], 0.6488, 2)
+        self.assertAlmostEqual(ci[1], 0.8999, 2)
 
-    def test_system_level_spearmanr_bootstrap(self):
+    def test_system_level_spearmanr_bootstrap(self) -> None:
 
-        nlg_corr_config = CorrelationNLGConfig(level="system", func_name="spearmanr")
-        corr_metric = nlg_corr_config.to_metric()
+        nlg_corr_config = CorrelationNLGConfig(
+            group_by="system", correlation_type="spearmanr"
+        )
+        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 0.815789, 3)
 
-        ci = corr_metric.calc_confidence_interval(stats, 0.05)
-        self.assertGreater(val, ci[0])
-        self.assertGreater(ci[1], val)
+        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
+        self.assertAlmostEqual(ci[0], 0.5642, 2)
+        self.assertAlmostEqual(ci[1], 0.9746, 2)
