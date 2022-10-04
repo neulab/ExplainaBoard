@@ -15,8 +15,8 @@ from explainaboard.processors import (
     kg_link_tail_prediction,
     language_modeling,
     machine_translation,
+    meta_evaluation_wmt_da,
     named_entity_recognition,
-    nlg_meta_evaluation,
     qa_multiple_choice,
     qa_open_domain,
     qa_tat,
@@ -50,7 +50,7 @@ __all__ = [
     'cloze_generative',
     'grammatical_error_correction',
     'qa_open_domain',
-    'nlg_meta_evaluation',
+    'meta_evaluation_wmt_da',
     'qa_tat',
     'argument_pair_extraction',
 ]

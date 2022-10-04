@@ -167,9 +167,10 @@ class CorrelationNLG(Metric):
 
 
 @dataclass
-@common_registry.register("CorrelationConfig")
-class CorrelationConfig(MetricConfig):
-    """Configuration for a correlation.
+@common_registry.register("CorrelationWMTDAConfig")
+class CorrelationWMTDAConfig(MetricConfig):
+    """Configuration of a correlation for WMT Metrics Meta Evaluation.
+
 
     :param group_by: Can be 'system' to group by system, 'segment' to group by segment
       or anything else (typically 'none') to not perform any grouping at all.
@@ -190,7 +191,7 @@ class CorrelationConfig(MetricConfig):
         raise NotImplementedError
 
 
-class CorrelationMetric(Metric):
+class CorrelationWMTDAMetric(Metric):
     """A metric that calculates correlations."""
 
     def is_simple_average(self, stats: MetricStats) -> bool:
@@ -207,7 +208,7 @@ class CorrelationMetric(Metric):
         pred_data: list[str],
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
-        config = narrow(CorrelationConfig, self.config)
+        config = narrow(CorrelationWMTDAConfig, self.config)
 
         return SimpleMetricStats(
             np.array(
@@ -228,7 +229,7 @@ class CorrelationMetric(Metric):
         Returns:
             The score.
         """
-        config = narrow(CorrelationConfig, self.config)
+        config = narrow(CorrelationWMTDAConfig, self.config)
         scores: dict[str, list] = {}
         for stat in agg_stats:
             sys_name = stat[0]
@@ -303,8 +304,8 @@ class CorrelationMetric(Metric):
 
 # TODO: (1) Make Segment/System level configurable (2) Document this function
 @dataclass
-@common_registry.register("KtauCorrelationConfig")
-class KtauCorrelationConfig(CorrelationConfig):
+@common_registry.register("KtauCorrelationWMTDAConfig")
+class KtauCorrelationWMTDAConfig(CorrelationWMTDAConfig):
     """A configuration for KtauCorrelation.
 
     Args:
@@ -323,23 +324,29 @@ class KtauCorrelationConfig(CorrelationConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return KtauCorrelation(self)
+        return KtauCorrelationWMTDA(self)
 
 
-class KtauCorrelation(CorrelationMetric):
+class KtauCorrelationWMTDA(CorrelationWMTDAMetric):
     """A metric to calculate Kendall's Tau rank correlation."""
 
     def _count(self, score: list, config: Optional[MetricConfig] = None):
-        config = narrow(KtauCorrelationConfig, unwrap_or(config, self.config))
+        config = narrow(KtauCorrelationWMTDAConfig, unwrap_or(config, self.config))
         conc = 0
         disc = 0
         num = 0
         for i in range(1, len(score)):
             for j in range(0, i):
-                if abs(score[i][0] - score[j][0]) >= config.threshold:
-                    manual_better = score[i][0] > score[j][0]
-                    system_better = score[i][1] > score[j][1]
-                    if manual_better == system_better:
+                manual_diff = score[i][0] - score[j][0]
+                system_diff = score[i][1] - score[j][1]
+                if manual_diff >= config.threshold:  # i is better than system j
+                    if system_diff > 0:
+                        conc += 1
+                    else:
+                        disc += 1
+                    num += 1
+                elif manual_diff <= -config.threshold:  # i is worse than j
+                    if system_diff < 0:
                         conc += 1
                     else:
                         disc += 1
@@ -367,34 +374,44 @@ class KtauCorrelation(CorrelationMetric):
 
 
 @dataclass
-@common_registry.register("PearsonCorrelationConfig")
-class PearsonCorrelationConfig(CorrelationConfig):
+@common_registry.register("PearsonCorrelationWMTDAConfig")
+class PearsonCorrelationWMTDAConfig(CorrelationWMTDAConfig):
     """A configuration for the PearsonCorrelation metric."""
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return PearsonCorrelation(self)
+        return PearsonCorrelationWMTDA(self)
 
 
-class PearsonCorrelation(CorrelationMetric):
+class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
     """A metric to calculate Pearson's correlation."""
 
     def calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """See CorrelationMetric.calc_metric_from_aggregate_single."""
         scores = self.get_scores_from_stats(single_stat)
+        config = narrow(CorrelationWMTDAConfig, self.config)
 
         manual_score = []
         system_score = []
 
-        for group_idx, group_vals in scores.items():
-            if len(group_vals[0]) != 0:
-                manual_score.append(sum(group_vals[0]) / len(group_vals[0]))
-            else:
-                manual_score.append(0)
-            if len(group_vals[1]) != 0:
-                system_score.append(sum(group_vals[1]) / len(group_vals[1]))
-            else:
-                manual_score.append(0)
+        if config.group_by == "segment":
+            for _, group_vals in scores.items():
+                for val in group_vals:
+                    manual_score.append(val[0])
+                    system_score.append(val[1])
+        elif config.group_by == "system":
+            for _, group_vals in scores.items():
+                manual_scores = [val[0] for val in group_vals]
+                system_scores = [val[1] for val in group_vals]
+                if len(manual_scores) == 0 or len(system_scores) == 0:
+                    continue
+                manual_score.append(sum(manual_scores) / len(manual_scores))
+                system_score.append(sum(system_scores) / len(system_scores))
+        else:
+            raise ValueError(
+                f"The grouping way of {config.group_by} " f"hasn't been supported"
+            )
+
         assert len(system_score) == len(manual_score)
 
         val = stats.pearsonr(system_score, manual_score)[0]

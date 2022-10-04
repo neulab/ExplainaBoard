@@ -25,11 +25,11 @@ class MetaEvalWMTDATest(unittest.TestCase):
     def test_da_cs_en(self):
 
         metadata = {
-            "task_name": TaskType.nlg_meta_evaluation.value,
+            "task_name": TaskType.meta_evaluation_wmt_da.value,
             "metric_names": ["SysPearsonCorr"],
             "confidence_alpha": None,
         }
-        loader = get_loader_class(TaskType.nlg_meta_evaluation)(
+        loader = get_loader_class(TaskType.meta_evaluation_wmt_da)(
             self.tsv_dataset,
             self.txt_output,
             Source.local_filesystem,
@@ -38,12 +38,14 @@ class MetaEvalWMTDATest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load().samples
-        processor = get_processor_class(TaskType.nlg_meta_evaluation)()
+        processor = get_processor_class(TaskType.meta_evaluation_wmt_da)()
 
         sys_info = processor.process(metadata, data)
-
         self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
+        self.assertAlmostEqual(
+            sys_info.results.overall[0]["SegKtauCorr"].value, -0.0169, 3
+        )
 
 
 class MetaEvalNLGTest(unittest.TestCase):
@@ -169,3 +171,4 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 0.5642, 2)
         self.assertAlmostEqual(ci[1], 0.9746, 2)
+

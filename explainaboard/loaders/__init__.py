@@ -13,7 +13,7 @@ from explainaboard.loaders import (
     language_modeling,
     loader,
     loader_registry,
-    nlg_meta_evaluation,
+    meta_evaluation_wmt_da,
     qa_multiple_choice,
     qa_open_domain,
     qa_tat,
@@ -44,7 +44,7 @@ __all__ = [
     'cloze_generative',
     'grammatical_error_correction',
     'qa_open_domain',
-    'nlg_meta_evaluation',
+    'meta_evaluation_wmt_da',
     'qa_tat',
     'argument_pair_extraction',
 ]
