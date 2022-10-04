@@ -121,7 +121,7 @@ class CorrelationWMTDAMetric(Metric):
 
     def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.ndim == 1:
+        if agg_stats.ndim == self.stats_ndim():
             val = self.calc_metric_from_aggregate_single(agg_stats)
             return np.array(val)
         else:
