@@ -14,10 +14,8 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import SeqCorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 
 
-@common_registry.register("GrammaticalErrorCorrectionProcessor")
 class GrammaticalErrorCorrectionProcessor(Processor):
     """A processor for the grammatical error correction task."""
 

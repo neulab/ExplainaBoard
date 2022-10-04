@@ -18,11 +18,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@common_registry.register("QAMultipleChoiceProcessor")
 class QAMultipleChoiceProcessor(Processor):
     """A processor for the multiple-choice QA task."""
 

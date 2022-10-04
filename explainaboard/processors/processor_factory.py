@@ -15,7 +15,6 @@ from explainaboard.processors.cloze_multiple_choice import ClozeMultipleChoicePr
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
-from explainaboard.processors.extractive_qa import QAExtractiveProcessor
 from explainaboard.processors.grammatical_error_correction import (
     GrammaticalErrorCorrectionProcessor,
 )
@@ -27,6 +26,7 @@ from explainaboard.processors.machine_translation import MachineTranslationProce
 from explainaboard.processors.meta_evaluation_wmt_da import MetaEvaluationWMTDAProcessor
 from explainaboard.processors.named_entity_recognition import NERProcessor
 from explainaboard.processors.processor import Processor
+from explainaboard.processors.qa_extractive import QAExtractiveProcessor
 from explainaboard.processors.qa_multiple_choice import QAMultipleChoiceProcessor
 from explainaboard.processors.qa_open_domain import QAOpenDomainProcessor
 from explainaboard.processors.qa_tat import QATatProcessor

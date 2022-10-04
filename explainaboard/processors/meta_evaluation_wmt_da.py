@@ -17,7 +17,6 @@ from explainaboard.metrics.nlg_meta_evaluation import (
     PearsonCorrelationWMTDAConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.language_utils import (
     is_chinese_lang_code,
     is_japanese_lang_code,
@@ -25,7 +24,6 @@ from explainaboard.utils.language_utils import (
 from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer
 
 
-@common_registry.register("MetaEvaluationWMTDAProcessor")
 class MetaEvaluationWMTDAProcessor(Processor):
     """A processor for the WMT meta-evaluation task."""
 

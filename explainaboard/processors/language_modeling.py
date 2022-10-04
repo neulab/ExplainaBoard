@@ -23,12 +23,10 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.log_prob import LogProbConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
 
-@common_registry.register("LanguageModelingProcessor")
 class LanguageModelingProcessor(Processor):
     """A processor for the language modeling task."""
 
