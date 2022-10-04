@@ -450,11 +450,13 @@ class Metric(metaclass=abc.ABCMeta):
                 - Non-batched data: []
                 - Batched data: [num_batches]
         """
-        if agg_stats.ndim not in (1, 2):
+        if agg_stats.ndim not in (self.stats_dim(), self.stats_dim() + 1):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
 
         result = self._calc_metric_from_aggregate(agg_stats)
-        result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
+        result_shape = (
+            () if agg_stats.ndim == self.stats_dim() else (agg_stats.shape[0],)
+        )
 
         assert result.shape == result_shape, (
             "BUG: invalid operation: "
@@ -492,6 +494,10 @@ class Metric(metaclass=abc.ABCMeta):
         last dimension of the returned ndarray.
         """
         return False
+
+    def stats_dim(self) -> int:
+        """The dimension of the sufficient statistics."""
+        return 1
 
     def calc_confidence_interval(
         self,
