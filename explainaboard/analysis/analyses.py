@@ -14,6 +14,7 @@ import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.metrics.accuracy import ConfidenceMetricResult
 from explainaboard.metrics.metric import (
     ConfidenceInterval,
     Metric,
@@ -23,6 +24,25 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
+
+
+@dataclass
+class AuxiliaryAnalysisResult:
+    """Extra information specific to analysis result."""
+
+    pass
+
+
+@dataclass
+class CalibrationAnalysisResult(AuxiliaryAnalysisResult):
+    """The result of an external evaluation metric.
+
+    Args:
+        agreement: The agreement according to some measure (e.g. Fleiss's Kappa).
+    """
+
+    expected_calibration_error: float
+    maximum_calibration_error: float
 
 
 @dataclass
@@ -82,7 +102,7 @@ class Analysis:
         metrics: list[Metric],
         stats: list[MetricStats],
         confidence_alpha: float,
-    ) -> AnalysisResult:
+    ) -> AnalysisResult | None:
         """Perform the analysis.
 
         Args:
@@ -111,6 +131,7 @@ class Analysis:
                 number=dikt.get('number', 4),
                 setting=dikt.get('setting'),
                 sample_limit=dikt.get('sample_limit', 50),
+                skippable=dikt.get('skippable', False),
             )
         elif type == 'ComboCountAnalysis':
             return ComboCountAnalysis(
@@ -153,6 +174,7 @@ class BucketAnalysisResult(AnalysisResult):
 
     bucket_performances: list[BucketPerformance]
     cls_name: Optional[str] = None
+    auxiliary_performances: Optional[AuxiliaryAnalysisResult] = None
 
     @staticmethod
     def from_dict(dikt: dict) -> BucketAnalysisResult:
@@ -203,7 +225,9 @@ class BucketAnalysisResult(AnalysisResult):
                 )
 
             texts.append('')
-
+        if self.auxiliary_performances:
+            for k, v in self.auxiliary_performances.__dict__.items():
+                texts.append(f"{k}\t" f"{v}")
         return "\n".join(texts)
 
 
@@ -231,6 +255,8 @@ class BucketAnalysis(Analysis):
     setting: Any = None  # For different bucket_methods, the settings are diverse
     sample_limit: int = 50
     cls_name: Optional[str] = None
+    auxiliary_analysis: Optional[bool] = False
+    skippable: Optional[bool] = False
 
     def __post_init__(self):
         """Set the class name."""
@@ -238,19 +264,49 @@ class BucketAnalysis(Analysis):
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
+    def perform_calibration_analysis(
+        self, bucket_performances: list[BucketPerformance] = []
+    ) -> CalibrationAnalysisResult:
+        """Calculate the metrics for calibration analysis.
+
+        This includes Expected Calibration Error and Maximum Calibration Error.
+        """
+        total_error, total_size = 0.0, 0
+        MCE = 0.0
+        for bucket_performance in bucket_performances:
+            metric_result = bucket_performance.performances.get(
+                "Accuracy", Performance(0.0)
+            )
+            bucket_accuracy = metric_result.value
+            bucket_confidence = (
+                metric_result.auxiliary_result.confidence
+                if isinstance(metric_result.auxiliary_result, ConfidenceMetricResult)
+                else 0.0
+            )
+            bucket_size = bucket_performance.n_samples
+            total_error += bucket_size * abs(bucket_accuracy - bucket_confidence)
+            total_size += bucket_size
+            MCE = max(MCE, abs(bucket_accuracy - bucket_confidence))
+        return CalibrationAnalysisResult(
+            expected_calibration_error=total_error / total_size,
+            maximum_calibration_error=MCE,
+        )
+
     def perform(
         self,
         cases: list[AnalysisCase],
         metrics: list[Metric],
         stats: list[MetricStats],
         confidence_alpha: float,
-    ) -> AnalysisResult:
+    ) -> AnalysisResult | None:
         """See Analysis.perform."""
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
             self.method,
         )
+        if self.skippable and self.feature not in cases[0].features:
+            return None
 
         if len(cases) == 0 or self.feature not in cases[0].features:
             raise RuntimeError(f"bucket analysis: feature {self.feature} not found.")
@@ -260,7 +316,6 @@ class BucketAnalysis(Analysis):
             bucket_number=self.number,
             bucket_setting=self.setting,
         )
-
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             # Subsample examples to save
@@ -288,7 +343,6 @@ class BucketAnalysis(Analysis):
                         bucket_stats,
                         confidence_alpha=confidence_alpha,
                     )
-
                     value = unwrap(metric_result.get_value(Score, "score")).value
                     ci = metric_result.get_value(ConfidenceInterval, "score_ci")
                     if ci is not None:
@@ -298,10 +352,21 @@ class BucketAnalysis(Analysis):
                         ci_low = None
                         ci_high = None
 
+                auxiliary_result = None
+                use_calibration_analysis = (
+                    self.feature == 'confidence'
+                    and metric_func.config.name == "Accuracy"
+                )
+                if use_calibration_analysis:
+                    self.auxiliary_analysis = True
+                    bucket_cases = [cases[i] for i in bucket_collection.samples]
+                    auxiliary_result = metric_func.calc_auxiliary_metric(bucket_cases)
+
                 performances[metric_func.config.name] = Performance(
                     value=value,
                     confidence_score_low=ci_low,
                     confidence_score_high=ci_high,
+                    auxiliary_result=auxiliary_result,
                 )
 
             bucket_performances.append(
@@ -313,9 +378,16 @@ class BucketAnalysis(Analysis):
                     bucket_name=bucket_collection.name,
                 )
             )
-
+        bucket_auxiliary_result = None
+        if self.auxiliary_analysis:
+            bucket_auxiliary_result = self.perform_calibration_analysis(
+                bucket_performances
+            )
         return BucketAnalysisResult(
-            name=self.feature, level=self.level, bucket_performances=bucket_performances
+            name=self.feature,
+            level=self.level,
+            bucket_performances=bucket_performances,
+            auxiliary_performances=bucket_auxiliary_result,
         )
 
 

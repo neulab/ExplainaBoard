@@ -64,6 +64,11 @@ class TextPairClassificationLoader(Loader):
         return {
             FileType.text: TextFileLoader(field_name, str),
             FileType.json: JSONFileLoader(
-                [FileLoaderField(field_name, field_name, str)]
+                [
+                    FileLoaderField(field_name, field_name, str),
+                    FileLoaderField(
+                        "confidence", "confidence", dtype=float, skippable=True
+                    ),
+                ]
             ),
         }
