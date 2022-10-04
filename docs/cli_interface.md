@@ -45,6 +45,7 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 
 
 
+
 ## [Text Classification](task_text_classification.md)
 
 Text classification consists of classifying text into different categories, such as
@@ -341,7 +342,9 @@ explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./d
 ```
 
 
+
 ## [WMT Metrics Direct Assessment Meta-evaluation](task_meta_evaluation.md)
+
 
 Evaluating the reliability of automated metrics for [WMT Metrics shared tasks](https://wmt-metrics-task.github.io/)
  using [direct assessment](https://www.statmt.org/wmt16/slides/wmt16-news-da.pdf) (DA).
@@ -359,3 +362,19 @@ explainaboard \
     --source-language en \
     --target-language en
 ```
+
+
+This is an example with a dataset supported by DataLab, for example 
+[wmt20_metrics_with_score](https://github.com/ExpressAI/DataLab/blob/main/datasets/wmt20_metrics_with_score/wmt20_metrics_with_score.py).
+
+```shell
+explainaboard \
+    --task meta-evaluation-wmt-da \
+    --dataset wmt20_metrics_with_score \
+    --sub-dataset cs-en_1.0.3 \
+    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score_1.0.3.txt \
+    --output-file-type text \
+    --source-language en \
+    --target-language en
+```
+

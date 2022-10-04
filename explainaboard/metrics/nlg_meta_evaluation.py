@@ -60,7 +60,6 @@ class CorrelationWMTDAMetric(Metric):
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         config = narrow(CorrelationWMTDAConfig, self.config)
-
         return SimpleMetricStats(
             np.array(
                 [
@@ -146,7 +145,6 @@ class CorrelationWMTDAMetric(Metric):
         Args:
             single_stat: The stats for the single segment or system
             config: The configuration used in calculating the metric
-
         Returns:
             The aggregated metric value.
         """
