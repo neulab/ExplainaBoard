@@ -401,22 +401,30 @@ class Metric(metaclass=abc.ABCMeta):
         """
         result = self._aggregate_stats(stats)
 
-        num_stats = (
-            result.shape[-1]
-            if self.uses_customized_aggregate()
-            else stats.num_statistics()
-        )
-        result_shape = (
-            (stats.get_batch_data().shape[0], num_stats)
-            if stats.is_batched()
-            else (num_stats,)
-        )
-
-        assert result.shape == result_shape, (
-            "BUG: invalid operation: "
-            f"{type(self).__name__}._aggregate_stats(): "
-            f"Expected shape {result_shape}, but got {result.shape}."
-        )
+        if self.uses_customized_aggregate():
+            if stats.is_batched():
+                assert stats.get_batch_data().shape[0] == result.shape[0], (
+                    "BUG: invalid operation: "
+                    f"{type(self).__name__}._aggregate_stats(): "
+                    f"Expected batch dimension {stats.get_batch_data().shape[0]}, but "
+                    f"got {result.shape[0]}."
+                )
+        else:
+            num_stats = (
+                result.shape[-1]
+                if self.uses_customized_aggregate()
+                else stats.num_statistics()
+            )
+            result_shape = (
+                (stats.get_batch_data().shape[0], num_stats)
+                if stats.is_batched()
+                else (num_stats,)
+            )
+            assert result.shape == result_shape, (
+                "BUG: invalid operation: "
+                f"{type(self).__name__}._aggregate_stats(): "
+                f"Expected shape {result_shape}, but got {result.shape}."
+            )
 
         return result
 
