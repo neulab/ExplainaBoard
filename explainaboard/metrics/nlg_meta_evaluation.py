@@ -111,7 +111,7 @@ class CorrelationWMTDAMetric(Metric):
 
         return scores
 
-    def stats_dim(self) -> int:
+    def stats_ndim(self) -> int:
         """See Metric.stats_dim."""
         return 2
 

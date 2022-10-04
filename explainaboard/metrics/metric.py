@@ -450,12 +450,12 @@ class Metric(metaclass=abc.ABCMeta):
                 - Non-batched data: []
                 - Batched data: [num_batches]
         """
-        if agg_stats.ndim not in (self.stats_dim(), self.stats_dim() + 1):
+        if agg_stats.ndim not in (self.stats_ndim(), self.stats_ndim() + 1):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
 
         result = self._calc_metric_from_aggregate(agg_stats)
         result_shape = (
-            () if agg_stats.ndim == self.stats_dim() else (agg_stats.shape[0],)
+            () if agg_stats.ndim == self.stats_ndim() else (agg_stats.shape[0],)
         )
 
         assert result.shape == result_shape, (
@@ -495,8 +495,8 @@ class Metric(metaclass=abc.ABCMeta):
         """
         return False
 
-    def stats_dim(self) -> int:
-        """The dimension of the sufficient statistics."""
+    def stats_ndim(self) -> int:
+        """The number of dimensions in the sufficient statistics."""
         return 1
 
     def calc_confidence_interval(
