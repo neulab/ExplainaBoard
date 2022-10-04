@@ -356,8 +356,7 @@ class BucketAnalysis(Analysis):
 
                 auxiliary_result = None
                 use_calibration_analysis = (
-                    self.feature == 'confidence'
-                    and metric_func.config.name == "Accuracy"
+                    self.feature == 'confidence' and metric_name == "Accuracy"
                 )
                 if use_calibration_analysis:
                     self.auxiliary_analysis = True
