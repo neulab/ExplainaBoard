@@ -1,0 +1,1735 @@
+{
+  "task_name": "aspect-based-sentiment-classification",
+  "source_language": "en",
+  "target_language": "en",
+  "reload_stat": true,
+  "source_tokenizer": {
+    "cls_name": "SingleSpaceTokenizer"
+  },
+  "target_tokenizer": {
+    "cls_name": "SingleSpaceTokenizer"
+  },
+  "analysis_levels": [
+    {
+      "name": "example",
+      "features": {
+        "aspect": {
+          "description": "the aspect to analyze",
+          "require_training_set": false,
+          "dtype": "string",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "text": {
+          "description": "the text regarding the aspect",
+          "require_training_set": false,
+          "dtype": "string",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "true_label": {
+          "description": "the true label of the input",
+          "require_training_set": false,
+          "dtype": "string",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "predicted_label": {
+          "description": "the predicted label",
+          "require_training_set": false,
+          "dtype": "string",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "confidence": {
+          "description": "the confidence of the predicted label",
+          "require_training_set": false,
+          "dtype": "float",
+          "max_value": 1.0,
+          "min_value": 0.0,
+          "cls_name": "Value"
+        },
+        "text_length": {
+          "description": "text length in tokens",
+          "require_training_set": false,
+          "dtype": "float",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "text_chars": {
+          "description": "text length in characters",
+          "require_training_set": false,
+          "dtype": "float",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "entity_number": {
+          "description": "number of named entities in the text",
+          "require_training_set": false,
+          "dtype": "float",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "aspect_length": {
+          "description": "aspect length in tokens",
+          "require_training_set": false,
+          "dtype": "float",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        },
+        "aspect_position": {
+          "description": "relative position of the aspect in the text",
+          "require_training_set": false,
+          "dtype": "float",
+          "max_value": null,
+          "min_value": null,
+          "cls_name": "Value"
+        }
+      },
+      "metric_configs": [
+        {
+          "name": "Accuracy",
+          "source_language": "en",
+          "target_language": "en",
+          "cls_name": "AccuracyConfig"
+        }
+      ]
+    }
+  ],
+  "analyses": [
+    {
+      "description": "the true label of the input",
+      "level": "example",
+      "feature": "true_label",
+      "method": "discrete",
+      "number": 15,
+      "setting": null,
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": false,
+      "skippable": false
+    },
+    {
+      "description": "calibration analysis",
+      "level": "example",
+      "feature": "confidence",
+      "method": "fixed",
+      "number": 10,
+      "setting": [
+        [
+          0.0,
+          0.1
+        ],
+        [
+          0.1,
+          0.2
+        ],
+        [
+          0.2,
+          0.3
+        ],
+        [
+          0.3,
+          0.4
+        ],
+        [
+          0.4,
+          0.5
+        ],
+        [
+          0.5,
+          0.6
+        ],
+        [
+          0.6,
+          0.7
+        ],
+        [
+          0.7,
+          0.8
+        ],
+        [
+          0.8,
+          0.9
+        ],
+        [
+          0.9,
+          1.0
+        ]
+      ],
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": true,
+      "skippable": true
+    },
+    {
+      "description": "confusion matrix",
+      "level": "example",
+      "features": [
+        "true_label",
+        "predicted_label"
+      ],
+      "cls_name": "ComboCountAnalysis",
+      "method": "discrete",
+      "sample_limit": 50
+    },
+    {
+      "description": "text length in tokens",
+      "level": "example",
+      "feature": "text_length",
+      "method": "continuous",
+      "number": 4,
+      "setting": null,
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": false,
+      "skippable": false
+    },
+    {
+      "description": "text length in characters",
+      "level": "example",
+      "feature": "text_chars",
+      "method": "continuous",
+      "number": 4,
+      "setting": null,
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": false,
+      "skippable": false
+    },
+    {
+      "description": "number of named entities in the text",
+      "level": "example",
+      "feature": "entity_number",
+      "method": "continuous",
+      "number": 4,
+      "setting": null,
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": false,
+      "skippable": false
+    },
+    {
+      "description": "aspect length in tokens",
+      "level": "example",
+      "feature": "aspect_length",
+      "method": "continuous",
+      "number": 4,
+      "setting": null,
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": false,
+      "skippable": false
+    },
+    {
+      "description": "relative position of the aspect in the text",
+      "level": "example",
+      "feature": "aspect_position",
+      "method": "continuous",
+      "number": 4,
+      "setting": null,
+      "sample_limit": 50,
+      "cls_name": "BucketAnalysis",
+      "auxiliary_analysis": false,
+      "skippable": false
+    }
+  ],
+  "results": {
+    "overall": [
+      {
+        "Accuracy": {
+          "value": 0.91,
+          "confidence_score_low": null,
+          "confidence_score_high": null,
+          "auxiliary_result": null
+        }
+      }
+    ],
+    "analyses": [
+      {
+        "name": "true_label",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 22,
+            "bucket_samples": [
+              1,
+              3,
+              4,
+              5,
+              7,
+              16,
+              17,
+              20,
+              22,
+              32,
+              40,
+              43,
+              44,
+              54,
+              56,
+              63,
+              68,
+              70,
+              75,
+              77,
+              85,
+              88
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8636363636363636,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": null,
+            "bucket_name": "negative"
+          },
+          {
+            "n_samples": 6,
+            "bucket_samples": [
+              8,
+              62,
+              78,
+              79,
+              86,
+              87
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.5,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": null,
+            "bucket_name": "neutral"
+          },
+          {
+            "n_samples": 72,
+            "bucket_samples": [
+              97,
+              15,
+              10,
+              67,
+              31,
+              24,
+              82,
+              41,
+              98,
+              71,
+              57,
+              39,
+              91,
+              94,
+              95,
+              29,
+              89,
+              37,
+              48,
+              93,
+              84,
+              11,
+              83,
+              72,
+              46,
+              66,
+              13,
+              47,
+              25,
+              73,
+              34,
+              51,
+              0,
+              14,
+              45,
+              35,
+              50,
+              69,
+              30,
+              18,
+              81,
+              28,
+              23,
+              21,
+              80,
+              9,
+              61,
+              12,
+              42,
+              92
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9583333333333334,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": null,
+            "bucket_name": "positive"
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": null
+      },
+      {
+        "name": "confidence",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 9,
+            "bucket_samples": [
+              7,
+              11,
+              18,
+              55,
+              62,
+              66,
+              83,
+              91,
+              94
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.05506609222867546
+                }
+              }
+            },
+            "bucket_interval": [
+              0.0,
+              0.1
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 18,
+            "bucket_samples": [
+              12,
+              20,
+              23,
+              31,
+              32,
+              42,
+              43,
+              45,
+              46,
+              53,
+              57,
+              59,
+              60,
+              61,
+              69,
+              75,
+              77,
+              85
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9444444444444444,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.14699491463448852
+                }
+              }
+            },
+            "bucket_interval": [
+              0.1,
+              0.2
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 9,
+            "bucket_samples": [
+              0,
+              8,
+              22,
+              28,
+              33,
+              38,
+              78,
+              82,
+              86
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.6666666666666666,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.24892903016714962
+                }
+              }
+            },
+            "bucket_interval": [
+              0.2,
+              0.3
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 8,
+            "bucket_samples": [
+              5,
+              16,
+              36,
+              54,
+              64,
+              67,
+              71,
+              99
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.3500874217862677
+                }
+              }
+            },
+            "bucket_interval": [
+              0.3,
+              0.4
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 10,
+            "bucket_samples": [
+              2,
+              19,
+              37,
+              50,
+              65,
+              70,
+              80,
+              81,
+              84,
+              89
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.45094915583426476
+                }
+              }
+            },
+            "bucket_interval": [
+              0.4,
+              0.5
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 12,
+            "bucket_samples": [
+              1,
+              14,
+              15,
+              24,
+              25,
+              30,
+              39,
+              41,
+              49,
+              73,
+              76,
+              95
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.5369294088479967
+                }
+              }
+            },
+            "bucket_interval": [
+              0.5,
+              0.6
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 13,
+            "bucket_samples": [
+              6,
+              10,
+              26,
+              27,
+              44,
+              47,
+              51,
+              56,
+              58,
+              74,
+              90,
+              92,
+              96
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8461538461538461,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.6448498132021998
+                }
+              }
+            },
+            "bucket_interval": [
+              0.6,
+              0.7
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 8,
+            "bucket_samples": [
+              9,
+              21,
+              29,
+              35,
+              48,
+              68,
+              87,
+              97
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.875,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.7493425185554186
+                }
+              }
+            },
+            "bucket_interval": [
+              0.7,
+              0.8
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 8,
+            "bucket_samples": [
+              3,
+              17,
+              40,
+              52,
+              79,
+              88,
+              93,
+              98
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.875,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.8566843165894644
+                }
+              }
+            },
+            "bucket_interval": [
+              0.8,
+              0.9
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 5,
+            "bucket_samples": [
+              4,
+              13,
+              34,
+              63,
+              72
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": {
+                  "confidence": 0.9501308669130847
+                }
+              }
+            },
+            "bucket_interval": [
+              0.9,
+              1.0
+            ],
+            "bucket_name": null
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": {
+          "expected_calibration_error": 0.4588287500885495,
+          "maximum_calibration_error": 0.9449339077713246
+        }
+      },
+      {
+        "name": "combo(true_label,predicted_label)",
+        "level": "example",
+        "features": [
+          "true_label",
+          "predicted_label"
+        ],
+        "combo_occurrences": [
+          {
+            "features": [
+              "positive",
+              "positive"
+            ],
+            "sample_count": 69,
+            "sample_ids": [
+              18,
+              12,
+              35,
+              83,
+              67,
+              93,
+              39,
+              46,
+              58,
+              29,
+              55,
+              99,
+              41,
+              19,
+              10,
+              37,
+              30,
+              21,
+              52,
+              25,
+              98,
+              61,
+              80,
+              47,
+              38,
+              36,
+              27,
+              9,
+              45,
+              60,
+              50,
+              23,
+              73,
+              90,
+              69,
+              26,
+              49,
+              64,
+              66,
+              13,
+              94,
+              92,
+              57,
+              65,
+              34,
+              59,
+              95,
+              84,
+              11,
+              15
+            ]
+          },
+          {
+            "features": [
+              "negative",
+              "negative"
+            ],
+            "sample_count": 19,
+            "sample_ids": [
+              1,
+              3,
+              4,
+              5,
+              7,
+              16,
+              17,
+              20,
+              22,
+              40,
+              43,
+              44,
+              54,
+              56,
+              63,
+              75,
+              77,
+              85,
+              88
+            ]
+          },
+          {
+            "features": [
+              "positive",
+              "negative"
+            ],
+            "sample_count": 2,
+            "sample_ids": [
+              6,
+              28
+            ]
+          },
+          {
+            "features": [
+              "neutral",
+              "negative"
+            ],
+            "sample_count": 3,
+            "sample_ids": [
+              8,
+              78,
+              79
+            ]
+          },
+          {
+            "features": [
+              "negative",
+              "neutral"
+            ],
+            "sample_count": 2,
+            "sample_ids": [
+              32,
+              68
+            ]
+          },
+          {
+            "features": [
+              "neutral",
+              "neutral"
+            ],
+            "sample_count": 3,
+            "sample_ids": [
+              62,
+              86,
+              87
+            ]
+          },
+          {
+            "features": [
+              "negative",
+              "positive"
+            ],
+            "sample_count": 1,
+            "sample_ids": [
+              70
+            ]
+          },
+          {
+            "features": [
+              "positive",
+              "neutral"
+            ],
+            "sample_count": 1,
+            "sample_ids": [
+              74
+            ]
+          }
+        ],
+        "cls_name": "ComboCountAnalysisResult"
+      },
+      {
+        "name": "text_length",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 26,
+            "bucket_samples": [
+              2,
+              68,
+              39,
+              90,
+              64,
+              67,
+              40,
+              28,
+              93,
+              43,
+              76,
+              8,
+              44,
+              65,
+              9,
+              92,
+              66,
+              82,
+              63,
+              19,
+              21,
+              22,
+              48,
+              51,
+              25,
+              55
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8846153846153846,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              5,
+              11
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 29,
+            "bucket_samples": [
+              16,
+              17,
+              56,
+              30,
+              58,
+              57,
+              24,
+              23,
+              89,
+              29,
+              98,
+              73,
+              42,
+              41,
+              0,
+              99,
+              26,
+              4,
+              35,
+              3,
+              50,
+              49,
+              34,
+              12,
+              36,
+              1,
+              27,
+              91,
+              33
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              12,
+              16
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 23,
+            "bucket_samples": [
+              18,
+              11,
+              96,
+              95,
+              10,
+              32,
+              94,
+              97,
+              31,
+              84,
+              83,
+              81,
+              80,
+              54,
+              53,
+              77,
+              61,
+              62,
+              85,
+              70,
+              72,
+              71,
+              69
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9130434782608695,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              17,
+              22
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 22,
+            "bucket_samples": [
+              45,
+              46,
+              47,
+              13,
+              14,
+              15,
+              52,
+              37,
+              38,
+              88,
+              75,
+              86,
+              74,
+              87,
+              79,
+              78,
+              60,
+              59,
+              20,
+              5,
+              6,
+              7
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8181818181818182,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              23,
+              43
+            ],
+            "bucket_name": null
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": null
+      },
+      {
+        "name": "text_chars",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 25,
+            "bucket_samples": [
+              2,
+              90,
+              68,
+              28,
+              64,
+              93,
+              40,
+              67,
+              43,
+              39,
+              76,
+              9,
+              92,
+              8,
+              22,
+              63,
+              51,
+              82,
+              44,
+              66,
+              65,
+              21,
+              48,
+              29,
+              30
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.88,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              17,
+              51
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 25,
+            "bucket_samples": [
+              19,
+              73,
+              55,
+              99,
+              98,
+              33,
+              34,
+              56,
+              24,
+              25,
+              23,
+              89,
+              16,
+              27,
+              3,
+              4,
+              41,
+              42,
+              26,
+              11,
+              57,
+              58,
+              10,
+              17,
+              12
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              52,
+              68
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 26,
+            "bucket_samples": [
+              0,
+              35,
+              32,
+              49,
+              50,
+              54,
+              1,
+              91,
+              18,
+              80,
+              31,
+              81,
+              95,
+              36,
+              96,
+              97,
+              94,
+              70,
+              69,
+              61,
+              71,
+              62,
+              72,
+              47,
+              45,
+              46
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9230769230769231,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              70,
+              97
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 24,
+            "bucket_samples": [
+              14,
+              15,
+              13,
+              83,
+              84,
+              77,
+              53,
+              85,
+              87,
+              88,
+              86,
+              52,
+              79,
+              78,
+              59,
+              60,
+              38,
+              37,
+              20,
+              74,
+              75,
+              6,
+              7,
+              5
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8333333333333334,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              99,
+              219
+            ],
+            "bucket_name": null
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": null
+      },
+      {
+        "name": "entity_number",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 61,
+            "bucket_samples": [
+              73,
+              35,
+              89,
+              17,
+              2,
+              22,
+              48,
+              98,
+              71,
+              29,
+              9,
+              99,
+              32,
+              93,
+              30,
+              18,
+              82,
+              40,
+              70,
+              34,
+              33,
+              36,
+              67,
+              83,
+              42,
+              28,
+              4,
+              45,
+              66,
+              24,
+              46,
+              92,
+              10,
+              63,
+              90,
+              77,
+              76,
+              65,
+              31,
+              57,
+              84,
+              50,
+              47,
+              37,
+              27,
+              38,
+              23,
+              21,
+              58,
+              11
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9180327868852459,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              0,
+              0
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 30,
+            "bucket_samples": [
+              1,
+              74,
+              75,
+              97,
+              78,
+              80,
+              81,
+              96,
+              95,
+              94,
+              79,
+              91,
+              15,
+              13,
+              39,
+              26,
+              25,
+              53,
+              54,
+              55,
+              56,
+              12,
+              0,
+              59,
+              60,
+              61,
+              62,
+              64,
+              16,
+              14
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              1,
+              1
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 9,
+            "bucket_samples": [
+              5,
+              85,
+              7,
+              87,
+              88,
+              52,
+              44,
+              6,
+              86
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8888888888888888,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              2,
+              2
+            ],
+            "bucket_name": null
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": null
+      },
+      {
+        "name": "aspect_length",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 51,
+            "bucket_samples": [
+              91,
+              26,
+              75,
+              18,
+              49,
+              50,
+              12,
+              71,
+              9,
+              96,
+              73,
+              28,
+              45,
+              19,
+              51,
+              35,
+              46,
+              52,
+              78,
+              48,
+              21,
+              92,
+              30,
+              37,
+              58,
+              89,
+              76,
+              42,
+              65,
+              63,
+              23,
+              56,
+              98,
+              17,
+              34,
+              87,
+              39,
+              31,
+              70,
+              41,
+              57,
+              90,
+              66,
+              10,
+              24,
+              29,
+              33,
+              47,
+              93,
+              80
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.9411764705882353,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              1,
+              1
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 38,
+            "bucket_samples": [
+              94,
+              97,
+              64,
+              88,
+              69,
+              84,
+              82,
+              81,
+              79,
+              68,
+              62,
+              0,
+              60,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              11,
+              13,
+              14,
+              15,
+              16,
+              22,
+              25,
+              20,
+              40,
+              54,
+              53,
+              44,
+              43,
+              27,
+              38,
+              99,
+              36,
+              32
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.8947368421052632,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              2,
+              2
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 7,
+            "bucket_samples": [
+              85,
+              72,
+              83,
+              61,
+              59,
+              67,
+              86
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              3,
+              4
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 4,
+            "bucket_samples": [
+              8,
+              55,
+              77,
+              74
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.5,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              5,
+              6
+            ],
+            "bucket_name": null
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": null
+      },
+      {
+        "name": "aspect_position",
+        "level": "example",
+        "bucket_performances": [
+          {
+            "n_samples": 25,
+            "bucket_samples": [
+              67,
+              8,
+              77,
+              0,
+              1,
+              2,
+              39,
+              10,
+              55,
+              61,
+              25,
+              89,
+              17,
+              74,
+              29,
+              71,
+              82,
+              24,
+              7,
+              86,
+              56,
+              93,
+              28,
+              44,
+              48
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.88,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              -0.029411764705882353,
+              0.1836734693877551
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 25,
+            "bucket_samples": [
+              52,
+              83,
+              22,
+              20,
+              90,
+              94,
+              57,
+              45,
+              72,
+              65,
+              37,
+              68,
+              98,
+              40,
+              13,
+              36,
+              32,
+              33,
+              73,
+              3,
+              5,
+              64,
+              95,
+              14,
+              78
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.88,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              0.1984732824427481,
+              0.46715328467153283
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 25,
+            "bucket_samples": [
+              87,
+              59,
+              31,
+              38,
+              85,
+              84,
+              12,
+              69,
+              30,
+              96,
+              46,
+              60,
+              80,
+              34,
+              4,
+              99,
+              49,
+              41,
+              43,
+              63,
+              88,
+              76,
+              26,
+              51,
+              35
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 1.0,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              0.48031496062992124,
+              0.7571428571428571
+            ],
+            "bucket_name": null
+          },
+          {
+            "n_samples": 25,
+            "bucket_samples": [
+              15,
+              18,
+              21,
+              62,
+              23,
+              53,
+              58,
+              16,
+              97,
+              81,
+              27,
+              92,
+              66,
+              42,
+              50,
+              70,
+              11,
+              19,
+              9,
+              54,
+              79,
+              47,
+              75,
+              91,
+              6
+            ],
+            "performances": {
+              "Accuracy": {
+                "value": 0.88,
+                "confidence_score_low": null,
+                "confidence_score_high": null,
+                "auxiliary_result": null
+              }
+            },
+            "bucket_interval": [
+              0.7676767676767676,
+              0.9497716894977168
+            ],
+            "bucket_name": null
+          }
+        ],
+        "cls_name": "BucketAnalysisResult",
+        "auxiliary_performances": null
+      }
+    ]
+  }
+}

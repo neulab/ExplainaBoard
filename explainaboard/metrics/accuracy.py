@@ -7,7 +7,9 @@ from typing import Any
 
 import numpy as np
 
+from explainaboard.analysis.case import AnalysisCase
 from explainaboard.metrics.metric import (
+    AuxiliaryMetricResult,
     Metric,
     MetricConfig,
     MetricStats,
@@ -15,6 +17,19 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import narrow
+
+
+@dataclass
+class ConfidenceMetricResult(AuxiliaryMetricResult):
+    """The result of the confidence metric for calibration analysis.
+
+    This is an auxiliary result of Accuracy metric result.
+
+    Args:
+        confidence: The average confidence of a bucket of sampels.
+    """
+
+    confidence: float
 
 
 @dataclass
@@ -34,7 +49,9 @@ class Accuracy(Metric):
     """
 
     def calc_stats_from_data(
-        self, true_data: list[Any], pred_data: list[Any]
+        self,
+        true_data: list[Any],
+        pred_data: list[Any],
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
@@ -45,6 +62,18 @@ class Accuracy(Metric):
                 ]
             )
         )
+
+    def calc_auxiliary_metric(
+        self, cases: list[AnalysisCase] | None = None
+    ) -> ConfidenceMetricResult:
+        """Calculate average confidence value given a list of samples.
+
+        This is the Accuracy metric result's auxiliary result.
+        """
+        if not cases or len(cases) == 0:
+            return ConfidenceMetricResult(0.0)
+        value = np.mean([case.features['confidence'] for case in cases]).squeeze()
+        return ConfidenceMetricResult(value)
 
 
 @dataclass

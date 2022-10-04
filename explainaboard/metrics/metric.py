@@ -580,7 +580,6 @@ class Metric(metaclass=abc.ABCMeta):
         """
         if stats.is_batched():
             raise ValueError("Batched stats can't be evaluated.")
-
         agg_stats = self.aggregate_stats(stats)
         score = self.calc_metric_from_aggregate(agg_stats)
 
@@ -618,3 +617,15 @@ class Metric(metaclass=abc.ABCMeta):
         """
         stats = self.calc_stats_from_data(true_data, pred_data)
         return self.evaluate_from_stats(stats, confidence_alpha)
+
+    def calc_auxiliary_metric(self, cases: list | None = None) -> AuxiliaryMetricResult:
+        """Return an auxiliary metric result for the current analysis result.
+
+        Args:
+            cases: a list of samples with the necessary features
+                in order to calculate the auxiliary metric result
+
+        Returns:
+            a resulting auxiliary metric result
+        """
+        ...

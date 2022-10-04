@@ -62,6 +62,7 @@ class FileLoaderField:
     dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
     parser: Optional[Callable[[str], str]] = None
+    skippable: Optional[bool] = False
 
     # Special constants used in field mapping
     SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'
@@ -439,6 +440,8 @@ class FileLoader:
         for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
             for f in fields:  # parse data point according to fields
+                if f.src_name not in data_point and f.skippable:
+                    continue
                 parsed_data_point[f.target_name] = self.parse_data(
                     self.find_field(data_point, f, field_mapping), f
                 )
