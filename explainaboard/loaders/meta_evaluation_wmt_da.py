@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -12,10 +11,8 @@ from explainaboard.loaders.file_loader import (
     TSVFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.meta_evaluation_wmt_da)
 class MetaEvaluationWMTDALoader(Loader):
     """Loader for the natural language generation task.
 
