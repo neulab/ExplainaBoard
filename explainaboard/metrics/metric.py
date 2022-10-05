@@ -403,11 +403,24 @@ class Metric(metaclass=abc.ABCMeta):
 
         if self.uses_customized_aggregate():
             if stats.is_batched():
-                assert stats.get_batch_data().shape[0] == result.shape[0], (
+                data = stats.get_batch_data()
+                assert (
+                    result.shape[0] == data.shape[0]
+                    and result.ndim == self.stats_ndim() + 1
+                ), (
                     "BUG: invalid operation: "
                     f"{type(self).__name__}._aggregate_stats(): "
-                    f"Expected batch dimension {stats.get_batch_data().shape[0]}, but "
-                    f"got {result.shape[0]}."
+                    f"Expected batch size {stats.get_batch_data().shape[0]} and "
+                    f"number of dimensions {self.stats_ndim()+1}, but "
+                    f"got batch size {result.shape[0]} and number of dimensions "
+                    f"{result.ndim}."
+                )
+            else:
+                assert result.ndim == self.stats_ndim(), (
+                    "BUG: invalid operation: "
+                    f"{type(self).__name__}._aggregate_stats(): "
+                    f"Expected number of dimensions {self.stats_ndim() + 1}, but "
+                    f"got number of dimensions {result.ndim}."
                 )
         else:
             result_shape = (
@@ -493,8 +506,9 @@ class Metric(metaclass=abc.ABCMeta):
     def uses_customized_aggregate(self) -> bool:
         """Whether the metric uses other aggregated stats than example-level stats.
 
-        If this function returns True, aggregate_stats() skips to check the size of the
-        last dimension of the returned ndarray.
+        If this function returns True, aggregate_stats() skips some checks on the size
+        of the last dimension of the returned ndarray. Note that this increases the
+        possibility of implementation mistakes, and should be used with caution.
         """
         return False
 
