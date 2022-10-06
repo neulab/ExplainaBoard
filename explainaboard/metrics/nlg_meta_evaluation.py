@@ -59,9 +59,6 @@ class CorrelationNLGConfig(MetricConfig):
 class CorrelationNLG(Metric):
     """A metric that calculates correlations."""
 
-    n_samples = 0
-    n_systems = 0
-
     def is_simple_average(self, stats: MetricStats) -> bool:
         """See Metric.is_simple_average."""
         return False
@@ -78,9 +75,6 @@ class CorrelationNLG(Metric):
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         config = narrow(CorrelationNLGConfig, self.config)
-        self.n_samples = len(true_data)
-        self.n_systems = len(true_data[0])
-
         if config.group_by == "sample":
             corr_func = config.get_correlation_func(config.correlation_type)
             return SimpleMetricStats(
@@ -109,12 +103,11 @@ class CorrelationNLG(Metric):
 
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
-        if stats.is_batched():
-            data = stats.get_batch_data()
-            return data.reshape((data.shape[0], data.shape[-2] * data.shape[-1]))
-        else:
-            data = stats.get_data()
-            return data.reshape((data.shape[-2] * data.shape[-1]))
+        return stats.get_batch_data() if stats.is_batched() else stats.get_data()
+
+    def stats_ndim(self) -> int:
+        """See Metric.stats_ndim."""
+        return 2
 
     def _calc_metric_from_aggregate_single(self, single_stat: np.ndarray) -> float:
         """Calculate an aggregate correlation metric from a single segment or system.
@@ -134,33 +127,24 @@ class CorrelationNLG(Metric):
         elif config.group_by == "sample":
             val = np.mean(single_stat)
         elif config.group_by == "system":
-            true_scores = np.sum(single_stat[:, 0 : int(self.n_systems)], axis=0)
-            pred_scores = np.sum(single_stat[:, int(self.n_systems) :], axis=0)
+            n_systems = int(single_stat.shape[-1] / 2)
+            true_scores = np.sum(single_stat[:, 0:n_systems], axis=0)
+            pred_scores = np.sum(single_stat[:, n_systems:], axis=0)
             val = corr_func(true_scores, pred_scores)[0]
         else:
             raise ValueError(
-                f"`group_by` with the value {config.group_by} hasn't" f"been supported."
+                f"group_by with the value {config.group_by} hasn't been supported."
             )
         return val
 
     def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.ndim == 1:
-            agg_stats = agg_stats.reshape(
-                (self.n_samples, int(agg_stats.shape[0] / self.n_samples))
-            )
+        if agg_stats.ndim == self.stats_ndim():
             val = self._calc_metric_from_aggregate_single(agg_stats)
             return np.array(val)
         else:
-            agg_stats = agg_stats.reshape(
-                (
-                    agg_stats.shape[0],
-                    self.n_samples,
-                    int(agg_stats.shape[1] / self.n_samples),
-                )
-            )
-
-            ret_metric = np.zeros(agg_stats.shape[0])
+            n_samples = agg_stats.shape[0]
+            ret_metric = np.zeros(n_samples)
             for i, single_stat in enumerate(agg_stats):
                 val = self._calc_metric_from_aggregate_single(single_stat)
                 ret_metric[i] = val
