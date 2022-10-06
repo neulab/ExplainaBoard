@@ -1,49 +1,9 @@
-import os
 import unittest
 
-from integration_tests.utils import test_artifacts_path
 import numpy as np
 
-from explainaboard import (
-    FileType,
-    get_loader_class,
-    get_processor_class,
-    Source,
-    TaskType,
-)
 from explainaboard.metrics.meta_evaluation import CorrelationNLG, CorrelationNLGConfig
 from explainaboard.utils.typing_utils import narrow, unwrap
-
-
-class MetaEvalWMTDATest(unittest.TestCase):
-    artifact_path = os.path.join(test_artifacts_path, "meta_evaluation")
-    tsv_dataset = os.path.join(artifact_path, "./wmt20-DA/cs-en/data.tsv")
-    txt_output = os.path.join(artifact_path, "./wmt20-DA/cs-en/score.txt")
-
-    def test_da_cs_en(self):
-
-        metadata = {
-            "task_name": TaskType.meta_evaluation_wmt_da.value,
-            "metric_names": ["SysPearsonCorr"],
-            "confidence_alpha": None,
-        }
-        loader = get_loader_class(TaskType.meta_evaluation_wmt_da)(
-            self.tsv_dataset,
-            self.txt_output,
-            Source.local_filesystem,
-            Source.local_filesystem,
-            FileType.tsv,
-            FileType.text,
-        )
-        data = loader.load().samples
-        processor = get_processor_class(TaskType.meta_evaluation_wmt_da)()
-
-        sys_info = processor.process(metadata, data)
-        self.assertGreater(len(sys_info.results.analyses), 0)
-        self.assertGreater(len(sys_info.results.overall), 0)
-        self.assertAlmostEqual(
-            sys_info.results.overall["example"]["SegKtauCorr"].value, -0.0169, 3
-        )
 
 
 class MetaEvalNLGInvalidValueTest(unittest.TestCase):
@@ -185,9 +145,7 @@ class MetaEvalNLGCITest(unittest.TestCase):
         val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
         self.assertAlmostEqual(val, 0.8162952, 3)
 
-        ci: tuple[float, float] = unwrap(
-            corr_metric.calc_confidence_interval(stats, 0.05)
-        )
+        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 0.6488, 2)
         self.assertAlmostEqual(ci[1], 0.8999, 2)
 
@@ -202,9 +160,7 @@ class MetaEvalNLGCITest(unittest.TestCase):
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 0.815789, 3)
 
-        ci: tuple[float, float] = unwrap(
-            corr_metric.calc_confidence_interval(stats, 0.05)
-        )
+        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 0.5642, 2)
         self.assertAlmostEqual(ci[1], 0.9746, 2)
 
@@ -222,8 +178,6 @@ class MetaEvalNLGCITest(unittest.TestCase):
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 1, 3)
 
-        ci: tuple[float, float] = unwrap(
-            corr_metric.calc_confidence_interval(stats, 0.05)
-        )
+        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 1, 2)
         self.assertAlmostEqual(ci[1], 1, 2)

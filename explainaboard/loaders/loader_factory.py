@@ -19,6 +19,7 @@ from explainaboard.loaders.grammatical_error_correction import (
 from explainaboard.loaders.kg_link_tail_prediction import KgLinkTailPredictionLoader
 from explainaboard.loaders.language_modeling import LanguageModelingLoader
 from explainaboard.loaders.loader import Loader
+from explainaboard.loaders.meta_evaluation_nlg import MetaEvaluationNLGLoader
 from explainaboard.loaders.meta_evaluation_wmt_da import MetaEvaluationWMTDALoader
 from explainaboard.loaders.qa_extractive import QAExtractiveLoader
 from explainaboard.loaders.qa_multiple_choice import QAMultipleChoiceLoader
@@ -55,6 +56,7 @@ _LOADERS: dict[TaskType, type[Loader]] = {
     TaskType.text_classification: TextClassificationLoader,
     TaskType.text_pair_classification: TextPairClassificationLoader,
     TaskType.word_segmentation: SeqLabLoader,
+    TaskType.meta_evaluation_nlg: MetaEvaluationNLGLoader,
 }
 
 
