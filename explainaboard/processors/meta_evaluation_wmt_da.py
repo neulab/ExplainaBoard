@@ -11,11 +11,11 @@ from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.nlg_meta_evaluation import (
+from explainaboard.metrics.meta_evaluation import (
     KtauCorrelationWMTDAConfig,
     PearsonCorrelationWMTDAConfig,
 )
+from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.utils.language_utils import (
     is_chinese_lang_code,
