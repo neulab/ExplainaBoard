@@ -23,10 +23,8 @@ from explainaboard.processors.kg_link_tail_prediction import (
 )
 from explainaboard.processors.language_modeling import LanguageModelingProcessor
 from explainaboard.processors.machine_translation import MachineTranslationProcessor
-
 from explainaboard.processors.meta_evaluation_nlg import MetaEvaluationNLGProcessor
 from explainaboard.processors.meta_evaluation_wmt_da import MetaEvaluationWMTDAProcessor
-
 from explainaboard.processors.named_entity_recognition import NERProcessor
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.qa_extractive import QAExtractiveProcessor
