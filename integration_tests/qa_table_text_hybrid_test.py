@@ -33,7 +33,7 @@ class QATableTextHybridTest(unittest.TestCase):
 
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
-            sys_info.results.overall[0]["ExactMatchQATat"].value, 0.746978, 3
+            sys_info.results.overall["example"]["ExactMatchQATat"].value, 0.746978, 3
         )
 
 

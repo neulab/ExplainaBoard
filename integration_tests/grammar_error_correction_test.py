@@ -29,7 +29,9 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
         }
         processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
-        self.assertAlmostEqual(sys_info.results.overall[0]["SeqCorrectCount"].value, 8)
+        self.assertAlmostEqual(
+            sys_info.results.overall["example"]["SeqCorrectCount"].value, 8
+        )
         self.assertGreater(len(sys_info.results.analyses), 0)
 
 

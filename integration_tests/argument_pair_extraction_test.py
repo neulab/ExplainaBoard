@@ -32,7 +32,7 @@ class ArgumentPairExtractionTest(unittest.TestCase):
         sys_info = processor.process(metadata, data)
         self.assertGreater(len(sys_info.results.analyses), 0)
 
-        overall = sys_info.results.overall[0]
+        overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
         self.assertAlmostEqual(overall["F1"].value, 0.25625, 4)
 

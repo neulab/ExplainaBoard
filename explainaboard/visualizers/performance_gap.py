@@ -36,10 +36,10 @@ def get_pairwise_performance_gap(
     Returns:
         A SystemOutputInfo object that has the difference between the performances.
     """
-    overall = [
-        _diff_overall(o1, o2)
-        for o1, o2 in zip(sys1.results.overall, sys2.results.overall)
-    ]
+    overall = {
+        level: _diff_overall(sys1.results.overall[level], sys2.results.overall[level])
+        for level in sys1.results.overall
+    }
 
     analyses: list[AnalysisResult] = []
 
