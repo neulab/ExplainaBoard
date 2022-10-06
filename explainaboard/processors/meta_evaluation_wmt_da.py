@@ -1,4 +1,4 @@
-"""A processor for the natural language generation meta-evaluation task."""
+"""A processor for the WMT Metrics meta-evaluation task."""
 
 from __future__ import annotations
 
@@ -13,11 +13,10 @@ from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.metrics.nlg_meta_evaluation import (
-    KtauCorrelationConfig,
-    PearsonCorrelationConfig,
+    KtauCorrelationWMTDAConfig,
+    PearsonCorrelationWMTDAConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.language_utils import (
     is_chinese_lang_code,
     is_japanese_lang_code,
@@ -25,14 +24,13 @@ from explainaboard.utils.language_utils import (
 from explainaboard.utils.tokenizer import SacreBleuTokenizer, Tokenizer
 
 
-@common_registry.register("NLGMetaEvaluationProcessor")
-class NLGMetaEvaluationProcessor(Processor):
-    """A processor for the natural language generation meta-evaluation task."""
+class MetaEvaluationWMTDAProcessor(Processor):
+    """A processor for the WMT meta-evaluation task."""
 
     @classmethod
     def task_type(cls) -> TaskType:
         """See Processor.task_type."""
-        return TaskType.nlg_meta_evaluation
+        return TaskType.meta_evaluation_wmt_da
 
     def get_tokenizer(self, lang: str | None) -> Tokenizer:
         """Get a tokenizer based on the language."""
@@ -137,8 +135,10 @@ class NLGMetaEvaluationProcessor(Processor):
     ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         return {
-            "SegKtauCorr": KtauCorrelationConfig(group_by="segment"),
-            "SysPearsonCorr": PearsonCorrelationConfig(group_by="system"),
+            "SegKtauCorr": KtauCorrelationWMTDAConfig(
+                group_by="segment", use_z_score=False
+            ),
+            "SysPearsonCorr": PearsonCorrelationWMTDAConfig(group_by="system"),
         }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()

@@ -25,7 +25,7 @@ class TaskType(str, Enum):
     cloze_mutiple_choice = "cloze-multiple-choice"
     cloze_generative = "cloze-generative"
     grammatical_error_correction = "grammatical-error-correction"
-    nlg_meta_evaluation = "nlg-meta-evaluation"
+    meta_evaluation_wmt_da = "meta-evaluation-wmt-da"
     tabular_regression = "tabular-regression"
     tabular_classification = "tabular-classification"
     argument_pair_extraction = "argument-pair-extraction"

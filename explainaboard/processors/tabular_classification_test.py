@@ -4,23 +4,16 @@ from __future__ import annotations
 
 import unittest
 
+from explainaboard.constants import TaskType
+from explainaboard.processors.processor_factory import get_processor_class
 from explainaboard.processors.tabular_classification import (
     TabularClassificationProcessor,
 )
-from explainaboard.serialization.serializers import PrimitiveSerializer
 
 
 class TabularClassificationProcessorTest(unittest.TestCase):
-    def test_serialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertEqual(
-            serializer.serialize(TabularClassificationProcessor()),
-            {"cls_name": "TabularClassificationProcessor"},
-        )
-
-    def test_deserialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertIsInstance(
-            serializer.deserialize({"cls_name": "TabularClassificationProcessor"}),
+    def test_get_processor_class(self) -> None:
+        self.assertIs(
+            get_processor_class(TaskType.tabular_classification),
             TabularClassificationProcessor,
         )

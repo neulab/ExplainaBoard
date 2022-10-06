@@ -401,14 +401,33 @@ class Metric(metaclass=abc.ABCMeta):
         """
         result = self._aggregate_stats(stats)
 
-        num_stats = stats.num_statistics()
-        result_shape = (
-            (stats.get_batch_data().shape[0], num_stats)
-            if stats.is_batched()
-            else (num_stats,)
-        )
-
-        if not self.uses_customized_aggregate():
+        if self.uses_customized_aggregate():
+            if stats.is_batched():
+                data = stats.get_batch_data()
+                assert (
+                    result.shape[0] == data.shape[0]
+                    and result.ndim == self.stats_ndim() + 1
+                ), (
+                    "BUG: invalid operation: "
+                    f"{type(self).__name__}._aggregate_stats(): "
+                    f"Expected batch size {stats.get_batch_data().shape[0]} and "
+                    f"number of dimensions {self.stats_ndim()+1}, but "
+                    f"got batch size {result.shape[0]} and number of dimensions "
+                    f"{result.ndim}."
+                )
+            else:
+                assert result.ndim == self.stats_ndim(), (
+                    "BUG: invalid operation: "
+                    f"{type(self).__name__}._aggregate_stats(): "
+                    f"Expected number of dimensions {self.stats_ndim() + 1}, but "
+                    f"got number of dimensions {result.ndim}."
+                )
+        else:
+            result_shape = (
+                (stats.get_batch_data().shape[0], stats.num_statistics())
+                if stats.is_batched()
+                else (stats.num_statistics(),)
+            )
             assert result.shape == result_shape, (
                 "BUG: invalid operation: "
                 f"{type(self).__name__}._aggregate_stats(): "
@@ -447,18 +466,19 @@ class Metric(metaclass=abc.ABCMeta):
                 - Non-batched data: []
                 - Batched data: [num_batches]
         """
-        if not self.uses_customized_aggregate() and agg_stats.ndim not in (1, 2):
+        if agg_stats.ndim not in (self.stats_ndim(), self.stats_ndim() + 1):
             raise ValueError(f"Invalid shape size: {agg_stats.shape}")
 
         result = self._calc_metric_from_aggregate(agg_stats)
-        result_shape = () if agg_stats.ndim == 1 else (agg_stats.shape[0],)
+        result_shape = (
+            () if agg_stats.ndim == self.stats_ndim() else (agg_stats.shape[0],)
+        )
 
-        if not self.uses_customized_aggregate():
-            assert result.shape == result_shape, (
-                "BUG: invalid operation: "
-                f"{type(self).__name__}._calc_metric_from_aggregate(): "
-                f"Expected shape {result_shape}, but got {result.shape}."
-            )
+        assert result.shape == result_shape, (
+            "BUG: invalid operation: "
+            f"{type(self).__name__}._calc_metric_from_aggregate(): "
+            f"Expected shape {result_shape}, but got {result.shape}."
+        )
 
         return result
 
@@ -486,10 +506,15 @@ class Metric(metaclass=abc.ABCMeta):
     def uses_customized_aggregate(self) -> bool:
         """Whether the metric uses other aggregated stats than example-level stats.
 
-        If this function returns True, aggregate_stats() skips to check the size of the
-        last dimension of the returned ndarray.
+        If this function returns True, aggregate_stats() skips some checks on the size
+        of the last dimension of the returned ndarray. Note that this increases the
+        possibility of implementation mistakes, and should be used with caution.
         """
         return False
+
+    def stats_ndim(self) -> int:
+        """The number of dimensions in the sufficient statistics."""
+        return 1
 
     def calc_confidence_interval(
         self,

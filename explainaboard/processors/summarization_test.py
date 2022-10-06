@@ -4,21 +4,13 @@ from __future__ import annotations
 
 import unittest
 
+from explainaboard.constants import TaskType
+from explainaboard.processors.processor_factory import get_processor_class
 from explainaboard.processors.summarization import SummarizationProcessor
-from explainaboard.serialization.serializers import PrimitiveSerializer
 
 
 class SummarizationProcessorTest(unittest.TestCase):
-    def test_serialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertEqual(
-            serializer.serialize(SummarizationProcessor()),
-            {"cls_name": "SummarizationProcessor"},
-        )
-
-    def test_deserialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertIsInstance(
-            serializer.deserialize({"cls_name": "SummarizationProcessor"}),
-            SummarizationProcessor,
+    def test_get_processor_class(self) -> None:
+        self.assertIs(
+            get_processor_class(TaskType.summarization), SummarizationProcessor
         )

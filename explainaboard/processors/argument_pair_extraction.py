@@ -15,13 +15,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.f1_score import APEF1ScoreConfig, F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.logging import progress
 from explainaboard.utils.span_utils import ArgumentPair, ArgumentPairOps
 from explainaboard.utils.typing_utils import unwrap
 
 
-@common_registry.register("ArgumentPairExtractionProcessor")
 class ArgumentPairExtractionProcessor(Processor):
     """A processor for the argument pair extraction task."""
 

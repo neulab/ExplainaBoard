@@ -41,15 +41,30 @@ You can load the dataset from an existing file using the
 
 ```shell
 explainaboard \
-    --task nlg-meta-evaluation \
+    --task meta-evaluation-wmt-da \
     --custom-dataset-paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv \
     --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt \
     --output-file-type text \
     --output-dir output/cs-en \
     --source-language en \
-    --target-language en \
-    --metrics SysPearsonCorr SegKtauCorr RootMeanSquareError
+    --target-language en
 ```
+ 
+
+You can also use a dataset supported by DataLab, for example 
+[wmt20_metrics_with_score](https://github.com/ExpressAI/DataLab/blob/main/datasets/wmt20_metrics_with_score/wmt20_metrics_with_score.py).
+
+```shell
+explainaboard \
+    --task meta-evaluation-wmt-da \
+    --dataset wmt20_metrics_with_score \
+    --sub-dataset cs-en_1.0.3 \
+    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score_1.0.3.txt \
+    --output-file-type text \
+    --source-language en \
+    --target-language en
+```
+
 
 
 

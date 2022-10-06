@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -12,10 +11,8 @@ from explainaboard.loaders.file_loader import (
     TextFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.tabular_regression)
 class TabularRegressionLoader(Loader):
     """Loader for the tabular regression task.
 
