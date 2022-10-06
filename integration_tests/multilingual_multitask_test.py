@@ -5,7 +5,7 @@ import unittest
 from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, TaskType
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.utils.tensor_analysis import (
     aggregate_score_tensor,
     filter_score_tensor,

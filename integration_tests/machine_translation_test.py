@@ -5,7 +5,7 @@ import unittest
 from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class MachineTranslationTest(unittest.TestCase):

@@ -206,10 +206,9 @@ def draw_charts_from_reports(
             report_info.append(SysOutputInfo.from_dict(json.load(fin)))
 
     # --- Overall results
-    num_levels = len(report_info[0].analysis_levels)
-    for level_id in range(num_levels):
+    for analysis in report_info[0].analyses:
         overall_results: list[dict[str, Performance]] = [
-            x.results.overall[level_id] for x in report_info
+            x.results.overall[analysis.level] for x in report_info
         ]
         overall_metric_names = sorted((overall_results[0].keys()))
 

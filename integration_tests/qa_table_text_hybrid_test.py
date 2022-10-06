@@ -2,7 +2,7 @@ import unittest
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.utils import cache_api
 
 
@@ -33,7 +33,7 @@ class QATableTextHybridTest(unittest.TestCase):
 
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
-            sys_info.results.overall[0]["ExactMatchQATat"].value, 0.746978, 3
+            sys_info.results.overall["example"]["ExactMatchQATat"].value, 0.746978, 3
         )
 
 
