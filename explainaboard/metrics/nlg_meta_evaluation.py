@@ -41,8 +41,6 @@ class CorrelationNLGConfig(MetricConfig):
     def get_correlation_func(self, name: str):
         """Get correlation function based on function name.
 
-        TODO(pengfei): organize this in a better way
-
         Args:
             name: function name
         """
@@ -67,7 +65,7 @@ class CorrelationNLG(Metric):
         """See Metric.uses_customized_aggregate."""
         return True
 
-    # TODO(Pengfei): better way to organize different strategies
+
     def calc_stats_from_data(
         self,
         true_data: list[Any],
@@ -277,7 +275,7 @@ class CorrelationWMTDAMetric(Metric):
         raise NotImplementedError
 
 
-# TODO: (1) Make Segment/System level configurable (2) Document this function
+
 @dataclass
 @common_registry.register("KtauCorrelationWMTDAConfig")
 class KtauCorrelationWMTDAConfig(CorrelationWMTDAConfig):
