@@ -11,10 +11,7 @@ from explainaboard import (
     Source,
     TaskType,
 )
-from explainaboard.metrics.nlg_meta_evaluation import (
-    CorrelationNLG,
-    CorrelationNLGConfig,
-)
+from explainaboard.metrics.meta_evaluation import CorrelationNLG, CorrelationNLGConfig
 from explainaboard.utils.typing_utils import narrow, unwrap
 
 
@@ -188,7 +185,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
         self.assertAlmostEqual(val, 0.8162952, 3)
 
-        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
+        ci: tuple[float, float] = unwrap(
+            corr_metric.calc_confidence_interval(stats, 0.05)
+        )
         self.assertAlmostEqual(ci[0], 0.6488, 2)
         self.assertAlmostEqual(ci[1], 0.8999, 2)
 
@@ -203,7 +202,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 0.815789, 3)
 
-        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
+        ci: tuple[float, float] = unwrap(
+            corr_metric.calc_confidence_interval(stats, 0.05)
+        )
         self.assertAlmostEqual(ci[0], 0.5642, 2)
         self.assertAlmostEqual(ci[1], 0.9746, 2)
 
@@ -221,6 +222,8 @@ class MetaEvalNLGCITest(unittest.TestCase):
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
         self.assertAlmostEqual(val, 1, 3)
 
-        ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
+        ci: tuple[float, float] = unwrap(
+            corr_metric.calc_confidence_interval(stats, 0.05)
+        )
         self.assertAlmostEqual(ci[0], 1, 2)
         self.assertAlmostEqual(ci[1], 1, 2)
