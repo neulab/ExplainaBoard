@@ -8,6 +8,7 @@ from typing import Any
 
 from explainaboard.analysis.analyses import AnalysisResult
 from explainaboard.analysis.performance import Performance
+from explainaboard.utils.typing_utils import narrow
 
 
 @dataclass
@@ -15,19 +16,25 @@ class Result:
     """A class to store results.
 
     Attributes:
-        overall: Overall results. The first list is over analysis levels, and the second
+        overall: Overall results. The first dict is over analysis levels, and the second
           is over metrics applicable to that analysis level.
         analyses: The results of various analyses.
     """
 
-    overall: list[dict[str, Performance]]
+    overall: dict[str, dict[str, Performance]]
     analyses: list[AnalysisResult]
 
     @classmethod
     def dict_conv(cls, k: str, v: Any):
         """A utility function for deserialization."""
         if k == 'overall':
-            return [{k: Performance.from_dict(v2) for k, v2 in v1.items()} for v1 in v]
+            return {
+                narrow(str, analysis_level_name): {
+                    narrow(str, metric_name): Performance.from_dict(perf)
+                    for metric_name, perf in narrow(dict, perfs).items()
+                }
+                for analysis_level_name, perfs in narrow(dict, v).items()
+            }
         elif k == 'analyses':
             return [AnalysisResult.from_dict(v1) for v1 in v]
         else:

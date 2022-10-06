@@ -31,7 +31,7 @@ sys_info.print_as_json(file=open("./report.json", 'w'))
 
 
 # get overall results of different metrics
-for name, metric_info in sys_info.results.overall[0].items():
+for name, metric_info in sys_info.results.overall["example"].items():
     value = metric_info.value
     confidence_score_low = metric_info.confidence_score_low
     confidence_score_high = metric_info.confidence_score_high
