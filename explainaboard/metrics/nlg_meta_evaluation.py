@@ -65,7 +65,6 @@ class CorrelationNLG(Metric):
         """See Metric.uses_customized_aggregate."""
         return True
 
-
     def calc_stats_from_data(
         self,
         true_data: list[Any],
@@ -273,7 +272,6 @@ class CorrelationWMTDAMetric(Metric):
             The aggregated metric value.
         """
         raise NotImplementedError
-
 
 
 @dataclass
