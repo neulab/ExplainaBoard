@@ -4,23 +4,16 @@ from __future__ import annotations
 
 import unittest
 
+from explainaboard.constants import TaskType
 from explainaboard.processors.grammatical_error_correction import (
     GrammaticalErrorCorrectionProcessor,
 )
-from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.processors.processor_factory import get_processor_class
 
 
 class GrammaticalErrorCorrectionProcessorTest(unittest.TestCase):
-    def test_serialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertEqual(
-            serializer.serialize(GrammaticalErrorCorrectionProcessor()),
-            {"cls_name": "GrammaticalErrorCorrectionProcessor"},
-        )
-
-    def test_deserialize(self) -> None:
-        serializer = PrimitiveSerializer()
-        self.assertIsInstance(
-            serializer.deserialize({"cls_name": "GrammaticalErrorCorrectionProcessor"}),
+    def test_get_processor_class(self) -> None:
+        self.assertIs(
+            get_processor_class(TaskType.grammatical_error_correction),
             GrammaticalErrorCorrectionProcessor,
         )

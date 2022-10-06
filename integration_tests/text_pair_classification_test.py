@@ -10,7 +10,7 @@ from explainaboard import (
     Source,
     TaskType,
 )
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class TextPairClassificationTest(unittest.TestCase):

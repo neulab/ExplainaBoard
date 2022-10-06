@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from explainaboard.constants import FileType, TaskType
+from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
     FileLoader,
@@ -10,10 +10,8 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.qa_extractive)
 class QAExtractiveLoader(Loader):
     """Loader for the extractive QA task."""
 

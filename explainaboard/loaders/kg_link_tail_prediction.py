@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -13,13 +12,11 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 from explainaboard.utils import cache_api
 from explainaboard.utils.preprocessor import MapPreprocessor
 from explainaboard.utils.typing_utils import narrow
 
 
-@register_loader(TaskType.kg_link_tail_prediction)
 class KgLinkTailPredictionLoader(Loader):
     """Loader for the knowledge graph link prediction task.
 

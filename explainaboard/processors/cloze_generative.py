@@ -23,11 +23,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import unwrap
 
 
-@common_registry.register("ClozeGenerativeProcessor")
 class ClozeGenerativeProcessor(Processor):
     """A processor for the generative cloze task."""
 

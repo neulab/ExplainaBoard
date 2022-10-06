@@ -6,11 +6,9 @@ from explainaboard import TaskType
 from explainaboard.metrics.f1_score import F1ScoreConfig, SeqF1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.sequence_labeling import SeqLabProcessor
-from explainaboard.serialization import common_registry
 from explainaboard.utils.span_utils import BIOSpanOps
 
 
-@common_registry.register("NERProcessor")
 class NERProcessor(SeqLabProcessor):
     """A processor for the named entity recognition task."""
 
