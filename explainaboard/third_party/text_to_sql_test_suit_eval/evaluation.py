@@ -625,7 +625,7 @@ def print_scores(scores, etype, include_turn_acc=True):
             print_formated_s("exact match", exact_scores, "{:<20.3f}")
 
 
-def sql_evaluate(glist, plist, config):
+def evaluate(glist, plist, config):
     """
     input:
         glist: a gold sql list containing N (gold_sql, db_id)

@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from explainaboard.third_party.text_to_sql_test_suit_eval.sql_evaluation import (
-    sql_evaluate,
-)
+from explainaboard.third_party.text_to_sql_test_suit_eval.evaluation import evaluate
 
 
 class SQL_Evaluation_Test(unittest.TestCase):
@@ -27,7 +25,7 @@ class SQL_Evaluation_Test(unittest.TestCase):
             "large_data/table/tables.json",
             "etype": "exec",
         }
-        result_raw = sql_evaluate(true, pred, config)
+        result_raw = evaluate(true, pred, config)
         result = sum(result_raw) / len(result_raw)
         self.assertAlmostEqual(result, 1.0 / 3.0)
 
@@ -37,6 +35,6 @@ class SQL_Evaluation_Test(unittest.TestCase):
             "large_data/table/tables.json",
             "etype": "match",
         }
-        result_raw = sql_evaluate(true, pred, config)
+        result_raw = evaluate(true, pred, config)
         result = sum(result_raw) / len(result_raw)
         self.assertAlmostEqual(result, 2.0 / 3.0)
