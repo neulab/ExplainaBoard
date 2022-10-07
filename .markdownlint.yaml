@@ -1,5 +1,10 @@
 MD013:
   # Number of characters
   line_length: 88
+  code_blocks: false
+
+MD024:
+  # Allow multiple headings with the same content
+  siblings_only: true
 
 ignores: ["explainaboard/third_party"]
