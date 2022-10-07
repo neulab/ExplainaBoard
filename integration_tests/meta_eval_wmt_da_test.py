@@ -188,8 +188,8 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci: tuple[float, float] = unwrap(
             corr_metric.calc_confidence_interval(stats, 0.05)
         )
-        self.assertAlmostEqual(ci[0], 0.6488, 2)
-        self.assertAlmostEqual(ci[1], 0.8999, 2)
+        self.assertGreater(val, ci[0])
+        self.assertGreater(ci[1], val)
 
     def test_system_level_spearmanr_bootstrap(self) -> None:
 
@@ -205,8 +205,8 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci: tuple[float, float] = unwrap(
             corr_metric.calc_confidence_interval(stats, 0.05)
         )
-        self.assertAlmostEqual(ci[0], 0.5642, 2)
-        self.assertAlmostEqual(ci[1], 0.9746, 2)
+        self.assertGreater(val, ci[0])
+        self.assertGreater(ci[1], val)
 
     def test_dataset_level_spearmanr_bootstrap(self) -> None:
 
