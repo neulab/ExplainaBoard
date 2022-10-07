@@ -2,14 +2,14 @@
 
 Let's take `text_classification` as an example to show how to add a new task for ExplainaBoard.
 
-To do so, you would first need to add your task to the modules `tasks.py`. 
+To do so, you would first need to add your task to the modules `tasks.py`.
 After doing so, you would also need to create a `Loader`, `Processor`, and unit tests for the
 new task, placed under the relevant directories.
 
-
 ## Task and Format Declaration
+
 (1) All the supported tasks are listed in **tasks.py**. If your task name is not listed in the file,
-please add your task to `TaskType` (enum) and the task list `_task_categories`. Task names can not 
+please add your task to `TaskType` (enum) and the task list `_task_categories`. Task names can not
 contain `space` and different words should be connected using `-`.
 
 (2) If the format of your task's dataset is not covered by `FileType` in the file
@@ -17,6 +17,7 @@ contain `space` and different words should be connected using `-`.
 task uses a standard format such as tsv, it is not necessary to add a new type).
 
 For example:
+
 ```python
 class TaskType(str, Enum):
     text_classification = "text-classification"
@@ -27,6 +28,7 @@ _task_categories: List[TaskCategory] = [
                  [Task(TaskType.text_classification, True, ["F1score", "Accuracy"])]),
 ]
 ```
+
 where the parameters in `TaskCategory` refers to the task's name, description, and the list of tasks
 
 ## Create a Loader module for your task
@@ -34,6 +36,7 @@ where the parameters in `TaskCategory` refers to the task's name, description, a
 (1) Create a new python file `text_classification.py` in the folder `explainaboard/loaders/`
 
 (2) In this file, we need to:
+
 * create a data loader for text classification task inheriting from the class `Loader`
 * implement the member function `def load(self)`
 
@@ -84,6 +87,7 @@ task to the one you're trying to implement to get hints.
 
 (3) Import this module (`text_classification.py`) in `__init__.py`
 For example, in this file `explainaboard/loaders/__init__.py`, we have:
+
 ```python
 from explainaboard.loaders import text_classification
 
@@ -97,6 +101,7 @@ __all__ = [
 (1) Create a new python file `text_classification.py` in the folder `explainaboard/processors/`
 
 (2) In this file, we need to:
+
 * create a processor for text classification task inheriting from the class `Processor`
 * define features that you aim to use for this task in the `_features` variable
 * [implement the features](add_new_features.md) that you want to use to perform analysis
@@ -107,7 +112,8 @@ you may want to override some of the functions in the base `Processor` class imp
 task, and `processors/named_entity_recognition.py` gives a good example of a more complicated task.
 
 (3) Import this module (text_classification.py) in `__init__.py`
-For example, in this file `explainaboard/processors/__init__.py`, we have: 
+For example, in this file `explainaboard/processors/__init__.py`, we have:
+
 ```python
 from explainaboard.processors import text_classification
 
@@ -116,12 +122,13 @@ __all__ = [
 ]
 ```
 
-
 ## Update new task information
+
 Once you finish all the above steps, you need to register the new task in the script
 tasks.py by declaring the supported formats, metrics, etc.
 
 For example, the following information can be added for text classification tasks.
+
 ```python
     TaskCategory(
         "text-classification",
@@ -144,4 +151,3 @@ For example, the following information can be added for text classification task
 (1) Create a new python file `test_text_classification.py` in the folder `integration_tests/`
 
 (2) Implement unit tests for this task referencing that of other similar tasks
-

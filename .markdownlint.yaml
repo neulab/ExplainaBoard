@@ -1,0 +1,5 @@
+MD013:
+  # Number of characters
+  line_length: 88
+
+ignores: ["explainaboard/third_party"]
