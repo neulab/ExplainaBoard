@@ -343,6 +343,19 @@ explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./d
 
 
 
+ 
+## [Meta Evaluation NLG]
+Evaluating the reliability of automated metrics for general text generation tasks, such as text summarization.
+
+**CLI Examples**
+
+The below example loads the meval_summeval dataset from DataLab: 
+```shell
+explainaboard --task meta-evaluation-nlg --dataset meval_summeval --sub-dataset coherence --system-outputs ./data/system_outputs/summeval/sumeval_bart.json > report.json
+```
+ 
+
+
 ## [WMT Metrics Direct Assessment Meta-evaluation](task_meta_evaluation.md)
 
 
@@ -378,3 +391,4 @@ explainaboard \
     --target-language en
 ```
 
+ 

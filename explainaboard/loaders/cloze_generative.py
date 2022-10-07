@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -11,10 +10,8 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.cloze_generative)
 class ClozeGenerativeLoader(Loader):
     """Loader for the generative cloze task."""
 

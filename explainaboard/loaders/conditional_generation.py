@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from explainaboard.constants import FileType, TaskType
+from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
     FileLoader,
@@ -12,11 +12,8 @@ from explainaboard.loaders.file_loader import (
     TSVFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.conditional_generation)
-@register_loader(TaskType.machine_translation)
 class ConditionalGenerationLoader(Loader):
     """Loader for the conditional generation task.
 
@@ -76,7 +73,6 @@ class ConditionalGenerationLoader(Loader):
         }
 
 
-@register_loader(TaskType.summarization)
 class SummarizationLoader(ConditionalGenerationLoader):
     """A loader for summarization."""
 
@@ -86,7 +82,6 @@ class SummarizationLoader(ConditionalGenerationLoader):
     ]
 
 
-@register_loader(TaskType.machine_translation)
 class MachineTranslationLoader(ConditionalGenerationLoader):
     """A loader for machine translation."""
 

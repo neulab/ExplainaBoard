@@ -5,7 +5,7 @@ from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class GrammarErrorCorrectionTest(unittest.TestCase):
@@ -29,7 +29,9 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
         }
         processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
-        self.assertAlmostEqual(sys_info.results.overall[0]["SeqCorrectCount"].value, 8)
+        self.assertAlmostEqual(
+            sys_info.results.overall["example"]["SeqCorrectCount"].value, 8
+        )
         self.assertGreater(len(sys_info.results.analyses), 0)
 
 

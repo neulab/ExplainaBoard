@@ -522,9 +522,9 @@ def main():
             logger = get_logger('report')
 
             logger.info('--- Overall Performance')
-            for overall_level in report.results.overall:
+            for level_name, overall_level in report.results.overall.items():
                 for metric_name, metric_stat in overall_level.items():
-                    logger.info(f'{metric_name}\t{metric_stat.value}')
+                    logger.info(f'{level_name}\t{metric_name}\t{metric_stat.value}')
             logger.info('')
             logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:

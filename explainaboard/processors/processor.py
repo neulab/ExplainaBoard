@@ -378,7 +378,7 @@ class Processor(metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         metric_stats: list[dict[str, MetricStats]],
-    ) -> list[dict[str, Performance]]:
+    ) -> dict[str, dict[str, Performance]]:
         """Get the overall performance according to metrics.
 
         Args:
@@ -389,7 +389,7 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
             a dictionary of metrics to overall performance numbers
         """
-        overall_results: list[dict[str, Performance]] = []
+        overall_results: dict[str, dict[str, Performance]] = {}
 
         for my_level, my_stats in zip(sys_info.analysis_levels, metric_stats):
             my_results: dict[str, Performance] = {}
@@ -410,7 +410,7 @@ class Processor(metaclass=abc.ABCMeta):
                     confidence_score_high=ci.high if ci is not None else None,
                 )
 
-            overall_results.append(my_results)
+            overall_results[my_level.name] = my_results
 
         return overall_results
 
