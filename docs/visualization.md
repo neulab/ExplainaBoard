@@ -13,6 +13,7 @@ also some rudimentary visualization tools at your disposal.
 **Charts:** If you want to draw visualizations of the bucketed analysis results or
 confusion matrices offline, you can run the following command over one or more
 reports:
+
 ```shell
 python -m explainaboard.visualizers.draw_charts --reports report1.json report2.json
 ```

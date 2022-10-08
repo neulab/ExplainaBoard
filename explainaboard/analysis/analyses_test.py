@@ -13,7 +13,7 @@ from explainaboard.analysis.performance import BucketPerformance, Performance
 
 class BucketAnalysisResultTest(unittest.TestCase):
     def test_inconsistent_num_metrics(self) -> None:
-        with self.assertRaisesRegex(ValueError, r"^Inconsistent number of metrics"):
+        with self.assertRaisesRegex(ValueError, r"^Inconsistent metrics"):
             BucketAnalysisResult(
                 name="foo",
                 level="bar",
@@ -21,25 +21,25 @@ class BucketAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[0, 1, 2, 3, 4],
-                        performances=[
-                            Performance(metric_name="metric1", value=0.5),
-                            Performance(metric_name="metric2", value=0.25),
-                        ],
+                        performances={
+                            "metric1": Performance(value=0.5),
+                            "metric2": Performance(value=0.25),
+                        },
                         bucket_name="baz",
                     ),
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
-                        performances=[
-                            Performance(metric_name="metric1", value=0.125),
-                        ],
+                        performances={
+                            "metric1": Performance(value=0.125),
+                        },
                         bucket_name="qux",
                     ),
                 ],
             )
 
     def test_inconsistent_metric_names(self) -> None:
-        with self.assertRaisesRegex(ValueError, r"^Inconsistent metric names"):
+        with self.assertRaisesRegex(ValueError, r"^Inconsistent metrics"):
             BucketAnalysisResult(
                 name="foo",
                 level="bar",
@@ -47,19 +47,19 @@ class BucketAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[0, 1, 2, 3, 4],
-                        performances=[
-                            Performance(metric_name="metric1", value=0.5),
-                            Performance(metric_name="metric2", value=0.25),
-                        ],
+                        performances={
+                            "metric1": Performance(value=0.5),
+                            "metric2": Performance(value=0.25),
+                        },
                         bucket_name="baz",
                     ),
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
-                        performances=[
-                            Performance(metric_name="metric1", value=0.125),
-                            Performance(metric_name="xxx", value=0.25),
-                        ],
+                        performances={
+                            "metric1": Performance(value=0.125),
+                            "xxx": Performance(value=0.25),
+                        },
                         bucket_name="qux",
                     ),
                 ],
@@ -73,19 +73,19 @@ class BucketAnalysisResultTest(unittest.TestCase):
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[0, 1, 2, 3, 4],
-                    performances=[
-                        Performance(metric_name="metric1", value=0.5),
-                        Performance(metric_name="metric2", value=0.25),
-                    ],
+                    performances={
+                        "metric1": Performance(value=0.5),
+                        "metric2": Performance(value=0.25),
+                    },
                     bucket_interval=(1.0, 2.0),
                 ),
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[5, 6, 7, 8, 9],
-                    performances=[
-                        Performance(metric_name="metric1", value=0.125),
-                        Performance(metric_name="metric2", value=0.0625),
-                    ],
+                    performances={
+                        "metric1": Performance(value=0.125),
+                        "metric2": Performance(value=0.0625),
+                    },
                     bucket_interval=(2.0, 3.0),
                 ),
             ],
@@ -113,19 +113,19 @@ class BucketAnalysisResultTest(unittest.TestCase):
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[0, 1, 2, 3, 4],
-                    performances=[
-                        Performance(metric_name="metric1", value=0.5),
-                        Performance(metric_name="metric2", value=0.25),
-                    ],
+                    performances={
+                        "metric1": Performance(value=0.5),
+                        "metric2": Performance(value=0.25),
+                    },
                     bucket_name="baz",
                 ),
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[5, 6, 7, 8, 9],
-                    performances=[
-                        Performance(metric_name="metric1", value=0.125),
-                        Performance(metric_name="metric2", value=0.0625),
-                    ],
+                    performances={
+                        "metric1": Performance(value=0.125),
+                        "metric2": Performance(value=0.0625),
+                    },
                     bucket_name="qux",
                 ),
             ],

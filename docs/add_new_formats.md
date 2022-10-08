@@ -1,7 +1,7 @@
 # Add New Format
 
-
 ## Case 1: Supported Formats
+
 If the format of your datasets has already been supported
 by the existing library, you can directly use it without
 any library-level modification
@@ -15,12 +15,11 @@ any library-level modification
 * `TaskType.extractive_qa`
   * `FileType.json` (same format with squad)
   
-
 For example, suppose that you have a system output of the summarization task
 in `tsv` format:
 
 ```python
-from explainaboard import TaskType, get_dataset_class
+from explainaboard import TaskType, get_dataset_class, get_processor_class
 dataset_path = "./integration_tests/artifacts/summarization/dataset.tsv"
 output_path = "./integration_tests/artifacts/summarization/output.txt"
 loader = get_dataset_class(TaskType.summarization)(
@@ -33,20 +32,22 @@ loader = get_dataset_class(TaskType.summarization)(
 )
 data = loader.load()
 
-processor = get_processor(TaskType.summarization, data = data)
+processor = get_processor_class(TaskType.summarization)()
 analysis = processor.process()
 analysis.write_to_directory("./")
 ```
 
-
 ## Case 2: Unsupported Formats
+
 If your dataset is in a new format which the current SDK doesn't support, you can
+
 * (1) reformat your data into a format that the current library supports
-* (2) or re-write the `loader.load()` function to make it 
+* (2) or re-write the `loader.load()` function to make it
   support your format.
   Taking the summarization task for example, suppose that the existing SDK only supports
   `tsv` format, we can make `json` format supported by adding the following code inside
   `loaders.summarization.TextSummarizationLoader.loader()`
+
   ```python
       def load(self) -> Iterable[Dict]:
         raw_data = self._load_raw_data_points()

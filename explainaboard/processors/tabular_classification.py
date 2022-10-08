@@ -18,11 +18,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 
 
-@register_processor(TaskType.tabular_classification)
-class TextClassificationProcessor(Processor):
+class TabularClassificationProcessor(Processor):
     """A processor for the tabular classification task."""
 
     @classmethod
@@ -77,7 +75,10 @@ class TextClassificationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level="example", source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [AccuracyConfig(name='Accuracy')]
+        return {"Accuracy": AccuracyConfig()}

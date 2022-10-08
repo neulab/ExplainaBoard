@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Callable
 from dataclasses import dataclass
 import itertools
-from typing import Optional
 
 import numpy as np
 
@@ -17,8 +17,7 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
-from explainaboard.utils.typing_utils import unwrap_or
+from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
 
 
 class QATatMetric(Metric):
@@ -33,12 +32,7 @@ class QATatMetric(Metric):
         """See Metric.is_simple_average."""
         return True
 
-    def calc_stats_from_data(
-        self,
-        true_data: list,
-        pred_data: list,
-        config: Optional[MetricConfig] = None,
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         stat_list = []
         for true_answer_info, pred_answer_info in zip(true_data, pred_data):
@@ -59,8 +53,9 @@ class QATatMetric(Metric):
                 prediction,
             )
 
-            config = unwrap_or(config, self.config)
-            preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
+            preprocessor = ExtractiveQAPreprocessor(
+                language=self.config.source_language
+            )
 
             args_iter = itertools.product(
                 prediction_strings, ground_truth_answer_strings
@@ -74,7 +69,7 @@ class QATatMetric(Metric):
 
     @abc.abstractmethod
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
         """Calculate a score given a ground truth answer string and a prediction."""
         ...
@@ -98,7 +93,7 @@ class ExactMatchQATat(QATatMetric):
         return True
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
         """See QATatMetric.sample_level_metric."""
         ground_truths = eval_util._answer_to_bags(ground_truth)
@@ -125,7 +120,7 @@ class F1ScoreQATat(QATatMetric):
         return True
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ):
         """See QATatMetric.sample_level_metric."""
         ground_truths = eval_util._answer_to_bags(ground_truth)

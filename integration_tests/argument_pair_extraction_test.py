@@ -3,9 +3,9 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class ArgumentPairExtractionTest(unittest.TestCase):
@@ -28,17 +28,13 @@ class ArgumentPairExtractionTest(unittest.TestCase):
             "dataset_name": "ape",
             "metric_names": ["APEF1Score", "F1Score"],
         }
-        processor = get_processor(TaskType.argument_pair_extraction)
+        processor = get_processor_class(TaskType.argument_pair_extraction)()
         sys_info = processor.process(metadata, data)
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
 
-        self.assertGreater(len(sys_info.results.overall), 0)
-        self.assertAlmostEqual(
-            sys_info.results.overall[0][0].value,
-            0.25625,
-            4,
-            "almost equal",
-        )
+        overall = sys_info.results.overall["example"]
+        self.assertGreater(len(overall), 0)
+        self.assertAlmostEqual(overall["F1"].value, 0.25625, 4)
 
 
 if __name__ == '__main__':

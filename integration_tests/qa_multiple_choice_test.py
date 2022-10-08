@@ -3,8 +3,8 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard import FileType, get_processor_class, Source, TaskType
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class QAMultipleChoiceTest(unittest.TestCase):
@@ -40,10 +40,10 @@ class QAMultipleChoiceTest(unittest.TestCase):
             "metric_names": ["Accuracy"],
         }
 
-        processor = get_processor(TaskType.qa_multiple_choice.value)
+        processor = get_processor_class(TaskType.qa_multiple_choice)()
         sys_info = processor.process(metadata, data)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_multiple_qa_customized_feature(self):
@@ -71,11 +71,11 @@ class QAMultipleChoiceTest(unittest.TestCase):
             "user_defined_features_configs": data.metadata.custom_features,
         }
 
-        processor = get_processor(TaskType.qa_multiple_choice.value)
+        processor = get_processor_class(TaskType.qa_multiple_choice)()
 
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
 

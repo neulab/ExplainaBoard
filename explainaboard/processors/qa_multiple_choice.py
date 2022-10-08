@@ -18,11 +18,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig, CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_multiple_choice)
 class QAMultipleChoiceProcessor(Processor):
     """A processor for the multiple-choice QA task."""
 
@@ -98,21 +96,22 @@ class QAMultipleChoiceProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            AccuracyConfig(
-                name='Accuracy',
+        return {
+            "Accuracy": AccuracyConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-            CorrectCountConfig(
-                name='CorrectCount',
+            "CorrectCount": CorrectCountConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-        ]
+        }
 
     def _get_true_label(self, data_point):
         """See processor._get_true_label."""

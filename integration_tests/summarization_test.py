@@ -4,7 +4,7 @@ import unittest
 from integration_tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 import numpy as np
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.metrics.external_eval import ExternalEvalConfig, ExternalEvalResult
@@ -50,17 +50,17 @@ class SummarizationTest(unittest.TestCase):
             "metric_names": ["bleu"],
         }
 
-        processor = get_processor(TaskType.summarization.value)
+        processor = get_processor_class(TaskType.summarization)()
 
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
 
-        condgen_processor = get_processor(TaskType.conditional_generation.value)
-        sum_processor = get_processor(TaskType.summarization.value)
+        condgen_processor = get_processor_class(TaskType.conditional_generation)()
+        sum_processor = get_processor_class(TaskType.summarization)()
 
         condgen_features_1 = condgen_processor.default_analysis_levels()
         sum_features = sum_processor.default_analysis_levels()
@@ -98,10 +98,10 @@ class SummarizationTest(unittest.TestCase):
             "sub_dataset_name": "3.0.0",
             "metric_names": ["rouge1"],
         }
-        processor = get_processor(TaskType.summarization)
+        processor = get_processor_class(TaskType.summarization)()
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     @unittest.skip('Not yet fixed in v0.11')
@@ -132,12 +132,12 @@ class SummarizationTest(unittest.TestCase):
             },
         }
 
-        processor = get_processor(TaskType.summarization.value)
+        processor = get_processor_class(TaskType.summarization)()
 
         sys_info = processor.process(metadata, data.samples)
         # print(sys_info.results.overall)
         # print(metadata["metric_configs"][0])
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         fluency = [
             x
             for x in sys_info.results.overall[0]

@@ -15,9 +15,8 @@ from explainaboard.metrics.continuous import (
 class RootMeanSquaredErrorConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            RootMeanSquaredErrorConfig("RootMeanSquaredError").serialize(),
+            RootMeanSquaredErrorConfig().serialize(),
             {
-                "name": "RootMeanSquaredError",
                 "source_language": None,
                 "target_language": None,
             },
@@ -25,15 +24,13 @@ class RootMeanSquaredErrorConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            RootMeanSquaredErrorConfig.deserialize(
-                {"name": "RootMeanSquaredError"},
-            ),
-            RootMeanSquaredErrorConfig("RootMeanSquaredError"),
+            RootMeanSquaredErrorConfig.deserialize({}),
+            RootMeanSquaredErrorConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            RootMeanSquaredErrorConfig("RootMeanSquaredError").to_metric(),
+            RootMeanSquaredErrorConfig().to_metric(),
             RootMeanSquaredError,
         )
 
@@ -41,9 +38,8 @@ class RootMeanSquaredErrorConfigTest(unittest.TestCase):
 class AbsoluteErrorConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            AbsoluteErrorConfig("AbsoluteError").serialize(),
+            AbsoluteErrorConfig().serialize(),
             {
-                "name": "AbsoluteError",
                 "source_language": None,
                 "target_language": None,
             },
@@ -51,12 +47,12 @@ class AbsoluteErrorConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            AbsoluteErrorConfig.deserialize({"name": "AbsoluteError"}),
-            AbsoluteErrorConfig("AbsoluteError"),
+            AbsoluteErrorConfig.deserialize({}),
+            AbsoluteErrorConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            AbsoluteErrorConfig("AbsoluteError").to_metric(),
+            AbsoluteErrorConfig().to_metric(),
             AbsoluteError,
         )

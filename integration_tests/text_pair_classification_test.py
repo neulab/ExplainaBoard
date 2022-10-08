@@ -3,8 +3,14 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import DatalabLoaderOption, FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard import (
+    DatalabLoaderOption,
+    FileType,
+    get_processor_class,
+    Source,
+    TaskType,
+)
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class TextPairClassificationTest(unittest.TestCase):
@@ -51,11 +57,11 @@ class TextPairClassificationTest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load()
-        processor = get_processor(TaskType.text_pair_classification)
+        processor = get_processor_class(TaskType.text_pair_classification)()
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_paws_fra(self):
@@ -71,9 +77,9 @@ class TextPairClassificationTest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load()
-        processor = get_processor(TaskType.text_pair_classification)
+        processor = get_processor_class(TaskType.text_pair_classification)()
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)

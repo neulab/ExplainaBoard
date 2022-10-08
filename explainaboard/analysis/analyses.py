@@ -14,13 +14,18 @@ import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance, Performance
-from explainaboard.metrics.metric import Metric, MetricConfig, MetricStats
+from explainaboard.metrics.metric import (
+    ConfidenceInterval,
+    Metric,
+    MetricConfig,
+    MetricStats,
+    Score,
+)
 from explainaboard.serialization.serializers import PrimitiveSerializer
-from explainaboard.utils.typing_utils import narrow, unwrap, unwrap_generator
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
-# See https://github.com/python/mypy/issues/5374
-@dataclass  # type: ignore
+@dataclass
 class AnalysisResult(metaclass=abc.ABCMeta):
     """A base class specifying the result of an analysis.
 
@@ -56,7 +61,7 @@ class AnalysisResult(metaclass=abc.ABCMeta):
 
 
 @dataclass
-class Analysis:
+class Analysis(metaclass=abc.ABCMeta):
     """A super-class for analyses.
 
     Analyses take in examples and analyze their features in
@@ -71,11 +76,12 @@ class Analysis:
     description: str | None
     level: str
 
+    @abc.abstractmethod
     def perform(
         self,
         cases: list[AnalysisCase],
-        metrics: list[Metric],
-        stats: list[MetricStats],
+        metrics: dict[str, Metric],
+        stats: dict[str, MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
         """Perform the analysis.
@@ -91,8 +97,9 @@ class Analysis:
         Returns:
             The result of the analysis.
         """
-        raise NotImplementedError
+        ...
 
+    @final
     @staticmethod
     def from_dict(dikt: dict):
         """Deserialization method."""
@@ -114,6 +121,7 @@ class Analysis:
                 features=tuple(dikt['features']),
             )
 
+    @final
     @staticmethod
     def _subsample_analysis_cases(
         sample_limit: int, analysis_cases: list[int]
@@ -163,20 +171,15 @@ class BucketAnalysisResult(AnalysisResult):
 
     def __post_init__(self):
         """Set the class name and validate."""
-        metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
-        num_metrics = len(metric_names)
+        metric_names = self.bucket_performances[0].performances.keys()
+
         for bucket_perf in self.bucket_performances:
-            if len(bucket_perf.performances) != num_metrics:
+            if bucket_perf.performances.keys() != metric_names:
                 raise ValueError(
-                    "Inconsistent number of metrics. "
-                    f"Required: {num_metrics}, got: {len(bucket_perf.performances)}"
+                    "Inconsistent metrics. "
+                    f"Required: {set(metric_names)}, "
+                    f"got: {set(bucket_perf.performances.keys())}"
                 )
-            for metric_name, perf in zip(metric_names, bucket_perf.performances):
-                if perf.metric_name != metric_name:
-                    raise ValueError(
-                        "Inconsistent metric names. "
-                        f"Required: {metric_name}, got: {perf.metric_name}"
-                    )
 
         self.cls_name: str = self.__class__.__name__
 
@@ -184,14 +187,14 @@ class BucketAnalysisResult(AnalysisResult):
         """See AnalysisResult.generate_report."""
         texts: list[str] = []
 
-        metric_names = [x.metric_name for x in self.bucket_performances[0].performances]
+        metric_names = sorted(k for k in self.bucket_performances[0].performances)
 
-        for i, metric_name in enumerate(metric_names):
+        for metric_name in metric_names:
             texts.append(f"the information of #{self.name}#")
             texts.append(f"bucket_name\t{metric_name}\t#samples")
 
             for bucket_perf in self.bucket_performances:
-                perf = bucket_perf.performances[i]
+                perf = bucket_perf.performances[metric_name]
 
                 if bucket_perf.bucket_interval is not None:
                     bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
@@ -241,8 +244,8 @@ class BucketAnalysis(Analysis):
     def perform(
         self,
         cases: list[AnalysisCase],
-        metrics: list[Metric],
-        stats: list[MetricStats],
+        metrics: dict[str, Metric],
+        stats: dict[str, MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
         """See Analysis.perform."""
@@ -269,23 +272,18 @@ class BucketAnalysis(Analysis):
             )
 
             n_samples = len(bucket_collection.samples)
-            bucket_performance = BucketPerformance(
-                n_samples=n_samples,
-                bucket_samples=subsampled_ids,
-                bucket_interval=bucket_collection.interval,
-                bucket_name=bucket_collection.name,
-            )
 
-            for metric_func, metric_stat in zip(
-                unwrap_generator(metrics),
-                unwrap_generator(stats),
-            ):
+            performances: dict[str, Performance] = {}
+
+            for metric_name, metric_func in metrics.items():
+                metric_stat = stats[metric_name]
+
                 # Samples may be empty when user defined a bucket interval that
                 # has no samples
                 if n_samples == 0.0:
                     value = 0.0
-                    conf_low: Optional[float] = None
-                    conf_high: Optional[float] = None
+                    ci_low: Optional[float] = None
+                    ci_high: Optional[float] = None
                 else:
                     bucket_stats = metric_stat.filter(bucket_collection.samples)
                     metric_result = metric_func.evaluate_from_stats(
@@ -293,24 +291,30 @@ class BucketAnalysis(Analysis):
                         confidence_alpha=confidence_alpha,
                     )
 
-                    conf_low, conf_high = (
-                        metric_result.confidence_interval
-                        if metric_result.confidence_interval
-                        else (None, None)
-                    )
+                    value = unwrap(metric_result.get_value(Score, "score")).value
+                    ci = metric_result.get_value(ConfidenceInterval, "score_ci")
+                    if ci is not None:
+                        ci_low = ci.low
+                        ci_high = ci.high
+                    else:
+                        ci_low = None
+                        ci_high = None
 
-                    value = metric_result.value
-
-                performance = Performance(
-                    metric_name=metric_func.config.name,
+                performances[metric_name] = Performance(
                     value=value,
-                    confidence_score_low=conf_low,
-                    confidence_score_high=conf_high,
+                    confidence_score_low=ci_low,
+                    confidence_score_high=ci_high,
                 )
 
-                bucket_performance.performances.append(performance)
-
-            bucket_performances.append(bucket_performance)
+            bucket_performances.append(
+                BucketPerformance(
+                    n_samples=n_samples,
+                    bucket_samples=subsampled_ids,
+                    performances=performances,
+                    bucket_interval=bucket_collection.interval,
+                    bucket_name=bucket_collection.name,
+                )
+            )
 
         return BucketAnalysisResult(
             name=self.feature, level=self.level, bucket_performances=bucket_performances
@@ -432,8 +436,8 @@ class ComboCountAnalysis(Analysis):
     def perform(
         self,
         cases: list[AnalysisCase],
-        metrics: list[Metric],
-        stats: list[MetricStats],
+        metrics: dict[str, Metric],
+        stats: dict[str, MetricStats],
         confidence_alpha: float,
     ) -> AnalysisResult:
         """See Analysis.perform."""
@@ -473,7 +477,7 @@ class AnalysisLevel:
 
     name: str
     features: dict[str, FeatureType]
-    metric_configs: list[MetricConfig]
+    metric_configs: dict[str, MetricConfig]
 
     @staticmethod
     def from_dict(dikt: dict):
@@ -485,11 +489,13 @@ class AnalysisLevel:
             k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
             for k, v in dikt['features'].items()
         }
-        metric_configs = [
+        metric_configs = {
             # See mypy/issues/4717
-            narrow(MetricConfig, serializer.deserialize(v))  # type: ignore
-            for v in dikt['metric_configs']
-        ]
+            narrow(str, k): narrow(
+                MetricConfig, serializer.deserialize(v)  # type: ignore
+            )
+            for k, v in dikt['metric_configs'].items()
+        }
         return AnalysisLevel(
             name=dikt['name'],
             features=features,

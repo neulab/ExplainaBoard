@@ -9,15 +9,18 @@ import numpy as np
 
 from explainaboard.metrics.metric import (
     AuxiliaryMetricResult,
+    ConfidenceInterval,
     Metric,
     MetricConfig,
     MetricResult,
     MetricStats,
+    MetricValue,
+    Score,
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.agreement import fleiss_kappa
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.utils.typing_utils import narrow
 
 UNANNOTATED_SYMBOL = -1
 
@@ -65,25 +68,11 @@ class ExternalEval(Metric):
     This tells whether the predicted output is in a set of true outputs.
     """
 
-    def _get_config(self, config: Optional[MetricConfig] = None) -> MetricConfig:
-        """Get the configuration or overwritten configuration.
-
-        Args:
-            config: Optional configuration to override the default configuration
-
-        Returns:
-            Either the default or overridden configuration
-        """
-        ret_config: MetricConfig = unwrap(config) if config is not None else self.config
-        return ret_config
-
     def is_simple_average(self, stats: MetricStats):
         """See Metric.is_simple_average."""
         return False
 
-    def calc_stats_from_external(
-        self, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_external(self) -> MetricStats:
         """Calculate statistics from external data.
 
         Args:
@@ -92,14 +81,11 @@ class ExternalEval(Metric):
         Returns:
             The calculated statistics.
         """
-        config = cast(ExternalEvalConfig, self._get_config(config))
-        return SimpleMetricStats(config.external_stats)
+        return SimpleMetricStats(narrow(ExternalEvalConfig, self.config).external_stats)
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
-        config = cast(ExternalEvalConfig, self._get_config(config))
+        config = narrow(ExternalEvalConfig, self.config)
 
         if config.external_stats is not None:
             n_sample, n_annotators = config.external_stats.shape
@@ -156,7 +142,7 @@ class ExternalEval(Metric):
         # self.config.agreement = fleiss_kappa(mat_kappa)
         return fleiss_kappa(mat_kappa)
 
-    def aggregate_stats(self, stats: MetricStats) -> np.ndarray:
+    def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
 
@@ -170,7 +156,6 @@ class ExternalEval(Metric):
         self,
         stats: MetricStats,
         confidence_alpha: Optional[float] = None,
-        config: Optional[MetricConfig] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
 
@@ -183,19 +168,17 @@ class ExternalEval(Metric):
         Returns:
             a resulting metric value
         """
-        config = self._get_config(config)
         agg_stats = self.aggregate_stats(stats)
-        agreement = self.calc_agreement(stats)
-        value = self.calc_metric_from_aggregate(agg_stats, config)
-        confidence_interval = (
-            self.calc_confidence_interval(stats, confidence_alpha)
-            if confidence_alpha
-            else None
-        )
-        return MetricResult(
-            config,
-            float(value),
-            confidence_interval,
-            confidence_alpha,
-            ExternalEvalResult(agreement),
-        )
+
+        metric_values: dict[str, MetricValue] = {
+            "score": Score(float(self.calc_metric_from_aggregate(agg_stats))),
+            "agreement": Score(self.calc_agreement(stats)),
+        }
+        if confidence_alpha is not None:
+            ci = self.calc_confidence_interval(stats, confidence_alpha)
+            if ci is not None:
+                metric_values["score_ci"] = ConfidenceInterval(
+                    ci[0], ci[1], confidence_alpha
+                )
+
+        return MetricResult(metric_values)

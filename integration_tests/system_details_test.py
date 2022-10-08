@@ -4,8 +4,8 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard import FileType, get_processor_class, Source, TaskType
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class SysDetailsTest(unittest.TestCase):
@@ -38,7 +38,7 @@ class SysDetailsTest(unittest.TestCase):
             FileType.text,
         )
         data = loader.load()
-        processor = get_processor(TaskType.text_classification)
+        processor = get_processor_class(TaskType.text_classification)()
 
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
 

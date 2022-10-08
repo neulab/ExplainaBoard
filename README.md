@@ -1,15 +1,12 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
 
-<p align="center">
-  <img src="./fig/logo-full-v2.png" width="800" class="center">
-  <br />
-  <br />
-  <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
-  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
-  <a href="https://pypi.org/project//"><img alt="PyPI" src="https://img.shields.io/pypi/v/explainaboard" /></a>
-  <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-  <a href=".github/workflows/ci.yml"><img alt="Integration Tests" src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
-</p>
+<img src="./fig/logo-full-v2.png" width="800" class="center">
+
+[![License](https://img.shields.io/github/license/neulab/ExplainaBoard)](https://github.com/neulab/ExplainaBoard/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/neulab/ExplainaBoard)](https://github.com/neulab/ExplainaBoard/stargazers)
+[![PyPI](https://img.shields.io/pypi/v/explainaboard)](https://pypi.org/project/explainaboard/)
+[![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
+[![Integration Tests](https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push)](.github/workflows/ci.yml)
 
 ## What is ExplainaBoard?
 
@@ -25,7 +22,6 @@ It offers a number of different ways with which you can evaluate and understand 
 4. *Common Errors*: What are common mistakes that top-5 systems made?
 5. *Fine-grained Error Analysis*: where do errors occur?
 6. *System Combination*: Is there potential complementarity between different systems?
-
 
 ## Using Explainaboard
 
@@ -43,13 +39,12 @@ ability to browse outputs and upload your own system outputs.
 First, follow the installation directions below, then take a look at our
 [**CLI examples**](docs/cli_interface.md).
 
-
 **Install Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
 ```
 pip install --upgrade pip  # recommending the newest version of pip.
 pip install explainaboard
-python -m spacy download en_core_web_sm  # if you plan to use the TextClassificationProcessor
+python -m spacy download en_core_web_sm  # if you plan to use the AspectBasedSentimentClassificationProcessor
 ```
 
 **Install Method 2 - Development:** Install from the source and develop locally (Python 3 only)
@@ -61,14 +56,15 @@ cd ExplainaBoard
 
 # Install the required dependencies and dev dependencies
 pip install ."[dev]"
+python -m spacy download en_core_web_sm
 pre-commit install
 ```
 
-- **Testing:** To run tests, you can run `python -m unittest`. 
+- **Testing:** To run tests, you can run `python -m unittest`.
 - **Linting and Code Style:** This project uses flake8 (linter) and black (formatter). They are enforced in the pre-commit hook and in the CI pipeline.
-    - run `python -m black .` to format code
-    - run `flake8` to lint code
-    - You can also configure your IDE to automatically format and lint the files as you are writing code.
+  - run `python -m black .` to format code
+  - run `flake8` to lint code
+  - You can also configure your IDE to automatically format and lint the files as you are writing code.
 
 After trying things out in the [CLI](docs/cli_interface.md), you can read how to add
 new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
@@ -95,4 +91,3 @@ If you find it useful in research, you can cite it in papers:
 We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
 Colin Raffel, Yang Liu, Li Dong. We also thank
 Vijay Viswanathan, Yiran Chen, Hiroaki Hayashi for useful discussion and feedback about ExplainaBoard.
-

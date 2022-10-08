@@ -4,14 +4,11 @@ from __future__ import annotations
 
 import unittest
 
-from explainaboard import TaskType
+from explainaboard.constants import TaskType
 from explainaboard.processors.chunking import ChunkingProcessor
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.processors.processor_factory import get_processor_class
 
 
 class ChunkingProcessorTest(unittest.TestCase):
-    def test_get_processor(self) -> None:
-        self.assertIsInstance(
-            get_processor(TaskType.chunking.value),
-            ChunkingProcessor,
-        )
+    def test_get_processor_class(self) -> None:
+        self.assertIs(get_processor_class(TaskType.chunking), ChunkingProcessor)

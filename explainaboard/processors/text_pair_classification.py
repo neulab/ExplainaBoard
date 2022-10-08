@@ -25,11 +25,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.text_pair_classification)
 class TextPairClassificationProcessor(Processor):
     """A processor for the text pair classification task."""
 
@@ -136,10 +134,13 @@ class TextPairClassificationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [AccuracyConfig(name='Accuracy')]
+        return {"Accuracy": AccuracyConfig()}
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
 

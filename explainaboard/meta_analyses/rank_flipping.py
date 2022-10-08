@@ -75,19 +75,20 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
         Returns:
             The metadata dictionary.
         """
+        metric_config_dict_iter = (
+            level.metric_configs for level in self.model1_report.analysis_levels
+        )
+        # TODO(odashi): This iterator may generate name collision.
+        metric_names_iter = itertools.chain.from_iterable(metric_config_dict_iter)
+
         metadata = {
             'custom_features': {
-                metric_config.name: {
+                name: {
                     "dtype": "string",  # for rank flipping, True or False
-                    "description": metric_config.name,
+                    "description": name,
                     "num_buckets": 2,  # for rank flipping, True or False
                 }
-                for metric_config in itertools.chain.from_iterable(
-                    [
-                        x.metric_configs
-                        for x in unwrap(self.model1_report.analysis_levels)
-                    ]
-                )
+                for name in metric_names_iter
             }
         }
         return metadata

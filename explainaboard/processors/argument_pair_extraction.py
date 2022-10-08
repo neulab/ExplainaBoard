@@ -15,13 +15,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.f1_score import APEF1ScoreConfig, F1ScoreConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.logging import progress
 from explainaboard.utils.span_utils import ArgumentPair, ArgumentPairOps
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.argument_pair_extraction)
 class ArgumentPairExtractionProcessor(Processor):
     """A processor for the argument pair extraction task."""
 
@@ -39,25 +37,26 @@ class ArgumentPairExtractionProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        defaults: dict[str, list[MetricConfig]] = {
-            'example': [
-                APEF1ScoreConfig(
-                    name='F1',
+        defaults: dict[str, dict[str, MetricConfig]] = {
+            'example': {
+                "F1": APEF1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
                 )
-            ],
-            'block': [
-                F1ScoreConfig(
-                    name='F1',
+            },
+            'block': {
+                "F1": F1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
                     ignore_classes=[cls._DEFAULT_TAG],
                 )
-            ],
+            },
         }
         return defaults[level]
 
@@ -165,7 +164,7 @@ class ArgumentPairExtractionProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         if analysis_level.name == 'example':
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
@@ -230,11 +229,13 @@ class ArgumentPairExtractionProcessor(Processor):
                             sys_info, output, case, statistics
                         )
                 cases.append(case)
+
         # calculate metric stats
         true_data = [x.true_label for x in cases]
         pred_data = [x.predicted_label for x in cases]
-        metric_stats: list[MetricStats] = [
-            x.to_metric().calc_stats_from_data(true_data, pred_data)
-            for x in analysis_level.metric_configs
-        ]
+        metric_stats = {
+            name: config.to_metric().calc_stats_from_data(true_data, pred_data)
+            for name, config in analysis_level.metric_configs.items()
+        }
+
         return cast(List[AnalysisCase], cases), metric_stats

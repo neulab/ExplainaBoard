@@ -18,11 +18,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_open_domain)
 class QAOpenDomainProcessor(Processor):
     """A processor for the open-domain QA task."""
 
@@ -85,21 +83,22 @@ class QAOpenDomainProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            ExactMatchQAConfig(
-                name='ExactMatch',
+        return {
+            "ExactMatch": ExactMatchQAConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-            F1ScoreQAConfig(
-                name='F1',
+            "F1": F1ScoreQAConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-        ]
+        }
 
     def _get_true_label(self, data_point):
         """See processor._get_true_label."""

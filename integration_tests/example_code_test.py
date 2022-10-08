@@ -3,7 +3,7 @@ import unittest
 
 from integration_tests.utils import top_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 
@@ -22,7 +22,7 @@ class ExampleCodeTest(unittest.TestCase):
             output_file_type=FileType.text,
         )
         data = loader.load().samples
-        processor = get_processor(TaskType.text_classification)
+        processor = get_processor_class(TaskType.text_classification)()
         analysis = processor.process(
             metadata={}, sys_output=data, skip_failed_analyses=True
         )
@@ -37,7 +37,7 @@ class ExampleCodeTest(unittest.TestCase):
             dataset_data=dataset, output_data=output
         )
         data = loader.load().samples
-        processor = get_processor(TaskType.summarization)
+        processor = get_processor_class(TaskType.summarization)()
         analysis = processor.process(
             metadata={}, sys_output=data, skip_failed_analyses=True
         )

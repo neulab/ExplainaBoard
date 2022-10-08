@@ -17,13 +17,11 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.processors.conditional_generation import (
     ConditionalGenerationProcessor,
 )
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 sum_attr = SUMAttribute()
 
 
-@register_processor(TaskType.summarization)
 class SummarizationProcessor(ConditionalGenerationProcessor):
     """A processor for the summarization task."""
 

@@ -4,10 +4,10 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, TaskType
+from explainaboard import FileType, get_processor_class, TaskType
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import FileLoaderMetadata
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.metrics.ranking import (
     HitsConfig,
     MeanRankConfig,
@@ -31,7 +31,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         loader = get_loader_class(task)(dataset, dataset)
         data = loader.load()
         # Initialize the processor and perform the processing
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
         sys_info = processor.process(
             metadata={}, sys_output=data.samples, skip_failed_analyses=True
         )
@@ -52,18 +52,18 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),  # you can modify k here
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
+            "metric_configs": {
+                "Hits4": HitsConfig(hits_k=4),  # you can modify k here
+                "MRR": MeanReciprocalRankConfig(),
+                "MR": MeanRankConfig(),
+            },
         }
 
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_with_user_defined_features(self):
@@ -102,19 +102,19 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k_237",
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
+            "metric_configs": {
+                "Hits4": HitsConfig(hits_k=4),
+                "MRR": MeanReciprocalRankConfig(),
+                "MR": MeanRankConfig(),
+            },
             "sort_by": "performance_value",
-            "sort_by_metric": "first",
+            "sort_by_metric": "Hits4",
         }
 
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
@@ -124,8 +124,8 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
-            first_item = symmetry_performances[i].performances[0].value
-            second_item = symmetry_performances[i + 1].performances[0].value
+            first_item = symmetry_performances[i].performances["Hits4"].value
+            second_item = symmetry_performances[i + 1].performances["Hits4"].value
             self.assertGreater(first_item, second_item)
 
     def test_sort_buckets_by_key(self):
@@ -139,19 +139,19 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.kg_link_tail_prediction.value,
             "dataset_name": "fb15k_237",
-            "metric_configs": [
-                HitsConfig(name='Hits4', hits_k=4),
-                MeanReciprocalRankConfig(name='MRR'),
-                MeanRankConfig(name='MR'),
-            ],
+            "metric_configs": {
+                "Hits4": HitsConfig(hits_k=4),
+                "MRR": MeanReciprocalRankConfig(),
+                "MR": MeanRankConfig(),
+            },
             "sort_by": "key",
         }
 
-        processor = get_processor(TaskType.kg_link_tail_prediction.value)
+        processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
 
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}

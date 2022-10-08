@@ -9,7 +9,7 @@ import os
 
 import eaas.endpoint
 
-from explainaboard import get_loader_class, get_processor, TaskType
+from explainaboard import get_loader_class, get_processor_class, TaskType
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (
@@ -488,10 +488,13 @@ def main():
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
-            metric_configs = [
-                get_metric_config_or_eaas(name)(name, source_language, target_language)
+            metric_configs = {
+                name: get_metric_config_or_eaas(name)(
+                    source_language=source_language,
+                    target_language=target_language,
+                )
                 for name in metric_names
-            ]
+            }
             metadata["metric_configs"] = metric_configs
 
         # Run analysis
@@ -507,7 +510,7 @@ def main():
             metadata_copied = copy.deepcopy(metadata)
             metadata_copied["task_name"] = task
 
-            processor = get_processor(task=task)
+            processor = get_processor_class(task=task)()
             report = processor.process(
                 metadata=metadata_copied,
                 sys_output=system_dataset.samples,
@@ -519,9 +522,9 @@ def main():
             logger = get_logger('report')
 
             logger.info('--- Overall Performance')
-            for overall_level in report.results.overall:
-                for metric_stat in overall_level:
-                    logger.info(f'{metric_stat.metric_name}\t{metric_stat.value}')
+            for level_name, overall_level in report.results.overall.items():
+                for metric_name, metric_stat in overall_level.items():
+                    logger.info(f'{level_name}\t{metric_name}\t{metric_stat.value}')
             logger.info('')
             logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:

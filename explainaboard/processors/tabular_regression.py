@@ -16,10 +16,8 @@ from explainaboard.metrics.continuous import (
 )
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 
 
-@register_processor(TaskType.tabular_regression)
 class TabularRegressionProcessor(Processor):
     """A processor for the tabular regression task."""
 
@@ -55,13 +53,16 @@ class TabularRegressionProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            RootMeanSquaredErrorConfig(name='RMSE'),
-            AbsoluteErrorConfig(name='AbsoluteError'),
-        ]
+        return {
+            "RMSE": RootMeanSquaredErrorConfig(),
+            "AbsoulteError": AbsoluteErrorConfig(),
+        }
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         return {}

@@ -4,26 +4,24 @@ from __future__ import annotations
 
 import unittest
 
-from explainaboard.metrics.nlg_meta_evaluation import (
-    CorrelationConfig,
-    KtauCorrelation,
-    KtauCorrelationConfig,
-    PearsonCorrelation,
-    PearsonCorrelationConfig,
+from explainaboard.metrics.meta_evaluation import (
+    CorrelationWMTDAConfig,
+    KtauCorrelationWMTDA,
+    KtauCorrelationWMTDAConfig,
+    PearsonCorrelationWMTDA,
+    PearsonCorrelationWMTDAConfig,
 )
 
 
 class CorrelationConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            CorrelationConfig(
-                "Correlation",
+            CorrelationWMTDAConfig(
                 group_by="system",
                 use_z_score=True,
                 no_human=True,
             ).serialize(),
             {
-                "name": "Correlation",
                 "source_language": None,
                 "target_language": None,
                 "group_by": "system",
@@ -34,16 +32,14 @@ class CorrelationConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            CorrelationConfig.deserialize(
+            CorrelationWMTDAConfig.deserialize(
                 {
-                    "name": "Correlation",
                     "group_by": "system",
                     "use_z_score": True,
                     "no_human": True,
                 }
             ),
-            CorrelationConfig(
-                "Correlation",
+            CorrelationWMTDAConfig(
                 group_by="system",
                 use_z_score=True,
                 no_human=True,
@@ -51,18 +47,16 @@ class CorrelationConfigTest(unittest.TestCase):
         )
 
 
-class KtauCorrelationConfigTest(unittest.TestCase):
+class KtauCorrelationWMTDAConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            KtauCorrelationConfig(
-                "KtauCorrelation",
+            KtauCorrelationWMTDAConfig(
                 group_by="system",
                 use_z_score=True,
                 no_human=True,
                 threshold=25,
             ).serialize(),
             {
-                "name": "KtauCorrelation",
                 "source_language": None,
                 "target_language": None,
                 "group_by": "system",
@@ -74,17 +68,15 @@ class KtauCorrelationConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            KtauCorrelationConfig.deserialize(
+            KtauCorrelationWMTDAConfig.deserialize(
                 {
-                    "name": "KtauCorrelation",
                     "group_by": "system",
                     "use_z_score": True,
                     "no_human": True,
                     "threshold": 25,
                 }
             ),
-            KtauCorrelationConfig(
-                "KtauCorrelation",
+            KtauCorrelationWMTDAConfig(
                 group_by="system",
                 use_z_score=True,
                 no_human=True,
@@ -94,22 +86,20 @@ class KtauCorrelationConfigTest(unittest.TestCase):
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            KtauCorrelationConfig("KtauCorrelation").to_metric(),
-            KtauCorrelation,
+            KtauCorrelationWMTDAConfig().to_metric(),
+            KtauCorrelationWMTDA,
         )
 
 
 class PearsonCorrelationConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            PearsonCorrelationConfig(
-                "PearsonCorrelation",
+            PearsonCorrelationWMTDAConfig(
                 group_by="system",
                 use_z_score=True,
                 no_human=True,
             ).serialize(),
             {
-                "name": "PearsonCorrelation",
                 "source_language": None,
                 "target_language": None,
                 "group_by": "system",
@@ -120,16 +110,14 @@ class PearsonCorrelationConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            PearsonCorrelationConfig.deserialize(
+            PearsonCorrelationWMTDAConfig.deserialize(
                 {
-                    "name": "PearsonCorrelation",
                     "group_by": "system",
                     "use_z_score": True,
                     "no_human": True,
                 }
             ),
-            PearsonCorrelationConfig(
-                "PearsonCorrelation",
+            PearsonCorrelationWMTDAConfig(
                 group_by="system",
                 use_z_score=True,
                 no_human=True,
@@ -138,6 +126,6 @@ class PearsonCorrelationConfigTest(unittest.TestCase):
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            PearsonCorrelationConfig("PearsonCorrelation").to_metric(),
-            PearsonCorrelation,
+            PearsonCorrelationWMTDAConfig().to_metric(),
+            PearsonCorrelationWMTDA,
         )

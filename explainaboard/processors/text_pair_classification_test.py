@@ -4,16 +4,16 @@ from __future__ import annotations
 
 import unittest
 
-from explainaboard import TaskType
-from explainaboard.processors.processor_registry import get_processor
+from explainaboard.constants import TaskType
+from explainaboard.processors.processor_factory import get_processor_class
 from explainaboard.processors.text_pair_classification import (
     TextPairClassificationProcessor,
 )
 
 
 class TextPairClassificationProcessorTest(unittest.TestCase):
-    def test_get_processor(self) -> None:
-        self.assertIsInstance(
-            get_processor(TaskType.text_pair_classification.value),
+    def test_get_processor_class(self) -> None:
+        self.assertIs(
+            get_processor_class(TaskType.text_pair_classification),
             TextPairClassificationProcessor,
         )

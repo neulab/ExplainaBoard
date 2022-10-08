@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
+    DatalabFileLoader,
     FileLoader,
     FileLoaderField,
     TextFileLoader,
     TSVFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.nlg_meta_evaluation)
-class NLGMetaEvaluationLoader(Loader):
+class MetaEvaluationWMTDALoader(Loader):
     """Loader for the natural language generation task.
 
     usage:
@@ -52,6 +50,22 @@ class NLGMetaEvaluationLoader(Loader):
                     FileLoaderField(6, target_field_names[6], float),
                     FileLoaderField(7, target_field_names[7], float),
                 ],
+            ),
+            FileType.datalab: DatalabFileLoader(
+                [
+                    FileLoaderField("sys_name_column", target_field_names[0], str),
+                    FileLoaderField("seg_id_column", target_field_names[1], str),
+                    FileLoaderField("test_set_column", target_field_names[2], str),
+                    FileLoaderField("source_column", target_field_names[3], str),
+                    FileLoaderField("reference_column", target_field_names[4], str),
+                    FileLoaderField("hypothesis_column", target_field_names[5], str),
+                    FileLoaderField(
+                        "manual_score_raw_column", target_field_names[6], str
+                    ),
+                    FileLoaderField(
+                        "manual_score_z_column", target_field_names[7], str
+                    ),
+                ]
             ),
         }
 

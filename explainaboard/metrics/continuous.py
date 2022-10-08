@@ -29,9 +29,7 @@ class RootMeanSquaredErrorConfig(MetricConfig):
 class RootMeanSquaredError(Metric):
     """Calculate the root mean squared error of continuous values."""
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         error = np.array([(x - y) for x, y in zip(true_data, pred_data)])
         squared_error = error * error
@@ -41,11 +39,13 @@ class RootMeanSquaredError(Metric):
         """See Metric.is_simple_average."""
         return False
 
-    def calc_metric_from_aggregate(
+    def _calc_metric_from_aggregate(
         self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
     ) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        return np.sqrt(agg_stats)
+        if agg_stats.shape[-1] != 1:
+            raise ValueError("Invalid shape for aggregate stats {agg_stats.shape}")
+        return np.sqrt(np.squeeze(agg_stats, axis=-1))
 
 
 @dataclass
@@ -61,9 +61,7 @@ class AbsoluteErrorConfig(MetricConfig):
 class AbsoluteError(Metric):
     """Calculate the absolute error of continuous values."""
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         error = np.array([abs(x - y) for x, y in zip(true_data, pred_data)])
         return SimpleMetricStats(error)

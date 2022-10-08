@@ -18,11 +18,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.extractive_qa import ExactMatchQAConfig, F1ScoreQAConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_extractive)
 class QAExtractiveProcessor(Processor):
     """A processor for the extractive QA task."""
 
@@ -96,26 +94,27 @@ class QAExtractiveProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         if source_language != target_language:
             raise ValueError(
                 'Source and target language must be equal for extractive '
                 f'QA, but got {source_language} and {target_language}'
             )
-        return [
-            F1ScoreQAConfig(
-                name='F1',
+        return {
+            "F1": F1ScoreQAConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-            ExactMatchQAConfig(
-                name='ExactMatch',
+            "ExactMatch": ExactMatchQAConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-        ]
+        }
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(

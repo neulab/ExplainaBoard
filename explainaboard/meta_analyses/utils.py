@@ -6,7 +6,7 @@ from typing import Any
 
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.typing_utils import narrow, unwrap
+from explainaboard.utils.typing_utils import narrow
 
 
 def report_to_sysout(report: SysOutputInfo) -> list[dict]:
@@ -19,7 +19,7 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
     """
     results_fine_grained = [
         narrow(BucketAnalysisResult, x)
-        for x in unwrap(report.results.analyses)
+        for x in report.results.analyses
         if isinstance(x, BucketAnalysisResult)
     ]
     meta_examples = []
@@ -30,13 +30,13 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
 
             # loop through and record all the metrics that describe this bucket
             example_features: dict[str, Any] = {}
-            for perf in bucket.performances:
+            for metric_name, perf in bucket.performances.items():
 
                 example_features['feature_name'] = feature_buckets.name
                 example_features['bucket_interval'] = bucket.bucket_interval
                 example_features['bucket_name'] = bucket.bucket_name
                 example_features['bucket_size'] = bucket.n_samples
-                example_features[perf.metric_name] = perf.value
+                example_features[metric_name] = perf.value
                 # example_features[f'{perf.metric_name}_CI'] = \
                 # [perf.confidence_score_low, perf.confidence_score_high]
 

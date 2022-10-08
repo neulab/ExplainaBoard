@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast, Optional
 
 import numpy as np
 
@@ -14,7 +13,7 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.utils.typing_utils import unwrap_or
+from explainaboard.utils.typing_utils import narrow
 
 
 @dataclass
@@ -40,9 +39,7 @@ class LogProb(Metric):
         """See Metric.is_simple_average."""
         return stats.num_statistics() == 1
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data.
 
         Takes in a list of floats (token-level), or list of lists of floats (sentence
@@ -56,14 +53,19 @@ class LogProb(Metric):
             t = type(pred_data[0])
             raise ValueError(f'Invalid type of pred_data for calc_stats_from_data {t}')
 
-    def calc_metric_from_aggregate(
-        self, agg_stats: np.ndarray, config: Optional[MetricConfig] = None
-    ) -> np.ndarray:
+    def _calc_metric_from_aggregate(self, agg_stats: np.ndarray) -> np.ndarray:
         """See Metric.calc_metric_from_aggregate."""
-        if agg_stats.ndim == 1:
+        is_batched = agg_stats.ndim != 1
+        if not is_batched:
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
-        config = cast(LogProbConfig, unwrap_or(config, self.config))
-        val = agg_stats if agg_stats.size == 1 else agg_stats[:, 0] / agg_stats[:, 1]
+        config = narrow(LogProbConfig, self.config)
+        val = (
+            agg_stats[:, 0]
+            if agg_stats.size == 1
+            else agg_stats[:, 0] / agg_stats[:, 1]
+        )
         if config.ppl:
             val = np.exp(-val)
+        if not is_batched:
+            val = val[0]
         return val

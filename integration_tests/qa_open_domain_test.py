@@ -3,9 +3,9 @@ import unittest
 
 from integration_tests.utils import test_artifacts_path
 
-from explainaboard import FileType, get_processor, Source, TaskType
+from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.loaders.loader_registry import get_loader_class
+from explainaboard.loaders.loader_factory import get_loader_class
 
 
 class QAOpenDomainTest(unittest.TestCase):
@@ -27,6 +27,6 @@ class QAOpenDomainTest(unittest.TestCase):
             "metric_names": ["ExactMatchQA"],
             "source_language": "en",
         }
-        processor = get_processor(TaskType.qa_open_domain.value)
+        processor = get_processor_class(TaskType.qa_open_domain)()
         sys_info = processor.process(metadata, data.samples, skip_failed_analyses=True)
-        self.assertIsNotNone(sys_info.results.analyses)
+        self.assertGreater(len(sys_info.results.analyses), 0)

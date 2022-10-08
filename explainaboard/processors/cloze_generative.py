@@ -23,11 +23,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import CorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.cloze_generative)
 class ClozeGenerativeProcessor(Processor):
     """A processor for the generative cloze task."""
 
@@ -108,16 +106,18 @@ class ClozeGenerativeProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            CorrectCountConfig(
-                name='CorrectCount',
+        return {
+            "CorrectCount": CorrectCountConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-        ]
+        }
 
     def _get_true_label(self, data_point):
         """See Processor._get_true_label."""

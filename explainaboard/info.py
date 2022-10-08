@@ -24,17 +24,6 @@ logger = get_logger(__name__)
 
 
 @dataclass
-class Table:
-    """A table of information.
-
-    Attributes:
-        table: A dictionary holding the table.
-    """
-
-    table: Optional[dict] = None
-
-
-@dataclass
 class PaperInfo:
     """Information about a paper.
 
@@ -84,14 +73,14 @@ class SysOutputInfo:
     target_language: str | None = None
     reload_stat: bool = True
     confidence_alpha: float = 0.05
-    system_details: Optional[dict] = None
+    system_details: dict[str, Any] = field(default_factory=dict)
     source_tokenizer: Optional[Tokenizer] = None
     target_tokenizer: Optional[Tokenizer] = None
-    analysis_levels: Optional[list[AnalysisLevel]] = None
-    analyses: Optional[list[Analysis]] = None
+    analysis_levels: list[AnalysisLevel] = field(default_factory=list)
+    analyses: list[Analysis] = field(default_factory=list)
 
     # set later
-    results: Result = field(default_factory=lambda: Result())
+    results: Result = field(default_factory=lambda: Result(overall={}, analyses=[]))
 
     def to_dict(self) -> dict:
         """Serialization function."""
@@ -273,4 +262,4 @@ class OverallStatistics:
 
     sys_info: SysOutputInfo
     analysis_cases: list[list[AnalysisCase]]
-    metric_stats: list[list[MetricStats]]
+    metric_stats: list[dict[str, MetricStats]]

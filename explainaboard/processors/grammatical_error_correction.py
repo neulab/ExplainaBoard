@@ -14,11 +14,9 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import SeqCorrectCountConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 
 
-@register_processor(TaskType.grammatical_error_correction)
-class GrammaticalErrorCorrection(Processor):
+class GrammaticalErrorCorrectionProcessor(Processor):
     """A processor for the grammatical error correction task."""
 
     @classmethod
@@ -69,10 +67,13 @@ class GrammaticalErrorCorrection(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [SeqCorrectCountConfig(name='SeqCorrectCount')]
+        return {"SeqCorrectCount": SeqCorrectCountConfig()}
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
 

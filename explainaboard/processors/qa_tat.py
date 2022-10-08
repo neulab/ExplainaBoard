@@ -20,11 +20,9 @@ from explainaboard.metrics.qa_table_text_hybrid import (
     F1ScoreQATatConfig,
 )
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.qa_tat)
 class QATatProcessor(Processor):
     """A processor for the TAT-QA dataset."""
 
@@ -122,21 +120,22 @@ class QATatProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [
-            ExactMatchQATatConfig(
-                name='ExactMatchQATat',
+        return {
+            "ExactMatchQATat": ExactMatchQATatConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-            F1ScoreQATatConfig(
-                name='F1ScoreQATat',
+            "F1ScoreQATat": F1ScoreQATatConfig(
                 source_language=source_language,
                 target_language=target_language,
             ),
-        ]
+        }
 
     def _get_true_label(self, data_point):
         """See processor._get_true_label."""

@@ -1,12 +1,12 @@
 # Programmatic Interface
 
 Below is some example code that demonstrates how you can access ExplainaBoard programmatically.
-You can see more about the supported tasks and data formats in 
+You can see more about the supported tasks and data formats in
 
 You can process an existing dataset, such as `sst2`:
 
 ```python
-from explainaboard import TaskType, get_loader_class, get_processor
+from explainaboard import TaskType, get_loader_class, get_processor_class
 # using a dataset we provide (datalab)
 loader = get_loader_class(TaskType.text_classification).from_datalab(
     dataset=DatalabLoaderOption("sst2"),
@@ -15,7 +15,7 @@ loader = get_loader_class(TaskType.text_classification).from_datalab(
     output_file_type=FileType.text,
 )
 data = loader.load().samples
-processor = get_processor(TaskType.text_classification)
+processor = get_processor_class(TaskType.text_classification)()
 analysis = processor.process(metadata={}, sys_output=data)
 analysis.write_to_directory("./")
 ```
@@ -27,7 +27,7 @@ dataset = "./integration_tests/artifacts/summarization/dataset.tsv"
 output = "./integration_tests/artifacts/summarization/output.tsv"
 loader = get_loader_class(TaskType.summarization)(dataset_data=dataset, output_data=output)
 data = loader.load()
-processor = get_processor(TaskType.summarization)
+processor = get_processor_class(TaskType.summarization)()
 analysis = processor.process(metadata={}, sys_output=data)
 analysis.write_to_directory("./")
 ```

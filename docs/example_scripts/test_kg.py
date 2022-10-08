@@ -1,6 +1,6 @@
 from typing import cast
 
-from explainaboard import get_loader_class, get_processor, TaskType
+from explainaboard import get_loader_class, get_processor_class, TaskType
 
 # This code details (1) how to evaluate your systems using ExplainaBoard
 # programmatically (2)how to collect different results
@@ -15,11 +15,11 @@ task = TaskType.kg_link_tail_prediction
 loader = get_loader_class(task)(dataset, dataset)
 data = loader.load()
 # Initialize the processor and perform the processing
-processor = get_processor(TaskType.kg_link_tail_prediction.value)
+processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 sys_info = processor.process(metadata={}, sys_output=data.samples)
 
-fine_grained_res = unwrap(sys_info.results.analyses)
-overall_res = unwrap(sys_info.results.overall)
+fine_grained_res = sys_info.results.analyses
+overall_res = sys_info.results.overall
 
 # print bucket information
 for analysis in fine_grained_res:
@@ -31,9 +31,7 @@ sys_info.print_as_json(file=open("./report.json", 'w'))
 
 
 # get overall results of different metrics
-for metric_info in unwrap(sys_info.results.overall)[0]:
-
-    name = metric_info.metric_name
+for name, metric_info in sys_info.results.overall["example"].items():
     value = metric_info.value
     confidence_score_low = metric_info.confidence_score_low
     confidence_score_high = metric_info.confidence_score_high
@@ -50,8 +48,7 @@ for metric_info in unwrap(sys_info.results.overall)[0]:
 for analyses in fine_grained_res:
     buckets = cast(BucketAnalysisResult, analyses)
     for bucket_info in buckets.bucket_performances:
-        for bucket_performance in bucket_info.performances:
-            metric_name = bucket_performance.metric_name
+        for metric_name, bucket_performance in bucket_info.performances.items():
             value = bucket_performance.value
             confidence_score_low = bucket_performance.confidence_score_low
             confidence_score_high = bucket_performance.confidence_score_high
