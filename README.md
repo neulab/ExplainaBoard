@@ -1,15 +1,12 @@
 # ExplainaBoard: An Explainable Leaderboard for NLP
 
-<p align="center">
-  <img src="./fig/logo-full-v2.png" width="800" class="center">
-  <br />
-  <br />
-  <a href="https://github.com/neulab/ExplainaBoard/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/neulab/ExplainaBoard" /></a>
-  <a href="https://github.com/neulab/ExplainaBoard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/neulab/ExplainaBoard" /></a>
-  <a href="https://pypi.org/project//"><img alt="PyPI" src="https://img.shields.io/pypi/v/explainaboard" /></a>
-  <a href="https://github.com/psf/black"><img alt="Code Style" src="https://img.shields.io/badge/code%20style-black-black" /></a>
-  <a href=".github/workflows/ci.yml"><img alt="Integration Tests" src="https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push" /></a>
-</p>
+<img src="./fig/logo-full-v2.png" width="800" class="center">
+
+[![License](https://img.shields.io/github/license/neulab/ExplainaBoard)](https://github.com/neulab/ExplainaBoard/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/neulab/ExplainaBoard)](https://github.com/neulab/ExplainaBoard/stargazers)
+[![PyPI](https://img.shields.io/pypi/v/explainaboard)](https://pypi.org/project/explainaboard/)
+[![Code Style](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
+[![Integration Tests](https://github.com/neulab/ExplainaBoard/actions/workflows/ci.yml/badge.svg?event=push)](.github/workflows/ci.yml)
 
 ## What is ExplainaBoard?
 

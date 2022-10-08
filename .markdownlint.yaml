@@ -8,8 +8,12 @@ MD024:
   # Allow multiple headings with the same content
   siblings_only: true
 
-# TODO(tetsuok): Re-enable once the existing issues are fixed.
-MD033: false
+MD033:
+  # Allows the following tags becasue there is no reasonable counterpart in Markdown.
+  # The <a> tag can be used to use an image as a link. The <img> tag can be used to
+  # change image size. Note that there is no standardized way to change image size in
+  # Markdown yet.
+  allowed_elements: [a, img]
 
 # TODO(tetsuok): Re-enable once the existing issues are fixed.
 MD036: false
