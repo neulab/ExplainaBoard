@@ -46,13 +46,13 @@ then all system outputs in the folder `./data/system_outputs/multilingual/json/m
 
  will be processed automatically, and two types of files will be generated:
 
-#### (1) analysis reports
+### (1) analysis reports
 
 * include both overall results and fine-grained analysis of a system
 * `json` format
 * in the folder `output/reports`
 
-#### (2) historgram figures
+### (2) historgram figures
 
 * each figure could be regarded as a visualization of corresponding analysis report, that provides fine-grained evaluation
    results for a system along certain feature (e.g., sentence length)
@@ -116,32 +116,32 @@ then you will get:
 
 ```
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xnli 
+Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       ar      en      es      zh
 Accuracy:       0.696   0.787   0.768   0.731
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: marc 
+Model: CL-mlpp15out1sum, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.915   0.934   0.926   0.915   0.871
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xquad 
+Model: CL-mlpp15out1sum, Dataset: xquad
 Language:       en      es      zh
 F1ScoreQA:      0.824   0.782   0.816
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xnli 
+Model: CL-mt5base, Dataset: xnli
 Language:       de      en      es      zh
 Accuracy:       0.721   0.768   0.738   0.712
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: marc 
+Model: CL-mt5base, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.920   0.934   0.933   0.914   0.868
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xquad 
+Model: CL-mt5base, Dataset: xquad
 Language:       en      es      zh
 F1ScoreQA:      0.812   0.782   0.816
 ```
@@ -159,25 +159,25 @@ Then, following results will be obtained:
 
 ```
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xnli 
+Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       ar      en      es      zh
 Accuracy:       0.696   0.787   0.768   0.731
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: marc 
+Model: CL-mlpp15out1sum, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.915   0.934   0.926   0.915   0.871
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xnli 
+Model: CL-mt5base, Dataset: xnli
 Language:       de      en      es      zh
 Accuracy:       0.721   0.768   0.738   0.712
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: marc 
+Model: CL-mt5base, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.920   0.934   0.933   0.914   0.868
-```  
+```
 
 ### Aggregated Results based on Customized "Query"
 
@@ -192,32 +192,32 @@ Then following results will be printed:
 
 ```
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xnli 
+Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       all_languages
 Accuracy:       0.746
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: marc 
+Model: CL-mlpp15out1sum, Dataset: marc
 Language:       all_languages
 Accuracy:       0.916
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xquad 
+Model: CL-mlpp15out1sum, Dataset: xquad
 Language:       all_languages
 F1ScoreQA:      0.807
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xnli 
+Model: CL-mt5base, Dataset: xnli
 Language:       all_languages
 Accuracy:       0.735
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: marc 
+Model: CL-mt5base, Dataset: marc
 Language:       all_languages
 Accuracy:       0.917
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xquad 
+Model: CL-mt5base, Dataset: xquad
 Language:       all_languages
 F1ScoreQA:      0.803
 ```
@@ -237,12 +237,12 @@ Then following results will be printed:
 
 ```
 ----------------------------------------
-Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: marc 
+Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: marc
 Language:       de      zh      fr      ja      es      en
 Accuracy:       -0.000  0.003   -0.007  0.001   0.000   -0.005
 
 ----------------------------------------
-Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: xnli 
+Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: xnli
 Language:       es      en      zh
 Accuracy:       0.030   0.020   0.019
 ```
