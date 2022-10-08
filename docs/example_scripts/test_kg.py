@@ -6,6 +6,7 @@ from explainaboard import get_loader_class, get_processor_class, TaskType
 # programmatically (2)how to collect different results
 # Load the data
 from explainaboard.analysis.analyses import BucketAnalysisResult
+from explainaboard.metrics.metric import ConfidenceInterval, Score
 from explainaboard.utils.typing_utils import unwrap
 
 dataset = (
@@ -31,37 +32,35 @@ sys_info.print_as_json(file=open("./report.json", 'w'))
 
 
 # get overall results of different metrics
-for name, metric_info in sys_info.results.overall["example"].items():
-    value = metric_info.value
-    confidence_score_low = metric_info.confidence_score_low
-    confidence_score_high = metric_info.confidence_score_high
+for name, metric_result in sys_info.results.overall["example"].items():
+    value = metric_result.get_value(Score, "score").value
+    ci = metric_result.get_value_or_none(ConfidenceInterval, "score_ci")
 
     print(
         f"metric_name:{name}\n"
         f"value:{value}\n"
-        f"confidence_score_low:{confidence_score_low}\n"
-        f"confidence_score_high:{confidence_score_high}\n"
+        f"confidence_score_low:{ci.low if ci is not None else None}\n"
+        f"confidence_score_high:{ci.high if ci is not None else None}\n"
     )
 
 
 # get fine-grained results
 for analyses in fine_grained_res:
     buckets = cast(BucketAnalysisResult, analyses)
-    for bucket_info in buckets.bucket_performances:
-        for metric_name, bucket_performance in bucket_info.performances.items():
-            value = bucket_performance.value
-            confidence_score_low = bucket_performance.confidence_score_low
-            confidence_score_high = bucket_performance.confidence_score_high
+    for bucket_performance in buckets.bucket_performances:
+        for metric_name, metric_result in bucket_performance.results.items():
+            value = metric_result.get_value(Score, "score").value
+            ci = metric_result.get_value_or_none(ConfidenceInterval, "score_ci")
 
             print("------------------------------------------------------")
 
-            bucket_name = unwrap(bucket_info.bucket_name)
+            bucket_name = unwrap(bucket_performance.bucket_name)
             print(f"feature_name:{buckets.name} bucket_name:{bucket_name}")
 
             print(
                 "\n"
                 f"metric_name:{metric_name}\n"
                 f"value:{value}\n"
-                f"confidence_score_low:{confidence_score_low}\n"
-                f"confidence_score_high:{confidence_score_high}\n"
+                f"confidence_score_low:{ci.low if ci is not None else None}\n"
+                f"confidence_score_high:{ci.high if ci is not None else None}\n"
             )
