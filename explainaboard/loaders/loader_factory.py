@@ -25,12 +25,12 @@ from explainaboard.loaders.qa_extractive import QAExtractiveLoader
 from explainaboard.loaders.qa_multiple_choice import QAMultipleChoiceLoader
 from explainaboard.loaders.qa_open_domain import QAOpenDomainLoader
 from explainaboard.loaders.qa_tat import QATatLoader
+from explainaboard.loaders.ranking import RankingwithContextLoader
 from explainaboard.loaders.sequence_labeling import SeqLabLoader
 from explainaboard.loaders.tabular_classification import TabularClassificationLoader
 from explainaboard.loaders.tabular_regression import TabularRegressionLoader
 from explainaboard.loaders.text_classification import TextClassificationLoader
 from explainaboard.loaders.text_pair_classification import TextPairClassificationLoader
-from explainaboard.loaders.ranking import RankingwithContextLoader
 
 _LOADERS: dict[TaskType, type[Loader]] = {
     TaskType.argument_pair_extraction: ArgumentPairExtractionLoader,
