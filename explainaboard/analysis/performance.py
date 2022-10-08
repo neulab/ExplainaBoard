@@ -47,7 +47,7 @@ class BucketPerformance:
         """
         serializer = PrimitiveSerializer()
 
-        if k == 'performances':
+        if k == 'results':
             return {
                 name: narrow(MetricResult, serializer.deserialize(v1))
                 for name, v1 in v.items()

@@ -105,7 +105,7 @@ class NERTest(unittest.TestCase):
 
         # 5. Unittest: test detailed bucket information: metric
         self.assertAlmostEqual(
-            unwrap(second_bucket.results["F1"].get_score(Score, "score")).value,
+            unwrap(second_bucket.results["F1"].get_value(Score, "score")).value,
             0.9121588089330025,
             4,
         )

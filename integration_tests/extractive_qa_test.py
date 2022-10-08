@@ -5,6 +5,7 @@ from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.loader_factory import get_loader_class
+from explainaboard.metrics.metric import Score
 
 
 class ExtractiveQATest(unittest.TestCase):
@@ -45,8 +46,12 @@ class ExtractiveQATest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.analyses), 0)
         overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
-        self.assertAlmostEqual(overall["ExactMatch"].value, 0.6974789915966386, 2)
-        self.assertAlmostEqual(overall["F1"].value, 0.8235975260931867, 2)
+        self.assertAlmostEqual(
+            overall["ExactMatch"].get_value(Score, "score").value, 0.6974789915966386, 2
+        )
+        self.assertAlmostEqual(
+            overall["F1"].get_value(Score, "score").value, 0.8235975260931867, 2
+        )
 
     def test_extractive_qa_zh(self):
         json_zh_dataset = os.path.join(self.artifact_path, "dataset-xquad-zh.json")
@@ -75,5 +80,9 @@ class ExtractiveQATest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.analyses), 0)
         overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
-        self.assertAlmostEqual(overall["ExactMatch"].value, 0.6285714285714286, 2)
-        self.assertAlmostEqual(overall["F1"].value, 0.7559651817716333, 2)
+        self.assertAlmostEqual(
+            overall["ExactMatch"].get_value(Score, "score").value, 0.6285714285714286, 2
+        )
+        self.assertAlmostEqual(
+            overall["F1"].get_value(Score, "score").value, 0.7559651817716333, 2
+        )

@@ -416,21 +416,6 @@ class Processor(metaclass=abc.ABCMeta):
     ) -> None:
         """Sorts the `performance_over_bucket` dictionary.
 
-        It should be of the format
-        {
-            feature_name_1: {
-                (bucket_1_interval_low, bucket_1_interval_up): BucketPerformance(
-                    performances = [
-                        Performance(metric_name = performance1),
-                        ...,
-                        Performance(metric_name = performancen)
-                    ]
-                ),
-                ...
-            },
-            ...
-        }
-
         Args:
             analysis_results: A list of analysis results.
             sort_by: 'key', 'performance_value', or 'n_bucket_samples';
