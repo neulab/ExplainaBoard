@@ -1,7 +1,4 @@
 # TODO(tetsuok): Re-enable once the existing issues are fixed.
-MD001: false
-
-# TODO(tetsuok): Re-enable once the existing issues are fixed.
 MD013: false
   # Number of characters
   # line_length: 88
