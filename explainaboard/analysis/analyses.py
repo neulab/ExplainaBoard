@@ -195,7 +195,7 @@ class BucketAnalysisResult(AnalysisResult):
 
             for bucket_perf in self.bucket_performances:
                 metric_result = bucket_perf.results[metric_name]
-                metric_value = unwrap(metric_result.get_value(Score, "score")).value
+                metric_value = metric_result.get_value(Score, "score").value
 
                 if bucket_perf.bucket_interval is not None:
                     bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"

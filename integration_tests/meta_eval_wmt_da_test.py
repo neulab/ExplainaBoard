@@ -1,6 +1,5 @@
 import os
 import unittest
-from explainaboard.metrics.metric import Score
 
 from integration_tests.utils import test_artifacts_path
 import numpy as np
@@ -13,6 +12,7 @@ from explainaboard import (
     TaskType,
 )
 from explainaboard.metrics.meta_evaluation import CorrelationNLG, CorrelationNLGConfig
+from explainaboard.metrics.metric import Score
 from explainaboard.utils.typing_utils import narrow, unwrap
 
 
@@ -43,11 +43,9 @@ class MetaEvalWMTDATest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
-            unwrap(
-                sys_info.results.overall["example"]["SegKtauCorr"].get_value(
-                    Score, "score"
-                )
-            ).value,
+            sys_info.results.overall["example"]["SegKtauCorr"]
+            .get_value(Score, "score")
+            .value,
             -0.0169,
             3,
         )

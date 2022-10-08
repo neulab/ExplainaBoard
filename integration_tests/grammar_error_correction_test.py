@@ -1,13 +1,12 @@
 import os
 import unittest
-from explainaboard.metrics.metric import Score
-from explainaboard.utils.typing_utils import unwrap
 
 from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_factory import get_loader_class
+from explainaboard.metrics.metric import Score
 
 
 class GrammarErrorCorrectionTest(unittest.TestCase):
@@ -32,11 +31,9 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
         processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
         self.assertAlmostEqual(
-            unwrap(
-                sys_info.results.overall["example"]["SeqCorrectCount"].get_value(
-                    Score, "score"
-                )
-            ).value,
+            sys_info.results.overall["example"]["SeqCorrectCount"]
+            .get_value(Score, "score")
+            .value,
             8,
         )
         self.assertGreater(len(sys_info.results.analyses), 0)

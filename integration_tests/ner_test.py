@@ -2,7 +2,6 @@ import dataclasses
 import os
 from typing import cast
 import unittest
-from explainaboard.metrics.metric import ConfidenceInterval, Score
 
 from integration_tests.utils import test_artifacts_path
 
@@ -10,6 +9,7 @@ from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_factory import get_loader_class
+from explainaboard.metrics.metric import ConfidenceInterval, Score
 from explainaboard.utils import cache_api
 from explainaboard.utils.typing_utils import unwrap
 
@@ -115,7 +115,7 @@ class NERTest(unittest.TestCase):
                 continue
             for bucket in bucket_vals.bucket_performances:
                 for result in bucket.results.values():
-                    ci = result.get_value(ConfidenceInterval, "score_ci")
+                    ci = result.get_value_or_none(ConfidenceInterval, "score_ci")
                     if ci is not None:
                         value = unwrap(result.get_value(Score, "score")).value
                         self.assertGreaterEqual(value, ci.low)

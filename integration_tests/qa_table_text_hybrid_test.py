@@ -5,7 +5,6 @@ from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.metrics.metric import Score
 from explainaboard.utils import cache_api
-from explainaboard.utils.typing_utils import unwrap
 
 
 class QATableTextHybridTest(unittest.TestCase):
@@ -35,11 +34,9 @@ class QATableTextHybridTest(unittest.TestCase):
 
         self.assertGreater(len(sys_info.results.overall), 0)
         self.assertAlmostEqual(
-            unwrap(
-                sys_info.results.overall["example"]["ExactMatchQATat"].get_value(
-                    Score, "score"
-                )
-            ).value,
+            sys_info.results.overall["example"]["ExactMatchQATat"]
+            .get_value(Score, "score")
+            .value,
             0.746978,
             3,
         )

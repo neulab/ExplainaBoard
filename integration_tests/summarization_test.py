@@ -1,6 +1,5 @@
 import os
 import unittest
-from explainaboard.metrics.metric import Score
 
 from integration_tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 import numpy as np
@@ -9,8 +8,8 @@ from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.metrics.external_eval import ExternalEvalConfig
+from explainaboard.metrics.metric import Score
 from explainaboard.utils import cache_api
-from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class SummarizationTest(unittest.TestCase):
@@ -144,5 +143,5 @@ class SummarizationTest(unittest.TestCase):
             ].items()
             if metric_name == "LikertScore_fluency"
         ][0]
-        self.assertEqual(unwrap(fluency.get_value(Score, "score")).value, 2.0)
-        self.assertEqual(unwrap(fluency.get_value(Score, "agreement")).value, 1.0)
+        self.assertEqual(fluency.get_value(Score, "score").value, 2.0)
+        self.assertEqual(fluency.get_value(Score, "agreement").value, 1.0)

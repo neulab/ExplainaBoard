@@ -8,7 +8,6 @@ from explainaboard.analysis.performance import BucketPerformance
 from explainaboard.analysis.result import Result
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import MetricResult, Score
-from explainaboard.utils.typing_utils import unwrap
 
 
 def _diff_overall(
@@ -25,8 +24,12 @@ def _diff_overall(
     """
     return {
         k: MetricResult(
-            unwrap(sys1[k].get_value(Score, "score")).value
-            - unwrap(sys2[k].get_value(Score, "score")).value
+            {
+                "score": Score(
+                    sys1[k].get_value(Score, "score").value
+                    - sys2[k].get_value(Score, "score").value
+                )
+            }
         )
         for k in sys1
     }
@@ -70,7 +73,7 @@ def get_pairwise_performance_gap(
                     BucketPerformance(
                         n_samples=bp1.n_samples,
                         bucket_samples=bp1.bucket_samples[:],
-                        performances=_diff_overall(bp1.performances, bp2.performances),
+                        results=_diff_overall(bp1.results, bp2.results),
                         bucket_interval=bp1.bucket_interval,
                         bucket_name=bp1.bucket_name,
                     )
