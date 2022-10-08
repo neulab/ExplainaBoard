@@ -188,6 +188,8 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci: tuple[float, float] = unwrap(
             corr_metric.calc_confidence_interval(stats, 0.05)
         )
+        # TODO: This check could be made more rigorous by checking whether the
+        #       confidence interval lies within a reasonable range
         self.assertGreater(val, ci[0])
         self.assertGreater(ci[1], val)
 
@@ -205,6 +207,8 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci: tuple[float, float] = unwrap(
             corr_metric.calc_confidence_interval(stats, 0.05)
         )
+        # TODO: This check could be made more rigorous by checking whether the
+        #       confidence interval lies within a reasonable range
         self.assertGreater(val, ci[0])
         self.assertGreater(ci[1], val)
 
