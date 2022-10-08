@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -12,18 +11,15 @@ from explainaboard.loaders.file_loader import (
     TextFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.argument_pair_identification)
-@register_loader(TaskType.ranking)
-class RankingLoader(Loader):
+class RankingwithContextLoader(Loader):
     """Loaders for the ranking tasks, such as argument pair identification."""
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         """See Loader.default_dataset_file_type."""
-        target_field_names = ["context", "utterance", "true_label"]
+        target_field_names = ["context", "query", "true_label"]
         return {
             FileType.datalab: DatalabFileLoader(
                 [

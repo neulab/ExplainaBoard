@@ -6,6 +6,9 @@ from explainaboard import TaskType
 from explainaboard.processors.argument_pair_extraction import (
     ArgumentPairExtractionProcessor,
 )
+from explainaboard.processors.argument_pair_identification import (
+    ArgumentPairIdentificationProcessor,
+)
 from explainaboard.processors.aspect_based_sentiment_classification import (
     AspectBasedSentimentClassificationProcessor,
 )
@@ -66,6 +69,8 @@ _TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
     TaskType.tabular_classification: TabularClassificationProcessor,
     TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
     TaskType.meta_evaluation_nlg: MetaEvaluationNLGProcessor,
+    TaskType.argument_pair_identification: ArgumentPairIdentificationProcessor,
+    TaskType.ranking_with_context: ArgumentPairIdentificationProcessor,
 }
 
 

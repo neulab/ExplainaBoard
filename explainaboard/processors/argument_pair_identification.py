@@ -20,25 +20,23 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.accuracy import AccuracyConfig
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.argument_pair_identification)
 class ArgumentPairIdentificationProcessor(Processor):
     """A processor for the argument pair identification task."""
 
     @classmethod
     def task_type(cls) -> TaskType:
         """See Processor.task_type."""
-        return TaskType.ranking
+        return TaskType.argument_pair_identification
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
         features: dict[str, FeatureType] = {
             "context": feature.Value(dtype=feature.DataType.STRING),
-            "utterance": feature.Sequence(
+            "query": feature.Sequence(
                 feature=feature.Value(dtype=feature.DataType.STRING)
             ),
             "true_label": feature.Value(dtype=feature.DataType.STRING),
@@ -51,11 +49,11 @@ class ArgumentPairIdentificationProcessor(Processor):
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['context']),
             ),
-            "utterance_length": feature.Value(
+            "query_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
-                description="the length in tokens of true utterance",
+                description="the length in tokens of true query",
                 func=lambda info, x, c: count_tokens(
-                    info, x['utterance'][int(x['true_label'])]
+                    info, x['query'][int(x['true_label'])]
                 ),
             ),
             "num_oov": feature.Value(
@@ -104,9 +102,9 @@ class ArgumentPairIdentificationProcessor(Processor):
     @classmethod
     def default_metrics(
         cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
+    ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
-        return [AccuracyConfig(name='Accuracy')]
+        return {"Accuracy": AccuracyConfig()}
 
     def _statistics_func(
         self, samples: Iterable[Any], sys_info: SysOutputInfo
