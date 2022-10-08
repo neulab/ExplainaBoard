@@ -155,7 +155,7 @@ class MetricResultTest(unittest.TestCase):
 
         result = MetricResult({"bar": score, "baz": ci})
 
-        # get_value() should return existing objects.
+        # get_value_or_none() should return existing objects.
         self.assertIsNone(result.get_value_or_none(Score, "foo"))
         self.assertIs(result.get_value_or_none(Score, "bar"), score)
         self.assertIsNone(result.get_value_or_none(Score, "baz"))
@@ -370,7 +370,7 @@ class MetricTest(unittest.TestCase):
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
-        ci = unwrap(result.get_value(ConfidenceInterval, "score_ci"))
+        ci = result.get_value(ConfidenceInterval, "score_ci")
         print(dataclasses.asdict(ci))
         # TODO(odahsi): According to the current default settings of bootstrapping,
         # estimated confidence intervals tends to become very wide for small data

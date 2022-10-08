@@ -15,7 +15,6 @@ import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
 from explainaboard.metrics.metric import Score
 import explainaboard.metrics.ranking
-from explainaboard.utils.typing_utils import unwrap
 
 
 class MetricTest(unittest.TestCase):
@@ -90,27 +89,25 @@ class MetricTest(unittest.TestCase):
                 # EaaS-returned value should be same as explainaboard-calculated value
                 self.assertAlmostEqual(
                     full_result['scores'][i]['corpus'],
-                    unwrap(
-                        metric.evaluate_from_stats(full_stats).get_value(Score, "score")
-                    ).value,
+                    metric.evaluate_from_stats(full_stats)
+                    .get_value(Score, "score")
+                    .value,
                 )
                 self.assertAlmostEqual(
                     half_result['scores'][i]['corpus'],
-                    unwrap(
-                        metric.evaluate_from_stats(half_stats).get_value(Score, "score")
-                    ).value,
+                    metric.evaluate_from_stats(half_stats)
+                    .get_value(Score, "score")
+                    .value,
                 )
                 # Stats calculated over half corpus should be the same as the stats
                 # split away from the full corpus
                 self.assertAlmostEqual(
-                    unwrap(
-                        metric.evaluate_from_stats(half_stats).get_value(Score, "score")
-                    ).value,
-                    unwrap(
-                        metric.evaluate_from_stats(split_stats).get_value(
-                            Score, "score"
-                        )
-                    ).value,
+                    metric.evaluate_from_stats(half_stats)
+                    .get_value(Score, "score")
+                    .value,
+                    metric.evaluate_from_stats(split_stats)
+                    .get_value(Score, "score")
+                    .value,
                 )
 
     def test_qa_metrics(self) -> None:
@@ -145,10 +142,10 @@ class MetricTest(unittest.TestCase):
         overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
         self.assertAlmostEqual(
-            unwrap(overall["ExactMatch"].get_value(Score, "score")).value,
+            overall["ExactMatch"].get_value(Score, "score").value,
             0.6974789915966386,
             2,
         )
         self.assertAlmostEqual(
-            unwrap(overall["F1"].get_value(Score, "score")).value, 0.8235975260931867, 2
+            overall["F1"].get_value(Score, "score").value, 0.8235975260931867, 2
         )

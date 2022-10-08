@@ -22,13 +22,7 @@ from explainaboard.analysis.feature import DataType, FeatureType, Value
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
-from explainaboard.metrics.metric import (
-    ConfidenceInterval,
-    MetricConfig,
-    MetricResult,
-    MetricStats,
-    Score,
-)
+from explainaboard.metrics.metric import MetricConfig, MetricResult, MetricStats, Score
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -471,9 +465,9 @@ class Processor(metaclass=abc.ABCMeta):
                 if sort_by_metric is None:
                     raise ValueError("sort_by_metric must be set.")
                 bucket_result.sort(
-                    key=lambda x: unwrap(
-                        x.results[sort_by_metric].get_value(Score, "score")
-                    ).value,
+                    key=lambda x: x.results[cast(str, sort_by_metric)]
+                    .get_value(Score, "score")
+                    .value,
                     reverse=not sort_ascending,
                 )
             # sort by the number of samples in each bucket
