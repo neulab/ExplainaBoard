@@ -61,7 +61,7 @@ class TextPairClassificationProcessor(Processor):
                 description="the confidence of the predicted label",
                 max_value=1.0,
                 min_value=0.0,
-                skippable=True,
+                optional=True,
             ),
             "text1_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
@@ -129,13 +129,13 @@ class TextPairClassificationProcessor(Processor):
                 description=features['true_label'].description,
                 feature="true_label",
                 method="discrete",
-                number=15,
+                num_buckets=15,
             ),
             CalibrationAnalysis(
                 level="example",
                 description="calibration analysis",
                 feature="confidence",
-                number=10,
+                num_buckets=10,
             ),
             ComboCountAnalysis(
                 level="example",

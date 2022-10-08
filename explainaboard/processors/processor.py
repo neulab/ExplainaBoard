@@ -85,7 +85,7 @@ class Processor(metaclass=abc.ABCMeta):
                 if (
                     isinstance(v, Value)
                     and v.dtype == DataType.FLOAT
-                    and not v.skippable
+                    and not v.optional
                 ):
                     analyses.append(
                         BucketAnalysis(
@@ -374,7 +374,7 @@ class Processor(metaclass=abc.ABCMeta):
         ):
             case = AnalysisCase(sample_id=i, features={})
             for feat_name, feat_spec in analysis_level.features.items():
-                if feat_name not in output and feat_spec.skippable:
+                if feat_name not in output and feat_spec.optional:
                     continue
                 if feat_spec.func is None:
                     case.features[feat_name] = output[feat_name]

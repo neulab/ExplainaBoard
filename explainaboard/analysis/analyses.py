@@ -114,7 +114,7 @@ class Analysis(metaclass=abc.ABCMeta):
                 level=dikt['level'],
                 feature=dikt['feature'],
                 method=dikt.get('method', 'continuous'),
-                number=dikt.get('num_buckets', 4),
+                num_buckets=dikt.get('num_buckets', 4),
                 setting=dikt.get('setting'),
                 sample_limit=dikt.get('sample_limit', 50),
             )
@@ -129,7 +129,7 @@ class Analysis(metaclass=abc.ABCMeta):
                 description=dikt.get('description'),
                 level=dikt['level'],
                 feature=dikt['feature'],
-                number=dikt.get('num_buckets', 10),
+                num_buckets=dikt.get('num_buckets', 10),
                 sample_limit=dikt.get('sample_limit', 50),
             )
 
@@ -234,7 +234,7 @@ class BucketAnalysis(Analysis):
     Attributes:
         feature: the name of the feature to bucket
         method: the bucket strategy, can be "continuous", "discrete", or "fixed"
-        number: the number of buckets to be used
+        num_buckets: the number of buckets to be used
         setting: parameters of bucketing, varying by `method`
         sample_limit: an upper limit on the number of samples saved in each bucket.
         cls_name: the name of the class.
@@ -242,7 +242,7 @@ class BucketAnalysis(Analysis):
 
     feature: str
     method: str = "continuous"
-    number: int = 4
+    num_buckets: int = 4
     setting: Any = None  # For different bucket_methods, the settings are diverse
     sample_limit: int = 50
     cls_name: Optional[str] = None
@@ -272,7 +272,7 @@ class BucketAnalysis(Analysis):
 
         samples_over_bucket = bucket_func(
             sample_features=[(x, x.features[self.feature]) for x in cases],
-            bucket_number=self.number,
+            bucket_number=self.num_buckets,
             bucket_setting=self.setting,
         )
 
@@ -345,8 +345,10 @@ class CalibrationAnalysisResult(AnalysisResult):
         bucket_performances: A list of performances bucket-by-bucket, including the
           interval over which the bucket is calculated, the Accuracy performance, and
           the average confidence as Accuracy performance's auxiliary result.
-        expected_calibration_error
-        maximum_calibration_error
+        expected_calibration_error: calibration error that measures the difference in
+          expectation between confidence and accuracy.
+        maximum_calibration_error: calibration error that meausre the worst-case
+          deviation between confidence and accuracy.
         cls_name: The name of the class.
     """
 
@@ -373,14 +375,21 @@ class CalibrationAnalysisResult(AnalysisResult):
 
     def __post_init__(self):
         """Set the class name and validate."""
-        metric_names = self.bucket_performances[0].performances.keys()
-
         for bucket_perf in self.bucket_performances:
-            if bucket_perf.performances.keys() != metric_names:
+            accuracy_performance = bucket_perf.performances.get("Accuracy", None)
+            if not accuracy_performance:
                 raise ValueError(
-                    "Inconsistent metrics. "
-                    f"Required: {set(metric_names)}, "
+                    "Wrong metrics. "
+                    "Required: Accuracy, "
                     f"got: {set(bucket_perf.performances.keys())}"
+                )
+            if not isinstance(
+                accuracy_performance.auxiliary_result, ConfidenceMetricResult
+            ):
+                raise ValueError(
+                    "Wrong accuracy auxiliary result. "
+                    "Required: ConfidenceMetricResult, "
+                    f"got: {type(accuracy_performance.auxiliary_result)}"
                 )
 
         self.cls_name: str = self.__class__.__name__
@@ -411,7 +420,7 @@ class CalibrationAnalysisResult(AnalysisResult):
 
         texts.append(f"expected_calibration_error\t{self.expected_calibration_error}")
         texts.append(f"maximum_calibration_error\t{self.maximum_calibration_error}")
-
+        texts.append('')
         return "\n".join(texts)
 
 
@@ -425,23 +434,25 @@ class CalibrationAnalysis(Analysis):
 
     Attributes:
         feature: the name of the confidence feature
-        number: the number of buckets to be used
+        num_buckets: the number of buckets to be used
         sample_limit: an upper limit on the number of samples saved in each bucket.
         cls_name: the name of the class.
     """
 
     feature: str
-    number: int = 10
+    num_buckets: int = 10
     sample_limit: int = 50
     cls_name: Optional[str] = None
 
     def __post_init__(self):
         """Set the class name."""
         self.cls_name: str = self.__class__.__name__
+        if self.num_buckets <= 0:
+            self.num_buckets = 10
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
-    def perform_calibration_analysis(
+    def _perform_calibration_analysis(
         self, bucket_performances: list[BucketPerformance] = []
     ) -> tuple[float, float]:
         """Calculate the metrics for calibration analysis.
@@ -449,7 +460,7 @@ class CalibrationAnalysis(Analysis):
         This includes Expected Calibration Error and Maximum Calibration Error.
         """
         total_error, total_size = 0.0, 0
-        MCE = 0.0
+        mce = 0.0
         for bucket_performance in bucket_performances:
             metric_result = bucket_performance.performances.get(
                 "Accuracy", Performance(0.0)
@@ -463,8 +474,9 @@ class CalibrationAnalysis(Analysis):
             bucket_size = bucket_performance.n_samples
             total_error += bucket_size * abs(bucket_accuracy - bucket_confidence)
             total_size += bucket_size
-            MCE = max(MCE, abs(bucket_accuracy - bucket_confidence))
-        return (total_error / total_size, MCE)
+            mce = max(mce, abs(bucket_accuracy - bucket_confidence))
+        ece = (total_error / total_size) if total_size > 0 else 0.0
+        return ece, mce
 
     def perform(
         self,
@@ -484,32 +496,32 @@ class CalibrationAnalysis(Analysis):
         if not acc_metric or not metric_stat:
             raise RuntimeError("calibration analysis: metric Accuracy not found.")
 
-        # Add confidence values to metric_stats
+        # Get confidence metric stats
         acc_data = metric_stat.get_data()
         conf_data = np.expand_dims(
             np.array([float(case.features.get(self.feature, 0.0)) for case in cases]), 1
         )
         assert acc_data.shape == conf_data.shape
-        metric_stat = SimpleMetricStats(np.concatenate([acc_data, conf_data], axis=-1))
+        conf_metric_stat = SimpleMetricStats(conf_data)
 
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
             "fixed",
         )
-        bucket_size = 1.0 / self.number
+
         bucket_setting = [
             (
-                (i * bucket_size, (i + 1) * bucket_size)
-                if i < self.number - 1
-                else (i * bucket_size, 1.0)
+                (float(i) / self.num_buckets, float(i + 1) / self.num_buckets)
+                if i < self.num_buckets - 1
+                else (float(i) / self.num_buckets, 1.0)
             )
-            for i in range(self.number)
+            for i in range(self.num_buckets)
         ]
 
         samples_over_bucket = bucket_func(
             sample_features=[(x, x.features[self.feature]) for x in cases],
-            bucket_number=self.number,
+            bucket_number=self.num_buckets,
             bucket_setting=bucket_setting,
         )
 
@@ -533,12 +545,14 @@ class CalibrationAnalysis(Analysis):
                 auxiliary_result = None
             else:
                 bucket_stats = metric_stat.filter(bucket_collection.samples)
+                bucket_conf_stats = conf_metric_stat.filter(bucket_collection.samples)
                 metric_result = acc_metric.evaluate_from_stats(
                     bucket_stats,
                     confidence_alpha=confidence_alpha,
+                    auxiliary_stats=bucket_conf_stats,
                 )
                 value = unwrap(metric_result.get_value(Score, "score")).value
-                confidence = unwrap(metric_result.get_value(Score, "confidence"))
+                confidence = metric_result.get_value(Score, "confidence")
                 auxiliary_result = (
                     ConfidenceMetricResult(confidence.value) if confidence else None
                 )
@@ -567,16 +581,13 @@ class CalibrationAnalysis(Analysis):
                 )
             )
 
-        (
-            expected_calibration_error,
-            maximum_calibration_error,
-        ) = self.perform_calibration_analysis(bucket_performances)
+        ece, mce = self._perform_calibration_analysis(bucket_performances)
         return CalibrationAnalysisResult(
             name=self.feature,
             level=self.level,
             bucket_performances=bucket_performances,
-            expected_calibration_error=expected_calibration_error,
-            maximum_calibration_error=maximum_calibration_error,
+            expected_calibration_error=ece,
+            maximum_calibration_error=mce,
         )
 
 

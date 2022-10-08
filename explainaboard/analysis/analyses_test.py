@@ -5,10 +5,12 @@ import unittest
 
 from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
+    CalibrationAnalysisResult,
     ComboCountAnalysisResult,
     ComboOccurence,
 )
 from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.metrics.accuracy import ConfidenceMetricResult
 
 
 class BucketAnalysisResultTest(unittest.TestCase):
@@ -174,6 +176,108 @@ class ComboCountAnalysisResultTest(unittest.TestCase):
             aaa\tbbb\t3
             iii\tjjj\t3
             xxx\tyyy\t3
+            """
+        )
+        self.assertEqual(result.generate_report(), report)
+
+
+class CalibrationAnalysisResultTest(unittest.TestCase):
+    def test_missing_accuracy_metric(self) -> None:
+        with self.assertRaisesRegex(ValueError, r"^Wrong metrics"):
+            CalibrationAnalysisResult(
+                name="foo",
+                level="example",
+                bucket_performances=[
+                    BucketPerformance(
+                        n_samples=5,
+                        bucket_samples=[0, 1, 2, 3, 4],
+                        performances={
+                            "Accuracy": Performance(
+                                value=0.5, auxiliary_result=ConfidenceMetricResult(0.5)
+                            ),
+                        },
+                        bucket_name="baz",
+                    ),
+                    BucketPerformance(
+                        n_samples=5,
+                        bucket_samples=[5, 6, 7, 8, 9],
+                        performances={
+                            "metric1": Performance(value=0.125),
+                        },
+                        bucket_name="qux",
+                    ),
+                ],
+                expected_calibration_error=0.16,
+                maximum_calibration_error=0.22,
+            )
+
+    def test_missing_confidence_metric(self) -> None:
+        with self.assertRaisesRegex(ValueError, r"^Wrong accuracy auxiliary result"):
+            CalibrationAnalysisResult(
+                name="foo",
+                level="example",
+                bucket_performances=[
+                    BucketPerformance(
+                        n_samples=5,
+                        bucket_samples=[0, 1, 2, 3, 4],
+                        performances={
+                            "Accuracy": Performance(
+                                value=0.5, auxiliary_result=ConfidenceMetricResult(0.5)
+                            ),
+                        },
+                        bucket_name="baz",
+                    ),
+                    BucketPerformance(
+                        n_samples=5,
+                        bucket_samples=[5, 6, 7, 8, 9],
+                        performances={
+                            "Accuracy": Performance(value=0.5),
+                        },
+                        bucket_name="qux",
+                    ),
+                ],
+                expected_calibration_error=0.16,
+                maximum_calibration_error=0.22,
+            )
+
+    def test_generate_report(self) -> None:
+        result = CalibrationAnalysisResult(
+            name="confidence",
+            level="example",
+            bucket_performances=[
+                BucketPerformance(
+                    n_samples=5,
+                    bucket_samples=[0, 1, 2, 3, 4],
+                    performances={
+                        "Accuracy": Performance(
+                            value=0.5, auxiliary_result=ConfidenceMetricResult(0.5)
+                        ),
+                    },
+                    bucket_interval=(0.0, 0.5),
+                ),
+                BucketPerformance(
+                    n_samples=5,
+                    bucket_samples=[5, 6, 7, 8, 9],
+                    performances={
+                        "Accuracy": Performance(
+                            value=0.7, auxiliary_result=ConfidenceMetricResult(0.7)
+                        ),
+                    },
+                    bucket_interval=(0.5, 1.0),
+                ),
+            ],
+            expected_calibration_error=0.16,
+            maximum_calibration_error=0.22,
+        )
+        report = textwrap.dedent(
+            """\
+            the information of #confidence#
+            bucket_name\tAccuracy\t#samples
+            (0.0, 0.5)\t0.5\t5
+            (0.5, 1.0)\t0.7\t5
+
+            expected_calibration_error\t0.16
+            maximum_calibration_error\t0.22
             """
         )
         self.assertEqual(result.generate_report(), report)

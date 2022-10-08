@@ -66,52 +66,19 @@ class Accuracy(Metric):
             )
         )
 
-    def _calc_metric_from_aggregate(
-        self,
-        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+    def calc_metric_from_auxiliary_stats(
+        self, auxiliary_stats: MetricStats
     ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
-        """Inner function of calc_metric_from_aggregate."""
-        if agg_stats.shape[-1] == 1:
-            return agg_stats.squeeze(-1)
-        return agg_stats
-
-    def calc_metric_from_aggregate(
-        self,
-        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
-    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
-        """From aggregated sufficient statistics, calculate the metric value.
-
-        Args:
-            agg_stats: aggregated statistics. Shape must be:
-                - Non-batched data: [num_aggregate_stats]
-                - Batched data: [num_batches, num_aggregate_stats]
-
-        Returns:
-            Calculated metrics. Shape must be:
-                - Non-batched data: [] if num_aggregate_stats is 1.
-                    Otherwise [num_aggregate_stats].
-                - Batched data: [num_batches]
-        """
-        if agg_stats.ndim not in (self.stats_ndim(), self.stats_ndim() + 1):
-            raise ValueError(f"Invalid shape size: {agg_stats.shape}")
-
-        result = self._calc_metric_from_aggregate(agg_stats)
-        result_shape = (
-            () if agg_stats.shape[0] == self.stats_ndim() else (agg_stats.shape[0],)
-        )
-
-        assert result.shape == result_shape, (
-            "BUG: invalid operation: "
-            f"{type(self).__name__}._calc_metric_from_aggregate(): "
-            f"Expected shape {result_shape}, but got {result.shape}."
-        )
-
-        return result
+        """Calculate confidence score."""
+        agg_auxiliary_stats = self.aggregate_stats(auxiliary_stats)
+        score = self.calc_metric_from_aggregate(agg_auxiliary_stats)
+        return score
 
     def evaluate_from_stats(
         self,
         stats: MetricStats,
         confidence_alpha: Optional[float] = None,
+        auxiliary_stats: Optional[MetricStats] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
 
@@ -125,17 +92,15 @@ class Accuracy(Metric):
         """
         if stats.is_batched():
             raise ValueError("Batched stats can't be evaluated.")
+
         agg_stats = self.aggregate_stats(stats)
         score = self.calc_metric_from_aggregate(agg_stats)
 
-        metric_values: dict[str, MetricValue] = (
-            {"score": Score(float(score))}
-            if stats.num_statistics() == 1
-            else {
-                "score": Score(float(score[0])),
-                "confidence": Score(float(score[1])),
-            }
-        )
+        assert score.ndim == 0, "BUG: obtained batched data."
+
+        metric_values: dict[str, MetricValue] = {
+            "score": Score(float(score)),
+        }
 
         if confidence_alpha is not None:
             ci = self.calc_confidence_interval(stats, confidence_alpha)
@@ -143,6 +108,11 @@ class Accuracy(Metric):
                 metric_values["score_ci"] = ConfidenceInterval(
                     ci[0], ci[1], confidence_alpha
                 )
+
+        if auxiliary_stats is not None:
+            ave_conf_score = self.calc_metric_from_auxiliary_stats(auxiliary_stats)
+            assert ave_conf_score.ndim == 0, "BUG: obtained batched data."
+            metric_values["confidence"] = Score(float(ave_conf_score))
 
         return MetricResult(metric_values)
 

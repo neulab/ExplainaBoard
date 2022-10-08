@@ -64,7 +64,7 @@ class AspectBasedSentimentClassificationLoader(Loader):
                 [
                     FileLoaderField(field_name, field_name, str),
                     FileLoaderField(
-                        "confidence", "confidence", dtype=float, skippable=True
+                        "confidence", "confidence", dtype=float, optional=True
                     ),
                 ]
             ),

@@ -62,7 +62,7 @@ class FileLoaderField:
     dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
     parser: Optional[Callable[[str], str]] = None
-    skippable: Optional[bool] = False
+    optional: Optional[bool] = None
 
     # Special constants used in field mapping
     SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'
@@ -384,7 +384,7 @@ class FileLoader:
             for sub_field in field_list:
                 sub_field = field_mapping.get(sub_field, sub_field)
                 if sub_field not in ret_dict:
-                    if field.skippable:
+                    if field.optional:
                         return None
                     raise ValueError(
                         f'{cls.__name__}: Could not find '

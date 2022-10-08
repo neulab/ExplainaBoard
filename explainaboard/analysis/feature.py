@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
 from enum import Enum
-from typing import Any, final, Optional, TypeVar
+from typing import Any, final, TypeVar
 
 from explainaboard.serialization import common_registry
 from explainaboard.serialization.types import Serializable, SerializableData
@@ -39,7 +39,7 @@ class FeatureType(Serializable, metaclass=ABCMeta):
         description: str | None = None,
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
-        skippable: Optional[bool] = False,
+        optional: bool = False,
     ) -> None:
         """Initializes FeatureType object.
 
@@ -47,15 +47,14 @@ class FeatureType(Serializable, metaclass=ABCMeta):
             description: Description of this feature.
             func: Function to calculate this feature from other features.
             require_training_set: Whether this feature relies on the training samples.
-            skippable: set it to True if this feature is optional in the output file
-                or it does not require default bucket analysis
+            optional: set it to True if this feature is optional.
         """
         self._description = description
         self._func = func
         self._require_training_set = (
             require_training_set if require_training_set is not None else False
         )
-        self._skippable = skippable
+        self._optional = optional
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
@@ -106,9 +105,9 @@ class FeatureType(Serializable, metaclass=ABCMeta):
 
     @final
     @property
-    def skippable(self) -> bool:
-        """Returns the description of this feature."""
-        return False if self._skippable is not True else True
+    def optional(self) -> bool:
+        """Returns whether this feature is optional."""
+        return self._optional
 
     @final
     def _serialize_base(self) -> dict[str, SerializableData]:
@@ -202,7 +201,7 @@ class Dict(FeatureType):
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
         feature: dict[str, FeatureType],
-        skippable: Optional[bool] = False,
+        optional: bool = False,
     ) -> None:
         """Initializes Dict object.
 
@@ -211,13 +210,13 @@ class Dict(FeatureType):
             func: See FeatureType.__init__.
             require_training_set: See FeatureType.__init__.
             feature: Definitions of member types.
-            skippable: See FeatureType.__init__.
+            optional: See FeatureType.__init__.
         """
         super().__init__(
             description=description,
             func=func,
             require_training_set=require_training_set,
-            skippable=skippable,
+            optional=optional,
         )
         self._feature = feature
 
@@ -285,7 +284,7 @@ class Value(FeatureType):
         require_training_set: bool | None = None,
         max_value: int | float | None = None,
         min_value: int | float | None = None,
-        skippable: Optional[bool] = False,
+        optional: bool = False,
     ) -> None:
         """Initializes Value object.
 
@@ -296,13 +295,13 @@ class Value(FeatureType):
             require_training_set: See FeatureType.__init__.
             max_value: The maximum value (inclusive) of values with int/float dtype.
             min_value: The minimum value (inclusive) of values with int/float dtype.
-            skippable: See FeatureType.__init__.
+            optional: See FeatureType.__init__.
         """
         super().__init__(
             description=description,
             func=func,
             require_training_set=require_training_set,
-            skippable=skippable,
+            optional=optional,
         )
 
         self._dtype = dtype
