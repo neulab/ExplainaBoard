@@ -11,8 +11,8 @@ MD024:
   # Allow multiple headings with the same content
   siblings_only: true
 
-# TODO(tetsuok): Re-enable once the existing issues are fixed.
-MD033: false
+MD033:
+  allowed_elements: [a, img]
 
 # TODO(tetsuok): Re-enable once the existing issues are fixed.
 MD036: false
