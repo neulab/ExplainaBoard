@@ -8,7 +8,6 @@ from typing import cast, Optional
 import numpy as np
 
 from explainaboard.metrics.metric import (
-    AuxiliaryMetricResult,
     ConfidenceInterval,
     Metric,
     MetricConfig,
@@ -23,17 +22,6 @@ from explainaboard.utils.agreement import fleiss_kappa
 from explainaboard.utils.typing_utils import narrow
 
 UNANNOTATED_SYMBOL = -1
-
-
-@dataclass
-class ExternalEvalResult(AuxiliaryMetricResult):
-    """The result of an external evaluation metric.
-
-    Args:
-        agreement: The agreement according to some measure (e.g. Fleiss's Kappa).
-    """
-
-    agreement: float
 
 
 @dataclass

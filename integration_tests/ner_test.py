@@ -2,6 +2,7 @@ import dataclasses
 import os
 from typing import cast
 import unittest
+from explainaboard.metrics.metric import ConfidenceInterval, Score
 
 from integration_tests.utils import test_artifacts_path
 
@@ -104,21 +105,21 @@ class NERTest(unittest.TestCase):
 
         # 5. Unittest: test detailed bucket information: metric
         self.assertAlmostEqual(
-            second_bucket.performances["F1"].value, 0.9121588089330025, 4
+            unwrap(second_bucket.results["F1"].get_score(Score, "score")).value,
+            0.9121588089330025,
+            4,
         )
         # 6 Unittest: test detailed bucket information: confidence interval
         for bucket_vals in sys_info.results.analyses:
             if not isinstance(bucket_vals, BucketAnalysisResult):
                 continue
             for bucket in bucket_vals.bucket_performances:
-                for performance in bucket.performances.values():
-                    if performance.confidence_score_low is not None:
-                        self.assertGreaterEqual(
-                            performance.value, performance.confidence_score_low
-                        )
-                        self.assertGreaterEqual(
-                            performance.confidence_score_high, performance.value
-                        )
+                for result in bucket.results.values():
+                    ci = result.get_value(ConfidenceInterval, "score_ci")
+                    if ci is not None:
+                        value = unwrap(result.get_value(Score, "score")).value
+                        self.assertGreaterEqual(value, ci.low)
+                        self.assertGreaterEqual(ci.high, value)
 
         # 7. Unittest: test if only fewer cases are printed (this is the expected
         # case, especially for sequence labeling tasks. Otherwise, the analysis report

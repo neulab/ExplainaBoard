@@ -1,5 +1,6 @@
 import os
 import unittest
+from explainaboard.metrics.metric import Score
 
 from integration_tests.utils import OPTIONAL_TEST_SUITES, test_artifacts_path
 import numpy as np
@@ -7,9 +8,9 @@ import numpy as np
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders import get_loader_class
 from explainaboard.loaders.file_loader import DatalabLoaderOption
-from explainaboard.metrics.external_eval import ExternalEvalConfig, ExternalEvalResult
+from explainaboard.metrics.external_eval import ExternalEvalConfig
 from explainaboard.utils import cache_api
-from explainaboard.utils.typing_utils import narrow
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class SummarizationTest(unittest.TestCase):
@@ -135,14 +136,13 @@ class SummarizationTest(unittest.TestCase):
         processor = get_processor_class(TaskType.summarization)()
 
         sys_info = processor.process(metadata, data.samples)
-        # print(sys_info.results.overall)
-        # print(metadata["metric_configs"][0])
         self.assertGreater(len(sys_info.results.analyses), 0)
         fluency = [
-            x
-            for x in sys_info.results.overall[0]
-            if x.metric_name == "LikertScore_fluency"
+            metric_result
+            for metric_name, metric_result in sys_info.results.overall[
+                "example"
+            ].items()
+            if metric_name == "LikertScore_fluency"
         ][0]
-        self.assertEqual(fluency.value, 2.0)
-        human_performance = narrow(ExternalEvalResult, fluency.auxiliary_result)
-        self.assertEqual(human_performance.agreement, 1.0)
+        self.assertEqual(unwrap(fluency.get_value(Score, "score")).value, 2.0)
+        self.assertEqual(unwrap(fluency.get_value(Score, "agreement")).value, 1.0)

@@ -6,7 +6,9 @@ import dataclasses
 from dataclasses import dataclass
 from typing import Any
 
-from explainaboard.metrics.metric import AuxiliaryMetricResult
+from explainaboard.metrics.metric import MetricResult
+from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.utils.typing_utils import narrow
 
 
 @dataclass(frozen=True)
@@ -16,7 +18,7 @@ class BucketPerformance:
     Attributes:
         n_samples: Number of samples in the bucket
         bucket_samples: IDs of the samples in the bucket
-        performances: A list of performances for each metric
+        results: A dict of MetricResults for each metric
         bucket_interval: For buckets over continuous values, the interval the bucket
           represents
         bucket_name: For buckets over discrete values, the feature the bucket represents
@@ -24,7 +26,7 @@ class BucketPerformance:
 
     n_samples: int
     bucket_samples: list[int]
-    performances: dict[str, Performance]
+    results: dict[str, MetricResult]
     bucket_interval: tuple[float, float] | None = None
     bucket_name: str | None = None
 
@@ -43,8 +45,13 @@ class BucketPerformance:
         Returns:
             The value corresponding to the key
         """
+        serializer = PrimitiveSerializer()
+
         if k == 'performances':
-            return {name: Performance.from_dict(v1) for name, v1 in v.items()}
+            return {
+                name: narrow(MetricResult, serializer.deserialize(v1))
+                for name, v1 in v.items()
+            }
         else:
             return v
 
@@ -55,27 +62,3 @@ class BucketPerformance:
         return cls(
             **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
         )
-
-
-@dataclass(frozen=True)
-class Performance:
-    """A performance value along with other information.
-
-    Attributes:
-        metric_name: The name of the metric
-        value: The mean value of the metric
-        confidence_score_low: The lower confidence bound
-        confidence_score_high: The higher confidence bound
-        auxiliary_result: Other auxiliary information used by particular metrics
-    """
-
-    value: float
-    confidence_score_low: float | None = None
-    confidence_score_high: float | None = None
-    auxiliary_result: AuxiliaryMetricResult | None = None
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> Performance:
-        """A deserialization function."""
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(**{k: v for k, v in data_dict.items() if k in field_names})

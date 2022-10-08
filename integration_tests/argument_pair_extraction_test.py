@@ -1,5 +1,7 @@
 import os
 import unittest
+from explainaboard.metrics.metric import Score
+from explainaboard.utils.typing_utils import unwrap
 
 from integration_tests.utils import test_artifacts_path
 
@@ -34,7 +36,9 @@ class ArgumentPairExtractionTest(unittest.TestCase):
 
         overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
-        self.assertAlmostEqual(overall["F1"].value, 0.25625, 4)
+        self.assertAlmostEqual(
+            unwrap(overall["F1"].get_value(Score, "score")).value, 0.25625, 4
+        )
 
 
 if __name__ == '__main__':

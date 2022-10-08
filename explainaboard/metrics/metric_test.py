@@ -133,12 +133,35 @@ class MetricResultTest(unittest.TestCase):
         result = MetricResult({"bar": score, "baz": ci})
 
         # get_value() should return existing objects.
-        self.assertIsNone(result.get_value(Score, "foo"))
+        with self.assertRaisesRegex(ValueError, r"^MetricValue \"foo\" not found.$"):
+            result.get_value(Score, "foo")
         self.assertIs(result.get_value(Score, "bar"), score)
-        self.assertIsNone(result.get_value(Score, "baz"))
-        self.assertIsNone(result.get_value(ConfidenceInterval, "foo"))
-        self.assertIsNone(result.get_value(ConfidenceInterval, "bar"))
+        with self.assertRaisesRegex(
+            ValueError, r"^MetricValue \"baz\" is not a subclass of Score.$"
+        ):
+            result.get_value(Score, "baz")
+        with self.assertRaisesRegex(ValueError, r"^MetricValue \"foo\" not found.$"):
+            result.get_value(ConfidenceInterval, "foo")
+        with self.assertRaisesRegex(
+            ValueError,
+            r"^MetricValue \"bar\" is not a subclass of ConfidenceInterval.$",
+        ):
+            result.get_value(ConfidenceInterval, "bar")
         self.assertIs(result.get_value(ConfidenceInterval, "baz"), ci)
+
+    def test_get_value_or_none(self) -> None:
+        score = Score(1.0)
+        ci = ConfidenceInterval(1.0, 2.0, 0.5)
+
+        result = MetricResult({"bar": score, "baz": ci})
+
+        # get_value() should return existing objects.
+        self.assertIsNone(result.get_value_or_none(Score, "foo"))
+        self.assertIs(result.get_value_or_none(Score, "bar"), score)
+        self.assertIsNone(result.get_value_or_none(Score, "baz"))
+        self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "foo"))
+        self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "bar"))
+        self.assertIs(result.get_value_or_none(ConfidenceInterval, "baz"), ci)
 
 
 class MetricTest(unittest.TestCase):
@@ -316,15 +339,15 @@ class MetricTest(unittest.TestCase):
         metric = _DummyMetric(_DummyMetricConfig("test"))
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=None)
-        self.assertEqual(unwrap(result.get_value(Score, "score")).value, 3.0)
-        self.assertIsNone(result.get_value(ConfidenceInterval, "score_ci"))
+        self.assertEqual(result.get_value(Score, "score").value, 3.0)
+        self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_tdist_with_ci(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
-        self.assertEqual(unwrap(result.get_value(Score, "score")).value, 3.0)
-        ci = unwrap(result.get_value(ConfidenceInterval, "score_ci"))
+        self.assertEqual(result.get_value(Score, "score").value, 3.0)
+        ci = result.get_value(ConfidenceInterval, "score_ci")
         self.assertAlmostEqual(ci.low, -0.9264863229551219)
         self.assertAlmostEqual(ci.high, 6.926486322955122)
 
@@ -332,21 +355,21 @@ class MetricTest(unittest.TestCase):
         metric = _DummyMetric(_DummyMetricConfig("test"))
         stats = SimpleMetricStats(np.array([3.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
-        self.assertEqual(unwrap(result.get_value(Score, "score")).value, 3.0)
-        self.assertIsNone(result.get_value(ConfidenceInterval, "score_ci"))
+        self.assertEqual(result.get_value(Score, "score").value, 3.0)
+        self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_bootstrap_without_ci(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=None)
-        self.assertEqual(unwrap(result.get_value(Score, "score")).value, 3.0)
-        self.assertIsNone(result.get_value(ConfidenceInterval, "score_ci"))
+        self.assertEqual(result.get_value(Score, "score").value, 3.0)
+        self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_bootstrap_with_ci(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
-        self.assertEqual(unwrap(result.get_value(Score, "score")).value, 3.0)
+        self.assertEqual(result.get_value(Score, "score").value, 3.0)
         ci = unwrap(result.get_value(ConfidenceInterval, "score_ci"))
         print(dataclasses.asdict(ci))
         # TODO(odahsi): According to the current default settings of bootstrapping,
@@ -358,5 +381,5 @@ class MetricTest(unittest.TestCase):
         metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
         stats = SimpleMetricStats(np.array([3.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
-        self.assertEqual(unwrap(result.get_value(Score, "score")).value, 3.0)
-        self.assertIsNone(result.get_value(ConfidenceInterval, "score_ci"))
+        self.assertEqual(result.get_value(Score, "score").value, 3.0)
+        self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))

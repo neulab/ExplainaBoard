@@ -13,11 +13,11 @@ import numpy as np
 import explainaboard.analysis.bucketing
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
 from explainaboard.analysis.feature import FeatureType
-from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.analysis.performance import BucketPerformance
 from explainaboard.metrics.metric import (
-    ConfidenceInterval,
     Metric,
     MetricConfig,
+    MetricResult,
     MetricStats,
     Score,
 )
@@ -171,14 +171,14 @@ class BucketAnalysisResult(AnalysisResult):
 
     def __post_init__(self):
         """Set the class name and validate."""
-        metric_names = self.bucket_performances[0].performances.keys()
+        metric_names = self.bucket_performances[0].results.keys()
 
         for bucket_perf in self.bucket_performances:
-            if bucket_perf.performances.keys() != metric_names:
+            if bucket_perf.results.keys() != metric_names:
                 raise ValueError(
                     "Inconsistent metrics. "
                     f"Required: {set(metric_names)}, "
-                    f"got: {set(bucket_perf.performances.keys())}"
+                    f"got: {set(bucket_perf.results.keys())}"
                 )
 
         self.cls_name: str = self.__class__.__name__
@@ -187,14 +187,15 @@ class BucketAnalysisResult(AnalysisResult):
         """See AnalysisResult.generate_report."""
         texts: list[str] = []
 
-        metric_names = sorted(k for k in self.bucket_performances[0].performances)
+        metric_names = sorted(k for k in self.bucket_performances[0].results)
 
         for metric_name in metric_names:
             texts.append(f"the information of #{self.name}#")
             texts.append(f"bucket_name\t{metric_name}\t#samples")
 
             for bucket_perf in self.bucket_performances:
-                perf = bucket_perf.performances[metric_name]
+                metric_result = bucket_perf.results[metric_name]
+                metric_value = unwrap(metric_result.get_value(Score, "score")).value
 
                 if bucket_perf.bucket_interval is not None:
                     bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
@@ -202,7 +203,7 @@ class BucketAnalysisResult(AnalysisResult):
                     bucket_name = unwrap(bucket_perf.bucket_name)
 
                 texts.append(
-                    f"{bucket_name}\t" f"{perf.value}\t" f"{bucket_perf.n_samples}"
+                    f"{bucket_name}\t" f"{metric_value}\t" f"{bucket_perf.n_samples}"
                 )
 
             texts.append('')
@@ -273,7 +274,7 @@ class BucketAnalysis(Analysis):
 
             n_samples = len(bucket_collection.samples)
 
-            performances: dict[str, Performance] = {}
+            results: dict[str, MetricResult] = {}
 
             for metric_name, metric_func in metrics.items():
                 metric_stat = stats[metric_name]
@@ -281,36 +282,19 @@ class BucketAnalysis(Analysis):
                 # Samples may be empty when user defined a bucket interval that
                 # has no samples
                 if n_samples == 0.0:
-                    value = 0.0
-                    ci_low: Optional[float] = None
-                    ci_high: Optional[float] = None
+                    results[metric_name] = MetricResult({})
                 else:
                     bucket_stats = metric_stat.filter(bucket_collection.samples)
-                    metric_result = metric_func.evaluate_from_stats(
+                    results[metric_name] = metric_func.evaluate_from_stats(
                         bucket_stats,
                         confidence_alpha=confidence_alpha,
                     )
-
-                    value = unwrap(metric_result.get_value(Score, "score")).value
-                    ci = metric_result.get_value(ConfidenceInterval, "score_ci")
-                    if ci is not None:
-                        ci_low = ci.low
-                        ci_high = ci.high
-                    else:
-                        ci_low = None
-                        ci_high = None
-
-                performances[metric_name] = Performance(
-                    value=value,
-                    confidence_score_low=ci_low,
-                    confidence_score_high=ci_high,
-                )
 
             bucket_performances.append(
                 BucketPerformance(
                     n_samples=n_samples,
                     bucket_samples=subsampled_ids,
-                    performances=performances,
+                    results=results,
                     bucket_interval=bucket_collection.interval,
                     bucket_name=bucket_collection.name,
                 )

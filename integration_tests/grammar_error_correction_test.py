@@ -1,5 +1,7 @@
 import os
 import unittest
+from explainaboard.metrics.metric import Score
+from explainaboard.utils.typing_utils import unwrap
 
 from integration_tests.utils import test_artifacts_path
 
@@ -30,7 +32,12 @@ class GrammarErrorCorrectionTest(unittest.TestCase):
         processor = get_processor_class(TaskType.grammatical_error_correction)()
         sys_info = processor.process(metadata, data)
         self.assertAlmostEqual(
-            sys_info.results.overall["example"]["SeqCorrectCount"].value, 8
+            unwrap(
+                sys_info.results.overall["example"]["SeqCorrectCount"].get_value(
+                    Score, "score"
+                )
+            ).value,
+            8,
         )
         self.assertGreater(len(sys_info.results.analyses), 0)
 

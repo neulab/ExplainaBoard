@@ -4,14 +4,16 @@ from __future__ import annotations
 import copy
 
 from explainaboard.analysis.analyses import AnalysisResult, BucketAnalysisResult
-from explainaboard.analysis.performance import BucketPerformance, Performance
+from explainaboard.analysis.performance import BucketPerformance
 from explainaboard.analysis.result import Result
 from explainaboard.info import SysOutputInfo
+from explainaboard.metrics.metric import MetricResult, Score
+from explainaboard.utils.typing_utils import unwrap
 
 
 def _diff_overall(
-    sys1: dict[str, Performance], sys2: dict[str, Performance]
-) -> dict[str, Performance]:
+    sys1: dict[str, MetricResult], sys2: dict[str, MetricResult]
+) -> dict[str, MetricResult]:
     """Helper function to make a difference performance.
 
     Args:
@@ -21,7 +23,13 @@ def _diff_overall(
     Returns:
         dict of Perforamnces generated from sys1 and sys2.
     """
-    return {k: Performance(sys1[k].value - sys2[k].value) for k in sys1}
+    return {
+        k: MetricResult(
+            unwrap(sys1[k].get_value(Score, "score")).value
+            - unwrap(sys2[k].get_value(Score, "score")).value
+        )
+        for k in sys1
+    }
 
 
 def get_pairwise_performance_gap(

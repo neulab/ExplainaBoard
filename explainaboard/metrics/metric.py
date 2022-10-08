@@ -18,13 +18,6 @@ from explainaboard.serialization.types import (
 from explainaboard.utils.typing_utils import narrow
 
 
-@dataclass
-class AuxiliaryMetricResult:
-    """Extra information specific to individual metrics."""
-
-    pass
-
-
 # TODO(odashi): See mypy/issues/4717
 @dataclass(frozen=True)  # type: ignore
 class MetricValue(Serializable, metaclass=abc.ABCMeta):
@@ -123,7 +116,28 @@ class MetricResult(Serializable):
         """
         self._values = values
 
-    def get_value(self, cls: type[MetricValueT], name: str) -> MetricValueT | None:
+    def get_value(self, cls: type[MetricValueT], name: str) -> MetricValueT:
+        """Obtains a value with specific type and name.
+
+        Args:
+            cls: Subtype of MetricValue that the resulting value has to be of.
+            name: Name of the value.
+
+        Raises:
+            ValueError: `name` not found, or the value is not an instance of `cls`.
+        """
+        value = self._values.get(name)
+        if value is None:
+            raise ValueError(f"MetricValue \"{name}\" not found.")
+        if not isinstance(value, cls):
+            raise ValueError(
+                f"MetricValue \"{name}\" is not a subclass of {cls.__name__}."
+            )
+        return value
+
+    def get_value_or_none(
+        self, cls: type[MetricValueT], name: str
+    ) -> MetricValueT | None:
         """Obtains a value with specific type and name.
 
         Args:
@@ -133,10 +147,10 @@ class MetricResult(Serializable):
         Returns:
             A MetricValue with `name` and `cls`, or None if such value does not exist.
         """
-        value = self._values.get(name)
-        if value is None:
+        try:
+            return self.get_value(cls, name)
+        except ValueError:
             return None
-        return value if isinstance(value, cls) else None
 
     def serialize(self) -> dict[str, SerializableData]:
         """See Serializable.serialize."""
