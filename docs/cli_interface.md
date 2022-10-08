@@ -145,7 +145,7 @@ explainaboard --task named-entity-recognition --dataset conll2003 --sub-dataset 
 Alternatively, you can reference a dataset file directly.
 
 ```shell
-explainaboard --task named-entity-recognition --custom-dataset-paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system-outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll 
+explainaboard --task named-entity-recognition --custom-dataset-paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system-outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll
 ```
 
 ## Word Segmentation
@@ -164,7 +164,7 @@ Note that the file `test-msr-predictions.tsv` can be downloaded [here](https://d
 
 Alternatively, you can reference a dataset file directly.
 
-```
+```shell
 explainaboard --task word-segmentation --custom-dataset-paths ./data/system_outputs/cws/test.tsv --system-outputs ./data/system_outputs/cws/prediction.tsv
 ```
 
@@ -182,7 +182,7 @@ explainaboard --task chunking --dataset conll00_chunk --system-outputs ./data/sy
 
 Alternatively, you can reference a dataset file directly.
 
-```
+```shell
 explainaboard --task chunking --custom-dataset-paths ./data/system_outputs/chunking/dataset-test-conll00.tsv --system-outputs ./data/system_outputs/chunking/test-conll00-predictions.tsv
 ```
 

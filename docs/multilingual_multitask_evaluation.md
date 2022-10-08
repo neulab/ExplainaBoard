@@ -33,7 +33,7 @@ Once the system outputs are ready, evaluation can be conducted through following
 
 ## 1. Generate Analysis Reports for System Output Collections
 
-```
+```shell
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/xnli/*
 ```
 
@@ -114,34 +114,34 @@ explainaboard --reports ./output/reports/*
 
 then you will get:
 
-```
+```text
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xnli 
+Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       ar      en      es      zh
 Accuracy:       0.696   0.787   0.768   0.731
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: marc 
+Model: CL-mlpp15out1sum, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.915   0.934   0.926   0.915   0.871
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xquad 
+Model: CL-mlpp15out1sum, Dataset: xquad
 Language:       en      es      zh
 F1ScoreQA:      0.824   0.782   0.816
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xnli 
+Model: CL-mt5base, Dataset: xnli
 Language:       de      en      es      zh
 Accuracy:       0.721   0.768   0.738   0.712
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: marc 
+Model: CL-mt5base, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.920   0.934   0.933   0.914   0.868
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xquad 
+Model: CL-mt5base, Dataset: xquad
 Language:       en      es      zh
 F1ScoreQA:      0.812   0.782   0.816
 ```
@@ -151,73 +151,73 @@ F1ScoreQA:      0.812   0.782   0.816
 ExplainaBoard also provides interface that users could filter all results with their specified
 conditions. For example, if we only care about results on  `xnli` and `marc` datasets
 
-```
+```shell
 explainaboard --reports ./output/reports/* --datasets xnli marc
 ```
 
 Then, following results will be obtained:
 
-```
+```text
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xnli 
+Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       ar      en      es      zh
 Accuracy:       0.696   0.787   0.768   0.731
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: marc 
+Model: CL-mlpp15out1sum, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.915   0.934   0.926   0.915   0.871
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xnli 
+Model: CL-mt5base, Dataset: xnli
 Language:       de      en      es      zh
 Accuracy:       0.721   0.768   0.738   0.712
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: marc 
+Model: CL-mt5base, Dataset: marc
 Language:       de      en      es      fr      ja      zh
 Accuracy:       0.933   0.920   0.934   0.933   0.914   0.868
-```  
+```
 
 ### Aggregated Results based on Customized "Query"
 
 ExplainaBoard SDK allows users to aggregate results along different dimension. For example, if we aim to
 know the average performance ove all languages for each dataset,
 
-```
+```shell
 explainaboard --reports ./output/reports/* --languages-aggregation average
 ```
 
 Then following results will be printed:
 
-```
+```text
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xnli 
+Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       all_languages
 Accuracy:       0.746
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: marc 
+Model: CL-mlpp15out1sum, Dataset: marc
 Language:       all_languages
 Accuracy:       0.916
 
 ----------------------------------------
-Model: CL-mlpp15out1sum, Dataset: xquad 
+Model: CL-mlpp15out1sum, Dataset: xquad
 Language:       all_languages
 F1ScoreQA:      0.807
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xnli 
+Model: CL-mt5base, Dataset: xnli
 Language:       all_languages
 Accuracy:       0.735
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: marc 
+Model: CL-mt5base, Dataset: marc
 Language:       all_languages
 Accuracy:       0.917
 
 ----------------------------------------
-Model: CL-mt5base, Dataset: xquad 
+Model: CL-mt5base, Dataset: xquad
 Language:       all_languages
 F1ScoreQA:      0.803
 ```
@@ -229,20 +229,20 @@ datasets (tasks) and different languages.
 For example, the following command represent: the performance gap between two systems on all languages
 from `mar` and `xnli` datasets.
 
-```
+```shell
 explainaboard --reports ./output/reports/* --datasets marc xnli --systems-aggregation minus
 ```
 
 Then following results will be printed:
 
-```
+```text
 ----------------------------------------
-Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: marc 
+Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: marc
 Language:       de      zh      fr      ja      es      en
 Accuracy:       -0.000  0.003   -0.007  0.001   0.000   -0.005
 
 ----------------------------------------
-Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: xnli 
+Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: xnli
 Language:       es      en      zh
 Accuracy:       0.030   0.020   0.019
 ```

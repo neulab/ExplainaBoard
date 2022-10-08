@@ -18,9 +18,6 @@ MD033: false
 MD036: false
 
 # TODO(tetsuok): Re-enable once the existing issues are fixed.
-MD040: false
-
-# TODO(tetsuok): Re-enable once the existing issues are fixed.
 MD046: false
 
 ignores: ["explainaboard/third_party"]

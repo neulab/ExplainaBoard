@@ -4,7 +4,7 @@
 
 The dataset file format is:
 
-```
+```text
 SYSName \t SEGID \t TestSet \t src \t ref \t sys \t manualRaw \t manualZ
 ```
 
@@ -25,7 +25,7 @@ More dataset files can be found at [WMT-DA-20](https://drive.google.com/drive/u/
 
 In order to perform analysis of your results, your system outputs should be a one-column score (the score your metric predicts for the particular example):
 
-```
+```text
 systemScore1
 systemScore2
 ...
