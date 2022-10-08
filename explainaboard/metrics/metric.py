@@ -449,7 +449,6 @@ class Metric(metaclass=abc.ABCMeta):
         else:
             return np.mean(data, axis=-2)
 
-    @final
     def calc_metric_from_aggregate(
         self,
         agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
@@ -640,15 +639,3 @@ class Metric(metaclass=abc.ABCMeta):
         """
         stats = self.calc_stats_from_data(true_data, pred_data)
         return self.evaluate_from_stats(stats, confidence_alpha)
-
-    def calc_auxiliary_metric(self, cases: list | None = None) -> AuxiliaryMetricResult:
-        """Return an auxiliary metric result for the current analysis result.
-
-        Args:
-            cases: a list of samples with the necessary features
-                in order to calculate the auxiliary metric result
-
-        Returns:
-            a resulting auxiliary metric result
-        """
-        ...

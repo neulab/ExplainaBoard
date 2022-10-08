@@ -16,6 +16,7 @@ from explainaboard.analysis.analyses import (
     AnalysisResult,
     BucketAnalysis,
     BucketAnalysisResult,
+    CalibrationAnalysis,
 )
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature import DataType, FeatureType, Value
@@ -312,14 +313,20 @@ class Processor(metaclass=abc.ABCMeta):
         for my_analysis in progress(sys_info.analyses):
             level_id = level_map[my_analysis.level]
             try:
-                analysis_result = my_analysis.perform(
-                    cases=analysis_cases[level_id],
-                    metrics=metrics[level_id],
-                    stats=metric_stats[level_id],
-                    confidence_alpha=sys_info.confidence_alpha,
+                if (
+                    isinstance(my_analysis, CalibrationAnalysis)
+                    and my_analysis.feature not in analysis_cases[level_id][0].features
+                ):
+                    continue
+
+                all_results.append(
+                    my_analysis.perform(
+                        cases=analysis_cases[level_id],
+                        metrics=metrics[level_id],
+                        stats=metric_stats[level_id],
+                        confidence_alpha=sys_info.confidence_alpha,
+                    )
                 )
-                if analysis_result is not None:
-                    all_results.append(analysis_result)
             except Exception as ex:
                 if not skip_failed_analyses:
                     raise

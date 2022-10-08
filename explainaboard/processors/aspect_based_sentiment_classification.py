@@ -11,6 +11,7 @@ from explainaboard.analysis.analyses import (
     Analysis,
     AnalysisLevel,
     BucketAnalysis,
+    CalibrationAnalysis,
     ComboCountAnalysis,
 )
 from explainaboard.analysis.feature import FeatureType
@@ -104,25 +105,11 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 method="discrete",
                 number=15,
             ),
-            BucketAnalysis(
+            CalibrationAnalysis(
                 level="example",
                 description="calibration analysis",
                 feature="confidence",
-                method="fixed",
                 number=10,
-                setting=[
-                    (0.0, 0.1),
-                    (0.1, 0.2),
-                    (0.2, 0.3),
-                    (0.3, 0.4),
-                    (0.4, 0.5),
-                    (0.5, 0.6),
-                    (0.6, 0.7),
-                    (0.7, 0.8),
-                    (0.8, 0.9),
-                    (0.9, 1.0),
-                ],
-                skippable=True,
             ),
             ComboCountAnalysis(
                 level="example",

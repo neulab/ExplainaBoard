@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
 from enum import Enum
-from typing import Any, final, TypeVar
+from typing import Any, final, Optional, TypeVar
 
 from explainaboard.serialization import common_registry
 from explainaboard.serialization.types import Serializable, SerializableData
@@ -39,7 +39,7 @@ class FeatureType(Serializable, metaclass=ABCMeta):
         description: str | None = None,
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
-        skippable: bool = False,
+        skippable: Optional[bool] = False,
     ) -> None:
         """Initializes FeatureType object.
 
@@ -108,7 +108,7 @@ class FeatureType(Serializable, metaclass=ABCMeta):
     @property
     def skippable(self) -> bool:
         """Returns the description of this feature."""
-        return self._skippable
+        return False if self._skippable is not True else True
 
     @final
     def _serialize_base(self) -> dict[str, SerializableData]:
@@ -202,7 +202,7 @@ class Dict(FeatureType):
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
         feature: dict[str, FeatureType],
-        skippable: bool = False,
+        skippable: Optional[bool] = False,
     ) -> None:
         """Initializes Dict object.
 
@@ -285,7 +285,7 @@ class Value(FeatureType):
         require_training_set: bool | None = None,
         max_value: int | float | None = None,
         min_value: int | float | None = None,
-        skippable: bool = False,
+        skippable: Optional[bool] = False,
     ) -> None:
         """Initializes Value object.
 

@@ -21,28 +21,10 @@ from explainaboard.metrics.metric import (
     MetricConfig,
     MetricStats,
     Score,
+    SimpleMetricStats,
 )
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow, unwrap
-
-
-@dataclass
-class AuxiliaryAnalysisResult:
-    """Extra information specific to analysis result."""
-
-    pass
-
-
-@dataclass
-class CalibrationAnalysisResult(AuxiliaryAnalysisResult):
-    """The result of an external evaluation metric.
-
-    Args:
-        agreement: The agreement according to some measure (e.g. Fleiss's Kappa).
-    """
-
-    expected_calibration_error: float
-    maximum_calibration_error: float
 
 
 @dataclass
@@ -76,6 +58,8 @@ class AnalysisResult(metaclass=abc.ABCMeta):
             return BucketAnalysisResult.from_dict(dikt)
         elif type == 'ComboCountAnalysisResult':
             return ComboCountAnalysisResult.from_dict(dikt)
+        elif type == 'CalibrationAnalysisResult':
+            return CalibrationAnalysisResult.from_dict(dikt)
         else:
             raise ValueError(f'bad AnalysisResult type {type}')
 
@@ -103,7 +87,7 @@ class Analysis(metaclass=abc.ABCMeta):
         metrics: dict[str, Metric],
         stats: dict[str, MetricStats],
         confidence_alpha: float,
-    ) -> AnalysisResult | None:
+    ) -> AnalysisResult:
         """Perform the analysis.
 
         Args:
@@ -130,16 +114,23 @@ class Analysis(metaclass=abc.ABCMeta):
                 level=dikt['level'],
                 feature=dikt['feature'],
                 method=dikt.get('method', 'continuous'),
-                number=dikt.get('number', 4),
+                number=dikt.get('num_buckets', 4),
                 setting=dikt.get('setting'),
                 sample_limit=dikt.get('sample_limit', 50),
-                skippable=dikt.get('skippable', False),
             )
         elif type == 'ComboCountAnalysis':
             return ComboCountAnalysis(
                 description=dikt.get('description'),
                 level=dikt['level'],
                 features=tuple(dikt['features']),
+            )
+        elif type == 'CalibrationAnalysis':
+            return CalibrationAnalysis(
+                description=dikt.get('description'),
+                level=dikt['level'],
+                feature=dikt['feature'],
+                number=dikt.get('num_buckets', 10),
+                sample_limit=dikt.get('sample_limit', 50),
             )
 
     @final
@@ -177,7 +168,6 @@ class BucketAnalysisResult(AnalysisResult):
 
     bucket_performances: list[BucketPerformance]
     cls_name: Optional[str] = None
-    auxiliary_performances: Optional[AuxiliaryAnalysisResult] = None
 
     @staticmethod
     def from_dict(dikt: dict) -> BucketAnalysisResult:
@@ -228,9 +218,7 @@ class BucketAnalysisResult(AnalysisResult):
                 )
 
             texts.append('')
-        if self.auxiliary_performances:
-            for k, v in self.auxiliary_performances.__dict__.items():
-                texts.append(f"{k}\t" f"{v}")
+
         return "\n".join(texts)
 
 
@@ -258,8 +246,6 @@ class BucketAnalysis(Analysis):
     setting: Any = None  # For different bucket_methods, the settings are diverse
     sample_limit: int = 50
     cls_name: Optional[str] = None
-    auxiliary_analysis: Optional[bool] = False
-    skippable: Optional[bool] = False
 
     def __post_init__(self):
         """Set the class name."""
@@ -267,49 +253,19 @@ class BucketAnalysis(Analysis):
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
-    def perform_calibration_analysis(
-        self, bucket_performances: list[BucketPerformance] = []
-    ) -> CalibrationAnalysisResult:
-        """Calculate the metrics for calibration analysis.
-
-        This includes Expected Calibration Error and Maximum Calibration Error.
-        """
-        total_error, total_size = 0.0, 0
-        MCE = 0.0
-        for bucket_performance in bucket_performances:
-            metric_result = bucket_performance.performances.get(
-                "Accuracy", Performance(0.0)
-            )
-            bucket_accuracy = metric_result.value
-            bucket_confidence = (
-                metric_result.auxiliary_result.confidence
-                if isinstance(metric_result.auxiliary_result, ConfidenceMetricResult)
-                else 0.0
-            )
-            bucket_size = bucket_performance.n_samples
-            total_error += bucket_size * abs(bucket_accuracy - bucket_confidence)
-            total_size += bucket_size
-            MCE = max(MCE, abs(bucket_accuracy - bucket_confidence))
-        return CalibrationAnalysisResult(
-            expected_calibration_error=total_error / total_size,
-            maximum_calibration_error=MCE,
-        )
-
     def perform(
         self,
         cases: list[AnalysisCase],
         metrics: dict[str, Metric],
         stats: dict[str, MetricStats],
         confidence_alpha: float,
-    ) -> AnalysisResult | None:
+    ) -> AnalysisResult:
         """See Analysis.perform."""
         # Preparation for bucketing
         bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
             explainaboard.analysis.bucketing,
             self.method,
         )
-        if self.skippable and self.feature not in cases[0].features:
-            return None
 
         if len(cases) == 0 or self.feature not in cases[0].features:
             raise RuntimeError(f"bucket analysis: feature {self.feature} not found.")
@@ -319,6 +275,7 @@ class BucketAnalysis(Analysis):
             bucket_number=self.number,
             bucket_setting=self.setting,
         )
+
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             # Subsample examples to save
@@ -345,6 +302,7 @@ class BucketAnalysis(Analysis):
                         bucket_stats,
                         confidence_alpha=confidence_alpha,
                     )
+
                     value = unwrap(metric_result.get_value(Score, "score")).value
                     ci = metric_result.get_value(ConfidenceInterval, "score_ci")
                     if ci is not None:
@@ -354,20 +312,10 @@ class BucketAnalysis(Analysis):
                         ci_low = None
                         ci_high = None
 
-                auxiliary_result = None
-                use_calibration_analysis = (
-                    self.feature == 'confidence' and metric_name == "Accuracy"
-                )
-                if use_calibration_analysis:
-                    self.auxiliary_analysis = True
-                    bucket_cases = [cases[i] for i in bucket_collection.samples]
-                    auxiliary_result = metric_func.calc_auxiliary_metric(bucket_cases)
-
                 performances[metric_name] = Performance(
                     value=value,
                     confidence_score_low=ci_low,
                     confidence_score_high=ci_high,
-                    auxiliary_result=auxiliary_result,
                 )
 
             bucket_performances.append(
@@ -379,16 +327,256 @@ class BucketAnalysis(Analysis):
                     bucket_name=bucket_collection.name,
                 )
             )
-        bucket_auxiliary_result = None
-        if self.auxiliary_analysis:
-            bucket_auxiliary_result = self.perform_calibration_analysis(
-                bucket_performances
-            )
+
         return BucketAnalysisResult(
+            name=self.feature, level=self.level, bucket_performances=bucket_performances
+        )
+
+
+@final
+@dataclass
+class CalibrationAnalysisResult(AnalysisResult):
+    """A result of running a `CalibrationAnalysis`.
+
+    Two types of calibration errors are calculated according to
+    https://arxiv.org/abs/1706.04599
+
+    Attributes:
+        bucket_performances: A list of performances bucket-by-bucket, including the
+          interval over which the bucket is calculated, the Accuracy performance, and
+          the average confidence as Accuracy performance's auxiliary result.
+        expected_calibration_error
+        maximum_calibration_error
+        cls_name: The name of the class.
+    """
+
+    bucket_performances: list[BucketPerformance]
+    expected_calibration_error: float
+    maximum_calibration_error: float
+    cls_name: Optional[str] = None
+
+    @staticmethod
+    def from_dict(dikt: dict) -> CalibrationAnalysisResult:
+        """Deserialization method."""
+        bucket_performances = [
+            BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
+        ]
+        expected_calibration_error = dikt['expected_calibration_error']
+        maximum_calibration_error = dikt['maximum_calibration_error']
+        return CalibrationAnalysisResult(
+            name=dikt['name'],
+            level=dikt['level'],
+            bucket_performances=bucket_performances,
+            expected_calibration_error=expected_calibration_error,
+            maximum_calibration_error=maximum_calibration_error,
+        )
+
+    def __post_init__(self):
+        """Set the class name and validate."""
+        metric_names = self.bucket_performances[0].performances.keys()
+
+        for bucket_perf in self.bucket_performances:
+            if bucket_perf.performances.keys() != metric_names:
+                raise ValueError(
+                    "Inconsistent metrics. "
+                    f"Required: {set(metric_names)}, "
+                    f"got: {set(bucket_perf.performances.keys())}"
+                )
+
+        self.cls_name: str = self.__class__.__name__
+
+    def generate_report(self) -> str:
+        """See AnalysisResult.generate_report."""
+        texts: list[str] = []
+
+        metric_names = sorted(k for k in self.bucket_performances[0].performances)
+
+        for metric_name in metric_names:
+            texts.append(f"the information of #{self.name}#")
+            texts.append(f"bucket_name\t{metric_name}\t#samples")
+
+            for bucket_perf in self.bucket_performances:
+                perf = bucket_perf.performances[metric_name]
+
+                if bucket_perf.bucket_interval is not None:
+                    bucket_name = f"{unwrap(bucket_perf.bucket_interval)}"
+                else:
+                    bucket_name = unwrap(bucket_perf.bucket_name)
+
+                texts.append(
+                    f"{bucket_name}\t" f"{perf.value}\t" f"{bucket_perf.n_samples}"
+                )
+
+            texts.append('')
+
+        texts.append(f"expected_calibration_error\t{self.expected_calibration_error}")
+        texts.append(f"maximum_calibration_error\t{self.maximum_calibration_error}")
+
+        return "\n".join(texts)
+
+
+@final
+@dataclass
+class CalibrationAnalysis(Analysis):
+    """Perform calibration analysis.
+
+    The interval [0, 1] is evenly divided into buckets.
+    Calculate the accuracy and average confidence of each bucket.
+
+    Attributes:
+        feature: the name of the confidence feature
+        number: the number of buckets to be used
+        sample_limit: an upper limit on the number of samples saved in each bucket.
+        cls_name: the name of the class.
+    """
+
+    feature: str
+    number: int = 10
+    sample_limit: int = 50
+    cls_name: Optional[str] = None
+
+    def __post_init__(self):
+        """Set the class name."""
+        self.cls_name: str = self.__class__.__name__
+
+    AnalysisCaseType = TypeVar('AnalysisCaseType')
+
+    def perform_calibration_analysis(
+        self, bucket_performances: list[BucketPerformance] = []
+    ) -> tuple[float, float]:
+        """Calculate the metrics for calibration analysis.
+
+        This includes Expected Calibration Error and Maximum Calibration Error.
+        """
+        total_error, total_size = 0.0, 0
+        MCE = 0.0
+        for bucket_performance in bucket_performances:
+            metric_result = bucket_performance.performances.get(
+                "Accuracy", Performance(0.0)
+            )
+            bucket_accuracy = metric_result.value
+            bucket_confidence = (
+                metric_result.auxiliary_result.confidence
+                if isinstance(metric_result.auxiliary_result, ConfidenceMetricResult)
+                else 0.0
+            )
+            bucket_size = bucket_performance.n_samples
+            total_error += bucket_size * abs(bucket_accuracy - bucket_confidence)
+            total_size += bucket_size
+            MCE = max(MCE, abs(bucket_accuracy - bucket_confidence))
+        return (total_error / total_size, MCE)
+
+    def perform(
+        self,
+        cases: list[AnalysisCase],
+        metrics: dict[str, Metric],
+        stats: dict[str, MetricStats],
+        confidence_alpha: float,
+    ) -> AnalysisResult:
+        """See Analysis.perform."""
+        if len(cases) == 0 or self.feature not in cases[0].features:
+            raise RuntimeError(
+                f"calibration analysis: feature {self.feature} not found."
+            )
+
+        acc_metric = metrics.get('Accuracy', None)
+        metric_stat = stats.get('Accuracy', None)
+        if not acc_metric or not metric_stat:
+            raise RuntimeError("calibration analysis: metric Accuracy not found.")
+
+        # Add confidence values to metric_stats
+        acc_data = metric_stat.get_data()
+        conf_data = np.expand_dims(
+            np.array([float(case.features.get(self.feature, 0.0)) for case in cases]), 1
+        )
+        assert acc_data.shape == conf_data.shape
+        metric_stat = SimpleMetricStats(np.concatenate([acc_data, conf_data], axis=-1))
+
+        # Preparation for bucketing
+        bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
+            explainaboard.analysis.bucketing,
+            "fixed",
+        )
+        bucket_size = 1.0 / self.number
+        bucket_setting = [
+            (
+                (i * bucket_size, (i + 1) * bucket_size)
+                if i < self.number - 1
+                else (i * bucket_size, 1.0)
+            )
+            for i in range(self.number)
+        ]
+
+        samples_over_bucket = bucket_func(
+            sample_features=[(x, x.features[self.feature]) for x in cases],
+            bucket_number=self.number,
+            bucket_setting=bucket_setting,
+        )
+
+        bucket_performances: list[BucketPerformance] = []
+        for bucket_collection in samples_over_bucket:
+            # Subsample examples to save
+            subsampled_ids = self._subsample_analysis_cases(
+                self.sample_limit, bucket_collection.samples
+            )
+
+            n_samples = len(bucket_collection.samples)
+
+            performances: dict[str, Performance] = {}
+
+            # Samples may be empty when user defined a bucket interval that
+            # has no samples
+            if n_samples == 0.0:
+                value = 0.0
+                ci_low: Optional[float] = None
+                ci_high: Optional[float] = None
+                auxiliary_result = None
+            else:
+                bucket_stats = metric_stat.filter(bucket_collection.samples)
+                metric_result = acc_metric.evaluate_from_stats(
+                    bucket_stats,
+                    confidence_alpha=confidence_alpha,
+                )
+                value = unwrap(metric_result.get_value(Score, "score")).value
+                confidence = unwrap(metric_result.get_value(Score, "confidence"))
+                auxiliary_result = (
+                    ConfidenceMetricResult(confidence.value) if confidence else None
+                )
+                ci = metric_result.get_value(ConfidenceInterval, "score_ci")
+                if ci is not None:
+                    ci_low = ci.low
+                    ci_high = ci.high
+                else:
+                    ci_low = None
+                    ci_high = None
+
+            performances['Accuracy'] = Performance(
+                value=value,
+                confidence_score_low=ci_low,
+                confidence_score_high=ci_high,
+                auxiliary_result=auxiliary_result,
+            )
+
+            bucket_performances.append(
+                BucketPerformance(
+                    n_samples=n_samples,
+                    bucket_samples=subsampled_ids,
+                    performances=performances,
+                    bucket_interval=bucket_collection.interval,
+                    bucket_name=bucket_collection.name,
+                )
+            )
+
+        (
+            expected_calibration_error,
+            maximum_calibration_error,
+        ) = self.perform_calibration_analysis(bucket_performances)
+        return CalibrationAnalysisResult(
             name=self.feature,
             level=self.level,
             bucket_performances=bucket_performances,
-            auxiliary_performances=bucket_auxiliary_result,
+            expected_calibration_error=expected_calibration_error,
+            maximum_calibration_error=maximum_calibration_error,
         )
 
 

@@ -384,6 +384,8 @@ class FileLoader:
             for sub_field in field_list:
                 sub_field = field_mapping.get(sub_field, sub_field)
                 if sub_field not in ret_dict:
+                    if field.skippable:
+                        return None
                     raise ValueError(
                         f'{cls.__name__}: Could not find '
                         f'field "{field.src_name}" in datapoint {data_point}'
@@ -440,12 +442,11 @@ class FileLoader:
         for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
             for f in fields:  # parse data point according to fields
-                if f.src_name not in data_point and f.skippable:
-                    continue
-                parsed_data_point[f.target_name] = self.parse_data(
-                    self.find_field(data_point, f, field_mapping), f
-                )
-
+                find_field_result = self.find_field(data_point, f, field_mapping)
+                if find_field_result is not None:
+                    parsed_data_point[f.target_name] = self.parse_data(
+                        find_field_result, f
+                    )
             self.generate_id(parsed_data_point, idx)
             parsed_data_points.append(parsed_data_point)
         return FileLoaderReturn(parsed_data_points, raw_data.metadata)

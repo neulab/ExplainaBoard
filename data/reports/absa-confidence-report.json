@@ -94,14 +94,13 @@
           "cls_name": "Value"
         }
       },
-      "metric_configs": [
-        {
-          "name": "Accuracy",
+      "metric_configs": {
+        "Accuracy": {
           "source_language": "en",
           "target_language": "en",
           "cls_name": "AccuracyConfig"
         }
-      ]
+      }
     }
   ],
   "analyses": [
@@ -113,62 +112,15 @@
       "number": 15,
       "setting": null,
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": false,
-      "skippable": false
+      "cls_name": "BucketAnalysis"
     },
     {
       "description": "calibration analysis",
       "level": "example",
       "feature": "confidence",
-      "method": "fixed",
       "number": 10,
-      "setting": [
-        [
-          0.0,
-          0.1
-        ],
-        [
-          0.1,
-          0.2
-        ],
-        [
-          0.2,
-          0.3
-        ],
-        [
-          0.3,
-          0.4
-        ],
-        [
-          0.4,
-          0.5
-        ],
-        [
-          0.5,
-          0.6
-        ],
-        [
-          0.6,
-          0.7
-        ],
-        [
-          0.7,
-          0.8
-        ],
-        [
-          0.8,
-          0.9
-        ],
-        [
-          0.9,
-          1.0
-        ]
-      ],
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": true,
-      "skippable": true
+      "cls_name": "CalibrationAnalysis"
     },
     {
       "description": "confusion matrix",
@@ -189,9 +141,7 @@
       "number": 4,
       "setting": null,
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": false,
-      "skippable": false
+      "cls_name": "BucketAnalysis"
     },
     {
       "description": "text length in characters",
@@ -201,9 +151,7 @@
       "number": 4,
       "setting": null,
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": false,
-      "skippable": false
+      "cls_name": "BucketAnalysis"
     },
     {
       "description": "number of named entities in the text",
@@ -213,9 +161,7 @@
       "number": 4,
       "setting": null,
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": false,
-      "skippable": false
+      "cls_name": "BucketAnalysis"
     },
     {
       "description": "aspect length in tokens",
@@ -225,9 +171,7 @@
       "number": 4,
       "setting": null,
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": false,
-      "skippable": false
+      "cls_name": "BucketAnalysis"
     },
     {
       "description": "relative position of the aspect in the text",
@@ -237,14 +181,12 @@
       "number": 4,
       "setting": null,
       "sample_limit": 50,
-      "cls_name": "BucketAnalysis",
-      "auxiliary_analysis": false,
-      "skippable": false
+      "cls_name": "BucketAnalysis"
     }
   ],
   "results": {
-    "overall": [
-      {
+    "overall": {
+      "example": {
         "Accuracy": {
           "value": 0.91,
           "confidence_score_low": null,
@@ -252,7 +194,7 @@
           "auxiliary_result": null
         }
       }
-    ],
+    },
     "analyses": [
       {
         "name": "true_label",
@@ -319,56 +261,56 @@
           {
             "n_samples": 72,
             "bucket_samples": [
-              97,
-              15,
-              10,
-              67,
-              31,
-              24,
+              28,
+              80,
+              14,
+              92,
               82,
-              41,
-              98,
-              71,
-              57,
-              39,
-              91,
-              94,
-              95,
-              29,
-              89,
               37,
-              48,
-              93,
-              84,
-              11,
-              83,
-              72,
-              46,
-              66,
-              13,
+              36,
+              65,
+              21,
+              96,
+              18,
               47,
               25,
-              73,
-              34,
-              51,
-              0,
-              14,
-              45,
-              35,
-              50,
-              69,
-              30,
-              18,
+              91,
+              19,
+              31,
+              46,
+              94,
+              64,
+              53,
+              48,
+              98,
               81,
-              28,
-              23,
-              21,
-              80,
-              9,
-              61,
-              12,
               42,
-              92
+              57,
+              99,
+              35,
+              51,
+              23,
+              30,
+              67,
+              9,
+              71,
+              73,
+              61,
+              66,
+              84,
+              49,
+              10,
+              27,
+              93,
+              0,
+              38,
+              76,
+              12,
+              83,
+              58,
+              89,
+              97,
+              6
             ],
             "performances": {
               "Accuracy": {
@@ -382,8 +324,7 @@
             "bucket_name": "positive"
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": null
+        "cls_name": "BucketAnalysisResult"
       },
       {
         "name": "confidence",
@@ -446,7 +387,7 @@
                 "confidence_score_low": null,
                 "confidence_score_high": null,
                 "auxiliary_result": {
-                  "confidence": 0.14699491463448852
+                  "confidence": 0.14699491463448855
                 }
               }
             },
@@ -481,7 +422,7 @@
             },
             "bucket_interval": [
               0.2,
-              0.3
+              0.30000000000000004
             ],
             "bucket_name": null
           },
@@ -508,7 +449,7 @@
               }
             },
             "bucket_interval": [
-              0.3,
+              0.30000000000000004,
               0.4
             ],
             "bucket_name": null
@@ -571,7 +512,7 @@
             },
             "bucket_interval": [
               0.5,
-              0.6
+              0.6000000000000001
             ],
             "bucket_name": null
           },
@@ -603,8 +544,8 @@
               }
             },
             "bucket_interval": [
-              0.6,
-              0.7
+              0.6000000000000001,
+              0.7000000000000001
             ],
             "bucket_name": null
           },
@@ -631,7 +572,7 @@
               }
             },
             "bucket_interval": [
-              0.7,
+              0.7000000000000001,
               0.8
             ],
             "bucket_name": null
@@ -690,11 +631,9 @@
             "bucket_name": null
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": {
-          "expected_calibration_error": 0.4588287500885495,
-          "maximum_calibration_error": 0.9449339077713246
-        }
+        "expected_calibration_error": 0.4588287500885495,
+        "maximum_calibration_error": 0.9449339077713246,
+        "cls_name": "CalibrationAnalysisResult"
       },
       {
         "name": "combo(true_label,predicted_label)",
@@ -711,56 +650,56 @@
             ],
             "sample_count": 69,
             "sample_ids": [
-              18,
-              12,
-              35,
-              83,
-              67,
-              93,
-              39,
-              46,
-              58,
-              29,
-              55,
-              99,
-              41,
-              19,
-              10,
-              37,
               30,
-              21,
-              52,
-              25,
-              98,
-              61,
-              80,
-              47,
-              38,
-              36,
-              27,
-              9,
-              45,
-              60,
-              50,
-              23,
-              73,
-              90,
               69,
-              26,
-              49,
-              64,
-              66,
-              13,
-              94,
-              92,
+              82,
               57,
-              65,
-              34,
-              59,
-              95,
+              73,
+              92,
+              31,
+              35,
+              46,
+              0,
+              2,
+              15,
+              10,
               84,
+              59,
+              41,
+              76,
+              26,
+              53,
+              91,
+              23,
+              98,
+              14,
+              18,
+              89,
               11,
-              15
+              34,
+              71,
+              93,
+              12,
+              49,
+              45,
+              65,
+              38,
+              37,
+              21,
+              9,
+              47,
+              58,
+              96,
+              39,
+              51,
+              64,
+              81,
+              29,
+              60,
+              97,
+              66,
+              36,
+              24
             ]
           },
           {
@@ -1037,8 +976,7 @@
             "bucket_name": null
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": null
+        "cls_name": "BucketAnalysisResult"
       },
       {
         "name": "text_chars",
@@ -1217,8 +1155,7 @@
             "bucket_name": null
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": null
+        "cls_name": "BucketAnalysisResult"
       },
       {
         "name": "entity_number",
@@ -1227,56 +1164,56 @@
           {
             "n_samples": 61,
             "bucket_samples": [
-              73,
-              35,
-              89,
-              17,
-              2,
-              22,
-              48,
-              98,
-              71,
-              29,
-              9,
-              99,
-              32,
-              93,
-              30,
-              18,
-              82,
-              40,
-              70,
-              34,
-              33,
-              36,
-              67,
-              83,
-              42,
-              28,
-              4,
-              45,
-              66,
-              24,
-              46,
-              92,
-              10,
-              63,
-              90,
-              77,
-              76,
-              65,
-              31,
-              57,
-              84,
-              50,
+              20,
               47,
-              37,
-              27,
-              38,
+              32,
+              83,
+              92,
+              45,
+              34,
+              66,
+              70,
+              50,
+              67,
+              8,
+              22,
+              76,
+              63,
+              11,
+              31,
+              69,
+              30,
+              10,
+              19,
+              40,
+              24,
+              3,
+              84,
+              2,
               23,
+              9,
+              65,
+              48,
+              37,
+              38,
+              4,
+              46,
+              18,
+              93,
+              89,
+              77,
+              42,
               21,
+              28,
+              82,
+              71,
               58,
-              11
+              99,
+              33,
+              72,
+              41,
+              49,
+              57
             ],
             "performances": {
               "Accuracy": {
@@ -1368,8 +1305,7 @@
             "bucket_name": null
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": null
+        "cls_name": "BucketAnalysisResult"
       },
       {
         "name": "aspect_length",
@@ -1378,56 +1314,56 @@
           {
             "n_samples": 51,
             "bucket_samples": [
-              91,
-              26,
-              75,
-              18,
-              49,
-              50,
-              12,
-              71,
-              9,
-              96,
-              73,
-              28,
-              45,
-              19,
-              51,
-              35,
-              46,
-              52,
-              78,
-              48,
-              21,
-              92,
-              30,
-              37,
-              58,
-              89,
-              76,
-              42,
-              65,
-              63,
               23,
+              73,
               56,
-              98,
-              17,
-              34,
-              87,
-              39,
-              31,
-              70,
-              41,
-              57,
-              90,
-              66,
-              10,
               24,
+              35,
+              91,
+              9,
+              52,
+              19,
+              89,
+              46,
+              63,
+              70,
+              30,
+              39,
+              96,
+              48,
               29,
-              33,
-              47,
+              66,
+              75,
+              58,
+              65,
+              34,
+              17,
+              57,
+              31,
+              18,
               93,
-              80
+              49,
+              95,
+              47,
+              12,
+              42,
+              90,
+              45,
+              37,
+              41,
+              87,
+              21,
+              33,
+              51,
+              98,
+              28,
+              10,
+              78,
+              76,
+              50,
+              92,
+              71,
+              26
             ],
             "performances": {
               "Accuracy": {
@@ -1547,8 +1483,7 @@
             "bucket_name": null
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": null
+        "cls_name": "BucketAnalysisResult"
       },
       {
         "name": "aspect_position",
@@ -1727,8 +1662,7 @@
             "bucket_name": null
           }
         ],
-        "cls_name": "BucketAnalysisResult",
-        "auxiliary_performances": null
+        "cls_name": "BucketAnalysisResult"
       }
     ]
   }

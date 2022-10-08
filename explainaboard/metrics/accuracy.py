@@ -3,16 +3,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
-from explainaboard.analysis.case import AnalysisCase
 from explainaboard.metrics.metric import (
     AuxiliaryMetricResult,
+    ConfidenceInterval,
     Metric,
     MetricConfig,
+    MetricResult,
     MetricStats,
+    MetricValue,
+    Score,
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
@@ -63,17 +66,85 @@ class Accuracy(Metric):
             )
         )
 
-    def calc_auxiliary_metric(
-        self, cases: list[AnalysisCase] | None = None
-    ) -> ConfidenceMetricResult:
-        """Calculate average confidence value given a list of samples.
+    def _calc_metric_from_aggregate(
+        self,
+        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """Inner function of calc_metric_from_aggregate."""
+        if agg_stats.shape[-1] == 1:
+            return agg_stats.squeeze(-1)
+        return agg_stats
 
-        This is the Accuracy metric result's auxiliary result.
+    def calc_metric_from_aggregate(
+        self,
+        agg_stats: np.ndarray[tuple[int], Any] | np.ndarray[tuple[int, int], Any],
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """From aggregated sufficient statistics, calculate the metric value.
+
+        Args:
+            agg_stats: aggregated statistics. Shape must be:
+                - Non-batched data: [num_aggregate_stats]
+                - Batched data: [num_batches, num_aggregate_stats]
+
+        Returns:
+            Calculated metrics. Shape must be:
+                - Non-batched data: [] if num_aggregate_stats is 1.
+                    Otherwise [num_aggregate_stats].
+                - Batched data: [num_batches]
         """
-        if not cases or len(cases) == 0:
-            return ConfidenceMetricResult(0.0)
-        value = np.mean([case.features['confidence'] for case in cases]).squeeze()
-        return ConfidenceMetricResult(value)
+        if agg_stats.ndim not in (self.stats_ndim(), self.stats_ndim() + 1):
+            raise ValueError(f"Invalid shape size: {agg_stats.shape}")
+
+        result = self._calc_metric_from_aggregate(agg_stats)
+        result_shape = (
+            () if agg_stats.shape[0] == self.stats_ndim() else (agg_stats.shape[0],)
+        )
+
+        assert result.shape == result_shape, (
+            "BUG: invalid operation: "
+            f"{type(self).__name__}._calc_metric_from_aggregate(): "
+            f"Expected shape {result_shape}, but got {result.shape}."
+        )
+
+        return result
+
+    def evaluate_from_stats(
+        self,
+        stats: MetricStats,
+        confidence_alpha: Optional[float] = None,
+    ) -> MetricResult:
+        """Return an evaluation result over stats.
+
+        Args:
+            stats: pre-computed metric stats
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of confidence intervals
+
+        Returns:
+            a resulting metric value
+        """
+        if stats.is_batched():
+            raise ValueError("Batched stats can't be evaluated.")
+        agg_stats = self.aggregate_stats(stats)
+        score = self.calc_metric_from_aggregate(agg_stats)
+
+        metric_values: dict[str, MetricValue] = (
+            {"score": Score(float(score))}
+            if stats.num_statistics() == 1
+            else {
+                "score": Score(float(score[0])),
+                "confidence": Score(float(score[1])),
+            }
+        )
+
+        if confidence_alpha is not None:
+            ci = self.calc_confidence_interval(stats, confidence_alpha)
+            if ci is not None:
+                metric_values["score_ci"] = ConfidenceInterval(
+                    ci[0], ci[1], confidence_alpha
+                )
+
+        return MetricResult(metric_values)
 
 
 @dataclass
