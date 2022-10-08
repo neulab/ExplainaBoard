@@ -1,19 +1,14 @@
 # How to Evaluate your Models Programmatically?
 
+This doc details
 
-This doc details 
 * how to evaluate your systems using ExplainaBoard programmatically
-* how to collect different results 
-
-
-
-
+* how to collect different results
 
 ## Evaluation
 
 Take the `kg-link-tail-prediction` task, for example, by running the following code,
 all analysis information will be stored in `sys_info.`
-
 
 ```python
 from explainaboard import TaskType, get_loader_class, get_processor_class
@@ -28,21 +23,21 @@ processor = get_processor_class(TaskType.kg_link_tail_prediction)()
 sys_info = processor.process(metadata={}, sys_output=data.samples)
 ```
 
-
 ## Manipulate Analysis Results
+
 The above code conducts the evaluation and puts everything in `sys_info.` In what follows,
 we will see how different types of information from `sys_info` are collected.
 
-
 #### Save analysis report locally
+
 ```python
 sys_info.print_as_json(file=open("./report.json", 'w'))
 ```
 
 Here is an [example](https://github.com/neulab/ExplainaBoard/blob/86d96b83d5ebf60adbdbdaa3a00883546fa05fde/data/reports/report_kg.json).
 
-
 #### Get overall results of different metrics
+
 ```python
 for overall_level in sys_info.results.overall:
     for metric_stat in overall_level:

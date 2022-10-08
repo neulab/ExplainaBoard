@@ -26,7 +26,6 @@ It offers a number of different ways with which you can evaluate and understand 
 5. *Fine-grained Error Analysis*: where do errors occur?
 6. *System Combination*: Is there potential complementarity between different systems?
 
-
 ## Using Explainaboard
 
 ExplainaBoard can be used online or offline.
@@ -42,7 +41,6 @@ ability to browse outputs and upload your own system outputs.
 
 First, follow the installation directions below, then take a look at our
 [**CLI examples**](docs/cli_interface.md).
-
 
 **Install Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
@@ -65,11 +63,11 @@ python -m spacy download en_core_web_sm
 pre-commit install
 ```
 
-- **Testing:** To run tests, you can run `python -m unittest`. 
+- **Testing:** To run tests, you can run `python -m unittest`.
 - **Linting and Code Style:** This project uses flake8 (linter) and black (formatter). They are enforced in the pre-commit hook and in the CI pipeline.
-    - run `python -m black .` to format code
-    - run `flake8` to lint code
-    - You can also configure your IDE to automatically format and lint the files as you are writing code.
+  - run `python -m black .` to format code
+  - run `flake8` to lint code
+  - You can also configure your IDE to automatically format and lint the files as you are writing code.
 
 After trying things out in the [CLI](docs/cli_interface.md), you can read how to add
 new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
@@ -96,4 +94,3 @@ If you find it useful in research, you can cite it in papers:
 We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
 Colin Raffel, Yang Liu, Li Dong. We also thank
 Vijay Viswanathan, Yiran Chen, Hiroaki Hayashi for useful discussion and feedback about ExplainaBoard.
-
