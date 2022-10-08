@@ -4,7 +4,7 @@ ExplainaBoard makes it possible to perform interactive evaluation from multiple 
 
 ## Customized Bucket Number
 
-##### Background
+### Background
 
 ExplainaBoard achieves interpretable evaluation by bucketing evaluation performance
 into different categories based on some pre-defined features.
@@ -16,7 +16,7 @@ If you are interested in more details, [Liu et al.2021](https://aclanthology.org
 When using ExplainaBoard Web, users can customize the number
 of buckets. For example:
 
-##### bucket number: 4
+#### bucket number: 4
 
 <img src="./fig/customized_bucket.png" width="300"/>
 
@@ -25,7 +25,7 @@ The bucket number could be updated to 5 when
 * clicking `+` button
 * clicking `Update analysis`
 
-##### bucket number: 5
+#### bucket number: 5
 
 <img src="./fig/customized_bucket_2.png" width="300"/>
 
@@ -40,6 +40,6 @@ For example:
 
 `[2,12], [13,18], [19,24], [25,52]`  -> `[2,12], [12,18], [18,26], [26,52]`
 
-##### bucket number: 5
+### bucket number: 5
 
 <img src="./fig/customized_bucket_3.png" width="300"/>

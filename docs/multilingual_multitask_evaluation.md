@@ -46,13 +46,13 @@ then all system outputs in the folder `./data/system_outputs/multilingual/json/m
 
  will be processed automatically, and two types of files will be generated:
 
-#### (1) analysis reports
+### (1) analysis reports
 
 * include both overall results and fine-grained analysis of a system
 * `json` format
 * in the folder `output/reports`
 
-#### (2) historgram figures
+### (2) historgram figures
 
 * each figure could be regarded as a visualization of corresponding analysis report, that provides fine-grained evaluation
    results for a system along certain feature (e.g., sentence length)
