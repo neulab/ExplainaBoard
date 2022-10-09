@@ -51,7 +51,7 @@ class AccuracyTest(unittest.TestCase):
         stats = SimpleMetricStats(np.array([1.0, 0.0, 1.0, 1.0, 0.0]))
         result = metric.evaluate_from_stats(stats=stats)
         self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 0.6)
-        self.assertTrue(result.get_value_or_none(Score, "confidence") is None)
+        self.assertIsNone(result.get_value_or_none(Score, "confidence"))
 
     def test_evaluate_from_stats_with_confidence(self) -> None:
         metric = AccuracyConfig().to_metric()
