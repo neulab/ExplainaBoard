@@ -37,7 +37,7 @@ A man playing an electric guitar on stage.   A man is performing for cash.  neut
 
 In this task, your system outputs should be one predicted label per line:
 
-```
+```text
 predicted_label
 ```
 
@@ -71,6 +71,6 @@ explainaboard --task text-pair-classification --custom-dataset-paths ./data/syst
 
 in which case the file format of the custom dataset file (`snli-dataset.tsv`) is TSV
 
-```
+```text
 text1 \t text2 \t true_label
 ```

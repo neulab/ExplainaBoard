@@ -42,7 +42,7 @@ where the first column represents source text and the 2nd column denotes gold re
 
 In this task, your system outputs should be as follows:
 
-```
+```text
 predicted_output_text
 ```
 
@@ -88,7 +88,7 @@ explainaboard --task summarization --dataset cnn_dailymail --system-outputs ./da
 
 In addition, you can use a custom dataset, in which case the format should be
 
-```
+```text
 source_sentence \t target_sentence
 ```
 
