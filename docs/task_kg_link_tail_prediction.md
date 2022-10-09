@@ -1,6 +1,5 @@
 # Analyzing Knowledge Graph Link Tail Prediction Task
 
-
 Before diving into the detail of this doc, you're strongly recommended to know [some
 important concepts about system analyses](concepts_about_system_analysis.md).
 
@@ -8,42 +7,33 @@ In this file we describe how to analyze models trained to predict the tail entit
 [`fb15k-237`](https://www.microsoft.com/en-us/download/details.aspx?id=52312).
 
 ## Outline
+
 * Evaluation with Build-in Features
-    * Data Preparation
-    * Perform Analysis with CLI
-    * Visualization Locally
+  * Data Preparation
+  * Perform Analysis with CLI
+  * Visualization Locally
 * Evaluation with Customized Features
-    * Data Preparation
-    * Perform Analysis with CLI
-
-
-
-
+  * Data Preparation
+  * Perform Analysis with CLI
 
 ## Evaluation with Build-in Features
 
-
-
 ### Data Preparation
-
-
 
 #### Format of `Dataset` File
 
 * (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset. 
+    you fortunately don't need to prepare the dataset.
 
 * (2) `json` (basically, it's a list of dictionaries with two keys: `gold_head`,
         `gold_predicate`, and `gold_tail`)
+
 ```json
 [
   {"gold_head": "abc", "gold_predicate": "dummy relation", "gold_tail":"cde"},
   ...
 ]
 ```
-
-
-
 
 #### Format of `System Output` File
 
@@ -83,17 +73,18 @@ In this task, your system outputs should be as follows:
     
 ]
 ```
+
 where
+
 * `gold_head`: true head entity
 * `gold_predicate`: true relation
 * `gold_tail`: true tail entity
 * `predict`: it suggest what type of information (e.g., `head`, `predicate`, `tail`) will be predicted
 * `predictions`: a list of predictions
 
-Let's say we have one system output file: 
-* [test-kg-prediction-no-user-defined.json](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/artifacts/test-kg-prediction-no-user-defined.json) 
+Let's say we have one system output file:
 
-
+* [test-kg-prediction-no-user-defined.json](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/artifacts/test-kg-prediction-no-user-defined.json)
 
 ### Perform Analysis with CLI
 
@@ -103,10 +94,12 @@ In order to perform your basic analysis, we can run the following command:
 explainaboard --task kg-link-tail-prediction --custom-dataset-paths ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json --system-outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined.json > report.json
 
 ```
+
 where
-* `--task`: denotes the task name. 
+
+* `--task`: denotes the task name.
 * `--custom-dataset-paths`: the path of test samples
-* `--system-outputs`: denote the path of system outputs. Multiple one should be 
+* `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`:optional, denotes the dataset name
 * `report.json`: the generated analysis file with json format. Tips: use a json viewer like [`this one`](http://jsonviewer.stack.hu/) for better interpretation.
@@ -117,34 +110,30 @@ you could also run (the advantage is that more bucketing features will be suppor
 ```shell
     explainaboard --task kg-link-tail-prediction --dataset fb15k_237 --sub-dataset origin --system-outputs test_distmult.json > log.res
 ```
-where 
+
+where
+
 * `test_distmult.json` represents the system output file, for example, you can download
 the above one [here](https://datalab-hub.s3.amazonaws.com/predictions/test_distmult.json
 )
 
-
-
 ### Bucketing Features
+
 * Toy feature `tail_entity_length`: the number of words in `true_tail`
 * More meaningful features to be added soon
 
-
 ### Visualization Locally
+
 Once the above command has been successfully conducted, histogram figures will be generated automatically in the folder
 `./output/figures/test-kg-prediction-no-user-defined-new/`, where each figure represent a fine-grained evaluation
 results along one features (e.g., relation type).
- 
-We have carefully designed and beautified these figures which 
+
+We have carefully designed and beautified these figures which
 could be directly applied for paper writing as needed.
 
 One example is shown below,
 
-
 <img src="./figures/entity_type_level_MeanReciprocalRank.png" width="600"/>
-
-
-
-
 
 ## Evaluation with Customized Features
 
@@ -207,9 +196,9 @@ An example system output is [provided](https://github.com/neulab/ExplainaBoard/b
 explainaboard --task kg-link-tail-prediction --custom-dataset-paths ./data/system_outputs/fb15k-237/data_mini.json --system-outputs ./data/system_outputs/fb15k-237/test-kg-prediction-no-user-defined-new.json > report.json
 ```
 
-
 ## Advanced Usage
-Intead of ExplainaBoard CLI, users could explore more functionality by using 
+
+Intead of ExplainaBoard CLI, users could explore more functionality by using
 pythonic interface provided by ExplainaBoard.
 
 ### Simple Example
@@ -231,8 +220,8 @@ sys_info = processor.process(metadata={}, sys_output=data.samples)
 sys_info.write_to_directory('./')
 ```
 
-
 ### Customized Bucket Order
+
 In some situation, users aim to specify the bucket order according to their needs.
 The following code gives an example.
 
@@ -265,6 +254,7 @@ sys_info = processor.process(metadata, data.samples)
 ```
 
 The options for the `"sort_by"` option are:
+
 1. `"key"` (default): sort by the bucket's lower boundary, alphabetically, low-to-high.
 2. `"performance_value"`: sort by bucket performance. Since each bucket has multiple metrics associated with it, use the `"sort_by_metric"` to choose which metric to sort on.
 3. `"n_bucket_samples"`, sort by the number of samples in each bucket.
@@ -272,10 +262,12 @@ The options for the `"sort_by"` option are:
 The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set to `"performance_value"`. The options for the `"sort_by_metric"` option are `"Hits"`, `"MR"`, `"MRR"`, etc: sort by a specific metric name. These names refer to the `metric_name` keyword in your metric definitions (i.e. what you pass into the `"metric_configs"` key in the `metadata` dictionary).
 
 The `"sort_by_metric"` option is applicable when the `"sort_by"` option is set to `"performance_value"`. The options for the `"sort_ascending"` option are:
+
 1. `False` (default): sort high-to-low.
 2. `True`: sort low-to-high; useful for e.g. the `"MeanRank"` metric.
 
 ### Customized Hits K
+
 The value of K in `Hits` metric could also be specified by users when needed. Below is an example of how to use this configuration while performing bucket sorting by the custom metric:
 
 ```python
@@ -341,6 +333,7 @@ sys_info = processor.process(metadata, data.samples)
 
 The basic idea is that users can specify other system-related information (e.g., hyper-parameters)
 via adding a key-value into `metadata`
+
 ```python
 metadata = {
     "task_name": TaskType.text_classification.value,
@@ -348,9 +341,11 @@ metadata = {
     "system_details": system_details,
 }
 ```
+
 [Here](https://github.com/neulab/ExplainaBoard/blob/main/integration_tests/test_system_details.py) is a complete code.
 
 ### Meta/Quantitative Analysis
+
 A preliminary version of the rank-flipping quantitative analysis has been implemented. Example code:
 
 ```python
@@ -386,6 +381,7 @@ print(meta_analysis_results)
 ```
 
 Meta-analysis for bucket-level ranking tables:
+
 ```python
 from explainaboard import RankingMetaAnalysis, TaskType, get_custom_dataset_loader, get_processor_class
 

@@ -414,8 +414,8 @@ class Processor(metaclass=abc.ABCMeta):
                     confidence_alpha=sys_info.confidence_alpha,
                 )
 
-                value = unwrap(metric_result.get_value(Score, "score")).value
-                ci = metric_result.get_value(ConfidenceInterval, "score_ci")
+                value = metric_result.get_value(Score, "score").value
+                ci = metric_result.get_value_or_none(ConfidenceInterval, "score_ci")
 
                 my_results[metric_name] = Performance(
                     value=value,

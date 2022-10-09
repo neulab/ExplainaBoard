@@ -18,6 +18,7 @@ from explainaboard.metrics.metric import Score, SimpleMetricStats
 from explainaboard.utils.typing_utils import unwrap
 
 
+
 class AccuracyConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
@@ -44,9 +45,7 @@ class AccuracyTest(unittest.TestCase):
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
-        self.assertAlmostEqual(
-            unwrap(result.get_value(Score, "score")).value, 2.0 / 3.0
-        )
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
 
     def test_evaluate_from_stats(self) -> None:
         metric = AccuracyConfig().to_metric()
@@ -93,7 +92,7 @@ class CorrectCountTest(unittest.TestCase):
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
-        self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 4)
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 4)
 
 
 class SeqCorrectCountConfigTest(unittest.TestCase):
@@ -152,4 +151,4 @@ class SeqCorrectCountTest(unittest.TestCase):
             }
         ]
         result = metric.evaluate(true, pred)
-        self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 5)
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 5)

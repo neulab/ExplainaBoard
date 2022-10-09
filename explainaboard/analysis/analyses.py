@@ -303,8 +303,8 @@ class BucketAnalysis(Analysis):
                         confidence_alpha=confidence_alpha,
                     )
 
-                    value = unwrap(metric_result.get_value(Score, "score")).value
-                    ci = metric_result.get_value(ConfidenceInterval, "score_ci")
+                    value = metric_result.get_value(Score, "score").value
+                    ci = metric_result.get_value_or_none(ConfidenceInterval, "score_ci")
                     if ci is not None:
                         ci_low = ci.low
                         ci_high = ci.high

@@ -14,6 +14,7 @@ module corresponding to its task, in this case:
 `explainaboard/processors/text_classification.py`
 
 To add a feature that is analyzed for each example:
+
 1. add an entry or two to the `features` list
 2. make sure that a `BucketAnalysis` object is added to the `analyses` list. For many
    processors, float features are added automatically, but string features need to be
@@ -60,18 +61,20 @@ class TextClassificationProcessor(Processor):
 
 
 ```
+
 where
+
 * `dtype` represents the data type of the feature
-    * `float` for continuous feature
-    * `string` for discrete feature
+  * `float` for continuous feature
+  * `string` for discrete feature
 * `description`: the description of the feature
 * `func`: a function to calculate the feature, with three arguments
-   * `info`: the SysOutputInfo object
-   * `x`: the original example data from the system output/dataset
-   * `c`: the `AnalysisCase` corresponding to this example
+  * `info`: the SysOutputInfo object
+  * `x`: the original example data from the system output/dataset
+  * `c`: the `AnalysisCase` corresponding to this example
 
 Note that it is possible to define features not only over the whole example, but also
-over individual tokens or spans. You can take a look at `sequence_labeling.py` or 
+over individual tokens or spans. You can take a look at `sequence_labeling.py` or
 `conditional_generation.py` for examples of this.
 
 ## Features and Unittests
