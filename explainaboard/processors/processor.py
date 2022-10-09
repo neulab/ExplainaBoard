@@ -199,11 +199,15 @@ class Processor(metaclass=abc.ABCMeta):
                         output_data=None,
                     )
                     dataset = loader.load()
-                except ValueError as e:
+                except FileNotFoundError as e:
                     get_logger().warning(
                         f"{sys_info.dataset_name} could not be loaded by DataLab so"
                         " no training set dependent features will be supported by"
                         f" ExplainaBoard. Error: {e}"
+                    )
+                except ValueError as e:
+                    get_logger().warning(
+                        f"Data split `{split_name}` couldn't been found. Error: {e}"
                     )
                 if dataset is not None:
                     statistics = self._statistics_func(dataset.samples, sys_info)
