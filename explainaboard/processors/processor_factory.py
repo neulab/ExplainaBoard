@@ -70,7 +70,6 @@ _TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
     TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
     TaskType.meta_evaluation_nlg: MetaEvaluationNLGProcessor,
     TaskType.argument_pair_identification: ArgumentPairIdentificationProcessor,
-    TaskType.ranking_with_context: ArgumentPairIdentificationProcessor,
 }
 
 
