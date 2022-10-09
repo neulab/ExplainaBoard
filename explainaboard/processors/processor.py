@@ -200,6 +200,10 @@ class Processor(metaclass=abc.ABCMeta):
                         " no training set dependent features will be supported by"
                         f" ExplainaBoard. Error: {e}"
                     )
+                except ValueError as e:
+                    get_logger().warning(
+                        f"Data split `{split_name}` couldn't been found. Error: {e}"
+                    )
                 if dataset is not None:
                     statistics = self._statistics_func(dataset.samples, sys_info)
                     get_logger().info(
