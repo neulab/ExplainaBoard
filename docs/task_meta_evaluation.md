@@ -1,12 +1,13 @@
 # Analyzing Meta Evaluation for NLG Tasks
 
-
 ## Data Preparation
 
 The dataset file format is:
+
 ```
 SYSName \t SEGID \t TestSet \t src \t ref \t sys \t manualRaw \t manualZ
 ```
+
 * SYSName is the name of system being scored.
 * SEGID is the ID of segment being scored.
 * TestSet is the ID of the test set.
@@ -14,9 +15,10 @@ SYSName \t SEGID \t TestSet \t src \t ref \t sys \t manualRaw \t manualZ
 * ref is the reference sentence.
 * sys is the sentence to be scored.
 * manualRaw is the manual evaluated raw score.
-* manualZ is the manual evaluated Z score, standardized for each annotator. 
+* manualZ is the manual evaluated Z score, standardized for each annotator.
 
 We have an example dataset file:
+
 * [data.tsv](./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv)
 
 More dataset files can be found at [WMT-DA-20](https://drive.google.com/drive/u/0/folders/1JXpo0yxPLYlNgLbOfP1bzs9z6SOx76Wo).
@@ -30,12 +32,11 @@ systemScore2
 ```
 
 We have an example system outputs file:
+
 * [score.txt](./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt)
 
-
-
-
 ## Performing Basic Analysis
+
 You can load the dataset from an existing file using the
 `--custom-dataset-paths` option
 
@@ -49,9 +50,8 @@ explainaboard \
     --source-language en \
     --target-language en
 ```
- 
 
-You can also use a dataset supported by DataLab, for example 
+You can also use a dataset supported by DataLab, for example
 [wmt20_metrics_with_score](https://github.com/ExpressAI/DataLab/blob/main/datasets/wmt20_metrics_with_score/wmt20_metrics_with_score.py).
 
 ```shell
@@ -64,7 +64,3 @@ explainaboard \
     --source-language en \
     --target-language en
 ```
-
-
-
-
