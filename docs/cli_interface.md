@@ -23,7 +23,7 @@ with examples of how to analyze different tasks. In particular
 We welcome contributions of [more tasks](add_new_tasks.md), or detailed documentation
 for tasks where the documentation does not yet exist! Please open an issue or file a PR.
 
-**Table of Contents**
+## Table of Contents
 
 * [Text Classification](#text-classification)
 * [Text Pair Classification](#text-pair-classification)
@@ -52,7 +52,7 @@ Text classification consists of classifying text into different categories, such
 sentiment values or topics. The below example performs an analysis on the Stanford
 Sentiment Treebank, a set of sentiment tags over English reviews.
 
-**CLI Examples**
+### CLI Examples
 
 The below example loads the `sst2` dataset from DataLab:
 
@@ -73,7 +73,7 @@ detection. The example below concerns natural language infernce, predicting whet
 premise, entails, contradicts, or is neutral with respect to a hypothesis, on the
 Stanford Natural Language Inference dataset.
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `snli` dataset from DataLab:
 
@@ -93,7 +93,7 @@ Conditional text generation concerns generation of one text based on other texts
 including tasks like summarization and machine translation. The below example evaluates
 a summarization system on the CNN-daily mail dataset.
 
-**CLI Example**
+### CLI Example
 
 The below example loads a miniature version of the CNN-daily mail dataset (100 lines only) from an existing file:
 
@@ -122,7 +122,7 @@ Language modeling is the task of predicting the probability for words in a text.
 You can analyze your language model outputs by inputting a file that has one log
 probability for each space-separated word. Here is an example:
 
-**CLI Example**
+### CLI Example
 
 The below example analyzes the wikitext corpus:
 
@@ -135,7 +135,7 @@ explainaboard --task language-modeling --custom-dataset-paths ./data/system_outp
 Named entity recognition recognizes entities such as people, organizations, or locations in text.
 The below examples demonstrate how you can perform such analysis on the CoNLL 2003 English named entity recognition dataset.
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `conll2003` NER dataset from DataLab:
 
@@ -146,14 +146,14 @@ explainaboard --task named-entity-recognition --dataset conll2003 --sub-dataset 
 Alternatively, you can reference a dataset file directly.
 
 ```shell
-explainaboard --task named-entity-recognition --custom-dataset-paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system-outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll 
+explainaboard --task named-entity-recognition --custom-dataset-paths ./data/system_outputs/conll2003/conll2003-dataset.conll --system-outputs ./data/system_outputs/conll2003/conll2003-elmo-output.conll
 ```
 
 ## Word Segmentation
 
 Word segmentation aims to segment texts without spaces between words.
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `msr` dataset from DataLab:
 
@@ -173,7 +173,7 @@ explainaboard --task word-segmentation --custom-dataset-paths ./data/system_outp
 
 Dividing text into syntactically related non-overlapping groups of words.
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `conll00_chunk` dataset from DataLab:
 
@@ -192,7 +192,7 @@ explainaboard --task chunking --custom-dataset-paths ./data/system_outputs/chunk
 Extractive QA attempts to answer queries based on extracting segments from an evidence passage.
 The below example performs this extraction on the dataset SQuAD.
 
-**CLI Example**
+### CLI Example
 
 Below is an example of referencing the dataset directly.
 
@@ -211,7 +211,7 @@ explainaboard --task qa-extractive --dataset squad --system-outputs MY_FILE > re
 This task aims to answer a question based on a hybrid of tabular
 and textual context, e.g., [Zhu et al.2021](https://aclanthology.org/2021.acl-long.254.pdf).
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `tat_qa` dataset from DataLab.
 
@@ -233,7 +233,7 @@ unstructured documents
 Following examples show how an open-domain QA system can be evaluated with detailed analyses using
 ExplainaBoard CLI.
 
-**CLI Example**
+### CLI Example
 
 Using Build-in datasets from DataLab:
 
@@ -246,7 +246,7 @@ explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --sys
 Answer a question from multiple options.
 The following example demonstrates this on the metaphor QA dataset.
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `fig_qa` dataset from DataLab.
 
@@ -264,7 +264,7 @@ explainaboard --task qa-multiple-choice --custom-dataset-paths ./data/system_out
 
 Predicting the tail entity of missing links in knowledge graphs
 
-**CLI Example**
+### CLI Example
 
 The below example loads the `fb15k_237` dataset from DataLab.
 
@@ -281,7 +281,7 @@ The below example loads the `fb15k_237` dataset from DataLab.
 
 Predict the sentiment of a text based on a specific aspect.
 
-**CLI Example**
+### CLI Example
 
 This is an example with a custom dataset.
 
@@ -293,7 +293,8 @@ explainaboard --task aspect-based-sentiment-classification --custom-dataset-path
 
 Fill in a blank based on multiple provided options
 
-**CLI Example**
+### CLI Example
+
 This is an example using the dataset from `DataLab`
 
 ```shell
@@ -304,7 +305,8 @@ explainaboard --task cloze-multiple-choice --dataset gaokao2018_np1 --sub-datase
 
 Fill in a blank based on hint
 
-**CLI Example**
+### CLI Example
+
 This is an example using the dataset from `DataLab`
 
 ```shell
@@ -314,7 +316,9 @@ explainaboard --task cloze-generative --dataset gaokao2018_np1 --sub-dataset clo
 ## [Grammatical Error Correction]
 
 Correct errors in a text
-**CLI Example**
+
+### CLI Example
+
 This is an example using the dataset from `DataLab`
 
 ```shell
@@ -330,7 +334,7 @@ features that is analyzed by ExplainaBoard is the `label` feature, so you might 
 specify other features to perform bucketing over using the `metadata` entry in the
 dataset `json` file, as is done in `sst2-tabclass-dataset.json` below.
 
-**CLI Examples**
+### CLI Examples
 
 The below example loads a dataset from an existing file:
 
@@ -343,7 +347,7 @@ explainaboard --task tabular-classification --custom-dataset-paths ./data/system
 Regression over tabular data is basically the same as tabular classification above, but
 the predicted outputs are continuous numbers instead of classes.
 
-**CLI Examples**
+### CLI Examples
 
 The below example loads a dataset from an existing file:
 
@@ -355,7 +359,7 @@ explainaboard --task tabular-regression --custom-dataset-paths ./data/system_out
 
 This task aim to detect the argument pairs from each passage pair of review and rebuttal.
 
-**CLI Examples**
+### CLI Examples
 
 The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab:
 
@@ -379,7 +383,7 @@ explainaboard --task argument-pair-identification --dataset iapi --system-output
 
 Evaluating the reliability of automated metrics for general text generation tasks, such as text summarization.
 
-**CLI Examples**
+### CLI Examples
 
 The below example loads the meval_summeval dataset from DataLab:
 
@@ -392,7 +396,7 @@ explainaboard --task meta-evaluation-nlg --dataset meval_summeval --sub-dataset 
 Evaluating the reliability of automated metrics for [WMT Metrics shared tasks](https://wmt-metrics-task.github.io/)
  using [direct assessment](https://www.statmt.org/wmt16/slides/wmt16-news-da.pdf) (DA).
 
-**CLI Example**
+### CLI Example
 
 This is an example with a custom dataset.
 
