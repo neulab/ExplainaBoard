@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import unittest
 
+import numpy as np
+
 from explainaboard.metrics.accuracy import (
     Accuracy,
     AccuracyConfig,
@@ -12,7 +14,8 @@ from explainaboard.metrics.accuracy import (
     SeqCorrectCount,
     SeqCorrectCountConfig,
 )
-from explainaboard.metrics.metric import Score
+from explainaboard.metrics.metric import Score, SimpleMetricStats
+from explainaboard.utils.typing_utils import unwrap
 
 
 class AccuracyConfigTest(unittest.TestCase):
@@ -42,6 +45,21 @@ class AccuracyTest(unittest.TestCase):
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
+
+    def test_evaluate_from_stats(self) -> None:
+        metric = AccuracyConfig().to_metric()
+        stats = SimpleMetricStats(np.array([1.0, 0.0, 1.0, 1.0, 0.0]))
+        result = metric.evaluate_from_stats(stats=stats)
+        self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 0.6)
+        self.assertIsNone(result.get_value_or_none(Score, "confidence"))
+
+    def test_evaluate_from_stats_with_confidence(self) -> None:
+        metric = AccuracyConfig().to_metric()
+        stats = SimpleMetricStats(np.array([1.0, 0.0, 1.0, 1.0, 0.0]))
+        conf_stats = SimpleMetricStats(np.array([0.5, 0.4, 0.6, 0.5, 0.5]))
+        result = metric.evaluate_from_stats(stats=stats, auxiliary_stats=conf_stats)
+        self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 0.6)
+        self.assertAlmostEqual(unwrap(result.get_value(Score, "confidence")).value, 0.5)
 
 
 class CorrectCountConfigTest(unittest.TestCase):

@@ -164,7 +164,7 @@ class SeqLabProcessor(Processor):
                 description=span_features["span_true_label"].description,
                 feature="span_true_label",
                 method="discrete",
-                number=15,
+                num_buckets=15,
             ),
             ComboCountAnalysis(
                 level="span",
@@ -176,7 +176,7 @@ class SeqLabProcessor(Processor):
                 description=span_features["span_capitalness"].description,
                 feature="span_capitalness",
                 method="discrete",
-                number=4,
+                num_buckets=4,
             ),
         ]
         analyses.extend(self.continuous_feature_analyses())
