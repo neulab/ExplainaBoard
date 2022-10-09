@@ -82,18 +82,20 @@ new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
 ExplainaBoard is developed by Carnegie Mellon University, Inspired Cognition Inc., and
 other collaborators. If you find it useful in research, you can cite it in papers:
 
-    @inproceedings{liu-etal-2021-explainaboard,
-        title = "{E}xplaina{B}oard: An Explainable Leaderboard for {NLP}",
-        author = "Liu, Pengfei and Fu, Jinlan and Xiao, Yang and Yuan, Weizhe and Chang, Shuaichen and Dai, Junqi and Liu, Yixin and Ye, Zihuiwen and Neubig, Graham",
-        booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing: System Demonstrations",
-        month = aug,
-        year = "2021",
-        address = "Online",
-        publisher = "Association for Computational Linguistics",
-        url = "https://aclanthology.org/2021.acl-demo.34",
-        doi = "10.18653/v1/2021.acl-demo.34",
-        pages = "280--289",
-    }
+```text
+@inproceedings{liu-etal-2021-explainaboard,
+    title = "{E}xplaina{B}oard: An Explainable Leaderboard for {NLP}",
+    author = "Liu, Pengfei and Fu, Jinlan and Xiao, Yang and Yuan, Weizhe and Chang, Shuaichen and Dai, Junqi and Liu, Yixin and Ye, Zihuiwen and Neubig, Graham",
+    booktitle = "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing: System Demonstrations",
+    month = aug,
+    year = "2021",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.acl-demo.34",
+    doi = "10.18653/v1/2021.acl-demo.34",
+    pages = "280--289",
+}
+```
 
 We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
 Colin Raffel, Yang Liu, Li Dong. We also thank
