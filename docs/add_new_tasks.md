@@ -1,16 +1,18 @@
 # Add New Tasks
 
-Let's take `text_classification` as an example to show how to add a new task for ExplainaBoard.
+Let's take `text_classification` as an example to show how to add a new task for
+ExplainaBoard.
 
 To do so, you would first need to add your task to the modules `tasks.py`.
-After doing so, you would also need to create a `Loader`, `Processor`, and unit tests for the
-new task, placed under the relevant directories.
+After doing so, you would also need to create a `Loader`, `Processor`, and unit tests
+for the new task, placed under the relevant directories.
 
 ## Task and Format Declaration
 
-(1) All the supported tasks are listed in **tasks.py**. If your task name is not listed in the file,
-please add your task to `TaskType` (enum) and the task list `_task_categories`. Task names can not
-contain `space` and different words should be connected using `-`.
+(1) All the supported tasks are listed in **tasks.py**. If your task name is not listed
+in the file, please add your task to `TaskType` (enum) and the task list
+`_task_categories`. Task names can not contain `space` and different words should be
+connected using `-`.
 
 (2) If the format of your task's dataset is not covered by `FileType` in the file
 `explainaboard/constants.py`, please manually add the new format (in the case that your
@@ -29,11 +31,13 @@ _task_categories: List[TaskCategory] = [
 ]
 ```
 
-where the parameters in `TaskCategory` refers to the task's name, description, and the list of tasks
+where the parameters in `TaskCategory` refers to the task's name, description, and the
+list of tasks.
 
 ## Create a Loader module for your task
 
-(1) Create a new python file `text_classification.py` in the folder `explainaboard/loaders/`
+(1) Create a new python file `text_classification.py` in the folder
+`explainaboard/loaders/`
 
 (2) In this file, we need to:
 
@@ -41,7 +45,7 @@ where the parameters in `TaskCategory` refers to the task's name, description, a
 * implement the member function `def load(self)`
 
 Here is the example for text classification:
-  
+
 ```python
 from typing import Dict, Iterable, List
 from explainaboard.constants import *
@@ -106,10 +110,11 @@ __all__ = [
 * define features that you aim to use for this task in the `_features` variable
 * [implement the features](add_new_features.md) that you want to use to perform analysis
 
-Note that for simpler tests, this is mostly all that you need to do. For more complex tasks,
-you may want to override some of the functions in the base `Processor` class implemented in
-`processors/processor.py`. `processors/text_classification.py` gives a good example of a simpler
-task, and `processors/named_entity_recognition.py` gives a good example of a more complicated task.
+Note that for simpler tests, this is mostly all that you need to do. For more complex
+tasks, you may want to override some of the functions in the base `Processor` class
+implemented in `processors/processor.py`. `processors/text_classification.py` gives a
+good example of a simpler task, and `processors/named_entity_recognition.py` gives a
+good example of a more complicated task.
 
 (3) Import this module (text_classification.py) in `__init__.py`
 For example, in this file `explainaboard/processors/__init__.py`, we have:

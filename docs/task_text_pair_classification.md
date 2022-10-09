@@ -23,7 +23,8 @@ A man playing an electric guitar on stage.   A man is performing for cash.  neut
 ...
 ```
 
-* (3) `json` (basically, it's a list of dictionaries with three keys: `text1`, `text2` and `true_label`)
+* (3) `json` (basically, it's a list of dictionaries with three keys: `text1`, `text2`
+  and `true_label`)
 
 ```json
 [

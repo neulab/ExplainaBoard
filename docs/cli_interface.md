@@ -95,7 +95,8 @@ a summarization system on the CNN-daily mail dataset.
 
 ### CLI Example
 
-The below example loads a miniature version of the CNN-daily mail dataset (100 lines only) from an existing file:
+The below example loads a miniature version of the CNN-daily mail dataset (100 lines
+only) from an existing file:
 
 ```shell
 explainaboard --task summarization --custom-dataset-paths ./data/system_outputs/cnndm/cnndm_mini-dataset.tsv --system-outputs ./data/system_outputs/cnndm/cnndm_mini-bart-output.txt --metrics rouge2 bart_score_en_ref
@@ -104,7 +105,8 @@ explainaboard --task summarization --custom-dataset-paths ./data/system_outputs/
 Note that this uses two different metrics separated by a space.
 
 You could also load the `cnn_dailymail` dataset from DataLab.
-Because the test set is large we don't include it directly in the explainaboard repository, but you can get an example by downloading with wget:
+Because the test set is large we don't include it directly in the explainaboard
+repository, but you can get an example by downloading with wget:
 
 ```shell
 wget -P ./data/system_outputs/cnndm/ https://storage.googleapis.com/inspired-public-data/explainaboard/task_data/summarization/cnndm-bart-output.txt
@@ -132,8 +134,9 @@ explainaboard --task language-modeling --custom-dataset-paths ./data/system_outp
 
 ## Named Entity Recognition
 
-Named entity recognition recognizes entities such as people, organizations, or locations in text.
-The below examples demonstrate how you can perform such analysis on the CoNLL 2003 English named entity recognition dataset.
+Named entity recognition recognizes entities such as people, organizations, or locations
+in text. The below examples demonstrate how you can perform such analysis on the CoNLL
+2003 English named entity recognition dataset.
 
 ### CLI Example
 
@@ -200,7 +203,10 @@ Below is an example of referencing the dataset directly.
 explainaboard --task qa-extractive --custom-dataset-paths ./data/system_outputs/squad/squad_mini-dataset.json --system-outputs ./data/system_outputs/squad/squad_mini-example-output.json > report.json
 ```
 
-The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
+The below example loads the `squad` dataset from DataLab. There is an
+[open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the
+specification of a dataset split, so this will not work at the moment. But we are
+working on it.
 
 ```shell
 explainaboard --task qa-extractive --dataset squad --system-outputs MY_FILE > report.json
@@ -230,8 +236,8 @@ wget -P ./ https://explainaboard.s3.amazonaws.com/system_outputs/qa_table_text_h
 Open-domain QA aims to answer a question in the form of natural language based on large-scale
 unstructured documents
 
-Following examples show how an open-domain QA system can be evaluated with detailed analyses using
-ExplainaBoard CLI.
+Following examples show how an open-domain QA system can be evaluated with detailed
+analyses using ExplainaBoard CLI.
 
 ### CLI Example
 
@@ -361,7 +367,8 @@ This task aim to detect the argument pairs from each passage pair of review and 
 
 ### CLI Examples
 
-The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py) dataset from DataLab:
+The below example loads the [`ape`](https://github.com/ExpressAI/DataLab/blob/main/datasets/ape/ape.py)
+dataset from DataLab:
 
 ```shell
 explainaboard --task argument-pair-extraction --dataset ape --system-outputs ./data/system_outputs/ape/ape_predictions.txt
@@ -373,7 +380,8 @@ Given an argument, the task aims to identify one matched argument from a list of
 
 ### CLI Examples
 
-The example below loads the [`iapi`](https://github.com/ExpressAI/DataLab/blob/main/datasets/iapi/iapi.py) dataset from DataLab:
+The example below loads the [`iapi`](https://github.com/ExpressAI/DataLab/blob/main/datasets/iapi/iapi.py)
+dataset from DataLab:
 
 ```shell
 explainaboard --task argument-pair-identification --dataset iapi --system-outputs data/system_outputs/iapi/predictions.txt > report.json
@@ -381,7 +389,8 @@ explainaboard --task argument-pair-identification --dataset iapi --system-output
 
 ## [Meta Evaluation NLG]
 
-Evaluating the reliability of automated metrics for general text generation tasks, such as text summarization.
+Evaluating the reliability of automated metrics for general text generation tasks, such
+as text summarization.
 
 ### CLI Examples
 

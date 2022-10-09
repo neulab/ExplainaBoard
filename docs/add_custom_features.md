@@ -1,10 +1,16 @@
 # Add custom features for custom analysis
 
-If you want to perform custom analysis with your custom features that are not supported in the original task processors, and these features are only related to one particular system/dataset instead of the task itself, you can define the custom features and analysis in the `metadata` section in the output JSON file.
+If you want to perform custom analysis with your custom features that are not supported
+in the original task processors, and these features are only related to one particular
+system/dataset instead of the task itself, you can define the custom features and
+analysis in the `metadata` section in the output JSON file.
 
 ## Example of bucket analysis
 
-Here is the output json format for bucket analysis with custom features. Discrete features should have `"dtype": "string"`, such as the subject of the sentence, etc. Continuous features should have `"dtype": "float"`, such as the count of particular words, the output logits/probability, etc.
+Here is the output json format for bucket analysis with custom features. Discrete
+features should have `"dtype": "string"`, such as the subject of the sentence, etc.
+Continuous features should have `"dtype": "float"`, such as the count of particular
+words, the output logits/probability, etc.
 
 ```
 {
@@ -59,12 +65,13 @@ where
   * `span` for span-level analysis (e.g. in named entity recognition analysis)
   * `token` for token-level analysis (e.g. in named entity conditional text generation)
 * `num_bucket`: the number of buckets to be used
-* `sample_limit`: if the number of examples are larger than sample_limit, randomly select sample_limit examples for analysis
+* `sample_limit`: if the number of examples are larger than sample_limit, randomly
+  select sample_limit examples for analysis
 
 ## Example of ComboCountAnalysis
 
-ComboCountAnalysis is used to count feature combinations (e.g. for confusion matrices). It will
-return counts of each combination of values for the features named in `features`.
+ComboCountAnalysis is used to count feature combinations (e.g. for confusion matrices).
+It will return counts of each combination of values for the features named in `features`.
 
 ```
 {
@@ -93,7 +100,8 @@ where
   * `example` for sentence-level analysis
   * `span` for span-level analysis (e.g. in named entity recognition analysis)
   * `token` for token-level analysis (e.g. in named entity conditional text generation)
-* `features` should be a list of feature names where each feature are predefined. These features can be true_label, predicted_label, or other custom features.
+* `features` should be a list of feature names where each feature are predefined. These
+  features can be true_label, predicted_label, or other custom features.
 
 ## Example output json files
 
@@ -102,7 +110,8 @@ where
 
 ## Note
 
-When running analysis with SDK command, `--custom-dataset-file-type` and `--output-file-type json` are required.
+When running analysis with SDK command, `--custom-dataset-file-type` and
+`--output-file-type json` are required.
 
 Example command:
 

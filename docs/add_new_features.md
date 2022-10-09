@@ -90,11 +90,13 @@ If you want to add features that are dependent on the training set, you will nee
 
 1. Implement a `get_statistics` function that saves the statistics from the training set
 2. Declare `require_training_set=True` in the feature definition
-3. Use the passed-in `statistics` object to access the training set statistics when calculating features
+3. Use the passed-in `statistics` object to access the training set statistics when
+   calculating features
 
 It is probably best to learn by example, so you can take a look at `get_num_oov` in
 `processors/text_classification.py`.
 
 ## Add Custom Features
 
-If you want to add system/dataset-related features that don't apply to the task itself, check [add_custom_features](add_custom_features.md)
+If you want to add system/dataset-related features that don't apply to the task itself,
+check [add_custom_features](add_custom_features.md).

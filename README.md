@@ -10,7 +10,11 @@
 
 ## What is ExplainaBoard?
 
-When developing a natural language processing (NLP or AI) system, often one of the hardest things is to understand where your system is working and where it is failing, and deciding what to do next. ExplainaBoard is a tool that *inspects your system outputs*, *identifies what is working and what is not working*, and helps *inspire you with ideas of where to go next*.
+When developing a natural language processing (NLP or AI) system, often one of the
+hardest things is to understand where your system is working and where it is failing,
+and deciding what to do next. ExplainaBoard is a tool that *inspects your system
+outputs*, *identifies what is working and what is not working*, and helps *inspire you
+with ideas of where to go next*.
 
 <img src="./fig/intro.png" width="300" align="right">
 
@@ -47,7 +51,8 @@ pip install explainaboard
 python -m spacy download en_core_web_sm  # if you plan to use the AspectBasedSentimentClassificationProcessor
 ```
 
-**Install Method 2 - Development:** Install from the source and develop locally (Python 3 only)
+**Install Method 2 - Development:** Install from the source and develop locally (Python
+3 only)
 
 ```bash
 # Clone current repo
@@ -61,10 +66,12 @@ pre-commit install
 ```
 
 - **Testing:** To run tests, you can run `python -m unittest`.
-- **Linting and Code Style:** This project uses flake8 (linter) and black (formatter). They are enforced in the pre-commit hook and in the CI pipeline.
+- **Linting and Code Style:** This project uses flake8 (linter) and black (formatter).
+  They are enforced in the pre-commit hook and in the CI pipeline.
   - run `python -m black .` to format code
   - run `flake8` to lint code
-  - You can also configure your IDE to automatically format and lint the files as you are writing code.
+  - You can also configure your IDE to automatically format and lint the files as you
+    are writing code.
 
 After trying things out in the [CLI](docs/cli_interface.md), you can read how to add
 new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
@@ -72,8 +79,8 @@ new [features](docs/add_new_features.md), [tasks](docs/add_new_tasks.md), or
 
 ## Acknowledgement
 
-ExplainaBoard is developed by Carnegie Mellon University, Inspired Cognition Inc., and other collaborators.
-If you find it useful in research, you can cite it in papers:
+ExplainaBoard is developed by Carnegie Mellon University, Inspired Cognition Inc., and
+other collaborators. If you find it useful in research, you can cite it in papers:
 
     @inproceedings{liu-etal-2021-explainaboard,
         title = "{E}xplaina{B}oard: An Explainable Leaderboard for {NLP}",
