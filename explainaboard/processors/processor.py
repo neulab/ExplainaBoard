@@ -194,7 +194,7 @@ class Processor(metaclass=abc.ABCMeta):
                         output_data=None,
                     )
                     dataset = loader.load()
-                except ValueError as e:
+                except FileNotFoundError as e:
                     get_logger().warning(
                         f"{sys_info.dataset_name} could not be loaded by DataLab so"
                         " no training set dependent features will be supported by"
