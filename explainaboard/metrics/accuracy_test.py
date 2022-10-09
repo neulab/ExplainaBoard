@@ -13,7 +13,6 @@ from explainaboard.metrics.accuracy import (
     SeqCorrectCountConfig,
 )
 from explainaboard.metrics.metric import Score
-from explainaboard.utils.typing_utils import unwrap
 
 
 class AccuracyConfigTest(unittest.TestCase):
@@ -42,9 +41,7 @@ class AccuracyTest(unittest.TestCase):
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
-        self.assertAlmostEqual(
-            unwrap(result.get_value(Score, "score")).value, 2.0 / 3.0
-        )
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
 
 
 class CorrectCountConfigTest(unittest.TestCase):
@@ -76,7 +73,7 @@ class CorrectCountTest(unittest.TestCase):
         true = ['a', 'b', 'a', 'b', 'a', 'b']
         pred = ['a', 'b', 'a', 'b', 'b', 'a']
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
-        self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 4)
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 4)
 
 
 class SeqCorrectCountConfigTest(unittest.TestCase):
@@ -135,4 +132,4 @@ class SeqCorrectCountTest(unittest.TestCase):
             }
         ]
         result = metric.evaluate(true, pred)
-        self.assertAlmostEqual(unwrap(result.get_value(Score, "score")).value, 5)
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 5)
