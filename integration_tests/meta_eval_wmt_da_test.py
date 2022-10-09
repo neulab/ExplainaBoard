@@ -190,6 +190,7 @@ class MetaEvalNLGCITest(unittest.TestCase):
         )
         # TODO: This check could be made more rigorous by checking whether the
         #       confidence interval lies within a reasonable range
+        # See https://github.com/neulab/ExplainaBoard/issues/537
         self.assertGreater(val, ci[0])
         self.assertGreater(ci[1], val)
 
@@ -209,6 +210,7 @@ class MetaEvalNLGCITest(unittest.TestCase):
         )
         # TODO: This check could be made more rigorous by checking whether the
         #       confidence interval lies within a reasonable range
+        # See https://github.com/neulab/ExplainaBoard/issues/537
         self.assertGreater(val, ci[0])
         self.assertGreater(ci[1], val)
 
