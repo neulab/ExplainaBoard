@@ -16,8 +16,5 @@ config:
     # Markdown yet.
     allowed_elements: [a, img]
 
-  # TODO(tetsuok): Re-enable once the existing issues are fixed.
-  MD046: false
-
 ignores:
   - "explainaboard/third_party"
