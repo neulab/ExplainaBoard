@@ -45,7 +45,7 @@ First, follow the installation directions below, then take a look at our
 
 **Install Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
-```
+```bash
 pip install --upgrade pip  # recommending the newest version of pip.
 pip install explainaboard
 python -m spacy download en_core_web_sm  # if you plan to use the AspectBasedSentimentClassificationProcessor

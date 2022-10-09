@@ -35,7 +35,7 @@ Once the system outputs are ready, evaluation can be conducted through following
 
 ## 1. Generate Analysis Reports for System Output Collections
 
-```
+```shell
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/xnli/*
 ```
 
@@ -122,7 +122,7 @@ explainaboard --reports ./output/reports/*
 
 then you will get:
 
-```
+```text
 ----------------------------------------
 Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       ar      en      es      zh
@@ -160,13 +160,13 @@ ExplainaBoard also provides interface that users could filter all results with t
 specified conditions. For example, if we only care about results on  `xnli` and `marc`
 datasets
 
-```
+```shell
 explainaboard --reports ./output/reports/* --datasets xnli marc
 ```
 
 Then, following results will be obtained:
 
-```
+```text
 ----------------------------------------
 Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       ar      en      es      zh
@@ -193,13 +193,13 @@ Accuracy:       0.933   0.920   0.934   0.933   0.914   0.868
 ExplainaBoard SDK allows users to aggregate results along different dimension. For
 example, if we aim to know the average performance ove all languages for each dataset,
 
-```
+```shell
 explainaboard --reports ./output/reports/* --languages-aggregation average
 ```
 
 Then following results will be printed:
 
-```
+```text
 ----------------------------------------
 Model: CL-mlpp15out1sum, Dataset: xnli
 Language:       all_languages
@@ -238,13 +238,13 @@ system2) over different datasets (tasks) and different languages.
 For example, the following command represent: the performance gap between two systems on
  all languages from `mar` and `xnli` datasets.
 
-```
+```shell
 explainaboard --reports ./output/reports/* --datasets marc xnli --systems-aggregation minus
 ```
 
 Then following results will be printed:
 
-```
+```text
 ----------------------------------------
 Model: CL-mlpp15out1sum V.S CL-mt5base, Dataset: marc
 Language:       de      zh      fr      ja      es      en

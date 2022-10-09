@@ -607,10 +607,17 @@ class Metric(metaclass=abc.ABCMeta):
             high = int(num_iterations * (1.0 - confidence_alpha / 2.0))
             return float(samp_results[low]), float(samp_results[high])
 
+    def calc_metric_from_auxiliary_stats(
+        self, auxiliary_stats: MetricStats
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """Calculate the auxiliary result from auxiliary stats."""
+        raise NotImplementedError
+
     def evaluate_from_stats(
         self,
         stats: MetricStats,
         confidence_alpha: Optional[float] = None,
+        auxiliary_stats: Optional[MetricStats] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
 
@@ -618,6 +625,7 @@ class Metric(metaclass=abc.ABCMeta):
             stats: pre-computed metric stats
             confidence_alpha: if set to not None, must be a number between 0 and 1,
                 indicating the inverse confidence level of confidence intervals
+            auxiliary_stats: metric stats used to calculate auxiliary metric result
 
         Returns:
             a resulting metric value

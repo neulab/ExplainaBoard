@@ -39,7 +39,7 @@ The movie is too long   negative
 
 In this task, your system outputs should be as follows:
 
-```
+```text
 predicted_label
 ```
 
@@ -77,7 +77,7 @@ explainaboard --task text-classification --custom-dataset-paths ./data/system_ou
 
 in which case the file format of this file is TSV
 
-```
+```text
 text \t true_label
 ```
 

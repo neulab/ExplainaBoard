@@ -41,7 +41,7 @@ where the first 1st, 2nd, 3rd column represent aspect text, sentence and true la
 
 In this task, your system outputs should be as follows:
 
-```
+```text
 predicted_label
 ```
 
@@ -56,7 +56,7 @@ etc. from different systems.
 If your dataset exists in DataLab you can read it directly from there. However, here
 we will give an example of using a custom dataset, which takes this form:
 
-```
+```text
 aspect \t sentence \t true_label
 ```
 

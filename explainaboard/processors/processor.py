@@ -16,6 +16,7 @@ from explainaboard.analysis.analyses import (
     AnalysisResult,
     BucketAnalysis,
     BucketAnalysisResult,
+    CalibrationAnalysis,
 )
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature import DataType, FeatureType, Value
@@ -81,7 +82,11 @@ class Processor(metaclass=abc.ABCMeta):
         for lev in analysis_levels:
             # Continuous features
             for k, v in lev.features.items():
-                if isinstance(v, Value) and v.dtype == DataType.FLOAT:
+                if (
+                    isinstance(v, Value)
+                    and v.dtype == DataType.FLOAT
+                    and not v.optional
+                ):
                     analyses.append(
                         BucketAnalysis(
                             level=lev.name,
@@ -194,11 +199,15 @@ class Processor(metaclass=abc.ABCMeta):
                         output_data=None,
                     )
                     dataset = loader.load()
-                except ValueError as e:
+                except FileNotFoundError as e:
                     get_logger().warning(
                         f"{sys_info.dataset_name} could not be loaded by DataLab so"
                         " no training set dependent features will be supported by"
                         f" ExplainaBoard. Error: {e}"
+                    )
+                except ValueError as e:
+                    get_logger().warning(
+                        f"Data split `{split_name}` couldn't been found. Error: {e}"
                     )
                 if dataset is not None:
                     statistics = self._statistics_func(dataset.samples, sys_info)
@@ -308,6 +317,12 @@ class Processor(metaclass=abc.ABCMeta):
         for my_analysis in progress(sys_info.analyses):
             level_id = level_map[my_analysis.level]
             try:
+                if (
+                    isinstance(my_analysis, CalibrationAnalysis)
+                    and my_analysis.feature not in analysis_cases[level_id][0].features
+                ):
+                    continue
+
                 all_results.append(
                     my_analysis.perform(
                         cases=analysis_cases[level_id],
@@ -363,6 +378,8 @@ class Processor(metaclass=abc.ABCMeta):
         ):
             case = AnalysisCase(sample_id=i, features={})
             for feat_name, feat_spec in analysis_level.features.items():
+                if feat_name not in output and feat_spec.optional:
+                    continue
                 if feat_spec.func is None:
                     case.features[feat_name] = output[feat_name]
                 elif not feat_spec.require_training_set:

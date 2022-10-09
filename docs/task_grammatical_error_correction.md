@@ -29,7 +29,7 @@ In what follows, we will describe how to analyze grammatical error correction sy
 In order to perform an analysis of your results, your system outputs should be arranged
 into following format:
 
-```
+```json
 [
   {
     "predicted_edits": {

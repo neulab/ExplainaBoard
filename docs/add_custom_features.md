@@ -12,7 +12,7 @@ features should have `"dtype": "string"`, such as the subject of the sentence, e
 Continuous features should have `"dtype": "float"`, such as the count of particular
 words, the output logits/probability, etc.
 
-```
+```json
 {
   "metadata": {
     "custom_features": {
@@ -73,7 +73,7 @@ where
 ComboCountAnalysis is used to count feature combinations (e.g. for confusion matrices).
 It will return counts of each combination of values for the features named in `features`.
 
-```
+```json
 {
   "metadata": {
     "custom_analyses": [
@@ -115,6 +115,6 @@ When running analysis with SDK command, `--custom-dataset-file-type` and
 
 Example command:
 
-```
+```shell
 explainaboard --task text-classification --custom-dataset-paths path_to_my_custom_data.tsv --system-outputs path_to_my_output_with_custom_features.json --report-json path_to_my_report.json --custom-dataset-file-type tsv --output-file-type json
 ```
