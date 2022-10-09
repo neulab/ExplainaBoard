@@ -116,7 +116,7 @@ class KGLinkTailPredictionProcessor(Processor):
                 description=features[k].description,
                 feature=k,
                 method="discrete",
-                number=v,
+                num_buckets=v,
             )
             for k, v in discrete_features.items()
         ]

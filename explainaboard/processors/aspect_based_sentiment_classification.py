@@ -11,6 +11,7 @@ from explainaboard.analysis.analyses import (
     Analysis,
     AnalysisLevel,
     BucketAnalysis,
+    CalibrationAnalysis,
     ComboCountAnalysis,
 )
 from explainaboard.analysis.feature import FeatureType
@@ -48,6 +49,13 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             "predicted_label": feature.Value(
                 dtype=feature.DataType.STRING,
                 description="the predicted label",
+            ),
+            "confidence": feature.Value(
+                dtype=feature.DataType.FLOAT,
+                description="the confidence of the predicted label",
+                max_value=1.0,
+                min_value=0.0,
+                optional=True,
             ),
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
@@ -95,7 +103,13 @@ class AspectBasedSentimentClassificationProcessor(Processor):
                 description=features["true_label"].description,
                 feature="true_label",
                 method="discrete",
-                number=15,
+                num_buckets=15,
+            ),
+            CalibrationAnalysis(
+                level="example",
+                description="calibration analysis",
+                feature="confidence",
+                num_buckets=10,
             ),
             ComboCountAnalysis(
                 level="example",

@@ -105,14 +105,14 @@ class QATatProcessor(Processor):
                 description=features["answer_type"].description,
                 feature="answer_type",
                 method="discrete",
-                number=10,
+                num_buckets=10,
             ),
             BucketAnalysis(
                 level="example",
                 description=features["answer_scale"].description,
                 feature="answer_scale",
                 method="discrete",
-                number=10,
+                num_buckets=10,
             ),
         ]
         analyses.extend(self.continuous_feature_analyses())

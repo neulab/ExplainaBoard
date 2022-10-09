@@ -39,6 +39,7 @@ class FeatureType(Serializable, metaclass=ABCMeta):
         description: str | None = None,
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
+        optional: bool = False,
     ) -> None:
         """Initializes FeatureType object.
 
@@ -46,12 +47,14 @@ class FeatureType(Serializable, metaclass=ABCMeta):
             description: Description of this feature.
             func: Function to calculate this feature from other features.
             require_training_set: Whether this feature relies on the training samples.
+            optional: set it to True if this feature is optional.
         """
         self._description = description
         self._func = func
         self._require_training_set = (
             require_training_set if require_training_set is not None else False
         )
+        self._optional = optional
 
     @abstractmethod
     def __eq__(self, other: object) -> bool:
@@ -99,6 +102,12 @@ class FeatureType(Serializable, metaclass=ABCMeta):
     def require_training_set(self) -> bool:
         """Returns whether this feature requires training set or not."""
         return self._require_training_set
+
+    @final
+    @property
+    def optional(self) -> bool:
+        """Returns whether this feature is optional."""
+        return self._optional
 
     @final
     def _serialize_base(self) -> dict[str, SerializableData]:
@@ -192,6 +201,7 @@ class Dict(FeatureType):
         func: Callable[..., Any] | None = None,
         require_training_set: bool | None = None,
         feature: dict[str, FeatureType],
+        optional: bool = False,
     ) -> None:
         """Initializes Dict object.
 
@@ -200,11 +210,13 @@ class Dict(FeatureType):
             func: See FeatureType.__init__.
             require_training_set: See FeatureType.__init__.
             feature: Definitions of member types.
+            optional: See FeatureType.__init__.
         """
         super().__init__(
             description=description,
             func=func,
             require_training_set=require_training_set,
+            optional=optional,
         )
         self._feature = feature
 
@@ -272,6 +284,7 @@ class Value(FeatureType):
         require_training_set: bool | None = None,
         max_value: int | float | None = None,
         min_value: int | float | None = None,
+        optional: bool = False,
     ) -> None:
         """Initializes Value object.
 
@@ -282,11 +295,13 @@ class Value(FeatureType):
             require_training_set: See FeatureType.__init__.
             max_value: The maximum value (inclusive) of values with int/float dtype.
             min_value: The minimum value (inclusive) of values with int/float dtype.
+            optional: See FeatureType.__init__.
         """
         super().__init__(
             description=description,
             func=func,
             require_training_set=require_training_set,
+            optional=optional,
         )
 
         self._dtype = dtype

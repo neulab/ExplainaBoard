@@ -54,7 +54,7 @@ class TextClassificationProcessor(Processor):
             BucketAnalysis(
                 feature="contains_question",
                 method="discrete",
-                number=2,
+                num_buckets=2,
             )
         ] + [BucketAnalysis(x, method="continuous") for x in continuous_features]
         # ...
