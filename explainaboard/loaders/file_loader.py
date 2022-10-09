@@ -62,7 +62,7 @@ class FileLoaderField:
     dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
     parser: Optional[Callable[[str], str]] = None
-    optional: Optional[bool] = None
+    optional: bool = False
 
     # Special constants used in field mapping
     SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'

@@ -590,7 +590,7 @@ class Metric(metaclass=abc.ABCMeta):
         self, auxiliary_stats: MetricStats
     ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
         """Calculate the auxiliary result from auxiliary stats."""
-        pass
+        raise NotImplementedError
 
     def evaluate_from_stats(
         self,

@@ -448,7 +448,7 @@ class CalibrationAnalysis(Analysis):
         """Set the class name."""
         self.cls_name: str = self.__class__.__name__
         if self.num_buckets <= 0:
-            self.num_buckets = 10
+            raise ValueError(f"Invalid num_buckets: {self.num_buckets}")
 
     AnalysisCaseType = TypeVar('AnalysisCaseType')
 
