@@ -13,7 +13,7 @@ can be analyzed in a similar way.
 
 * (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
     you fortunately don't need to prepare the dataset.
-  
+
 * (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
 
 ```python
@@ -36,7 +36,7 @@ The movie is too long   negative
 
 In this task, your system outputs should be as follows:
 
-```
+```text
 predicted_label
 ```
 
@@ -73,7 +73,7 @@ explainaboard --task text-classification --custom-dataset-paths ./data/system_ou
 
 in which case the file format of this file is TSV
 
-```
+```text
 text \t true_label
 ```
 

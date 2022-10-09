@@ -8,7 +8,7 @@ can be analyzed in a similar way.
 
 In order to perform analysis of your results, they should be in the following text format:
 
-```
+```text
 0
 1
 2
