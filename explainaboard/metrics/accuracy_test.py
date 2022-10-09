@@ -18,7 +18,6 @@ from explainaboard.metrics.metric import Score, SimpleMetricStats
 from explainaboard.utils.typing_utils import unwrap
 
 
-
 class AccuracyConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
