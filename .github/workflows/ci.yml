@@ -45,6 +45,7 @@ jobs:
           python -m nltk.downloader punkt
       - name: test
         run: bash cicd/run_integration_tests.sh
+        timeout-minutes: 30
   format:
     runs-on: ubuntu-latest
     steps:
