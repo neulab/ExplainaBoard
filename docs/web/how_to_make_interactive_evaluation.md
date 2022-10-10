@@ -11,7 +11,9 @@ into different categories based on some pre-defined features.
 For example, according the the text sample's length, system performance could
 be grouped into 4 buckets: [2,12], [13,18], [19,24], [25,52].
 
-If you are interested in more details, [Liu et al.2021](https://aclanthology.org/2021.acl-demo.34.pdf), [Fu et al.2020](http://aclanthology.lst.uni-saarland.de/2020.emnlp-main.489.pdf) are highly recommended.
+If you are interested in more details, [Liu et al.2021](https://aclanthology.org/2021.acl-demo.34.pdf),
+[Fu et al.2020](http://aclanthology.lst.uni-saarland.de/2020.emnlp-main.489.pdf) are
+highly recommended.
 
 When using ExplainaBoard Web, users can customize the number
 of buckets. For example:

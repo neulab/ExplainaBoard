@@ -4,8 +4,8 @@ Before diving into the detail of this doc, you're strongly recommended to know [
 important concepts about system analyses](concepts_about_system_analysis.md).
 
 In this file we describe how to analyze open-domain QA models.
-We will give an example using the  [natural_questions_comp_gen](https://github.com/ExpressAI/DataLab/blob/main/datasets/natural_questions_comp_gen/natural_questions_comp_gen.py) dataset, but other datasets
-can be analyzed in a similar way.
+We will give an example using the [natural_questions_comp_gen](https://github.com/ExpressAI/DataLab/blob/main/datasets/natural_questions_comp_gen/natural_questions_comp_gen.py)
+dataset, but other datasets can be analyzed in a similar way.
 
 ## Data Preparation
 
@@ -53,9 +53,12 @@ explainaboard --task qa-open-domain --dataset natural_questions_comp_gen   --sys
 
 where
 
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
+* `--task`: denotes the task name, you can find all supported task names
+  [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
 * `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`:denotes the dataset name
-* `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/reports/report.json). Tips: use a json viewer
-                  like [this one](http://jsonviewer.stack.hu/) for better interpretation.
+* `report.json`: the generated analysis file with json format. You can find the file
+  [here](https://github.com/ExpressAI/ExplainaBoard/blob/main/data/reports/report.json).
+  Tips: use a json viewer like [this one](http://jsonviewer.stack.hu/) for better
+  interpretation.

@@ -23,7 +23,8 @@ We have an example dataset file:
 
 More dataset files can be found at [WMT-DA-20](https://drive.google.com/drive/u/0/folders/1JXpo0yxPLYlNgLbOfP1bzs9z6SOx76Wo).
 
-In order to perform analysis of your results, your system outputs should be a one-column score (the score your metric predicts for the particular example):
+In order to perform analysis of your results, your system outputs should be a one-column
+score (the score your metric predicts for the particular example):
 
 ```text
 systemScore1

@@ -4,17 +4,20 @@ Before diving into the detail of this doc, you're strongly recommended to know [
 important concepts about system analyses](concepts_about_system_analysis.md).
 
 In this file we describe how to analyze text classification models.
-We will give an example using the `text-classification` [sst2](https://github.com/ExpressAI/ExplainaBoard/tree/main/data/datasets/sst2) dataset, but other datasets
-can be analyzed in a similar way.
+We will give an example using the `text-classification`
+[sst2](https://github.com/ExpressAI/ExplainaBoard/tree/main/data/datasets/sst2) dataset,
+but other datasets can be analyzed in a similar way.
 
 ## Data Preparation
 
 ### Format of `Dataset` File
 
-* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset.
+* (1) `datalab`: if your datasets have been supported by
+  [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets), you fortunately
+  don't need to prepare the dataset.
 
-* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
+* (2) `tsv` (without column names at the first row), see one
+  [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/sst2/sst2-dataset.tsv)
 
 ```python
 I love this movie   positive
@@ -57,7 +60,8 @@ explainaboard --task text-classification --dataset sst2 --system-outputs ./data/
 
 where
 
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
+* `--task`: denotes the task name, you can find all supported task names
+  [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/cli_interface.md)
 * `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
 * `--dataset`: denotes the dataset name

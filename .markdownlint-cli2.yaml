@@ -1,9 +1,8 @@
 config:
-  # TODO(tetsuok): Re-enable once the existing issues are fixed.
-  MD013: false
+  MD013:
     # Number of characters
-    # line_length: 88
-    # code_blocks: false
+    line_length: 88
+    code_blocks: false
 
   MD024:
     # Allow multiple headings with the same content

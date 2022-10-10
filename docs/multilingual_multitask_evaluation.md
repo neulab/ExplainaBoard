@@ -4,8 +4,8 @@ ExplainaBoard currently supports multilingual/multitask evaluation.
 
 ## Data Preparation
 
-To achieve multilingual/multitask evaluation, the system outputs files must been organized into JSON
-format with following skeleton:
+To achieve multilingual/multitask evaluation, the system outputs files must been
+organized into JSON format with following skeleton:
 
 ```JSON
 {
@@ -26,8 +26,10 @@ format with following skeleton:
 where `...` will be instantiated task-dependently. Specifically,
 
 * [Example](../data/system_outputs/multilingual/json/mlpp/marc/) for text classification
-* [Example](../data/system_outputs/multilingual/json/mlpp/xnli/) for sentence pair classification
-* [Example](../data/system_outputs/multilingual/json/mlpp/xquad/) for extractive question answering
+* [Example](../data/system_outputs/multilingual/json/mlpp/xnli/) for sentence pair
+  classification
+* [Example](../data/system_outputs/multilingual/json/mlpp/xquad/) for extractive
+  question answering
 
 Once the system outputs are ready, evaluation can be conducted through following steps.
 
@@ -54,29 +56,33 @@ then all system outputs in the folder `./data/system_outputs/multilingual/json/m
 
 ### (2) historgram figures
 
-* each figure could be regarded as a visualization of corresponding analysis report, that provides fine-grained evaluation
-   results for a system along certain feature (e.g., sentence length)
+* each figure could be regarded as a visualization of corresponding analysis report,
+  that provides fine-grained evaluation results for a system along certain feature
+  (e.g., sentence length)
 * `png` format (would be useful for paper writing)
 * in the folder `output/figures`
 
 ## 2. More Datasets (tasks), More Systems
 
-We can repeat the above process, using ExplainaBoard SDK to performan analysis for different tasks (datasets) from different languages.
-For example,
+We can repeat the above process, using ExplainaBoard SDK to performan analysis for
+different tasks (datasets) from different languages. For example,
 
-* Differant languages on `marc` dataset (text classification task) using `mt5base (a.k.a CL-mt5base)` system
+* Differant languages on `marc` dataset (text classification task) using
+  `mt5base (a.k.a CL-mt5base)` system
 
 ```shell
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/marc/*
 ```
 
-* Differant languages on `xquad` dataset (text classification task) using `mt5base` system
+* Differant languages on `xquad` dataset (text classification task) using `mt5base`
+  system
 
 ```shell
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mt5base/xquad/*
 ```
 
-* Differant languages on `xnli` dataset (natural language inference task) using `mlpp (a.k.a CL-mlpp15out1sum)` system
+* Differant languages on `xnli` dataset (natural language inference task) using
+  `mlpp (a.k.a CL-mlpp15out1sum)` system
 
 ```shell
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/xnli/*
@@ -88,7 +94,8 @@ explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/xnli
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/marc/*
 ```
 
-* Differant languages on `xquad` dataset (extractive question answwering) using `mlpp` system
+* Differant languages on `xquad` dataset (extractive question answwering) using `mlpp`
+  system
 
 ```shell
 explainaboard --system-outputs ./data/system_outputs/multilingual/json/mlpp/xquad/*
@@ -102,7 +109,8 @@ After the above two steps, for all system outputs from
 * three tasks (datasets): `xnli`, `marc`, `xquad`
 * multiple languages (e.g., `de`, `en`, `es`, `zh`)
 
-, corresponding reports have been generated. The next step is to perform analysis based on these reports.
+, corresponding reports have been generated. The next step is to perform analysis based
+on these reports.
 
 ExplainaBoard SDK (CLI) provides some interfaces to achieve this goal, for example
 
@@ -148,8 +156,9 @@ F1ScoreQA:      0.812   0.782   0.816
 
 ### Filter Results based on Customized "Query"
 
-ExplainaBoard also provides interface that users could filter all results with their specified
-conditions. For example, if we only care about results on  `xnli` and `marc` datasets
+ExplainaBoard also provides interface that users could filter all results with their
+specified conditions. For example, if we only care about results on  `xnli` and `marc`
+datasets
 
 ```shell
 explainaboard --reports ./output/reports/* --datasets xnli marc
@@ -181,8 +190,8 @@ Accuracy:       0.933   0.920   0.934   0.933   0.914   0.868
 
 ### Aggregated Results based on Customized "Query"
 
-ExplainaBoard SDK allows users to aggregate results along different dimension. For example, if we aim to
-know the average performance ove all languages for each dataset,
+ExplainaBoard SDK allows users to aggregate results along different dimension. For
+example, if we aim to know the average performance ove all languages for each dataset,
 
 ```shell
 explainaboard --reports ./output/reports/* --languages-aggregation average
@@ -224,10 +233,10 @@ F1ScoreQA:      0.803
 
 ### System Pair Analysis of Two Groups of Results
 
-Using ExplainaBoard SDK, users can easily get the performance gap (system1 minus system2) over different
-datasets (tasks) and different languages.
-For example, the following command represent: the performance gap between two systems on all languages
-from `mar` and `xnli` datasets.
+Using ExplainaBoard SDK, users can easily get the performance gap (system1 minus
+system2) over different datasets (tasks) and different languages.
+For example, the following command represent: the performance gap between two systems on
+ all languages from `mar` and `xnli` datasets.
 
 ```shell
 explainaboard --reports ./output/reports/* --datasets marc xnli --systems-aggregation minus

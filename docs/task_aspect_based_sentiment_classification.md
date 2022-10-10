@@ -4,17 +4,20 @@ Before diving into the detail of this doc, you're strongly recommended to know [
 important concepts about system analyses](concepts_about_system_analysis.md).
 
 In this file we describe how to analyze aspect-based sentiment classification models.
-We will give an example using the `aspect-based-sentiment-classification` [laptop](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv) dataset, but other datasets
-can be analyzed in a similar way.
+We will give an example using the `aspect-based-sentiment-classification`
+[laptop](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/test-aspect.tsv)
+dataset, but other datasets can be analyzed in a similar way.
 
 ## Data Preparation
 
 ### Format of `Dataset` File
 
-* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset.
+* (1) `datalab`: if your datasets have been supported by
+  [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets), you fortunately
+  don't need to prepare the dataset.
 
-* (2) `tsv` (without column names at the first row), see one [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/absa-dataset.tsv)
+* (2) `tsv` (without column names at the first row), see one
+  [example](https://github.com/neulab/ExplainaBoard/blob/main/data/system_outputs/absa/absa-dataset.tsv)
 
 ```python
 Boot time  Boot time  is super fast, around anywhere from 35 seconds to 1 minute. positive
@@ -24,7 +27,8 @@ Windows 8 Did not enjoy the new  Windows 8  and  touchscreen functions . negativ
 
 where the first 1st, 2nd, 3rd column represent aspect text, sentence and true label respectively.
 
-* (3) `json` (basically, it's a list of dictionaries with three keys: `aspect`, `text` and `true_label`)
+* (3) `json` (basically, it's a list of dictionaries with three keys: `aspect`, `text`
+  and `true_label`)
 
 ```json
 [
@@ -64,8 +68,11 @@ explainaboard --task aspect-based-sentiment-classification --custom-dataset-path
 
 where
 
-* `--task`: denotes the task name, you can find all supported task names [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
+* `--task`: denotes the task name, you can find all supported task names
+  [here](https://github.com/neulab/ExplainaBoard/blob/main/docs/supported_tasks.md)
 * `--system-outputs`: denote the path of system outputs. Multiple one should be
   separated by space, for example, system1 system2
-* `report.json`: the generated analysis file with json format. You can find the file [here](https://github.com/neulab/ExplainaBoard/blob/main/data/reports/report_absa.json). Tips: use a json viewer
-                  like [this one](http://jsonviewer.stack.hu/) for better interpretation.
+* `report.json`: the generated analysis file with json format. You can find the file
+  [here](https://github.com/neulab/ExplainaBoard/blob/main/data/reports/report_absa.json).
+  Tips: use a json viewer like [this one](http://jsonviewer.stack.hu/) for better
+  interpretation.

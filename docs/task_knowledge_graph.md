@@ -1,7 +1,7 @@
 # Analysis Example: Knowledge Graph Task
 
-This doc walks through how knowledge graph-based tasks are evaluated interactively using ExplainaBoard
-web application.
+This doc walks through how knowledge graph-based tasks are evaluated interactively using
+ExplainaBoard web application.
 
 ## Prerequisite Docs
 

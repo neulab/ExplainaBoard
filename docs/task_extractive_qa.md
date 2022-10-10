@@ -3,17 +3,19 @@
 Before diving into the detail of this doc, you're strongly recommended to know [some
 important concepts about system analyses](concepts_about_system_analysis.md).
 
-In this file we describe how to analyze models trained on extractive QA datasets, for example
-[`squad`](http://datalab.nlpedia.ai/#/normal_dataset/6163a29beb9872f33252b01b/dataset_samples).
+In this file we describe how to analyze models trained on extractive QA datasets, for
+example [`squad`](http://datalab.nlpedia.ai/#/normal_dataset/6163a29beb9872f33252b01b/dataset_samples).
 
 ## Data Preparation
 
 ### Format of `Dataset` File
 
-* (1) `datalab`: if your datasets have been supported by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
-    you fortunately don't need to prepare the dataset.
+* (1) `datalab`: if your datasets have been supported by
+  [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets), you fortunately
+  don't need to prepare the dataset.
 
-* (2) `json` (basically, it's a list of dictionaries with three keys: `context`, `question`, and `answers`)
+* (2) `json` (basically, it's a list of dictionaries with three keys: `context`,
+  `question`, and `answers`)
 
 ```json
 [
@@ -45,7 +47,10 @@ An example system output file is here:
 
 ## Performing Basic Analysis
 
-The below example loads the `squad` dataset from DataLab. There is an [open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the specification of a dataset split, so this will not work at the moment. But we are working on it.
+The below example loads the `squad` dataset from DataLab. There is an
+[open issue](https://github.com/neulab/ExplainaBoard/issues/239) that prevents the
+specification of a dataset split, so this will not work at the moment. But we are
+working on it.
 
 ```shell
 explainaboard --task qa-extractive --dataset squad --system-outputs MY_FILE > report.json
