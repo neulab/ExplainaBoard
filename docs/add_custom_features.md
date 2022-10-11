@@ -35,7 +35,7 @@ words, the output logits/probability, etc.
         "level": "feature-level",
         "feature": "discrete-custom-feature-name",
         "num_buckets": 15,
-        "method": "discrete"
+        "method": "discrete",
         "sample_limit": 50
       },
       {
@@ -43,7 +43,7 @@ words, the output logits/probability, etc.
         "level": "feature-level",
         "feature": "continuous-custom-feature-name",
         "num_buckets": 15,
-        "method": "continuous"
+        "method": "continuous",
         "sample_limit": 50
       }
     ]
@@ -60,7 +60,7 @@ words, the output logits/probability, etc.
 
 where
 
-* `feature-level` represents the fine-grained level of the analysis
+* `feature-level`: the fine-grained level of the analysis
   * `example` for sentence-level analysis
   * `span` for span-level analysis (e.g. in named entity recognition analysis)
   * `token` for token-level analysis (e.g. in named entity conditional text generation)
@@ -96,12 +96,72 @@ It will return counts of each combination of values for the features named in `f
 
 where
 
-* `feature-level` represents the fine-grained level of the analysis
+* `feature-level`: the fine-grained level of the analysis
   * `example` for sentence-level analysis
   * `span` for span-level analysis (e.g. in named entity recognition analysis)
   * `token` for token-level analysis (e.g. in named entity conditional text generation)
-* `features` should be a list of feature names where each feature are predefined. These
+* `features`: a list of feature names where each feature are predefined. These
   features can be true_label, predicted_label, or other custom features.
+
+## Example of CalibrationAnalysis
+
+CalibrationAnalysis is to measure the descrepency between the predicting
+probability and the true correctness likelihood. It must come together
+with the accuracy metric. For tasks with a default accuracy metric,
+calibration analysis is automatically perform on `confidence` feature.
+You can directly add the `confidence` values to the examples in the json output.
+You may also customize calibration analysis with custom feature name and settings.
+
+Default calibration analysis format [example](../data/system_outputs/absa/absa-example-output-confidence.json).
+
+```json
+{
+  "examples": [
+    {
+      "predicted_label": "positive",
+      "confidence": 0.22101897026820283
+    }
+  ]
+}
+```
+
+Custom calibration analysis format [example](../data/system_outputs/absa/absa-example-output-custom-calibration-analysis.json).
+
+```json
+{
+  "metadata": {
+    "custom_features": {
+      "example": {
+        "log_likelihood": {
+          "cls_name": "Value",
+          "dtype": "float",
+          "description": "log likelihood"
+        }
+      }
+    },
+    "custom_analyses": [
+      {
+        "cls_name": "CalibrationAnalysis",
+        "level": "example",
+        "feature": "log_likelihood",
+        "num_buckets": 5,
+        "sample_limit": 50
+      }
+    ]
+  },
+  "examples": [
+    {
+      "predicted_label": "positive",
+      "log_likelihood": 0.22101897026820283
+    }
+  ]
+}
+```
+
+where
+
+* `feature`: the customized name of the confidence feature
+* `num_bucket`: the number of buckets of the same size between interval [0, 1]
 
 ## Example output json files
 
