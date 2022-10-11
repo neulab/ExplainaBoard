@@ -1,0 +1,376 @@
+[
+    {
+        "db_id": "concert_singer",
+        "query": "SELECT DISTINCT country FROM singer WHERE age > 20",
+        "query_toks": [
+            "SELECT",
+            "DISTINCT",
+            "country",
+            "FROM",
+            "singer",
+            "WHERE",
+            "age",
+            ">",
+            "20"
+        ],
+        "query_toks_no_value": [
+            "select",
+            "distinct",
+            "country",
+            "from",
+            "singer",
+            "where",
+            "age",
+            ">",
+            "value"
+        ],
+        "question": "What are all distinct countries where singers above age 20 are from?",
+        "question_toks": [
+            "What",
+            "are",
+            "all",
+            "distinct",
+            "countries",
+            "where",
+            "singers",
+            "above",
+            "age",
+            "20",
+            "are",
+            "from",
+            "?"
+        ],
+        "sql": {
+            "from": {
+                "table_units": [
+                    [
+                        "table_unit",
+                        1
+                    ]
+                ],
+                "conds": []
+            },
+            "select": [
+                true,
+                [
+                    [
+                        0,
+                        [
+                            0,
+                            [
+                                0,
+                                10,
+                                false
+                            ],
+                            null
+                        ]
+                    ]
+                ]
+            ],
+            "where": [
+                [
+                    false,
+                    3,
+                    [
+                        0,
+                        [
+                            0,
+                            13,
+                            false
+                        ],
+                        null
+                    ],
+                    20.0,
+                    null
+                ]
+            ],
+            "groupBy": [],
+            "having": [],
+            "orderBy": [],
+            "limit": null,
+            "intersect": null,
+            "union": null,
+            "except": null
+        },
+        "mentions": {
+            "schema": [
+                [
+                    "singer.age",
+                    "age",
+                    "where"
+                ],
+                [
+                    "singer.country",
+                    "country",
+                    "select"
+                ]
+            ],
+            "value": [
+                [
+                    20,
+                    [
+                        "singer.age",
+                        "age",
+                        "where"
+                    ],
+                    "where"
+                ]
+            ],
+            "keyword": [
+                [
+                    ">",
+                    "more than",
+                    "where"
+                ]
+            ]
+        }
+    },
+    {
+        "db_id": "concert_singer",
+        "query": "SELECT DISTINCT country FROM singer WHERE age > 20",
+        "query_toks": [
+            "SELECT",
+            "DISTINCT",
+            "country",
+            "FROM",
+            "singer",
+            "WHERE",
+            "age",
+            ">",
+            "20"
+        ],
+        "query_toks_no_value": [
+            "select",
+            "distinct",
+            "country",
+            "from",
+            "singer",
+            "where",
+            "age",
+            ">",
+            "value"
+        ],
+        "question": "What are  the different countries with singers above age 20?",
+        "question_toks": [
+            "What",
+            "are",
+            "the",
+            "different",
+            "countries",
+            "with",
+            "singers",
+            "above",
+            "age",
+            "20",
+            "?"
+        ],
+        "sql": {
+            "from": {
+                "table_units": [
+                    [
+                        "table_unit",
+                        1
+                    ]
+                ],
+                "conds": []
+            },
+            "select": [
+                true,
+                [
+                    [
+                        0,
+                        [
+                            0,
+                            [
+                                0,
+                                10,
+                                false
+                            ],
+                            null
+                        ]
+                    ]
+                ]
+            ],
+            "where": [
+                [
+                    false,
+                    3,
+                    [
+                        0,
+                        [
+                            0,
+                            13,
+                            false
+                        ],
+                        null
+                    ],
+                    20.0,
+                    null
+                ]
+            ],
+            "groupBy": [],
+            "having": [],
+            "orderBy": [],
+            "limit": null,
+            "intersect": null,
+            "union": null,
+            "except": null
+        },
+        "mentions": {
+            "schema": [
+                [
+                    "singer.age",
+                    "age",
+                    "where"
+                ],
+                [
+                    "singer.country",
+                    "country",
+                    "select"
+                ]
+            ],
+            "value": [
+                [
+                    20,
+                    [
+                        "singer.age",
+                        "age",
+                        "where"
+                    ],
+                    "where"
+                ]
+            ],
+            "keyword": [
+                [
+                    ">",
+                    "more than",
+                    "where"
+                ]
+            ]
+        }
+    },
+    {
+        "db_id": "concert_singer",
+        "query": "SELECT DISTINCT country FROM singer WHERE age > 20",
+        "query_toks": [
+            "SELECT",
+            "DISTINCT",
+            "country",
+            "FROM",
+            "singer",
+            "WHERE",
+            "age",
+            ">",
+            "20"
+        ],
+        "query_toks_no_value": [
+            "select",
+            "distinct",
+            "country",
+            "from",
+            "singer",
+            "where",
+            "age",
+            ">",
+            "value"
+        ],
+        "question": "What are  the different countries with singers above age 20?",
+        "question_toks": [
+            "What",
+            "are",
+            "the",
+            "different",
+            "countries",
+            "with",
+            "singers",
+            "above",
+            "age",
+            "20",
+            "?"
+        ],
+        "sql": {
+            "from": {
+                "table_units": [
+                    [
+                        "table_unit",
+                        1
+                    ]
+                ],
+                "conds": []
+            },
+            "select": [
+                true,
+                [
+                    [
+                        0,
+                        [
+                            0,
+                            [
+                                0,
+                                10,
+                                false
+                            ],
+                            null
+                        ]
+                    ]
+                ]
+            ],
+            "where": [
+                [
+                    false,
+                    3,
+                    [
+                        0,
+                        [
+                            0,
+                            13,
+                            false
+                        ],
+                        null
+                    ],
+                    20.0,
+                    null
+                ]
+            ],
+            "groupBy": [],
+            "having": [],
+            "orderBy": [],
+            "limit": null,
+            "intersect": null,
+            "union": null,
+            "except": null
+        },
+        "mentions": {
+            "schema": [
+                [
+                    "singer.age",
+                    "age",
+                    "where"
+                ],
+                [
+                    "singer.country",
+                    "country",
+                    "select"
+                ]
+            ],
+            "value": [
+                [
+                    20,
+                    [
+                        "singer.age",
+                        "age",
+                        "where"
+                    ],
+                    "where"
+                ]
+            ],
+            "keyword": [
+                [
+                    ">",
+                    "more than",
+                    "where"
+                ]
+            ]
+        }
+    }
+]
