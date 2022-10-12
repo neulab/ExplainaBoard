@@ -105,14 +105,17 @@ where
 
 ## Example of CalibrationAnalysis
 
-CalibrationAnalysis is to measure the descrepency between the predicting
-probability and the true correctness likelihood. It must come together
-with the accuracy metric. For tasks with a default accuracy metric,
-calibration analysis is automatically perform on `confidence` feature.
-You can directly add the `confidence` values to the examples in the json output.
-You may also customize calibration analysis with custom feature name and settings.
+CalibrationAnalysis measures [calibration](https://arxiv.org/abs/1706.04599),
+the association between a model-predicted probability and the likelihood
+of the answer being correct. It must be used on tasks that use the
+Accuracy metric. For tasks that use the Accuracy metric, by default,
+calibration analysis is automatically performed if your model inputs
+have the `confidence` feature. You can directly add the `confidence`
+values to the examples in a json-formatted system output file.
+You may also customize calibration analysis with custom feature name
+and settings.
 
-Default calibration analysis format [example](../data/system_outputs/absa/absa-example-output-confidence.json).
+Default calibration analysis format [example](../data/system_outputs/absa/absa-example-output-confidence.json):
 
 ```json
 {
@@ -125,17 +128,17 @@ Default calibration analysis format [example](../data/system_outputs/absa/absa-e
 }
 ```
 
-Custom calibration analysis format [example](../data/system_outputs/absa/absa-example-output-custom-calibration-analysis.json).
+Custom calibration analysis format [example](../data/system_outputs/absa/absa-example-output-custom-calibration-analysis.json):
 
 ```json
 {
   "metadata": {
     "custom_features": {
       "example": {
-        "log_likelihood": {
+        "probability": {
           "cls_name": "Value",
           "dtype": "float",
-          "description": "log likelihood"
+          "description": "model-predicted probability"
         }
       }
     },
@@ -143,7 +146,7 @@ Custom calibration analysis format [example](../data/system_outputs/absa/absa-ex
       {
         "cls_name": "CalibrationAnalysis",
         "level": "example",
-        "feature": "log_likelihood",
+        "feature": "probability",
         "num_buckets": 5,
         "sample_limit": 50
       }
@@ -152,7 +155,7 @@ Custom calibration analysis format [example](../data/system_outputs/absa/absa-ex
   "examples": [
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.22101897026820283
+      "probability": 0.22101897026820283
     }
   ]
 }
