@@ -7,7 +7,7 @@ by [datalab](https://github.com/ExpressAI/DataLab/tree/main/datasets),
 you fortunately don't need to prepare the dataset.
 Otherwise, you can upload your custom datasets in the supported formats.
 
-You may refer to the example files for more specific formats,
+You may refer to the example files for more specific information about the formats,
     or click on the task link for more explanation.
 
 To upload custom features and analysis, please refer to this [instruction](./add_custom_features.md).
