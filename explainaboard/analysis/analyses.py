@@ -360,7 +360,7 @@ class CalibrationAnalysisResult(AnalysisResult):
         """Set the class name and validate."""
         for bucket_perf in self.bucket_performances:
             metric_result = bucket_perf.results.get("Accuracy", None)
-            if metric_result is not None:
+            if metric_result is None:
                 raise ValueError(
                     "Wrong metrics. "
                     "Required: Accuracy, "

@@ -212,7 +212,7 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
             )
 
     def test_missing_confidence_metric(self) -> None:
-        with self.assertRaisesRegex(ValueError, r"^Wrong accuracy auxiliary result"):
+        with self.assertRaisesRegex(ValueError, r"^MetricResult does not have"):
             CalibrationAnalysisResult(
                 name="foo",
                 level="example",
