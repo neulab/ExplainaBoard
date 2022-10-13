@@ -2,18 +2,19 @@
   "metadata": {
     "custom_features": {
       "example": {
-        "log_likelihood": {
+        "probability": {
           "cls_name": "Value",
           "dtype": "float",
-          "description": "log likelihood"
+          "description": "model-predicted probability"
         }
       }
     },
     "custom_analyses": [
       {
         "cls_name": "CalibrationAnalysis",
+        "description": "calibration analysis",
         "level": "example",
-        "feature": "log_likelihood",
+        "feature": "probability",
         "num_buckets": 5,
         "sample_limit": 50
       }
@@ -22,403 +23,403 @@
   "examples": [
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.22101897026820283
+      "probability": 0.22101897026820283
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.5389248957898355
+      "probability": 0.5389248957898355
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4115532308855685
+      "probability": 0.4115532308855685
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.8165551610219877
+      "probability": 0.8165551610219877
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.9474597810675172
+      "probability": 0.9474597810675172
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.32138668589140806
+      "probability": 0.32138668589140806
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.629870007629387
+      "probability": 0.629870007629387
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.07591783704825072
+      "probability": 0.07591783704825072
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.22542696006492935
+      "probability": 0.22542696006492935
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.7598390447065743
+      "probability": 0.7598390447065743
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6694212146002387
+      "probability": 0.6694212146002387
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.08722976140281902
+      "probability": 0.08722976140281902
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.11370239751613875
+      "probability": 0.11370239751613875
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.9156789643479785
+      "probability": 0.9156789643479785
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5509657090415676
+      "probability": 0.5509657090415676
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5657081839969839
+      "probability": 0.5657081839969839
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.3308575332943039
+      "probability": 0.3308575332943039
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.8474528030216899
+      "probability": 0.8474528030216899
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.06987496751005229
+      "probability": 0.06987496751005229
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4874082057843133
+      "probability": 0.4874082057843133
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.15392737126203238
+      "probability": 0.15392737126203238
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.7369118067912848
+      "probability": 0.7369118067912848
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.2979616307884081
+      "probability": 0.2979616307884081
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.16090502109879656
+      "probability": 0.16090502109879656
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5387224824404864
+      "probability": 0.5387224824404864
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5200312421887148
+      "probability": 0.5200312421887148
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6278166274559787
+      "probability": 0.6278166274559787
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6549220700523178
+      "probability": 0.6549220700523178
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.21623002442291284
+      "probability": 0.21623002442291284
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.7534142374123239
+      "probability": 0.7534142374123239
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5869688539379192
+      "probability": 0.5869688539379192
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.1141509046530057
+      "probability": 0.1141509046530057
     },
     {
       "predicted_label": "neutral",
-      "log_likelihood": 0.15478799781092323
+      "probability": 0.15478799781092323
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.2963203419053768
+      "probability": 0.2963203419053768
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.9706166177079982
+      "probability": 0.9706166177079982
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.768398517674372
+      "probability": 0.768398517674372
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.35183306307199647
+      "probability": 0.35183306307199647
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4707619888416986
+      "probability": 0.4707619888416986
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.2293170875846552
+      "probability": 0.2293170875846552
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5001737318872465
+      "probability": 0.5001737318872465
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.8754493711832672
+      "probability": 0.8754493711832672
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5432239789184382
+      "probability": 0.5432239789184382
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.1727505416237718
+      "probability": 0.1727505416237718
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.131101634467908
+      "probability": 0.131101634467908
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.6112939112366231
+      "probability": 0.6112939112366231
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.15461435152799996
+      "probability": 0.15461435152799996
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.16602166885291791
+      "probability": 0.16602166885291791
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6295495033361569
+      "probability": 0.6295495033361569
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.7960455221047018
+      "probability": 0.7960455221047018
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.522174012073477
+      "probability": 0.522174012073477
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4676488444154836
+      "probability": 0.4676488444154836
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6758702498438351
+      "probability": 0.6758702498438351
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.8724686264395733
+      "probability": 0.8724686264395733
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.17867325454069694
+      "probability": 0.17867325454069694
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.3686607691373329
+      "probability": 0.3686607691373329
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.0848016815786864
+      "probability": 0.0848016815786864
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.6148694496396131
+      "probability": 0.6148694496396131
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.19302234717599376
+      "probability": 0.19302234717599376
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6993069518793291
+      "probability": 0.6993069518793291
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.13320782013206534
+      "probability": 0.13320782013206534
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.17070913281922306
+      "probability": 0.17070913281922306
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.11428576820064573
+      "probability": 0.11428576820064573
     },
     {
       "predicted_label": "neutral",
-      "log_likelihood": 0.09594727713187023
+      "probability": 0.09594727713187023
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.9170311161686253
+      "probability": 0.9170311161686253
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.3619528467646753
+      "probability": 0.3619528467646753
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4295502957765899
+      "probability": 0.4295502957765899
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.003856072798612442
+      "probability": 0.003856072798612442
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.34082675460168743
+      "probability": 0.34082675460168743
     },
     {
       "predicted_label": "neutral",
-      "log_likelihood": 0.7024597835368152
+      "probability": 0.7024597835368152
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.18937595834226906
+      "probability": 0.18937595834226906
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4751742206627174
+      "probability": 0.4751742206627174
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.38804705732550593
+      "probability": 0.38804705732550593
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.9998678552733038
+      "probability": 0.9998678552733038
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5682298763845529
+      "probability": 0.5682298763845529
     },
     {
       "predicted_label": "neutral",
-      "log_likelihood": 0.6718652416881192
+      "probability": 0.6718652416881192
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.10603382493700453
+      "probability": 0.10603382493700453
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5054255008101368
+      "probability": 0.5054255008101368
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.1344867835906718
+      "probability": 0.1344867835906718
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.2318749899947139
+      "probability": 0.2318749899947139
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.8569222668358397
+      "probability": 0.8569222668358397
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.44946253018225124
+      "probability": 0.44946253018225124
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4192766118973569
+      "probability": 0.4192766118973569
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.2714825722700095
+      "probability": 0.2714825722700095
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.023960481761199137
+      "probability": 0.023960481761199137
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.43591612722191697
+      "probability": 0.43591612722191697
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.10415168486872883
+      "probability": 0.10415168486872883
     },
     {
       "predicted_label": "neutral",
-      "log_likelihood": 0.250728694205138
+      "probability": 0.250728694205138
     },
     {
       "predicted_label": "neutral",
-      "log_likelihood": 0.7717626576143738
+      "probability": 0.7717626576143738
     },
     {
       "predicted_label": "negative",
-      "log_likelihood": 0.8126695307031789
+      "probability": 0.8126695307031789
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.4627395026747506
+      "probability": 0.4627395026747506
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6241172937856139
+      "probability": 0.6241172937856139
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.044442221477066446
+      "probability": 0.044442221477066446
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6694440519657886
+      "probability": 0.6694440519657886
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.8947008234748023
+      "probability": 0.8947008234748023
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.009564529349522455
+      "probability": 0.009564529349522455
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.5026044387066011
+      "probability": 0.5026044387066011
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.6047009985155979
+      "probability": 0.6047009985155979
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.7059085786029033
+      "probability": 0.7059085786029033
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.8772559500353768
+      "probability": 0.8772559500353768
     },
     {
       "predicted_label": "positive",
-      "log_likelihood": 0.3371346642032317
+      "probability": 0.3371346642032317
     }
   ]
 }
