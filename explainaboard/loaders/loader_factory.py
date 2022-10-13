@@ -25,6 +25,7 @@ from explainaboard.loaders.qa_extractive import QAExtractiveLoader
 from explainaboard.loaders.qa_multiple_choice import QAMultipleChoiceLoader
 from explainaboard.loaders.qa_open_domain import QAOpenDomainLoader
 from explainaboard.loaders.qa_tat import QATatLoader
+from explainaboard.loaders.ranking import RankingwithContextLoader
 from explainaboard.loaders.sequence_labeling import SeqLabLoader
 from explainaboard.loaders.tabular_classification import TabularClassificationLoader
 from explainaboard.loaders.tabular_regression import TabularRegressionLoader
@@ -57,6 +58,8 @@ _LOADERS: dict[TaskType, type[Loader]] = {
     TaskType.text_pair_classification: TextPairClassificationLoader,
     TaskType.word_segmentation: SeqLabLoader,
     TaskType.meta_evaluation_nlg: MetaEvaluationNLGLoader,
+    TaskType.argument_pair_identification: RankingwithContextLoader,
+    TaskType.ranking_with_context: RankingwithContextLoader,
 }
 
 

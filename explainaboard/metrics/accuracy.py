@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
 
 import numpy as np
 
 from explainaboard.metrics.metric import (
+    ConfidenceInterval,
     Metric,
     MetricConfig,
+    MetricResult,
     MetricStats,
+    MetricValue,
+    Score,
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
@@ -34,7 +38,9 @@ class Accuracy(Metric):
     """
 
     def calc_stats_from_data(
-        self, true_data: list[Any], pred_data: list[Any]
+        self,
+        true_data: list[Any],
+        pred_data: list[Any],
     ) -> MetricStats:
         """See Metric.calc_stats_from_data."""
         return SimpleMetricStats(
@@ -45,6 +51,56 @@ class Accuracy(Metric):
                 ]
             )
         )
+
+    def calc_metric_from_auxiliary_stats(
+        self, auxiliary_stats: MetricStats
+    ) -> np.ndarray[tuple[()], Any] | np.ndarray[tuple[int], Any]:
+        """Calculate confidence score."""
+        agg_auxiliary_stats = self.aggregate_stats(auxiliary_stats)
+        score = self.calc_metric_from_aggregate(agg_auxiliary_stats)
+        return score
+
+    def evaluate_from_stats(
+        self,
+        stats: MetricStats,
+        confidence_alpha: Optional[float] = None,
+        auxiliary_stats: Optional[MetricStats] = None,
+    ) -> MetricResult:
+        """Return an evaluation result over stats.
+
+        Args:
+            stats: pre-computed metric stats
+            confidence_alpha: if set to not None, must be a number between 0 and 1,
+                indicating the inverse confidence level of confidence intervals
+
+        Returns:
+            a resulting metric value
+        """
+        if stats.is_batched():
+            raise ValueError("Batched stats can't be evaluated.")
+
+        agg_stats = self.aggregate_stats(stats)
+        score = self.calc_metric_from_aggregate(agg_stats)
+
+        assert score.ndim == 0, "BUG: obtained batched data."
+
+        metric_values: dict[str, MetricValue] = {
+            "score": Score(float(score)),
+        }
+
+        if confidence_alpha is not None:
+            ci = self.calc_confidence_interval(stats, confidence_alpha)
+            if ci is not None:
+                metric_values["score_ci"] = ConfidenceInterval(
+                    ci[0], ci[1], confidence_alpha
+                )
+
+        if auxiliary_stats is not None:
+            ave_conf_score = self.calc_metric_from_auxiliary_stats(auxiliary_stats)
+            assert ave_conf_score.ndim == 0, "BUG: obtained batched data."
+            metric_values["confidence"] = Score(float(ave_conf_score))
+
+        return MetricResult(metric_values)
 
 
 @dataclass

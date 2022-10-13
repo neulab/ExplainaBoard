@@ -1,7 +1,7 @@
 # Programmatic Interface
 
 Below is some example code that demonstrates how you can access ExplainaBoard programmatically.
-You can see more about the supported tasks and data formats in 
+You can see more about the supported tasks and data formats in
 
 You can process an existing dataset, such as `sst2`:
 

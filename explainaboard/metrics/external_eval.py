@@ -144,6 +144,7 @@ class ExternalEval(Metric):
         self,
         stats: MetricStats,
         confidence_alpha: Optional[float] = None,
+        auxiliary_stats: Optional[MetricStats] = None,
     ) -> MetricResult:
         """Return an evaluation result over stats.
 
