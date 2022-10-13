@@ -294,7 +294,7 @@ class MetricTest(unittest.TestCase):
 
     def test_calc_confidence_interval_tdist_multi_agg(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
-        stats = SimpleMetricStats(np.array([list(range(1, 32)), list(range(3, 34))]))
+        stats = SimpleMetricStats(np.arange(1, 61).reshape(30, 2))
         with self.assertRaisesRegex(ValueError, r"^t-test can be applied"):
             metric.calc_confidence_interval(stats, 0.05)
 
