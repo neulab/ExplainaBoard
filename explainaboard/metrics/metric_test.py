@@ -314,14 +314,14 @@ class MetricTest(unittest.TestCase):
 
     def test_calc_confidence_interval_tdist(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
-        stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]))
+        stats = SimpleMetricStats(np.arange(1.0, 31.0))
         ci = unwrap(metric.calc_confidence_interval(stats, 0.05))
-        self.assertAlmostEqual(ci[0], -0.8901042532768724)
-        self.assertAlmostEqual(ci[1], 7.890104253276872)
+        self.assertAlmostEqual(ci[0], -2.202365416010039)
+        self.assertAlmostEqual(ci[1], 33.20236541601004)
 
     def test_calc_confidence_interval_tdist_multi_agg(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
-        stats = SimpleMetricStats(np.array([[1.0, 2.0], [3.0, 4.0]]))
+        stats = SimpleMetricStats(np.arange(1, 61).reshape(30, 2))
         with self.assertRaisesRegex(ValueError, r"^t-test can be applied"):
             metric.calc_confidence_interval(stats, 0.05)
 
@@ -371,12 +371,12 @@ class MetricTest(unittest.TestCase):
 
     def test_evaluate_from_stats_tdist_with_ci(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
-        stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
+        stats = SimpleMetricStats(np.arange(1.0, 31.0))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
-        self.assertEqual(result.get_value(Score, "score").value, 3.0)
+        self.assertEqual(result.get_value(Score, "score").value, 15.5)
         ci = result.get_value(ConfidenceInterval, "score_ci")
-        self.assertAlmostEqual(ci.low, -0.9264863229551219)
-        self.assertAlmostEqual(ci.high, 6.926486322955122)
+        self.assertAlmostEqual(ci.low, -2.202365416010039)
+        self.assertAlmostEqual(ci.high, 33.20236541601004)
 
     def test_evaluate_from_stats_tdist_single_data(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))

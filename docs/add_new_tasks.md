@@ -151,8 +151,20 @@ For example, the following information can be added for text classification task
     ),
 ```
 
-## Finally, create a Unittest module for your task
+## Create a Unittest module for your task
 
 (1) Create a new python file `test_text_classification.py` in the folder `integration_tests/`
 
 (2) Implement unit tests for this task referencing that of other similar tasks
+
+## Finally, add documentation for your task
+
+(1) Create a documentation `task_<your_task>.md` in the `docs` folder which should include
+    information like task description, file formats, analysis options and etc.
+    Here is an [example](./task_text_classification.md).
+
+(2) Supplement [task_file_formats.md](./task_file_formats.md)
+    with your task doc and example files.
+
+(3) Supplement [cli_interface.md](./cli_interface.md)
+    with your task description and CLI examples.
