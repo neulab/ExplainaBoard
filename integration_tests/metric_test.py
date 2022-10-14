@@ -141,5 +141,11 @@ class MetricTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.analyses), 0)
         overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
-        self.assertAlmostEqual(overall["ExactMatch"].value, 0.6974789915966386, 2)
-        self.assertAlmostEqual(overall["F1"].value, 0.8235975260931867, 2)
+        self.assertAlmostEqual(
+            overall["ExactMatch"].get_value(Score, "score").value,
+            0.6974789915966386,
+            2,
+        )
+        self.assertAlmostEqual(
+            overall["F1"].get_value(Score, "score").value, 0.8235975260931867, 2
+        )

@@ -21,13 +21,6 @@ from explainaboard.utils.typing_utils import narrow
 _MIN_SAMPLE_SIZE = 30
 
 
-@dataclass
-class AuxiliaryMetricResult:
-    """Extra information specific to individual metrics."""
-
-    pass
-
-
 # TODO(odashi): See mypy/issues/4717
 @dataclass(frozen=True)  # type: ignore
 class MetricValue(Serializable, metaclass=abc.ABCMeta):

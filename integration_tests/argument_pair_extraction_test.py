@@ -6,6 +6,7 @@ from integration_tests.utils import test_artifacts_path
 from explainaboard import FileType, get_processor_class, Source, TaskType
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_factory import get_loader_class
+from explainaboard.metrics.metric import Score
 
 
 class ArgumentPairExtractionTest(unittest.TestCase):
@@ -34,7 +35,9 @@ class ArgumentPairExtractionTest(unittest.TestCase):
 
         overall = sys_info.results.overall["example"]
         self.assertGreater(len(overall), 0)
-        self.assertAlmostEqual(overall["F1"].value, 0.25625, 4)
+        self.assertAlmostEqual(
+            overall["F1"].get_value(Score, "score").value, 0.25625, 4
+        )
 
 
 if __name__ == '__main__':

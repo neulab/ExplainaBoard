@@ -20,16 +20,10 @@ from explainaboard.analysis.analyses import (
 )
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature import DataType, FeatureType, Value
-from explainaboard.analysis.performance import Performance
 from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
-from explainaboard.metrics.metric import (
-    ConfidenceInterval,
-    MetricConfig,
-    MetricStats,
-    Score,
-)
+from explainaboard.metrics.metric import MetricConfig, MetricResult, MetricStats, Score
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
@@ -395,7 +389,7 @@ class Processor(metaclass=abc.ABCMeta):
         self,
         sys_info: SysOutputInfo,
         metric_stats: list[dict[str, MetricStats]],
-    ) -> dict[str, dict[str, Performance]]:
+    ) -> dict[str, dict[str, MetricResult]]:
         """Get the overall performance according to metrics.
 
         Args:
@@ -406,25 +400,16 @@ class Processor(metaclass=abc.ABCMeta):
         Returns:
             a dictionary of metrics to overall performance numbers
         """
-        overall_results: dict[str, dict[str, Performance]] = {}
+        overall_results: dict[str, dict[str, MetricResult]] = {}
 
         for my_level, my_stats in zip(sys_info.analysis_levels, metric_stats):
-            my_results: dict[str, Performance] = {}
+            my_results: dict[str, MetricResult] = {}
 
             for metric_name, metric_cfg in my_level.metric_configs.items():
                 metric_stat = my_stats[metric_name]
-                metric_result = metric_cfg.to_metric().evaluate_from_stats(
+                my_results[metric_name] = metric_cfg.to_metric().evaluate_from_stats(
                     metric_stat,
                     confidence_alpha=sys_info.confidence_alpha,
-                )
-
-                value = metric_result.get_value(Score, "score").value
-                ci = metric_result.get_value_or_none(ConfidenceInterval, "score_ci")
-
-                my_results[metric_name] = Performance(
-                    value=value,
-                    confidence_score_low=ci.low if ci is not None else None,
-                    confidence_score_high=ci.high if ci is not None else None,
                 )
 
             overall_results[my_level.name] = my_results
@@ -447,21 +432,6 @@ class Processor(metaclass=abc.ABCMeta):
         sort_ascending: bool = False,
     ) -> None:
         """Sorts the `performance_over_bucket` dictionary.
-
-        It should be of the format
-        {
-            feature_name_1: {
-                (bucket_1_interval_low, bucket_1_interval_up): BucketPerformance(
-                    performances = [
-                        Performance(metric_name = performance1),
-                        ...,
-                        Performance(metric_name = performancen)
-                    ]
-                ),
-                ...
-            },
-            ...
-        }
 
         Args:
             analysis_results: A list of analysis results.
@@ -497,7 +467,9 @@ class Processor(metaclass=abc.ABCMeta):
                 if sort_by_metric is None:
                     raise ValueError("sort_by_metric must be set.")
                 bucket_result.sort(
-                    key=lambda x: x.performances[cast(str, sort_by_metric)].value,
+                    key=lambda x: x.results[cast(str, sort_by_metric)]
+                    .get_value(Score, "score")
+                    .value,
                     reverse=not sort_ascending,
                 )
             # sort by the number of samples in each bucket
