@@ -17,6 +17,9 @@ from explainaboard.serialization.types import (
 )
 from explainaboard.utils.typing_utils import narrow
 
+# Minimum sample size the central limit theorem can be applied to.
+_MIN_SAMPLE_SIZE = 30
+
 
 @dataclass
 class AuxiliaryMetricResult:
@@ -563,13 +566,14 @@ class Metric(metaclass=abc.ABCMeta):
 
         stats_data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
         num_stats = stats.num_statistics()
+        sample_size = len(stats)
 
         if stats_data.shape[-2] <= 1:
             # We cannot calculate confidence intervals if we only have a single sample
             return None
 
         # Do t-test if applicable
-        elif self.is_simple_average(stats):
+        elif self.is_simple_average(stats) and sample_size >= _MIN_SAMPLE_SIZE:
             if num_stats != 1:
                 raise ValueError(
                     "t-test can be applied for only 1 stat, "
@@ -587,7 +591,6 @@ class Metric(metaclass=abc.ABCMeta):
             )
         # Do bootstrapping otherwise
         else:
-            sample_size = len(stats)
             all_indices = np.array(range(sample_size))
             rng = np.random.default_rng()
             all_indices = rng.choice(
