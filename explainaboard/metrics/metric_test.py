@@ -126,6 +126,33 @@ class MetricResultTest(unittest.TestCase):
         restored = narrow(MetricResult, MetricResult.deserialize(serialized))
         self.assertEqual(restored._values, {"bar": score, "baz": ci})
 
+    def test_eq(self) -> None:
+        s1 = Score(1.0)
+        s2 = Score(1.0)
+        s3 = Score(2.0)
+        c1 = ConfidenceInterval(1.0, 2.0, 0.5)
+        c2 = ConfidenceInterval(1.0, 2.0, 0.5)
+        c3 = ConfidenceInterval(1.0, 2.0, 0.6)
+
+        r = MetricResult
+
+        self.assertEqual(r({"a": s1}), r({"a": s2}))
+        self.assertEqual(r({"a": c1}), r({"a": c2}))
+        self.assertEqual(r({"a": s1, "b": c1}), r({"a": s2, "b": c2}))
+
+        # Different keys
+        self.assertNotEqual(r({"a": s1}), r({"b": s1}))
+        self.assertNotEqual(r({"a": s1, "b": c1}), r({"a": s1}))
+        self.assertNotEqual(r({"a": s1, "b": c1}), r({"a": s1, "c": c1}))
+
+        # Different types
+        self.assertNotEqual(r({"a": s1}), r({"a": c1}))
+        self.assertNotEqual(r({"a": s1, "b": c1}), r({"a": s1, "b": s2}))
+
+        # Different values
+        self.assertNotEqual(r({"a": s1}), r({"a": s3}))
+        self.assertNotEqual(r({"a": s1, "b": c1}), r({"a": s1, "b": c3}))
+
     def test_get_value(self) -> None:
         score = Score(1.0)
         ci = ConfidenceInterval(1.0, 2.0, 0.5)

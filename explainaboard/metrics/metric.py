@@ -116,6 +116,22 @@ class MetricResult(Serializable):
         """
         self._values = values
 
+    def __eq__(self, other: object) -> bool:
+        """Checks the equality with another object.
+
+        Args:
+            other: An object to check the equality with self.
+
+        Returs:
+            True if other can be treated as the same as self, False otherwise.
+        """
+        keys = self._values.keys()
+        return (
+            isinstance(other, MetricResult)
+            and other._values.keys() == keys
+            and all(other._values[k] == self._values[k] for k in keys)
+        )
+
     def get_value(self, cls: type[MetricValueT], name: str) -> MetricValueT:
         """Obtains a value with specific type and name.
 

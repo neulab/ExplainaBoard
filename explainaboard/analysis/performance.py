@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
-import dataclasses
 from dataclasses import dataclass
-from typing import Any
+from typing import final
 
 from explainaboard.metrics.metric import MetricResult
-from explainaboard.serialization.serializers import PrimitiveSerializer
-from explainaboard.utils.typing_utils import narrow
+from explainaboard.serialization import common_registry
+from explainaboard.serialization.types import SerializableDataclass
 
 
+@common_registry.register("BucketPerformance")
+@final
 @dataclass(frozen=True)
-class BucketPerformance:
+class BucketPerformance(SerializableDataclass):
     """A class containing information about performance over buckets.
 
     Attributes:
@@ -30,35 +31,12 @@ class BucketPerformance:
     bucket_interval: tuple[float, float] | None = None
     bucket_name: str | None = None
 
-    @classmethod
-    def dict_conv(cls, k: str, v: Any) -> Any:
-        """A deserialization utility function.
-
-        It takes in a key corresponding to a
-        parameter name, and dictionary corresponding to a serialized version of that
-        parameter's value, then return the deserialized version of the value.
-
-        Args:
-            k: the parameter name
-            v: the parameter's value
-
-        Returns:
-            The value corresponding to the key
-        """
-        serializer = PrimitiveSerializer()
-
-        if k == 'results':
-            return {
-                name: narrow(MetricResult, serializer.deserialize(v1))
-                for name, v1 in v.items()
-            }
-        else:
-            return v
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> BucketPerformance:
-        """A deserialization function."""
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
+    def __post_init__(self) -> None:
+        """Validates member values."""
+        has_interval = self.bucket_interval is not None
+        has_name = self.bucket_name is not None
+        if has_interval == has_name:
+            raise ValueError(
+                "Only either `bucket_interavl` or `bucket_name` must has a value. "
+                f"{self.bucket_interval=}, {self.bucket_name=}"
+            )
