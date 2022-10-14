@@ -84,7 +84,6 @@ def get_processor_class(task: TaskType) -> type[Processor]:
 
     Raises:
         ValueError: if the given task is not supported.
-        TypeError: if the obtained class is not a subclass of Processor class.
     """
     try:
         cls = _TASK_TYPE_TO_PROCESSOR[task]
