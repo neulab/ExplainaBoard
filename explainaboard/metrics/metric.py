@@ -380,7 +380,7 @@ class Metric(metaclass=abc.ABCMeta):
 
         Args:
             config: The configuration for the metric
-            seed: a user-provided seed to initialize a SeedSequence.
+            seed: A user-provided seed to initialize a SeedSequence.
         """
         self.config = config
         self._seed = np.random.SeedSequence(seed)
