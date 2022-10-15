@@ -375,12 +375,15 @@ class Metric(metaclass=abc.ABCMeta):
 
     config: MetricConfig
 
-    def __init__(self, config: MetricConfig):
+    def __init__(self, config: MetricConfig, seed: int | None = None):
         """Initialize the metric.
 
-        :param config: The configuration for the metric
+        Args:
+            config: The configuration for the metric
+            seed: a user-provided seed to initialize a SeedSequence.
         """
         self.config = config
+        self._seed = np.random.SeedSequence(seed)
 
     @abc.abstractmethod
     def calc_stats_from_data(
@@ -401,6 +404,19 @@ class Metric(metaclass=abc.ABCMeta):
             decomposable eval metrics
         """
         ...
+
+    @final
+    def get_seed(self) -> np.random.SeedSequence:
+        """Gets a SeedSequence.
+
+        When a subclass needs to construct a random number generator, initialize the
+        generator with a spawned `numpy.random.SeedSequence` object from the
+        `SeedSequence` object returned by this method.
+
+        Returns:
+            A SeedSequence.
+        """
+        return self._seed
 
     @final
     def aggregate_stats(
@@ -585,7 +601,7 @@ class Metric(metaclass=abc.ABCMeta):
         # Do bootstrapping otherwise
         else:
             all_indices = np.array(range(sample_size))
-            rng = np.random.default_rng()
+            rng = np.random.default_rng(self.get_seed())
             all_indices = rng.choice(
                 all_indices, size=(num_iterations, sample_size), replace=True
             )
