@@ -7,7 +7,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from explainaboard.analysis.analyses import AnalysisResult
-from explainaboard.analysis.performance import Performance
+from explainaboard.metrics.metric import MetricResult
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.typing_utils import narrow
 
 
@@ -21,17 +22,21 @@ class Result:
         analyses: The results of various analyses.
     """
 
-    overall: dict[str, dict[str, Performance]]
+    overall: dict[str, dict[str, MetricResult]]
     analyses: list[AnalysisResult]
 
     @classmethod
     def dict_conv(cls, k: str, v: Any):
         """A utility function for deserialization."""
+        serializer = PrimitiveSerializer()
+
         if k == 'overall':
             return {
                 narrow(str, analysis_level_name): {
-                    narrow(str, metric_name): Performance.from_dict(perf)
-                    for metric_name, perf in narrow(dict, perfs).items()
+                    narrow(str, metric_name): narrow(
+                        MetricResult, serializer.deserialize(metric_result)
+                    )
+                    for metric_name, metric_result in narrow(dict, perfs).items()
                 }
                 for analysis_level_name, perfs in narrow(dict, v).items()
             }

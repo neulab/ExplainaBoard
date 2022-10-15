@@ -32,8 +32,8 @@ from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
     ComboCountAnalysisResult,
 )
-from explainaboard.analysis.performance import Performance
 from explainaboard.info import SysOutputInfo
+from explainaboard.metrics.metric import ConfidenceInterval, MetricResult, Score
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 from explainaboard.visualizers.bar_chart import make_bar_chart
@@ -126,6 +126,20 @@ def render_interval_to_tick_label(interval: tuple[float, float]) -> str:
     return f'[{interval[0]:.2f},{interval[0]:.2f}]'
 
 
+def _get_errors(result: MetricResult) -> tuple[float, float]:
+    """Helper to obtain confidence interval ranges.
+
+    Args:
+        result: MetricResult to calculate the errors.
+
+    Returns:
+        Calculated errors: (value - ci.low, ci.high - value)
+    """
+    value = result.get_value(Score, "score").value
+    ci = result.get_value(ConfidenceInterval, "score_ci")
+    return value - ci.low, ci.high - value
+
+
 def plot_buckets(
     bucket_results: list[BucketAnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
@@ -145,24 +159,19 @@ def plot_buckets(
         for x in bucket_results[0].bucket_performances
     ]
 
-    bucket0_names = sorted(bucket_results[0].bucket_performances[0].performances.keys())
+    bucket0_names = sorted(bucket_results[0].bucket_performances[0].results.keys())
 
     for metric_name in bucket0_names:
         # indices: [analysis_id][bucket_id]
-        performances: list[list[Performance]] = [
-            [x.performances[metric_name] for x in y.bucket_performances]
+        results: list[list[MetricResult]] = [
+            [x.results[metric_name] for x in y.bucket_performances]
             for y in bucket_results
         ]
-        ys = [[x.value for x in y] for y in performances]
+        ys = [[x.get_value(Score, "score").value for x in y] for y in results]
 
-        if performances[0][0].confidence_score_low is not None:
-            y_errs = [
-                (
-                    [x.value - unwrap(x.confidence_score_low) for x in y],
-                    [unwrap(x.confidence_score_high) - x.value for x in y],
-                )
-                for y in performances
-            ]
+        if results[0][0].get_value_or_none(ConfidenceInterval, "score_ci") is not None:
+            error_tuples = [[_get_errors(x) for x in y] for y in results]
+            y_errs = [([x[0] for x in y], [x[1] for x in y]) for y in error_tuples]
         else:
             y_errs = None
 
@@ -207,27 +216,29 @@ def draw_charts_from_reports(
 
     # --- Overall results
     for analysis in report_info[0].analyses:
-        overall_results: list[dict[str, Performance]] = [
+        overall_results: list[dict[str, MetricResult]] = [
             x.results.overall[analysis.level] for x in report_info
         ]
         overall_metric_names = sorted((overall_results[0].keys()))
 
-        ys = [[y[name].value for name in overall_metric_names] for y in overall_results]
-        y_errs = None
-        if overall_results[0][overall_metric_names[0]].confidence_score_low is not None:
-            y_errs = [
-                (
-                    [
-                        y[name].value - unwrap(y[name].confidence_score_low)
-                        for name in overall_metric_names
-                    ],
-                    [
-                        unwrap(y[name].confidence_score_high) - y[name].value
-                        for name in overall_metric_names
-                    ],
-                )
+        ys = [
+            [y[name].get_value(Score, "score").value for name in overall_metric_names]
+            for y in overall_results
+        ]
+
+        if (
+            overall_results[0][overall_metric_names[0]].get_value_or_none(
+                ConfidenceInterval, "score_ci"
+            )
+            is not None
+        ):
+            error_tuples = [
+                [_get_errors(y[name]) for name in overall_metric_names]
                 for y in overall_results
             ]
+            y_errs = [([x[0] for x in y], [x[1] for x in y]) for y in error_tuples]
+        else:
+            y_errs = None
 
         make_bar_chart(
             ys,

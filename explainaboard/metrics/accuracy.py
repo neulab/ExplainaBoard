@@ -8,7 +8,6 @@ from typing import Any, Optional
 import numpy as np
 
 from explainaboard.metrics.metric import (
-    AuxiliaryMetricResult,
     ConfidenceInterval,
     Metric,
     MetricConfig,
@@ -20,19 +19,6 @@ from explainaboard.metrics.metric import (
 )
 from explainaboard.serialization import common_registry
 from explainaboard.utils.typing_utils import narrow
-
-
-@dataclass
-class ConfidenceMetricResult(AuxiliaryMetricResult):
-    """The result of the confidence metric for calibration analysis.
-
-    This is an auxiliary result of Accuracy metric result.
-
-    Args:
-        confidence: The average confidence of a bucket of sampels.
-    """
-
-    confidence: float
 
 
 @dataclass

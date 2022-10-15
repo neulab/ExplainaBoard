@@ -18,7 +18,7 @@ from explainaboard.loaders.file_loader import (
     FileLoaderMetadata,
 )
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
+from explainaboard.metrics.metric import MetricConfig, Score
 from explainaboard.serialization import common_registry
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
@@ -502,11 +502,6 @@ def main():
         for loader, system_dataset, system_full_path, task in zip(
             loaders, system_datasets, system_outputs, tasks
         ):
-
-            # metadata.update(loader.user_defined_metadata_configs)
-            # metadata[
-            #     "user_defined_features_configs"
-            # ] = loader.user_defined_features_configs
             metadata_copied = copy.deepcopy(metadata)
             metadata_copied["task_name"] = task
 
@@ -522,9 +517,10 @@ def main():
             logger = get_logger('report')
 
             logger.info('--- Overall Performance')
-            for level_name, overall_level in report.results.overall.items():
-                for metric_name, metric_stat in overall_level.items():
-                    logger.info(f'{level_name}\t{metric_name}\t{metric_stat.value}')
+            for level_name, overall in report.results.overall.items():
+                for metric_name, metric_result in overall.items():
+                    value = metric_result.get_value(Score, "score").value
+                    logger.info(f"{level_name}\t{metric_name}\t{value}")
             logger.info('')
             logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:

@@ -9,8 +9,8 @@ from explainaboard.analysis.analyses import (
     ComboCountAnalysisResult,
     ComboOccurence,
 )
-from explainaboard.analysis.performance import BucketPerformance, Performance
-from explainaboard.metrics.accuracy import ConfidenceMetricResult
+from explainaboard.analysis.performance import BucketPerformance
+from explainaboard.metrics.metric import MetricResult, Score
 
 
 class BucketAnalysisResultTest(unittest.TestCase):
@@ -23,17 +23,17 @@ class BucketAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[0, 1, 2, 3, 4],
-                        performances={
-                            "metric1": Performance(value=0.5),
-                            "metric2": Performance(value=0.25),
+                        results={
+                            "metric1": MetricResult({"score": Score(0.5)}),
+                            "metric2": MetricResult({"score": Score(0.25)}),
                         },
                         bucket_name="baz",
                     ),
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
-                        performances={
-                            "metric1": Performance(value=0.125),
+                        results={
+                            "metric1": MetricResult({"score": Score(0.125)}),
                         },
                         bucket_name="qux",
                     ),
@@ -49,18 +49,18 @@ class BucketAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[0, 1, 2, 3, 4],
-                        performances={
-                            "metric1": Performance(value=0.5),
-                            "metric2": Performance(value=0.25),
+                        results={
+                            "metric1": MetricResult({"score": Score(0.5)}),
+                            "metric2": MetricResult({"score": Score(0.25)}),
                         },
                         bucket_name="baz",
                     ),
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
-                        performances={
-                            "metric1": Performance(value=0.125),
-                            "xxx": Performance(value=0.25),
+                        results={
+                            "metric1": MetricResult({"score": Score(0.125)}),
+                            "xxx": MetricResult({"score": Score(0.25)}),
                         },
                         bucket_name="qux",
                     ),
@@ -75,18 +75,18 @@ class BucketAnalysisResultTest(unittest.TestCase):
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[0, 1, 2, 3, 4],
-                    performances={
-                        "metric1": Performance(value=0.5),
-                        "metric2": Performance(value=0.25),
+                    results={
+                        "metric1": MetricResult({"score": Score(0.5)}),
+                        "metric2": MetricResult({"score": Score(0.25)}),
                     },
                     bucket_interval=(1.0, 2.0),
                 ),
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[5, 6, 7, 8, 9],
-                    performances={
-                        "metric1": Performance(value=0.125),
-                        "metric2": Performance(value=0.0625),
+                    results={
+                        "metric1": MetricResult({"score": Score(0.125)}),
+                        "metric2": MetricResult({"score": Score(0.0625)}),
                     },
                     bucket_interval=(2.0, 3.0),
                 ),
@@ -115,18 +115,18 @@ class BucketAnalysisResultTest(unittest.TestCase):
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[0, 1, 2, 3, 4],
-                    performances={
-                        "metric1": Performance(value=0.5),
-                        "metric2": Performance(value=0.25),
+                    results={
+                        "metric1": MetricResult({"score": Score(0.5)}),
+                        "metric2": MetricResult({"score": Score(0.25)}),
                     },
                     bucket_name="baz",
                 ),
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[5, 6, 7, 8, 9],
-                    performances={
-                        "metric1": Performance(value=0.125),
-                        "metric2": Performance(value=0.0625),
+                    results={
+                        "metric1": MetricResult({"score": Score(0.125)}),
+                        "metric2": MetricResult({"score": Score(0.0625)}),
                     },
                     bucket_name="qux",
                 ),
@@ -191,9 +191,9 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[0, 1, 2, 3, 4],
-                        performances={
-                            "Accuracy": Performance(
-                                value=0.5, auxiliary_result=ConfidenceMetricResult(0.5)
+                        results={
+                            "Accuracy": MetricResult(
+                                {"score": Score(0.5), "confidence": Score(0.5)}
                             ),
                         },
                         bucket_name="baz",
@@ -201,8 +201,8 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
-                        performances={
-                            "metric1": Performance(value=0.125),
+                        results={
+                            "metric1": MetricResult({"score": Score(0.5)}),
                         },
                         bucket_name="qux",
                     ),
@@ -212,7 +212,7 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
             )
 
     def test_missing_confidence_metric(self) -> None:
-        with self.assertRaisesRegex(ValueError, r"^Wrong accuracy auxiliary result"):
+        with self.assertRaisesRegex(ValueError, r"^MetricResult does not have"):
             CalibrationAnalysisResult(
                 name="foo",
                 level="example",
@@ -220,9 +220,9 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[0, 1, 2, 3, 4],
-                        performances={
-                            "Accuracy": Performance(
-                                value=0.5, auxiliary_result=ConfidenceMetricResult(0.5)
+                        results={
+                            "Accuracy": MetricResult(
+                                {"score": Score(0.5), "confidence": Score(0.5)}
                             ),
                         },
                         bucket_name="baz",
@@ -230,8 +230,8 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
-                        performances={
-                            "Accuracy": Performance(value=0.5),
+                        results={
+                            "Accuracy": MetricResult({"score": Score(0.5)}),
                         },
                         bucket_name="qux",
                     ),
@@ -248,9 +248,9 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[0, 1, 2, 3, 4],
-                    performances={
-                        "Accuracy": Performance(
-                            value=0.5, auxiliary_result=ConfidenceMetricResult(0.5)
+                    results={
+                        "Accuracy": MetricResult(
+                            {"score": Score(0.5), "confidence": Score(0.5)}
                         ),
                     },
                     bucket_interval=(0.0, 0.5),
@@ -258,9 +258,9 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                 BucketPerformance(
                     n_samples=5,
                     bucket_samples=[5, 6, 7, 8, 9],
-                    performances={
-                        "Accuracy": Performance(
-                            value=0.7, auxiliary_result=ConfidenceMetricResult(0.7)
+                    results={
+                        "Accuracy": MetricResult(
+                            {"score": Score(0.7), "confidence": Score(0.7)}
                         ),
                     },
                     bucket_interval=(0.5, 1.0),

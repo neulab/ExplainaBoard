@@ -8,6 +8,7 @@ from explainaboard import FileType, get_processor_class, TaskType
 from explainaboard.analysis.analyses import BucketAnalysisResult
 from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_factory import get_loader_class
+from explainaboard.metrics.metric import Score
 from explainaboard.metrics.ranking import (
     HitsConfig,
     MeanRankConfig,
@@ -124,8 +125,18 @@ class KgLinkTailPredictionTest(unittest.TestCase):
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
         for i in range(len(symmetry_performances) - 1):
-            first_item = symmetry_performances[i].performances["Hits4"].value
-            second_item = symmetry_performances[i + 1].performances["Hits4"].value
+            first_item = (
+                symmetry_performances[i]
+                .results["Hits4"]
+                .get_value(Score, "score")
+                .value
+            )
+            second_item = (
+                symmetry_performances[i + 1]
+                .results["Hits4"]
+                .get_value(Score, "score")
+                .value
+            )
             self.assertGreater(first_item, second_item)
 
     def test_sort_buckets_by_key(self):
