@@ -311,7 +311,9 @@ class MetricTest(unittest.TestCase):
         self.assertAlmostEqual(ci[1], 4.833333333333333)
 
     def test_calc_confidence_interval_bootstrap_multi_agg(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False), seed=12345
+        )
         stats = SimpleMetricStats(np.array([[0.5, 1.5], [1.5, 2.5], [2.5, 3.5]]))
         with self.assertRaisesRegex(ValueError, r"^Multiple aggregates"):
             metric.calc_confidence_interval(stats, 0.05)
