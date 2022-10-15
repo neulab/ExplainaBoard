@@ -1,12 +1,15 @@
+"""The main entry point for running ExplainaBoard."""
+
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 
 import eaas.endpoint
 
-from explainaboard import get_loader_class, get_processor, TaskType
+from explainaboard import get_loader_class, get_processor_class, TaskType
 from explainaboard.constants import Source
 from explainaboard.info import SysOutputInfo
 from explainaboard.loaders.file_loader import (
@@ -15,8 +18,8 @@ from explainaboard.loaders.file_loader import (
     FileLoaderMetadata,
 )
 from explainaboard.metrics.eaas import EaaSMetricConfig
-from explainaboard.metrics.metric import MetricConfig
-from explainaboard.metrics.registry import get_metric_config_class
+from explainaboard.metrics.metric import MetricConfig, Score
+from explainaboard.serialization import common_registry
 from explainaboard.utils.io_utils import text_writer
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tensor_analysis import (
@@ -30,12 +33,15 @@ from explainaboard.visualizers.draw_charts import draw_charts_from_reports
 
 
 def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
-    """
-    Get the task for each system output.
-    :param task: Explicitly specified task. Use if present
-    :param system_outputs: System output files, load from metadata in these files if
-      an explicit task is not set
-    :return: A list of task types for each system
+    """Get the task for each system output.
+
+    Args:
+        task: Explicitly specified task. Use if present
+        system_outputs: System output files, load from metadata in these files if
+          an explicit task is not set
+
+    Returns:
+        A list of task types for each system
     """
     real_tasks: list[TaskType] = []
     if task:
@@ -67,7 +73,8 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
 
 
 def analyze_reports(args):
-    """
+    """Analyze reports based on the input arguments.
+
     score_tensor is a nested dict, for example
     score_tensor[system_name][dataset_name][language] =
     {
@@ -122,10 +129,15 @@ def analyze_reports(args):
 
 
 def create_parser():
+    """Create the parser with argparse.
+
+    Returns:
+        The parser.
+    """
     parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
     parser.add_argument('--task', type=str, required=False, help="the task name")
     parser.add_argument(
-        '--system_outputs',
+        '--system-outputs',
         type=str,
         required=True,
         nargs="+",
@@ -169,21 +181,21 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--systems_aggregation',
+        '--systems-aggregation',
         type=str,
         required=False,
         help="None|minus|combination",
     )
 
     parser.add_argument(
-        '--datasets_aggregation',
+        '--datasets-aggregation',
         type=str,
         required=False,
         help="None|average|",
     )
 
     parser.add_argument(
-        '--languages_aggregation',
+        '--languages-aggregation',
         type=str,
         required=False,
         help="None|average|",
@@ -198,7 +210,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--sub_dataset',
+        '--sub-dataset',
         type=str,
         required=False,
         default=None,
@@ -215,7 +227,7 @@ def create_parser():
 
     parser.add_argument(
         '--language',
-        '--target_language',
+        '--target-language',
         dest='target_language',
         type=str,
         required=False,
@@ -225,7 +237,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--source_language',
+        '--source-language',
         type=str,
         required=False,
         default=None,
@@ -233,7 +245,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--reload_stat',
+        '--reload-stat',
         type=str,
         required=False,
         default=None,
@@ -249,7 +261,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--output_file_type',
+        '--output-file-type',
         type=str,
         required=False,
         default=None,
@@ -257,15 +269,26 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--conf_value',
+        '--conf-value',
+        dest="confidence_alpha",
         type=float,
         required=False,
-        default=0.05,
-        help="the p-value with which to calculate the confidence interval",
+        help="Deprecated. use --confidence-alpha instead.",
     )
 
     parser.add_argument(
-        '--output_dir',
+        '--confidence-alpha',
+        type=float,
+        required=False,
+        default=0.05,
+        help=(
+            "the *inverse* confidence level of confidence intervals. If you need to "
+            "set the confidence level to 0.95, set this value to 0.05."
+        ),
+    )
+
+    parser.add_argument(
+        '--output-dir',
         type=str,
         required=False,
         default=None,
@@ -273,7 +296,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--report_json',
+        '--report-json',
         type=str,
         required=False,
         default=None,
@@ -281,23 +304,29 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--system_details',
+        '--system-details',
         type=str,
         required=False,
         help="a json file to store detailed information for a system",
     )
 
     parser.add_argument(
-        '--custom_dataset_paths',
+        '--custom-dataset-paths',
         type=str,
         nargs="*",
         help="path to custom dataset",
     )
 
     parser.add_argument(
-        '--custom_dataset_file_type',
+        '--custom-dataset-file-type',
         type=str,
         help="file types for custom datasets",
+    )
+
+    parser.add_argument(
+        '--skip-failed-analyses',
+        action='store_true',
+        help="whether to skip failed analyses or report errors.",
     )
     return parser
 
@@ -315,7 +344,10 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
         ValueError: `name` is not registered in neither the registry nor EaaS.
     """
     try:
-        return get_metric_config_class(name)
+        cls = common_registry.get_type(name)
+        if not issubclass(cls, MetricConfig):
+            raise TypeError(f"Obtained class is not a MetricConfig: {cls.__name__}")
+        return cls
     except ValueError:
         if name in eaas.endpoint.EndpointConfig().valid_metrics:
             return EaaSMetricConfig
@@ -327,6 +359,7 @@ def get_metric_config_or_eaas(name: str) -> type[MetricConfig]:
 
 # TODO(Pengfei): The overall implementation of this script should be deduplicated
 def main():
+    """The main function to be executed."""
     args = create_parser().parse_args()
 
     reload_stat: bool = False if args.reload_stat == "0" else True
@@ -363,7 +396,7 @@ def main():
         if output_dir_reports and not os.path.exists(output_dir_reports):
             os.makedirs(output_dir_reports)
 
-        # check for benchmark submission: explainaboard  --system_outputs ./data/
+        # check for benchmark submission: explainaboard  --system-outputs ./data/
         # system_outputs/sst2/user_specified_metadata.json
         num_systems = len(system_outputs)
         dataset_file_types: list[str | None] = [dataset_file_type] * num_systems
@@ -447,18 +480,21 @@ def main():
             "source_language": source_language,
             "target_language": target_language,
             "reload_stat": reload_stat,
-            "conf_value": args.conf_value,
+            "confidence_alpha": args.confidence_alpha,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
+            "custom_analyses": system_datasets[0].metadata.custom_analyses,
         }
-
         if metric_names is not None:
             if 'metric_configs' in metadata:
                 raise ValueError('Cannot specify both metric names and metric configs')
-            metric_configs = [
-                get_metric_config_or_eaas(name)(name, source_language, target_language)
+            metric_configs = {
+                name: get_metric_config_or_eaas(name)(
+                    source_language=source_language,
+                    target_language=target_language,
+                )
                 for name in metric_names
-            ]
+            }
             metadata["metric_configs"] = metric_configs
 
         # Run analysis
@@ -466,31 +502,30 @@ def main():
         for loader, system_dataset, system_full_path, task in zip(
             loaders, system_datasets, system_outputs, tasks
         ):
+            metadata_copied = copy.deepcopy(metadata)
+            metadata_copied["task_name"] = task
 
-            # metadata.update(loader.user_defined_metadata_configs)
-            # metadata[
-            #     "user_defined_features_configs"
-            # ] = loader.user_defined_features_configs
-            metadata["task_name"] = task
-
-            processor = get_processor(task=task)
+            processor = get_processor_class(task=task)()
             report = processor.process(
-                metadata=metadata, sys_output=system_dataset.samples
+                metadata=metadata_copied,
+                sys_output=system_dataset.samples,
+                skip_failed_analyses=args.skip_failed_analyses,
             )
             reports.append(report)
 
             # print to the console
-            get_logger('report').info('--- Overall Performance')
-            for overall_level in report.results.overall:
-                for metric_stat in overall_level:
-                    get_logger('report').info(
-                        f'{metric_stat.metric_name}\t{metric_stat.value}'
-                    )
-            get_logger('report').info('')
-            get_logger('report').info('--- Fine-grained Analyses')
+            logger = get_logger('report')
+
+            logger.info('--- Overall Performance')
+            for level_name, overall in report.results.overall.items():
+                for metric_name, metric_result in overall.items():
+                    value = metric_result.get_value(Score, "score").value
+                    logger.info(f"{level_name}\t{metric_name}\t{value}")
+            logger.info('')
+            logger.info('--- Fine-grained Analyses')
             for analysis in report.results.analyses:
                 if analysis is not None:
-                    analysis.print()
+                    logger.info(analysis.generate_report())
 
             if output_dir:
 

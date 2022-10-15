@@ -1,9 +1,12 @@
+"""File loaders."""
+
 from __future__ import annotations
 
+from collections.abc import Callable
 import copy
 import csv
 import dataclasses
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from io import StringIO
 import itertools
 import json
@@ -26,8 +29,8 @@ from datalabs.features.features import ClassLabel, Sequence
 from explainaboard.analysis.analyses import Analysis
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.constants import Source
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.load_resources import get_customized_features
-from explainaboard.utils.preprocessor import Preprocessor
 from explainaboard.utils.typing_utils import narrow
 
 DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
@@ -36,41 +39,39 @@ T = TypeVar('T')
 
 @dataclass
 class FileLoaderField:
-    """
-    :param src_name: field name in the source file. use int for tsv column indices,
-        str for dict keys, or tuple for hierarchical dict keys
-    :param target_name: field name expected in the loaded data
-    :param dtype: data type of the field in the loaded data. It is only intended for
-        simple type conversion so it only supports int, float and str. Pass in None
-        to turn off type conversion.
-    :param strip_before_parsing: call strip() on strings before casting to either str,
-        int or float. It is only intended to be used with these three data types.
-            It defaults to True for str. For all other types, it defaults to False
-    :param parser: a custom parser for the field. When called,
-        `data_points[idx][src_name]` is passed in as input, it is expected to return
-        the parsed result. If parser is not None, `strip_before_parsing` and dtype
-        will not have any effect.
+    """A filed in a file loader.
+
+    Attributes:
+        src_name: field name in the source file. use int for tsv column indices,
+            str for dict keys, or tuple for hierarchical dict keys
+        target_name: field name expected in the loaded data
+        dtype: data type of the field in the loaded data. It is only intended for
+            simple type conversion so it only supports int, float and str. Pass in None
+            to turn off type conversion.
+        strip_before_parsing: call strip() on strings before casting to either str,
+            int or float. It is only intended to be used with these three data types.
+                It defaults to True for str. For all other types, it defaults to False
+        parser: a custom parser for the field. When called,
+            `data_points[idx][src_name]` is passed in as input, it is expected to return
+            the parsed result. If parser is not None, `strip_before_parsing` and dtype
+            will not have any effect.
     """
 
     src_name: int | str | Iterable[str]
     target_name: int | str
     dtype: Optional[DType] = None
     strip_before_parsing: Optional[bool] = None
-    parser: Optional[Preprocessor] = None
+    parser: Optional[Callable[[str], str]] = None
+    optional: bool = False
 
     # Special constants used in field mapping
     SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'
     TARGET_LANGUAGE: ClassVar[str] = '__TARGET_LANGUAGE__'
 
     def __post_init__(self):
+        """Validate data and set defaults."""
         if self.strip_before_parsing is None:
             self.strip_before_parsing = self.dtype == str
-
-        # # validation
-        # if not any([isinstance(self.src_name, x) for x in [str, int, Iterable[str]]]):
-        #     raise ValueError("src_name must be str, int, or Iterable[str]")
-        # if not any([isinstance(self.target_name, x) for x in [str, int]]):
-        #     raise ValueError("src_name must be str or int")
 
         if self.dtype is None and self.strip_before_parsing:
             raise ValueError(
@@ -84,13 +85,14 @@ class FileLoaderField:
 
 @dataclass
 class FileLoaderMetadata:
-    """
-    Metadata that is populated in the process of loading the dataset or output files.
-    :param source_language: The language of the input
-    :param target_language: The language of the output
-    :param supported_languages: All languages supported by the dataset at all
-    :param task: The specific task to be analyzed
-    :param supported_tasks: The task or tasks that *can* be handeled (e.g. by a dataset)
+    """Metadata populated in the process of loading the dataset or output files.
+
+    Attributes:
+        source_language: The language of the input
+        target_language: The language of the output
+        supported_languages: All languages supported by the dataset at all
+        task: The specific task to be analyzed
+        supported_tasks: The task or tasks that *can* be handled (e.g. by a dataset)
     """
 
     system_name: str | None = None
@@ -99,17 +101,17 @@ class FileLoaderMetadata:
     split: str | None = None
     source_language: str | None = None
     target_language: str | None = None
-    supported_languages: list[str] | None = None
+    supported_languages: list[str] = field(default_factory=list)
     task_name: str | None = None
-    supported_tasks: list[str] | None = None
-    custom_features: dict[str, dict[str, FeatureType]] | None = None
+    supported_tasks: list[str] = field(default_factory=list)
+    custom_features: dict[str, dict[str, FeatureType]] = field(default_factory=dict)
     # analysis level name -> list of analyses dictionary
-    custom_analyses: list[Analysis] | None = None
+    custom_analyses: list[Analysis] = field(default_factory=list)
 
     def merge(self, other: FileLoaderMetadata) -> None:
-        """
-        Merge the information from the two pieces of metadata. In the case that the
-        two conflict, the passed-in metadata get preference.
+        """Merge the information from the two pieces of metadata.
+
+        In the case that the two conflict, the passed-in metadata get preference.
         """
         # TODO(gneubig): This should be changed into a for loop
         self.system_name = other.system_name or self.system_name
@@ -126,6 +128,11 @@ class FileLoaderMetadata:
 
     @classmethod
     def from_dict(cls, data: dict) -> FileLoaderMetadata:
+        """Deserialize a dictionary into File Loader Metadata.
+
+        Args:
+            data: The data to serialize.
+        """
         # TODO(gneubig): A better way to do this might be through a library such as
         #                pydantic or dacite
         source_language = data.get('source_language')
@@ -137,15 +144,22 @@ class FileLoaderMetadata:
                     '"target_language"'
                 )
             source_language = target_language = data.get('language')
-        custom_features: dict[str, dict[str, FeatureType]] | None = None
-        custom_analyses: list[Analysis] | None = None
+        custom_features: dict[str, dict[str, FeatureType]] = {}
+        custom_analyses: list[Analysis] = []
         if 'custom_features' in data:
+            ft_serializer = PrimitiveSerializer()
             custom_features = {
-                k1: {k2: FeatureType.from_dict(v2) for k2, v2 in v1.items()}
+                k1: {
+                    # See https://github.com/python/mypy/issues/4717
+                    k2: narrow(
+                        FeatureType, ft_serializer.deserialize(v2)  # type: ignore
+                    )
+                    for k2, v2 in v1.items()
+                }
                 for k1, v1 in data['custom_features'].items()
             }
         if 'custom_analyses' in data:
-            custom_analyses = [Analysis.from_dict(v) for v in data['custom_analyses']]
+            custom_analyses = data['custom_analyses']
         return FileLoaderMetadata(
             system_name=data.get('system_name'),
             dataset_name=data.get('dataset_name'),
@@ -153,15 +167,23 @@ class FileLoaderMetadata:
             split=data.get('split'),
             source_language=source_language,
             target_language=target_language,
-            supported_languages=data.get('supported_languages'),
+            supported_languages=data.get('supported_languages', []),
             task_name=data.get('task_name'),
-            supported_tasks=data.get('supported_tasks'),
+            supported_tasks=data.get('supported_tasks', []),
             custom_features=custom_features,
             custom_analyses=custom_analyses,
         )
 
     @classmethod
     def from_file(cls, file_name: str) -> FileLoaderMetadata:
+        """Load meta data from a file.
+
+        Args:
+            file_name: The name of the file to load from.
+
+        Returns:
+            A file loader metadata class.
+        """
         with open(file_name, 'r') as file_in:
             my_data = json.load(file_in)
             if not isinstance(my_data, dict) or 'metadata' not in my_data:
@@ -172,6 +194,12 @@ class FileLoaderMetadata:
 
 @dataclass
 class FileLoaderReturn(Sized):
+    """Data returned by a FileLoader.
+
+    Attributes:
+        samples: A list of samples from the dataset
+        metadata: Metadata regarding the samples or the dataset
+    """
 
     samples: list
     metadata: FileLoaderMetadata = dataclasses.field(
@@ -179,24 +207,31 @@ class FileLoaderReturn(Sized):
     )
 
     def __len__(self) -> int:
+        """Return the length of the samples."""
         return len(self.samples)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int) -> Any:
+        """Get a certain sample from the dataset."""
         return self.samples[item]
 
 
 class FileLoader:
+    """A class that loads raw data from a file."""
+
     def __init__(
         self,
         fields: list[FileLoaderField] = None,
         use_idx_as_id: bool = True,
         id_field_name: Optional[str] = None,
     ) -> None:
-        """Loader that loads data according to fields
+        """Loader that loads data according to fields.
 
-        :param use_idx_as_id: whether to use sample indices as IDs. Generated IDs are
-        str even though it represents an index. (This is to make sure all sample IDs
-        are str.)
+        Args:
+            fields: A specification of the fields to be read in from the file.
+            use_idx_as_id: whether to use sample indices as IDs. Generated IDs are
+                            str even though it represents an index.
+                            (This is to make sure all sample IDs are str.)
+            id_field_name: The name of the field to be used as an ID
         """
         self._fields = fields or []
         self._use_idx_as_id = use_idx_as_id
@@ -204,8 +239,12 @@ class FileLoader:
 
         self.validate()
 
-    def validate(self):
-        """validates fields"""
+    def validate(self) -> None:
+        """Validates the setting of the fields.
+
+        Raises:
+            ValueError: if the fields are not valid
+        """
         if self._use_idx_as_id and self._id_field_name:
             raise ValueError("id_field_name must be None when use_idx_as_id is True")
         target_names = [field.target_name for field in self._fields]
@@ -213,13 +252,29 @@ class FileLoader:
             raise ValueError("target_name must be unique")
 
     @final
-    def add_fields(self, fields: list[FileLoaderField]):
+    def add_fields(self, fields: list[FileLoaderField]) -> None:
+        """Add more more fields to the FileLoader.
+
+        Args:
+            fields: The fields to add.
+
+        Raises:
+            ValueError: if the fields are wrong.
+        """
         self._fields.extend(fields)
         self.validate()
 
     @staticmethod
     def parse_data(data: Any, field: FileLoaderField) -> Any:
+        """Parse data loaded in from a file to the required data type.
 
+        Args:
+            data: The data loaded in from the file.
+            field: Information about the field.
+
+        Returns:
+            The parsed data.
+        """
         if field.parser:
             return field.parser(data)
         if field.strip_before_parsing:
@@ -240,8 +295,13 @@ class FileLoader:
             return data
         raise NotImplementedError(f"dtype {dtype} is not supported")
 
-    def generate_id(self, parsed_data_point: dict, sample_idx: int):
-        """generates an id attribute for each data point in place"""
+    def generate_id(self, parsed_data_point: dict, sample_idx: int) -> None:
+        """Generates an id attribute for each data point in place.
+
+        Args:
+            parsed_data_point: The data point parsed into a dict.
+            sample_idx: The ID of the sample.
+        """
         if self._use_idx_as_id:
             parsed_data_point["id"] = str(sample_idx)
         elif self._id_field_name:
@@ -255,12 +315,16 @@ class FileLoader:
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
-        """Load data from source and return an iterable of data points. It does not use
-        fields information to parse the data points.
+        """Load data from source and return an iterable of data points.
 
-        :param data: if str, it's either base64 encoded system
-            output or a path
-        :param source: source of data
+        It does not use fields information to parse the data points.
+
+        Args:
+            data: if str, it's either base64 encoded system output or a path
+            source: source of data
+
+        Returns:
+            The data loaded from the file.
         """
         raise NotImplementedError(
             "load_raw() is not implemented for the base FileLoader"
@@ -269,13 +333,11 @@ class FileLoader:
     def _map_fields(self, fields: list, field_mapping: dict[str, str] | None = None):
         new_fields = copy.deepcopy(fields)
         if field_mapping is not None:
-            for field in new_fields:
-                if isinstance(field.src_name, str):
-                    field.src_name = field_mapping.get(field.src_name, field.src_name)
-                elif isinstance(field.src_name, Iterable):
-                    field.src_name = [field_mapping.get(x, x) for x in field.src_name]
-                else:
-                    field.src_name = field.src_name
+            for f in new_fields:
+                if isinstance(f.src_name, str):
+                    f.src_name = field_mapping.get(f.src_name, f.src_name)
+                elif isinstance(f.src_name, Iterable):
+                    f.src_name = [field_mapping.get(x, x) for x in f.src_name]
         return new_fields
 
     @classmethod
@@ -285,17 +347,21 @@ class FileLoader:
         field: FileLoaderField,
         field_mapping: dict[str, str] | None = None,
     ):
-        """
-        In a structured dictionary, find a specified field specified by an
+        """In a structured dictionary, find a specified field.
+
+        This can be specified by an
         * int index to a list (data_point[field])
         * str index to a dictionary (datapoint[field])
         * Iterable[str] index to a dictionary (datapoint[field[0]][field[1]]...)
 
-        :param data_point: The data to search
-        :param field: The file loader field corresponding to the dict
-        :param field_mapping: A mapping between field names. If a str in a field name
-          exists as a key in the mapping, the value will be used to search instead
-        :return: the required data
+        Args:
+            data_point: The data to search
+            field: The file loader field corresponding to the dict
+            field_mapping: A mapping between field names. If a str in a field name
+              exists as a key in the mapping, the value will be used to search instead
+
+        Returns:
+            the required data
         """
         if field_mapping is None:
             field_mapping = {}
@@ -318,6 +384,8 @@ class FileLoader:
             for sub_field in field_list:
                 sub_field = field_mapping.get(sub_field, sub_field)
                 if sub_field not in ret_dict:
+                    if field.optional:
+                        return None
                     raise ValueError(
                         f'{cls.__name__}: Could not find '
                         f'field "{field.src_name}" in datapoint {data_point}'
@@ -331,12 +399,16 @@ class FileLoader:
         source: Source,
         field_mapping: dict[str, str] | None = None,
     ) -> FileLoaderReturn:
-        """Load data from source, parse data points with fields information and return an
-        iterable of data points.
-        :param data: An indication of the data to be loading
-        :param source: The source from which it should be loaded
-        :param field_mapping: A mapping from field name in the loader spec to field name
-          in the actual input
+        """Load data from source, parse data points with fields information.
+
+        Args:
+            data: An indication of the data to be loading
+            source: The source from which it should be loaded
+            field_mapping: A mapping from field name in the loader spec to field name
+              in the actual input
+
+        Returns:
+             an iterable of data points.
         """
         raw_data = self.load_raw(data, source)
         parsed_data_points: list[dict] = []
@@ -369,26 +441,31 @@ class FileLoader:
         # process the actual data
         for idx, data_point in enumerate(raw_data.samples):
             parsed_data_point = {}
-            for field in fields:  # parse data point according to fields
-                parsed_data_point[field.target_name] = self.parse_data(
-                    self.find_field(data_point, field, field_mapping), field
-                )
-
+            for f in fields:  # parse data point according to fields
+                find_field_result = self.find_field(data_point, f, field_mapping)
+                if find_field_result is not None:
+                    parsed_data_point[f.target_name] = self.parse_data(
+                        find_field_result, f
+                    )
             self.generate_id(parsed_data_point, idx)
             parsed_data_points.append(parsed_data_point)
         return FileLoaderReturn(parsed_data_points, raw_data.metadata)
 
 
 class TSVFileLoader(FileLoader):
-    def validate(self):
+    """A class for loading from TSV files."""
+
+    def validate(self) -> None:
+        """See FileLoader.validate."""
         super().validate()
-        for field in self._fields:
-            if not isinstance(field.src_name, int):
+        for f in self._fields:
+            if not isinstance(f.src_name, int):
                 raise ValueError("field src_name for TSVFileLoader must be an int")
 
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
+        """See FileLoader.load_raw."""
         data = narrow(str, data)
         if source == Source.in_memory:
             file = StringIO(data)
@@ -404,10 +481,18 @@ class TSVFileLoader(FileLoader):
 
 
 class CoNLLFileLoader(FileLoader):
+    """A loader from CoNLL-formatted files."""
+
     def __init__(self, fields: list[FileLoaderField] = None) -> None:
+        """Constructor.
+
+        Args:
+            fields: A list of fields to read from each column.
+        """
         super().__init__(fields, False)
 
-    def validate(self):
+    def validate(self) -> None:
+        """See FileLoader.validate."""
         super().validate()
         if len(self._fields) not in [1, 2]:
             raise ValueError(
@@ -418,6 +503,7 @@ class CoNLLFileLoader(FileLoader):
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
+        """See FileLoader.load_raw."""
         data = narrow(str, data)
         if source == Source.in_memory:
             return FileLoaderReturn(data.splitlines())
@@ -432,6 +518,7 @@ class CoNLLFileLoader(FileLoader):
         source: Source,
         field_mapping: dict[str, str] | None = None,
     ) -> FileLoaderReturn:
+        """See FileLoader.load."""
         raw_data = self.load_raw(data, source)
         parsed_samples: list[dict] = []
         guid = 0
@@ -444,8 +531,8 @@ class CoNLLFileLoader(FileLoader):
             # uses the first field to check if data is empty
             if curr_sentence_fields.get(self._fields[0].src_name):
                 new_sample: dict = {}
-                for field in self._fields:  # parse data point according to fields
-                    new_sample[field.target_name] = curr_sentence_fields[field.src_name]
+                for f in self._fields:  # parse data point according to fields
+                    new_sample[f.target_name] = curr_sentence_fields[f.src_name]
                 new_sample["id"] = str(guid)
                 parsed_samples.append(new_sample)
                 guid += 1
@@ -467,9 +554,9 @@ class CoNLLFileLoader(FileLoader):
                         f"not enough fields for {line} (sentence index: {guid})"
                     )
 
-                for field in self._fields:
-                    curr_sentence_fields[field.src_name].append(
-                        self.parse_data(splits[narrow(int, field.src_name)], field)
+                for f in self._fields:
+                    curr_sentence_fields[f.src_name].append(
+                        self.parse_data(splits[narrow(int, f.src_name)], f)
                     )
 
         add_sample()  # add last example
@@ -477,9 +564,12 @@ class CoNLLFileLoader(FileLoader):
 
 
 class JSONFileLoader(FileLoader):
+    """A loader from JSON files."""
+
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
+        """See FileLoader.load_raw."""
         data = narrow(str, data)
         if source == Source.in_memory:
             loaded = json.loads(data)
@@ -509,34 +599,46 @@ class JSONFileLoader(FileLoader):
 
 @dataclass
 class DatalabLoaderOption:
+    """A class representing the options when using DataLabLoader.
+
+    Attributes:
+        dataset: The name of the dataset
+        subdataset: The name of the sub dataset (optional)
+        split: The name of the split
+        custom_features: Custom features that are added to the retrieved file
+        custom_analyses: Custom analyses that are added
+    """
+
     dataset: str
     subdataset: str | None = None
     split: str = "test"
-    custom_features: dict[str, dict[str, FeatureType]] | None = None
-    custom_analyses: list[Analysis] | None = None
+    custom_features: dict[str, dict[str, FeatureType]] = field(default_factory=dict)
+    custom_analyses: list[Analysis] = field(default_factory=list)
 
 
 class DatalabFileLoader(FileLoader):
+    """A file loader for loading from DataLab."""
+
     @classmethod
-    def replace_one(cls, names: list[str], lab: int):
+    def _replace_one(cls, names: list[str], lab: int):
         return names[lab] if lab != -1 else '_NULL_'
 
     @classmethod
-    def replace_labels(cls, features: dict, example: dict) -> dict:
+    def _replace_labels(cls, features: dict, example: dict) -> dict:
         new_example = {}
         for examp_k, examp_v in example.items():
             examp_f = features[examp_k]
             # Label feature
             if isinstance(examp_f, ClassLabel):
                 names = cast(ClassLabel, examp_f).names
-                new_example[examp_k] = cls.replace_one(names, examp_v)
+                new_example[examp_k] = cls._replace_one(names, examp_v)
             # Sequence feature
             elif isinstance(examp_f, Sequence):
                 examp_seq = cast(Sequence, examp_f)
                 # Sequence of labels
                 if isinstance(examp_seq.feature, ClassLabel):
                     names = cast(ClassLabel, examp_seq.feature).names
-                    new_example[examp_k] = [cls.replace_one(names, x) for x in examp_v]
+                    new_example[examp_k] = [cls._replace_one(names, x) for x in examp_v]
                 # Sequence of anything else
                 else:
                     new_example[examp_k] = examp_v
@@ -548,7 +650,9 @@ class DatalabFileLoader(FileLoader):
     def load_raw(
         self, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
+        """See FileLoader.load_raw."""
         config = narrow(DatalabLoaderOption, data)
+        ft_serializer = PrimitiveSerializer()
 
         # load customized features from global config files
         customized_features_from_config = get_customized_features()
@@ -564,14 +668,13 @@ class DatalabFileLoader(FileLoader):
                         f'{level_name}'
                     )
                 parsed_level_feats = {
-                    k: FeatureType.from_dict(v) for k, v in level_feats.items()
+                    # See https://github.com/python/mypy/issues/4717
+                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                    for k, v in level_feats.items()
                 }
                 new_features = config.custom_features.get(level_name, {})
                 new_features.update(parsed_level_feats)
                 config.custom_features[level_name] = new_features
-            config.custom_analyses = [
-                Analysis.from_dict(x) for x in ds_feats['custom_analyses']
-            ]
 
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
@@ -596,6 +699,7 @@ class DatalabFileLoader(FileLoader):
         )
         # load customized features from global config files
         if config.dataset in customized_features_from_config:
+
             if metadata.custom_features is None:
                 metadata.custom_features = {}
             metadata.custom_features.update(
@@ -631,14 +735,16 @@ class DatalabFileLoader(FileLoader):
                 )
         # Return
         return FileLoaderReturn(
-            [self.replace_labels(info.features, x) for x in dataset],
+            [self._replace_labels(info.features, x) for x in dataset],
             metadata=metadata,
         )
 
 
 class TextFileLoader(FileLoader):
-    """loads a text file. Each line is a different sample.
-    - only one field is allowed. It is often used for predicted outputs.
+    """Loads a text file where each line is a different sample.
+
+    Only one field is allowed. It is often used for predicted outputs of text generation
+    models.
     """
 
     def __init__(
@@ -647,7 +753,15 @@ class TextFileLoader(FileLoader):
         dtype: DType = str,
         strip_before_parsing: Optional[bool] = None,
     ) -> None:
-        # src_name is not used for this file loader, it overrides the base load method.
+        """Constructor.
+
+        src_name is not used for this file loader, it overrides the base load method.
+
+        Args:
+            target_name: The name of the target field.
+            dtype: The type of the field.
+            strip_before_parsing: Whether to strip white space before parsing.
+        """
         super().__init__(
             [FileLoaderField("_", target_name, dtype, strip_before_parsing)],
             use_idx_as_id=True,
@@ -657,6 +771,7 @@ class TextFileLoader(FileLoader):
     def load_raw(
         cls, data: str | DatalabLoaderOption, source: Source
     ) -> FileLoaderReturn:
+        """See FileLoader.load_raw."""
         data = narrow(str, data)
         if source == Source.in_memory:
             return FileLoaderReturn(data.splitlines())
@@ -665,7 +780,8 @@ class TextFileLoader(FileLoader):
                 return FileLoaderReturn(f.readlines())
         raise NotImplementedError
 
-    def validate(self):
+    def validate(self) -> None:
+        """See FileLoader.validate."""
         super().validate()
         if len(self._fields) != 1:
             raise ValueError("Text File Loader only takes one field")
@@ -676,6 +792,7 @@ class TextFileLoader(FileLoader):
         source: Source,
         field_mapping: dict[str, str] | None = None,
     ) -> FileLoaderReturn:
+        """See FileLoader.load."""
         raw_data = self.load_raw(data, source)
         data_list: list[str] = raw_data.samples
         parsed_data_points: list[dict] = []

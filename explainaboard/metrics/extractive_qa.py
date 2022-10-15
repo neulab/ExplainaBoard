@@ -1,9 +1,12 @@
+"""Evaluation metrics for extractive question answering."""
+
 from __future__ import annotations
 
 import abc
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 
@@ -13,14 +16,13 @@ from explainaboard.metrics.metric import (
     MetricStats,
     SimpleMetricStats,
 )
-from explainaboard.metrics.registry import register_metric_config
-from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, Preprocessor
-from explainaboard.utils.typing_utils import unwrap_or
+from explainaboard.serialization import common_registry
+from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
 
 
 class ExtractiveQAMetric(Metric):
-    """
-    An abstract class for extractive QA tasks that measures scores after normalization.
+    """An abstract class for extractive QA tasks that measures scores after normalization.
+
     The actual metric must inherit this class and implement the sample_level_metric()
     function.
     """
@@ -29,11 +31,10 @@ class ExtractiveQAMetric(Metric):
         self,
         true_data: list[Union[str, list[str]]],
         pred_data: list[str],
-        config: Optional[MetricConfig] = None,
     ) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
         true_data = [[x] if isinstance(x, str) else x for x in true_data]
-        config = unwrap_or(config, self.config)
-        preprocessor = ExtractiveQAPreprocessor(language=config.source_language)
+        preprocessor = ExtractiveQAPreprocessor(language=self.config.source_language)
         return SimpleMetricStats(
             np.array(
                 [
@@ -45,47 +46,58 @@ class ExtractiveQAMetric(Metric):
 
     @abc.abstractmethod
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
-        """
-        Calculate a score given a ground truth answer string and a prediction.
+        """Calculate the metric  for a single sample.
+
+        Args:
+            ground_truth: The ground truth answer.
+            prediction: The prediction.
+            preprocessor: The preprocessor to be applied to the prediction.
+
+        Returns:
+            The value of the sample-level metric.
         """
         ...
 
 
 @dataclass
-@register_metric_config
+@common_registry.register("ExactMatchQAConfig")
 class ExactMatchQAConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for ExactMatchQA."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return ExactMatchQA(self)
 
 
 class ExactMatchQA(ExtractiveQAMetric):
-    """
-    Calculate a score for extractive QA based on exact match.
-    """
+    """Calculate a score for extractive QA based on exact match."""
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ) -> float:
+        """See ExtractiveQAMetric.sample_level_metric."""
         return 1.0 if preprocessor(prediction) == preprocessor(ground_truth) else 0.0
 
 
 @dataclass
-@register_metric_config
+@common_registry.register("F1ScoreQAConfig")
 class F1ScoreQAConfig(MetricConfig):
-    def to_metric(self):
+    """Configuration for F1ScoreQA."""
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
         return F1ScoreQA(self)
 
 
 class F1ScoreQA(ExtractiveQAMetric):
-    """
-    Calculate a score for extractive QA based on F1 score.
-    """
+    """Calculate a score for extractive QA based on F1 score."""
 
     def sample_level_metric(
-        self, ground_truth: str, prediction: str, preprocessor: Preprocessor
+        self, ground_truth: str, prediction: str, preprocessor: Callable[[str], str]
     ):
+        """See ExtractiveQAMetric.sample_level_metric."""
         prediction_tokens = preprocessor(prediction).split()
         ground_truth_tokens = preprocessor(ground_truth).split()
         common = Counter(prediction_tokens) & Counter(ground_truth_tokens)

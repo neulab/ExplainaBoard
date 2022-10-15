@@ -1,3 +1,9 @@
+"""Operations over tensors.
+
+TODO(gneubig):
+  Thes could probably be made easier through using Pandas dataframes or numpy arrays
+"""
+
 import copy
 from typing import Optional
 
@@ -11,21 +17,23 @@ def aggregate_score_tensor(
     systems_aggregation: Optional[str] = None,
     datasets_aggregation: Optional[str] = None,
     languages_aggregation: Optional[str] = None,
-):
-    """
-    This function aggregate score tensor based on specified parameters along
-    three dimensions: system, dataset and language
+) -> dict:
+    """This function aggregates score tensor based on specified parameters.
+
+    It can be done along three dimensions: system, dataset and language
     TODO(Pengfei):
      (1) this function could be duplicated
      (2) the way to implement the aggregation should be generalized
 
-    :param score_tensor:
-    :param systems_aggregation:
-    :param datasets_aggregation:
-    :param languages_aggregation:
-    :return:
-    """
+    Args:
+        score_tensor: The tensor to aggregate
+        systems_aggregation: How to aggregate over systems, e.g. "minus"
+        datasets_aggregation: How to aggregate over datasets, e.g. "average"
+        languages_aggregation: How to aggregate over langauges, e.g. "average"
 
+    Returns:
+        A tensor with the scores aggregated
+    """
     if datasets_aggregation is not None and languages_aggregation is None:
         languages_aggregation = datasets_aggregation
 
@@ -128,9 +136,17 @@ def filter_score_tensor(
     systems: Optional[list],
     datasets: Optional[list],
     languages: Optional[list],
-):
-    """
-    filter score tensor based on given systems, datasets and languages
+) -> dict:
+    """Remove elements of the tensor that don't match certain filters.
+
+    Args:
+        score_tensor: The tensor of scores
+        systems: The list of systems to include, or `None` for all
+        datasets: The list of datasets to include, or `None` for all
+        languages: The list of languages to include, or `None` for all
+
+    Returns:
+        The filtered tensor
     """
     score_tensor_copy = copy.deepcopy(score_tensor)
 
@@ -154,9 +170,10 @@ def filter_score_tensor(
     return score_tensor_filter
 
 
-def print_score_tensor(score_tensor: dict):
-    """
-    print the score_tensor, for example,
+def print_score_tensor(score_tensor: dict) -> None:
+    """Print the score_tensor.
+
+    For example,
      ----------------------------------------
     System: CL-mt5base, Dataset: xnli
     Language:       ar      bg      de      el      en      es      fr
@@ -172,6 +189,8 @@ def print_score_tensor(score_tensor: dict):
     Language:       de      en      es      fr      ja      zh
     Accuracy:       0.933   0.915   0.934   0.926   0.915   0.871
 
+    Args:
+        score_tensor: The tensor to print out.
     """
     get_logger('report').info(score_tensor.keys())
     for system_name, m_value in score_tensor.items():

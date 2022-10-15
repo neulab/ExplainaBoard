@@ -1,42 +1,89 @@
+"""Measure the gap between two models."""
+from __future__ import annotations
+
 import copy
 
-from explainaboard.analysis.analyses import BucketAnalysisResult
+from explainaboard.analysis.analyses import AnalysisResult, BucketAnalysisResult
+from explainaboard.analysis.performance import BucketPerformance
+from explainaboard.analysis.result import Result
 from explainaboard.info import SysOutputInfo
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.metrics.metric import MetricResult, Score
+
+
+def _diff_overall(
+    sys1: dict[str, MetricResult], sys2: dict[str, MetricResult]
+) -> dict[str, MetricResult]:
+    """Helper function to make a difference performance.
+
+    Args:
+        sys1: System1 overall performances.
+        sys2: System1 overall performances.
+
+    Returns:
+        dict of Perforamnces generated from sys1 and sys2.
+    """
+    return {
+        k: MetricResult(
+            {
+                "score": Score(
+                    sys1[k].get_value(Score, "score").value
+                    - sys2[k].get_value(Score, "score").value
+                )
+            }
+        )
+        for k in sys1
+    }
 
 
 def get_pairwise_performance_gap(
     sys1: SysOutputInfo, sys2: SysOutputInfo
 ) -> SysOutputInfo:
+    """Measure the performance gap between two models.
+
+    Args:
+        sys1: Information from the first system.
+        sys2: Information from the second system.
+
+    Returns:
+        A SystemOutputInfo object that has the difference between the performances.
+    """
+    overall = {
+        level: _diff_overall(sys1.results.overall[level], sys2.results.overall[level])
+        for level in sys1.results.overall
+    }
+
+    analyses: list[AnalysisResult] = []
+
+    for analysis1, analysis2 in zip(sys1.results.analyses, sys2.results.analyses):
+        if not isinstance(analysis1, BucketAnalysisResult):
+            analyses.append(copy.deepcopy(analysis1))
+            continue
+
+        if not isinstance(analysis2, BucketAnalysisResult):
+            raise ValueError(
+                "Mismatched analyses: "
+                f"{type(analysis1).__name__} v.s. {type(analysis2).__name__}"
+            )
+
+        analyses.append(
+            BucketAnalysisResult(
+                name=analysis1.name,
+                level=analysis1.level,
+                bucket_performances=[
+                    BucketPerformance(
+                        n_samples=bp1.n_samples,
+                        bucket_samples=bp1.bucket_samples[:],
+                        results=_diff_overall(bp1.results, bp2.results),
+                        bucket_interval=bp1.bucket_interval,
+                        bucket_name=bp1.bucket_name,
+                    )
+                    for bp1, bp2 in zip(
+                        analysis1.bucket_performances, analysis2.bucket_performances
+                    )
+                ],
+            )
+        )
 
     sys = copy.deepcopy(sys1)
-
-    orm, or1, or2 = (unwrap(x.results.overall) for x in (sys, sys1, sys2))
-    for orm_lev, or1_lev, or2_lev in zip(orm, or1, or2):
-        for orm_met, or1_met, or2_met in zip(orm_lev, or1_lev, or2_lev):
-            orm_met.value = float(or1_met.value) - float(or2_met.value)
-            orm_met.confidence_score_low = None
-            orm_met.confidence_score_high = None
-
-    fgr, fgr1, fgr2 = (unwrap(x.results.analyses) for x in (sys, sys1, sys2))
-    for fgr_buks, fgr1_buks, fgr2_buks in zip(fgr, fgr1, fgr2):
-        if (
-            not isinstance(fgr_buks, BucketAnalysisResult)
-            or not isinstance(fgr1_buks, BucketAnalysisResult)
-            or not isinstance(fgr2_buks, BucketAnalysisResult)
-        ):
-            continue
-        for fgr_buk, fgr1_buk, fgr2_buk in zip(
-            fgr_buks.bucket_performances,
-            fgr1_buks.bucket_performances,
-            fgr2_buks.bucket_performances,
-        ):
-            for fgr_met, fgr1_met, fgr2_met in zip(
-                fgr_buk.performances, fgr1_buk.performances, fgr2_buk.performances
-            ):
-                fgr_met.value = fgr1_met.value - fgr2_met.value
-                # TODO(gneubig): these could be done via pairwise bootstraps
-                fgr_met.confidence_score_low = None
-                fgr_met.confidence_score_high = None
-
+    sys.results = Result(overall=overall, analyses=analyses)
     return sys

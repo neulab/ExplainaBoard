@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/python/black.git
-    rev: 22.3.0 
+    rev: 22.3.0
     hooks:
       - id: black
         files: '\.py$'
@@ -8,11 +8,22 @@ repos:
     rev: 4.0.1
     hooks:
       - id: flake8
+        name: flake8
         additional_dependencies:
           - flake8-absolute-import
           - flake8-black>=0.1.1
         entry: flake8
         files: '\.py$'
+      - id: flake8
+        name: docstring
+        additional_dependencies:
+          - flake8-docstrings>=1.6
+        args:
+          - --docstring-convention=google
+          - --select=D
+        entry: flake8
+        exclude: '^explainaboard\/third_party\/.*\.py|_test\.py$'
+        files: '^explainaboard\/.*\.py$'
   - repo: https://github.com/pycqa/isort.git
     rev: 5.6.4
     hooks:
@@ -24,9 +35,14 @@ repos:
       - id: upgrade-type-hints
         files: '\.py$'
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: 'v0.942'
+    rev: 'v0.981'
     hooks:
       - id: mypy
         additional_dependencies:
           - types-requests
         files: '\.py$'
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.5.1
+    hooks:
+    - id: markdownlint-cli2
+    - id: markdownlint-cli2-fix

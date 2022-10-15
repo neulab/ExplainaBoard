@@ -1,6 +1,7 @@
+"""Loaders for the tabular regression task."""
+
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -10,14 +11,10 @@ from explainaboard.loaders.file_loader import (
     TextFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.tabular_regression)
 class TabularRegressionLoader(Loader):
-    """
-    Validate and Reformat system output file with tsv format:
-    text \t true_label \t predicted_label
+    """Loader for the tabular regression task.
 
     usage:
         please refer to `test_loaders.py`
@@ -25,10 +22,12 @@ class TabularRegressionLoader(Loader):
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         target_field_names = ["true_value"]
         return {
             FileType.json: JSONFileLoader(
@@ -45,6 +44,7 @@ class TabularRegressionLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         field_name = "predicted_value"
         return {
             FileType.text: TextFileLoader(field_name, float),

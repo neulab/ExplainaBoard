@@ -1,15 +1,17 @@
+"""A processor for the language modeling task."""
+
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import Any
 
-from datalabs import aggregating
 import numpy as np
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseSpan
-from explainaboard.analysis.feature import FeatureType
+from explainaboard.analysis.feature import DataType, FeatureType, Value
 from explainaboard.analysis.feature_funcs import (
     cap_feature,
     count_tokens,
@@ -21,33 +23,35 @@ from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.log_prob import LogProbConfig
 from explainaboard.metrics.metric import MetricConfig, MetricStats, SimpleMetricStats
 from explainaboard.processors.processor import Processor
-from explainaboard.processors.processor_registry import register_processor
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 
 
-@register_processor(TaskType.language_modeling)
 class LanguageModelingProcessor(Processor):
+    """A processor for the language modeling task."""
+
     @classmethod
     def task_type(cls) -> TaskType:
+        """See Processor.task_type."""
         return TaskType.language_modeling
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
-            "text": feature.Value("string"),
-            "log_probs": feature.Value("string"),
+            "text": feature.Value(dtype=feature.DataType.STRING),
+            "log_probs": feature.Value(dtype=feature.DataType.STRING),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
                 func=lambda info, x, c: count_tokens(info, x['text']),
             ),
             "text_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in characters",
                 func=lambda info, x, c: len(x['text']),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -55,7 +59,7 @@ class LanguageModelingProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=(
                     "the average rank of each word based on its frequency in "
                     "training set"
@@ -66,7 +70,7 @@ class LanguageModelingProcessor(Processor):
                 ),
             ),
             "length_fre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the frequency of text length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(
@@ -77,11 +81,11 @@ class LanguageModelingProcessor(Processor):
 
         tok_features: dict[str, FeatureType] = {
             "tok_log_prob": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=("log probability of the token according to the LM"),
             ),
             "tok_capitalness": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description=(
                     "The capitalness of an token. For example, "
                     "first_caps represents only the first character of "
@@ -91,24 +95,24 @@ class LanguageModelingProcessor(Processor):
                 func=lambda info, x, c: cap_feature(c.text),
             ),
             "tok_position": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description=("The relative position of a token in a sentence"),
                 func=lambda info, x, c: c.token_span[0] / count_tokens(info, x['text']),
             ),
             "tok_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="The number of characters in a token",
                 func=lambda info, x, c: len(c.text),
             ),
             # TODO(gneubig): commented out because probably less important
             # "tok_test_freq": feature.Value(
-            #     dtype="float",
+            #     dtype=feature.DataType.FLOAT,
             #     description="tok frequency in the test set",
             #     require_training_set=False,
             #     func=...
             # ),
             "tok_train_freq": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="tok frequency in the training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['vocab'].get(c.text, 0.0),
@@ -129,11 +133,16 @@ class LanguageModelingProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         analyses: list[Analysis] = []
         analysis_levels = self.default_analysis_levels()
         for lev in analysis_levels:
             for k, v in lev.features.items():
-                if v.dtype == 'float32' and k != 'tok_log_prob':
+                if (
+                    isinstance(v, Value)
+                    and v.dtype == DataType.FLOAT
+                    and k != 'tok_log_prob'
+                ):
                     analyses.append(
                         BucketAnalysis(
                             level=lev.name,
@@ -150,7 +159,7 @@ class LanguageModelingProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         if analysis_level.name == 'example':
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
@@ -191,28 +200,38 @@ class LanguageModelingProcessor(Processor):
                             sys_info, output, case, statistics
                         )
                 cases.append(case)
-        metric_stats: list[MetricStats] = [
-            SimpleMetricStats(np.array([x.features['tok_log_prob'] for x in cases]))
-        ]
+        metric_stats: dict[str, MetricStats] = {
+            "Perplexity": SimpleMetricStats(
+                np.array([x.features['tok_log_prob'] for x in cases])
+            ),
+            "LogProb": SimpleMetricStats(
+                np.array([x.features['tok_log_prob'] for x in cases])
+            ),
+        }
         return cases, metric_stats
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
-    ) -> list[MetricConfig]:
-        return [
-            LogProbConfig(name='Perplexity', ppl=True),
-            LogProbConfig(name='LogProb', ppl=False),
-        ]
+        cls,
+        level: str = 'example',
+        source_language: str | None = None,
+        target_language: str | None = None,
+    ) -> dict[str, MetricConfig]:
+        """See Processor.default_metrics."""
+        return {
+            "Perplexity": LogProbConfig(ppl=True),
+            "LogProb": LogProbConfig(ppl=False),
+        }
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return None
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return [float(x) for x in data_point["log_probs"].split(' ')]
 
-    @aggregating()
-    def _statistics_func(self, samples, sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}
         length_fre: dict[int, float] = {}
         total_samps = 0

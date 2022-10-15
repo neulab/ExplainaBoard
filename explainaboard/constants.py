@@ -1,7 +1,12 @@
+"""Definition of constants used in the whole library."""
+from __future__ import annotations
+
 from enum import Enum
 
 
 class TaskType(str, Enum):
+    """Task types available in this tool."""
+
     text_classification = "text-classification"
     named_entity_recognition = "named-entity-recognition"
     qa_extractive = "qa-extractive"
@@ -12,6 +17,7 @@ class TaskType(str, Enum):
     kg_link_tail_prediction = "kg-link-tail-prediction"
     qa_multiple_choice = "qa-multiple-choice"
     qa_open_domain = "qa-open-domain"
+    qa_tat = "qa-tat"
     conditional_generation = "conditional-generation"
     word_segmentation = "word-segmentation"
     language_modeling = "language-modeling"
@@ -19,16 +25,27 @@ class TaskType(str, Enum):
     cloze_mutiple_choice = "cloze-multiple-choice"
     cloze_generative = "cloze-generative"
     grammatical_error_correction = "grammatical-error-correction"
-    nlg_meta_evaluation = "nlg-meta-evaluation"
+    meta_evaluation_wmt_da = "meta-evaluation-wmt-da"
     tabular_regression = "tabular-regression"
     tabular_classification = "tabular-classification"
+    argument_pair_extraction = "argument-pair-extraction"
+    ranking_with_context = "ranking-with-context"
+    argument_pair_identification = "argument-pair-identification"
+    meta_evaluation_nlg = "meta-evaluation-nlg"
 
     @staticmethod
-    def list():
+    def list() -> list[str]:
+        """Obtains string representations of all values.
+
+        Returns:
+            List of all values in str.
+        """
         return list(map(lambda c: c.value, TaskType))
 
 
 class Source(str, Enum):
+    """Types of data sources."""
+
     in_memory = "in_memory"  # content has been loaded in memory
     local_filesystem = "local_filesystem"
     s3 = "s3"
@@ -36,6 +53,8 @@ class Source(str, Enum):
 
 
 class FileType(str, Enum):
+    """Types of file formats."""
+
     json = "json"
     tsv = "tsv"
     csv = "csv"
@@ -44,5 +63,10 @@ class FileType(str, Enum):
     text = "text"
 
     @staticmethod
-    def list():
+    def list() -> list[str]:
+        """Obtains string representations of all values.
+
+        Returns:
+            List of all values in str.
+        """
         return list(map(lambda c: c.value, FileType))

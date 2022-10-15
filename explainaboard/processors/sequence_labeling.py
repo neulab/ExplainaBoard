@@ -1,10 +1,11 @@
+"""A processor for the sequence labeling task."""
+
 from __future__ import annotations
 
 import abc
+from collections.abc import Iterable
 import copy
 from typing import Any, cast, List
-
-from datalabs import aggregating, Dataset
 
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import (
@@ -17,39 +18,53 @@ from explainaboard.analysis.case import AnalysisCase, AnalysisCaseLabeledSpan
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import feat_freq_rank, feat_num_oov
 from explainaboard.info import SysOutputInfo
-from explainaboard.loaders.file_loader import DatalabFileLoader
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.processors.processor import Processor
 from explainaboard.utils.logging import progress
 from explainaboard.utils.span_utils import cap_feature, Span, SpanOps
+from explainaboard.utils.tokenizer import SingleSpaceTokenizer, Tokenizer
 from explainaboard.utils.typing_utils import unwrap
 
 
 class SeqLabProcessor(Processor):
+    """A processor for the sequence labeling task."""
+
     @classmethod
     @abc.abstractmethod
-    def default_span_ops(cls) -> SpanOps:
+    def _default_span_ops(cls) -> SpanOps:
         """Returns the default metrics of this processor."""
         ...
 
     _DEFAULT_TAG = 'O'
 
     def __init__(self):
+        """Constructor."""
         super().__init__()
-        self._span_ops: SpanOps = self.default_span_ops()
+        self._span_ops: SpanOps = self._default_span_ops()
+
+    def get_tokenizer(self, lang: str | None) -> Tokenizer:
+        """Get a tokenizer based on the language."""
+        return SingleSpaceTokenizer()
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
+        """See Processor.default_analysis_levels."""
         examp_features: dict[str, FeatureType] = {
-            "tokens": feature.Sequence(feature=feature.Value("string")),
-            "true_tags": feature.Sequence(feature=feature.Value("string")),
-            "pred_tags": feature.Sequence(feature=feature.Value("string")),
+            "tokens": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "true_tags": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
+            "pred_tags": feature.Sequence(
+                feature=feature.Value(dtype=feature.DataType.STRING)
+            ),
             "text_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
                 func=lambda info, x, c: len(x['tokens']),
             ),
             "span_density": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="ratio of entity tokens to all tokens",
                 func=lambda info, x, c: float(
                     len([y for y in x['true_tags'] if y != self._DEFAULT_TAG])
@@ -57,7 +72,7 @@ class SeqLabProcessor(Processor):
                 / len(x['true_tags']),
             ),
             "num_oov": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
@@ -65,7 +80,7 @@ class SeqLabProcessor(Processor):
                 ),
             ),
             "fre_rank": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="average rank of each word based on training set frequency",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
@@ -76,42 +91,42 @@ class SeqLabProcessor(Processor):
 
         span_features: dict[str, FeatureType] = {
             "span_text": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="text of the span",
                 func=lambda info, x, c: c.text,
             ),
             "span_length": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="span length in tokens",
                 func=lambda info, x, c: c.token_span[1] - c.token_span[0],
             ),
             "span_true_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="true label of the span",
                 func=lambda info, x, c: c.true_label,
             ),
             "span_pred_label": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="predicted label of the span",
                 func=lambda info, x, c: c.predicted_label,
             ),
             "span_capitalness": feature.Value(
-                dtype="string",
+                dtype=feature.DataType.STRING,
                 description="whether the span is capitalized",
                 func=lambda info, x, c: cap_feature(c.text),
             ),
             "span_rel_pos": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="relative position of the span",
                 func=lambda info, x, c: c.token_span[0] / len(x['tokens']),
             ),
             "span_chars": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="number of characters in the span",
                 func=lambda info, x, c: len(c.text),
             ),
             "span_econ": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="consistency of the span labels",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['econ_dic'].get(
@@ -119,7 +134,7 @@ class SeqLabProcessor(Processor):
                 ),
             ),
             "span_efre": feature.Value(
-                dtype="float",
+                dtype=feature.DataType.FLOAT,
                 description="frequency of the span in the training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: stat['efre_dic'].get(c.text.lower(), 0.0),
@@ -140,6 +155,7 @@ class SeqLabProcessor(Processor):
         ]
 
     def default_analyses(self) -> list[Analysis]:
+        """See Processor.default_analyses."""
         analysis_levels = self.default_analysis_levels()
         span_features = analysis_levels[1].features
         analyses: list[Analysis] = [
@@ -148,7 +164,7 @@ class SeqLabProcessor(Processor):
                 description=span_features["span_true_label"].description,
                 feature="span_true_label",
                 method="discrete",
-                number=15,
+                num_buckets=15,
             ),
             ComboCountAnalysis(
                 level="span",
@@ -160,21 +176,21 @@ class SeqLabProcessor(Processor):
                 description=span_features["span_capitalness"].description,
                 feature="span_capitalness",
                 method="discrete",
-                number=4,
+                num_buckets=4,
             ),
         ]
         analyses.extend(self.continuous_feature_analyses())
         return analyses
 
     def _get_true_label(self, data_point: dict):
+        """See processor._get_true_label."""
         return data_point["true_tags"]
 
     def _get_predicted_label(self, data_point: dict):
+        """See processor._get_predicted_label."""
         return data_point["pred_tags"]
 
-    @aggregating()
-    def _statistics_func(self, samples: Dataset, sys_info: SysOutputInfo):
-        dl_features = samples.info.features
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
 
         tokens_sequences = []
         tags_sequences = []
@@ -182,8 +198,7 @@ class SeqLabProcessor(Processor):
         vocab: dict[str, int] = {}
         tag_vocab: dict[str, int] = {}
         for sample in progress(samples):
-            rep_sample = DatalabFileLoader.replace_labels(dl_features, sample)
-            tokens, tags = rep_sample["tokens"], rep_sample["tags"]
+            tokens, tags = sample["tokens"], sample["true_tags"]
 
             # update vocabulary
             for token, tag in zip(tokens, tags):
@@ -215,7 +230,7 @@ class SeqLabProcessor(Processor):
         sys_output: list[dict],
         statistics: Any,
         analysis_level: AnalysisLevel,
-    ) -> tuple[list[AnalysisCase], list[MetricStats]]:
+    ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
         if analysis_level.name == 'example':
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
@@ -275,21 +290,25 @@ class SeqLabProcessor(Processor):
         # calculate metric stats
         true_data = [x.true_label for x in cases]
         pred_data = [x.predicted_label for x in cases]
-        metric_stats: list[MetricStats] = [
-            x.to_metric().calc_stats_from_data(true_data, pred_data)
-            for x in analysis_level.metric_configs
-        ]
+        metric_stats: dict[str, MetricStats] = {
+            name: config.to_metric().calc_stats_from_data(true_data, pred_data)
+            for name, config in analysis_level.metric_configs.items()
+        }
         return cast(List[AnalysisCase], cases), metric_stats
 
     def get_econ_efre_dic(
         self, words: list[str], bio_tags: list[str]
     ) -> tuple[dict[str, float], dict[str, int]]:
-        """
-        Calculate the entity label consistency and frequency features from this paper
+        """Calculates entity label consistency and frequency features.
+
+        Reference this paper:
         https://aclanthology.org/2020.emnlp-main.489.pdf
-        :param words: a list of all words in the corpus
-        :param bio_tags: a list of all tags in the corpus
-        :return: Returns two dictionaries:
+
+        Args:
+            words: a list of all words in the corpus
+            bio_tags: a list of all tags in the corpus
+
+        Returns: two dictionaries:
                     econ: 'span|||tag' pointing to entity consistency values
                     efre: 'span' pointing to entity frequency values
         """
@@ -337,6 +356,7 @@ class SeqLabProcessor(Processor):
         return econ_dic, efre_dic
 
     def deserialize_system_output(self, output: dict) -> dict:
+        """See Processor.deserialize_system_output."""
         new_output = copy.deepcopy(output)
         if "span_info" in new_output:
             new_output["span_info"] = [

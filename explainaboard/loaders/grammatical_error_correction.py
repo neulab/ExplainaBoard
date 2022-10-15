@@ -1,6 +1,8 @@
+"""Loaders for grammatical error correction task."""
+
 from __future__ import annotations
 
-from explainaboard.constants import FileType, TaskType
+from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
     FileLoader,
@@ -8,14 +10,10 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.grammatical_error_correction)
 class GrammaticalErrorCorrectionLoader(Loader):
-    """
-    Validate and Reformat system output file with tsv format:
-    text \t true_label \t predicted_label
+    """Loader for the grammatical error correction task.
 
     usage:
         please refer to `test_loaders.py`
@@ -25,14 +23,17 @@ class GrammaticalErrorCorrectionLoader(Loader):
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """See Loader.default_output_file_type."""
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         return {
             FileType.json: JSONFileLoader(
                 [
@@ -50,6 +51,7 @@ class GrammaticalErrorCorrectionLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         field_name = "predicted_edits"
         return {
             FileType.json: JSONFileLoader(

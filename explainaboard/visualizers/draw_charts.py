@@ -1,16 +1,15 @@
-"""
-draw_charts.py
+"""draw_charts.py.
 
 This is a program that takes in an ExplainaBoard report or reports and outputs visual
 summaries of the included analyses.
 
 Here is an example of usage:
 > explainaboard --task text-classification --dataset sst2 \
-                --system_outputs ./data/system_outputs/sst2/sst2-lstm-output.txt \
-                --report_json report-lstm.json
+                --system-outputs ./data/system_outputs/sst2/sst2-lstm-output.txt \
+                --report-json report-lstm.json
 > explainaboard --task text-classification --dataset sst2 \
-                --system_outputs ./data/system_outputs/sst2/sst2-cnn-output.txt \
-                --report_json report-cnn.json
+                --system-outputs ./data/system_outputs/sst2/sst2-cnn-output.txt \
+                --report-json report-cnn.json
 > python -m explainaboard.visualizers.draw_charts \
                 --reports report-lstm.json report-cnn.json
 
@@ -22,6 +21,9 @@ import argparse
 import json
 import os
 
+# NOTE(odashi): List is required to set the first argument of cast() in Python 3.8.
+from typing import cast, List
+
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -30,8 +32,8 @@ from explainaboard.analysis.analyses import (
     BucketAnalysisResult,
     ComboCountAnalysisResult,
 )
-from explainaboard.analysis.performance import Performance
 from explainaboard.info import SysOutputInfo
+from explainaboard.metrics.metric import ConfidenceInterval, MetricResult, Score
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import unwrap
 from explainaboard.visualizers.bar_chart import make_bar_chart
@@ -40,13 +42,12 @@ from explainaboard.visualizers.bar_chart import make_bar_chart
 def plot_combo_counts(
     combo_results: list[ComboCountAnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
-    """
-    Plot combo count results
-    :param combo_results: The analyses to write out
-    :param output_dir: The directory to write to
-    :param sys_names: The names of the systems
-    """
+    """Plot combo count results.
 
+    combo_results: The analyses to write out
+    output_dir: The directory to write to
+    sys_names: The names of the systems
+    """
     # get feature maps
     if any(x.features != combo_results[0].features for x in combo_results):
         raise ValueError(
@@ -56,9 +57,10 @@ def plot_combo_counts(
     feature_names = combo_results[0].features
     feature_maps: list[dict[str, int]] = [dict() for _ in feature_names]
     for combo_result in combo_results:
-        for feats, count in unwrap(combo_result.combo_counts):
+        for occ in combo_result.combo_occurrences:
+            feats = occ.features
             for feat, featmap in zip(feats, feature_maps):
-                featmap[feat] = featmap.get(feat, 0) + count
+                featmap[feat] = featmap.get(feat, 0) + occ.sample_count
     # sort in descending order of frequency of each feature map
     sorted_names = [
         [v[0] for v in sorted(x.items(), key=lambda y: -y[1])] for x in feature_maps
@@ -81,17 +83,20 @@ def plot_combo_counts(
                 f'plot_combo_counts currently only supports feature combinations of '
                 f'size 2, but got {feature_names}'
             )
-        conf_matrix = np.zeros([len(x) for x in feature_maps])
-        for feats, count in unwrap(combo_result.combo_counts):
-            conf_matrix[feature_maps[0][feats[0]], feature_maps[1][feats[1]]] = count
+        confusion_matrix = np.zeros([len(x) for x in feature_maps])
+        for occ in combo_result.combo_occurrences:
+            feats = occ.features
+            confusion_matrix[
+                feature_maps[0][feats[0]], feature_maps[1][feats[1]]
+            ] = occ.sample_count
         fig, ax = plt.subplots(figsize=(7.5, 7.5))
-        ax.matshow(conf_matrix, cmap=plt.cm.Blues, alpha=0.3)
-        for i in range(conf_matrix.shape[0]):
-            for j in range(conf_matrix.shape[1]):
+        ax.matshow(confusion_matrix, cmap=plt.cm.Blues, alpha=0.3)
+        for i in range(confusion_matrix.shape[0]):
+            for j in range(confusion_matrix.shape[1]):
                 ax.text(
                     x=j,
                     y=i,
-                    s=conf_matrix[i, j],
+                    s=confusion_matrix[i, j],
                     va='center',
                     ha='center',
                     size='xx-large',
@@ -109,40 +114,66 @@ def plot_combo_counts(
         plt.savefig(out_file, format='png', bbox_inches='tight')
 
 
+def render_interval_to_tick_label(interval: tuple[float, float]) -> str:
+    """Render a bucket interval (tuple of floats) to a tick label to display.
+
+    Args:
+        interval: the input value range
+
+    Returns:
+        a string-rendered tick label
+    """
+    return f'[{interval[0]:.2f},{interval[0]:.2f}]'
+
+
+def _get_errors(result: MetricResult) -> tuple[float, float]:
+    """Helper to obtain confidence interval ranges.
+
+    Args:
+        result: MetricResult to calculate the errors.
+
+    Returns:
+        Calculated errors: (value - ci.low, ci.high - value)
+    """
+    value = result.get_value(Score, "score").value
+    ci = result.get_value(ConfidenceInterval, "score_ci")
+    return value - ci.low, ci.high - value
+
+
 def plot_buckets(
     bucket_results: list[BucketAnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
-    """
-    Plot bucket results in a bar chart
-    :param bucket_results: The analyses to write out
-    :param output_dir: The directory to write to
-    :param sys_names: The names of the systems
+    """Plot bucket results in a bar chart.
+
+    Args:
+        bucket_results: The analyses to write out
+        output_dir: The directory to write to
+        sys_names: The names of the systems
     """
     feature_name = bucket_results[0].name
 
-    bucket0_intervals = [
-        x.bucket_interval for x in bucket_results[0].bucket_performances
+    bucket0_ticklabels: list[str] = [
+        x.bucket_name
+        if x.bucket_name is not None
+        else render_interval_to_tick_label(unwrap(x.bucket_interval))
+        for x in bucket_results[0].bucket_performances
     ]
-    bucket0_names = [
-        x.metric_name for x in bucket_results[0].bucket_performances[0].performances
-    ]
-    for metric_id, metric_name in enumerate(bucket0_names):
 
-        performances: list[list[Performance]] = [
-            [x.performances[metric_id] for x in y.bucket_performances]
+    bucket0_names = sorted(bucket_results[0].bucket_performances[0].results.keys())
+
+    for metric_name in bucket0_names:
+        # indices: [analysis_id][bucket_id]
+        results: list[list[MetricResult]] = [
+            [x.results[metric_name] for x in y.bucket_performances]
             for y in bucket_results
         ]
-        ys = [[x.value for x in y] for y in performances]
+        ys = [[x.get_value(Score, "score").value for x in y] for y in results]
 
-        y_errs = None
-        if performances[0][0].confidence_score_low is not None:
-            y_errs = [
-                (
-                    [x.value - unwrap(x.confidence_score_low) for x in y],
-                    [unwrap(x.confidence_score_high) - x.value for x in y],
-                )
-                for y in performances
-            ]
+        if results[0][0].get_value_or_none(ConfidenceInterval, "score_ci") is not None:
+            error_tuples = [[_get_errors(x) for x in y] for y in results]
+            y_errs = [([x[0] for x in y], [x[1] for x in y]) for y in error_tuples]
+        else:
+            y_errs = None
 
         make_bar_chart(
             ys,
@@ -154,7 +185,7 @@ def plot_buckets(
             errs=y_errs,
             title=None,
             xlabel=feature_name,
-            xticklabels=bucket0_intervals,
+            xticklabels=bucket0_ticklabels,
             ylabel=metric_name,
         )
 
@@ -162,13 +193,13 @@ def plot_buckets(
 def draw_charts_from_reports(
     reports: list[str], output_dir: str, sys_names: list[str] | None = None
 ) -> None:
-    """
-    Draw bar charts from report file generated from ExplainaBoard
-    :param reports: Reports to plot
-    :param output_dir:
-    :return:
-    """
+    """Draw bar charts from report file generated from ExplainaBoard.
 
+    Args:
+        reports: Reports to plot
+        output_dir: The directory where the plots should be written
+        sys_names: The names of the systems to write in the plots
+    """
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -184,23 +215,30 @@ def draw_charts_from_reports(
             report_info.append(SysOutputInfo.from_dict(json.load(fin)))
 
     # --- Overall results
-    num_levels = len(unwrap(report_info[0].analysis_levels))
-    for level_id in range(num_levels):
-        overall_results: list[list[Performance]] = [
-            list(unwrap(x.results.overall)[level_id]) for x in report_info
+    for analysis in report_info[0].analyses:
+        overall_results: list[dict[str, MetricResult]] = [
+            x.results.overall[analysis.level] for x in report_info
         ]
-        overall_metric_names = [x.metric_name for x in overall_results[0]]
+        overall_metric_names = sorted((overall_results[0].keys()))
 
-        ys = [[x.value for x in y] for y in overall_results]
-        y_errs = None
-        if overall_results[0][0].confidence_score_low is not None:
-            y_errs = [
-                (
-                    [x.value - unwrap(x.confidence_score_low) for x in y],
-                    [unwrap(x.confidence_score_high) - x.value for x in y],
-                )
+        ys = [
+            [y[name].get_value(Score, "score").value for name in overall_metric_names]
+            for y in overall_results
+        ]
+
+        if (
+            overall_results[0][overall_metric_names[0]].get_value_or_none(
+                ConfidenceInterval, "score_ci"
+            )
+            is not None
+        ):
+            error_tuples = [
+                [_get_errors(y[name]) for name in overall_metric_names]
                 for y in overall_results
             ]
+            y_errs = [([x[0] for x in y], [x[1] for x in y]) for y in error_tuples]
+        else:
+            y_errs = None
 
         make_bar_chart(
             ys,
@@ -217,7 +255,7 @@ def draw_charts_from_reports(
 
     # --- analysis results
     analysis_results: list[list[AnalysisResult]] = [
-        unwrap(x.results.analyses) for x in report_info
+        x.results.analyses for x in report_info
     ]
     if any(len(x) != len(analysis_results[0]) for x in analysis_results):
         raise ValueError(
@@ -231,16 +269,26 @@ def draw_charts_from_reports(
                 f'mismatched analyses: {[x.name for x in analysis_result]}'
             )
 
+        analysis_result_list = list(analysis_result)
+
         if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
-            plot_buckets(analysis_result, output_dir, sys_names)
+            plot_buckets(
+                cast(List[BucketAnalysisResult], analysis_result_list),
+                output_dir,
+                sys_names,
+            )
         elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
-            plot_combo_counts(analysis_result, output_dir, sys_names)
+            plot_combo_counts(
+                cast(List[ComboCountAnalysisResult], analysis_result_list),
+                output_dir,
+                sys_names,
+            )
         else:
             raise ValueError('illegal types of analyses')
 
 
 def main():
-
+    """Main function."""
     parser = argparse.ArgumentParser(
         description='Draw Histogram for ExplainaBoard Report'
     )
@@ -257,7 +305,7 @@ def main():
     )
 
     parser.add_argument(
-        '--sys_names',
+        '--sys-names',
         type=str,
         required=False,
         nargs="+",
@@ -266,7 +314,7 @@ def main():
     )
 
     parser.add_argument(
-        '--output_dir',
+        '--output-dir',
         type=str,
         required=False,
         default="figures",

@@ -1,6 +1,7 @@
+"""Loaders for the multiple choice QA task."""
+
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -9,21 +10,24 @@ from explainaboard.loaders.file_loader import (
     JSONFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.qa_multiple_choice)
 class QAMultipleChoiceLoader(Loader):
+    """Loader for the multiple choice QA task."""
+
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.json
 
     @classmethod
     def default_output_file_type(cls) -> FileType:
+        """See Loader.default_output_file_type."""
         return FileType.json
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         target_field_names = ["context", "options", "question", "answers"]
         return {
             FileType.json: JSONFileLoader(
@@ -46,6 +50,7 @@ class QAMultipleChoiceLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         return {
             FileType.json: JSONFileLoader(
                 [FileLoaderField("predicted_answers", "predicted_answers", dict)]

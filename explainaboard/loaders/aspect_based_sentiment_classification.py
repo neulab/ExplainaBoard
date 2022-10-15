@@ -1,6 +1,7 @@
+"""Loaders for the aspect based sentiment classification task."""
+
 from __future__ import annotations
 
-from explainaboard import TaskType
 from explainaboard.constants import FileType
 from explainaboard.loaders.file_loader import (
     DatalabFileLoader,
@@ -11,14 +12,10 @@ from explainaboard.loaders.file_loader import (
     TSVFileLoader,
 )
 from explainaboard.loaders.loader import Loader
-from explainaboard.loaders.loader_registry import register_loader
 
 
-@register_loader(TaskType.aspect_based_sentiment_classification)
 class AspectBasedSentimentClassificationLoader(Loader):
-    """
-    Validate and Reformat system output file with tsv format:
-    aspect \t text \t true_label \t predicted_label
+    """Loader for the aspect based sentiment classification task.
 
     usage:
         please refer to `test_loaders.py`
@@ -26,10 +23,12 @@ class AspectBasedSentimentClassificationLoader(Loader):
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
+        """See Loader.default_dataset_file_type."""
         return FileType.tsv
 
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_dataset_file_loaders."""
         field_names = ["aspect", "text", "true_label"]
         return {
             FileType.tsv: TSVFileLoader(
@@ -57,10 +56,16 @@ class AspectBasedSentimentClassificationLoader(Loader):
 
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
+        """See Loader.default_output_file_loaders."""
         field_name = "predicted_label"
         return {
             FileType.text: TextFileLoader(field_name, str),
             FileType.json: JSONFileLoader(
-                [FileLoaderField(field_name, field_name, str)]
+                [
+                    FileLoaderField(field_name, field_name, str),
+                    FileLoaderField(
+                        "confidence", "confidence", dtype=float, optional=True
+                    ),
+                ]
             ),
         }
