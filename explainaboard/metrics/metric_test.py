@@ -299,7 +299,9 @@ class MetricTest(unittest.TestCase):
             metric.calc_confidence_interval(stats, 0.05)
 
     def test_calc_confidence_interval_bootstrap(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False), seed=12345
+        )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]))
         ci = unwrap(metric.calc_confidence_interval(stats, 0.05))
         # NOTE(odashi):
@@ -365,7 +367,9 @@ class MetricTest(unittest.TestCase):
         self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_bootstrap_with_ci(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False), seed=12345
+        )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
