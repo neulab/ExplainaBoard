@@ -577,7 +577,7 @@ class Metric(metaclass=abc.ABCMeta):
             if my_std == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
-                alpha=1.0 - confidence_alpha,  # See ExplainaBoard/issues/510
+                confidence=1.0 - confidence_alpha,  # See ExplainaBoard/issues/510
                 df=stats_data.shape[-2] - 1,
                 loc=my_mean,
                 scale=my_std,
