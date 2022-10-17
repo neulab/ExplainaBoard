@@ -371,7 +371,26 @@ class SimpleMetricStats(MetricStats):
 
 
 class Metric(metaclass=abc.ABCMeta):
-    """A class representing an evaluation metric."""
+    """A class representing an evaluation metric.
+
+    When a subclass needs to construct a random number generator, initialize the random
+    generator as follows: Invoke the `get_seed()` method to get a numpy SeedSequence,
+    spawn the SeedSequence with the SeedSequence's `spawn` method, and then pass the
+    spawned SeedSequence to the random generator's constructor.
+
+    Example:
+        class FooMetric(Metric):
+            def foo(self) -> None:
+                # Spawns a SeedSequence.
+                seed = self.get_seed().spawn(1)[0]
+                # Initializes a random generator with the spawned seed.
+                rng = np.random.default_rng(seed)
+                # Do something with `rng`.
+
+        config = MetricConfig(...)
+        metric = FooMetric(config, seed=12345)
+        metric.foo()
+    """
 
     config: MetricConfig
 
@@ -380,7 +399,8 @@ class Metric(metaclass=abc.ABCMeta):
 
         Args:
             config: The configuration for the metric
-            seed: A user-provided seed to initialize a SeedSequence.
+            seed: A seed, used to initialize a random generator in this class or
+                subclasses. If None, the default seed is used.
         """
         self.config = config
         self._seed = np.random.SeedSequence(seed)
@@ -409,8 +429,7 @@ class Metric(metaclass=abc.ABCMeta):
     def get_seed(self) -> np.random.SeedSequence:
         """Gets a numpy SeedSequence.
 
-        When a subclass needs to construct a random number generator, initialize the
-        generator by spawned numpy SeedSequence from the returned SeedSequence object.
+        See Metric for the usage.
 
         Returns:
             A numpy SeedSequence.
