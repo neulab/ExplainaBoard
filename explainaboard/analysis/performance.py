@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import final
 
@@ -63,7 +64,8 @@ class BucketPerformance(Serializable):
         raw_bucket_interval = data.get("bucket_interval")
         if raw_bucket_interval is not None:
             assert (
-                isinstance(raw_bucket_interval, tuple) and len(raw_bucket_interval) == 2
+                isinstance(raw_bucket_interval, Sequence)
+                and len(raw_bucket_interval) == 2
             ), f"BUG: wrong bucket interval: {raw_bucket_interval=}"
             bucket_interval = (
                 float(raw_bucket_interval[0]),
