@@ -374,9 +374,11 @@ class Metric(metaclass=abc.ABCMeta):
     """A class representing an evaluation metric.
 
     When a subclass needs to construct a random number generator, initialize the random
-    generator as follows: Invoke the `get_seed()` method to get a numpy SeedSequence,
-    spawn the SeedSequence with the SeedSequence's `spawn` method, and then pass the
-    spawned SeedSequence to the random generator's constructor.
+    generator as follows:
+
+    1. Invoke the `get_seed()` method to get a numpy SeedSequence;
+    2. Spawn the SeedSequence with the SeedSequence's `spawn` method;
+    3. Pass the spawned SeedSequence to the random generator's constructor.
 
     Example:
         class FooMetric(Metric):
