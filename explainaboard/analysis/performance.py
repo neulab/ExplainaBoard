@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast, final
+from typing import final
 
 from explainaboard.metrics.metric import MetricResult
 from explainaboard.serialization import common_registry
@@ -62,13 +62,12 @@ class BucketPerformance(Serializable):
         }
         raw_bucket_interval = data.get("bucket_interval")
         if raw_bucket_interval is not None:
-            # HACK(odashi):
-            # Deserializer could pass lists rather than tuples.
-            # This casting ignores the difference between tuple and list.
-            bucket_interval_seq = cast(tuple, raw_bucket_interval)
+            assert (
+                isinstance(raw_bucket_interval, tuple) and len(raw_bucket_interval) == 2
+            ), f"BUG: wrong bucket interval: {raw_bucket_interval=}"
             bucket_interval = (
-                narrow(float, bucket_interval_seq[0]),
-                narrow(float, bucket_interval_seq[1]),
+                float(raw_bucket_interval[0]),
+                float(raw_bucket_interval[1]),
             )
         else:
             bucket_interval = None
