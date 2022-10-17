@@ -96,7 +96,7 @@ class EaaSMetricConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return EaaSMetric(self, seed=None)
+        return EaaSMetric(self)
 
 
 class EaaSMetric(Metric):

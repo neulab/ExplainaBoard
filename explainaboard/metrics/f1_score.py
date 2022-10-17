@@ -41,7 +41,7 @@ class F1ScoreConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return F1Score(self, seed=None)
+        return F1Score(self)
 
 
 class F1Score(Metric):
@@ -140,7 +140,7 @@ class APEF1ScoreConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return APEF1Score(self, seed=None)
+        return APEF1Score(self)
 
 
 class APEF1Score(Metric):
@@ -199,7 +199,7 @@ class SeqF1ScoreConfig(F1ScoreConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return SeqF1Score(self, seed=None)
+        return SeqF1Score(self)
 
 
 class SeqF1Score(F1Score):

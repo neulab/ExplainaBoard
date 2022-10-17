@@ -29,7 +29,7 @@ class LogProbConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return LogProb(self, seed=None)
+        return LogProb(self)
 
 
 class LogProb(Metric):

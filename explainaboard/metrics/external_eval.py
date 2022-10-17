@@ -47,7 +47,7 @@ class ExternalEvalConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return ExternalEval(self, seed=None)
+        return ExternalEval(self)
 
 
 class ExternalEval(Metric):

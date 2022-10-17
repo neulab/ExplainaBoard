@@ -396,7 +396,9 @@ class Metric(metaclass=abc.ABCMeta):
 
     config: MetricConfig
 
-    def __init__(self, config: MetricConfig, seed: np.random.SeedSequence | None):
+    def __init__(
+        self, config: MetricConfig, seed: np.random.SeedSequence | None = None
+    ):
         """Initialize the metric.
 
         Args:
