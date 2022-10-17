@@ -82,7 +82,7 @@ class ExactMatchQATatConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return ExactMatchQATat(self)
+        return ExactMatchQATat(self, seed=None)
 
 
 class ExactMatchQATat(QATatMetric):
@@ -109,7 +109,7 @@ class F1ScoreQATatConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return F1ScoreQATat(self)
+        return F1ScoreQATat(self, seed=None)
 
 
 class F1ScoreQATat(QATatMetric):

@@ -23,7 +23,7 @@ class RootMeanSquaredErrorConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return RootMeanSquaredError(self)
+        return RootMeanSquaredError(self, seed=None)
 
 
 class RootMeanSquaredError(Metric):
@@ -55,7 +55,7 @@ class AbsoluteErrorConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return AbsoluteError(self)
+        return AbsoluteError(self, seed=None)
 
 
 class AbsoluteError(Metric):

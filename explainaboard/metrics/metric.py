@@ -390,13 +390,13 @@ class Metric(metaclass=abc.ABCMeta):
                 # Do something with `rng`.
 
         config = MetricConfig(...)
-        metric = FooMetric(config, seed=12345)
+        metric = FooMetric(config, seed=np.random.SeedSequence(12345))
         metric.foo()
     """
 
     config: MetricConfig
 
-    def __init__(self, config: MetricConfig, seed: int | None = None):
+    def __init__(self, config: MetricConfig, seed: np.random.SeedSequence | None):
         """Initialize the metric.
 
         Args:
@@ -405,7 +405,7 @@ class Metric(metaclass=abc.ABCMeta):
                 subclasses. If None, the default seed is used.
         """
         self.config = config
-        self._seed = np.random.SeedSequence(seed)
+        self._seed = seed if seed is not None else np.random.SeedSequence()
 
     @abc.abstractmethod
     def calc_stats_from_data(

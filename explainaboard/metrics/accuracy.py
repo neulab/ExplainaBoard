@@ -28,7 +28,7 @@ class AccuracyConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return Accuracy(self)
+        return Accuracy(self, seed=None)
 
 
 class Accuracy(Metric):
@@ -110,7 +110,7 @@ class CorrectCountConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return CorrectCount(self)
+        return CorrectCount(self, seed=None)
 
 
 class CorrectCount(Accuracy):
@@ -149,7 +149,7 @@ class SeqCorrectCountConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return SeqCorrectCount(self)
+        return SeqCorrectCount(self, seed=None)
 
 
 class SeqCorrectCount(CorrectCount):

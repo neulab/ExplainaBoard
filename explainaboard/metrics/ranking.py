@@ -46,7 +46,7 @@ class HitsConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return Hits(self)
+        return Hits(self, seed=None)
 
 
 class Hits(RankingMetric):
@@ -82,7 +82,7 @@ class MeanReciprocalRankConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return MeanReciprocalRank(self)
+        return MeanReciprocalRank(self, seed=None)
 
 
 class MeanReciprocalRank(RankingMetric):
@@ -118,7 +118,7 @@ class MeanRankConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return MeanRank(self)
+        return MeanRank(self, seed=None)
 
 
 class MeanRank(RankingMetric):

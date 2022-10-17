@@ -139,7 +139,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="spearmanr"
         )
-        corr_metric = CorrelationNLG(nlg_corr_config, seed=12345)
+        corr_metric = CorrelationNLG(
+            nlg_corr_config, seed=np.random.SeedSequence(12345)
+        )
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
@@ -154,7 +156,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         nlg_corr_config = CorrelationNLGConfig(
             group_by="system", correlation_type="spearmanr"
         )
-        corr_metric = CorrelationNLG(nlg_corr_config, seed=12345)
+        corr_metric = CorrelationNLG(
+            nlg_corr_config, seed=np.random.SeedSequence(12345)
+        )
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
@@ -172,7 +176,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         nlg_corr_config = CorrelationNLGConfig(
             group_by="dataset", correlation_type="spearmanr"
         )
-        corr_metric = CorrelationNLG(nlg_corr_config, seed=12345)
+        corr_metric = CorrelationNLG(
+            nlg_corr_config, seed=np.random.SeedSequence(12345)
+        )
         stats = corr_metric.calc_stats_from_data(true_data, pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)

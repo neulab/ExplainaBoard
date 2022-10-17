@@ -36,7 +36,7 @@ class CorrelationNLGConfig(MetricConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return CorrelationNLG(self)
+        return CorrelationNLG(self, seed=None)
 
     def get_correlation_func(self, name: str):
         """Get correlation function based on function name.
@@ -295,7 +295,7 @@ class KtauCorrelationWMTDAConfig(CorrelationWMTDAConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return KtauCorrelationWMTDA(self)
+        return KtauCorrelationWMTDA(self, seed=None)
 
 
 class KtauCorrelationWMTDA(CorrelationWMTDAMetric):
@@ -351,7 +351,7 @@ class PearsonCorrelationWMTDAConfig(CorrelationWMTDAConfig):
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
-        return PearsonCorrelationWMTDA(self)
+        return PearsonCorrelationWMTDA(self, seed=None)
 
 
 class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):

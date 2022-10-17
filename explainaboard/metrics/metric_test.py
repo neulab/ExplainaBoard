@@ -29,7 +29,7 @@ class _DummyMetricConfig(MetricConfig):
     aggregate_stats_fn: Callable[[MetricStats], np.ndarray[Any, Any]] | None = None
 
     def to_metric(self) -> Metric:
-        return _DummyMetric(self)
+        return _DummyMetric(self, seed=None)
 
 
 class _DummyMetric(Metric):
@@ -166,25 +166,25 @@ class MetricResultTest(unittest.TestCase):
 
 class MetricTest(unittest.TestCase):
     def test_aggregate_stats_1dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0]))
         aggregate = metric.aggregate_stats(stats)
         self.assertTrue(np.array_equal(aggregate, np.array([2.0])))
 
     def test_aggregate_stats_2dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]))
         aggregate = metric.aggregate_stats(stats)
         self.assertTrue(np.array_equal(aggregate, np.array([3.0, 4.0])))
 
     def test_aggregate_stats_2dim_empty(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.zeros((0, 3)))
         aggregate = metric.aggregate_stats(stats)
         self.assertTrue(np.array_equal(aggregate, np.zeros((3,))))
 
     def test_aggregate_stats_3dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(
             np.array([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
         )
@@ -192,7 +192,7 @@ class MetricTest(unittest.TestCase):
         self.assertTrue(np.array_equal(aggregate, np.array([[2.0, 3.0], [6.0, 7.0]])))
 
     def test_aggregate_stats_3dim_empty(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.zeros((2, 0, 3)))
         aggregate = metric.aggregate_stats(stats)
         self.assertTrue(np.array_equal(aggregate, np.zeros((2, 3))))
@@ -204,7 +204,8 @@ class MetricTest(unittest.TestCase):
         metric = _DummyMetric(
             _DummyMetricConfig(
                 "test", uses_customized_aggregate=True, aggregate_stats_fn=agg_fn
-            )
+            ),
+            seed=None,
         )
         stats = SimpleMetricStats(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]))
         aggregate = metric.aggregate_stats(stats)
@@ -214,7 +215,9 @@ class MetricTest(unittest.TestCase):
         def agg_fn(stats: MetricStats) -> np.ndarray[Any, Any]:
             return stats.get_data().max(axis=-2).max(axis=-1, keepdims=True)
 
-        metric = _DummyMetric(_DummyMetricConfig("test", aggregate_stats_fn=agg_fn))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", aggregate_stats_fn=agg_fn), seed=None
+        )
         stats = SimpleMetricStats(np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]))
         with self.assertRaisesRegex(
             AssertionError, r"Expected shape \(2,\), but got \(1,\)\.$"
@@ -228,7 +231,8 @@ class MetricTest(unittest.TestCase):
         metric = _DummyMetric(
             _DummyMetricConfig(
                 "test", uses_customized_aggregate=True, aggregate_stats_fn=agg_fn
-            )
+            ),
+            seed=None,
         )
         stats = SimpleMetricStats(
             np.array([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
@@ -240,7 +244,9 @@ class MetricTest(unittest.TestCase):
         def agg_fn(stats: MetricStats) -> np.ndarray[Any, Any]:
             return stats.get_batch_data().max(axis=-2).max(axis=-1, keepdims=True)
 
-        metric = _DummyMetric(_DummyMetricConfig("test", aggregate_stats_fn=agg_fn))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", aggregate_stats_fn=agg_fn), seed=None
+        )
         stats = SimpleMetricStats(
             np.array([[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]])
         )
@@ -250,57 +256,58 @@ class MetricTest(unittest.TestCase):
             metric.aggregate_stats(stats)
 
     def test_calc_metric_from_aggregate_0dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         aggregate = np.array(3.0)
         with self.assertRaisesRegex(ValueError, r"^Invalid shape size: \(\)$"):
             metric.calc_metric_from_aggregate(aggregate)
 
     def test_calc_metric_from_aggregate_1dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         aggregate = np.array([3.0])
         result = metric.calc_metric_from_aggregate(aggregate)
         self.assertTrue(np.array_equal(result, np.array(3.0)))
 
     def test_calc_metric_from_aggregate_1dim_multi(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         aggregate = np.array([3.0, 4.0])
         with self.assertRaisesRegex(ValueError, r"^Multiple aggregates"):
             metric.calc_metric_from_aggregate(aggregate)
 
     def test_calc_metric_from_aggregate_2dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         aggregate = np.array([[1.0], [2.0], [3.0]])
         result = metric.calc_metric_from_aggregate(aggregate)
         self.assertTrue(np.array_equal(result, np.array([1.0, 2.0, 3.0])))
 
     def test_calc_metric_from_aggregate_2dim_multi(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         aggregate = np.array([[1.0, 10.0], [2.0, 20.0], [3.0, 30.0]])
         with self.assertRaisesRegex(ValueError, r"^Multiple aggregates"):
             metric.calc_metric_from_aggregate(aggregate)
 
     def test_calc_metric_from_aggregate_3dim(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         aggregate = np.array([[[1.0], [2.0], [3.0]], [[4.0], [5.0], [6.0]]])
         with self.assertRaisesRegex(ValueError, r"Invalid shape size: \(2, 3, 1\)$"):
             metric.calc_metric_from_aggregate(aggregate)
 
     def test_calc_confidence_interval_tdist(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.arange(1.0, 31.0))
         ci = unwrap(metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], -2.202365416010039)
         self.assertAlmostEqual(ci[1], 33.20236541601004)
 
     def test_calc_confidence_interval_tdist_multi_agg(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.arange(1, 61).reshape(30, 2))
         with self.assertRaisesRegex(ValueError, r"^t-test can be applied"):
             metric.calc_confidence_interval(stats, 0.05)
 
     def test_calc_confidence_interval_bootstrap(self) -> None:
         metric = _DummyMetric(
-            _DummyMetricConfig("test", is_simple_average=False), seed=12345
+            _DummyMetricConfig("test", is_simple_average=False),
+            seed=np.random.SeedSequence(12345),
         )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]))
         ci = unwrap(metric.calc_confidence_interval(stats, 0.05))
@@ -312,14 +319,15 @@ class MetricTest(unittest.TestCase):
 
     def test_calc_confidence_interval_bootstrap_multi_agg(self) -> None:
         metric = _DummyMetric(
-            _DummyMetricConfig("test", is_simple_average=False), seed=12345
+            _DummyMetricConfig("test", is_simple_average=False),
+            seed=np.random.SeedSequence(12345),
         )
         stats = SimpleMetricStats(np.array([[0.5, 1.5], [1.5, 2.5], [2.5, 3.5]]))
         with self.assertRaisesRegex(ValueError, r"^Multiple aggregates"):
             metric.calc_confidence_interval(stats, 0.05)
 
     def test_calc_confidence_interval_invalid_alpha(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]))
         with self.assertRaisesRegex(ValueError, r"^Invalid confidence_alpha: -0.125$"):
             self.assertIsNone(metric.calc_confidence_interval(stats, -0.125))
@@ -333,20 +341,21 @@ class MetricTest(unittest.TestCase):
     def test_calc_confidence_interval_single_example(self) -> None:
         for is_single_average in (False, True):
             metric = _DummyMetric(
-                _DummyMetricConfig("test", is_simple_average=is_single_average)
+                _DummyMetricConfig("test", is_simple_average=is_single_average),
+                seed=None,
             )
             stats = SimpleMetricStats(np.array([[1.0]]))
             self.assertIsNone(metric.calc_confidence_interval(stats, 0.05))
 
     def test_evaluate_from_stats_tdist_without_ci(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=None)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
         self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_tdist_with_ci(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.arange(1.0, 31.0))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 15.5)
@@ -355,14 +364,16 @@ class MetricTest(unittest.TestCase):
         self.assertAlmostEqual(ci.high, 33.20236541601004)
 
     def test_evaluate_from_stats_tdist_single_data(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test"))
+        metric = _DummyMetric(_DummyMetricConfig("test"), seed=None)
         stats = SimpleMetricStats(np.array([3.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
         self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_bootstrap_without_ci(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False), seed=None
+        )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=None)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
@@ -370,7 +381,8 @@ class MetricTest(unittest.TestCase):
 
     def test_evaluate_from_stats_bootstrap_with_ci(self) -> None:
         metric = _DummyMetric(
-            _DummyMetricConfig("test", is_simple_average=False), seed=12345
+            _DummyMetricConfig("test", is_simple_average=False),
+            seed=np.random.SeedSequence(12345),
         )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
@@ -383,7 +395,9 @@ class MetricTest(unittest.TestCase):
         self.assertAlmostEqual(ci.high, 4.2)
 
     def test_evaluate_from_stats_bootstrap_single_data(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False), seed=None
+        )
         stats = SimpleMetricStats(np.array([3.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
