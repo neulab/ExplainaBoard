@@ -433,19 +433,8 @@ class Metric(metaclass=abc.ABCMeta):
     def get_seed(self) -> np.random.SeedSequence:
         """Gets a numpy SeedSequence.
 
-        Returned SeedSequence can be used to construct other classes by this method.
-        See also the `Metric` docstring.
-
-        Example:
-            class Routine:
-                def __init__(self, metric: Metric):
-                    self._metric = metric
-                    seed = self._metric.get_seed().spawn(1)[0]
-                    # Supposes that a class, InnerRoutine holds its own SeedSequence.
-                    self._inner_routine = InnerRoutine(seed=seed)
-
-                def do_something(self):
-                    self._inner_routine.do_something_else()
+        Returned SeedSequence can be used to construct a random generator in Metric
+        or the subclasses. See also the `Metric` class docstring.
 
         Returns:
             A numpy SeedSequence.
