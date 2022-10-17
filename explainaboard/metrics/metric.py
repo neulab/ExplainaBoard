@@ -407,14 +407,13 @@ class Metric(metaclass=abc.ABCMeta):
 
     @final
     def get_seed(self) -> np.random.SeedSequence:
-        """Gets a SeedSequence.
+        """Gets a numpy SeedSequence.
 
         When a subclass needs to construct a random number generator, initialize the
-        generator with a spawned `numpy.random.SeedSequence` object from the
-        `SeedSequence` object returned by this method.
+        generator by spawned numpy SeedSequence from the returned SeedSequence object.
 
         Returns:
-            A SeedSequence.
+            A numpy SeedSequence.
         """
         return self._seed
 
