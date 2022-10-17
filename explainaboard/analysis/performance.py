@@ -39,7 +39,7 @@ class BucketPerformance(Serializable):
         has_name = self.bucket_name is not None
         if has_interval == has_name:
             raise ValueError(
-                "Only either `bucket_interavl` or `bucket_name` must has a value. "
+                "Either `bucket_interval` or `bucket_name` must have a value, but not both. "
                 f"{self.bucket_interval=}, {self.bucket_name=}"
             )
 
