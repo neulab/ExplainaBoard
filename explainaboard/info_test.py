@@ -1,5 +1,7 @@
 """Tests for explainaboard.info."""
 
+from __future__ import annotations
+
 import pathlib
 import tempfile
 import unittest

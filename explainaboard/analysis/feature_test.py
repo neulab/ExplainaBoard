@@ -1,5 +1,7 @@
 """Tests for explainaboard.analysis.feature."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.analysis.feature import DataType, Dict, Sequence, Value

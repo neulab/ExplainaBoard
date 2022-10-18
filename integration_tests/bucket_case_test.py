@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.analysis.case import (

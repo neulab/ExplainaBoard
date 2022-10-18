@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.grammatical_error_correction."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.constants import TaskType

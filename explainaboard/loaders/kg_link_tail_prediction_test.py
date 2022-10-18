@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.kg_link_tail_prediction."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.constants import TaskType
