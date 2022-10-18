@@ -184,7 +184,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="spearmanr"
         )
-        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
+        corr_metric = CorrelationNLG(
+            nlg_corr_config, seed=np.random.SeedSequence(12345)
+        )
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric._calc_metric_from_aggregate_single(stats_arr)
@@ -193,18 +195,17 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci: tuple[float, float] = unwrap(
             corr_metric.calc_confidence_interval(stats, 0.05)
         )
-        # TODO: This check could be made more rigorous by checking whether the
-        #       confidence interval lies within a reasonable range
-        # See https://github.com/neulab/ExplainaBoard/issues/537
-        self.assertGreater(val, ci[0])
-        self.assertGreater(ci[1], val)
+        self.assertAlmostEqual(ci[0], 0.6488, 2)
+        self.assertAlmostEqual(ci[1], 0.8999, 2)
 
     def test_system_level_spearmanr_bootstrap(self) -> None:
 
         nlg_corr_config = CorrelationNLGConfig(
             group_by="system", correlation_type="spearmanr"
         )
-        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
+        corr_metric = CorrelationNLG(
+            nlg_corr_config, seed=np.random.SeedSequence(12345)
+        )
         stats = corr_metric.calc_stats_from_data(self.true_data, self.pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)
@@ -213,11 +214,8 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci: tuple[float, float] = unwrap(
             corr_metric.calc_confidence_interval(stats, 0.05)
         )
-        # TODO: This check could be made more rigorous by checking whether the
-        #       confidence interval lies within a reasonable range
-        # See https://github.com/neulab/ExplainaBoard/issues/537
-        self.assertGreater(val, ci[0])
-        self.assertGreater(ci[1], val)
+        self.assertAlmostEqual(ci[0], 0.5642, 2)
+        self.assertAlmostEqual(ci[1], 0.9746, 2)
 
     def test_dataset_level_spearmanr_bootstrap(self) -> None:
 
@@ -227,7 +225,9 @@ class MetaEvalNLGCITest(unittest.TestCase):
         nlg_corr_config = CorrelationNLGConfig(
             group_by="dataset", correlation_type="spearmanr"
         )
-        corr_metric = narrow(CorrelationNLG, nlg_corr_config.to_metric())
+        corr_metric = CorrelationNLG(
+            nlg_corr_config, seed=np.random.SeedSequence(12345)
+        )
         stats = corr_metric.calc_stats_from_data(true_data, pred_data)
         stats_arr = corr_metric.aggregate_stats(stats)
         val = corr_metric.calc_metric_from_aggregate(stats_arr)

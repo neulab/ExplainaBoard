@@ -371,16 +371,43 @@ class SimpleMetricStats(MetricStats):
 
 
 class Metric(metaclass=abc.ABCMeta):
-    """A class representing an evaluation metric."""
+    """A class representing an evaluation metric.
+
+    When a subclass needs to construct a random number generator, initialize the random
+    generator as follows:
+
+    1. Invoke the `get_seed()` method to get a numpy SeedSequence;
+    2. Spawn the SeedSequence with the SeedSequence's `spawn` method;
+    3. Pass the spawned SeedSequence to the random generator's constructor.
+
+    Example:
+        class FooMetric(Metric):
+            def foo(self) -> None:
+                # Spawns a SeedSequence.
+                seed = self.get_seed().spawn(1)[0]
+                # Initializes a random generator with the spawned seed.
+                rng = np.random.default_rng(seed)
+                # Do something with `rng`.
+
+        config = MetricConfig(...)
+        metric = FooMetric(config, seed=np.random.SeedSequence(12345))
+        metric.foo()
+    """
 
     config: MetricConfig
 
-    def __init__(self, config: MetricConfig):
+    def __init__(
+        self, config: MetricConfig, seed: np.random.SeedSequence | None = None
+    ):
         """Initialize the metric.
 
-        :param config: The configuration for the metric
+        Args:
+            config: The configuration for the metric
+            seed: A seed, used to initialize a random generator in this class or
+                subclasses. If None, the default seed is used.
         """
         self.config = config
+        self._seed = seed if seed is not None else np.random.SeedSequence()
 
     @abc.abstractmethod
     def calc_stats_from_data(
@@ -401,6 +428,18 @@ class Metric(metaclass=abc.ABCMeta):
             decomposable eval metrics
         """
         ...
+
+    @final
+    def get_seed(self) -> np.random.SeedSequence:
+        """Gets a numpy SeedSequence.
+
+        Returned SeedSequence can be used to construct a random generator in Metric
+        or the subclasses. See also the `Metric` class docstring.
+
+        Returns:
+            A numpy SeedSequence.
+        """
+        return self._seed
 
     @final
     def aggregate_stats(
@@ -585,7 +624,7 @@ class Metric(metaclass=abc.ABCMeta):
         # Do bootstrapping otherwise
         else:
             all_indices = np.array(range(sample_size))
-            rng = np.random.default_rng()
+            rng = np.random.default_rng(self.get_seed())
             all_indices = rng.choice(
                 all_indices, size=(num_iterations, sample_size), replace=True
             )
