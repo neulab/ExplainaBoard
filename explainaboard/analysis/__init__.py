@@ -1,3 +1,3 @@
-# flake8: noqa: FI18
-
 """This directory contains code implementing various analyses."""
+
+from __future__ import annotations

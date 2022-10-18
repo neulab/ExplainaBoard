@@ -1,3 +1,3 @@
-# flake8: noqa: FI18
-
 """Code to implement evaluation metrics."""
+
+from __future__ import annotations

@@ -1,3 +1,3 @@
-# flake8: noqa: FI18
-
 """Package definition of explainaboard.utils."""
+
+from __future__ import annotations

@@ -1,1 +1,1 @@
-# flake8: noqa: FI18
+from __future__ import annotations
