@@ -199,6 +199,9 @@ class BucketAnalysisDetails(AnalysisDetails):
 
     def __post_init__(self):
         """Set the class name and validate."""
+        if not self.bucket_performances:
+            raise ValueError("No element in bucket_performances.")
+
         metric_names = self.bucket_performances[0].results.keys()
 
         for bucket_perf in self.bucket_performances:
@@ -374,6 +377,9 @@ class CalibrationAnalysisDetails(AnalysisDetails):
 
     def __post_init__(self):
         """Set the class name and validate."""
+        if not self.bucket_performances:
+            raise ValueError("No element in bucket_performances.")
+
         for bucket_perf in self.bucket_performances:
             metric_result = bucket_perf.results.get("Accuracy", None)
             if metric_result is None:
@@ -584,7 +590,7 @@ class CalibrationAnalysis(Analysis):
         )
 
 
-@common_registry.register("ComboOccurence")
+@common_registry.register("ComboOccurrence")
 @final
 @dataclass(frozen=True)
 class ComboOccurence(Serializable):
