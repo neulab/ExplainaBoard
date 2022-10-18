@@ -8,6 +8,9 @@ from integration_tests.utils import test_artifacts_path
 from explainaboard.info import SysOutputInfo
 from explainaboard.interpretation.bucket_interpretation import BucketIntpereter
 from explainaboard.interpretation.combo_interpretation import ComboIntpereter
+from explainaboard.interpretation.multi_bucket_interpretation import (
+    MultiBucketIntpereter,
+)
 
 
 class InterpretationTest(unittest.TestCase):
@@ -72,4 +75,27 @@ class InterpretationTest(unittest.TestCase):
             "These samples, which are frequently"
             " mispredicted by the model, need to be"
             " prioritized for solutions.",
+        )
+
+    def test_multi_bucket_interpreter(self):
+
+        analysis_example = self.report.results.analyses
+        interpreter = MultiBucketIntpereter(
+            analysis_example, self.feature_types
+        ).perform()
+
+        # print(interpreter.observations)
+        # print(interpreter.suggestions)
+
+        self.assertEqual(
+            interpreter.observations["F1"][0].keywords, "salient_feature_description"
+        )
+        self.assertEqual(
+            interpreter.suggestions["F1"][0].keywords, "salient_feature_description"
+        )
+        self.assertEqual(
+            interpreter.suggestions["F1"][0].content,
+            "The performance of the system is highly affected by"
+            " these features. Consider augment the training samples"
+            " to improve the model performance.",
         )
