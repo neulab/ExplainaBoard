@@ -1,5 +1,7 @@
 """Tests for explainaboard.utils.tokenizer."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.serialization.serializers import PrimitiveSerializer

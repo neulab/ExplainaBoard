@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.file_loader."""
 
+from __future__ import annotations
+
 from unittest import TestCase
 
 from explainaboard import Source

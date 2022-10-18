@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 from explainaboard import FileType, get_processor_class, Source, TaskType

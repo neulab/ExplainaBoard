@@ -5,7 +5,7 @@ repos:
       - id: black
         files: '\.py$'
   - repo: https://gitlab.com/pycqa/flake8.git
-    rev: 4.0.1
+    rev: 5.0.4
     hooks:
       - id: flake8
         name: flake8
@@ -24,6 +24,15 @@ repos:
         entry: flake8
         exclude: '^explainaboard\/third_party\/.*\.py|_test\.py$'
         files: '^explainaboard\/.*\.py$'
+      - id: flake8
+        name: future-import
+        additional_dependencies:
+          - flake8-future-import
+        args:
+          - --select=FI
+        entry: flake8
+        exclude: '^explainaboard\/third_party\/.*\.py'
+        files: '\.py$'
   - repo: https://github.com/pycqa/isort.git
     rev: 5.6.4
     hooks:

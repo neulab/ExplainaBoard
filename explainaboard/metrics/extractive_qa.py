@@ -21,7 +21,7 @@ from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor
 
 
 class ExtractiveQAMetric(Metric):
-    """An abstract class for extractive QA tasks that measures scores after normalization.
+    """Abstract class for extractive QA tasks that measures scores after normalization.
 
     The actual metric must inherit this class and implement the sample_level_metric()
     function.

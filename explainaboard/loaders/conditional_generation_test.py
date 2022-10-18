@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.conditional_generation."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.constants import TaskType

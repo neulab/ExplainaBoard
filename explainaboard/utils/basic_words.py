@@ -1,5 +1,7 @@
 """Definition of English basic words."""
 
+from __future__ import annotations
+
 BASIC_WORDS = [
     'a',
     'about',

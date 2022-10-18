@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.cloze_generative."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.constants import TaskType

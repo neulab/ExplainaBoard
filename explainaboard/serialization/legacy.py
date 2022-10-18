@@ -1,5 +1,7 @@
 """DEPRECATED: do not use this module for new implementations."""
 
+from __future__ import annotations
+
 import copy
 import dataclasses
 from inspect import getsource

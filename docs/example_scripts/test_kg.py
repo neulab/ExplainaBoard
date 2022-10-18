@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import cast
 
 from explainaboard import get_loader_class, get_processor_class, TaskType

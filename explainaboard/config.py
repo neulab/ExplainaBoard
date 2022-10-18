@@ -1,5 +1,7 @@
 """Global configs of the library."""
 
+from __future__ import annotations
+
 TORCH_VERSION = "N/A"
 TORCH_AVAILABLE = False
 

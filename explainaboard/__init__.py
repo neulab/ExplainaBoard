@@ -1,5 +1,7 @@
 """Package definition for explainaboard."""
 
+from __future__ import annotations
+
 from explainaboard.constants import FileType, Source, TaskType
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.meta_analyses import RankFlippingMetaAnalysis, RankingMetaAnalysis
