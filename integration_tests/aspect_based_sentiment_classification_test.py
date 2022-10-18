@@ -4,6 +4,7 @@ import unittest
 from integration_tests.utils import load_file_as_str, test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
+from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_factory import get_loader_class
 
 
@@ -49,3 +50,29 @@ class AspectBasedSentimentClassificationTest(unittest.TestCase):
 
         self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
+
+    def test_load_dataset_from_datalab(self):
+        loader = get_loader_class(
+            TaskType.aspect_based_sentiment_classification
+        ).from_datalab(
+            dataset=DatalabLoaderOption("restaurant14"),
+            output_data=os.path.join(self.artifact_path, "test-rest14.txt"),
+            output_source=Source.local_filesystem,
+            output_file_type=FileType.text,
+        )
+        data = loader.load()
+        self.assertEqual(len(data), 1120)
+
+        metadata = {
+            "task_name": TaskType.aspect_based_sentiment_classification,
+            "dataset_name": "restaurant14",
+            "metric_names": ["Accuracy"],
+        }
+
+        processor = get_processor_class(
+            TaskType.aspect_based_sentiment_classification
+        )()
+
+        sys_info = processor.process(metadata, data.samples)
+        for analysis in sys_info.results.analyses:
+            analysis.generate_report()  # Discard generated reports
