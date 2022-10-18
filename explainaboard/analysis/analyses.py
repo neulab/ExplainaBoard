@@ -28,7 +28,6 @@ from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow, unwrap
 
 
-@dataclass(frozen=True)
 class AnalysisDetails(Serializable, metaclass=abc.ABCMeta):
     """An abstract base class of detail information of AnalysisResult."""
 
