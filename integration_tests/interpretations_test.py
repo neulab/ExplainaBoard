@@ -7,6 +7,7 @@ from integration_tests.utils import test_artifacts_path
 
 from explainaboard.info import SysOutputInfo
 from explainaboard.interpretation.bucket_interpretation import BucketIntpereter
+from explainaboard.interpretation.combo_interpretation import ComboIntpereter
 
 
 class InterpretationTest(unittest.TestCase):
@@ -46,4 +47,29 @@ class InterpretationTest(unittest.TestCase):
             " Consider improving the training samples under appropriate"
             " feature value of span_length to improve"
             " the model performance.",
+        )
+
+    def test_combo_interpreter(self):
+
+        analysis_example = self.report.results.analyses[1]
+        interpreter = ComboIntpereter(analysis_example).perform()
+
+        # print(analysis_example.name)
+        # print(interpreter.observations)
+        # print(interpreter.suggestions)
+
+        self.assertEqual(
+            analysis_example.name, "combo(span_true_label,span_pred_label)"
+        )
+        self.assertEqual(
+            interpreter.observations[0].keywords, "misprediction_description"
+        )
+        self.assertEqual(
+            interpreter.suggestions[0].keywords, "misprediction_description"
+        )
+        self.assertEqual(
+            interpreter.suggestions[0].content,
+            "These samples, which are frequently"
+            " mispredicted by the model, need to be"
+            " prioritized for solutions.",
         )
