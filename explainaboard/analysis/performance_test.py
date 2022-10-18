@@ -19,9 +19,9 @@ class BucketPerformanceTest(unittest.TestCase):
         )
 
     def test_post_init_invalid(self) -> None:
-        with self.assertRaisesRegex(ValueError, r"^Only either"):
+        with self.assertRaisesRegex(ValueError, r"^Either `bucket_interval` or"):
             BucketPerformance(n_samples=0, bucket_samples=[], results={})
-        with self.assertRaisesRegex(ValueError, r"^Only either"):
+        with self.assertRaisesRegex(ValueError, r"^Either `bucket_interval` or"):
             BucketPerformance(
                 n_samples=0,
                 bucket_samples=[],
