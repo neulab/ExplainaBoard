@@ -15,6 +15,7 @@ from explainaboard.interpretation.interpretation import (
     InterpretationSuggestion,
     Interpreter,
 )
+from explainaboard.metrics.metric import Score
 from explainaboard.utils.typing_utils import narrow
 
 
@@ -55,11 +56,11 @@ class BucketInterpretationStats(InterpretationStats):
 class BucketIntpereter(Interpreter):
     """A controller to perform the interpretation process for bucket analysis.
 
-        Attributes:
-            bucket_analysis: an analysis result with BucketAnalysisResult type
-            feature_types: a dictionary that maps feature name to corresponding type.
-            threshold_unreliable_bucket: this variable determines how many
-            unreliable buckets will be selected
+    Attributes:
+        bucket_analysis: an analysis result with BucketAnalysisResult type
+        feature_types: a dictionary that maps feature name to corresponding type.
+        threshold_unreliable_bucket: this variable determines how many
+        unreliable buckets will be selected
 
     """
 
@@ -76,11 +77,15 @@ class BucketIntpereter(Interpreter):
         """Get performances with the format of dict_to_list."""
         performances_d2l = {}
         for bucket_info in self.bucket_analysis.bucket_performances:
-            for metric_name, perf_info in bucket_info.performances.items():
+            for metric_name, perf_info in bucket_info.results.items():
                 if metric_name not in performances_d2l:
-                    performances_d2l[metric_name] = [perf_info.value]
+                    performances_d2l[metric_name] = [
+                        perf_info.get_value(Score, "score").value
+                    ]
                 else:
-                    performances_d2l[metric_name].append(perf_info.value)
+                    performances_d2l[metric_name].append(
+                        perf_info.get_value(Score, "score").value
+                    )
         return performances_d2l
 
     def _get_unreliable_buckets(self) -> list[str]:

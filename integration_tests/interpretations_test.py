@@ -7,10 +7,6 @@ from integration_tests.utils import test_artifacts_path
 
 from explainaboard.info import SysOutputInfo
 from explainaboard.interpretation.bucket_interpretation import BucketIntpereter
-from explainaboard.interpretation.combo_interpretation import ComboIntpereter
-from explainaboard.interpretation.multi_bucket_interpretation import (
-    MultiBucketIntpereter,
-)
 
 
 class InterpretationTest(unittest.TestCase):
