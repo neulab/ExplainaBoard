@@ -1,17 +1,16 @@
 import dataclasses
 import os
-from typing import cast
 import unittest
 
 from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, Source, TaskType
-from explainaboard.analysis.analyses import BucketAnalysisResult
+from explainaboard.analysis.analyses import AnalysisResult, BucketAnalysisDetails
 from explainaboard.loaders.file_loader import DatalabLoaderOption
 from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.metrics.metric import ConfidenceInterval, Score
 from explainaboard.utils import cache_api
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class NERTest(unittest.TestCase):
@@ -91,12 +90,13 @@ class NERTest(unittest.TestCase):
         self.assertTrue("span_efre" in span_analysis_map)
 
         # 2. Unittest: test the number of buckets of training dependent features
-        span_econ_analysis = cast(BucketAnalysisResult, span_analysis_map['span_econ'])
-        self.assertEqual(len(span_econ_analysis.bucket_performances), 3)
+        analysis = narrow(AnalysisResult, span_analysis_map['span_econ'])
+        details = narrow(BucketAnalysisDetails, analysis.details)
+        self.assertEqual(len(details.bucket_performances), 3)
 
         # 3. Unittest: test detailed bucket information: bucket interval
         # [0.007462686567164179,0.9565217391304348]
-        second_bucket = span_econ_analysis.bucket_performances[1]
+        second_bucket = details.bucket_performances[1]
         second_bucket_interval = unwrap(second_bucket.bucket_interval)
         self.assertAlmostEqual(second_bucket_interval[0], 0.007462686567164179, 4)
         self.assertAlmostEqual(second_bucket_interval[1], 0.8571428571428571, 4)
@@ -111,9 +111,9 @@ class NERTest(unittest.TestCase):
         )
         # 6 Unittest: test detailed bucket information: confidence interval
         for bucket_vals in sys_info.results.analyses:
-            if not isinstance(bucket_vals, BucketAnalysisResult):
+            if not isinstance(bucket_vals.details, BucketAnalysisDetails):
                 continue
-            for bucket in bucket_vals.bucket_performances:
+            for bucket in bucket_vals.details.bucket_performances:
                 for result in bucket.results.values():
                     ci = result.get_value_or_none(ConfidenceInterval, "score_ci")
                     if ci is not None:

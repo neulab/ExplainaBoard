@@ -21,51 +21,57 @@ import argparse
 import json
 import os
 
-# NOTE(odashi): List is required to set the first argument of cast() in Python 3.8.
-from typing import cast, List
-
 from matplotlib import pyplot as plt
 import numpy as np
 
 from explainaboard.analysis.analyses import (
     AnalysisResult,
-    BucketAnalysisResult,
-    ComboCountAnalysisResult,
+    BucketAnalysisDetails,
+    ComboCountAnalysisDetails,
 )
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import ConfidenceInterval, MetricResult, Score
 from explainaboard.utils.logging import progress
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.utils.typing_utils import narrow, unwrap
 from explainaboard.visualizers.bar_chart import make_bar_chart
 
 
 def plot_combo_counts(
-    combo_results: list[ComboCountAnalysisResult], output_dir: str, sys_names: list[str]
+    combo_results: list[AnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
     """Plot combo count results.
 
-    combo_results: The analyses to write out
-    output_dir: The directory to write to
-    sys_names: The names of the systems
+    Args:
+        combo_results: The analyses to write out
+        output_dir: The directory to write to
+        sys_names: The names of the systems
     """
+    first_details = narrow(ComboCountAnalysisDetails, combo_results[0].details)
+
+    for i, x in enumerate(combo_results):
+        details = narrow(ComboCountAnalysisDetails, x.details)
+        if details.features != first_details.features:
+            raise ValueError(
+                "All combo_results must have the same features. "
+                f"Expected: {first_details.features}, but got: {details.features}"
+            )
+
     # get feature maps
-    if any(x.features != combo_results[0].features for x in combo_results):
-        raise ValueError(
-            f'all combo_results must have the same features, but got '
-            f'{[x.features for x in combo_results]}'
-        )
-    feature_names = combo_results[0].features
+    feature_names = first_details.features
     feature_maps: list[dict[str, int]] = [dict() for _ in feature_names]
     for combo_result in combo_results:
-        for occ in combo_result.combo_occurrences:
+        details = narrow(ComboCountAnalysisDetails, combo_result.details)
+        for occ in details.combo_occurrences:
             feats = occ.features
             for feat, featmap in zip(feats, feature_maps):
                 featmap[feat] = featmap.get(feat, 0) + occ.sample_count
+
     # sort in descending order of frequency of each feature map
     sorted_names = [
         [v[0] for v in sorted(x.items(), key=lambda y: -y[1])] for x in feature_maps
     ]
     first_set = set(sorted_names[0])
+
     # if all sets of keys are the same, sort in descending order of total frequency
     if all(set(x) == first_set for x in sorted_names):
         total_cnt: dict[str, int] = {}
@@ -78,13 +84,14 @@ def plot_combo_counts(
 
     # Create all the plots
     for combo_idx, (combo_result, sys_name) in enumerate(zip(combo_results, sys_names)):
+        details = narrow(ComboCountAnalysisDetails, combo_result.details)
         if len(feature_names) != 2:
             raise ValueError(
                 f'plot_combo_counts currently only supports feature combinations of '
                 f'size 2, but got {feature_names}'
             )
         confusion_matrix = np.zeros([len(x) for x in feature_maps])
-        for occ in combo_result.combo_occurrences:
+        for occ in details.combo_occurrences:
             feats = occ.features
             confusion_matrix[
                 feature_maps[0][feats[0]], feature_maps[1][feats[1]]
@@ -141,7 +148,7 @@ def _get_errors(result: MetricResult) -> tuple[float, float]:
 
 
 def plot_buckets(
-    bucket_results: list[BucketAnalysisResult], output_dir: str, sys_names: list[str]
+    bucket_results: list[AnalysisResult], output_dir: str, sys_names: list[str]
 ) -> None:
     """Plot bucket results in a bar chart.
 
@@ -151,20 +158,24 @@ def plot_buckets(
         sys_names: The names of the systems
     """
     feature_name = bucket_results[0].name
+    first_details = narrow(BucketAnalysisDetails, bucket_results[0].details)
 
     bucket0_ticklabels: list[str] = [
         x.bucket_name
         if x.bucket_name is not None
         else render_interval_to_tick_label(unwrap(x.bucket_interval))
-        for x in bucket_results[0].bucket_performances
+        for x in first_details.bucket_performances
     ]
 
-    bucket0_names = sorted(bucket_results[0].bucket_performances[0].results.keys())
+    bucket0_names = sorted(first_details.bucket_performances[0].results.keys())
 
     for metric_name in bucket0_names:
         # indices: [analysis_id][bucket_id]
         results: list[list[MetricResult]] = [
-            [x.results[metric_name] for x in y.bucket_performances]
+            [
+                x.results[metric_name]
+                for x in narrow(BucketAnalysisDetails, y.details).bucket_performances
+            ]
             for y in bucket_results
         ]
         ys = [[x.get_value(Score, "score").value for x in y] for y in results]
@@ -271,18 +282,12 @@ def draw_charts_from_reports(
 
         analysis_result_list = list(analysis_result)
 
-        if all(isinstance(x, BucketAnalysisResult) for x in analysis_result):
-            plot_buckets(
-                cast(List[BucketAnalysisResult], analysis_result_list),
-                output_dir,
-                sys_names,
-            )
-        elif all(isinstance(x, ComboCountAnalysisResult) for x in analysis_result):
-            plot_combo_counts(
-                cast(List[ComboCountAnalysisResult], analysis_result_list),
-                output_dir,
-                sys_names,
-            )
+        if all(isinstance(x.details, BucketAnalysisDetails) for x in analysis_result):
+            plot_buckets(analysis_result_list, output_dir, sys_names)
+        elif all(
+            isinstance(x.details, ComboCountAnalysisDetails) for x in analysis_result
+        ):
+            plot_combo_counts(analysis_result_list, output_dir, sys_names)
         else:
             raise ValueError('illegal types of analyses')
 

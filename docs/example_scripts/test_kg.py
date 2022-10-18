@@ -1,13 +1,11 @@
-from typing import cast
-
 from explainaboard import get_loader_class, get_processor_class, TaskType
 
 # This code details (1) how to evaluate your systems using ExplainaBoard
 # programmatically (2)how to collect different results
 # Load the data
-from explainaboard.analysis.analyses import BucketAnalysisResult
+from explainaboard.analysis.analyses import BucketAnalysisDetails
 from explainaboard.metrics.metric import ConfidenceInterval, Score
-from explainaboard.utils.typing_utils import unwrap
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 dataset = (
     "../../integration_tests/artifacts/kg_link_tail_prediction/no_custom_feature.json"
@@ -46,8 +44,8 @@ for name, metric_result in sys_info.results.overall["example"].items():
 
 # get fine-grained results
 for analyses in fine_grained_res:
-    buckets = cast(BucketAnalysisResult, analyses)
-    for bucket_performance in buckets.bucket_performances:
+    details = narrow(BucketAnalysisDetails, analyses.details)
+    for bucket_performance in details.bucket_performances:
         for metric_name, metric_result in bucket_performance.results.items():
             value = metric_result.get_value(Score, "score").value
             ci = metric_result.get_value_or_none(ConfidenceInterval, "score_ci")
@@ -55,7 +53,7 @@ for analyses in fine_grained_res:
             print("------------------------------------------------------")
 
             bucket_name = unwrap(bucket_performance.bucket_name)
-            print(f"feature_name:{buckets.name} bucket_name:{bucket_name}")
+            print(f"feature_name:{analyses.name} bucket_name:{bucket_name}")
 
             print(
                 "\n"

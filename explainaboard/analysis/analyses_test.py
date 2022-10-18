@@ -4,9 +4,10 @@ import textwrap
 import unittest
 
 from explainaboard.analysis.analyses import (
-    BucketAnalysisResult,
-    CalibrationAnalysisResult,
-    ComboCountAnalysisResult,
+    AnalysisResult,
+    BucketAnalysisDetails,
+    CalibrationAnalysisDetails,
+    ComboCountAnalysisDetails,
     ComboOccurence,
 )
 from explainaboard.analysis.performance import BucketPerformance
@@ -16,35 +17,66 @@ from explainaboard.metrics.metric import MetricResult, Score
 class BucketAnalysisResultTest(unittest.TestCase):
     def test_inconsistent_num_metrics(self) -> None:
         with self.assertRaisesRegex(ValueError, r"^Inconsistent metrics"):
-            BucketAnalysisResult(
+            AnalysisResult(
                 name="foo",
                 level="bar",
-                bucket_performances=[
-                    BucketPerformance(
-                        n_samples=5,
-                        bucket_samples=[0, 1, 2, 3, 4],
-                        results={
-                            "metric1": MetricResult({"score": Score(0.5)}),
-                            "metric2": MetricResult({"score": Score(0.25)}),
-                        },
-                        bucket_name="baz",
-                    ),
-                    BucketPerformance(
-                        n_samples=5,
-                        bucket_samples=[5, 6, 7, 8, 9],
-                        results={
-                            "metric1": MetricResult({"score": Score(0.125)}),
-                        },
-                        bucket_name="qux",
-                    ),
-                ],
+                details=BucketAnalysisDetails(
+                    bucket_performances=[
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[0, 1, 2, 3, 4],
+                            results={
+                                "metric1": MetricResult({"score": Score(0.5)}),
+                                "metric2": MetricResult({"score": Score(0.25)}),
+                            },
+                            bucket_name="baz",
+                        ),
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[5, 6, 7, 8, 9],
+                            results={
+                                "metric1": MetricResult({"score": Score(0.125)}),
+                            },
+                            bucket_name="qux",
+                        ),
+                    ],
+                ),
             )
 
     def test_inconsistent_metric_names(self) -> None:
         with self.assertRaisesRegex(ValueError, r"^Inconsistent metrics"):
-            BucketAnalysisResult(
+            AnalysisResult(
                 name="foo",
                 level="bar",
+                details=BucketAnalysisDetails(
+                    bucket_performances=[
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[0, 1, 2, 3, 4],
+                            results={
+                                "metric1": MetricResult({"score": Score(0.5)}),
+                                "metric2": MetricResult({"score": Score(0.25)}),
+                            },
+                            bucket_name="baz",
+                        ),
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[5, 6, 7, 8, 9],
+                            results={
+                                "metric1": MetricResult({"score": Score(0.125)}),
+                                "xxx": MetricResult({"score": Score(0.25)}),
+                            },
+                            bucket_name="qux",
+                        ),
+                    ],
+                ),
+            )
+
+    def test_generate_report_with_interval(self) -> None:
+        result = AnalysisResult(
+            name="foo",
+            level="bar",
+            details=BucketAnalysisDetails(
                 bucket_performances=[
                     BucketPerformance(
                         n_samples=5,
@@ -53,44 +85,19 @@ class BucketAnalysisResultTest(unittest.TestCase):
                             "metric1": MetricResult({"score": Score(0.5)}),
                             "metric2": MetricResult({"score": Score(0.25)}),
                         },
-                        bucket_name="baz",
+                        bucket_interval=(1.0, 2.0),
                     ),
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
                         results={
                             "metric1": MetricResult({"score": Score(0.125)}),
-                            "xxx": MetricResult({"score": Score(0.25)}),
+                            "metric2": MetricResult({"score": Score(0.0625)}),
                         },
-                        bucket_name="qux",
+                        bucket_interval=(2.0, 3.0),
                     ),
                 ],
-            )
-
-    def test_generate_report_with_interval(self) -> None:
-        result = BucketAnalysisResult(
-            name="foo",
-            level="bar",
-            bucket_performances=[
-                BucketPerformance(
-                    n_samples=5,
-                    bucket_samples=[0, 1, 2, 3, 4],
-                    results={
-                        "metric1": MetricResult({"score": Score(0.5)}),
-                        "metric2": MetricResult({"score": Score(0.25)}),
-                    },
-                    bucket_interval=(1.0, 2.0),
-                ),
-                BucketPerformance(
-                    n_samples=5,
-                    bucket_samples=[5, 6, 7, 8, 9],
-                    results={
-                        "metric1": MetricResult({"score": Score(0.125)}),
-                        "metric2": MetricResult({"score": Score(0.0625)}),
-                    },
-                    bucket_interval=(2.0, 3.0),
-                ),
-            ],
+            ),
         )
         report = textwrap.dedent(
             """\
@@ -108,29 +115,31 @@ class BucketAnalysisResultTest(unittest.TestCase):
         self.assertEqual(result.generate_report(), report)
 
     def test_generate_report_with_name(self) -> None:
-        result = BucketAnalysisResult(
+        result = AnalysisResult(
             name="foo",
             level="bar",
-            bucket_performances=[
-                BucketPerformance(
-                    n_samples=5,
-                    bucket_samples=[0, 1, 2, 3, 4],
-                    results={
-                        "metric1": MetricResult({"score": Score(0.5)}),
-                        "metric2": MetricResult({"score": Score(0.25)}),
-                    },
-                    bucket_name="baz",
-                ),
-                BucketPerformance(
-                    n_samples=5,
-                    bucket_samples=[5, 6, 7, 8, 9],
-                    results={
-                        "metric1": MetricResult({"score": Score(0.125)}),
-                        "metric2": MetricResult({"score": Score(0.0625)}),
-                    },
-                    bucket_name="qux",
-                ),
-            ],
+            details=BucketAnalysisDetails(
+                bucket_performances=[
+                    BucketPerformance(
+                        n_samples=5,
+                        bucket_samples=[0, 1, 2, 3, 4],
+                        results={
+                            "metric1": MetricResult({"score": Score(0.5)}),
+                            "metric2": MetricResult({"score": Score(0.25)}),
+                        },
+                        bucket_name="baz",
+                    ),
+                    BucketPerformance(
+                        n_samples=5,
+                        bucket_samples=[5, 6, 7, 8, 9],
+                        results={
+                            "metric1": MetricResult({"score": Score(0.125)}),
+                            "metric2": MetricResult({"score": Score(0.0625)}),
+                        },
+                        bucket_name="qux",
+                    ),
+                ],
+            ),
         )
         report = textwrap.dedent(
             """\
@@ -151,23 +160,27 @@ class BucketAnalysisResultTest(unittest.TestCase):
 class ComboCountAnalysisResultTest(unittest.TestCase):
     def test_inconsistent_feature(self) -> None:
         with self.assertRaisesRegex(ValueError, r"^Inconsistent number of features"):
-            ComboCountAnalysisResult(
+            AnalysisResult(
                 name="foo",
                 level="bar",
-                features=("feat1", "feat2"),
-                combo_occurrences=[ComboOccurence(("xyz",), 3, list(range(3)))],
+                details=ComboCountAnalysisDetails(
+                    features=("feat1", "feat2"),
+                    combo_occurrences=[ComboOccurence(("xyz",), 3, list(range(3)))],
+                ),
             )
 
     def test_generate_report(self) -> None:
-        result = ComboCountAnalysisResult(
+        result = AnalysisResult(
             name="foo",
             level="bar",
-            features=("feat1", "feat2"),
-            combo_occurrences=[
-                ComboOccurence(("aaa", "bbb"), 3, list(range(3))),
-                ComboOccurence(("iii", "jjj"), 3, list(range(3, 6))),
-                ComboOccurence(("xxx", "yyy"), 3, list(range(6, 9))),
-            ],
+            details=ComboCountAnalysisDetails(
+                features=("feat1", "feat2"),
+                combo_occurrences=[
+                    ComboOccurence(("aaa", "bbb"), 3, list(range(3))),
+                    ComboOccurence(("iii", "jjj"), 3, list(range(3, 6))),
+                    ComboOccurence(("xxx", "yyy"), 3, list(range(6, 9))),
+                ],
+            ),
         )
         report = textwrap.dedent(
             """\
@@ -184,38 +197,71 @@ class ComboCountAnalysisResultTest(unittest.TestCase):
 class CalibrationAnalysisResultTest(unittest.TestCase):
     def test_missing_accuracy_metric(self) -> None:
         with self.assertRaisesRegex(ValueError, r"^Wrong metrics"):
-            CalibrationAnalysisResult(
+            AnalysisResult(
                 name="foo",
                 level="example",
-                bucket_performances=[
-                    BucketPerformance(
-                        n_samples=5,
-                        bucket_samples=[0, 1, 2, 3, 4],
-                        results={
-                            "Accuracy": MetricResult(
-                                {"score": Score(0.5), "confidence": Score(0.5)}
-                            ),
-                        },
-                        bucket_name="baz",
-                    ),
-                    BucketPerformance(
-                        n_samples=5,
-                        bucket_samples=[5, 6, 7, 8, 9],
-                        results={
-                            "metric1": MetricResult({"score": Score(0.5)}),
-                        },
-                        bucket_name="qux",
-                    ),
-                ],
-                expected_calibration_error=0.16,
-                maximum_calibration_error=0.22,
+                details=CalibrationAnalysisDetails(
+                    bucket_performances=[
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[0, 1, 2, 3, 4],
+                            results={
+                                "Accuracy": MetricResult(
+                                    {"score": Score(0.5), "confidence": Score(0.5)}
+                                ),
+                            },
+                            bucket_name="baz",
+                        ),
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[5, 6, 7, 8, 9],
+                            results={
+                                "metric1": MetricResult({"score": Score(0.5)}),
+                            },
+                            bucket_name="qux",
+                        ),
+                    ],
+                    expected_calibration_error=0.16,
+                    maximum_calibration_error=0.22,
+                ),
             )
 
     def test_missing_confidence_metric(self) -> None:
         with self.assertRaisesRegex(ValueError, r"^MetricResult does not have"):
-            CalibrationAnalysisResult(
+            AnalysisResult(
                 name="foo",
                 level="example",
+                details=CalibrationAnalysisDetails(
+                    bucket_performances=[
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[0, 1, 2, 3, 4],
+                            results={
+                                "Accuracy": MetricResult(
+                                    {"score": Score(0.5), "confidence": Score(0.5)}
+                                ),
+                            },
+                            bucket_name="baz",
+                        ),
+                        BucketPerformance(
+                            n_samples=5,
+                            bucket_samples=[5, 6, 7, 8, 9],
+                            results={
+                                "Accuracy": MetricResult({"score": Score(0.5)}),
+                            },
+                            bucket_name="qux",
+                        ),
+                    ],
+                    expected_calibration_error=0.16,
+                    maximum_calibration_error=0.22,
+                ),
+            )
+
+    def test_generate_report(self) -> None:
+        result = AnalysisResult(
+            name="confidence",
+            level="example",
+            details=CalibrationAnalysisDetails(
                 bucket_performances=[
                     BucketPerformance(
                         n_samples=5,
@@ -225,49 +271,22 @@ class CalibrationAnalysisResultTest(unittest.TestCase):
                                 {"score": Score(0.5), "confidence": Score(0.5)}
                             ),
                         },
-                        bucket_name="baz",
+                        bucket_interval=(0.0, 0.5),
                     ),
                     BucketPerformance(
                         n_samples=5,
                         bucket_samples=[5, 6, 7, 8, 9],
                         results={
-                            "Accuracy": MetricResult({"score": Score(0.5)}),
+                            "Accuracy": MetricResult(
+                                {"score": Score(0.7), "confidence": Score(0.7)}
+                            ),
                         },
-                        bucket_name="qux",
+                        bucket_interval=(0.5, 1.0),
                     ),
                 ],
                 expected_calibration_error=0.16,
                 maximum_calibration_error=0.22,
-            )
-
-    def test_generate_report(self) -> None:
-        result = CalibrationAnalysisResult(
-            name="confidence",
-            level="example",
-            bucket_performances=[
-                BucketPerformance(
-                    n_samples=5,
-                    bucket_samples=[0, 1, 2, 3, 4],
-                    results={
-                        "Accuracy": MetricResult(
-                            {"score": Score(0.5), "confidence": Score(0.5)}
-                        ),
-                    },
-                    bucket_interval=(0.0, 0.5),
-                ),
-                BucketPerformance(
-                    n_samples=5,
-                    bucket_samples=[5, 6, 7, 8, 9],
-                    results={
-                        "Accuracy": MetricResult(
-                            {"score": Score(0.7), "confidence": Score(0.7)}
-                        ),
-                    },
-                    bucket_interval=(0.5, 1.0),
-                ),
-            ],
-            expected_calibration_error=0.16,
-            maximum_calibration_error=0.22,
+            ),
         )
         report = textwrap.dedent(
             """\

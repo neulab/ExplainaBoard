@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
-from explainaboard.analysis.analyses import BucketAnalysisResult
+from explainaboard.analysis.analyses import BucketAnalysisDetails
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import Score
-from explainaboard.utils.typing_utils import narrow
 
 
 def report_to_sysout(report: SysOutputInfo) -> list[dict]:
@@ -19,21 +18,22 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
     system output.
     """
     results_fine_grained = [
-        narrow(BucketAnalysisResult, x)
+        x
         for x in report.results.analyses
-        if isinstance(x, BucketAnalysisResult)
+        if isinstance(x.details, BucketAnalysisDetails)
     ]
     meta_examples = []
-    for feature_buckets in results_fine_grained:
+    for result in results_fine_grained:
+        details = cast(BucketAnalysisDetails, result.details)
 
         # feature_perfs has `n_buckets` elements, each corresponding to a single bucket
-        for bucket in feature_buckets.bucket_performances:
+        for bucket in details.bucket_performances:
 
             # loop through and record all the metrics that describe this bucket
             example_features: dict[str, Any] = {}
             for metric_name, metric_result in bucket.results.items():
 
-                example_features['feature_name'] = feature_buckets.name
+                example_features['feature_name'] = result.name
                 example_features['bucket_interval'] = bucket.bucket_interval
                 example_features['bucket_name'] = bucket.bucket_name
                 example_features['bucket_size'] = bucket.n_samples

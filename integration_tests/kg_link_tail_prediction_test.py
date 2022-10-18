@@ -5,7 +5,7 @@ import unittest
 from integration_tests.utils import test_artifacts_path
 
 from explainaboard import FileType, get_processor_class, TaskType
-from explainaboard.analysis.analyses import BucketAnalysisResult
+from explainaboard.analysis.analyses import BucketAnalysisDetails
 from explainaboard.loaders.file_loader import FileLoaderMetadata
 from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.metrics.metric import Score
@@ -120,7 +120,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
         symmetry_performances = narrow(
-            BucketAnalysisResult, analysis_map['symmetry']
+            BucketAnalysisDetails, analysis_map['symmetry'].details
         ).bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
@@ -167,7 +167,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
         symmetry_performances = narrow(
-            BucketAnalysisResult, analysis_map['symmetry']
+            BucketAnalysisDetails, analysis_map['symmetry'].details
         ).bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
