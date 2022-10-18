@@ -326,18 +326,23 @@ class MetricTest(unittest.TestCase):
             metric.calc_confidence_interval(stats, 0.05)
 
     def test_calc_confidence_interval_bootstrap(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False),
+            seed=np.random.SeedSequence(12345),
+        )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0]))
         ci = unwrap(metric.calc_confidence_interval(stats, 0.05))
         # NOTE(odashi):
         # The sampler takes only 3 samples for each bootstrap iteration, resulting in
         # very wide confidence interval. This is a limitation of bootstrapping.
-        self.assertLess(ci[0], ci[1])
-        self.assertGreaterEqual(ci[0], 1.0)
-        self.assertLessEqual(ci[1], 6.0)
+        self.assertAlmostEqual(ci[0], 2.166666666666666)
+        self.assertAlmostEqual(ci[1], 4.833333333333333)
 
     def test_calc_confidence_interval_bootstrap_multi_agg(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False),
+            seed=np.random.SeedSequence(12345),
+        )
         stats = SimpleMetricStats(np.array([[0.5, 1.5], [1.5, 2.5], [2.5, 3.5]]))
         with self.assertRaisesRegex(ValueError, r"^Multiple aggregates"):
             metric.calc_confidence_interval(stats, 0.05)
@@ -393,7 +398,10 @@ class MetricTest(unittest.TestCase):
         self.assertIsNone(result.get_value_or_none(ConfidenceInterval, "score_ci"))
 
     def test_evaluate_from_stats_bootstrap_with_ci(self) -> None:
-        metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
+        metric = _DummyMetric(
+            _DummyMetricConfig("test", is_simple_average=False),
+            seed=np.random.SeedSequence(12345),
+        )
         stats = SimpleMetricStats(np.array([1.0, 2.0, 3.0, 4.0, 5.0]))
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
@@ -401,8 +409,8 @@ class MetricTest(unittest.TestCase):
         print(dataclasses.asdict(ci))
         # TODO(odahsi): According to the current default settings of bootstrapping,
         # estimated confidence intervals tends to become very wide for small data
-        self.assertGreaterEqual(ci.low, 1.0)
-        self.assertLessEqual(ci.high, 5.0)
+        self.assertAlmostEqual(ci.low, 1.8)
+        self.assertAlmostEqual(ci.high, 4.2)
 
     def test_evaluate_from_stats_bootstrap_single_data(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test", is_simple_average=False))
