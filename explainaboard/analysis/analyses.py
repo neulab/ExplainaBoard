@@ -171,8 +171,10 @@ class BucketAnalysisResult(AnalysisResult):
     @staticmethod
     def from_dict(dikt: dict) -> BucketAnalysisResult:
         """Deserialization method."""
+        serializer = PrimitiveSerializer()
         bucket_performances = [
-            BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
+            narrow(BucketPerformance, serializer.deserialize(v1))
+            for v1 in dikt['bucket_performances']
         ]
         return BucketAnalysisResult(
             name=dikt['name'],
@@ -343,8 +345,10 @@ class CalibrationAnalysisResult(AnalysisResult):
     @staticmethod
     def from_dict(dikt: dict) -> CalibrationAnalysisResult:
         """Deserialization method."""
+        serializer = PrimitiveSerializer()
         bucket_performances = [
-            BucketPerformance.from_dict(v1) for v1 in dikt['bucket_performances']
+            narrow(BucketPerformance, serializer.deserialize(v1))
+            for v1 in dikt['bucket_performances']
         ]
         expected_calibration_error = dikt['expected_calibration_error']
         maximum_calibration_error = dikt['maximum_calibration_error']

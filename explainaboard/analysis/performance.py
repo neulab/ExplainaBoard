@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
-import dataclasses
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any
+from typing import final
 
 from explainaboard.metrics.metric import MetricResult
-from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization import common_registry
+from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow
 
 
+@common_registry.register("BucketPerformance")
+@final
 @dataclass(frozen=True)
-class BucketPerformance:
+class BucketPerformance(Serializable):
     """A class containing information about performance over buckets.
 
     Attributes:
@@ -30,35 +33,56 @@ class BucketPerformance:
     bucket_interval: tuple[float, float] | None = None
     bucket_name: str | None = None
 
+    def __post_init__(self) -> None:
+        """Validates member values."""
+        has_interval = self.bucket_interval is not None
+        has_name = self.bucket_name is not None
+        if has_interval == has_name:
+            raise ValueError(
+                "Either `bucket_interval` or `bucket_name` must have a value, "
+                "but not both. "
+                f"{self.bucket_interval=}, {self.bucket_name=}"
+            )
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """See Serializable.serialize."""
+        return {
+            "n_samples": self.n_samples,
+            "bucket_samples": self.bucket_samples,
+            "results": self.results,
+            "bucket_interval": self.bucket_interval,
+            "bucket_name": self.bucket_name,
+        }
+
     @classmethod
-    def dict_conv(cls, k: str, v: Any) -> Any:
-        """A deserialization utility function.
-
-        It takes in a key corresponding to a
-        parameter name, and dictionary corresponding to a serialized version of that
-        parameter's value, then return the deserialized version of the value.
-
-        Args:
-            k: the parameter name
-            v: the parameter's value
-
-        Returns:
-            The value corresponding to the key
-        """
-        serializer = PrimitiveSerializer()
-
-        if k == 'results':
-            return {
-                name: narrow(MetricResult, serializer.deserialize(v1))
-                for name, v1 in v.items()
-            }
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """See Serializable.deserialize."""
+        bucket_samples = [narrow(int, x) for x in narrow(list, data["bucket_samples"])]
+        results = {
+            narrow(str, k): narrow(MetricResult, v)
+            for k, v in narrow(dict, data["results"]).items()
+        }
+        raw_bucket_interval = data.get("bucket_interval")
+        if raw_bucket_interval is not None:
+            assert (
+                isinstance(raw_bucket_interval, Sequence)
+                and len(raw_bucket_interval) == 2
+            ), f"BUG: wrong bucket interval: {raw_bucket_interval=}"
+            bucket_interval = (
+                float(raw_bucket_interval[0]),
+                float(raw_bucket_interval[1]),
+            )
         else:
-            return v
+            bucket_interval = None
+        raw_bucket_name = data.get("bucket_name")
+        bucket_name = (
+            narrow(str, raw_bucket_name) if raw_bucket_name is not None else None
+        )
 
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> BucketPerformance:
-        """A deserialization function."""
-        field_names = set(f.name for f in dataclasses.fields(cls))
         return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
+            n_samples=narrow(int, data["n_samples"]),
+            bucket_samples=bucket_samples,
+            results=results,
+            bucket_interval=bucket_interval,
+            bucket_name=bucket_name,
         )
