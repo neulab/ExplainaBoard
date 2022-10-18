@@ -144,10 +144,11 @@ class MultiBucketIntpereter(Interpreter):
             templates["salient_feature_description"] = template_hcf
 
         if stats.max_performance_gap_features is not None:
-            template_pgf \
-                = f". On the `{stats.max_performance_gap_features['feature_name']}` " \
-                  f"feature, the bucket performance difference reaches the maximum " \
-                  f"of {stats.max_performance_gap_features['max_performance_gap']}"
+            template_pgf = (
+                f"On the `{stats.max_performance_gap_features['feature_name']}` "
+                f"feature, the bucket performance difference reaches the maximum "
+                f"of {stats.max_performance_gap_features['max_performance_gap']}"
+            )
 
             templates["max_performance_gap_feature"] = template_pgf
 
