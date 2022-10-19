@@ -12,8 +12,11 @@ from explainaboard.analysis.analyses import (
     AnalysisDetails,
     AnalysisLevel,
     AnalysisResult,
+    BucketAnalysis,
     BucketAnalysisDetails,
+    CalibrationAnalysis,
     CalibrationAnalysisDetails,
+    ComboCountAnalysis,
     ComboCountAnalysisDetails,
     ComboOccurence,
 )
@@ -237,6 +240,32 @@ class BucketAnalysisDetailsTest(unittest.TestCase):
         self.assertEqual(serializer.deserialize(details_serialized), details)
 
 
+class BucketAnalysisTest(unittest.TestCase):
+    def test_serialization(self) -> None:
+        analysis = BucketAnalysis(
+            description="foo",
+            level="bar",
+            feature="baz",
+            method="qux",
+            num_buckets=10,
+            setting=[1, 2, 3],
+            sample_limit=20,
+        )
+        analysis_serialized = {
+            "cls_name": "BucketAnalysis",
+            "description": "foo",
+            "level": "bar",
+            "feature": "baz",
+            "method": "qux",
+            "num_buckets": 10,
+            "setting": [1, 2, 3],
+            "sample_limit": 20,
+        }
+        serializer = PrimitiveSerializer()
+        self.assertEqual(serializer.serialize(analysis), analysis_serialized)
+        self.assertEqual(serializer.deserialize(analysis_serialized), analysis)
+
+
 class ComboOccurrenceTest(unittest.TestCase):
     def test_serialization(self) -> None:
         occ = ComboOccurence(("aaa", "bbb"), 3, [0, 1, 2])
@@ -297,6 +326,28 @@ class ComboCountAnalysisDetailsTest(unittest.TestCase):
         }
         self.assertEqual(serializer.serialize(details), details_serialized)
         self.assertEqual(serializer.deserialize(details_serialized), details)
+
+
+class ComboCountAnalysisTest(unittest.TestCase):
+    def test_serialization(self) -> None:
+        analysis = ComboCountAnalysis(
+            description="foo",
+            level="bar",
+            features=("123", "456", "789"),
+            method="baz",
+            sample_limit=10,
+        )
+        analysis_serialized = {
+            "cls_name": "ComboCountAnalysis",
+            "description": "foo",
+            "level": "bar",
+            "features": ("123", "456", "789"),
+            "method": "baz",
+            "sample_limit": 10,
+        }
+        serializer = PrimitiveSerializer()
+        self.assertEqual(serializer.serialize(analysis), analysis_serialized)
+        self.assertEqual(serializer.deserialize(analysis_serialized), analysis)
 
 
 class CalibrationAnalysisDetailsTest(unittest.TestCase):
@@ -432,6 +483,28 @@ class CalibrationAnalysisDetailsTest(unittest.TestCase):
         }
         self.assertEqual(serializer.serialize(details), details_serialized)
         self.assertEqual(serializer.deserialize(details_serialized), details)
+
+
+class CalibrationAnalysisTest(unittest.TestCase):
+    def test_serialization(self) -> None:
+        analysis = CalibrationAnalysis(
+            description="foo",
+            level="bar",
+            feature="baz",
+            num_buckets=10,
+            sample_limit=20,
+        )
+        analysis_serialized = {
+            "cls_name": "CalibrationAnalysis",
+            "description": "foo",
+            "level": "bar",
+            "feature": "baz",
+            "num_buckets": 10,
+            "sample_limit": 20,
+        }
+        serializer = PrimitiveSerializer()
+        self.assertEqual(serializer.serialize(analysis), analysis_serialized)
+        self.assertEqual(serializer.deserialize(analysis_serialized), analysis)
 
 
 class AnalysisLevelTest(unittest.TestCase):

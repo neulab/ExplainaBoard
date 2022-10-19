@@ -267,13 +267,19 @@ class Processor(metaclass=abc.ABCMeta):
                 config.target_language = sys_info.target_language
 
         level_map = {x.name: x for x in analysis_levels}
-        analyses.extend([Analysis.from_dict(v) for v in custom_analyses])
 
-        ft_serializer = PrimitiveSerializer()
+        serializer = PrimitiveSerializer()
+
+        analyses.extend(
+            [
+                narrow(Analysis, serializer.deserialize(v))  # type: ignore
+                for v in custom_analyses
+            ]
+        )
 
         for level_name, feature_content in custom_features.items():
             additional_features = {
-                k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
                 if isinstance(v, dict)
                 else v
                 for k, v in feature_content.items()

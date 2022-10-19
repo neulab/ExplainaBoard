@@ -7,7 +7,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
 import random
-from typing import final, Optional, TypeVar
+from typing import final
 
 import numpy as np
 
@@ -150,18 +150,6 @@ class Analysis(Serializable, metaclass=abc.ABCMeta):
         """
         ...
 
-    @final
-    def _serialize(self) -> dict[str, SerializableData]:
-        """Serializes the inner members, used from serialize() in the subclasses.
-
-        Returns:
-            Serialized dict.
-        """
-        return {
-            "description": self.description,
-            "level": self.level,
-        }
-
 
 @common_registry.register("BucketAnalysisDetails")
 @final
@@ -238,7 +226,7 @@ class BucketAnalysisDetails(AnalysisDetails):
 
 @common_registry.register("BucketAnalysis")
 @final
-@dataclass
+@dataclass(frozen=True)
 class BucketAnalysis(Analysis):
     """Perform an analysis of various examples bucketed by features.
 
@@ -325,7 +313,8 @@ class BucketAnalysis(Analysis):
     def serialize(self) -> dict[str, SerializableData]:
         """Implements Serializable.serialize."""
         return {
-            **super()._serialize(),
+            "description": self.description,
+            "level": self.level,
             "feature": self.feature,
             "method": self.method,
             "num_buckets": self.num_buckets,
@@ -335,7 +324,16 @@ class BucketAnalysis(Analysis):
 
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
-        ...
+        """Implements Serializable.deserialize."""
+        return cls(
+            description=narrow(str, data["description"]),
+            level=narrow(str, data["level"]),
+            feature=narrow(str, data["feature"]),
+            method=narrow(str, data["method"]),
+            num_buckets=narrow(int, data["num_buckets"]),
+            setting=data["setting"],
+            sample_limit=narrow(int, data["sample_limit"]),
+        )
 
 
 @common_registry.register("CalibrationAnalysisDetails")
@@ -431,8 +429,9 @@ class CalibrationAnalysisDetails(AnalysisDetails):
         )
 
 
+@common_registry.register("CalibrationAnalysis")
 @final
-@dataclass
+@dataclass(frozen=True)
 class CalibrationAnalysis(Analysis):
     """Perform calibration analysis.
 
@@ -449,11 +448,9 @@ class CalibrationAnalysis(Analysis):
     feature: str
     num_buckets: int = 10
     sample_limit: int = 50
-    cls_name: Optional[str] = None
 
     def __post_init__(self):
         """Set the class name."""
-        self.cls_name: str = self.__class__.__name__
         if self.num_buckets <= 0:
             raise ValueError(f"Invalid num_buckets: {self.num_buckets}")
 
@@ -570,6 +567,27 @@ class CalibrationAnalysis(Analysis):
             ),
         )
 
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "description": self.description,
+            "level": self.level,
+            "feature": self.feature,
+            "num_buckets": self.num_buckets,
+            "sample_limit": self.sample_limit,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        return cls(
+            description=narrow(str, data["description"]),
+            level=narrow(str, data["level"]),
+            feature=narrow(str, data["feature"]),
+            num_buckets=narrow(int, data["num_buckets"]),
+            sample_limit=narrow(int, data["sample_limit"]),
+        )
+
 
 @common_registry.register("ComboOccurrence")
 @final
@@ -680,8 +698,9 @@ class ComboCountAnalysisDetails(AnalysisDetails):
         return cls(features=features, combo_occurrences=combo_occs)
 
 
+@common_registry.register("ComboCountAnalysis")
 @final
-@dataclass
+@dataclass(frozen=True)
 class ComboCountAnalysis(Analysis):
     """A class used to count feature combinations (e.g. for confusion matrices).
 
@@ -697,13 +716,8 @@ class ComboCountAnalysis(Analysis):
     """
 
     features: tuple[str, ...]
-    cls_name: Optional[str] = None
     method: str = "discrete"
     sample_limit: int = 50
-
-    def __post_init__(self):
-        """Set the class name."""
-        self.cls_name: str = self.__class__.__name__
 
     def perform(
         self,
@@ -734,6 +748,31 @@ class ComboCountAnalysis(Analysis):
                 features=self.features,
                 combo_occurrences=combo_list,
             ),
+        )
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "description": self.description,
+            "level": self.level,
+            "features": self.features,
+            "method": self.method,
+            "sample_limit": self.sample_limit,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        features = tuple(
+            narrow(str, x) for x in narrow(Sequence, data["features"])  # type: ignore
+        )
+
+        return cls(
+            description=narrow(str, data["description"]),
+            level=narrow(str, data["level"]),
+            features=features,
+            method=narrow(str, data["method"]),
+            sample_limit=narrow(int, data["sample_limit"]),
         )
 
 

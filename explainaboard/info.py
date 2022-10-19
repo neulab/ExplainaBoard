@@ -222,7 +222,7 @@ class SysOutputInfo:
         elif k == 'analysis_levels':
             return PrimitiveSerializer().deserialize(v)
         elif k == 'analyses':
-            return [Analysis.from_dict(v1) for v1 in v]
+            return PrimitiveSerializer().deserialize(v)
         else:
             return v
 
