@@ -2,19 +2,20 @@
 
 from __future__ import annotations
 
-from collections.abc import Hashable, Iterable
+from collections.abc import Hashable, Iterable, Sequence
 
 # List and Tuple is required for the first argument of narrow().
-from typing import Any, cast, List, Tuple
+from typing import Any, cast, List, Protocol, Tuple
 
 import numpy as np
 
 from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
+from explainaboard.serialization.types import SerializableData
 
 _INFINITE_INTERVAL = (-1e10, 1e10)
 
 
-def find_range(
+def _find_range(
     keys: Iterable[tuple[float, float]], x: float
 ) -> tuple[float, float] | None:
     """Finds the range that covers the given value.
@@ -32,8 +33,8 @@ def find_range(
 
 def continuous(
     sample_features: list[tuple[AnalysisCase, Any]],
-    bucket_number: int = 4,
-    bucket_setting: Any = None,
+    bucket_number: int | None = None,
+    bucket_setting: SerializableData = None,
 ) -> list[AnalysisCaseCollection]:
     """Bucketing based on continuous features.
 
@@ -50,9 +51,12 @@ def continuous(
     Returns:
         A list of AnalysisCaseCollections corresponding to the buckets.
     """
+    if bucket_number is None:
+        bucket_number = 4
+
     if len(sample_features) == 0:
         return [AnalysisCaseCollection(samples=[], interval=_INFINITE_INTERVAL)]
-    if bucket_setting is not None and len(bucket_setting) > 0:
+    if isinstance(bucket_setting, Sequence) and len(bucket_setting) > 0:
         raise NotImplementedError('bucket_setting incompatible with continuous')
     # Bucketing different Attributes
     cases = [x1 for x1, x2 in sample_features]
@@ -106,8 +110,8 @@ def continuous(
 
 def discrete(
     sample_features: list[tuple[AnalysisCase, Any]],
-    bucket_number: int = int(1e10),
-    bucket_setting: Any = 1,
+    bucket_number: int | None = None,
+    bucket_setting: SerializableData = None,
 ) -> list[AnalysisCaseCollection]:
     """Bucket attributes by discrete value.
 
@@ -121,9 +125,14 @@ def discrete(
     Returns:
         A list of AnalysisCaseCollections corresponding to the buckets.
     """
-    feat2idx = {}
+    if bucket_number is None:
+        bucket_number = 10_000_000_000
     if bucket_setting is None:
         bucket_setting = 0
+    if not isinstance(bucket_setting, int):
+        raise ValueError(f"Incompatible {bucket_setting=}, expected int.")
+
+    feat2idx = {}
     for idx, (case, feat) in enumerate(sample_features):
         if feat not in feat2idx:
             feat2idx[feat] = [idx]
@@ -142,8 +151,8 @@ def discrete(
 
 def fixed(
     sample_features: list[tuple[AnalysisCase, Any]],
-    bucket_number: int,
-    bucket_setting: Any,
+    bucket_number: int | None = None,
+    bucket_setting: SerializableData = None,
 ) -> list[AnalysisCaseCollection]:
     """Bucketing based on pre-determined buckets.
 
@@ -156,6 +165,9 @@ def fixed(
     Returns:
         A list of AnalysisCaseCollections corresponding to the buckets.
     """
+    if bucket_number is None or bucket_setting is None:
+        raise ValueError("bucket_number and bucket_setting must be set.")
+
     interval_or_names = cast(List[Hashable], bucket_setting)
     if len(interval_or_names) == 0:
         raise ValueError("Can not determine bucket keys.")
@@ -178,7 +190,7 @@ def fixed(
         interval_features = cast(List[float], features)
 
         for idx, interval in enumerate(interval_features):
-            key = find_range(intervals, interval)
+            key = _find_range(intervals, interval)
             if key is not None:
                 interval2idx[key].append(idx)
 
@@ -186,3 +198,51 @@ def fixed(
             AnalysisCaseCollection(samples=v, interval=k)
             for k, v in interval2idx.items()
         ]
+
+
+class BucketingFn(Protocol):
+    """Function type of bucketing methods."""
+
+    @staticmethod
+    def __call__(
+        sample_features: list[tuple[AnalysisCase, Any]],
+        bucket_number: int | None = None,
+        bucket_setting: SerializableData = None,
+    ) -> list[AnalysisCaseCollection]:
+        """Applies bucketing.
+
+        Args:
+            sample_features: List of samples to process.
+            bucket_number: Number of buckets.
+            bucket_setting: Method-specific settings to configure the behavior.
+
+        Returns:
+            Generated buckets.
+        """
+        ...
+
+
+# Registry for get_bucketing_method.
+_BUCKETING_METHODS: dict[str, BucketingFn] = {
+    "continuous": continuous,
+    "discrete": discrete,
+    "fixed": fixed,
+}
+
+
+def get_bucketing_method(name: str) -> BucketingFn:
+    """Obtains bucketing method.
+
+    Args:
+        name: Method name.
+
+    Returns:
+        Bucketing method associated to `name`.
+
+    Raises:
+        ValueError: No method associated to `name`.
+    """
+    fn = _BUCKETING_METHODS.get(name)
+    if fn is None:
+        raise ValueError(f"No bucketing method associated to {name=}")
+    return fn

@@ -4,15 +4,15 @@ from __future__ import annotations
 
 import abc
 from collections import defaultdict
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import dataclass
 import random
-from typing import Any, final, Optional, TypeVar
+from typing import final, Optional, TypeVar
 
 import numpy as np
 
-import explainaboard.analysis.bucketing
-from explainaboard.analysis.case import AnalysisCase, AnalysisCaseCollection
+from explainaboard.analysis.bucketing import get_bucketing_method
+from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.performance import BucketPerformance
 from explainaboard.metrics.metric import (
@@ -276,7 +276,7 @@ class BucketAnalysis(Analysis):
     feature: str
     method: str = "continuous"
     num_buckets: int = 4
-    setting: Any = None  # For different bucket_methods, the settings are diverse
+    setting: SerializableData = None  # Differs for each bucketing method.
     sample_limit: int = 50
     cls_name: Optional[str] = None
 
@@ -295,10 +295,7 @@ class BucketAnalysis(Analysis):
     ) -> AnalysisResult:
         """See Analysis.perform."""
         # Preparation for bucketing
-        bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
-            explainaboard.analysis.bucketing,
-            self.method,
-        )
+        bucket_func = get_bucketing_method(self.method)
 
         if len(cases) == 0 or self.feature not in cases[0].features:
             raise RuntimeError(f"bucket analysis: feature {self.feature} not found.")
@@ -525,10 +522,7 @@ class CalibrationAnalysis(Analysis):
         conf_metric_stat = SimpleMetricStats(conf_data)
 
         # Preparation for bucketing
-        bucket_func: Callable[..., list[AnalysisCaseCollection]] = getattr(
-            explainaboard.analysis.bucketing,
-            "fixed",
-        )
+        bucket_func = get_bucketing_method("fixed")
 
         bucket_setting = [
             (
