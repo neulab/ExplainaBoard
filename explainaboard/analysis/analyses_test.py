@@ -1,5 +1,7 @@
 """Tests for explainaboard.analysis.analyses."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 import textwrap
 from typing import final
