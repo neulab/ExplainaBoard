@@ -111,8 +111,8 @@ class AnalysisResult(Serializable):
         )
 
 
-@dataclass
-class Analysis(metaclass=abc.ABCMeta):
+@dataclass(frozen=True)
+class Analysis(Serializable, metaclass=abc.ABCMeta):
     """A super-class for analyses.
 
     Analyses take in examples and analyze their features in
@@ -151,34 +151,16 @@ class Analysis(metaclass=abc.ABCMeta):
         ...
 
     @final
-    @staticmethod
-    def from_dict(dikt: dict):
-        """Deserialization method."""
-        type = dikt.pop('cls_name')
-        if type == 'BucketAnalysis':
-            return BucketAnalysis(
-                description=dikt.get('description'),
-                level=dikt['level'],
-                feature=dikt['feature'],
-                method=dikt.get('method', 'continuous'),
-                num_buckets=dikt.get('num_buckets', 4),
-                setting=dikt.get('setting'),
-                sample_limit=dikt.get('sample_limit', 50),
-            )
-        elif type == 'ComboCountAnalysis':
-            return ComboCountAnalysis(
-                description=dikt.get('description'),
-                level=dikt['level'],
-                features=tuple(dikt['features']),
-            )
-        elif type == 'CalibrationAnalysis':
-            return CalibrationAnalysis(
-                description=dikt.get('description'),
-                level=dikt['level'],
-                feature=dikt['feature'],
-                num_buckets=dikt.get('num_buckets', 10),
-                sample_limit=dikt.get('sample_limit', 50),
-            )
+    def _serialize(self) -> dict[str, SerializableData]:
+        """Serializes the inner members, used from serialize() in the subclasses.
+
+        Returns:
+            Serialized dict.
+        """
+        return {
+            "description": self.description,
+            "level": self.level,
+        }
 
 
 @common_registry.register("BucketAnalysisDetails")
@@ -254,6 +236,7 @@ class BucketAnalysisDetails(AnalysisDetails):
         return cls(bucket_performances=bucket_perfs)
 
 
+@common_registry.register("BucketAnalysis")
 @final
 @dataclass
 class BucketAnalysis(Analysis):
@@ -277,13 +260,6 @@ class BucketAnalysis(Analysis):
     num_buckets: int = 4
     setting: Any = None  # For different bucket_methods, the settings are diverse
     sample_limit: int = 50
-    cls_name: Optional[str] = None
-
-    def __post_init__(self):
-        """Set the class name."""
-        self.cls_name: str = self.__class__.__name__
-
-    AnalysisCaseType = TypeVar('AnalysisCaseType')
 
     def perform(
         self,
@@ -348,6 +324,21 @@ class BucketAnalysis(Analysis):
             level=self.level,
             details=BucketAnalysisDetails(bucket_performances=bucket_performances),
         )
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            **super()._serialize(),
+            "feature": self.feature,
+            "method": self.method,
+            "num_buckets": self.num_buckets,
+            "setting": self.setting,
+            "sample_limit": self.sample_limit,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        ...
 
 
 @common_registry.register("CalibrationAnalysisDetails")
@@ -468,8 +459,6 @@ class CalibrationAnalysis(Analysis):
         self.cls_name: str = self.__class__.__name__
         if self.num_buckets <= 0:
             raise ValueError(f"Invalid num_buckets: {self.num_buckets}")
-
-    AnalysisCaseType = TypeVar('AnalysisCaseType')
 
     def _perform_calibration_analysis(
         self, bucket_performances: list[BucketPerformance] = []
@@ -721,8 +710,6 @@ class ComboCountAnalysis(Analysis):
     def __post_init__(self):
         """Set the class name."""
         self.cls_name: str = self.__class__.__name__
-
-    AnalysisCaseType = TypeVar('AnalysisCaseType')
 
     def perform(
         self,
