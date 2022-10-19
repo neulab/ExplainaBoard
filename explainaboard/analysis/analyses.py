@@ -6,6 +6,7 @@ import abc
 from collections import defaultdict
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+import random
 from typing import Any, final, Optional, TypeVar
 
 import numpy as np
@@ -26,6 +27,24 @@ from explainaboard.serialization import common_registry
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow, unwrap
+
+
+def _subsample_analysis_cases(
+    sample_limit: int, analysis_cases: list[int]
+) -> list[int]:
+    """Sample a subset from a list.
+
+    Args:
+        sample_limit: The maximum number to sample
+        analysis_cases: A list of sample IDs
+
+    Returns:
+        Subsampled list of sample IDs
+    """
+    if len(analysis_cases) > sample_limit:
+        return random.sample(analysis_cases, sample_limit)
+    else:
+        return analysis_cases
 
 
 class AnalysisDetails(Serializable, metaclass=abc.ABCMeta):
@@ -162,26 +181,6 @@ class Analysis(metaclass=abc.ABCMeta):
                 sample_limit=dikt.get('sample_limit', 50),
             )
 
-    @final
-    @staticmethod
-    def _subsample_analysis_cases(
-        sample_limit: int, analysis_cases: list[int]
-    ) -> list[int]:
-        """Sample a subset from a list.
-
-        Args:
-            sample_limit: The maximum number to sample
-            analysis_cases: A list of sample IDs
-
-        Returns:
-            Subsampled list of sample IDs
-        """
-        if len(analysis_cases) > sample_limit:
-            sample_ids = np.random.choice(analysis_cases, sample_limit, replace=False)
-            return sample_ids.tolist()
-        else:
-            return analysis_cases
-
 
 @common_registry.register("BucketAnalysisDetails")
 @final
@@ -313,7 +312,7 @@ class BucketAnalysis(Analysis):
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             # Subsample examples to save
-            subsampled_ids = self._subsample_analysis_cases(
+            subsampled_ids = _subsample_analysis_cases(
                 self.sample_limit, bucket_collection.samples
             )
 
@@ -549,7 +548,7 @@ class CalibrationAnalysis(Analysis):
         bucket_performances: list[BucketPerformance] = []
         for bucket_collection in samples_over_bucket:
             # Subsample examples to save
-            subsampled_ids = self._subsample_analysis_cases(
+            subsampled_ids = _subsample_analysis_cases(
                 self.sample_limit, bucket_collection.samples
             )
 
@@ -744,9 +743,7 @@ class ComboCountAnalysis(Analysis):
             combo_map[feat_vals].append(case.sample_id)
 
         combo_list = [
-            ComboOccurence(
-                k, len(v), self._subsample_analysis_cases(self.sample_limit, v)
-            )
+            ComboOccurence(k, len(v), _subsample_analysis_cases(self.sample_limit, v))
             for k, v in combo_map.items()
         ]
 
