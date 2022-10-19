@@ -8,6 +8,7 @@ from typing import final
 import unittest
 
 from explainaboard.analysis.analyses import (
+    _subsample_analysis_cases,
     AnalysisDetails,
     AnalysisResult,
     BucketAnalysisDetails,
@@ -21,6 +22,23 @@ from explainaboard.serialization import common_registry
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow
+
+
+class ModuleTest(unittest.TestCase):
+    def test_subsample_analysis_cases(self) -> None:
+        population = [1, 2, 3]
+
+        for _ in range(10):
+            # Returns a list with unique values.
+            sampled = _subsample_analysis_cases(2, population)
+            self.assertEqual(len(sampled), 2)
+            self.assertNotEqual(sampled[0], sampled[1])
+
+        for _ in range(10):
+            # Returns exactly the same list.
+            self.assertEqual(_subsample_analysis_cases(3, population), population)
+            # Larger sample limit does not cause error.
+            self.assertEqual(_subsample_analysis_cases(4, population), population)
 
 
 @common_registry.register("DummyAnalysisDetails")
