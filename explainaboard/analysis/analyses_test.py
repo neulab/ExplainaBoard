@@ -10,14 +10,17 @@ import unittest
 from explainaboard.analysis.analyses import (
     _subsample_analysis_cases,
     AnalysisDetails,
+    AnalysisLevel,
     AnalysisResult,
     BucketAnalysisDetails,
     CalibrationAnalysisDetails,
     ComboCountAnalysisDetails,
     ComboOccurence,
 )
+from explainaboard.analysis.feature import DataType, FeatureType, Value
 from explainaboard.analysis.performance import BucketPerformance
-from explainaboard.metrics.metric import MetricResult, Score
+from explainaboard.metrics.accuracy import AccuracyConfig
+from explainaboard.metrics.metric import MetricConfig, MetricResult, Score
 from explainaboard.serialization import common_registry
 from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
@@ -429,3 +432,23 @@ class CalibrationAnalysisDetailsTest(unittest.TestCase):
         }
         self.assertEqual(serializer.serialize(details), details_serialized)
         self.assertEqual(serializer.deserialize(details_serialized), details)
+
+
+class AnalysisLevelTest(unittest.TestCase):
+    def test_serialization(self) -> None:
+        features: dict[str, FeatureType] = {"foo": Value(dtype=DataType.INT)}
+        metric_configs: dict[str, MetricConfig] = {"bar": AccuracyConfig()}
+        level = AnalysisLevel(
+            name="test", features=features, metric_configs=metric_configs
+        )
+        serializer = PrimitiveSerializer()
+        features_serialized = serializer.serialize(features)
+        metric_configs_serialized = serializer.serialize(metric_configs)
+        level_serialized = {
+            "cls_name": "AnalysisLevel",
+            "name": "test",
+            "features": features_serialized,
+            "metric_configs": metric_configs_serialized,
+        }
+        self.assertEqual(serializer.serialize(level), level_serialized)
+        self.assertEqual(serializer.deserialize(level_serialized), level)

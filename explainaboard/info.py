@@ -220,7 +220,7 @@ class SysOutputInfo:
         elif k.endswith('tokenizer'):
             return PrimitiveSerializer().deserialize(v)
         elif k == 'analysis_levels':
-            return [AnalysisLevel.from_dict(v1) for v1 in v]
+            return PrimitiveSerializer().deserialize(v)
         elif k == 'analyses':
             return [Analysis.from_dict(v1) for v1 in v]
         else:

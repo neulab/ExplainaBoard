@@ -24,7 +24,6 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow, unwrap
 
@@ -757,8 +756,10 @@ class ComboCountAnalysis(Analysis):
         )
 
 
-@dataclass
-class AnalysisLevel:
+@common_registry.register("AnalysisLevel")
+@final
+@dataclass(frozen=True)
+class AnalysisLevel(Serializable):
     """Specifies the features of a particular level at which analysis is performed.
 
     Args:
@@ -771,25 +772,28 @@ class AnalysisLevel:
     features: dict[str, FeatureType]
     metric_configs: dict[str, MetricConfig]
 
-    @staticmethod
-    def from_dict(dikt: dict):
-        """Deserialization method."""
-        serializer = PrimitiveSerializer()
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "name": self.name,
+            "features": self.features,
+            "metric_configs": self.metric_configs,
+        }
 
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
         features = {
-            # See https://github.com/python/mypy/issues/4717
-            k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
-            for k, v in dikt['features'].items()
+            narrow(str, k): narrow(FeatureType, v)  # type: ignore
+            for k, v in narrow(dict, data["features"]).items()
         }
         metric_configs = {
-            # See mypy/issues/4717
-            narrow(str, k): narrow(
-                MetricConfig, serializer.deserialize(v)  # type: ignore
-            )
-            for k, v in dikt['metric_configs'].items()
+            narrow(str, k): narrow(MetricConfig, v)  # type: ignore
+            for k, v in narrow(dict, data["metric_configs"]).items()
         }
-        return AnalysisLevel(
-            name=dikt['name'],
+
+        return cls(
+            name=narrow(str, data["name"]),
             features=features,
             metric_configs=metric_configs,
         )
