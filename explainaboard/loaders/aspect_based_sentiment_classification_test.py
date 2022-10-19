@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.aspect_based_sentiment_classification."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.constants import TaskType

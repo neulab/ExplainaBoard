@@ -4,6 +4,8 @@ TODO(gneubig):
   Thes could probably be made easier through using Pandas dataframes or numpy arrays
 """
 
+from __future__ import annotations
+
 import copy
 from typing import Optional
 

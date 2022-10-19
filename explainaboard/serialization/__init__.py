@@ -1,5 +1,7 @@
 """Package definition of explainaboard/serialization."""
 
+from __future__ import annotations
+
 from typing import Final
 
 from explainaboard.serialization.registry import TypeRegistry

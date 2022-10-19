@@ -30,6 +30,7 @@ can get "answer"
 answer = system_output[A][B]
 """
 
+from __future__ import annotations
 
 from explainaboard import TaskType
 

@@ -1,5 +1,7 @@
 """Tests for explainaboard.processors.sequence_labeling."""
 
+from __future__ import annotations
+
 import unittest
 
 

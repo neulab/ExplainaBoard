@@ -1,5 +1,7 @@
 """Tests for explainaboard.utils.preprocessor."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.utils.preprocessor import ExtractiveQAPreprocessor, MapPreprocessor

@@ -1,5 +1,7 @@
 """Tests for explainaboard.loaders.qa_open_domain."""
 
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.constants import TaskType

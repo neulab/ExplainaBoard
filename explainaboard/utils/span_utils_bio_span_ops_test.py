@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 from explainaboard.utils.span_utils import BIOSpanOps

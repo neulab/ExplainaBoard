@@ -1,5 +1,7 @@
 """Utility functions to calculate agreement scores."""
 
+from __future__ import annotations
+
 import numpy as np
 
 

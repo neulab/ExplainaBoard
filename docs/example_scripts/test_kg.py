@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from explainaboard import get_loader_class, get_processor_class, TaskType
 
 # This code details (1) how to evaluate your systems using ExplainaBoard
