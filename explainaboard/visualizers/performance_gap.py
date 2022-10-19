@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import copy
 
-from explainaboard.analysis.analyses import AnalysisResult, BucketAnalysisResult
+from explainaboard.analysis.analyses import AnalysisResult, BucketAnalysisDetails
 from explainaboard.analysis.performance import BucketPerformance
 from explainaboard.analysis.result import Result
 from explainaboard.info import SysOutputInfo
@@ -55,32 +55,35 @@ def get_pairwise_performance_gap(
     analyses: list[AnalysisResult] = []
 
     for analysis1, analysis2 in zip(sys1.results.analyses, sys2.results.analyses):
-        if not isinstance(analysis1, BucketAnalysisResult):
+        if not isinstance(analysis1.details, BucketAnalysisDetails):
             analyses.append(copy.deepcopy(analysis1))
             continue
 
-        if not isinstance(analysis2, BucketAnalysisResult):
+        if not isinstance(analysis2.details, BucketAnalysisDetails):
             raise ValueError(
                 "Mismatched analyses: "
                 f"{type(analysis1).__name__} v.s. {type(analysis2).__name__}"
             )
 
         analyses.append(
-            BucketAnalysisResult(
+            AnalysisResult(
                 name=analysis1.name,
                 level=analysis1.level,
-                bucket_performances=[
-                    BucketPerformance(
-                        n_samples=bp1.n_samples,
-                        bucket_samples=bp1.bucket_samples[:],
-                        results=_diff_overall(bp1.results, bp2.results),
-                        bucket_interval=bp1.bucket_interval,
-                        bucket_name=bp1.bucket_name,
-                    )
-                    for bp1, bp2 in zip(
-                        analysis1.bucket_performances, analysis2.bucket_performances
-                    )
-                ],
+                details=BucketAnalysisDetails(
+                    bucket_performances=[
+                        BucketPerformance(
+                            n_samples=bp1.n_samples,
+                            bucket_samples=bp1.bucket_samples[:],
+                            results=_diff_overall(bp1.results, bp2.results),
+                            bucket_interval=bp1.bucket_interval,
+                            bucket_name=bp1.bucket_name,
+                        )
+                        for bp1, bp2 in zip(
+                            analysis1.details.bucket_performances,
+                            analysis2.details.bucket_performances,
+                        )
+                    ],
+                ),
             )
         )
 

@@ -15,7 +15,7 @@ from explainaboard.analysis.analyses import (
     AnalysisLevel,
     AnalysisResult,
     BucketAnalysis,
-    BucketAnalysisResult,
+    BucketAnalysisDetails,
     CalibrationAnalysis,
 )
 from explainaboard.analysis.case import AnalysisCase
@@ -449,9 +449,10 @@ class Processor(metaclass=abc.ABCMeta):
             sort_ascending: if True, sort low-to-high; by default, sort high-to-low.
         """
         for analysis_result in analysis_results:
-            if not isinstance(analysis_result, BucketAnalysisResult):
+            if not isinstance(analysis_result.details, BucketAnalysisDetails):
                 continue
-            bucket_result = analysis_result.bucket_performances
+
+            bucket_result = analysis_result.details.bucket_performances
 
             # based on alphabetical order of the bucket lower boundary; low to high
             if sort_by == 'key':

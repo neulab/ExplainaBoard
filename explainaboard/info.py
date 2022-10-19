@@ -216,7 +216,7 @@ class SysOutputInfo:
             The modified parameter value
         """
         if k == 'results':
-            return Result.from_dict(v)
+            return PrimitiveSerializer().deserialize(v)
         elif k.endswith('tokenizer'):
             return PrimitiveSerializer().deserialize(v)
         elif k == 'analysis_levels':

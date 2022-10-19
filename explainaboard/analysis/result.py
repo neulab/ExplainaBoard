@@ -2,18 +2,20 @@
 
 from __future__ import annotations
 
-import dataclasses
 from dataclasses import dataclass
-from typing import Any
+from typing import final
 
 from explainaboard.analysis.analyses import AnalysisResult
 from explainaboard.metrics.metric import MetricResult
-from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization import common_registry
+from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow
 
 
+@common_registry.register("Result")
+@final
 @dataclass
-class Result:
+class Result(Serializable):
     """A class to store results.
 
     Attributes:
@@ -25,30 +27,23 @@ class Result:
     overall: dict[str, dict[str, MetricResult]]
     analyses: list[AnalysisResult]
 
-    @classmethod
-    def dict_conv(cls, k: str, v: Any):
-        """A utility function for deserialization."""
-        serializer = PrimitiveSerializer()
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "overall": self.overall,
+            "analyses": self.analyses,
+        }
 
-        if k == 'overall':
-            return {
-                narrow(str, analysis_level_name): {
-                    narrow(str, metric_name): narrow(
-                        MetricResult, serializer.deserialize(metric_result)
-                    )
-                    for metric_name, metric_result in narrow(dict, perfs).items()
-                }
-                for analysis_level_name, perfs in narrow(dict, v).items()
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        overall: dict[str, dict[str, MetricResult]] = {
+            narrow(str, level_name): {
+                narrow(str, metric_name): narrow(MetricResult, result)
+                for metric_name, result in narrow(dict, metrics).items()
             }
-        elif k == 'analyses':
-            return [AnalysisResult.from_dict(v1) for v1 in v]
-        else:
-            raise NotImplementedError
+            for level_name, metrics in narrow(dict, data["overall"]).items()
+        }
+        analyses = [narrow(AnalysisResult, x) for x in narrow(list, data["analyses"])]
 
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> Result:
-        """Deserialization function."""
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
+        return cls(overall=overall, analyses=analyses)

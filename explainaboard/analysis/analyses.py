@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import abc
 from collections import defaultdict
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any, final, Optional, TypeVar
 
@@ -22,12 +22,33 @@ from explainaboard.metrics.metric import (
     Score,
     SimpleMetricStats,
 )
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.typing_utils import narrow, unwrap
 
 
-@dataclass
-class AnalysisResult(metaclass=abc.ABCMeta):
+class AnalysisDetails(Serializable, metaclass=abc.ABCMeta):
+    """An abstract base class of detail information of AnalysisResult."""
+
+    @abc.abstractmethod
+    def generate_report(self, name: str, level: str) -> str:
+        """Generates human-readable report.
+
+        Args:
+            name: Name of this result.
+            level: AnalysisLevel associated to this result.
+
+        Returns:
+            Multi-line string representing the printable report.
+        """
+        ...
+
+
+@common_registry.register("AnalysisResult")
+@final
+@dataclass(frozen=True)
+class AnalysisResult(Serializable):
     """A base class specifying the result of an analysis.
 
     The actual details of the result will be implemented by the inheriting class.
@@ -35,32 +56,41 @@ class AnalysisResult(metaclass=abc.ABCMeta):
     Attributes:
         name: The name of the analysis.
         level: The level that the analysis belongs to.
+        details: Details of this result.
     """
 
     name: str
     level: str
+    details: AnalysisDetails
 
-    @abc.abstractmethod
+    @final
     def generate_report(self) -> str:
         """Generate human-readable report.
 
         Returns:
             Multi-lined string representing the report of this result.
         """
-        ...
+        return self.details.generate_report(self.name, self.level)
 
-    @staticmethod
-    def from_dict(dikt):
-        """Deserialization method."""
-        type = dikt.pop('cls_name')
-        if type == 'BucketAnalysisResult':
-            return BucketAnalysisResult.from_dict(dikt)
-        elif type == 'ComboCountAnalysisResult':
-            return ComboCountAnalysisResult.from_dict(dikt)
-        elif type == 'CalibrationAnalysisResult':
-            return CalibrationAnalysisResult.from_dict(dikt)
-        else:
-            raise ValueError(f'bad AnalysisResult type {type}')
+    @final
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "name": self.name,
+            "level": self.level,
+            "details": self.details,
+        }
+
+    @final
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        return cls(
+            name=narrow(str, data["name"]),
+            level=narrow(str, data["level"]),
+            # See mypy/4717
+            details=narrow(AnalysisDetails, data["details"]),  # type: ignore
+        )
 
 
 @dataclass
@@ -153,37 +183,25 @@ class Analysis(metaclass=abc.ABCMeta):
             return analysis_cases
 
 
+@common_registry.register("BucketAnalysisDetails")
 @final
-@dataclass
-class BucketAnalysisResult(AnalysisResult):
+@dataclass(frozen=True)
+class BucketAnalysisDetails(AnalysisDetails):
     """A result of running a `BucketAnalysis`.
 
     Attributes:
         bucket_performances: A list of performances bucket-by-bucket, including the
           interval over which the bucket is calculated, the performance itself, etc.
           See `BucketPerformance` for more details.
-        cls_name: The name of the class.
     """
 
     bucket_performances: list[BucketPerformance]
-    cls_name: Optional[str] = None
-
-    @staticmethod
-    def from_dict(dikt: dict) -> BucketAnalysisResult:
-        """Deserialization method."""
-        serializer = PrimitiveSerializer()
-        bucket_performances = [
-            narrow(BucketPerformance, serializer.deserialize(v1))
-            for v1 in dikt['bucket_performances']
-        ]
-        return BucketAnalysisResult(
-            name=dikt['name'],
-            level=dikt['level'],
-            bucket_performances=bucket_performances,
-        )
 
     def __post_init__(self):
         """Set the class name and validate."""
+        if not self.bucket_performances:
+            raise ValueError("No element in bucket_performances.")
+
         metric_names = self.bucket_performances[0].results.keys()
 
         for bucket_perf in self.bucket_performances:
@@ -194,16 +212,14 @@ class BucketAnalysisResult(AnalysisResult):
                     f"got: {set(bucket_perf.results.keys())}"
                 )
 
-        self.cls_name: str = self.__class__.__name__
-
-    def generate_report(self) -> str:
-        """See AnalysisResult.generate_report."""
+    def generate_report(self, name: str, level: str) -> str:
+        """Implements AnalysisResultDetils.generate_report."""
         texts: list[str] = []
 
         metric_names = sorted(k for k in self.bucket_performances[0].results)
 
         for metric_name in metric_names:
-            texts.append(f"the information of #{self.name}#")
+            texts.append(f"the information of #{name}#")
             texts.append(f"bucket_name\t{metric_name}\t#samples")
 
             for bucket_perf in self.bucket_performances:
@@ -222,6 +238,22 @@ class BucketAnalysisResult(AnalysisResult):
             texts.append('')
 
         return "\n".join(texts)
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialze."""
+        return {
+            "bucket_performances": self.bucket_performances,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialze."""
+        bucket_perfs = [
+            narrow(BucketPerformance, x)
+            for x in narrow(list, data["bucket_performances"])
+        ]
+
+        return cls(bucket_performances=bucket_perfs)
 
 
 @final
@@ -313,14 +345,17 @@ class BucketAnalysis(Analysis):
                 )
             )
 
-        return BucketAnalysisResult(
-            name=self.feature, level=self.level, bucket_performances=bucket_performances
+        return AnalysisResult(
+            name=self.feature,
+            level=self.level,
+            details=BucketAnalysisDetails(bucket_performances=bucket_performances),
         )
 
 
+@common_registry.register("CalibrationAnalysisDetails")
 @final
-@dataclass
-class CalibrationAnalysisResult(AnalysisResult):
+@dataclass(frozen=True)
+class CalibrationAnalysisDetails(AnalysisDetails):
     """A result of running a `CalibrationAnalysis`.
 
     Two types of calibration errors are calculated according to
@@ -334,34 +369,17 @@ class CalibrationAnalysisResult(AnalysisResult):
           expectation between confidence and accuracy.
         maximum_calibration_error: calibration error that meausre the worst-case
           deviation between confidence and accuracy.
-        cls_name: The name of the class.
     """
 
     bucket_performances: list[BucketPerformance]
     expected_calibration_error: float
     maximum_calibration_error: float
-    cls_name: Optional[str] = None
-
-    @staticmethod
-    def from_dict(dikt: dict) -> CalibrationAnalysisResult:
-        """Deserialization method."""
-        serializer = PrimitiveSerializer()
-        bucket_performances = [
-            narrow(BucketPerformance, serializer.deserialize(v1))
-            for v1 in dikt['bucket_performances']
-        ]
-        expected_calibration_error = dikt['expected_calibration_error']
-        maximum_calibration_error = dikt['maximum_calibration_error']
-        return CalibrationAnalysisResult(
-            name=dikt['name'],
-            level=dikt['level'],
-            bucket_performances=bucket_performances,
-            expected_calibration_error=expected_calibration_error,
-            maximum_calibration_error=maximum_calibration_error,
-        )
 
     def __post_init__(self):
         """Set the class name and validate."""
+        if not self.bucket_performances:
+            raise ValueError("No element in bucket_performances.")
+
         for bucket_perf in self.bucket_performances:
             metric_result = bucket_perf.results.get("Accuracy", None)
             if metric_result is None:
@@ -374,16 +392,14 @@ class CalibrationAnalysisResult(AnalysisResult):
             if confidence is None:
                 raise ValueError("MetricResult does not have the \"confidence\" score.")
 
-        self.cls_name: str = self.__class__.__name__
-
-    def generate_report(self) -> str:
-        """See AnalysisResult.generate_report."""
+    def generate_report(self, name: str, level: str) -> str:
+        """Implements AnalysisDetails.generate_report."""
         texts: list[str] = []
 
         metric_names = sorted(self.bucket_performances[0].results.keys())
 
         for metric_name in metric_names:
-            texts.append(f"the information of #{self.name}#")
+            texts.append(f"the information of #{name}#")
             texts.append(f"bucket_name\t{metric_name}\t#samples")
 
             for bucket_perf in self.bucket_performances:
@@ -403,6 +419,30 @@ class CalibrationAnalysisResult(AnalysisResult):
         texts.append(f"maximum_calibration_error\t{self.maximum_calibration_error}")
         texts.append('')
         return "\n".join(texts)
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "bucket_performances": self.bucket_performances,
+            "expected_calibration_error": self.expected_calibration_error,
+            "maximum_calibration_error": self.maximum_calibration_error,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        bucket_perfs = [
+            narrow(BucketPerformance, x)
+            for x in narrow(list, data["bucket_performances"])
+        ]
+
+        return cls(
+            bucket_performances=bucket_perfs,
+            expected_calibration_error=narrow(
+                float, data["expected_calibration_error"]
+            ),
+            maximum_calibration_error=narrow(float, data["maximum_calibration_error"]),
+        )
 
 
 @final
@@ -539,17 +579,21 @@ class CalibrationAnalysis(Analysis):
             )
 
         ece, mce = self._perform_calibration_analysis(bucket_performances)
-        return CalibrationAnalysisResult(
+        return AnalysisResult(
             name=self.feature,
             level=self.level,
-            bucket_performances=bucket_performances,
-            expected_calibration_error=ece,
-            maximum_calibration_error=mce,
+            details=CalibrationAnalysisDetails(
+                bucket_performances=bucket_performances,
+                expected_calibration_error=ece,
+                maximum_calibration_error=mce,
+            ),
         )
 
 
+@common_registry.register("ComboOccurrence")
+@final
 @dataclass(frozen=True)
-class ComboOccurence:
+class ComboOccurence(Serializable):
     """A struct representing occurences of the string tuples.
 
     Args:
@@ -564,23 +608,39 @@ class ComboOccurence:
     sample_count: int
     sample_ids: list[int]
 
-    @staticmethod
-    def from_dict(dikt: dict) -> ComboOccurence:
-        """Deserialization method."""
-        return ComboOccurence(
-            features=dikt['features'],
-            sample_count=dikt['sample_count'],
-            sample_ids=dikt['sample_ids'],
-        )
-
     def __lt__(self, other: ComboOccurence) -> bool:
         """Implement __lt__ to allow natural sorting."""
         return (self.features, self.sample_count) < (other.features, other.sample_count)
 
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "features": self.features,
+            "sample_count": self.sample_count,
+            "sample_ids": self.sample_ids,
+        }
 
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        features = tuple(
+            # See mypy/4717
+            narrow(str, x)
+            for x in narrow(Sequence, data["features"])  # type: ignore
+        )
+        sample_ids = [narrow(int, x) for x in narrow(list, data["sample_ids"])]
+
+        return cls(
+            features=features,
+            sample_count=narrow(int, data["sample_count"]),
+            sample_ids=sample_ids,
+        )
+
+
+@common_registry.register("ComboCountAnalysisDetails")
 @final
-@dataclass
-class ComboCountAnalysisResult(AnalysisResult):
+@dataclass(frozen=True)
+class ComboCountAnalysisDetails(AnalysisDetails):
     """A result of running a `ComboCountAnalysis`.
 
     Attributes:
@@ -593,19 +653,6 @@ class ComboCountAnalysisResult(AnalysisResult):
 
     features: tuple[str, ...]
     combo_occurrences: list[ComboOccurence]
-    cls_name: Optional[str] = None
-
-    @staticmethod
-    def from_dict(dikt: dict) -> ComboCountAnalysisResult:
-        """Deserialization method."""
-        return ComboCountAnalysisResult(
-            name=dikt['name'],
-            level=dikt['level'],
-            features=dikt['features'],
-            combo_occurrences=[
-                ComboOccurence.from_dict(d) for d in dikt['combo_occurrences']
-            ],
-        )
 
     def __post_init__(self):
         """Set the class name and validate."""
@@ -617,10 +664,8 @@ class ComboCountAnalysisResult(AnalysisResult):
                     f"Required: {num_features}, got: {len(occ.features)}"
                 )
 
-        self.cls_name: str = self.__class__.__name__
-
-    def generate_report(self) -> str:
-        """See AnalysisResult.generate_report."""
+    def generate_report(self, name: str, level: str) -> str:
+        """Implements AnalysisResult.generate_report."""
         texts: list[str] = []
 
         texts.append('feature combos for ' + ', '.join(self.features))
@@ -631,6 +676,27 @@ class ComboCountAnalysisResult(AnalysisResult):
 
         texts.append('')
         return "\n".join(texts)
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "features": self.features,
+            "combo_occurrences": self.combo_occurrences,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        features = tuple(
+            # See mypy/4717
+            narrow(str, x)
+            for x in narrow(Sequence, data["features"])  # type: ignore
+        )
+        combo_occs = [
+            narrow(ComboOccurence, x) for x in narrow(list, data["combo_occurrences"])
+        ]
+
+        return cls(features=features, combo_occurrences=combo_occs)
 
 
 @final
@@ -684,11 +750,13 @@ class ComboCountAnalysis(Analysis):
             for k, v in combo_map.items()
         ]
 
-        return ComboCountAnalysisResult(
+        return AnalysisResult(
             name='combo(' + ','.join(self.features) + ')',
             level=self.level,
-            features=self.features,
-            combo_occurrences=combo_list,
+            details=ComboCountAnalysisDetails(
+                features=self.features,
+                combo_occurrences=combo_list,
+            ),
         )
 
 
