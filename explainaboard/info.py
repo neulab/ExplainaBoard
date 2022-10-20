@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import dataclasses
 from dataclasses import dataclass, field
 import json
@@ -179,28 +178,6 @@ class SysOutputInfo:
         file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
 
     @classmethod
-    def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
-        """Create SysOutputInfo from the JSON file in `sys_output_info_dir`.
-
-        Args:
-            sys_output_info_dir (`str`): The directory containing the metadata file.
-                This should be the root directory of a specific dataset version.
-        """
-        logger.info("Loading Dataset info from %s", sys_output_info_dir)
-        if not sys_output_info_dir:
-            raise ValueError(
-                "Calling DatasetInfo.from_directory() with undefined dataset_info_dir."
-            )
-
-        with open(
-            os.path.join(sys_output_info_dir, config.SYS_OUTPUT_INFO_FILENAME),
-            "r",
-            encoding="utf-8",
-        ) as f:
-            data_dict = json.load(f)
-        return cls.from_dict(data_dict)
-
-    @classmethod
     def dict_conv(cls, k: str, v: Any) -> Any:
         """Deserialization utility function.
 
@@ -233,21 +210,6 @@ class SysOutputInfo:
         return cls(
             **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
         )
-
-    def update(self, other_sys_output_info: SysOutputInfo, ignore_none=True):
-        """Update with another SysOutputInfo."""
-        self_dict = self.__dict__
-        self_dict.update(
-            **{
-                k: copy.deepcopy(v)
-                for k, v in other_sys_output_info.__dict__.items()
-                if (v is not None or not ignore_none)
-            }
-        )
-
-    def copy(self) -> SysOutputInfo:
-        """Create a new copy of the SysOutputInfo."""
-        return self.__class__(**{k: copy.deepcopy(v) for k, v in self.__dict__.items()})
 
 
 @dataclass
