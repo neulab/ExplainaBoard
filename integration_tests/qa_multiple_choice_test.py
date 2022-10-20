@@ -70,14 +70,13 @@ class QAMultipleChoiceTest(unittest.TestCase):
             "dataset_name": "fig_qa",
             "metric_names": ["Accuracy"],
             # don't forget this, otherwise the user-defined features will be ignored
-            "user_defined_features_configs": data.metadata.custom_features,
+            "custom_features": data.metadata.custom_features,
         }
 
         processor = get_processor_class(TaskType.qa_multiple_choice)()
-
         sys_info = processor.process(metadata, data.samples)
 
-        self.assertGreater(len(sys_info.results.analyses), 0)
+        self.assertEqual(len(sys_info.results.analyses), 5)
         self.assertGreater(len(sys_info.results.overall), 0)
 
 
