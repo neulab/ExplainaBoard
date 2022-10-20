@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import copy
 import dataclasses
 from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Callable, ClassVar, Optional, TypeVar, final
-from unittest.mock import DEFAULT
+from typing import Callable, ClassVar, final, Optional, TypeVar
 
 from explainaboard import config
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
@@ -18,15 +16,15 @@ from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
 from explainaboard.serialization import common_registry
 from explainaboard.serialization.legacy import general_to_dict
-from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tokenizer import Tokenizer
-from explainaboard.utils.typing_utils import narrow
+from explainaboard.utils.typing_utils import narrow, unwrap
 
 logger = get_logger(__name__)
 
 T = TypeVar("T")
+
 
 # TODO(odashi): This function may be generally useful. Move it to the serialization
 # submodule.
@@ -211,43 +209,6 @@ class SysOutputInfo(Serializable):
         self.replace_nonstring_keys(data_dict)
         file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
 
-    @classmethod
-    def from_directory(cls, sys_output_info_dir: str) -> "SysOutputInfo":
-        """Create SysOutputInfo from the JSON file in `sys_output_info_dir`.
-
-        Args:
-            sys_output_info_dir (`str`): The directory containing the metadata file.
-                This should be the root directory of a specific dataset version.
-        """
-        logger.info("Loading Dataset info from %s", sys_output_info_dir)
-        if not sys_output_info_dir:
-            raise ValueError(
-                "Calling DatasetInfo.from_directory() with undefined dataset_info_dir."
-            )
-
-        with open(
-            os.path.join(sys_output_info_dir, config.SYS_OUTPUT_INFO_FILENAME),
-            "r",
-            encoding="utf-8",
-        ) as f:
-            data_dict = json.load(f)
-        return cls.from_dict(data_dict)
-
-    def update(self, other_sys_output_info: SysOutputInfo, ignore_none=True):
-        """Update with another SysOutputInfo."""
-        self_dict = self.__dict__
-        self_dict.update(
-            **{
-                k: copy.deepcopy(v)
-                for k, v in other_sys_output_info.__dict__.items()
-                if (v is not None or not ignore_none)
-            }
-        )
-
-    def copy(self) -> SysOutputInfo:
-        """Create a new copy of the SysOutputInfo."""
-        return self.__class__(**{k: copy.deepcopy(v) for k, v in self.__dict__.items()})
-
     def serialize(self) -> dict[str, SerializableData]:
         """Implements Serializable.serialize."""
         return {
@@ -271,16 +232,19 @@ class SysOutputInfo(Serializable):
     @classmethod
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
         """Implements Serializable.deserialize."""
+        # TODO(odashi): Remove type:ignore if mypy/4717 was fixed.
+
         system_details = {
-            narrow(str, k): narrow(SerializableData, v)
-            for k, v in _get_value_or(data, dict, "system_details", {}).items()
+            narrow(str, k): narrow(SerializableData, v)  # type: ignore
+            for k, v in unwrap(_get_value_or(data, dict, "system_details", {})).items()
         }
         analysis_levels = [
             narrow(AnalysisLevel, x)
-            for x in _get_value_or(data, list, "analysis_levels", [])
+            for x in unwrap(_get_value_or(data, list, "analysis_levels", []))
         ]
         analyses = [
-            narrow(Analysis, x) for x in _get_value_or(data, list, "analyses", [])
+            narrow(Analysis, x)  # type: ignore
+            for x in unwrap(_get_value_or(data, list, "analyses", []))
         ]
 
         return cls(
@@ -291,15 +255,25 @@ class SysOutputInfo(Serializable):
             dataset_split=_get_value_or(data, str, "dataset_split"),
             source_language=_get_value_or(data, str, "source_language"),
             target_language=_get_value_or(data, str, "target_language"),
-            reload_stat=_get_value_or(data, bool, cls.DEFAULT_RELOAD_STAT),
-            confidence_alpha=_get_value_or(data, float, cls.DEFAULT_CONFIDENCE_ALPHA),
+            reload_stat=unwrap(
+                _get_value_or(data, bool, "reload_stat", cls.DEFAULT_RELOAD_STAT)
+            ),
+            confidence_alpha=unwrap(
+                _get_value_or(
+                    data, float, "confidence_alpha", cls.DEFAULT_CONFIDENCE_ALPHA
+                )
+            ),
             system_details=system_details,
-            source_tokenizer=_get_value_or(data, Tokenizer, "source_tokenizer"),
-            target_tokenizer=_get_value_or(data, Tokenizer, "target_tokenizer"),
+            source_tokenizer=_get_value_or(
+                data, Tokenizer, "source_tokenizer"  # type: ignore
+            ),
+            target_tokenizer=_get_value_or(
+                data, Tokenizer, "target_tokenizer"  # type: ignore
+            ),
             analysis_levels=analysis_levels,
             analyses=analyses,
-            results=_get_value_or(
-                data, Result, "results", Result(overall={}, analyses=[])
+            results=unwrap(
+                _get_value_or(data, Result, "results", Result(overall={}, analyses=[]))
             ),
         )
 
