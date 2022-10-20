@@ -21,7 +21,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
 	  pip install .[text_to_sql]
           python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
@@ -41,7 +40,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install .
 	  pip install .[text_to_sql]
           python -m spacy download en_core_web_sm
           python -m nltk.downloader punkt
