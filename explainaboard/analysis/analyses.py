@@ -7,7 +7,7 @@ from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
 import random
-from typing import final
+from typing import ClassVar, final
 
 import numpy as np
 
@@ -150,6 +150,38 @@ class Analysis(Serializable, metaclass=abc.ABCMeta):
         """
         ...
 
+    def _serialize(self) -> dict[str, SerializableData]:
+        """Serialize function for base members.
+
+        This function is used by serialize() of subclasses.
+
+        Returns:
+            Serialized data containing base members.
+        """
+        return {
+            "description": self.description,
+            "level": self.level,
+        }
+
+    @classmethod
+    def _deserialize(cls, data: dict[str, SerializableData]) -> dict[str, object]:
+        """Deserialize function for base members.
+
+        This function is used by deserialize() of subclasses.
+
+        Args:
+            data: Serialized data.
+
+        Returns:
+            Dict of deserialized members. The returned dict is used as keyword arguments
+            of __init__.
+        """
+        desc = data.get("description")
+        return {
+            "description": narrow(str, desc) if desc is not None else None,
+            "level": narrow(str, data["level"]),
+        }
+
 
 @common_registry.register("BucketAnalysisDetails")
 @final
@@ -243,11 +275,15 @@ class BucketAnalysis(Analysis):
         cls_name: the name of the class.
     """
 
+    DEFAULT_METHOD: ClassVar[str] = "continuous"
+    DEFAULT_NUM_BUCKETS: ClassVar[int] = 4
+    DEFAULT_SAMPLE_LIMIT: ClassVar[int] = 50
+
     feature: str
-    method: str = "continuous"
-    num_buckets: int = 4
+    method: str = DEFAULT_METHOD
+    num_buckets: int = DEFAULT_NUM_BUCKETS
     setting: SerializableData = None  # Differs for each bucketing method.
-    sample_limit: int = 50
+    sample_limit: int = DEFAULT_SAMPLE_LIMIT
 
     def perform(
         self,
@@ -313,8 +349,7 @@ class BucketAnalysis(Analysis):
     def serialize(self) -> dict[str, SerializableData]:
         """Implements Serializable.serialize."""
         return {
-            "description": self.description,
-            "level": self.level,
+            **super()._serialize(),
             "feature": self.feature,
             "method": self.method,
             "num_buckets": self.num_buckets,
@@ -326,13 +361,14 @@ class BucketAnalysis(Analysis):
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
         """Implements Serializable.deserialize."""
         return cls(
-            description=narrow(str, data["description"]),
-            level=narrow(str, data["level"]),
+            **super()._deserialize(data),  # type: ignore
             feature=narrow(str, data["feature"]),
-            method=narrow(str, data["method"]),
-            num_buckets=narrow(int, data["num_buckets"]),
-            setting=data["setting"],
-            sample_limit=narrow(int, data["sample_limit"]),
+            method=narrow(str, data.get("method", cls.DEFAULT_METHOD)),
+            num_buckets=narrow(int, data.get("num_buckets", cls.DEFAULT_NUM_BUCKETS)),
+            setting=data.get("setting"),
+            sample_limit=narrow(
+                int, data.get("sample_limit", cls.DEFAULT_SAMPLE_LIMIT)
+            ),
         )
 
 
@@ -445,9 +481,12 @@ class CalibrationAnalysis(Analysis):
         cls_name: the name of the class.
     """
 
+    DEFAULT_NUM_BUCKETS: ClassVar[int] = 10
+    DEFAULT_SAMPLE_LIMIT: ClassVar[int] = 50
+
     feature: str
-    num_buckets: int = 10
-    sample_limit: int = 50
+    num_buckets: int = DEFAULT_NUM_BUCKETS
+    sample_limit: int = DEFAULT_SAMPLE_LIMIT
 
     def __post_init__(self):
         """Set the class name."""
@@ -570,8 +609,7 @@ class CalibrationAnalysis(Analysis):
     def serialize(self) -> dict[str, SerializableData]:
         """Implements Serializable.serialize."""
         return {
-            "description": self.description,
-            "level": self.level,
+            **super()._serialize(),
             "feature": self.feature,
             "num_buckets": self.num_buckets,
             "sample_limit": self.sample_limit,
@@ -581,11 +619,12 @@ class CalibrationAnalysis(Analysis):
     def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
         """Implements Serializable.deserialize."""
         return cls(
-            description=narrow(str, data["description"]),
-            level=narrow(str, data["level"]),
+            **super()._deserialize(data),  # type: ignore
             feature=narrow(str, data["feature"]),
-            num_buckets=narrow(int, data["num_buckets"]),
-            sample_limit=narrow(int, data["sample_limit"]),
+            num_buckets=narrow(int, data.get("num_buckets", cls.DEFAULT_NUM_BUCKETS)),
+            sample_limit=narrow(
+                int, data.get("sample_limit", cls.DEFAULT_SAMPLE_LIMIT)
+            ),
         )
 
 
@@ -715,9 +754,12 @@ class ComboCountAnalysis(Analysis):
           in each combo occurrence.
     """
 
+    DEFAULT_METHOD: ClassVar[str] = "discrete"
+    DEFAULT_SAMPLE_LIMIT: ClassVar[int] = 50
+
     features: tuple[str, ...]
-    method: str = "discrete"
-    sample_limit: int = 50
+    method: str = DEFAULT_METHOD
+    sample_limit: int = DEFAULT_SAMPLE_LIMIT
 
     def perform(
         self,
@@ -753,8 +795,7 @@ class ComboCountAnalysis(Analysis):
     def serialize(self) -> dict[str, SerializableData]:
         """Implements Serializable.serialize."""
         return {
-            "description": self.description,
-            "level": self.level,
+            **super()._serialize(),
             "features": self.features,
             "method": self.method,
             "sample_limit": self.sample_limit,
@@ -768,11 +809,12 @@ class ComboCountAnalysis(Analysis):
         )
 
         return cls(
-            description=narrow(str, data["description"]),
-            level=narrow(str, data["level"]),
+            **super()._deserialize(data),  # type: ignore
             features=features,
-            method=narrow(str, data["method"]),
-            sample_limit=narrow(int, data["sample_limit"]),
+            method=narrow(str, data.get("method", cls.DEFAULT_METHOD)),
+            sample_limit=narrow(
+                int, data.get("sample_limit", cls.DEFAULT_SAMPLE_LIMIT)
+            ),
         )
 
 
