@@ -224,7 +224,6 @@ def draw_charts_from_reports(
     report_info: list[SysOutputInfo] = []
     for report in reports:
         with open(report) as fin:
-
             report_info.append(
                 narrow(SysOutputInfo, PrimitiveSerializer().deserialize(json.load(fin)))
             )
