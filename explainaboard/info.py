@@ -170,12 +170,6 @@ class SysOutputInfo(Serializable):
             indent=2,
         )
 
-    def _dump_info(self, file):
-        """Convert SystemOutputInfo => JSON."""
-        data_dict = self.to_dict()
-        self.replace_nonstring_keys(data_dict)
-        file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
-
     def serialize(self) -> dict[str, SerializableData]:
         """Implements Serializable.serialize."""
         return {
