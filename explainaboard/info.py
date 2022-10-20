@@ -8,19 +8,47 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Any, Callable, Optional
+from typing import Callable, ClassVar, Optional, TypeVar, final
+from unittest.mock import DEFAULT
 
 from explainaboard import config
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.legacy import general_to_dict
 from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import narrow
 
 logger = get_logger(__name__)
+
+T = TypeVar("T")
+
+# TODO(odashi): This function may be generally useful. Move it to the serialization
+# submodule.
+def _get_value_or(
+    data: dict[str, SerializableData], cls: type[T], key: str, default: T | None = None
+) -> T | None:
+    """Helper function to obtain a typed value or None from a serialized data.
+
+    Args:
+        data: Serialized data.
+        cls: Data type to obtain.
+        key: Data key to obtain.
+        default: Default value or None.
+
+    Returns:
+        `data[key]` if it has type of `cls`, `default` if `data[key]` does not exist.
+
+    Raises:
+        TypeError: Thrown by inner `narrow()`: `data[key]` has an incompatible type.
+    """
+    value = data.get(key)
+    return narrow(cls, value) if value is not None else default
 
 
 @dataclass
@@ -44,8 +72,10 @@ class PaperInfo:
     bib: Optional[str] = None
 
 
+@common_registry.register("SysOutputInfo")
+@final
 @dataclass
-class SysOutputInfo:
+class SysOutputInfo(Serializable):
     """Information about a system output and its analysis settings.
 
     Attributes:
@@ -63,19 +93,22 @@ class SysOutputInfo:
         analysis_levels: the levels of analysis to perform
     """
 
+    DEFAULT_RELOAD_STAT: ClassVar[bool] = True
+    DEFAULT_CONFIDENCE_ALPHA: ClassVar[float] = 0.05
+
     # set in the system_output scripts
     task_name: str
-    system_name: Optional[str] = None
-    dataset_name: Optional[str] = None
-    sub_dataset_name: Optional[str] = None
-    dataset_split: Optional[str] = None
+    system_name: str | None = None
+    dataset_name: str | None = None
+    sub_dataset_name: str | None = None
+    dataset_split: str | None = None
     source_language: str | None = None
     target_language: str | None = None
-    reload_stat: bool = True
-    confidence_alpha: float = 0.05
-    system_details: dict[str, Any] = field(default_factory=dict)
-    source_tokenizer: Optional[Tokenizer] = None
-    target_tokenizer: Optional[Tokenizer] = None
+    reload_stat: bool = DEFAULT_RELOAD_STAT
+    confidence_alpha: float = DEFAULT_CONFIDENCE_ALPHA
+    system_details: dict[str, SerializableData] = field(default_factory=dict)
+    source_tokenizer: Tokenizer | None = None
+    target_tokenizer: Tokenizer | None = None
     analysis_levels: list[AnalysisLevel] = field(default_factory=list)
     analyses: list[Analysis] = field(default_factory=list)
 
@@ -200,40 +233,6 @@ class SysOutputInfo:
             data_dict = json.load(f)
         return cls.from_dict(data_dict)
 
-    @classmethod
-    def dict_conv(cls, k: str, v: Any) -> Any:
-        """Deserialization utility function.
-
-        A deserialization utility function that takes in a key corresponding to a
-        parameter name, and dictionary corresponding to a serialized version of that
-        parameter's value, then return the deserialized version of the value.
-
-        Args:
-            k: the parameter name
-            v: the parameter's value
-
-        Returns:
-            The modified parameter value
-        """
-        if k == 'results':
-            return PrimitiveSerializer().deserialize(v)
-        elif k.endswith('tokenizer'):
-            return PrimitiveSerializer().deserialize(v)
-        elif k == 'analysis_levels':
-            return PrimitiveSerializer().deserialize(v)
-        elif k == 'analyses':
-            return PrimitiveSerializer().deserialize(v)
-        else:
-            return v
-
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> SysOutputInfo:
-        """Deserialization function."""
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
-        )
-
     def update(self, other_sys_output_info: SysOutputInfo, ignore_none=True):
         """Update with another SysOutputInfo."""
         self_dict = self.__dict__
@@ -248,6 +247,61 @@ class SysOutputInfo:
     def copy(self) -> SysOutputInfo:
         """Create a new copy of the SysOutputInfo."""
         return self.__class__(**{k: copy.deepcopy(v) for k, v in self.__dict__.items()})
+
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "task_name": self.task_name,
+            "system_name": self.system_name,
+            "dataset_name": self.dataset_name,
+            "sub_dataset_name": self.sub_dataset_name,
+            "dataset_split": self.dataset_split,
+            "source_language": self.source_language,
+            "target_language": self.target_language,
+            "reload_stat": self.reload_stat,
+            "confidence_alpha": self.confidence_alpha,
+            "system_details": self.system_details,
+            "source_tokenizer": self.source_tokenizer,
+            "target_tokenizer": self.target_tokenizer,
+            "analysis_levels": self.analysis_levels,
+            "analyses": self.analyses,
+            "results": self.results,
+        }
+
+    @classmethod
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        system_details = {
+            narrow(str, k): narrow(SerializableData, v)
+            for k, v in _get_value_or(data, dict, "system_details", {}).items()
+        }
+        analysis_levels = [
+            narrow(AnalysisLevel, x)
+            for x in _get_value_or(data, list, "analysis_levels", [])
+        ]
+        analyses = [
+            narrow(Analysis, x) for x in _get_value_or(data, list, "analyses", [])
+        ]
+
+        return cls(
+            task_name=narrow(str, data["task_name"]),
+            system_name=_get_value_or(data, str, "system_name"),
+            dataset_name=_get_value_or(data, str, "dataset_name"),
+            sub_dataset_name=_get_value_or(data, str, "sub_dataset_name"),
+            dataset_split=_get_value_or(data, str, "dataset_split"),
+            source_language=_get_value_or(data, str, "source_language"),
+            target_language=_get_value_or(data, str, "target_language"),
+            reload_stat=_get_value_or(data, bool, cls.DEFAULT_RELOAD_STAT),
+            confidence_alpha=_get_value_or(data, float, cls.DEFAULT_CONFIDENCE_ALPHA),
+            system_details=system_details,
+            source_tokenizer=_get_value_or(data, Tokenizer, "source_tokenizer"),
+            target_tokenizer=_get_value_or(data, Tokenizer, "target_tokenizer"),
+            analysis_levels=analysis_levels,
+            analyses=analyses,
+            results=_get_value_or(
+                data, Result, "results", Result(overall={}, analyses=[])
+            ),
+        )
 
 
 @dataclass
