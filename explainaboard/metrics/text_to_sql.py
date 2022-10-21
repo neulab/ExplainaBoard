@@ -20,7 +20,7 @@ from explainaboard.serialization import common_registry
 from explainaboard.third_party.text_to_sql_test_suit_eval.evaluation import evaluate
 
 
-@dataclass
+@dataclass(frozen=True)
 @common_registry.register("SQLExactSetMatchConfig")
 class SQLExactSetMatchConfig(MetricConfig):
     """Configuration for SQLExactSetMatch.
