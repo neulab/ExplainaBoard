@@ -69,7 +69,7 @@ class SQLExactSetMatch(Metric):
         return SimpleMetricStats(np.array(em_list))
 
 
-@dataclass
+@dataclass(frozen=True)
 @common_registry.register("SQLExecutionConfig")
 class SQLExecutionConfig(MetricConfig):
     """Configuration for SQLExecution.
