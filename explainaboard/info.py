@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import ClassVar, final, Optional, TextIO, TypeVar
+from typing import cast, ClassVar, final, Optional, TextIO, TypeVar
 
 from explainaboard import config
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
@@ -196,7 +196,7 @@ class SysOutputInfo(Serializable):
         # TODO(odashi): Remove type:ignore if mypy/4717 was fixed.
 
         system_details = {
-            narrow(str, k): narrow(SerializableData, v)  # type: ignore
+            narrow(str, k): cast(SerializableData, v)
             for k, v in unwrap_or(_get_value(data, dict, "system_details"), {}).items()
         }
         analysis_levels = [
