@@ -108,7 +108,7 @@ class SQLExecution(Metric):
         Returns:
           See Metric.calc_stats_from_data.
         """
-        config = cast(SQLExecutionConfig, config or self.config)
+        config = narrow(SQLExecutionConfig, config or self.config)
         config_dict = {
             "db_dir": config.db_dir,
             "table_path": config.table_path,
