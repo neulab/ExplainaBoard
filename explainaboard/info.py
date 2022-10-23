@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import cast, ClassVar, final, Optional, TextIO, TypeVar
+from typing import Any, cast, ClassVar, final, Optional, TextIO, TypeVar
 
 from explainaboard import config
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
@@ -235,6 +236,31 @@ class SysOutputInfo(Serializable):
             results=unwrap_or(
                 _get_value(data, Result, "results"), Result(overall={}, analyses=[])
             ),
+        )
+
+    # TODO(odashi): This function is hacky and shouldn't be used.
+    # Remove this function after introducing the struct of system metadata.
+    # See also: https://github.com/neulab/ExplainaBoard/issues/575
+    @classmethod
+    def from_any_dict(cls, data: dict[str, Any]) -> SysOutputInfo:
+        """Generates SysOutputInfo from a dict.
+
+        Args:
+            data: Data, which may contain some information about SysOutputInfo.
+
+        Returns:
+            Generated SysOutputInfo.
+        """
+        keys = set(x.name for x in dataclasses.fields(cls))
+
+        serialized_sysout = {
+            cast(str, k): cast(SerializableData, v)
+            for k, v in data.items()
+            if k in keys
+        }
+        serialized_sysout["cls_name"] = "SysOutputInfo"
+        return narrow(
+            SysOutputInfo, PrimitiveSerializer().deserialize(serialized_sysout)
         )
 
 

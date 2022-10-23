@@ -25,7 +25,6 @@ from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.metrics.metric import MetricConfig, MetricResult, MetricStats, Score
 from explainaboard.serialization.serializers import PrimitiveSerializer
-from explainaboard.serialization.types import SerializableData
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -488,30 +487,6 @@ class Processor(metaclass=abc.ABCMeta):
             else:
                 raise ValueError(f"Invalid sort_by: {sort_by}")
 
-    # TODO(odashi): This function is hacky and shouldn't be used.
-    # Remove this function after introducing the struct of system metadata.
-    # See also: https://github.com/neulab/ExplainaBoard/issues/575
-    @staticmethod
-    def _make_sysoutputinfo(metadata: dict[Any, Any]) -> SysOutputInfo:
-        """Generates SysOutputInfo from metadata.
-
-        Args:
-            metadata: Metadata passed to the processor.
-
-        Returns:
-            Generated SysOutputInfo.
-        """
-        keys = SysOutputInfo(task_name="").serialize().keys()
-        serialized_sysout = {
-            cast(str, k): cast(SerializableData, v)
-            for k, v in metadata.items()
-            if k in keys
-        }
-        serialized_sysout["cls_name"] = "SysOutputInfo"
-        return narrow(
-            SysOutputInfo, PrimitiveSerializer().deserialize(serialized_sysout)
-        )
-
     def get_overall_statistics(
         self, metadata: dict, sys_output: list[dict]
     ) -> OverallStatistics:
@@ -526,7 +501,7 @@ class Processor(metaclass=abc.ABCMeta):
         if "task_name" not in metadata.keys():
             metadata["task_name"] = self.task_type().value
 
-        sys_info = self._make_sysoutputinfo(metadata)
+        sys_info = SysOutputInfo.from_any_dict(metadata)
 
         if sys_info.target_tokenizer is None:
             sys_info.target_tokenizer = self.get_tokenizer(sys_info.target_language)

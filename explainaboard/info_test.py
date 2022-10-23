@@ -153,3 +153,28 @@ class SysOutputInfoTest(unittest.TestCase):
         self.assertEqual(deserialized.analysis_levels, sysout.analysis_levels)
         self.assertEqual(deserialized.analyses, sysout.analyses)
         self.assertEqual(deserialized.results, sysout.results)
+
+    def test_from_any_dict(self) -> None:
+        data = {
+            "task_name": "foo",
+            "system_name": "bar",
+            "unknown_field": "baz",  # should be ignored
+        }
+        deserialized = SysOutputInfo.from_any_dict(data)
+        self.assertEqual(deserialized.task_name, "foo")
+        self.assertEqual(deserialized.system_name, "bar")
+        self.assertIsNone(deserialized.dataset_name)
+        self.assertIsNone(deserialized.sub_dataset_name)
+        self.assertIsNone(deserialized.dataset_split)
+        self.assertIsNone(deserialized.source_language)
+        self.assertIsNone(deserialized.target_language)
+        self.assertEqual(deserialized.reload_stat, SysOutputInfo.DEFAULT_RELOAD_STAT)
+        self.assertEqual(
+            deserialized.confidence_alpha, SysOutputInfo.DEFAULT_CONFIDENCE_ALPHA
+        )
+        self.assertEqual(deserialized.system_details, {})
+        self.assertIsNone(deserialized.source_tokenizer)
+        self.assertIsNone(deserialized.target_tokenizer)
+        self.assertEqual(deserialized.analysis_levels, [])
+        self.assertEqual(deserialized.analyses, [])
+        self.assertEqual(deserialized.results, Result(overall={}, analyses=[]))
