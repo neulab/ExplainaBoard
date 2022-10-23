@@ -262,6 +262,7 @@ class SysOutputInfo(Serializable):
             if k in keys
         }
         serialized_sysout["cls_name"] = "SysOutputInfo"
+
         return narrow(
             SysOutputInfo, PrimitiveSerializer().deserialize(serialized_sysout)
         )
