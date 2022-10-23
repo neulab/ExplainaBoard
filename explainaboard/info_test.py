@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import pathlib
 import tempfile
 import unittest
@@ -91,7 +92,7 @@ class SysOutputInfoTest(unittest.TestCase):
         levels = [AnalysisLevel("level", {}, {})]
         analyses: list[Analysis] = [BucketAnalysis("description", "level", "feature")]
         results = Result(overall={}, analyses=[])
-        sysout = SysOutputInfo(
+        sysout_base = SysOutputInfo(
             task_name="foo",
             system_name="bar",
             dataset_name="baz",
@@ -100,7 +101,7 @@ class SysOutputInfoTest(unittest.TestCase):
             source_language="en",
             target_language="zh",
             reload_stat=True,
-            confidence_alpha=0.5,
+            confidence_alpha=None,
             system_details={"detail": 123},
             source_tokenizer=tokenizer1,
             target_tokenizer=tokenizer2,
@@ -116,7 +117,7 @@ class SysOutputInfoTest(unittest.TestCase):
         levels_serialized = serializer.serialize(levels)
         analyses_serialized = serializer.serialize(analyses)
         results_serialized = serializer.serialize(results)
-        sysout_serialized = {
+        sysout_serialized_base = {
             "cls_name": "SysOutputInfo",
             "task_name": "foo",
             "system_name": "bar",
@@ -126,7 +127,6 @@ class SysOutputInfoTest(unittest.TestCase):
             "source_language": "en",
             "target_language": "zh",
             "reload_stat": True,
-            "confidence_alpha": 0.5,
             "system_details": {"detail": 123},
             "source_tokenizer": tokenizer1_serialized,
             "target_tokenizer": tokenizer2_serialized,
@@ -134,25 +134,48 @@ class SysOutputInfoTest(unittest.TestCase):
             "analyses": analyses_serialized,
             "results": results_serialized,
         }
-        self.assertEqual(serializer.serialize(sysout), sysout_serialized)
 
-        # SysOutputInfo can't be compared directly.
-        deserialized = narrow(SysOutputInfo, serializer.deserialize(sysout_serialized))
-        self.assertEqual(deserialized.task_name, sysout.task_name)
-        self.assertEqual(deserialized.system_name, sysout.system_name)
-        self.assertEqual(deserialized.dataset_name, sysout.dataset_name)
-        self.assertEqual(deserialized.sub_dataset_name, sysout.sub_dataset_name)
-        self.assertEqual(deserialized.dataset_split, sysout.dataset_split)
-        self.assertEqual(deserialized.source_language, sysout.source_language)
-        self.assertEqual(deserialized.target_language, sysout.target_language)
-        self.assertEqual(deserialized.reload_stat, sysout.reload_stat)
-        self.assertEqual(deserialized.confidence_alpha, sysout.confidence_alpha)
-        self.assertEqual(deserialized.system_details, sysout.system_details)
-        self.assertIsInstance(deserialized.source_tokenizer, SingleSpaceTokenizer)
-        self.assertIsInstance(deserialized.target_tokenizer, SacreBleuTokenizer)
-        self.assertEqual(deserialized.analysis_levels, sysout.analysis_levels)
-        self.assertEqual(deserialized.analyses, sysout.analyses)
-        self.assertEqual(deserialized.results, sysout.results)
+        # Test serialization
+        for alpha in [None, 0.5]:
+            sysout_serialized = dict(sysout_serialized_base)
+            sysout_serialized["confidence_alpha"] = alpha
+            sysout = copy.copy(sysout_base)
+            sysout.confidence_alpha = alpha
+            self.assertEqual(serializer.serialize(sysout), sysout_serialized)
+
+        test_cases: list[tuple[bool, float | None, float | None]] = [
+            (False, None, SysOutputInfo.DEFAULT_CONFIDENCE_ALPHA),
+            (True, None, None),
+            (True, 0.5, 0.5),
+        ]
+
+        # Test deserialization
+        for set_alpha, given_alpha, restored_alpha in test_cases:
+            sysout_serialized = dict(sysout_serialized_base)
+            if set_alpha:
+                sysout_serialized["confidence_alpha"] = given_alpha
+            sysout = copy.copy(sysout_base)
+            sysout.confidence_alpha = restored_alpha
+
+            # SysOutputInfo can't be compared directly.
+            deserialized = narrow(
+                SysOutputInfo, serializer.deserialize(sysout_serialized)
+            )
+            self.assertEqual(deserialized.task_name, sysout.task_name)
+            self.assertEqual(deserialized.system_name, sysout.system_name)
+            self.assertEqual(deserialized.dataset_name, sysout.dataset_name)
+            self.assertEqual(deserialized.sub_dataset_name, sysout.sub_dataset_name)
+            self.assertEqual(deserialized.dataset_split, sysout.dataset_split)
+            self.assertEqual(deserialized.source_language, sysout.source_language)
+            self.assertEqual(deserialized.target_language, sysout.target_language)
+            self.assertEqual(deserialized.reload_stat, sysout.reload_stat)
+            self.assertEqual(deserialized.confidence_alpha, sysout.confidence_alpha)
+            self.assertEqual(deserialized.system_details, sysout.system_details)
+            self.assertIsInstance(deserialized.source_tokenizer, SingleSpaceTokenizer)
+            self.assertIsInstance(deserialized.target_tokenizer, SacreBleuTokenizer)
+            self.assertEqual(deserialized.analysis_levels, sysout.analysis_levels)
+            self.assertEqual(deserialized.analyses, sysout.analyses)
+            self.assertEqual(deserialized.results, sysout.results)
 
     def test_from_any_dict(self) -> None:
         data = {

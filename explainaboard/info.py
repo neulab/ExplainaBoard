@@ -91,7 +91,6 @@ class SysOutputInfo(Serializable):
     DEFAULT_RELOAD_STAT: ClassVar[bool] = True
     DEFAULT_CONFIDENCE_ALPHA: ClassVar[float] = 0.05
 
-    # set in the system_output scripts
     task_name: str | None = None
     system_name: str | None = None
     dataset_name: str | None = None
@@ -100,7 +99,9 @@ class SysOutputInfo(Serializable):
     source_language: str | None = None
     target_language: str | None = None
     reload_stat: bool = DEFAULT_RELOAD_STAT
-    confidence_alpha: float = DEFAULT_CONFIDENCE_ALPHA
+    # NOTE(odashi): confidence_alpha == None has a meaning beyond "unset": it prevents
+    # calculating confidence intervals.
+    confidence_alpha: float | None = DEFAULT_CONFIDENCE_ALPHA
     system_details: dict[str, SerializableData] = field(default_factory=dict)
     source_tokenizer: Tokenizer | None = None
     target_tokenizer: Tokenizer | None = None
@@ -196,6 +197,11 @@ class SysOutputInfo(Serializable):
         """Implements Serializable.deserialize."""
         # TODO(odashi): Remove type:ignore if mypy/4717 was fixed.
 
+        if "confidence_alpha" in data:
+            confidence_alpha = _get_value(data, float, "confidence_alpha")
+        else:
+            confidence_alpha = cls.DEFAULT_CONFIDENCE_ALPHA
+
         system_details = {
             narrow(str, k): cast(SerializableData, v)
             for k, v in unwrap_or(_get_value(data, dict, "system_details"), {}).items()
@@ -220,10 +226,7 @@ class SysOutputInfo(Serializable):
             reload_stat=unwrap_or(
                 _get_value(data, bool, "reload_stat"), cls.DEFAULT_RELOAD_STAT
             ),
-            confidence_alpha=unwrap_or(
-                _get_value(data, float, "confidence_alpha"),
-                cls.DEFAULT_CONFIDENCE_ALPHA,
-            ),
+            confidence_alpha=confidence_alpha,
             system_details=system_details,
             source_tokenizer=_get_value(
                 data, Tokenizer, "source_tokenizer"  # type: ignore
