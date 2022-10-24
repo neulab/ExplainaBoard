@@ -31,6 +31,7 @@ from explainaboard.analysis.analyses import (
 )
 from explainaboard.info import SysOutputInfo
 from explainaboard.metrics.metric import ConfidenceInterval, MetricResult, Score
+from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.logging import progress
 from explainaboard.utils.typing_utils import narrow, unwrap
 from explainaboard.visualizers.bar_chart import make_bar_chart
@@ -223,7 +224,9 @@ def draw_charts_from_reports(
     report_info: list[SysOutputInfo] = []
     for report in reports:
         with open(report) as fin:
-            report_info.append(SysOutputInfo.from_dict(json.load(fin)))
+            report_info.append(
+                narrow(SysOutputInfo, PrimitiveSerializer().deserialize(json.load(fin)))
+            )
 
     # --- Overall results
     for analysis in report_info[0].analyses:
