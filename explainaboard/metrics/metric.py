@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import abc
+import copy
 from dataclasses import dataclass
 from typing import Any, final, Optional, TypeVar
 
@@ -221,6 +222,28 @@ class MetricConfig(SerializableDataclass, metaclass=abc.ABCMeta):
             Instantiated Metric object.
         """
         ...
+
+    @final
+    def replace_languages(
+        self, source_language: str | None, target_language: str | None
+    ) -> MetricConfig:
+        """Creates a new MetricConfig with specified source/target languages.
+
+        Args:
+            source_language: New source language.
+            target_language: New target language.
+
+        Returns:
+            A new MetricConfig object, in which source/target_language are replaced to
+            the new config, while other values are maintained.
+        """
+        # NOTE(odashi): Since this class can be inherited, we need to collect every
+        # member not listed in this class.
+        # TODO(odashi): Avoid copy.
+        copied = copy.deepcopy(self)
+        copied.source_language = source_language
+        copied.target_language = target_language
+        return copied
 
 
 class MetricStats(metaclass=abc.ABCMeta):

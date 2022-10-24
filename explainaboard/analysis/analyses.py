@@ -859,3 +859,22 @@ class AnalysisLevel(Serializable):
             features=features,
             metric_configs=metric_configs,
         )
+
+    @final
+    def replace_metric_configs(
+        self, metric_configs: dict[str, MetricConfig]
+    ) -> AnalysisLevel:
+        """Creates a new AnalysisLevel with replacing the set of MetricConfigs.
+
+        Args:
+            metric_configs:
+                New dict of MetricConfigs to replace the original member.
+
+        Returns:
+            A new MetricConfigs with the replaced metric_configs.
+        """
+        return AnalysisLevel(
+            name=self.name,
+            features=self.features,
+            metric_configs=metric_configs,
+        )

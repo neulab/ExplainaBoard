@@ -250,26 +250,35 @@ class Processor(metaclass=abc.ABCMeta):
 
         Args:
             custom_features: the features to customize
-            metric_configs: additional metric configurations. Keys are analysis level
-                name and metric name.
+            metric_configs: MetricConfgs to replace.
+                If `metric_configs[analysis_level_name]` has a dict, it is used instead
+                of the default MetricConfigs associated to `analysis_level_name`.
             custom_analyses: the analyses to customize
 
         Returns:
             Customized analyses.
         """
-        analysis_levels = self.default_analysis_levels()
-        analyses = self.default_analyses()
-        for level in analysis_levels:
-            for name, config in metric_configs.get(level.name, {}).items():
-                level.metric_configs[name] = config
-            for config in level.metric_configs.values():
-                config.source_language = sys_info.source_language
-                config.target_language = sys_info.target_language
+        analysis_levels: list[AnalysisLevel] = []
+
+        # Replaces MetricConfigs for each AnalysisLevel.
+        for level in self.default_analysis_levels():
+            metric_configs_orig = metric_configs.get(level.name, level.metric_configs)
+            metric_configs_replaced = {
+                name: config.replace_languages(
+                    source_language=sys_info.source_language,
+                    target_language=sys_info.target_language,
+                )
+                for name, config in metric_configs_orig.items()
+            }
+            analysis_levels.append(
+                level.replace_metric_configs(metric_configs_replaced)
+            )
 
         level_map = {x.name: x for x in analysis_levels}
 
         serializer = PrimitiveSerializer()
 
+        analyses = self.default_analyses()
         analyses.extend(
             [
                 narrow(Analysis, serializer.deserialize(v))  # type: ignore
@@ -516,12 +525,16 @@ class Processor(metaclass=abc.ABCMeta):
         custom_features: dict = metadata.get('custom_features', {})
         custom_analyses: list = metadata.get('custom_analyses', [])
 
-        metric_configs: dict[str, dict[str, MetricConfig]] = {
-            "example": metadata.get('metric_configs', {})
-        }
+        metric_configs = metadata.get("metric_configs")
+        if metric_configs is not None:
+            metric_configs_dict = {
+                "example": cast(dict[str, MetricConfig], metric_configs)
+            }
+        else:
+            metric_configs_dict = {}
 
         sys_info.analysis_levels, sys_info.analyses = self._customize_analyses(
-            sys_info, custom_features, metric_configs, custom_analyses
+            sys_info, custom_features, metric_configs_dict, custom_analyses
         )
 
         # get scoring statistics

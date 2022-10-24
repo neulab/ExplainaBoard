@@ -525,3 +525,15 @@ class AnalysisLevelTest(unittest.TestCase):
         }
         self.assertEqual(serializer.serialize(level), level_serialized)
         self.assertEqual(serializer.deserialize(level_serialized), level)
+
+    def test_replace_metric_configs(self) -> None:
+        level = AnalysisLevel(
+            name="test", features={}, metric_configs={"foo": AccuracyConfig()}
+        )
+        new_level = level.replace_metric_configs({"bar": AccuracyConfig()})
+        self.assertIsNot(level, new_level)
+        self.assertIn("foo", level.metric_configs)
+        self.assertNotIn("bar", level.metric_configs)
+        self.assertNotIn("foo", new_level.metric_configs)
+        self.assertIn("bar", new_level.metric_configs)
+        self.assertIsNot(level.metric_configs["foo"], new_level.metric_configs["bar"])

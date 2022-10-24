@@ -191,6 +191,19 @@ class MetricResultTest(unittest.TestCase):
         self.assertIs(result.get_value_or_none(ConfidenceInterval, "baz"), ci)
 
 
+class MetricConfigTest(unittest.TestCase):
+    def test_replace_languages(self) -> None:
+        config = _DummyMetricConfig(source_language="xx", target_language="yy")
+        new_config = config.replace_languages(
+            source_language="aa", target_language="bb"
+        )
+        self.assertIsNot(new_config, config)
+        self.assertEqual(config.source_language, "xx")
+        self.assertEqual(config.target_language, "yy")
+        self.assertEqual(new_config.source_language, "aa")
+        self.assertEqual(new_config.target_language, "bb")
+
+
 class MetricTest(unittest.TestCase):
     def test_aggregate_stats_1dim(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
@@ -406,7 +419,6 @@ class MetricTest(unittest.TestCase):
         result = metric.evaluate_from_stats(stats, confidence_alpha=0.05)
         self.assertEqual(result.get_value(Score, "score").value, 3.0)
         ci = result.get_value(ConfidenceInterval, "score_ci")
-        print(dataclasses.asdict(ci))
         # TODO(odahsi): According to the current default settings of bootstrapping,
         # estimated confidence intervals tends to become very wide for small data
         self.assertAlmostEqual(ci.low, 1.8)
