@@ -528,7 +528,10 @@ class Processor(metaclass=abc.ABCMeta):
         metric_configs = metadata.get("metric_configs")
         if metric_configs is not None:
             metric_configs_dict = {
-                "example": cast(dict[str, MetricConfig], metric_configs)
+                "example": {
+                    narrow(str, k): narrow(MetricConfig, v)  # type: ignore
+                    for k, v in metric_configs.items()
+                }
             }
         else:
             metric_configs_dict = {}
