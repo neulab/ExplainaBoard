@@ -11,9 +11,9 @@ from explainaboard.utils import cache_api
 
 class QATableTextHybridTest(unittest.TestCase):
     json_output_customized = cache_api.cache_online_file(
-        'https://explainaboard.s3.amazonaws.com/system_outputs/'
-        'qa_table_text_hybrid/predictions_list.json',
-        'predictions/qa_table_text_hybrid/predictions_list.json',
+        "https://explainaboard.s3.amazonaws.com/system_outputs/"
+        "qa_table_text_hybrid/predictions_list.json",
+        "predictions/qa_table_text_hybrid/predictions_list.json",
     )
 
     def test_datalab_loader(self):
@@ -44,5 +44,5 @@ class QATableTextHybridTest(unittest.TestCase):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

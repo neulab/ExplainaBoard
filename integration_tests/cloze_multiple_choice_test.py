@@ -34,5 +34,5 @@ class ClozeMultipleChoiceTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.analyses), 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

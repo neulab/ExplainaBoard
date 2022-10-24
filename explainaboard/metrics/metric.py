@@ -148,10 +148,10 @@ class MetricResult(Serializable):
         """
         value = self._values.get(name)
         if value is None:
-            raise ValueError(f"MetricValue \"{name}\" not found.")
+            raise ValueError(f'MetricValue "{name}" not found.')
         if not isinstance(value, cls):
             raise ValueError(
-                f"MetricValue \"{name}\" is not a subclass of {cls.__name__}."
+                f'MetricValue "{name}" is not a subclass of {cls.__name__}.'
             )
         return value
 
@@ -628,7 +628,7 @@ class Metric(metaclass=abc.ABCMeta):
             A confidence interval or `None` if one cannot be calculated.
         """
         if not (0.0 < confidence_alpha < 1.0):
-            raise ValueError(f'Invalid confidence_alpha: {confidence_alpha}')
+            raise ValueError(f"Invalid confidence_alpha: {confidence_alpha}")
 
         if stats.is_batched():
             raise ValueError(

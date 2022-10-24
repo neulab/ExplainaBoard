@@ -30,12 +30,12 @@ class MachineTranslationTest(unittest.TestCase):
         self.assertEqual(
             data[0],
             {
-                'source': 'Ak sa chcete dostať ešte hlbšie, môžete si všimnúť '
-                + 'trhlinky.',
-                'reference': 'Now just to get really deep in , you can really get to '
-                + 'the cracks .',
-                'id': '0',
-                'hypothesis': 'If you want to get a deeper , you can see the forces .',
+                "source": "Ak sa chcete dostať ešte hlbšie, môžete si všimnúť "
+                + "trhlinky.",
+                "reference": "Now just to get really deep in , you can really get to "
+                + "the cracks .",
+                "id": "0",
+                "hypothesis": "If you want to get a deeper , you can see the forces .",
             },
         )
 
@@ -94,13 +94,13 @@ class MachineTranslationTest(unittest.TestCase):
         self.assertEqual(
             data[0],
             {
-                'source': 'Ak sa chcete dostať ešte hlbšie, môžete si všimnúť '
-                + 'trhlinky.',
-                'reference': 'Now just to get really deep in , you can really get to '
-                + 'the cracks .',
-                'id': '0',
-                'hypothesis': 'If you want to get a deeper , you can see the forces .',
-                'num_capital_letters': 1,
+                "source": "Ak sa chcete dostať ešte hlbšie, môžete si všimnúť "
+                + "trhlinky.",
+                "reference": "Now just to get really deep in , you can really get to "
+                + "the cracks .",
+                "id": "0",
+                "hypothesis": "If you want to get a deeper , you can see the forces .",
+                "num_capital_letters": 1,
             },
         )
 
@@ -110,8 +110,8 @@ class MachineTranslationTest(unittest.TestCase):
             dataclasses.asdict(data.metadata), data.samples, skip_failed_analyses=True
         )
         analysis_names = [x.name for x in sys_info.results.analyses if x is not None]
-        self.assertIn('num_capital_letters', analysis_names)
+        self.assertIn("num_capital_letters", analysis_names)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

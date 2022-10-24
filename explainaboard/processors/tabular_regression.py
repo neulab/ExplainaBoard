@@ -41,7 +41,7 @@ class TabularRegressionProcessor(Processor):
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -54,7 +54,7 @@ class TabularRegressionProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:

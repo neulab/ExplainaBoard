@@ -40,13 +40,13 @@ class QAOpenDomainProcessor(Processor):
             "question_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['question']),
+                func=lambda info, x, c: count_tokens(info, x["question"]),
             ),
             "answer_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: count_tokens(
-                    info, x['answers'][0], side='target'
+                    info, x["answers"][0], side="target"
                 ),
             ),
             "num_oov": feature.Value(
@@ -54,7 +54,7 @@ class QAOpenDomainProcessor(Processor):
                 description="the number of out-of-vocabulary words in the context",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['context'], stat['source_vocab']
+                    info, x["context"], stat["source_vocab"]
                 ),
             ),
             "fre_rank": feature.Value(
@@ -64,14 +64,14 @@ class QAOpenDomainProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['context'], stat['source_vocab_rank']
+                    info, x["context"], stat["source_vocab_rank"]
                 ),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -84,7 +84,7 @@ class QAOpenDomainProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
@@ -110,7 +110,7 @@ class QAOpenDomainProcessor(Processor):
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['question'], unwrap(sys_info.source_tokenizer)
+            samples, lambda x: x["question"], unwrap(sys_info.source_tokenizer)
         )
 
-        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
+        return {"source_vocab": source_vocab, "source_vocab_rank": source_vocab_rank}

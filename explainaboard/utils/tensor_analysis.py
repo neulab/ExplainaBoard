@@ -194,7 +194,7 @@ def print_score_tensor(score_tensor: dict) -> None:
     Args:
         score_tensor: The tensor to print out.
     """
-    get_logger('report').info(score_tensor.keys())
+    get_logger("report").info(score_tensor.keys())
     for system_name, m_value in score_tensor.items():
         for dataset_name, d_value in score_tensor[system_name].items():
             info_printed = (
@@ -214,10 +214,10 @@ def print_score_tensor(score_tensor: dict) -> None:
                 f"{metric_name}:\t"
                 + "\t".join(
                     [
-                        '{:.3f}'.format(score["value"])
+                        "{:.3f}".format(score["value"])
                         for score in score_tensor[system_name][dataset_name].values()
                     ]
                 )
                 + "\n"
             )
-            get_logger('report').info(info_printed)
+            get_logger("report").info(info_printed)

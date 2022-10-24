@@ -163,7 +163,7 @@ class CorrelationWMTDAConfig(MetricConfig):
       systems. The default setting excludes all human translations.
     """
 
-    group_by: str = 'none'
+    group_by: str = "none"
     use_z_score: bool = True
     no_human: bool = True
 
@@ -218,15 +218,15 @@ class CorrelationWMTDAMetric(Metric):
             auto_score = stat[3]
             group_idx = (
                 sys_name
-                if config.group_by == 'system'
-                else (seg_id if config.group_by == 'segment' else '')
+                if config.group_by == "system"
+                else (seg_id if config.group_by == "segment" else "")
             )
 
-            score = float(auto_score) if auto_score != '' else None
-            score_manual = float(manual_score) if manual_score != '' else None
+            score = float(auto_score) if auto_score != "" else None
+            score_manual = float(manual_score) if manual_score != "" else None
 
             if config.no_human and (
-                'Human' in sys_name or 'HUMAN' in sys_name or sys_name.startswith('ref')
+                "Human" in sys_name or "HUMAN" in sys_name or sys_name.startswith("ref")
             ):
                 continue
 

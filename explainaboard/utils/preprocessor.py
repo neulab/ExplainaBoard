@@ -52,9 +52,9 @@ class ExtractiveQAPreprocessor:
     _PUNCT = {
         chr(i)
         for i in range(sys.maxunicode)
-        if unicodedata.category(chr(i)).startswith('P')
+        if unicodedata.category(chr(i)).startswith("P")
     }.union(string.punctuation)
-    _MIXED_SEGMENTATION_LANGS = ['zh']
+    _MIXED_SEGMENTATION_LANGS = ["zh"]
 
     def __init__(self, language: str | None) -> None:
         """Initialises ExtractiveQAPreprocessor.
@@ -62,15 +62,15 @@ class ExtractiveQAPreprocessor:
         Args:
             language: The language code of texts, or None for unspecified languages.
         """
-        if language in ['en', 'eng']:
+        if language in ["en", "eng"]:
             pattern = r"\b(a|an|the)\b"
-        elif language in ['es', 'spa']:
+        elif language in ["es", "spa"]:
             pattern = r"\b(un|una|unos|unas|el|la|los|las)\b"
-        elif language in ['vi', 'vie']:
+        elif language in ["vi", "vie"]:
             pattern = r"\b(của|là|cái|chiếc|những)\b"
-        elif language in ['de', 'deu']:
+        elif language in ["de", "deu"]:
             pattern = r"\b(ein|eine|einen|einem|eines|einer|der|die|das|den|dem|des)\b"
-        elif language in ['ar', 'ara']:
+        elif language in ["ar", "ara"]:
             pattern = r"\sال^|ال"
         else:
             pattern = None
@@ -90,10 +90,10 @@ class ExtractiveQAPreprocessor:
         )
 
     def _white_space_fix(self, text: str) -> str:
-        return ' '.join(t for t in self._tokenizer(text) if t.strip() != '')
+        return " ".join(t for t in self._tokenizer(text) if t.strip() != "")
 
     def _remove_punc(self, text: str) -> str:
-        return ''.join(ch for ch in text if ch not in self._PUNCT)
+        return "".join(ch for ch in text if ch not in self._PUNCT)
 
     def __call__(self, text: str) -> str:
         """Process texts.

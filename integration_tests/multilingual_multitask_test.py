@@ -50,7 +50,7 @@ class MultilingualMultiTaskTest(unittest.TestCase):
                     f"user_defined_metadata_configs in system output {output} hasn't "
                     "been specified or task name should be specified"
                 )
-            tasks.append(loader.user_defined_metadata_configs['task_name'])
+            tasks.append(loader.user_defined_metadata_configs["task_name"])
 
         # Get loaders using real `task` and `file_type`
         loaders = [
@@ -108,7 +108,7 @@ class MultilingualMultiTaskTest(unittest.TestCase):
                 score_tensor[system_name][dataset_name][language] = score_info
 
         self.assertEqual(
-            len(list(score_tensor.keys())), len(['CL-mlpp15out1sum', 'CL-mt5base'])
+            len(list(score_tensor.keys())), len(["CL-mlpp15out1sum", "CL-mt5base"])
         )
         print_score_tensor(score_tensor)
 
@@ -120,7 +120,7 @@ class MultilingualMultiTaskTest(unittest.TestCase):
         score_tensor_filter = filter_score_tensor(
             score_tensor, systems, datasets, languages
         )
-        self.assertEqual(list(score_tensor_filter.keys()), ['CL-mlpp15out1sum'])
+        self.assertEqual(list(score_tensor_filter.keys()), ["CL-mlpp15out1sum"])
         print_score_tensor(score_tensor_filter)
 
         # aggregation by three dimensions
@@ -136,7 +136,7 @@ class MultilingualMultiTaskTest(unittest.TestCase):
         print_score_tensor(score_tensor_aggregated)
         self.assertEqual(
             list(score_tensor_aggregated["CL-mt5base"]["xnli"].keys()),
-            ['all_languages'],
+            ["all_languages"],
         )
 
         # aggregation by three dimensions
@@ -152,5 +152,5 @@ class MultilingualMultiTaskTest(unittest.TestCase):
         print_score_tensor(score_tensor_aggregated)
         self.assertEqual(
             len(list(score_tensor_aggregated.keys())),
-            len(['CL-mlpp15out1sum V.S CL-mt5base']),
+            len(["CL-mlpp15out1sum V.S CL-mt5base"]),
         )

@@ -53,39 +53,39 @@ def gen_argument_pairs(
         next_label = (
             _get_argument_label(true_tags[token_idx + 1])
             if token_idx + 1 < len(true_tags)
-            else 'O'
+            else "O"
         )
 
         pred_label = pred_tags[token_idx]
         next_pred_label = (
-            pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
+            pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else "O"
         )
 
-        if prefix == 'Reply':
+        if prefix == "Reply":
             if gold_label.startswith("B-"):
                 start = token_idx
             if (gold_label.startswith("B-") or gold_label.startswith("I-")) and (
-                next_label.startswith("O") or next_label.startswith('B')
+                next_label.startswith("O") or next_label.startswith("B")
             ):
                 end = token_idx
                 pair_idx = int(gold_label[2:])
                 if pair_idx not in reply_dict.keys():
-                    reply_dict[pair_idx] = str(start) + '|' + str(end)
+                    reply_dict[pair_idx] = str(start) + "|" + str(end)
                 else:
-                    reply_dict[pair_idx] += '||' + str(start) + '|' + str(end)
+                    reply_dict[pair_idx] += "||" + str(start) + "|" + str(end)
 
             if pred_label.startswith("B-"):
                 start_pred = token_idx
             if (pred_label.startswith("B-") or pred_label.startswith("I-")) and (
-                next_pred_label.startswith("O") or next_pred_label.startswith('B')
+                next_pred_label.startswith("O") or next_pred_label.startswith("B")
             ):
                 end_pred = token_idx
                 pair_idx = int(pred_label[2:])
                 if pair_idx not in reply_pred_dict.keys():
-                    reply_pred_dict[pair_idx] = str(start_pred) + '|' + str(end_pred)
+                    reply_pred_dict[pair_idx] = str(start_pred) + "|" + str(end_pred)
                 else:
                     reply_pred_dict[pair_idx] += (
-                        '||' + str(start_pred) + '|' + str(end_pred)
+                        "||" + str(start_pred) + "|" + str(end_pred)
                     )
 
     for token_idx, token in enumerate(true_tags):
@@ -95,19 +95,19 @@ def gen_argument_pairs(
         next_label = (
             _get_argument_label(true_tags[token_idx + 1])
             if token_idx + 1 < len(true_tags)
-            else 'O'
+            else "O"
         )
 
         pred_label = pred_tags[token_idx]
         next_pred_label = (
-            pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else 'O'
+            pred_tags[token_idx + 1] if token_idx + 1 < len(pred_tags) else "O"
         )
 
-        if prefix == 'Review':
+        if prefix == "Review":
             if gold_label.startswith("B-"):
                 start = token_idx
             if (gold_label.startswith("B-") or gold_label.startswith("I-")) and (
-                next_label.startswith("O") or next_label.startswith('B')
+                next_label.startswith("O") or next_label.startswith("B")
             ):
                 end = token_idx
                 pair_idx = int(gold_label[2:])
@@ -148,7 +148,7 @@ def gen_argument_pairs(
             if pred_label.startswith("B-"):
                 start_pred = token_idx
             if (pred_label.startswith("B-") or pred_label.startswith("I-")) and (
-                next_pred_label.startswith("O") or next_pred_label.startswith('B')
+                next_pred_label.startswith("O") or next_pred_label.startswith("B")
             ):
                 end_pred = token_idx
                 pair_idx = int(pred_label[2:])
@@ -417,7 +417,7 @@ class SpanOps:
             lower_tag = span.span_tag
             lower_text = span_text.lower()
             span.span_econ = self.resources["econ_dic"].get(
-                f'{lower_text}|||{lower_tag}', 0.0
+                f"{lower_text}|||{lower_tag}", 0.0
             )
             span.span_efre = self.resources["efre_dic"].get(lower_text, 0.0)
         return span
@@ -433,7 +433,7 @@ class SpanOps:
             A list of spans extracted from the tags.
         """
         if len(tags) != len(toks):
-            raise ValueError(f'length of tags and toks not same\n{tags}\n{toks}')
+            raise ValueError(f"length of tags and toks not same\n{tags}\n{toks}")
         spans = []
         char_starts = [0]
         span_start = -1
@@ -560,19 +560,19 @@ class BMESSpanOps(SpanOps):
         return "position_tag"
 
     def _span_ends(self, tags: list[str], i: int) -> bool:
-        return i != 0 and tags[i] in {'B', 'S'}
+        return i != 0 and tags[i] in {"B", "S"}
 
     def _span_starts(self, tags: list[str], i: int) -> bool:
-        return tags[i] in {'B', 'S'}
+        return tags[i] in {"B", "S"}
 
     def _span_type(self, tags: list[str], pos: tuple[int, int]) -> str:
-        return ''.join(tags[pos[0] : pos[1]])
+        return "".join(tags[pos[0] : pos[1]])
 
 
 class BIOSpanOps(SpanOps):
     """SpanOps for BIO tagging schemes."""
 
-    _DEFAULT = 'O'
+    _DEFAULT = "O"
 
     @classmethod
     def default_match_type(cls) -> str:
@@ -580,13 +580,13 @@ class BIOSpanOps(SpanOps):
         return "position_tag"
 
     def _span_ends(self, tags: list[str], i: int) -> bool:
-        return i != 0 and tags[i - 1] != self._DEFAULT and not tags[i].startswith('I')
+        return i != 0 and tags[i - 1] != self._DEFAULT and not tags[i].startswith("I")
 
     def _span_starts(self, tags: list[str], i: int) -> bool:
         # The second condition is when an "I" tag is predicted without B
-        return tags[i].startswith('B') or (
-            tags[i].startswith('I') and (i == 0 or tags[i - 1] == self._DEFAULT)
+        return tags[i].startswith("B") or (
+            tags[i].startswith("I") and (i == 0 or tags[i - 1] == self._DEFAULT)
         )
 
     def _span_type(self, tags: list[str], pos: tuple[int, int]) -> str:
-        return tags[pos[0]].split('-')[1]
+        return tags[pos[0]].split("-")[1]

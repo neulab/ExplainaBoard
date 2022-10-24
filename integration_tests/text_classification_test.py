@@ -49,10 +49,10 @@ class TextClassificationTest(unittest.TestCase):
         self.assertEqual(
             data[6],
             {
-                'text': 'guaranteed to move anyone who ever , , or rolled .',
-                'true_label': 'positive',
-                'id': '6',
-                'predicted_label': 'positive',
+                "text": "guaranteed to move anyone who ever , , or rolled .",
+                "true_label": "positive",
+                "id": "6",
+                "predicted_label": "positive",
             },
         )
 

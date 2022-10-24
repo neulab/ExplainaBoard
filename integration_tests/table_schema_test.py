@@ -18,5 +18,5 @@ class TableSchemaTest(unittest.TestCase):
         self.assertEqual(len(table_schemas[TaskType.named_entity_recognition]), 4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

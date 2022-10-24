@@ -43,8 +43,8 @@ class BaseLoaderTests(TestCase):
                 "id",
                 "true_head",
                 "true_link",
-                'true_head_decipher',
-                'true_tail_decipher',
+                "true_head_decipher",
+                "true_tail_decipher",
                 "true_tail",
                 "predict",
                 "predictions",
@@ -77,13 +77,13 @@ class BaseLoaderTests(TestCase):
         spaces_path = os.path.join(test_artifacts_path, "ner", "dataset-space.tsv")
         loader_true = CoNLLFileLoader(
             [
-                FileLoaderField(0, 'tokens', str),
-                FileLoaderField(1, 'true_tags', str),
+                FileLoaderField(0, "tokens", str),
+                FileLoaderField(1, "true_tags", str),
             ]
         )
         loader_pred = CoNLLFileLoader(
             [
-                FileLoaderField(1, 'pred_tags', str),
+                FileLoaderField(1, "pred_tags", str),
             ]
         )
         tabs_true = loader_true.load(tabs_path, Source.local_filesystem)
@@ -109,7 +109,7 @@ class BaseLoaderTests(TestCase):
 
 class LoadFromDatalabTest(TestCase):
     def test_datalab_loader(self):
-        output_data = '\n'.join(['positive' for x in range(872)])
+        output_data = "\n".join(["positive" for x in range(872)])
         loader = get_loader_class(TaskType.text_classification).from_datalab(
             dataset=DatalabLoaderOption("sst2", split="validation"),
             output_data=output_data,
@@ -120,7 +120,7 @@ class LoadFromDatalabTest(TestCase):
         self.assertEqual(len(data.samples), 872)
 
     def test_datalab_loader_with_features(self):
-        output_data = '\n'.join(['x' for _ in range(500)])
+        output_data = "\n".join(["x" for _ in range(500)])
         # Without features
         loader = get_loader_class(TaskType.machine_translation).from_datalab(
             dataset=DatalabLoaderOption("conala", split="test"),
@@ -130,9 +130,9 @@ class LoadFromDatalabTest(TestCase):
         )
         data = loader.load()
         self.assertEqual(len(data.samples), 500)
-        self.assertTrue('orig_en' not in data.samples[0])
+        self.assertTrue("orig_en" not in data.samples[0])
         # With features
-        custom_features = {'example': ['orig_en']}
+        custom_features = {"example": ["orig_en"]}
         loader = get_loader_class(TaskType.machine_translation).from_datalab(
             dataset=DatalabLoaderOption(
                 "conala", split="test", custom_features=custom_features
@@ -143,7 +143,7 @@ class LoadFromDatalabTest(TestCase):
         )
         data = loader.load()
         self.assertEqual(len(data.samples), 500)
-        self.assertTrue('orig_en' in data.samples[0])
+        self.assertTrue("orig_en" in data.samples[0])
 
     def test_invalid_dataset_name(self):
         loader = get_loader_class(TaskType.text_classification).from_datalab(

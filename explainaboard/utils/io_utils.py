@@ -21,5 +21,5 @@ def text_writer(filename: str | None = None) -> Generator[TextIO, None, None]:
     if filename is None:
         yield sys.stdout
     else:
-        with open(filename, 'w') as fp:
+        with open(filename, "w") as fp:
             yield fp

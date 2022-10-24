@@ -367,9 +367,9 @@ class Processor(metaclass=abc.ABCMeta):
                 - List of analysis levels.
                 - Mapping from metric name to stats.
         """
-        if analysis_level.name != 'example':
+        if analysis_level.name != "example":
             raise NotImplementedError(
-                f'Does not support analysis level {analysis_level.name} by default'
+                f"Does not support analysis level {analysis_level.name} by default"
             )
 
         # Calculate metrics
@@ -383,7 +383,7 @@ class Processor(metaclass=abc.ABCMeta):
         # Calculate features
         cases: list[AnalysisCase] = []
         for i, output in progress(
-            enumerate(sys_output), desc='calculating example-level features'
+            enumerate(sys_output), desc="calculating example-level features"
         ):
             case = AnalysisCase(sample_id=i, features={})
             for feat_name, feat_spec in analysis_level.features.items():
@@ -470,7 +470,7 @@ class Processor(metaclass=abc.ABCMeta):
             bucket_result = analysis_result.details.bucket_performances
 
             # based on alphabetical order of the bucket lower boundary; low to high
-            if sort_by == 'key':
+            if sort_by == "key":
                 if bucket_result[0].bucket_interval is not None:
                     # Sort by intervals.
                     bucket_result.sort(key=lambda x: unwrap(x.bucket_interval))
@@ -479,7 +479,7 @@ class Processor(metaclass=abc.ABCMeta):
                     bucket_result.sort(key=lambda x: unwrap(x.bucket_name))
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
-            elif sort_by == 'performance_value':
+            elif sort_by == "performance_value":
                 if sort_by_metric is None:
                     raise ValueError("sort_by_metric must be set.")
                 bucket_result.sort(
@@ -489,7 +489,7 @@ class Processor(metaclass=abc.ABCMeta):
                     reverse=not sort_ascending,
                 )
             # sort by the number of samples in each bucket
-            elif sort_by == 'n_bucket_samples':
+            elif sort_by == "n_bucket_samples":
                 bucket_result.sort(
                     key=lambda x: x.n_samples, reverse=not sort_ascending
                 )
@@ -522,8 +522,8 @@ class Processor(metaclass=abc.ABCMeta):
             )
 
         # declare customized features: _features will be updated
-        custom_features: dict = metadata.get('custom_features', {})
-        custom_analyses: list = metadata.get('custom_analyses', [])
+        custom_features: dict = metadata.get("custom_features", {})
+        custom_analyses: list = metadata.get("custom_analyses", [])
 
         metric_configs = metadata.get("metric_configs")
         if metric_configs is not None:
@@ -583,9 +583,9 @@ class Processor(metaclass=abc.ABCMeta):
 
         self.sort_bucket_info(
             analyses,
-            sort_by=metadata.get('sort_by', 'key'),
-            sort_by_metric=metadata.get('sort_by_metric'),
-            sort_ascending=metadata.get('sort_ascending', False),
+            sort_by=metadata.get("sort_by", "key"),
+            sort_by_metric=metadata.get("sort_by_metric"),
+            sort_ascending=metadata.get("sort_ascending", False),
         )
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
         return sys_info

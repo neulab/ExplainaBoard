@@ -87,8 +87,8 @@ def plot_combo_counts(
         details = narrow(ComboCountAnalysisDetails, combo_result.details)
         if len(feature_names) != 2:
             raise ValueError(
-                f'plot_combo_counts currently only supports feature combinations of '
-                f'size 2, but got {feature_names}'
+                f"plot_combo_counts currently only supports feature combinations of "
+                f"size 2, but got {feature_names}"
             )
         confusion_matrix = np.zeros([len(x) for x in feature_maps])
         for occ in details.combo_occurrences:
@@ -104,9 +104,9 @@ def plot_combo_counts(
                     x=j,
                     y=i,
                     s=confusion_matrix[i, j],
-                    va='center',
-                    ha='center',
-                    size='xx-large',
+                    va="center",
+                    ha="center",
+                    size="xx-large",
                 )
         plt.ylabel(feature_names[0], fontsize=16)
         ax.set_yticks(np.arange(len(sorted_names[0])))
@@ -114,11 +114,11 @@ def plot_combo_counts(
         plt.xlabel(feature_names[1], fontsize=16)
         ax.set_xticks(np.arange(len(sorted_names[1])))
         ax.set_xticklabels(sorted_names[1])
-        plt.title(f'confusion for {sys_name}', fontsize=18)
+        plt.title(f"confusion for {sys_name}", fontsize=18)
         out_file = os.path.join(
-            output_dir, f'{feature_names[0]}_{feature_names[1]}_combo_{combo_idx}.png'
+            output_dir, f"{feature_names[0]}_{feature_names[1]}_combo_{combo_idx}.png"
         )
-        plt.savefig(out_file, format='png', bbox_inches='tight')
+        plt.savefig(out_file, format="png", bbox_inches="tight")
 
 
 def render_interval_to_tick_label(interval: tuple[float, float]) -> str:
@@ -130,7 +130,7 @@ def render_interval_to_tick_label(interval: tuple[float, float]) -> str:
     Returns:
         a string-rendered tick label
     """
-    return f'[{interval[0]:.2f},{interval[0]:.2f}]'
+    return f"[{interval[0]:.2f},{interval[0]:.2f}]"
 
 
 def _get_errors(result: MetricResult) -> tuple[float, float]:
@@ -189,8 +189,8 @@ def plot_buckets(
         make_bar_chart(
             ys,
             output_dir,
-            f'{feature_name}_{metric_name}',
-            output_fig_format='png',
+            f"{feature_name}_{metric_name}",
+            output_fig_format="png",
             fig_size=(8, 6),
             sys_names=sys_names,
             errs=y_errs,
@@ -218,7 +218,7 @@ def draw_charts_from_reports(
     if sys_names is None:
         sys_names = [os.path.splitext(os.path.basename(x))[0] for x in reports]
     elif len(sys_names) != len(reports):
-        raise ValueError('Length of sys_names must equal that of reports')
+        raise ValueError("Length of sys_names must equal that of reports")
 
     report_info: list[SysOutputInfo] = []
     for report in reports:
@@ -254,14 +254,14 @@ def draw_charts_from_reports(
         make_bar_chart(
             ys,
             output_dir,
-            'overall',
-            output_fig_format='png',
+            "overall",
+            output_fig_format="png",
             fig_size=(8, 6),
             sys_names=sys_names,
             errs=y_errs,
             title=None,
             xticklabels=overall_metric_names,
-            ylabel='metric value',
+            ylabel="metric value",
         )
 
     # --- analysis results
@@ -270,14 +270,14 @@ def draw_charts_from_reports(
     ]
     if any(len(x) != len(analysis_results[0]) for x in analysis_results):
         raise ValueError(
-            f'mismatched number of analyses: {[len(x) for x in analysis_results]}'
+            f"mismatched number of analyses: {[len(x) for x in analysis_results]}"
         )
 
     # Bucket performance: feature name, for example, sentence length
     for analysis_result in progress(zip(*analysis_results)):
         if any(x.name != analysis_result[0].name for x in analysis_result):
             raise ValueError(
-                f'mismatched analyses: {[x.name for x in analysis_result]}'
+                f"mismatched analyses: {[x.name for x in analysis_result]}"
             )
 
         analysis_result_list = list(analysis_result)
@@ -289,19 +289,19 @@ def draw_charts_from_reports(
         ):
             plot_combo_counts(analysis_result_list, output_dir, sys_names)
         else:
-            raise ValueError('illegal types of analyses')
+            raise ValueError("illegal types of analyses")
 
 
 def main():
     """Main function."""
     parser = argparse.ArgumentParser(
-        description='Draw Histogram for ExplainaBoard Report'
+        description="Draw Histogram for ExplainaBoard Report"
     )
 
-    parser.add_argument('--task', type=str, required=False, help="the task name")
+    parser.add_argument("--task", type=str, required=False, help="the task name")
 
     parser.add_argument(
-        '--reports',
+        "--reports",
         type=str,
         required=True,
         nargs="+",
@@ -310,7 +310,7 @@ def main():
     )
 
     parser.add_argument(
-        '--sys-names',
+        "--sys-names",
         type=str,
         required=False,
         nargs="+",
@@ -319,7 +319,7 @@ def main():
     )
 
     parser.add_argument(
-        '--output-dir',
+        "--output-dir",
         type=str,
         required=False,
         default="figures",
@@ -335,5 +335,5 @@ def main():
     draw_charts_from_reports(reports, output_dir, sys_names=sys_names)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

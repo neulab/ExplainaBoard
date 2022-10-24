@@ -15,8 +15,8 @@ def general_to_dict(data: Any) -> Any:
     """DEPRECATED: do not use this function for new implementations."""
     if isinstance(data, Serializable):
         return PrimitiveSerializer().serialize(data)
-    elif hasattr(data, 'to_dict'):
-        return general_to_dict(getattr(data, 'to_dict')())
+    elif hasattr(data, "to_dict"):
+        return general_to_dict(getattr(data, "to_dict")())
     elif dataclasses.is_dataclass(data):
         # NOTE(odashi): Simulates dataclasses.asdict(), but processes inner data by
         # general_to_dict to appropriately treat Serializable objects.
