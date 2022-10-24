@@ -510,7 +510,8 @@ class Processor(metaclass=abc.ABCMeta):
         if "task_name" not in metadata.keys():
             metadata["task_name"] = self.task_type().value
 
-        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info = SysOutputInfo.from_any_dict(metadata)
+
         if sys_info.target_tokenizer is None:
             sys_info.target_tokenizer = self.get_tokenizer(sys_info.target_language)
 

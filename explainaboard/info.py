@@ -7,19 +7,43 @@ from dataclasses import dataclass, field
 import json
 import os
 import sys
-from typing import Any, Callable, Optional
+from typing import Any, cast, ClassVar, final, Optional, TextIO, TypeVar
 
 from explainaboard import config
 from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.case import AnalysisCase
 from explainaboard.analysis.result import Result
 from explainaboard.metrics.metric import MetricStats
-from explainaboard.serialization.legacy import general_to_dict
+from explainaboard.serialization import common_registry
 from explainaboard.serialization.serializers import PrimitiveSerializer
+from explainaboard.serialization.types import Serializable, SerializableData
 from explainaboard.utils.logging import get_logger
 from explainaboard.utils.tokenizer import Tokenizer
+from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 logger = get_logger(__name__)
+
+T = TypeVar("T")
+
+
+# TODO(odashi): This function may be generally useful. Move it to the serialization
+# submodule.
+def _get_value(data: dict[str, SerializableData], cls: type[T], key: str) -> T | None:
+    """Helper function to obtain a typed value or None from a serialized data.
+
+    Args:
+        data: Serialized data.
+        cls: Data type to obtain.
+        key: Data key to obtain.
+
+    Returns:
+        `data[key]` if it has type of `cls`, `None` if `data[key]` does not exist.
+
+    Raises:
+        TypeError: Thrown by inner `narrow()`: `data[key]` has an incompatible type.
+    """
+    value = data.get(key)
+    return narrow(cls, value) if value is not None else None
 
 
 @dataclass
@@ -43,8 +67,10 @@ class PaperInfo:
     bib: Optional[str] = None
 
 
+@common_registry.register("SysOutputInfo")
+@final
 @dataclass
-class SysOutputInfo:
+class SysOutputInfo(Serializable):
     """Information about a system output and its analysis settings.
 
     Attributes:
@@ -62,54 +88,32 @@ class SysOutputInfo:
         analysis_levels: the levels of analysis to perform
     """
 
-    # set in the system_output scripts
-    task_name: str
-    system_name: Optional[str] = None
-    dataset_name: Optional[str] = None
-    sub_dataset_name: Optional[str] = None
-    dataset_split: Optional[str] = None
+    DEFAULT_RELOAD_STAT: ClassVar[bool] = True
+    DEFAULT_CONFIDENCE_ALPHA: ClassVar[float] = 0.05
+
+    task_name: str | None = None
+    system_name: str | None = None
+    dataset_name: str | None = None
+    sub_dataset_name: str | None = None
+    dataset_split: str | None = None
     source_language: str | None = None
     target_language: str | None = None
-    reload_stat: bool = True
-    confidence_alpha: float = 0.05
-    system_details: dict[str, Any] = field(default_factory=dict)
-    source_tokenizer: Optional[Tokenizer] = None
-    target_tokenizer: Optional[Tokenizer] = None
+    reload_stat: bool = DEFAULT_RELOAD_STAT
+    # NOTE(odashi): confidence_alpha == None has a meaning beyond "unset": it prevents
+    # calculating confidence intervals.
+    confidence_alpha: float | None = DEFAULT_CONFIDENCE_ALPHA
+    system_details: dict[str, SerializableData] = field(default_factory=dict)
+    source_tokenizer: Tokenizer | None = None
+    target_tokenizer: Tokenizer | None = None
     analysis_levels: list[AnalysisLevel] = field(default_factory=list)
     analyses: list[Analysis] = field(default_factory=list)
 
     # set later
     results: Result = field(default_factory=lambda: Result(overall={}, analyses=[]))
 
-    def to_dict(self) -> dict:
-        """Serialization function."""
-        ret_dict = {}
-        for f in dataclasses.fields(self):
-            obj = getattr(self, f.name)
-            if obj is not None:
-                ret_dict[f.name] = general_to_dict(obj)
-        return ret_dict
-
-    def replace_nonstring_keys(self, data):
-        """Function to replace keys that are not strings for serialization to JSON."""
-        if isinstance(data, list):
-            for value in data:
-                if isinstance(value, dict):
-                    self.replace_nonstring_keys(value)
-        else:
-            replace_keys = []
-            for key, value in data.items():
-                if isinstance(value, Callable):
-                    # TODO(gneubig): cannot serialize functions so info is lost
-                    data[key] = None
-                if not isinstance(key, str):
-                    replace_keys.append(key)
-                if isinstance(value, dict) or isinstance(value, list):
-                    self.replace_nonstring_keys(value)
-            for key in replace_keys:
-                data[str(key)] = data[key]
-                del data[key]
-
+    # TODO(odashi): This function does many out-of-scope work. It should be enough to
+    # provide a functionality to dump the serialized data into a dict, and let users
+    # save the dumped data under their responsibility.
     def write_to_directory(
         self,
         dataset_info_dir: str,
@@ -153,62 +157,114 @@ class SysOutputInfo:
                     f"Attempted to overwrite the existing file: {file_path}"
                 )
 
-        with open(file_path, "wb") as f:
-            self._dump_info(f)
+        with open(file_path, "w") as f:
+            self.print_as_json(file=f)
 
-    def print_as_json(self, file=None) -> None:
+    def print_as_json(self, file: TextIO | None = None) -> None:
         """Print as json to the specified file.
 
         Args:
             file: The file stream to print to, or None for stdout.
-
-        Raises:
-            TypeError: If the data dict can not be written to.
         """
-        if file is None:
-            file = sys.stdout
-        data_dict = self.to_dict()
-        self.replace_nonstring_keys(data_dict)
-        json.dump(data_dict, fp=file, indent=2)
+        json.dump(
+            PrimitiveSerializer().serialize(self),
+            file if file is not None else sys.stdout,
+            indent=2,
+        )
 
-    def _dump_info(self, file):
-        """Convert SystemOutputInfo => JSON."""
-        data_dict = self.to_dict()
-        self.replace_nonstring_keys(data_dict)
-        file.write(json.dumps(data_dict, indent=2).encode("utf-8"))
+    def serialize(self) -> dict[str, SerializableData]:
+        """Implements Serializable.serialize."""
+        return {
+            "task_name": self.task_name,
+            "system_name": self.system_name,
+            "dataset_name": self.dataset_name,
+            "sub_dataset_name": self.sub_dataset_name,
+            "dataset_split": self.dataset_split,
+            "source_language": self.source_language,
+            "target_language": self.target_language,
+            "reload_stat": self.reload_stat,
+            "confidence_alpha": self.confidence_alpha,
+            "system_details": self.system_details,
+            "source_tokenizer": self.source_tokenizer,
+            "target_tokenizer": self.target_tokenizer,
+            "analysis_levels": self.analysis_levels,
+            "analyses": self.analyses,
+            "results": self.results,
+        }
 
     @classmethod
-    def dict_conv(cls, k: str, v: Any) -> Any:
-        """Deserialization utility function.
+    def deserialize(cls, data: dict[str, SerializableData]) -> Serializable:
+        """Implements Serializable.deserialize."""
+        # TODO(odashi): Remove type:ignore if mypy/4717 was fixed.
 
-        A deserialization utility function that takes in a key corresponding to a
-        parameter name, and dictionary corresponding to a serialized version of that
-        parameter's value, then return the deserialized version of the value.
+        if "confidence_alpha" in data:
+            confidence_alpha = _get_value(data, float, "confidence_alpha")
+        else:
+            confidence_alpha = cls.DEFAULT_CONFIDENCE_ALPHA
+
+        system_details = {
+            narrow(str, k): cast(SerializableData, v)
+            for k, v in unwrap_or(_get_value(data, dict, "system_details"), {}).items()
+        }
+        analysis_levels = [
+            narrow(AnalysisLevel, x)
+            for x in unwrap_or(_get_value(data, list, "analysis_levels"), [])
+        ]
+        analyses = [
+            narrow(Analysis, x)  # type: ignore
+            for x in unwrap_or(_get_value(data, list, "analyses"), [])
+        ]
+
+        return cls(
+            task_name=_get_value(data, str, "task_name"),
+            system_name=_get_value(data, str, "system_name"),
+            dataset_name=_get_value(data, str, "dataset_name"),
+            sub_dataset_name=_get_value(data, str, "sub_dataset_name"),
+            dataset_split=_get_value(data, str, "dataset_split"),
+            source_language=_get_value(data, str, "source_language"),
+            target_language=_get_value(data, str, "target_language"),
+            reload_stat=unwrap_or(
+                _get_value(data, bool, "reload_stat"), cls.DEFAULT_RELOAD_STAT
+            ),
+            confidence_alpha=confidence_alpha,
+            system_details=system_details,
+            source_tokenizer=_get_value(
+                data, Tokenizer, "source_tokenizer"  # type: ignore
+            ),
+            target_tokenizer=_get_value(
+                data, Tokenizer, "target_tokenizer"  # type: ignore
+            ),
+            analysis_levels=analysis_levels,
+            analyses=analyses,
+            results=unwrap_or(
+                _get_value(data, Result, "results"), Result(overall={}, analyses=[])
+            ),
+        )
+
+    # TODO(odashi): This function is hacky and shouldn't be used.
+    # Remove this function after introducing the struct of system metadata.
+    # See also: https://github.com/neulab/ExplainaBoard/issues/575
+    @classmethod
+    def from_any_dict(cls, data: dict[str, Any]) -> SysOutputInfo:
+        """Generates SysOutputInfo from a dict.
 
         Args:
-            k: the parameter name
-            v: the parameter's value
+            data: Data, which may contain some information about SysOutputInfo.
 
         Returns:
-            The modified parameter value
+            Generated SysOutputInfo.
         """
-        if k == "results":
-            return PrimitiveSerializer().deserialize(v)
-        elif k.endswith("tokenizer"):
-            return PrimitiveSerializer().deserialize(v)
-        elif k == "analysis_levels":
-            return PrimitiveSerializer().deserialize(v)
-        elif k == "analyses":
-            return PrimitiveSerializer().deserialize(v)
-        else:
-            return v
+        keys = set(x.name for x in dataclasses.fields(cls))
 
-    @classmethod
-    def from_dict(cls, data_dict: dict) -> SysOutputInfo:
-        """Deserialization function."""
-        field_names = set(f.name for f in dataclasses.fields(cls))
-        return cls(
-            **{k: cls.dict_conv(k, v) for k, v in data_dict.items() if k in field_names}
+        serialized_sysout = {
+            cast(str, k): cast(SerializableData, v)
+            for k, v in data.items()
+            if k in keys
+        }
+        serialized_sysout["cls_name"] = "SysOutputInfo"
+
+        return narrow(
+            SysOutputInfo, PrimitiveSerializer().deserialize(serialized_sysout)
         )
 
 
