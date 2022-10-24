@@ -35,13 +35,13 @@ class MetaEvaluationWMTDAProcessor(Processor):
     def get_tokenizer(self, lang: str | None) -> Tokenizer:
         """Get a tokenizer based on the language."""
         if is_chinese_lang_code(lang):
-            return SacreBleuTokenizer(variety='zh')
+            return SacreBleuTokenizer(variety="zh")
         elif is_japanese_lang_code(lang):
-            return SacreBleuTokenizer(variety='ja-mecab')
-        elif lang == 'python':
-            return SacreBleuTokenizer(variety='conala')
+            return SacreBleuTokenizer(variety="ja-mecab")
+        elif lang == "python":
+            return SacreBleuTokenizer(variety="conala")
         else:
-            return SacreBleuTokenizer(variety='intl')
+            return SacreBleuTokenizer(variety="intl")
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
@@ -85,35 +85,35 @@ class MetaEvaluationWMTDAProcessor(Processor):
             "src_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="source length",
-                func=lambda info, x, c: count_tokens(info, x['src']),
+                func=lambda info, x, c: count_tokens(info, x["src"]),
             ),
             "ref_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="reference length",
-                func=lambda info, x, c: count_tokens(info, x['ref'], side='target'),
+                func=lambda info, x, c: count_tokens(info, x["ref"], side="target"),
             ),
             "sys_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="system output length",
-                func=lambda info, x, c: count_tokens(info, x['ref'], side='target'),
+                func=lambda info, x, c: count_tokens(info, x["ref"], side="target"),
             ),
             "src_divided_ref": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="ratio of source length to reference length",
-                func=lambda info, x, c: c.features['src_length']
-                / c.features['ref_length'],
+                func=lambda info, x, c: c.features["src_length"]
+                / c.features["ref_length"],
             ),
             "sys_divided_ref": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="ratio of system output length to reference length",
-                func=lambda info, x, c: c.features['sys_length']
-                / c.features['ref_length'],
+                func=lambda info, x, c: c.features["sys_length"]
+                / c.features["ref_length"],
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -129,7 +129,7 @@ class MetaEvaluationWMTDAProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:

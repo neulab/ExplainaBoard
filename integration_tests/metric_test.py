@@ -35,7 +35,7 @@ class MetricTest(unittest.TestCase):
                 }
             )
         return eaas_client.async_score(
-            inputs, metrics=metric_names.copy(), calculate=['corpus', 'stats']
+            inputs, metrics=metric_names.copy(), calculate=["corpus", "stats"]
         )
 
     def test_eaas_decomposabiltiy(self) -> None:
@@ -58,7 +58,7 @@ class MetricTest(unittest.TestCase):
 
         # Initialize client and decide which metrics to test
         eaas_client = AsyncClient(Config())
-        metric_names = ['rouge1', 'bleu', 'chrf', 'length_ratio']
+        metric_names = ["rouge1", "bleu", "chrf", "length_ratio"]
         # Uncomment the following line to test all metrics,
         # but beware that it will be very slow
         # metric_names = eaas_client._valid_metrics
@@ -88,13 +88,13 @@ class MetricTest(unittest.TestCase):
                 split_stats = full_stats.filter(half_ids)
                 # EaaS-returned value should be same as explainaboard-calculated value
                 self.assertAlmostEqual(
-                    full_result['scores'][i]['corpus'],
+                    full_result["scores"][i]["corpus"],
                     metric.evaluate_from_stats(full_stats)
                     .get_value(Score, "score")
                     .value,
                 )
                 self.assertAlmostEqual(
-                    half_result['scores'][i]['corpus'],
+                    half_result["scores"][i]["corpus"],
                     metric.evaluate_from_stats(half_stats)
                     .get_value(Score, "score")
                     .value,

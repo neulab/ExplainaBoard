@@ -46,13 +46,13 @@ class GrammaticalErrorCorrectionProcessor(Processor):
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="length of the text",
-                func=lambda info, x, c: count_tokens(info, x['text']),
+                func=lambda info, x, c: count_tokens(info, x["text"]),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -68,7 +68,7 @@ class GrammaticalErrorCorrectionProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:

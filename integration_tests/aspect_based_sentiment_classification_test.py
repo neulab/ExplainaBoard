@@ -31,12 +31,12 @@ class AspectBasedSentimentClassificationTest(unittest.TestCase):
         self.assertEqual(
             data[0],
             {
-                'aspect': 'Boot time',
-                'text': 'Boot time  is super fast, around anywhere from 35 seconds to '
-                + '1 minute.',
-                'true_label': 'positive',
-                'id': '0',
-                'predicted_label': 'positive',
+                "aspect": "Boot time",
+                "text": "Boot time  is super fast, around anywhere from 35 seconds to "
+                + "1 minute.",
+                "true_label": "positive",
+                "id": "0",
+                "predicted_label": "positive",
             },
         )
 

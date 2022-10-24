@@ -65,7 +65,7 @@ class RankingMetaAnalysis(MetaAnalysis):
             The ranking table.
         """
         if metric not in self.feature_names:
-            raise ValueError(f'metric {metric} does not exist in original model report')
+            raise ValueError(f"metric {metric} does not exist in original model report")
         metric_id = self.feature_names.index(metric)
         metric_ranking_table = self.ranking_table[metric_id]
         metric_ranking_df = pd.DataFrame(
@@ -106,7 +106,7 @@ class RankingMetaAnalysis(MetaAnalysis):
         metric_names_iter = itertools.chain.from_iterable(metric_config_dict_iter)
 
         metadata = {
-            'custom_features': {
+            "custom_features": {
                 name: {
                     "dtype": "string",
                     "description": name,
@@ -124,17 +124,17 @@ class RankingMetaAnalysis(MetaAnalysis):
             for r in self.model_reports
         ]
         reference_info: dict[str, Any] = {
-            'feature_name': 'overall',
-            'bucket_interval': None,
-            'bucket_name': '',
-            'bucket_size': -1,
+            "feature_name": "overall",
+            "bucket_interval": None,
+            "bucket_name": "",
+            "bucket_size": -1,
         }
-        for feature_id, feature in enumerate(metadata['custom_features'].keys()):
+        for feature_id, feature in enumerate(metadata["custom_features"].keys()):
             values = [
                 model_result[feature].value for model_result in model_overall_results
             ]
             model_ranks = RankingMetaAnalysis._get_ranks_of(values, self.model_ids)
-            reference_info[f'{feature}_model_ranking'] = model_ranks
+            reference_info[f"{feature}_model_ranking"] = model_ranks
 
         return reference_info
 
@@ -146,12 +146,12 @@ class RankingMetaAnalysis(MetaAnalysis):
         num_buckets = len(model_sysouts[0])
         for model_sysout in model_sysouts:
             if len(model_sysout) != num_buckets:
-                raise ValueError('length of model\'s meta-sysouts do not match')
+                raise ValueError("length of model's meta-sysouts do not match")
 
         aggregated_examples = []
         ranking_table = np.zeros(
             (
-                len(metadata['custom_features'].keys()),  # 'Hits1', 'Hits2', ...
+                len(metadata["custom_features"].keys()),  # 'Hits1', 'Hits2', ...
                 len(model_sysouts),  # 'rotate', 'rescal', ...
                 num_buckets + 1,  # 'feature1_(a,b)', 'feature1_(c,d)', ..., 'overall'
             ),
@@ -170,27 +170,27 @@ class RankingMetaAnalysis(MetaAnalysis):
 
             # calculate difference metrics
             example = {
-                'feature_name': bucket_info['feature_name'],
-                'bucket_interval': bucket_info['bucket_interval'],
-                'bucket_name': bucket_info['bucket_name'],
-                'bucket_size': bucket_info['bucket_size'],
+                "feature_name": bucket_info["feature_name"],
+                "bucket_interval": bucket_info["bucket_interval"],
+                "bucket_name": bucket_info["bucket_name"],
+                "bucket_size": bucket_info["bucket_size"],
             }
-            for feature_id, feature in enumerate(metadata['custom_features'].keys()):
+            for feature_id, feature in enumerate(metadata["custom_features"].keys()):
                 values = [model_bucket[feature] for model_bucket in buckets_per_model]
                 model_ranks = RankingMetaAnalysis._get_ranks_of(values, self.model_ids)
-                example[f'{feature}_model_ranking'] = model_ranks
+                example[f"{feature}_model_ranking"] = model_ranks
                 ranking_table[feature_id, :, bucket_id] = model_ranks
             aggregated_examples.append(example)
 
         # save overall results into last column of table
-        for feature_id, feature in enumerate(metadata['custom_features'].keys()):
-            overall_model_ranks = reference_dict[f'{feature}_model_ranking']
+        for feature_id, feature in enumerate(metadata["custom_features"].keys()):
+            overall_model_ranks = reference_dict[f"{feature}_model_ranking"]
             ranking_table[feature_id, :, -1] = overall_model_ranks
 
         self.ranking_table = ranking_table
         self.feature_names = list(
-            metadata['custom_features'].keys()
+            metadata["custom_features"].keys()
         )  # 'Hits1', 'Hits2', ...
-        self.bucket_names = bucket_names + ['overall']
+        self.bucket_names = bucket_names + ["overall"]
 
         return aggregated_examples

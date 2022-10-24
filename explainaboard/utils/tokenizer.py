@@ -36,11 +36,11 @@ def get_default_tokenizer(lang: str | None) -> Tokenizer:
         A tokenizer
     """
     if is_chinese_lang_code(lang):
-        return SacreBleuTokenizer(variety='zh')
+        return SacreBleuTokenizer(variety="zh")
     elif is_japanese_lang_code(lang):
-        return SacreBleuTokenizer(variety='ja-mecab')
-    elif lang == 'python':
-        return SacreBleuTokenizer(variety='conala')
+        return SacreBleuTokenizer(variety="ja-mecab")
+    elif lang == "python":
+        return SacreBleuTokenizer(variety="conala")
     else:
         return SingleSpaceTokenizer()
 
@@ -163,7 +163,7 @@ class SingleSpaceTokenizer(Tokenizer):
         strs: list[str] = []
         positions: list[int] = []
 
-        for x in text.split(' '):
+        for x in text.split(" "):
             strs.append(x)
             positions.append(start)
             start = start + len(x) + 1
@@ -179,7 +179,7 @@ class SingleSpaceTokenizer(Tokenizer):
         Returns:
             The detokenized strings.
         """
-        return ' '.join(tokens)
+        return " ".join(tokens)
 
 
 class TokenizerConala(BaseTokenizer):
@@ -201,12 +201,12 @@ class TokenizerConala(BaseTokenizer):
         Returns:
             space-separated tokens
         """
-        text = re.sub(r'([^A-Za-z0-9_])', r' \1 ', text)
-        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-        text = re.sub(r'\s+', ' ', text)
-        text = text.replace('"', '`')
-        text = text.replace('\'', '`')
-        text = text.strip(' ')
+        text = re.sub(r"([^A-Za-z0-9_])", r" \1 ", text)
+        text = re.sub(r"([a-z])([A-Z])", r"\1 \2", text)
+        text = re.sub(r"\s+", " ", text)
+        text = text.replace('"', "`")
+        text = text.replace("'", "`")
+        text = text.strip(" ")
 
         return text
 
@@ -226,7 +226,7 @@ class SacreBleuTokenizer(Tokenizer):
         Returns:
             Function to normalize texts.
         """
-        if variety == 'conala':
+        if variety == "conala":
             trdict = str.maketrans("'\"", "``")
             return lambda text: text.translate(trdict)
         else:
@@ -242,18 +242,18 @@ class SacreBleuTokenizer(Tokenizer):
         Returns:
             Runction to tokenize texts to space-joined tokens.
         """
-        if variety == 'intl':
+        if variety == "intl":
             return TokenizerV14International()
-        elif variety == 'zh':
+        elif variety == "zh":
             return TokenizerZh()
-        elif variety == 'ja-mecab':
+        elif variety == "ja-mecab":
             return TokenizerJaMecab()
-        elif variety == 'conala':
+        elif variety == "conala":
             return TokenizerConala()
         else:
-            raise ValueError(f'Illegal variety of SacreBleuTokenizer: {variety}')
+            raise ValueError(f"Illegal variety of SacreBleuTokenizer: {variety}")
 
-    def __init__(self, variety: str = 'intl'):
+    def __init__(self, variety: str = "intl"):
         """Constructor function.
 
         Args:
@@ -274,7 +274,7 @@ class SacreBleuTokenizer(Tokenizer):
             The tokenized sequence
         """
         return TokenSeq.from_orig_and_tokens(
-            self._normalizer(text), self._tokenizer(text).split(' ')
+            self._normalizer(text), self._tokenizer(text).split(" ")
         )
 
     def detokenize(self, tokens: list[str]) -> str:
@@ -302,7 +302,7 @@ class MLQAMixTokenizer(Tokenizer):
         self._punct = {
             chr(i)
             for i in range(sys.maxunicode)
-            if unicodedata.category(chr(i)).startswith('P')
+            if unicodedata.category(chr(i)).startswith("P")
         }.union(string.punctuation)
 
     @lru_cache(maxsize=20)
@@ -318,7 +318,7 @@ class MLQAMixTokenizer(Tokenizer):
         segs_out: list[str] = []
         temp_str = ""
         for char in text:
-            if re.search(r'[\u4e00-\u9fa5]', char) or char in self._punct:
+            if re.search(r"[\u4e00-\u9fa5]", char) or char in self._punct:
                 if temp_str != "":
                     ss = self._ss_tokenizer(temp_str)
                     segs_out.extend(ss)

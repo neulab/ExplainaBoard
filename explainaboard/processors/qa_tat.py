@@ -60,36 +60,36 @@ class QATatProcessor(Processor):
                 dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
                 func=lambda info, x, c: sum(
-                    [count_tokens(info, text) for text in x['context']["text"]]
+                    [count_tokens(info, text) for text in x["context"]["text"]]
                 ),
             ),
             "table_rows": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of table row",
-                func=lambda info, x, c: len(x['table']),
+                func=lambda info, x, c: len(x["table"]),
             ),
             "table_columns": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of table column",
-                func=lambda info, x, c: len(x['table'][0])
-                if len(x['table']) > 0
+                func=lambda info, x, c: len(x["table"][0])
+                if len(x["table"]) > 0
                 else 0,
             ),
             "question_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['question']),
+                func=lambda info, x, c: count_tokens(info, x["question"]),
             ),
             "answer_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the length of answer",
-                func=lambda info, x, c: len(x['true_answer']),
+                func=lambda info, x, c: len(x["true_answer"]),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -121,7 +121,7 @@ class QATatProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
@@ -155,7 +155,7 @@ class QATatProcessor(Processor):
     @aggregating()
     def _statistics_func(self, samples: Iterator, sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['question'], unwrap(sys_info.source_tokenizer)
+            samples, lambda x: x["question"], unwrap(sys_info.source_tokenizer)
         )
 
-        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
+        return {"source_vocab": source_vocab, "source_vocab_rank": source_vocab_rank}

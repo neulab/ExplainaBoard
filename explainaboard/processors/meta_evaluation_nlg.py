@@ -32,13 +32,13 @@ class MetaEvaluationNLGProcessor(Processor):
     def get_tokenizer(self, lang: str | None) -> Tokenizer:
         """Get a tokenizer based on the language."""
         if is_chinese_lang_code(lang):
-            return SacreBleuTokenizer(variety='zh')
+            return SacreBleuTokenizer(variety="zh")
         elif is_japanese_lang_code(lang):
-            return SacreBleuTokenizer(variety='ja-mecab')
-        elif lang == 'python':
-            return SacreBleuTokenizer(variety='conala')
+            return SacreBleuTokenizer(variety="ja-mecab")
+        elif lang == "python":
+            return SacreBleuTokenizer(variety="conala")
         else:
-            return SacreBleuTokenizer(variety='intl')
+            return SacreBleuTokenizer(variety="intl")
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
         """See Processor.default_analysis_levels."""
@@ -61,13 +61,13 @@ class MetaEvaluationNLGProcessor(Processor):
             "src_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="source length",
-                func=lambda info, x, c: count_tokens(info, x['source']),
+                func=lambda info, x, c: count_tokens(info, x["source"]),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -83,7 +83,7 @@ class MetaEvaluationNLGProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:

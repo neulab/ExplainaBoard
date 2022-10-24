@@ -33,24 +33,24 @@ class ArgumentPairExtractionProcessor(Processor):
         super().__init__()
         self._argument_pair_ops: ArgumentPairOps = ArgumentPairOps()
 
-    _DEFAULT_TAG = 'O'
+    _DEFAULT_TAG = "O"
 
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         defaults: dict[str, dict[str, MetricConfig]] = {
-            'example': {
+            "example": {
                 "F1": APEF1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
                 )
             },
-            'block': {
+            "block": {
                 "F1": F1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
@@ -75,12 +75,12 @@ class ArgumentPairExtractionProcessor(Processor):
             "num_sent": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of sentences",
-                func=lambda info, x, c: len(x['sentences']),
+                func=lambda info, x, c: len(x["sentences"]),
             ),
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the length of all sentences",
-                func=lambda info, x, c: len(" ".join(x['sentences'])),
+                func=lambda info, x, c: len(" ".join(x["sentences"])),
             ),
         }
 
@@ -124,14 +124,14 @@ class ArgumentPairExtractionProcessor(Processor):
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             ),
             AnalysisLevel(
-                name='block',
+                name="block",
                 features=block_features,
-                metric_configs=self.default_metrics(level='block'),
+                metric_configs=self.default_metrics(level="block"),
             ),
         ]
 
@@ -152,11 +152,11 @@ class ArgumentPairExtractionProcessor(Processor):
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab, vocab_rank = accumulate_vocab_from_samples(
             samples,
-            lambda x: " ".join(x['sentences']),
+            lambda x: " ".join(x["sentences"]),
             unwrap(sys_info.source_tokenizer),
         )
 
-        return {'vocab': vocab, 'vocab_rank': vocab_rank}
+        return {"vocab": vocab, "vocab_rank": vocab_rank}
 
     def _gen_cases_and_stats(
         self,
@@ -165,42 +165,42 @@ class ArgumentPairExtractionProcessor(Processor):
         statistics: Any,
         analysis_level: AnalysisLevel,
     ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
-        if analysis_level.name == 'example':
+        if analysis_level.name == "example":
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
             )
-        elif analysis_level.name != 'block':
-            raise ValueError(f'{analysis_level.name}-level analysis not supported')
+        elif analysis_level.name != "block":
+            raise ValueError(f"{analysis_level.name}-level analysis not supported")
         # Do block-level analysis. `AnalysisCaseLabeledBlock` typing is necessary
         # otherwise an error will happen later when using `x.true_label`
         cases: list[AnalysisCaseLabeledArgumentPair] = []
         # Calculate features
         for i, output in progress(
-            enumerate(sys_output), desc='calculating span-level features'
+            enumerate(sys_output), desc="calculating span-level features"
         ):
             # get the spans from each sentence
             sentences = output["sentences"]
             true_spans, pred_spans = self._argument_pair_ops.get_argument_pairs(
-                output['true_tags'], output['pred_tags'], sentences
+                output["true_tags"], output["pred_tags"], sentences
             )
             true_spans = cast(List[ArgumentPair], true_spans)
             pred_spans = cast(List[ArgumentPair], pred_spans)
             # merge the spans together
             merged_spans: dict[tuple[int, int, int, int], ArgumentPair] = {}
             for span in true_spans:
-                span.block_tag = f'{span.block_tag} {self._DEFAULT_TAG}'
+                span.block_tag = f"{span.block_tag} {self._DEFAULT_TAG}"
                 merged_spans[unwrap(span.block_pos)] = span
             for span in pred_spans:
                 merged_span = merged_spans.get(unwrap(span.block_pos))
                 if not merged_span:
-                    span.block_tag = f'{self._DEFAULT_TAG} {span.block_tag}'
+                    span.block_tag = f"{self._DEFAULT_TAG} {span.block_tag}"
                     merged_spans[unwrap(span.block_pos)] = span
                 else:
-                    true_tag, _ = unwrap(merged_span.block_tag).split(' ')
-                    merged_span.block_tag = f'{true_tag} {span.block_tag}'
+                    true_tag, _ = unwrap(merged_span.block_tag).split(" ")
+                    merged_span.block_tag = f"{true_tag} {span.block_tag}"
             # analysis cases
             for ms in merged_spans.values():
-                true_tag, pred_tag = unwrap(ms.block_tag).split(' ')
+                true_tag, pred_tag = unwrap(ms.block_tag).split(" ")
                 case = AnalysisCaseLabeledArgumentPair(
                     sample_id=i,
                     features={},
@@ -218,7 +218,7 @@ class ArgumentPairExtractionProcessor(Processor):
                 for feat_name, feat_spec in analysis_level.features.items():
                     if feat_spec.func is None:
                         raise ValueError(
-                            f'could not find feature function for {feat_name}'
+                            f"could not find feature function for {feat_name}"
                         )
                     elif not feat_spec.require_training_set:
                         case.features[feat_name] = feat_spec.func(

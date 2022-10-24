@@ -18,15 +18,15 @@ from explainaboard.utils.typing_utils import unwrap
 def _get_tokens(sys_info: SysOutputInfo, text: str | list[str], side: str) -> list[str]:
     if isinstance(text, list):
         return text
-    elif side == 'source':
+    elif side == "source":
         return unwrap(sys_info.source_tokenizer)(text).strs
-    elif side == 'target':
+    elif side == "target":
         return unwrap(sys_info.target_tokenizer)(text).strs
     else:
-        raise ValueError(f'Bad side {side}')
+        raise ValueError(f"Bad side {side}")
 
 
-def count_tokens(sys_info: SysOutputInfo, text: str, side: str = 'source') -> float:
+def count_tokens(sys_info: SysOutputInfo, text: str, side: str = "source") -> float:
     """Count the number of tokens in the text.
 
     Args:
@@ -127,7 +127,7 @@ def feat_freq_rank(
     sys_info: SysOutputInfo,
     text: str | list[str],
     vocab_rank: dict[str, int],
-    side: str = 'source',
+    side: str = "source",
 ) -> float:
     """Return the average frequency rank of the tokens in the text.
 
@@ -155,7 +155,7 @@ def feat_num_oov(
     sys_info: SysOutputInfo,
     text: str | list[str],
     vocab: dict[str, int],
-    side: str = 'source',
+    side: str = "source",
 ) -> int:
     """Return the number of out-of-vocabulary words in a text.
 
@@ -179,7 +179,7 @@ def feat_length_freq(
     sys_info: SysOutputInfo,
     text: str,
     length_freq: dict[int, float],
-    side: str = 'source',
+    side: str = "source",
 ) -> float:
     """A feature regarding how frequent the length is in the training corpus.
 
@@ -217,7 +217,7 @@ def cap_feature(text: str) -> str:
 
 
 def relative_position(
-    sys_info: SysOutputInfo, text: str, word: str, side: str = 'source'
+    sys_info: SysOutputInfo, text: str, word: str, side: str = "source"
 ) -> float:
     """Return the relative position of a token within the string text.
 
@@ -243,7 +243,7 @@ def relative_position(
 
 
 def absolute_position(
-    sys_info: SysOutputInfo, text: str, word: str, side: str = 'source'
+    sys_info: SysOutputInfo, text: str, word: str, side: str = "source"
 ) -> float:
     """Return the absolute position of a token within the string text.
 

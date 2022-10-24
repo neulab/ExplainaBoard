@@ -28,7 +28,7 @@ def get_all_tasks() -> list[str]:
     task_infos = get_task_mapping()
     all_tasks = []
     for task_category, description in task_infos.items():
-        task_list = description['options']
+        task_list = description["options"]
         all_tasks += task_list
     return all_tasks
 
@@ -40,4 +40,4 @@ for task_name in all_tasks:
 
 # TODO(odashi): avoid storing list of tasks into enum as num should be considered
 # as a static type.
-TaskType = enum.Enum('TaskType', all_tasks_dict)  # type: ignore
+TaskType = enum.Enum("TaskType", all_tasks_dict)  # type: ignore

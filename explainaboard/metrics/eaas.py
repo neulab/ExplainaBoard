@@ -56,7 +56,7 @@ class EaaSMetricStats(MetricStats):
             self._data = np.array(
                 [
                     x if isinstance(x, list) else [x]
-                    for x in result['scores'][self._pos]['stats']
+                    for x in result["scores"][self._pos]["stats"]
                 ]
             )
 
@@ -102,7 +102,7 @@ class EaaSMetricConfig(MetricConfig):
 class EaaSMetric(Metric):
     """A metric that calculates evaluation scores using EaaS."""
 
-    _NOT_SIMPLE_METRICS = {'bleu', 'chrf', 'length_ratio', 'length'}
+    _NOT_SIMPLE_METRICS = {"bleu", "chrf", "length_ratio", "length"}
     _SACREBLEU_METRICS: dict[str, sacrebleu.metrics.base.Metric] = {
         "bleu": sacrebleu.BLEU,
         "chrf": sacrebleu.CHRF,
@@ -126,7 +126,7 @@ class EaaSMetric(Metric):
                     / 100.0
                 )
             calc_result = ret_metric
-        elif config.name == 'length_ratio':
+        elif config.name == "length_ratio":
             calc_result = agg_stats[:, 0] / agg_stats[:, 1]
         else:
             calc_result = agg_stats[:, 0]
@@ -143,7 +143,7 @@ class EaaSMetric(Metric):
     def _aggregate_stats(self, stats: MetricStats) -> np.ndarray:
         """See: Metric.aggregate_stats."""
         data = stats.get_batch_data() if stats.is_batched() else stats.get_data()
-        if narrow(EaaSMetricConfig, self.config).name in {'bleu', 'chrf'}:
+        if narrow(EaaSMetricConfig, self.config).name in {"bleu", "chrf"}:
             return np.sum(data, axis=-2)
         else:
             return np.mean(data, axis=-2)
@@ -158,12 +158,12 @@ class EaaSMetric(Metric):
         inputs = []
         for td, pd in zip(true_data, pred_data):
             ntd = copy.deepcopy(td)
-            ntd['hypothesis'] = pd
+            ntd["hypothesis"] = pd
             inputs.append(ntd)
         async_request = get_eaas_client().async_score(
             inputs,
             metrics=[narrow(EaaSMetricConfig, self.config).name],
-            calculate=['corpus', 'stats'],
+            calculate=["corpus", "stats"],
         )
         return EaaSMetricStats(
             name=unwrap(narrow(EaaSMetricConfig, self.config).name),

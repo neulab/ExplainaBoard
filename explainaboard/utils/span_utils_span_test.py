@@ -9,7 +9,7 @@ class SpanClassTest(unittest.TestCase):
     def test_span_class(self):
         sample_id = 0
         seq = ["I", "love", "New", "York"]
-        span_text = 'New York'
+        span_text = "New York"
         span = Span(
             span_text=span_text,
             span_tag="LOC",

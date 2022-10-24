@@ -52,24 +52,24 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
             "attr_compression": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="compression",
-                func=lambda info, x, c: c.features['sum_attributes'][
+                func=lambda info, x, c: c.features["sum_attributes"][
                     "attr_compression"
                 ],
             ),
             "attr_copy_len": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="copy length",
-                func=lambda info, x, c: c.features['sum_attributes']["attr_copy_len"],
+                func=lambda info, x, c: c.features["sum_attributes"]["attr_copy_len"],
             ),
             "attr_coverage": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="coverage",
-                func=lambda info, x, c: c.features['sum_attributes']["attr_coverage"],
+                func=lambda info, x, c: c.features["sum_attributes"]["attr_coverage"],
             ),
             "attr_novelty": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="novelty",
-                func=lambda info, x, c: c.features['sum_attributes']["attr_novelty"],
+                func=lambda info, x, c: c.features["sum_attributes"]["attr_novelty"],
             ),
         }
         f[0].features.update(new_examp_features)
@@ -77,20 +77,20 @@ class SummarizationProcessor(ConditionalGenerationProcessor):
 
     @classmethod
     def _get_default_eaas_strs(cls):
-        return ['rouge1', 'rouge2', 'rougeL', 'length_ratio']
+        return ["rouge1", "rouge2", "rougeL", "length_ratio"]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples_list, lambda x: x['source'], unwrap(sys_info.source_tokenizer)
+            samples_list, lambda x: x["source"], unwrap(sys_info.source_tokenizer)
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
-            samples_list, lambda x: x['reference'], unwrap(sys_info.target_tokenizer)
+            samples_list, lambda x: x["reference"], unwrap(sys_info.target_tokenizer)
         )
         return {
-            'source_vocab': source_vocab,
-            'source_vocab_rank': source_vocab_rank,
-            'target_vocab': target_vocab,
-            'target_vocab_rank': target_vocab_rank,
+            "source_vocab": source_vocab,
+            "source_vocab_rank": source_vocab_rank,
+            "target_vocab": target_vocab,
+            "target_vocab_rank": target_vocab_rank,
         }

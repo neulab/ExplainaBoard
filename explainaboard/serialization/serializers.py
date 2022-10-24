@@ -54,14 +54,14 @@ class PrimitiveSerializer:
 
         if isinstance(data, dict):
             if "cls_name" in data:
-                raise ValueError("dict can not contain the key \"cls_name\".")
+                raise ValueError('dict can not contain the key "cls_name".')
             return {k: self.serialize(v) for k, v in data.items()}
 
         if isinstance(data, Serializable):
             cls_name = self._registry.get_name(type(data))
             attributes = data.serialize()
             if "cls_name" in attributes:
-                raise ValueError("Serializable can not contain the key \"cls_name\".")
+                raise ValueError('Serializable can not contain the key "cls_name".')
             attributes["cls_name"] = cls_name
             return {k: self.serialize(v) for k, v in attributes.items()}
 
@@ -107,7 +107,7 @@ class PrimitiveSerializer:
                 return cls.deserialize(attributes)
 
             raise ValueError(
-                f"Value of \"cls_name\" must be str, but got {type(cls_name).__name__}"
+                f'Value of "cls_name" must be str, but got {type(cls_name).__name__}'
             )
 
         raise ValueError(f"Not a serialized data: {type(data).__name__}")

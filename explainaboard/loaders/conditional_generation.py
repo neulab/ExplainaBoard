@@ -21,11 +21,11 @@ class ConditionalGenerationLoader(Loader):
         please refer to `test_loaders.py`
     """
 
-    OUTPUT_FIELDS = ['source', 'reference']
-    JSON_FIELDS: list[str | tuple[str, str]] = ['source', 'reference']
+    OUTPUT_FIELDS = ["source", "reference"]
+    JSON_FIELDS: list[str | tuple[str, str]] = ["source", "reference"]
     JSON_FIELDS_DATALAB: list[str | tuple[str, str]] = [
-        'source_column',
-        'reference_column',
+        "source_column",
+        "reference_column",
     ]
 
     @classmethod
@@ -77,8 +77,8 @@ class SummarizationLoader(ConditionalGenerationLoader):
     """A loader for summarization."""
 
     JSON_FIELDS_DATALAB: list[str | tuple[str, str]] = [
-        'source_column',
-        'reference_column',
+        "source_column",
+        "reference_column",
     ]
 
 
@@ -86,11 +86,11 @@ class MachineTranslationLoader(ConditionalGenerationLoader):
     """A loader for machine translation."""
 
     JSON_FIELDS_DATALAB = [
-        ('translation', FileLoaderField.SOURCE_LANGUAGE),
-        ('translation', FileLoaderField.TARGET_LANGUAGE),
+        ("translation", FileLoaderField.SOURCE_LANGUAGE),
+        ("translation", FileLoaderField.TARGET_LANGUAGE),
     ]
 
     JSON_FIELDS = [
-        ('translation', FileLoaderField.SOURCE_LANGUAGE),
-        ('translation', FileLoaderField.TARGET_LANGUAGE),
+        ("translation", FileLoaderField.SOURCE_LANGUAGE),
+        ("translation", FileLoaderField.TARGET_LANGUAGE),
     ]

@@ -20,20 +20,20 @@ class ChunkingProcessor(SeqLabProcessor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         defaults: dict[str, dict[str, MetricConfig]] = {
-            'example': {
+            "example": {
                 "F1": SeqF1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,
-                    tag_schema='bio',
+                    tag_schema="bio",
                 )
             },
-            'span': {
+            "span": {
                 "F1": F1ScoreConfig(
                     source_language=source_language,
                     target_language=target_language,

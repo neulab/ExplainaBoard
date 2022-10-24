@@ -34,7 +34,7 @@ from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.typing_utils import narrow
 
 DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 @dataclass
@@ -65,8 +65,8 @@ class FileLoaderField:
     optional: bool = False
 
     # Special constants used in field mapping
-    SOURCE_LANGUAGE: ClassVar[str] = '__SOURCE_LANGUAGE__'
-    TARGET_LANGUAGE: ClassVar[str] = '__TARGET_LANGUAGE__'
+    SOURCE_LANGUAGE: ClassVar[str] = "__SOURCE_LANGUAGE__"
+    TARGET_LANGUAGE: ClassVar[str] = "__TARGET_LANGUAGE__"
 
     def __post_init__(self):
         """Validate data and set defaults."""
@@ -135,18 +135,18 @@ class FileLoaderMetadata:
         """
         # TODO(gneubig): A better way to do this might be through a library such as
         #                pydantic or dacite
-        source_language = data.get('source_language')
-        target_language = data.get('target_language')
-        if data.get('language'):
+        source_language = data.get("source_language")
+        target_language = data.get("target_language")
+        if data.get("language"):
             if source_language or target_language:
                 raise ValueError(
                     'can not set both "language" and "source_language"/'
                     '"target_language"'
                 )
-            source_language = target_language = data.get('language')
+            source_language = target_language = data.get("language")
         custom_features: dict[str, dict[str, FeatureType]] = {}
         custom_analyses: list[Analysis] = []
-        if 'custom_features' in data:
+        if "custom_features" in data:
             ft_serializer = PrimitiveSerializer()
             custom_features = {
                 k1: {
@@ -156,20 +156,20 @@ class FileLoaderMetadata:
                     )
                     for k2, v2 in v1.items()
                 }
-                for k1, v1 in data['custom_features'].items()
+                for k1, v1 in data["custom_features"].items()
             }
-        if 'custom_analyses' in data:
-            custom_analyses = data['custom_analyses']
+        if "custom_analyses" in data:
+            custom_analyses = data["custom_analyses"]
         return FileLoaderMetadata(
-            system_name=data.get('system_name'),
-            dataset_name=data.get('dataset_name'),
-            sub_dataset_name=data.get('sub_dataset_name'),
-            split=data.get('split'),
+            system_name=data.get("system_name"),
+            dataset_name=data.get("dataset_name"),
+            sub_dataset_name=data.get("sub_dataset_name"),
+            split=data.get("split"),
             source_language=source_language,
             target_language=target_language,
-            supported_languages=data.get('supported_languages', []),
-            task_name=data.get('task_name'),
-            supported_tasks=data.get('supported_tasks', []),
+            supported_languages=data.get("supported_languages", []),
+            task_name=data.get("task_name"),
+            supported_tasks=data.get("supported_tasks", []),
             custom_features=custom_features,
             custom_analyses=custom_analyses,
         )
@@ -184,12 +184,12 @@ class FileLoaderMetadata:
         Returns:
             A file loader metadata class.
         """
-        with open(file_name, 'r') as file_in:
+        with open(file_name, "r") as file_in:
             my_data = json.load(file_in)
-            if not isinstance(my_data, dict) or 'metadata' not in my_data:
-                raise ValueError(f'Could not find metadata in {file_name}')
+            if not isinstance(my_data, dict) or "metadata" not in my_data:
+                raise ValueError(f"Could not find metadata in {file_name}")
             else:
-                return FileLoaderMetadata.from_file(my_data['metadata'])
+                return FileLoaderMetadata.from_file(my_data["metadata"])
 
 
 @dataclass
@@ -369,13 +369,13 @@ class FileLoader:
             int_idx = int(field.src_name)
             if int_idx >= len(data_point):
                 raise ValueError(
-                    f'{cls.__name__}: Could not find '
+                    f"{cls.__name__}: Could not find "
                     f'field "{field.src_name}" in datapoint {data_point}'
                 )
             return data_point[int_idx]
         elif isinstance(data_point, dict):
             if isinstance(field.src_name, int):
-                raise ValueError(f'unexpected int index for dict data_point in {field}')
+                raise ValueError(f"unexpected int index for dict data_point in {field}")
             # Parse a string or tuple identifier
             field_list = (
                 [field.src_name] if isinstance(field.src_name, str) else field.src_name
@@ -387,7 +387,7 @@ class FileLoader:
                     if field.optional:
                         return None
                     raise ValueError(
-                        f'{cls.__name__}: Could not find '
+                        f"{cls.__name__}: Could not find "
                         f'field "{field.src_name}" in datapoint {data_point}'
                     )
                 ret_dict = ret_dict[sub_field]
@@ -428,13 +428,13 @@ class FileLoader:
         fields = self._map_fields(self._fields, actual_mapping)
         if raw_data.metadata.custom_features is not None:
             for level_name, feats in raw_data.metadata.custom_features.items():
-                if level_name == 'example':
+                if level_name == "example":
                     for feat in feats:
                         fields.append(FileLoaderField(feat, feat, None))
                 else:
                     raise ValueError(
-                        'cannot currently load custom features other '
-                        f'than on the example level (got {level_name})'
+                        "cannot currently load custom features other "
+                        f"than on the example level (got {level_name})"
                     )
         assert [x.src_name for x in before_fields] == [x.src_name for x in self._fields]
 
@@ -469,10 +469,10 @@ class TSVFileLoader(FileLoader):
         data = narrow(str, data)
         if source == Source.in_memory:
             file = StringIO(data)
-            lines = list(csv.reader(file, delimiter='\t', quoting=csv.QUOTE_NONE))
+            lines = list(csv.reader(file, delimiter="\t", quoting=csv.QUOTE_NONE))
         elif source == Source.local_filesystem:
             with open(data, "r", encoding="utf8") as fin:
-                lines = list(csv.reader(fin, delimiter='\t', quoting=csv.QUOTE_NONE))
+                lines = list(csv.reader(fin, delimiter="\t", quoting=csv.QUOTE_NONE))
         else:
             raise NotImplementedError
         return FileLoaderReturn(
@@ -574,26 +574,26 @@ class JSONFileLoader(FileLoader):
         if source == Source.in_memory:
             loaded = json.loads(data)
         elif source == Source.local_filesystem:
-            with open(data, 'r', encoding="utf8") as json_file:
+            with open(data, "r", encoding="utf8") as json_file:
                 loaded = json.load(json_file)
         else:
             raise NotImplementedError
         if isinstance(loaded, list):
             return FileLoaderReturn(loaded)
         else:
-            if 'examples' not in loaded or not isinstance(loaded['examples'], list):
+            if "examples" not in loaded or not isinstance(loaded["examples"], list):
                 raise ValueError(
-                    f'Error loading {data}. Input JSON files in dict '
+                    f"Error loading {data}. Input JSON files in dict "
                     'format must have a list "examples"'
                 )
-            raw_data = loaded.pop('examples')
-            if len(loaded) > 1 or (len(loaded) == 1 and 'metadata' not in loaded):
+            raw_data = loaded.pop("examples")
+            if len(loaded) > 1 or (len(loaded) == 1 and "metadata" not in loaded):
                 raise ValueError(
-                    f'Error loading {data}. Input JSON files in dict '
+                    f"Error loading {data}. Input JSON files in dict "
                     'format must have "examples" and optionally '
                     '"metadata", nothing else'
                 )
-            metadata = FileLoaderMetadata.from_dict(loaded.get('metadata', {}))
+            metadata = FileLoaderMetadata.from_dict(loaded.get("metadata", {}))
             return FileLoaderReturn(raw_data, metadata=metadata)
 
 
@@ -621,7 +621,7 @@ class DatalabFileLoader(FileLoader):
 
     @classmethod
     def _replace_one(cls, names: list[str], lab: int):
-        return names[lab] if lab != -1 else '_NULL_'
+        return names[lab] if lab != -1 else "_NULL_"
 
     @classmethod
     def _replace_labels(cls, features: dict, example: dict) -> dict:
@@ -660,12 +660,12 @@ class DatalabFileLoader(FileLoader):
             ds_feats = customized_features_from_config[config.dataset]
             if config.custom_features is None:
                 config.custom_features = {}
-            for level_name, level_feats in ds_feats['custom_features'].items():
-                if level_name != 'example':
+            for level_name, level_feats in ds_feats["custom_features"].items():
+                if level_name != "example":
                     raise NotImplementedError(
-                        'currently custom features are only '
-                        'supported on the example level, but got '
-                        f'{level_name}'
+                        "currently custom features are only "
+                        "supported on the example level, but got "
+                        f"{level_name}"
                     )
                 parsed_level_feats = {
                     # See https://github.com/python/mypy/issues/4717
@@ -682,7 +682,7 @@ class DatalabFileLoader(FileLoader):
         # TODO(gneubig): patch for an inconsistency in datalab, where DatasetDict
         #  doesn't have info
         if isinstance(dataset, DatasetDict) or isinstance(dataset, IterableDatasetDict):
-            raise ValueError('Cannot handle DatasetDict returns')
+            raise ValueError("Cannot handle DatasetDict returns")
         info = dataset.info
 
         # update src_name based on task schema (e.g., text1_column => sentence1)
@@ -703,12 +703,12 @@ class DatalabFileLoader(FileLoader):
             if metadata.custom_features is None:
                 metadata.custom_features = {}
             metadata.custom_features.update(
-                customized_features_from_config[config.dataset]['custom_features']
+                customized_features_from_config[config.dataset]["custom_features"]
             )
             if metadata.custom_analyses is None:
                 metadata.custom_analyses = []
             metadata.custom_analyses.extend(
-                customized_features_from_config[config.dataset]['custom_analyses']
+                customized_features_from_config[config.dataset]["custom_analyses"]
             )
 
         if info.languages is not None:

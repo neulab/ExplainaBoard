@@ -60,22 +60,22 @@ class AspectBasedSentimentClassificationProcessor(Processor):
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['text'], side='source'),
+                func=lambda info, x, c: count_tokens(info, x["text"], side="source"),
             ),
             "text_chars": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in characters",
-                func=lambda info, x, c: len(x['text']),
+                func=lambda info, x, c: len(x["text"]),
             ),
             "entity_number": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="number of named entities in the text",
-                func=lambda info, x, c: len(get_named_entities(x['text'])),
+                func=lambda info, x, c: len(get_named_entities(x["text"])),
             ),
             "aspect_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="aspect length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['aspect'], side='source'),
+                func=lambda info, x, c: count_tokens(info, x["aspect"], side="source"),
             ),
             "aspect_position": feature.Value(
                 dtype=feature.DataType.FLOAT,
@@ -87,7 +87,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -127,7 +127,7 @@ class AspectBasedSentimentClassificationProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:

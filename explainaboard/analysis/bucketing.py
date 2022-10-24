@@ -57,7 +57,7 @@ def continuous(
     if len(sample_features) == 0:
         return [AnalysisCaseCollection(samples=[], interval=_INFINITE_INTERVAL)]
     if isinstance(bucket_setting, Sequence) and len(bucket_setting) > 0:
-        raise NotImplementedError('bucket_setting incompatible with continuous')
+        raise NotImplementedError("bucket_setting incompatible with continuous")
     # Bucketing different Attributes
     cases = [x1 for x1, x2 in sample_features]
     vals = np.array([x2 for x1, x2 in sample_features])

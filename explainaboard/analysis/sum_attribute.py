@@ -10,11 +10,11 @@ from nltk import sent_tokenize, word_tokenize
 from nltk.util import ngrams
 
 try:
-    nltk.data.find('tokenizers/punkt')
+    nltk.data.find("tokenizers/punkt")
 except LookupError:
     # TODO(odashi): Avoid programatic download: it requires unnecessary outbound
     # connection and won't work in offline systems.
-    nltk.download('punkt')
+    nltk.download("punkt")
 
 
 class SUMAttribute:

@@ -32,8 +32,8 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
         f[0].features["attr_compression"] = feature.Value(
             dtype=feature.DataType.FLOAT,
             description="the ratio between source and reference length",
-            func=lambda info, x, c: c.features['source_length']
-            / c.features['reference_length'],
+            func=lambda info, x, c: c.features["source_length"]
+            / c.features["reference_length"],
         )
 
         return f
@@ -41,27 +41,27 @@ class MachineTranslationProcessor(ConditionalGenerationProcessor):
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         if sys_info.source_language is None or sys_info.target_language is None:
             raise ValueError(
-                'source or target languages must be specified to load '
-                f'translation data, but source={sys_info.source_language} '
-                f', target={sys_info.target_language}'
+                "source or target languages must be specified to load "
+                f"translation data, but source={sys_info.source_language} "
+                f", target={sys_info.target_language}"
             )
 
         samples_list = list(samples)
 
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples_list,
-            lambda x: x['source'],
+            lambda x: x["source"],
             unwrap(sys_info.source_tokenizer),
         )
 
         target_vocab, target_vocab_rank = accumulate_vocab_from_samples(
             samples_list,
-            lambda x: x['reference'],
+            lambda x: x["reference"],
             unwrap(sys_info.target_tokenizer),
         )
         return {
-            'source_vocab': source_vocab,
-            'source_vocab_rank': source_vocab_rank,
-            'target_vocab': target_vocab,
-            'target_vocab_rank': target_vocab_rank,
+            "source_vocab": source_vocab,
+            "source_vocab_rank": source_vocab_rank,
+            "target_vocab": target_vocab,
+            "target_vocab_rank": target_vocab_rank,
         }
