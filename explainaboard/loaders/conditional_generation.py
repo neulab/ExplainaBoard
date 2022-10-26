@@ -18,7 +18,7 @@ class ConditionalGenerationLoader(Loader):
     """Loader for the conditional generation task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     OUTPUT_FIELDS = ["source", "reference"]

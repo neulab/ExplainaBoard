@@ -18,7 +18,7 @@ class AspectBasedSentimentClassificationLoader(Loader):
     """Loader for the aspect based sentiment classification task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     @classmethod

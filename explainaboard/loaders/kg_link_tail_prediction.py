@@ -21,7 +21,7 @@ class KgLinkTailPredictionLoader(Loader):
     """Loader for the knowledge graph link prediction task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
 
     NOTE: kg task has a system output format that's different from all the
     other tasks. Samples are stored in a dict instead of a list so we have
