@@ -16,7 +16,7 @@ class GrammaticalErrorCorrectionLoader(Loader):
     """Loader for the grammatical error correction task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     JSON_FIELDS: list[str | tuple[str, str]] = ["text", "edits"]

@@ -17,7 +17,7 @@ class TabularClassificationLoader(Loader):
     """Loader for the tabular classification task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     @classmethod

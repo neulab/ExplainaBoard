@@ -17,7 +17,7 @@ class LanguageModelingLoader(Loader):
     """Loader for the language modeling task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     @classmethod
