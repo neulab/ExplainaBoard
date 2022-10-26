@@ -245,11 +245,10 @@ def create_parser():
     )
 
     parser.add_argument(
-        "--reload-stat",
-        type=str,
-        required=False,
-        default=None,
-        help="reload precomputed statistics over training set (if exists)",
+        "--no-use-cache",
+        dest="use_cache",
+        action="store_false",
+        help="Disable cached statistics over training set.",
     )
 
     parser.add_argument(
@@ -362,7 +361,7 @@ def main():
     """The main function to be executed."""
     args = create_parser().parse_args()
 
-    reload_stat: bool = False if args.reload_stat == "0" else True
+    use_cache: bool = args.use_cache
     system_outputs: list[str] = args.system_outputs
 
     reports: list[str] | None = args.reports
@@ -479,7 +478,6 @@ def main():
             "split_name": split,
             "source_language": source_language,
             "target_language": target_language,
-            "reload_stat": reload_stat,
             "confidence_alpha": args.confidence_alpha,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
@@ -510,6 +508,7 @@ def main():
                 metadata=metadata_copied,
                 sys_output=system_dataset.samples,
                 skip_failed_analyses=args.skip_failed_analyses,
+                use_cache=use_cache,
             )
             reports.append(report)
 

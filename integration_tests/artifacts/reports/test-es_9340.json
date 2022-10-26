@@ -6,7 +6,6 @@
     "metric_names": [
         "Accuracy"
     ],
-    "reload_stat": true,
     "is_print_case": true,
     "language": "es",
     "confidence_alpha": 0.05,

@@ -100,7 +100,6 @@ class SysOutputInfoTest(unittest.TestCase):
             dataset_split="quux",
             source_language="en",
             target_language="zh",
-            reload_stat=True,
             confidence_alpha=None,
             system_details={"detail": 123},
             source_tokenizer=tokenizer1,
@@ -126,7 +125,6 @@ class SysOutputInfoTest(unittest.TestCase):
             "dataset_split": "quux",
             "source_language": "en",
             "target_language": "zh",
-            "reload_stat": True,
             "system_details": {"detail": 123},
             "source_tokenizer": tokenizer1_serialized,
             "target_tokenizer": tokenizer2_serialized,
@@ -168,7 +166,6 @@ class SysOutputInfoTest(unittest.TestCase):
             self.assertEqual(deserialized.dataset_split, sysout.dataset_split)
             self.assertEqual(deserialized.source_language, sysout.source_language)
             self.assertEqual(deserialized.target_language, sysout.target_language)
-            self.assertEqual(deserialized.reload_stat, sysout.reload_stat)
             self.assertEqual(deserialized.confidence_alpha, sysout.confidence_alpha)
             self.assertEqual(deserialized.system_details, sysout.system_details)
             self.assertIsInstance(deserialized.source_tokenizer, SingleSpaceTokenizer)
@@ -191,7 +188,6 @@ class SysOutputInfoTest(unittest.TestCase):
         self.assertIsNone(deserialized.dataset_split)
         self.assertIsNone(deserialized.source_language)
         self.assertIsNone(deserialized.target_language)
-        self.assertEqual(deserialized.reload_stat, SysOutputInfo.DEFAULT_RELOAD_STAT)
         self.assertEqual(
             deserialized.confidence_alpha, SysOutputInfo.DEFAULT_CONFIDENCE_ALPHA
         )

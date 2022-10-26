@@ -81,14 +81,12 @@ class SysOutputInfo(Serializable):
         dataset_split (str): the name of the split.
         source_language (str): the language of the input
         target_language (str): the language of the output
-        reload_stat (bool): whether to reload the statistics or not
         system_details (dict): a dictionary of system details
         source_tokenizer (Tokenizer): the tokenizer for source sentences
         target_tokenizer (Tokenizer): the tokenizer for target sentences
         analysis_levels: the levels of analysis to perform
     """
 
-    DEFAULT_RELOAD_STAT: ClassVar[bool] = True
     DEFAULT_CONFIDENCE_ALPHA: ClassVar[float] = 0.05
 
     task_name: str | None = None
@@ -98,7 +96,6 @@ class SysOutputInfo(Serializable):
     dataset_split: str | None = None
     source_language: str | None = None
     target_language: str | None = None
-    reload_stat: bool = DEFAULT_RELOAD_STAT
     # NOTE(odashi): confidence_alpha == None has a meaning beyond "unset": it prevents
     # calculating confidence intervals.
     confidence_alpha: float | None = DEFAULT_CONFIDENCE_ALPHA
@@ -182,7 +179,6 @@ class SysOutputInfo(Serializable):
             "dataset_split": self.dataset_split,
             "source_language": self.source_language,
             "target_language": self.target_language,
-            "reload_stat": self.reload_stat,
             "confidence_alpha": self.confidence_alpha,
             "system_details": self.system_details,
             "source_tokenizer": self.source_tokenizer,
@@ -223,9 +219,6 @@ class SysOutputInfo(Serializable):
             dataset_split=_get_value(data, str, "dataset_split"),
             source_language=_get_value(data, str, "source_language"),
             target_language=_get_value(data, str, "target_language"),
-            reload_stat=unwrap_or(
-                _get_value(data, bool, "reload_stat"), cls.DEFAULT_RELOAD_STAT
-            ),
             confidence_alpha=confidence_alpha,
             system_details=system_details,
             source_tokenizer=_get_value(
