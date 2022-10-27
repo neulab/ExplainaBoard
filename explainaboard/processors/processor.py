@@ -157,7 +157,7 @@ class Processor(metaclass=abc.ABCMeta):
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo) -> Any:
         ...
 
-    def _gen_external_stats(self, sys_info: SysOutputInfo) -> Any:
+    def _gen_external_stats(self, sys_info: SysOutputInfo, use_cache: bool) -> Any:
         """Generate external statistics.
 
         These are gathered from a relatively costly source, such as the training set,
@@ -165,6 +165,7 @@ class Processor(metaclass=abc.ABCMeta):
 
         Args:
             sys_info: Information about the system outputs
+            use_cache: whether to reload the statistics from cache or not.
 
         Returns:
             Statistics from, usually, the training set that are used to calculate
@@ -179,7 +180,7 @@ class Processor(metaclass=abc.ABCMeta):
                 else sys_info.sub_dataset_name
             )
             # read statistics from cache
-            if sys_info.reload_stat:
+            if use_cache:
                 statistics = read_statistics_from_cache(
                     sys_info.dataset_name, sub_dataset
                 )
@@ -497,13 +498,17 @@ class Processor(metaclass=abc.ABCMeta):
                 raise ValueError(f"Invalid sort_by: {sort_by}")
 
     def get_overall_statistics(
-        self, metadata: dict, sys_output: list[dict]
+        self,
+        metadata: dict,
+        sys_output: list[dict],
+        use_cache: bool = True,
     ) -> OverallStatistics:
         """Get the overall statistics information of the system output.
 
         Args:
             metadata: The metadata of the system
             sys_output: The system output itself
+            use_cache: whether to reload the statistics from cache or not.
         """
         if metadata is None:
             metadata = {}
@@ -542,7 +547,7 @@ class Processor(metaclass=abc.ABCMeta):
         )
 
         # get scoring statistics
-        external_stats = self._gen_external_stats(sys_info)
+        external_stats = self._gen_external_stats(sys_info, use_cache)
 
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []
@@ -561,7 +566,11 @@ class Processor(metaclass=abc.ABCMeta):
 
     @final
     def process(
-        self, metadata: dict, sys_output: list[dict], skip_failed_analyses: bool = False
+        self,
+        metadata: dict,
+        sys_output: list[dict],
+        skip_failed_analyses: bool = False,
+        use_cache: bool = True,
     ) -> SysOutputInfo:
         """Run the whole process of processing the output.
 
@@ -569,11 +578,16 @@ class Processor(metaclass=abc.ABCMeta):
             metadata: The metadata used to specify information about processing.
             sys_output: They list of system outputs.
             skip_failed_analyses: Whether to skip failed analyses.
+            use_cache: whether to reload the statistics or not.
 
         Returns:
             Information about the processed system output.
         """
-        overall_statistics = self.get_overall_statistics(metadata, sys_output)
+        overall_statistics = self.get_overall_statistics(
+            metadata,
+            sys_output,
+            use_cache,
+        )
         sys_info = unwrap(overall_statistics.sys_info)
         analyses = self.perform_analyses(
             sys_info,
