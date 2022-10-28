@@ -235,7 +235,7 @@ class BucketAnalysisDetails(AnalysisDetails):
                     f"{bucket_name}\t" f"{metric_value}\t" f"{bucket_perf.n_samples}"
                 )
 
-            texts.append('')
+            texts.append("")
 
         return "\n".join(texts)
 
@@ -410,7 +410,7 @@ class CalibrationAnalysisDetails(AnalysisDetails):
                 )
             confidence = metric_result.get_value_or_none(Score, "confidence")
             if confidence is None:
-                raise ValueError("MetricResult does not have the \"confidence\" score.")
+                raise ValueError('MetricResult does not have the "confidence" score.')
 
     def generate_report(self, name: str, level: str) -> str:
         """Implements AnalysisDetails.generate_report."""
@@ -433,11 +433,11 @@ class CalibrationAnalysisDetails(AnalysisDetails):
 
                 texts.append(f"{bucket_name}\t" f"{score}\t" f"{bucket_perf.n_samples}")
 
-            texts.append('')
+            texts.append("")
 
         texts.append(f"expected_calibration_error\t{self.expected_calibration_error}")
         texts.append(f"maximum_calibration_error\t{self.maximum_calibration_error}")
-        texts.append('')
+        texts.append("")
         return "\n".join(texts)
 
     def serialize(self) -> dict[str, SerializableData]:
@@ -532,8 +532,8 @@ class CalibrationAnalysis(Analysis):
                 f"calibration analysis: feature {self.feature} not found."
             )
 
-        acc_metric = metrics.get('Accuracy', None)
-        metric_stat = stats.get('Accuracy', None)
+        acc_metric = metrics.get("Accuracy", None)
+        metric_stat = stats.get("Accuracy", None)
         if not acc_metric or not metric_stat:
             raise RuntimeError("calibration analysis: metric Accuracy not found.")
 
@@ -706,13 +706,13 @@ class ComboCountAnalysisDetails(AnalysisDetails):
         """Implements AnalysisResult.generate_report."""
         texts: list[str] = []
 
-        texts.append('feature combos for ' + ', '.join(self.features))
-        texts.append('\t'.join(self.features + ('#',)))
+        texts.append("feature combos for " + ", ".join(self.features))
+        texts.append("\t".join(self.features + ("#",)))
 
         for occ in sorted(self.combo_occurrences):
-            texts.append('\t'.join(occ.features + (str(occ.sample_count),)))
+            texts.append("\t".join(occ.features + (str(occ.sample_count),)))
 
-        texts.append('')
+        texts.append("")
         return "\n".join(texts)
 
     def serialize(self) -> dict[str, SerializableData]:
@@ -784,7 +784,7 @@ class ComboCountAnalysis(Analysis):
         ]
 
         return AnalysisResult(
-            name='combo(' + ','.join(self.features) + ')',
+            name="combo(" + ",".join(self.features) + ")",
             level=self.level,
             details=ComboCountAnalysisDetails(
                 features=self.features,
@@ -857,5 +857,24 @@ class AnalysisLevel(Serializable):
         return cls(
             name=narrow(str, data["name"]),
             features=features,
+            metric_configs=metric_configs,
+        )
+
+    @final
+    def replace_metric_configs(
+        self, metric_configs: dict[str, MetricConfig]
+    ) -> AnalysisLevel:
+        """Creates a new AnalysisLevel with replacing the set of MetricConfigs.
+
+        Args:
+            metric_configs:
+                New dict of MetricConfigs to replace the original member.
+
+        Returns:
+            A new MetricConfigs with the replaced metric_configs.
+        """
+        return AnalysisLevel(
+            name=self.name,
+            features=self.features,
             metric_configs=metric_configs,
         )

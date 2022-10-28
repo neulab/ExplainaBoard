@@ -82,7 +82,7 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
         metric_names_iter = itertools.chain.from_iterable(metric_config_dict_iter)
 
         metadata = {
-            'custom_features': {
+            "custom_features": {
                 name: {
                     "dtype": "string",  # for rank flipping, True or False
                     "description": name,
@@ -110,7 +110,7 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
         )
         model1_metric_is_greater = {
             metric_name: m1_overall[metric_name].value > m2_overall[metric_name].value
-            for metric_name in metadata['custom_features'].keys()
+            for metric_name in metadata["custom_features"].keys()
         }
         return model1_metric_is_greater
 
@@ -141,31 +141,31 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
 
             # bucket info (feature name, bucket interval, bucket name, bucket size)
             # should match exactly
-            if m1_bucket['feature_name'] != m2_bucket['feature_name']:
+            if m1_bucket["feature_name"] != m2_bucket["feature_name"]:
                 raise ValueError(
-                    f'feature name does not match:\n{m1_bucket} vs {m2_bucket}'
+                    f"feature name does not match:\n{m1_bucket} vs {m2_bucket}"
                 )
-            if m1_bucket['bucket_interval'] != m2_bucket['bucket_interval']:
+            if m1_bucket["bucket_interval"] != m2_bucket["bucket_interval"]:
                 raise ValueError(
-                    f'bucket interval does not match:\n{m1_bucket} vs {m2_bucket}'
+                    f"bucket interval does not match:\n{m1_bucket} vs {m2_bucket}"
                 )
-            if m1_bucket['bucket_name'] != m2_bucket['bucket_name']:
+            if m1_bucket["bucket_name"] != m2_bucket["bucket_name"]:
                 raise ValueError(
-                    f'bucket name does not match:\n{m1_bucket} vs {m2_bucket}'
+                    f"bucket name does not match:\n{m1_bucket} vs {m2_bucket}"
                 )
-            if m1_bucket['bucket_size'] != m2_bucket['bucket_size']:
+            if m1_bucket["bucket_size"] != m2_bucket["bucket_size"]:
                 raise ValueError(
-                    f'bucket size does not match:\n{m1_bucket} vs {m2_bucket}'
+                    f"bucket size does not match:\n{m1_bucket} vs {m2_bucket}"
                 )
 
             # calculate difference metrics
             example = {
-                'feature_name': m1_bucket['feature_name'],
-                'bucket_interval': m1_bucket['bucket_interval'],
-                'bucket_name': m1_bucket['bucket_name'],
-                'bucket_size': m1_bucket['bucket_size'],
+                "feature_name": m1_bucket["feature_name"],
+                "bucket_interval": m1_bucket["bucket_interval"],
+                "bucket_name": m1_bucket["bucket_name"],
+                "bucket_size": m1_bucket["bucket_size"],
             }
-            for feature in metadata['custom_features'].keys():
+            for feature in metadata["custom_features"].keys():
                 reference = reference_dict[feature]
                 example[feature] = RankFlippingMetaAnalysis._is_flipped(
                     m1_bucket[feature], m2_bucket[feature], reference
@@ -196,14 +196,14 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
         # for rank-flipping, it's very easy to bucket, since there are only 2
         # buckets (True or False). Let's just immediately calculate it here.
         rank_flipping_buckets = {
-            metric_name: {'ranking_same': 0, 'ranking_flipped': 0}
-            for metric_name in metadata['custom_features'].keys()
+            metric_name: {"ranking_same": 0, "ranking_flipped": 0}
+            for metric_name in metadata["custom_features"].keys()
         }
 
         for example in aggregated_sysout:
-            for metric_name in metadata['custom_features'].keys():
+            for metric_name in metadata["custom_features"].keys():
                 if example[metric_name]:
-                    rank_flipping_buckets[metric_name]['ranking_flipped'] += 1
+                    rank_flipping_buckets[metric_name]["ranking_flipped"] += 1
                 else:
-                    rank_flipping_buckets[metric_name]['ranking_same'] += 1
+                    rank_flipping_buckets[metric_name]["ranking_same"] += 1
         return rank_flipping_buckets

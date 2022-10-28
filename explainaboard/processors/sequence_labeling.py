@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from collections.abc import Iterable
 import copy
-from typing import Any, cast, List
+from typing import Any, cast
 
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import (
@@ -35,7 +35,7 @@ class SeqLabProcessor(Processor):
         """Returns the default metrics of this processor."""
         ...
 
-    _DEFAULT_TAG = 'O'
+    _DEFAULT_TAG = "O"
 
     def __init__(self):
         """Constructor."""
@@ -61,22 +61,22 @@ class SeqLabProcessor(Processor):
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
-                func=lambda info, x, c: len(x['tokens']),
+                func=lambda info, x, c: len(x["tokens"]),
             ),
             "span_density": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="ratio of entity tokens to all tokens",
                 func=lambda info, x, c: float(
-                    len([y for y in x['true_tags'] if y != self._DEFAULT_TAG])
+                    len([y for y in x["true_tags"] if y != self._DEFAULT_TAG])
                 )
-                / len(x['true_tags']),
+                / len(x["true_tags"]),
             ),
             "num_oov": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['tokens'], stat['vocab'], side='none'
+                    info, x["tokens"], stat["vocab"], side="none"
                 ),
             ),
             "fre_rank": feature.Value(
@@ -84,7 +84,7 @@ class SeqLabProcessor(Processor):
                 description="average rank of each word based on training set frequency",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['tokens'], stat['vocab_rank'], side='none'
+                    info, x["tokens"], stat["vocab_rank"], side="none"
                 ),
             ),
         }
@@ -118,7 +118,7 @@ class SeqLabProcessor(Processor):
             "span_rel_pos": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="relative position of the span",
-                func=lambda info, x, c: c.token_span[0] / len(x['tokens']),
+                func=lambda info, x, c: c.token_span[0] / len(x["tokens"]),
             ),
             "span_chars": feature.Value(
                 dtype=feature.DataType.FLOAT,
@@ -129,28 +129,28 @@ class SeqLabProcessor(Processor):
                 dtype=feature.DataType.FLOAT,
                 description="consistency of the span labels",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['econ_dic'].get(
-                    f'{c.text.lower()}|||{c.true_label}', 0.0
+                func=lambda info, x, c, stat: stat["econ_dic"].get(
+                    f"{c.text.lower()}|||{c.true_label}", 0.0
                 ),
             ),
             "span_efre": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="frequency of the span in the training set",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['efre_dic'].get(c.text.lower(), 0.0),
+                func=lambda info, x, c, stat: stat["efre_dic"].get(c.text.lower(), 0.0),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=examp_features,
-                metric_configs=self.default_metrics(level='example'),
+                metric_configs=self.default_metrics(level="example"),
             ),
             AnalysisLevel(
-                name='span',
+                name="span",
                 features=span_features,
-                metric_configs=self.default_metrics(level='span'),
+                metric_configs=self.default_metrics(level="span"),
             ),
         ]
 
@@ -231,38 +231,38 @@ class SeqLabProcessor(Processor):
         statistics: Any,
         analysis_level: AnalysisLevel,
     ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
-        if analysis_level.name == 'example':
+        if analysis_level.name == "example":
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
             )
-        elif analysis_level.name != 'span':
-            raise ValueError(f'{analysis_level.name}-level analysis not supported')
+        elif analysis_level.name != "span":
+            raise ValueError(f"{analysis_level.name}-level analysis not supported")
         # Do span-level analysis
         cases: list[AnalysisCaseLabeledSpan] = []
         # Calculate features
         for i, output in progress(
-            enumerate(sys_output), desc='calculating span-level features'
+            enumerate(sys_output), desc="calculating span-level features"
         ):
             # get the spans from each sentence
             tokens = output["tokens"]
-            true_spans = self._span_ops.get_spans(toks=tokens, tags=output['true_tags'])
-            pred_spans = self._span_ops.get_spans(toks=tokens, tags=output['pred_tags'])
+            true_spans = self._span_ops.get_spans(toks=tokens, tags=output["true_tags"])
+            pred_spans = self._span_ops.get_spans(toks=tokens, tags=output["pred_tags"])
             # merge the spans together
             merged_spans: dict[tuple[int, int], Span] = {}
             for span in true_spans:
-                span.span_tag = f'{span.span_tag} {self._DEFAULT_TAG}'
+                span.span_tag = f"{span.span_tag} {self._DEFAULT_TAG}"
                 merged_spans[unwrap(span.span_pos)] = span
             for span in pred_spans:
                 merged_span = merged_spans.get(unwrap(span.span_pos))
                 if not merged_span:
-                    span.span_tag = f'{self._DEFAULT_TAG} {span.span_tag}'
+                    span.span_tag = f"{self._DEFAULT_TAG} {span.span_tag}"
                     merged_spans[unwrap(span.span_pos)] = span
                 else:
-                    true_tag, _ = unwrap(merged_span.span_tag).split(' ')
-                    merged_span.span_tag = f'{true_tag} {span.span_tag}'
+                    true_tag, _ = unwrap(merged_span.span_tag).split(" ")
+                    merged_span.span_tag = f"{true_tag} {span.span_tag}"
             # analysis cases
             for ms in merged_spans.values():
-                true_tag, pred_tag = unwrap(ms.span_tag).split(' ')
+                true_tag, pred_tag = unwrap(ms.span_tag).split(" ")
                 case = AnalysisCaseLabeledSpan(
                     sample_id=i,
                     features={},
@@ -276,7 +276,7 @@ class SeqLabProcessor(Processor):
                 for feat_name, feat_spec in analysis_level.features.items():
                     if feat_spec.func is None:
                         raise ValueError(
-                            f'could not find feature function for {feat_name}'
+                            f"could not find feature function for {feat_name}"
                         )
                     elif not feat_spec.require_training_set:
                         case.features[feat_name] = feat_spec.func(
@@ -294,7 +294,7 @@ class SeqLabProcessor(Processor):
             name: config.to_metric().calc_stats_from_data(true_data, pred_data)
             for name, config in analysis_level.metric_configs.items()
         }
-        return cast(List[AnalysisCase], cases), metric_stats
+        return cast(list[AnalysisCase], cases), metric_stats
 
     def get_econ_efre_dic(
         self, words: list[str], bio_tags: list[str]
@@ -323,10 +323,10 @@ class SeqLabProcessor(Processor):
             idx_start = true_chunk[1]
             idx_end = true_chunk[2]
             chunk_to_tag[(idx_start, idx_end)] = true_chunk[0]
-            span_str = ''
+            span_str = ""
             for i in range(0, idx_end - idx_start):
                 w = words[idx_start + i].lower()
-                span_str += w if i == 0 else f' {w}'
+                span_str += w if i == 0 else f" {w}"
                 prefixes.add(span_str)
             entity_to_tagcnt[span_str] = {}
             efre_dic[span_str] = efre_dic.get(span_str, 0) + 1
@@ -334,10 +334,10 @@ class SeqLabProcessor(Processor):
         # Actually calculate stats
         ltws = len(words)
         for idx_start in range(ltws):
-            span_str = ''
+            span_str = ""
             for i in range(0, ltws - idx_start):
                 w = words[idx_start + i].lower()
-                span_str += w if i == 0 else f' {w}'
+                span_str += w if i == 0 else f" {w}"
                 if span_str not in prefixes:
                     break
                 if span_str in entity_to_tagcnt:
@@ -352,7 +352,7 @@ class SeqLabProcessor(Processor):
         for span_str, cnt_dic in entity_to_tagcnt.items():
             cnt_sum = float(sum(cnt_dic.values()))
             for tag, cnt in cnt_dic.items():
-                econ_dic[f'{span_str}|||{tag}'] = cnt / cnt_sum
+                econ_dic[f"{span_str}|||{tag}"] = cnt / cnt_sum
         return econ_dic, efre_dic
 
     def deserialize_system_output(self, output: dict) -> dict:

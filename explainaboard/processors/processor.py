@@ -157,7 +157,7 @@ class Processor(metaclass=abc.ABCMeta):
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo) -> Any:
         ...
 
-    def _gen_external_stats(self, sys_info: SysOutputInfo) -> Any:
+    def _gen_external_stats(self, sys_info: SysOutputInfo, use_cache: bool) -> Any:
         """Generate external statistics.
 
         These are gathered from a relatively costly source, such as the training set,
@@ -165,6 +165,7 @@ class Processor(metaclass=abc.ABCMeta):
 
         Args:
             sys_info: Information about the system outputs
+            use_cache: whether to reload the statistics from cache or not.
 
         Returns:
             Statistics from, usually, the training set that are used to calculate
@@ -179,7 +180,7 @@ class Processor(metaclass=abc.ABCMeta):
                 else sys_info.sub_dataset_name
             )
             # read statistics from cache
-            if sys_info.reload_stat:
+            if use_cache:
                 statistics = read_statistics_from_cache(
                     sys_info.dataset_name, sub_dataset
                 )
@@ -250,26 +251,35 @@ class Processor(metaclass=abc.ABCMeta):
 
         Args:
             custom_features: the features to customize
-            metric_configs: additional metric configurations. Keys are analysis level
-                name and metric name.
+            metric_configs: MetricConfgs to replace.
+                If `metric_configs[analysis_level_name]` has a dict, it is used instead
+                of the default MetricConfigs associated to `analysis_level_name`.
             custom_analyses: the analyses to customize
 
         Returns:
             Customized analyses.
         """
-        analysis_levels = self.default_analysis_levels()
-        analyses = self.default_analyses()
-        for level in analysis_levels:
-            for name, config in metric_configs.get(level.name, {}).items():
-                level.metric_configs[name] = config
-            for config in level.metric_configs.values():
-                config.source_language = sys_info.source_language
-                config.target_language = sys_info.target_language
+        analysis_levels: list[AnalysisLevel] = []
+
+        # Replaces MetricConfigs for each AnalysisLevel.
+        for level in self.default_analysis_levels():
+            metric_configs_orig = metric_configs.get(level.name, level.metric_configs)
+            metric_configs_replaced = {
+                name: config.replace_languages(
+                    source_language=sys_info.source_language,
+                    target_language=sys_info.target_language,
+                )
+                for name, config in metric_configs_orig.items()
+            }
+            analysis_levels.append(
+                level.replace_metric_configs(metric_configs_replaced)
+            )
 
         level_map = {x.name: x for x in analysis_levels}
 
         serializer = PrimitiveSerializer()
 
+        analyses = self.default_analyses()
         analyses.extend(
             [
                 narrow(Analysis, serializer.deserialize(v))  # type: ignore
@@ -358,9 +368,9 @@ class Processor(metaclass=abc.ABCMeta):
                 - List of analysis levels.
                 - Mapping from metric name to stats.
         """
-        if analysis_level.name != 'example':
+        if analysis_level.name != "example":
             raise NotImplementedError(
-                f'Does not support analysis level {analysis_level.name} by default'
+                f"Does not support analysis level {analysis_level.name} by default"
             )
 
         # Calculate metrics
@@ -374,7 +384,7 @@ class Processor(metaclass=abc.ABCMeta):
         # Calculate features
         cases: list[AnalysisCase] = []
         for i, output in progress(
-            enumerate(sys_output), desc='calculating example-level features'
+            enumerate(sys_output), desc="calculating example-level features"
         ):
             case = AnalysisCase(sample_id=i, features={})
             for feat_name, feat_spec in analysis_level.features.items():
@@ -461,7 +471,7 @@ class Processor(metaclass=abc.ABCMeta):
             bucket_result = analysis_result.details.bucket_performances
 
             # based on alphabetical order of the bucket lower boundary; low to high
-            if sort_by == 'key':
+            if sort_by == "key":
                 if bucket_result[0].bucket_interval is not None:
                     # Sort by intervals.
                     bucket_result.sort(key=lambda x: unwrap(x.bucket_interval))
@@ -470,7 +480,7 @@ class Processor(metaclass=abc.ABCMeta):
                     bucket_result.sort(key=lambda x: unwrap(x.bucket_name))
             # sort based on the value of the first perf value, whatever that may
             # be; high to low
-            elif sort_by == 'performance_value':
+            elif sort_by == "performance_value":
                 if sort_by_metric is None:
                     raise ValueError("sort_by_metric must be set.")
                 bucket_result.sort(
@@ -480,7 +490,7 @@ class Processor(metaclass=abc.ABCMeta):
                     reverse=not sort_ascending,
                 )
             # sort by the number of samples in each bucket
-            elif sort_by == 'n_bucket_samples':
+            elif sort_by == "n_bucket_samples":
                 bucket_result.sort(
                     key=lambda x: x.n_samples, reverse=not sort_ascending
                 )
@@ -488,20 +498,25 @@ class Processor(metaclass=abc.ABCMeta):
                 raise ValueError(f"Invalid sort_by: {sort_by}")
 
     def get_overall_statistics(
-        self, metadata: dict, sys_output: list[dict]
+        self,
+        metadata: dict,
+        sys_output: list[dict],
+        use_cache: bool = True,
     ) -> OverallStatistics:
         """Get the overall statistics information of the system output.
 
         Args:
             metadata: The metadata of the system
             sys_output: The system output itself
+            use_cache: whether to reload the statistics from cache or not.
         """
         if metadata is None:
             metadata = {}
         if "task_name" not in metadata.keys():
             metadata["task_name"] = self.task_type().value
 
-        sys_info = SysOutputInfo.from_dict(metadata)
+        sys_info = SysOutputInfo.from_any_dict(metadata)
+
         if sys_info.target_tokenizer is None:
             sys_info.target_tokenizer = self.get_tokenizer(sys_info.target_language)
 
@@ -513,19 +528,26 @@ class Processor(metaclass=abc.ABCMeta):
             )
 
         # declare customized features: _features will be updated
-        custom_features: dict = metadata.get('custom_features', {})
-        custom_analyses: list = metadata.get('custom_analyses', [])
+        custom_features: dict = metadata.get("custom_features", {})
+        custom_analyses: list = metadata.get("custom_analyses", [])
 
-        metric_configs: dict[str, dict[str, MetricConfig]] = {
-            "example": metadata.get('metric_configs', {})
-        }
+        metric_configs = metadata.get("metric_configs")
+        if metric_configs is not None:
+            metric_configs_dict = {
+                "example": {
+                    narrow(str, k): narrow(MetricConfig, v)  # type: ignore
+                    for k, v in metric_configs.items()
+                }
+            }
+        else:
+            metric_configs_dict = {}
 
         sys_info.analysis_levels, sys_info.analyses = self._customize_analyses(
-            sys_info, custom_features, metric_configs, custom_analyses
+            sys_info, custom_features, metric_configs_dict, custom_analyses
         )
 
         # get scoring statistics
-        external_stats = self._gen_external_stats(sys_info)
+        external_stats = self._gen_external_stats(sys_info, use_cache)
 
         # generate cases for each level
         analysis_cases: list[list[AnalysisCase]] = []
@@ -544,7 +566,11 @@ class Processor(metaclass=abc.ABCMeta):
 
     @final
     def process(
-        self, metadata: dict, sys_output: list[dict], skip_failed_analyses: bool = False
+        self,
+        metadata: dict,
+        sys_output: list[dict],
+        skip_failed_analyses: bool = False,
+        use_cache: bool = True,
     ) -> SysOutputInfo:
         """Run the whole process of processing the output.
 
@@ -552,11 +578,16 @@ class Processor(metaclass=abc.ABCMeta):
             metadata: The metadata used to specify information about processing.
             sys_output: They list of system outputs.
             skip_failed_analyses: Whether to skip failed analyses.
+            use_cache: whether to reload the statistics or not.
 
         Returns:
             Information about the processed system output.
         """
-        overall_statistics = self.get_overall_statistics(metadata, sys_output)
+        overall_statistics = self.get_overall_statistics(
+            metadata,
+            sys_output,
+            use_cache,
+        )
         sys_info = unwrap(overall_statistics.sys_info)
         analyses = self.perform_analyses(
             sys_info,
@@ -567,9 +598,9 @@ class Processor(metaclass=abc.ABCMeta):
 
         self.sort_bucket_info(
             analyses,
-            sort_by=metadata.get('sort_by', 'key'),
-            sort_by_metric=metadata.get('sort_by_metric'),
-            sort_ascending=metadata.get('sort_ascending', False),
+            sort_by=metadata.get("sort_by", "key"),
+            sort_by_metric=metadata.get("sort_by_metric"),
+            sort_ascending=metadata.get("sort_ascending", False),
         )
         sys_info.results = Result(overall=sys_info.results.overall, analyses=analyses)
         return sys_info

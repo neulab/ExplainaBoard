@@ -40,8 +40,8 @@ class AccuracyConfigTest(unittest.TestCase):
 class AccuracyTest(unittest.TestCase):
     def test_evaluate(self) -> None:
         metric = AccuracyConfig().to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a']
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = ["a", "b", "a", "b", "b", "a"]
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
 
@@ -87,8 +87,8 @@ class CorrectCountConfigTest(unittest.TestCase):
 class CorrectCountTest(unittest.TestCase):
     def test_evaluate(self) -> None:
         metric = CorrectCountConfig().to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a']
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = ["a", "b", "a", "b", "b", "a"]
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 4)
 

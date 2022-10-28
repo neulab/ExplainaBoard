@@ -22,9 +22,9 @@ class NERTest(unittest.TestCase):
     conll_output_full = os.path.join(artifact_path, "conll2003-elmo-output.conll")
 
     json_output_customized = cache_api.cache_online_file(
-        'https://storage.googleapis.com/inspired-public-data/'
-        'explainaboard/task_data/named_entity_recognition/test-conll03.json',
-        'explainaboard/task_data/named_entity_recognition/test-conll03.json',
+        "https://storage.googleapis.com/inspired-public-data/"
+        "explainaboard/task_data/named_entity_recognition/test-conll03.json",
+        "explainaboard/task_data/named_entity_recognition/test-conll03.json",
     )
 
     def test_generate_system_analysis(self):
@@ -92,7 +92,7 @@ class NERTest(unittest.TestCase):
         self.assertTrue("span_efre" in span_analysis_map)
 
         # 2. Unittest: test the number of buckets of training dependent features
-        analysis = narrow(AnalysisResult, span_analysis_map['span_econ'])
+        analysis = narrow(AnalysisResult, span_analysis_map["span_econ"])
         details = narrow(BucketAnalysisDetails, analysis.details)
         self.assertEqual(len(details.bucket_performances), 3)
 

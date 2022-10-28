@@ -33,10 +33,10 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
             example_features: dict[str, Any] = {}
             for metric_name, metric_result in bucket.results.items():
 
-                example_features['feature_name'] = result.name
-                example_features['bucket_interval'] = bucket.bucket_interval
-                example_features['bucket_name'] = bucket.bucket_name
-                example_features['bucket_size'] = bucket.n_samples
+                example_features["feature_name"] = result.name
+                example_features["bucket_interval"] = bucket.bucket_interval
+                example_features["bucket_name"] = bucket.bucket_name
+                example_features["bucket_size"] = bucket.n_samples
                 example_features[metric_name] = metric_result.get_value(
                     Score, "value"
                 ).value

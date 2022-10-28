@@ -68,9 +68,9 @@ class TypeRegistry(Generic[T]):
                     * `cls` is already registered.
             """
             if name in self._str_to_cls:
-                raise ValueError(f"Name \"{name}\" is already used in the registry.")
+                raise ValueError(f'Name "{name}" is already used in the registry.')
             if cls in self._cls_to_str:
-                raise ValueError(f"Type \"{cls.__name__}\" is already registered.")
+                raise ValueError(f'Type "{cls.__name__}" is already registered.')
             self._str_to_cls[name] = cls
             self._cls_to_str[cls] = name
             return cls
@@ -91,7 +91,7 @@ class TypeRegistry(Generic[T]):
         """
         cls = self._str_to_cls.get(name)
         if cls is None:
-            raise ValueError(f"No type associated to the name \"{name}\".")
+            raise ValueError(f'No type associated to the name "{name}".')
         return cls
 
     def get_name(self, cls: type[T]) -> str:
@@ -108,5 +108,5 @@ class TypeRegistry(Generic[T]):
         """
         name = self._cls_to_str.get(cls)
         if name is None:
-            raise ValueError(f"No name associated to the type \"{cls.__name__}\".")
+            raise ValueError(f'No name associated to the type "{cls.__name__}".')
         return name

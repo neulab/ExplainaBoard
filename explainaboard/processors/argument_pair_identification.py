@@ -47,13 +47,13 @@ class ArgumentPairIdentificationProcessor(Processor):
             "context_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="context length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['context']),
+                func=lambda info, x, c: count_tokens(info, x["context"]),
             ),
             "query_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the length in tokens of true query",
                 func=lambda info, x, c: count_tokens(
-                    info, x['query'][int(x['true_label'])]
+                    info, x["query"][int(x["true_label"])]
                 ),
             ),
             "num_oov": feature.Value(
@@ -61,7 +61,7 @@ class ArgumentPairIdentificationProcessor(Processor):
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['context'], stat['vocab']
+                    info, x["context"], stat["vocab"]
                 ),
             ),
             "fre_rank": feature.Value(
@@ -72,7 +72,7 @@ class ArgumentPairIdentificationProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['context'], stat['vocab_rank']
+                    info, x["context"], stat["vocab_rank"]
                 ),
             ),
             "length_fre": feature.Value(
@@ -80,14 +80,14 @@ class ArgumentPairIdentificationProcessor(Processor):
                 description="the frequency of context length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(
-                    info, x['context'], stat['length_fre']
+                    info, x["context"], stat["length_fre"]
                 ),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -101,7 +101,7 @@ class ArgumentPairIdentificationProcessor(Processor):
 
     @classmethod
     def default_metrics(
-        cls, level='example', source_language=None, target_language=None
+        cls, level="example", source_language=None, target_language=None
     ) -> dict[str, MetricConfig]:
         """See Processor.default_metrics."""
         return {"Accuracy": AccuracyConfig()}

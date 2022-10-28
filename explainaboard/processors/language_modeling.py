@@ -43,19 +43,19 @@ class LanguageModelingProcessor(Processor):
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['text']),
+                func=lambda info, x, c: count_tokens(info, x["text"]),
             ),
             "text_chars": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in characters",
-                func=lambda info, x, c: len(x['text']),
+                func=lambda info, x, c: len(x["text"]),
             ),
             "num_oov": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['text'], stat['vocab']
+                    info, x["text"], stat["vocab"]
                 ),
             ),
             "fre_rank": feature.Value(
@@ -66,7 +66,7 @@ class LanguageModelingProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['text'], stat['vocab_rank']
+                    info, x["text"], stat["vocab_rank"]
                 ),
             ),
             "length_fre": feature.Value(
@@ -74,7 +74,7 @@ class LanguageModelingProcessor(Processor):
                 description="the frequency of text length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(
-                    info, x['text'], stat['length_fre']
+                    info, x["text"], stat["length_fre"]
                 ),
             ),
         }
@@ -97,7 +97,7 @@ class LanguageModelingProcessor(Processor):
             "tok_position": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description=("The relative position of a token in a sentence"),
-                func=lambda info, x, c: c.token_span[0] / count_tokens(info, x['text']),
+                func=lambda info, x, c: c.token_span[0] / count_tokens(info, x["text"]),
             ),
             "tok_chars": feature.Value(
                 dtype=feature.DataType.FLOAT,
@@ -115,20 +115,20 @@ class LanguageModelingProcessor(Processor):
                 dtype=feature.DataType.FLOAT,
                 description="tok frequency in the training set",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['vocab'].get(c.text, 0.0),
+                func=lambda info, x, c, stat: stat["vocab"].get(c.text, 0.0),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=examp_features,
-                metric_configs=self.default_metrics(level='example'),
+                metric_configs=self.default_metrics(level="example"),
             ),
             AnalysisLevel(
-                name='token',
+                name="token",
                 features=tok_features,
-                metric_configs=self.default_metrics(level='token'),
+                metric_configs=self.default_metrics(level="token"),
             ),
         ]
 
@@ -141,7 +141,7 @@ class LanguageModelingProcessor(Processor):
                 if (
                     isinstance(v, Value)
                     and v.dtype == DataType.FLOAT
-                    and k != 'tok_log_prob'
+                    and k != "tok_log_prob"
                 ):
                     analyses.append(
                         BucketAnalysis(
@@ -160,28 +160,28 @@ class LanguageModelingProcessor(Processor):
         statistics: Any,
         analysis_level: AnalysisLevel,
     ) -> tuple[list[AnalysisCase], dict[str, MetricStats]]:
-        if analysis_level.name == 'example':
+        if analysis_level.name == "example":
             return super()._gen_cases_and_stats(
                 sys_info, sys_output, statistics, analysis_level
             )
-        elif analysis_level.name != 'token':
-            raise ValueError(f'{analysis_level.name}-level analysis not supported')
+        elif analysis_level.name != "token":
+            raise ValueError(f"{analysis_level.name}-level analysis not supported")
         # Do tok-level analysis
         cases: list[AnalysisCase] = []
         # Calculate features
         for i, output in progress(
-            enumerate(sys_output), desc='calculating tok-level features'
+            enumerate(sys_output), desc="calculating tok-level features"
         ):
             # get the tokens and scores from each sentence
-            toks = output["text"].split(' ')
-            probs = [float(x) for x in output["log_probs"].split(' ')]
+            toks = output["text"].split(" ")
+            probs = [float(x) for x in output["log_probs"].split(" ")]
             # analysis cases
             curr_char = 0
             for j, (tok, prob) in enumerate(zip(toks, probs)):
                 next_char = curr_char + len(tok)
                 case = AnalysisCaseSpan(
                     sample_id=i,
-                    features={'tok_log_prob': prob},
+                    features={"tok_log_prob": prob},
                     token_span=(j, j + 1),
                     char_span=(curr_char, next_char),
                     text=tok,
@@ -202,10 +202,10 @@ class LanguageModelingProcessor(Processor):
                 cases.append(case)
         metric_stats: dict[str, MetricStats] = {
             "Perplexity": SimpleMetricStats(
-                np.array([x.features['tok_log_prob'] for x in cases])
+                np.array([x.features["tok_log_prob"] for x in cases])
             ),
             "LogProb": SimpleMetricStats(
-                np.array([x.features['tok_log_prob'] for x in cases])
+                np.array([x.features["tok_log_prob"] for x in cases])
             ),
         }
         return cases, metric_stats
@@ -213,7 +213,7 @@ class LanguageModelingProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
@@ -229,7 +229,7 @@ class LanguageModelingProcessor(Processor):
 
     def _get_predicted_label(self, data_point: dict):
         """See processor._get_predicted_label."""
-        return [float(x) for x in data_point["log_probs"].split(' ')]
+        return [float(x) for x in data_point["log_probs"].split(" ")]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         vocab: dict[str, float] = {}

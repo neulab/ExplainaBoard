@@ -59,7 +59,7 @@ class TextClassificationLoader(Loader):
     Validate and Reformat system output file with tsv format:
     text \t true_label \t predicted_label
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     def load(self) -> Iterable[Dict]:

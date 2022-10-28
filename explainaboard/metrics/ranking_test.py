@@ -39,8 +39,8 @@ class HitsConfigTest(unittest.TestCase):
 class HitsTest(unittest.TestCase):
     def test_evaluate(self) -> None:
         metric = HitsConfig().to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = [["a", "b"], ["c", "d"], ["c", "a"], ["a", "c"], ["b", "a"], ["a", "b"]]
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 4.0 / 6.0)
 
@@ -71,8 +71,8 @@ class MeanReciprocalRankConfigTest(unittest.TestCase):
 class MeanReciprocalRankTest(unittest.TestCase):
     def test_evaluate(self) -> None:
         metric = MeanReciprocalRankConfig().to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'b']
-        pred = [['a', 'b'], ['c', 'd'], ['c', 'a'], ['a', 'c'], ['b', 'a'], ['a', 'b']]
+        true = ["a", "b", "a", "b", "a", "b"]
+        pred = [["a", "b"], ["c", "d"], ["c", "a"], ["a", "c"], ["b", "a"], ["a", "b"]]
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 2.5 / 6.0)
 

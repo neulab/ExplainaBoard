@@ -18,7 +18,7 @@ class TextPairClassificationLoader(Loader):
     """Loader for the text pair classification task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     @classmethod

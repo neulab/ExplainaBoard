@@ -51,44 +51,44 @@ class KGLinkTailPredictionProcessor(Processor):
                 dtype=feature.DataType.FLOAT,
                 description="length of the tail entity in tokens",
                 func=lambda info, x, c: count_tokens(
-                    info, x['true_tail_decipher'], side='target'
+                    info, x["true_tail_decipher"], side="target"
                 ),
             ),
             "head_entity_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="length of the head entity in tokens",
                 func=lambda info, x, c: count_tokens(
-                    info, x['true_head_decipher'], side='target'
+                    info, x["true_head_decipher"], side="target"
                 ),
             ),
             "tail_fre": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="average frequency of the tail entity",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['tail_fre'].get(
-                    x['true_tail_decipher'], 0
+                func=lambda info, x, c, stat: stat["tail_fre"].get(
+                    x["true_tail_decipher"], 0
                 ),
             ),
             "link_fre": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="frequency of relation in training set",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['link_fre'].get(x['true_link'], 0),
+                func=lambda info, x, c, stat: stat["link_fre"].get(x["true_link"], 0),
             ),
             "head_fre": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="frequency of head entity in training set",
                 require_training_set=True,
-                func=lambda info, x, c, stat: stat['head_fre'].get(
-                    x['true_head_decipher'], 0
+                func=lambda info, x, c, stat: stat["head_fre"].get(
+                    x["true_head_decipher"], 0
                 ),
             ),
             "symmetry": feature.Value(
                 dtype=feature.DataType.STRING,
                 description="whether the relation is symmetric",
-                func=lambda info, x, c: 'symmetric'
-                if x['true_link'] in self._symmetric_relations
-                else 'asymmetric',
+                func=lambda info, x, c: "symmetric"
+                if x["true_link"] in self._symmetric_relations
+                else "asymmetric",
             ),
             "entity_type_level": feature.Value(
                 dtype=feature.DataType.STRING,
@@ -99,7 +99,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -109,7 +109,7 @@ class KGLinkTailPredictionProcessor(Processor):
         """See Processor.default_analyses."""
         analysis_levels = self.default_analysis_levels()
         features = analysis_levels[0].features
-        discrete_features = {'symmetry': 2, 'entity_type_level': 8, 'true_link': 15}
+        discrete_features = {"symmetry": 2, "entity_type_level": 8, "true_link": 15}
         analyses: list[Analysis] = [
             BucketAnalysis(
                 level=analysis_levels[0].name,
@@ -126,7 +126,7 @@ class KGLinkTailPredictionProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
@@ -143,27 +143,27 @@ class KGLinkTailPredictionProcessor(Processor):
 
     # TODO: is this the best place to put this?
     _symmetric_relations = {
-        '/base/popstra/celebrity/breakup./base/popstra/breakup/participant',
-        '/base/popstra/celebrity/canoodled./base/popstra/canoodled/participant',
-        '/base/popstra/celebrity/dated./base/popstra/dated/participant',
-        '/base/popstra/celebrity/friendship./base/popstra/friendship/participant',
-        '/celebrities/celebrity/celebrity_friends./celebrities/friendship/friend',
-        '/celebrities/celebrity/sexual_relationships./celebrities/romantic_relationship/celebrity',  # noqa: E501
-        '/influence/influence_node/peers./influence/peer_relationship/peers',
-        '/location/location/adjoin_s./location/adjoining_relationship/adjoins',
-        '/people/person/spouse_s./people/marriage/spouse',
-        '/people/person/sibling_s./people/sibling relationship/sibling',
+        "/base/popstra/celebrity/breakup./base/popstra/breakup/participant",
+        "/base/popstra/celebrity/canoodled./base/popstra/canoodled/participant",
+        "/base/popstra/celebrity/dated./base/popstra/dated/participant",
+        "/base/popstra/celebrity/friendship./base/popstra/friendship/participant",
+        "/celebrities/celebrity/celebrity_friends./celebrities/friendship/friend",
+        "/celebrities/celebrity/sexual_relationships./celebrities/romantic_relationship/celebrity",  # noqa: E501
+        "/influence/influence_node/peers./influence/peer_relationship/peers",
+        "/location/location/adjoin_s./location/adjoining_relationship/adjoins",
+        "/people/person/spouse_s./people/marriage/spouse",
+        "/people/person/sibling_s./people/sibling relationship/sibling",
     }
 
     def __init__(self) -> None:
         """Constructor."""
         super().__init__()
         file_path = cache_api.cache_online_file(
-            'https://storage.googleapis.com/inspired-public-data/'
-            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
-            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            "https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json",
+            "explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json",
         )
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             self.entity_type_level_map: dict = json.load(file)
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo) -> dict:
@@ -174,13 +174,13 @@ class KGLinkTailPredictionProcessor(Processor):
 
         for sample in progress(samples):
 
-            tail = sample['true_tail_decipher']
+            tail = sample["true_tail_decipher"]
             dict_tail[tail] = dict_tail.get(tail, 0) + 1
 
-            head = sample['true_head_decipher']
+            head = sample["true_head_decipher"]
             dict_head[head] = dict_head.get(head, 0) + 1
 
-            link = sample['true_link']
+            link = sample["true_link"]
             dict_link[link] = dict_link.get(link, 0) + 1
 
         return {
@@ -200,10 +200,10 @@ class KGLinkTailPredictionProcessor(Processor):
         cases = []
         true_data = [self._get_true_label(x) for x in sys_output]
         pred_data = [self._get_predicted_label(x) for x in sys_output]
-        rank_data = [narrow(int, x.get('true_rank')) for x in sys_output]
+        rank_data = [narrow(int, x.get("true_rank")) for x in sys_output]
         if any(item is None for item in rank_data):
             raise ValueError(
-                'Some data points do not have rank information; check system outputs.'
+                "Some data points do not have rank information; check system outputs."
             )
 
         metric_stats: dict[str, MetricStats] = {}
@@ -216,7 +216,7 @@ class KGLinkTailPredictionProcessor(Processor):
 
         # Calculate features
         for i, output in progress(
-            enumerate(sys_output), desc='calculating example-level features'
+            enumerate(sys_output), desc="calculating example-level features"
         ):
             case = AnalysisCase(sample_id=i, features={})
             for feat_name, feat_spec in analysis_level.features.items():
@@ -246,7 +246,7 @@ class KGLinkTailPredictionProcessor(Processor):
         # [type_level_0, type_level_1, ... type_level_6]
         # e.g. ["Thing", "Agent", "Person", None, None, None, None]
         tail_entity_type_levels = self.entity_type_level_map.get(
-            existing_features['true_tail'], None
+            existing_features["true_tail"], None
         )
         if tail_entity_type_levels is None:
             return default_level  # entity types not found

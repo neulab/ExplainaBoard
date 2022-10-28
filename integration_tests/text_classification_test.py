@@ -49,10 +49,10 @@ class TextClassificationTest(unittest.TestCase):
         self.assertEqual(
             data[6],
             {
-                'text': 'guaranteed to move anyone who ever , , or rolled .',
-                'true_label': 'positive',
-                'id': '6',
-                'predicted_label': 'positive',
+                "text": "guaranteed to move anyone who ever , , or rolled .",
+                "true_label": "positive",
+                "id": "6",
+                "predicted_label": "positive",
             },
         )
 
@@ -105,7 +105,6 @@ class TextClassificationTest(unittest.TestCase):
             "task_name": TaskType.text_classification.value,
             "metric_names": ["Accuracy", "F1Score"],
             "dataset_name": "ag_news",
-            "reload_stat": False,
         }
         loader = get_loader_class(TaskType.text_classification)(
             self.json_dataset,
@@ -118,7 +117,7 @@ class TextClassificationTest(unittest.TestCase):
         data = loader.load()
 
         processor = get_processor_class(TaskType.text_classification)()
-        sys_info = processor.process(metadata, data)
+        sys_info = processor.process(metadata, data, use_cache=False)
 
         self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)

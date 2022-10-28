@@ -4,6 +4,7 @@ repos:
     hooks:
       - id: black
         files: '\.py$'
+        exclude: '^explainaboard\/third_party\/.*\.py|_test\.py$'
   - repo: https://gitlab.com/pycqa/flake8.git
     rev: 5.0.4
     hooks:
@@ -12,6 +13,7 @@ repos:
         additional_dependencies:
           - flake8-absolute-import
           - flake8-black>=0.1.1
+          - flake8-pep585>=0.1.6
         entry: flake8
         files: '\.py$'
       - id: flake8

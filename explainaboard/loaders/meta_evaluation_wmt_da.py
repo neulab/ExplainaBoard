@@ -17,7 +17,7 @@ class MetaEvaluationWMTDALoader(Loader):
     """Loader for the natural language generation task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     @classmethod
@@ -29,14 +29,14 @@ class MetaEvaluationWMTDALoader(Loader):
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         """See Loader.default_dataset_file_loaders."""
         target_field_names = [
-            'sys_name',
-            'seg_id',
-            'test_set',
-            'src',
-            'ref',
-            'sys',
-            'manual_raw',
-            'manual_z',
+            "sys_name",
+            "seg_id",
+            "test_set",
+            "src",
+            "ref",
+            "sys",
+            "manual_raw",
+            "manual_z",
         ]
         return {
             FileType.tsv: TSVFileLoader(

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import itertools
-from typing import cast, Tuple
+from typing import cast
 
 import numpy as np
 
@@ -35,7 +35,7 @@ class F1ScoreConfig(MetricConfig):
       ignore_classes: Classes for which we should not calculate precision/recall.
     """
 
-    average: str = 'micro'
+    average: str = "micro"
     separate_match: bool = False
     ignore_classes: list[str] = field(default_factory=list)
 
@@ -103,28 +103,28 @@ class F1Score(Metric):
             agg_stats = agg_stats.reshape((1, agg_stats.shape[0]))
 
         config = cast(F1ScoreConfig, self.config)
-        supported_averages = {'micro', 'macro'}
+        supported_averages = {"micro", "macro"}
         stat_mult: int = 4 if config.separate_match else 3
         if config.average not in supported_averages:
-            raise ValueError(f'only {supported_averages} supported for now')
+            raise ValueError(f"only {supported_averages} supported for now")
 
         true = agg_stats[:, 0::stat_mult]
         pred = agg_stats[:, 1::stat_mult]
         true_match = agg_stats[:, 2::stat_mult]
         pred_match = agg_stats[:, stat_mult - 1 :: stat_mult]
 
-        if config.average == 'micro':
+        if config.average == "micro":
             true, pred, true_match, pred_match = (
                 np.sum(x, axis=1) for x in (true, pred, true_match, pred_match)
             )
 
-        np.seterr(invalid='ignore')
+        np.seterr(invalid="ignore")
         p = np.where(pred != 0.0, pred_match / pred, 0.0)
         r = np.where(true != 0.0, true_match / true, 0.0)
         f1 = np.where(p + r != 0.0, 2 * p * r / (p + r), 0.0)
-        np.seterr(invalid='warn')
+        np.seterr(invalid="warn")
 
-        if config.average == 'macro':
+        if config.average == "macro":
             f1 = np.mean(f1, axis=1)
 
         if not is_batched:
@@ -170,7 +170,7 @@ class APEF1Score(Metric):
 
         for tags, pred_tags in zip(true_data, pred_data):
             gold_spans, pred_spans = cast(
-                Tuple[set, set], gen_argument_pairs(tags, pred_tags)
+                tuple[set, set], gen_argument_pairs(tags, pred_tags)
             )
             stats.append(
                 [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]
@@ -195,7 +195,7 @@ class APEF1Score(Metric):
 class SeqF1ScoreConfig(F1ScoreConfig):
     """Configuration for SeqF1Score."""
 
-    tag_schema: str = 'bio'
+    tag_schema: str = "bio"
 
     def to_metric(self) -> Metric:
         """See MetricConfig.to_metric."""
@@ -225,12 +225,12 @@ class SeqF1Score(F1Score):
         """
         # Get span ops
         seq_config = narrow(SeqF1ScoreConfig, self.config)
-        if seq_config.tag_schema == 'bio':
+        if seq_config.tag_schema == "bio":
             span_ops: SpanOps = BIOSpanOps()
-        elif seq_config.tag_schema == 'bmes':
+        elif seq_config.tag_schema == "bmes":
             span_ops = BMESSpanOps()
         else:
-            raise ValueError(f'Illegal tag_schema {seq_config.tag_schema}')
+            raise ValueError(f"Illegal tag_schema {seq_config.tag_schema}")
 
         true_spans_list: list[list[tuple[str, int, int]]] = [
             span_ops.get_spans_simple(true_tags) for true_tags in true_data

@@ -64,29 +64,29 @@ class TextClassificationProcessor(Processor):
             "text_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in tokens",
-                func=lambda info, x, c: count_tokens(info, x['text']),
+                func=lambda info, x, c: count_tokens(info, x["text"]),
             ),
             "text_chars": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="text length in characters",
-                func=lambda info, x, c: len(x['text']),
+                func=lambda info, x, c: len(x["text"]),
             ),
             "basic_words": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the ratio of basic words",
-                func=lambda info, x, c: get_basic_words(x['text']),
+                func=lambda info, x, c: get_basic_words(x["text"]),
             ),
             "lexical_richness": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="lexical diversity",
-                func=lambda info, x, c: get_lexical_richness(x['text']),
+                func=lambda info, x, c: get_lexical_richness(x["text"]),
             ),
             "num_oov": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['text'], stat['vocab']
+                    info, x["text"], stat["vocab"]
                 ),
             ),
             "fre_rank": feature.Value(
@@ -97,7 +97,7 @@ class TextClassificationProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['text'], stat['vocab_rank']
+                    info, x["text"], stat["vocab_rank"]
                 ),
             ),
             "length_fre": feature.Value(
@@ -105,14 +105,14 @@ class TextClassificationProcessor(Processor):
                 description="the frequency of text length in training set",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_length_freq(
-                    info, x['text'], stat['length_fre']
+                    info, x["text"], stat["length_fre"]
                 ),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -148,7 +148,7 @@ class TextClassificationProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:

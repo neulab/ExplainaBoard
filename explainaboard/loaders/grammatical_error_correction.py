@@ -16,10 +16,10 @@ class GrammaticalErrorCorrectionLoader(Loader):
     """Loader for the grammatical error correction task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
-    JSON_FIELDS: list[str | tuple[str, str]] = ['text', 'edits']
+    JSON_FIELDS: list[str | tuple[str, str]] = ["text", "edits"]
 
     @classmethod
     def default_dataset_file_type(cls) -> FileType:
@@ -37,14 +37,14 @@ class GrammaticalErrorCorrectionLoader(Loader):
         return {
             FileType.json: JSONFileLoader(
                 [
-                    FileLoaderField('text', 'text', str),
-                    FileLoaderField('edits', 'edits', dict),
+                    FileLoaderField("text", "text", str),
+                    FileLoaderField("edits", "edits", dict),
                 ]
             ),
             FileType.datalab: DatalabFileLoader(
                 [
-                    FileLoaderField('source_column', 'text', str),
-                    FileLoaderField('reference_column', 'edits', dict),
+                    FileLoaderField("source_column", "text", str),
+                    FileLoaderField("reference_column", "edits", dict),
                 ]
             ),
         }

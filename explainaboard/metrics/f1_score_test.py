@@ -54,18 +54,18 @@ class F1ScoreConfigTest(unittest.TestCase):
 
 class F1ScoreTest(unittest.TestCase):
     def test_evaluate_micro(self) -> None:
-        metric = F1ScoreConfig(average='micro').to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
-        sklearn_f1 = f1_score(true, pred, average='micro')
+        metric = F1ScoreConfig(average="micro").to_metric()
+        true = ["a", "b", "a", "b", "a", "a", "c", "c"]
+        pred = ["a", "b", "a", "b", "b", "a", "c", "a"]
+        sklearn_f1 = f1_score(true, pred, average="micro")
         result = metric.evaluate(true, pred, confidence_alpha=0.05)
         self.assertAlmostEqual(result.get_value(Score, "score").value, sklearn_f1)
 
     def test_evaluate_macro(self) -> None:
-        metric = F1ScoreConfig(average='macro').to_metric()
-        true = ['a', 'b', 'a', 'b', 'a', 'a', 'c', 'c']
-        pred = ['a', 'b', 'a', 'b', 'b', 'a', 'c', 'a']
-        sklearn_f1 = f1_score(true, pred, average='macro')
+        metric = F1ScoreConfig(average="macro").to_metric()
+        true = ["a", "b", "a", "b", "a", "a", "c", "c"]
+        pred = ["a", "b", "a", "b", "b", "a", "c", "a"]
+        sklearn_f1 = f1_score(true, pred, average="macro")
         result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(result.get_value(Score, "score").value, sklearn_f1)
 
@@ -114,26 +114,26 @@ class SeqF1ScoreConfigTest(unittest.TestCase):
 class SeqF1ScoreTest(unittest.TestCase):
     def test_evaluate_micro(self) -> None:
         true = [
-            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'O', 'O'],
-            ['B-PER', 'I-PER', 'O'],
+            ["O", "O", "B-MISC", "I-MISC", "B-MISC", "O", "O"],
+            ["B-PER", "I-PER", "O"],
         ]
         pred = [
-            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
-            ['B-PER', 'I-PER', 'O'],
+            ["O", "O", "B-MISC", "I-MISC", "B-MISC", "I-MISC", "O"],
+            ["B-PER", "I-PER", "O"],
         ]
-        metric = SeqF1ScoreConfig(average='micro', tag_schema='bio').to_metric()
+        metric = SeqF1ScoreConfig(average="micro", tag_schema="bio").to_metric()
         result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
 
     def test_evaluate_macro(self) -> None:
         true = [
-            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'O', 'O'],
-            ['B-PER', 'I-PER', 'O'],
+            ["O", "O", "B-MISC", "I-MISC", "B-MISC", "O", "O"],
+            ["B-PER", "I-PER", "O"],
         ]
         pred = [
-            ['O', 'O', 'B-MISC', 'I-MISC', 'B-MISC', 'I-MISC', 'O'],
-            ['B-PER', 'I-PER', 'O'],
+            ["O", "O", "B-MISC", "I-MISC", "B-MISC", "I-MISC", "O"],
+            ["B-PER", "I-PER", "O"],
         ]
-        metric = SeqF1ScoreConfig(average='macro', tag_schema='bio').to_metric()
+        metric = SeqF1ScoreConfig(average="macro", tag_schema="bio").to_metric()
         result = metric.evaluate(true, pred, confidence_alpha=None)
         self.assertAlmostEqual(result.get_value(Score, "score").value, 3.0 / 4.0)

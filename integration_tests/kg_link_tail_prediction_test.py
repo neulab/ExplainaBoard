@@ -84,8 +84,8 @@ class KgLinkTailPredictionTest(unittest.TestCase):
                 "id",
                 "true_head",
                 "true_link",
-                'true_head_decipher',
-                'true_tail_decipher',
+                "true_head_decipher",
+                "true_tail_decipher",
                 "true_tail",
                 "predict",
                 "predictions",
@@ -122,7 +122,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
         symmetry_performances = narrow(
-            BucketAnalysisDetails, analysis_map['symmetry'].details
+            BucketAnalysisDetails, analysis_map["symmetry"].details
         ).bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return
@@ -169,7 +169,7 @@ class KgLinkTailPredictionTest(unittest.TestCase):
 
         analysis_map = {x.name: x for x in sys_info.results.analyses if x is not None}
         symmetry_performances = narrow(
-            BucketAnalysisDetails, analysis_map['symmetry'].details
+            BucketAnalysisDetails, analysis_map["symmetry"].details
         ).bucket_performances
         if len(symmetry_performances) <= 1:  # can't sort if only 1 item
             return

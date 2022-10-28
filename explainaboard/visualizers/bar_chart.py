@@ -8,9 +8,9 @@ import os
 from matplotlib import pyplot as plt
 import numpy as np
 
-logging.basicConfig(level='INFO')
+logging.basicConfig(level="INFO")
 
-mlogger = logging.getLogger('matplotlib')
+mlogger = logging.getLogger("matplotlib")
 mlogger.setLevel(logging.WARNING)
 
 
@@ -45,7 +45,7 @@ def make_bar_chart(
     datas: list[list[float]],
     output_directory: str,
     output_fig_file: str,
-    output_fig_format: str = 'png',
+    output_fig_format: str = "png",
     fig_size: tuple[int, int] = (8, 6),
     sys_names: list[str] | None = None,
     errs: list[tuple[list[float], list[float]]] | None = None,
@@ -100,5 +100,5 @@ def make_bar_chart(
 
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
-    out_file = os.path.join(output_directory, f'{output_fig_file}.{output_fig_format}')
-    plt.savefig(out_file, format=output_fig_format, bbox_inches='tight')
+    out_file = os.path.join(output_directory, f"{output_fig_file}.{output_fig_format}")
+    plt.savefig(out_file, format=output_fig_format, bbox_inches="tight")

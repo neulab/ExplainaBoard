@@ -47,15 +47,15 @@ def word_scale_factor(x: str) -> float:
 def scale_to_num(scale: str) -> float:
     scale = scale.lower()
     num = 1.0
-    if 'hundred' in scale:  # hundred
+    if "hundred" in scale:  # hundred
         num = 100.0
-    elif 'thousand' in scale:  # thousand
+    elif "thousand" in scale:  # thousand
         num = 1000.0
-    elif 'million' in scale:  # million
+    elif "million" in scale:  # million
         num = 1000000.0
-    elif 'billion' in scale:  # billion
+    elif "billion" in scale:  # billion
         num = 1000000000.0
-    elif 'percent' in scale:  # percent
+    elif "percent" in scale:  # percent
         num = 0.01
     return num
 
@@ -67,9 +67,9 @@ def extract_one_num_from_str(s: str) -> int | None | float:
     if len(groups) == 0:
         return None
     num = groups[0][0]
-    if num == '':
+    if num == "":
         return None
-    if '.' in num:
+    if "." in num:
         return float(num)
     return int(num)
 
@@ -109,11 +109,11 @@ def to_number(text: str) -> float | None:
 
 
 def remove_articles(text: str) -> str:
-    return re.sub(r'\b(a|an|the)\b', ' ', text)
+    return re.sub(r"\b(a|an|the)\b", " ", text)
 
 
 def white_space_fix(text: str) -> str:
-    return ' '.join(text.split())
+    return " ".join(text.split())
 
 
 EXCLUDE = set(string.punctuation)
@@ -121,7 +121,7 @@ EXCLUDE = set(string.punctuation)
 
 def remove_punc(text: str) -> str:
     if not is_number(text):
-        return ''.join(ch for ch in text if ch not in EXCLUDE)
+        return "".join(ch for ch in text if ch not in EXCLUDE)
     else:
         return text
 
@@ -148,11 +148,11 @@ def normalize_answer(text: str) -> str:
         for token in tokenize(text)
     ]
     parts = [part for part in parts if part.strip()]
-    normalized = ' '.join(parts).strip()
+    normalized = " ".join(parts).strip()
     return normalized
 
 
-STRIPPED_CHARACTERS = string.punctuation + ''.join([u"‘", u"’", u"´", u"`", "_"])
+STRIPPED_CHARACTERS = string.punctuation + "".join(["‘", "’", "´", "`", "_"])
 
 
 def ws_tokenize(text: str) -> list[str]:
@@ -234,7 +234,7 @@ def _match_numbers_if_present(gold_bag: set[str], predicted_bag: set[str]) -> bo
 
 
 def extract_gold_answers(qa_annotation: dict[str, Any]) -> tuple[str, list, str]:
-    '''
+    """
     span
     multi-span
     arithmetic (+ - * /)
@@ -242,17 +242,17 @@ def extract_gold_answers(qa_annotation: dict[str, Any]) -> tuple[str, list, str]
     date
     other
     gold answers is a list of list, each item in gold answers is a valid answer
-    '''
-    answer_type, scale = qa_annotation["answer_type"], qa_annotation['scale']
-    answer_content = qa_annotation['answer']
+    """
+    answer_type, scale = qa_annotation["answer_type"], qa_annotation["scale"]
+    answer_content = qa_annotation["answer"]
     gold_answers = []
-    if answer_type in ['multi-span', 'span']:  # list
+    if answer_type in ["multi-span", "span"]:  # list
         if not isinstance(answer_content, list):
             raise TypeError("answer_content must be list.")
         gold_answers = answer_content  # multi-span
     elif answer_type in ["arithmetic"]:
         gold_answers.append(str(answer_content))
-    elif answer_type in ['count']:
+    elif answer_type in ["count"]:
         gold_answers.append(str(int(answer_content)))
     else:
         gold_answers.append(str(answer_content))
@@ -278,10 +278,10 @@ def get_answer_str(answers: list[str], scale: str) -> list[str]:
                 if scale:
                     ans_str = ans_str + " " + str(scale)
             else:
-                if '%' in ans_str:
-                    ans_str = '%.4f' % ans_num
+                if "%" in ans_str:
+                    ans_str = "%.4f" % ans_num
                 else:
-                    ans_str = '%.4f' % (round(ans_num, 2) * scale_to_num(scale))
+                    ans_str = "%.4f" % (round(ans_num, 2) * scale_to_num(scale))
         else:
             if scale:
                 ans_str = ans_str + " " + str(scale)
@@ -307,10 +307,10 @@ def add_percent_pred(
     if pred_str is None:
         return prediction_strings
     if (
-        not pred_scale and '%' not in pred_str and is_number(pred_str)
+        not pred_scale and "%" not in pred_str and is_number(pred_str)
     ):  # mode only or no pred_scale num only
         pred_str_num = to_number(pred_str)
         if pred_str_num is None:
             return prediction_strings
-        prediction_strings.append('%.4f' % pred_str_num)
+        prediction_strings.append("%.4f" % pred_str_num)
     return prediction_strings

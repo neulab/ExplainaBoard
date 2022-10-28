@@ -77,13 +77,13 @@ class SummarizationTest(unittest.TestCase):
             self.assertTrue(all([x in lsumf] for x in lcf1))
 
     # Commented out following code since it's too slow for unittest
-    @unittest.skipUnless('test_sum' in OPTIONAL_TEST_SUITES, reason='time consuming')
+    @unittest.skipUnless("test_sum" in OPTIONAL_TEST_SUITES, reason="time consuming")
     def test_datalab_loader(self):
 
         json_output_customized = cache_api.cache_online_file(
-            'https://storage.googleapis.com/inspired-public-data/'
-            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
-            'explainaboard/task_data/summarization/cnndm-bart-output.txt',
+            "https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/summarization/cnndm-bart-output.txt",
+            "explainaboard/task_data/summarization/cnndm-bart-output.txt",
         )
 
         loader = get_loader_class(TaskType.summarization).from_datalab(
@@ -106,7 +106,7 @@ class SummarizationTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.analyses), 0)
         self.assertGreater(len(sys_info.results.overall), 0)
 
-    @unittest.skip('Not yet fixed in v0.11')
+    @unittest.skip("Not yet fixed in v0.11")
     def test_generate_system_human_eval(self):
         loader = get_loader_class(TaskType.summarization)(
             self.tsv_dataset,

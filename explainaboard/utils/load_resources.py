@@ -23,6 +23,6 @@ def get_customized_features(path_file: Optional[str] = None) -> dict:
         if path_file is None
         else path_file
     )
-    with open(customized_feature_config_file, 'r') as file:
+    with open(customized_feature_config_file, "r") as file:
         customized_features = json.loads(file.read())
     return customized_features

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Hashable, Iterable, Sequence
 
 # List and Tuple is required for the first argument of narrow().
-from typing import Any, cast, List, Protocol, Tuple
+from typing import Any, cast, Protocol
 
 import numpy as np
 
@@ -57,7 +57,7 @@ def continuous(
     if len(sample_features) == 0:
         return [AnalysisCaseCollection(samples=[], interval=_INFINITE_INTERVAL)]
     if isinstance(bucket_setting, Sequence) and len(bucket_setting) > 0:
-        raise NotImplementedError('bucket_setting incompatible with continuous')
+        raise NotImplementedError("bucket_setting incompatible with continuous")
     # Bucketing different Attributes
     cases = [x1 for x1, x2 in sample_features]
     vals = np.array([x2 for x1, x2 in sample_features])
@@ -168,16 +168,16 @@ def fixed(
     if bucket_number is None or bucket_setting is None:
         raise ValueError("bucket_number and bucket_setting must be set.")
 
-    interval_or_names = cast(List[Hashable], bucket_setting)
+    interval_or_names = cast(list[Hashable], bucket_setting)
     if len(interval_or_names) == 0:
         raise ValueError("Can not determine bucket keys.")
 
     features = [x[1] for x in sample_features]
 
     if isinstance(interval_or_names[0], str):
-        names = cast(List[str], interval_or_names)
+        names = cast(list[str], interval_or_names)
         name2idx: dict[str, list[int]] = {k: [] for k in names}
-        name_features = cast(List[str], features)
+        name_features = cast(list[str], features)
 
         for idx, name in enumerate(name_features):
             if name in names:
@@ -185,9 +185,9 @@ def fixed(
 
         return [AnalysisCaseCollection(samples=v, name=k) for k, v in name2idx.items()]
     else:
-        intervals = cast(List[Tuple[float, float]], interval_or_names)
+        intervals = cast(list[tuple[float, float]], interval_or_names)
         interval2idx: dict[tuple[float, float], list[int]] = {k: [] for k in intervals}
-        interval_features = cast(List[float], features)
+        interval_features = cast(list[float], features)
 
         for idx, interval in enumerate(interval_features):
             key = _find_range(intervals, interval)

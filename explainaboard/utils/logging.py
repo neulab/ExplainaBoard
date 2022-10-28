@@ -8,7 +8,7 @@ from typing import Optional, TypeVar
 
 from tqdm import tqdm
 
-hide_progress = 'EXPLAINABOARD_HIDE_PROGRESS' in os.environ
+hide_progress = "EXPLAINABOARD_HIDE_PROGRESS" in os.environ
 
 T = TypeVar("T")
 
@@ -44,5 +44,5 @@ def get_logger(name: Optional[str] = None) -> logging.Logger:
     """
     full_name = _get_library_name()
     if name is not None:
-        full_name = f'{full_name}.{name}'
+        full_name = f"{full_name}.{name}"
     return logging.getLogger(full_name)

@@ -48,15 +48,15 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
         real_tasks = [task] * len(system_outputs)
         if task not in TaskType.list():
             raise ValueError(
-                f'Task name {task} was not recognized. ExplainaBoard currently '
-                f'supports:{TaskType.list()}'
+                f"Task name {task} was not recognized. ExplainaBoard currently "
+                f"supports:{TaskType.list()}"
             )
         return real_tasks
     else:
         for sys_output in system_outputs:
             # give me a task, or give me death (by exception)
             task_or_die: TaskType | None = None
-            msg: str = ''
+            msg: str = ""
             try:
                 metadata = FileLoaderMetadata.from_file(sys_output)
                 task_or_die = TaskType(unwrap(metadata.task_name))
@@ -64,9 +64,9 @@ def get_tasks(task: TaskType, system_outputs: list[str]) -> list[TaskType]:
                 msg = str(e)
             if task_or_die is None:
                 raise ValueError(
-                    'Must either specify a task explicitly or have one '
-                    'specified in metadata, but could find neither for '
-                    f'{sys_output}. {msg}'
+                    "Must either specify a task explicitly or have one "
+                    "specified in metadata, but could find neither for "
+                    f"{sys_output}. {msg}"
                 )
             real_tasks.append(unwrap(task_or_die))
     return real_tasks
@@ -134,10 +134,10 @@ def create_parser():
     Returns:
         The parser.
     """
-    parser = argparse.ArgumentParser(description='Explainable Leaderboards for NLP')
-    parser.add_argument('--task', type=str, required=False, help="the task name")
+    parser = argparse.ArgumentParser(description="Explainable Leaderboards for NLP")
+    parser.add_argument("--task", type=str, required=False, help="the task name")
     parser.add_argument(
-        '--system-outputs',
+        "--system-outputs",
         type=str,
         required=True,
         nargs="+",
@@ -148,7 +148,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--reports',
+        "--reports",
         type=str,
         required=False,
         nargs="+",
@@ -157,7 +157,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--systems',
+        "--systems",
         type=str,
         required=False,
         nargs="+",
@@ -165,7 +165,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--datasets',
+        "--datasets",
         type=str,
         required=False,
         nargs="+",
@@ -173,7 +173,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--languages',
+        "--languages",
         type=str,
         required=False,
         nargs="+",
@@ -181,28 +181,28 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--systems-aggregation',
+        "--systems-aggregation",
         type=str,
         required=False,
         help="None|minus|combination",
     )
 
     parser.add_argument(
-        '--datasets-aggregation',
+        "--datasets-aggregation",
         type=str,
         required=False,
         help="None|average|",
     )
 
     parser.add_argument(
-        '--languages-aggregation',
+        "--languages-aggregation",
         type=str,
         required=False,
         help="None|average|",
     )
 
     parser.add_argument(
-        '--dataset',
+        "--dataset",
         type=str,
         required=False,
         default=None,
@@ -210,7 +210,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--sub-dataset',
+        "--sub-dataset",
         type=str,
         required=False,
         default=None,
@@ -218,17 +218,17 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--split',
+        "--split",
         type=str,
         required=False,
-        default='test',
+        default="test",
         help="the name of the split within the dataset",
     )
 
     parser.add_argument(
-        '--language',
-        '--target-language',
-        dest='target_language',
+        "--language",
+        "--target-language",
+        dest="target_language",
         type=str,
         required=False,
         default=None,
@@ -237,7 +237,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--source-language',
+        "--source-language",
         type=str,
         required=False,
         default=None,
@@ -245,15 +245,14 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--reload-stat',
-        type=str,
-        required=False,
-        default=None,
-        help="reload precomputed statistics over training set (if exists)",
+        "--no-use-cache",
+        dest="use_cache",
+        action="store_false",
+        help="Disable cached statistics over training set.",
     )
 
     parser.add_argument(
-        '--metrics',
+        "--metrics",
         type=str,
         required=False,
         nargs="*",
@@ -261,7 +260,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--output-file-type',
+        "--output-file-type",
         type=str,
         required=False,
         default=None,
@@ -269,7 +268,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--conf-value',
+        "--conf-value",
         dest="confidence_alpha",
         type=float,
         required=False,
@@ -277,7 +276,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--confidence-alpha',
+        "--confidence-alpha",
         type=float,
         required=False,
         default=0.05,
@@ -288,7 +287,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--output-dir',
+        "--output-dir",
         type=str,
         required=False,
         default=None,
@@ -296,7 +295,7 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--report-json',
+        "--report-json",
         type=str,
         required=False,
         default=None,
@@ -304,28 +303,28 @@ def create_parser():
     )
 
     parser.add_argument(
-        '--system-details',
+        "--system-details",
         type=str,
         required=False,
         help="a json file to store detailed information for a system",
     )
 
     parser.add_argument(
-        '--custom-dataset-paths',
+        "--custom-dataset-paths",
         type=str,
         nargs="*",
         help="path to custom dataset",
     )
 
     parser.add_argument(
-        '--custom-dataset-file-type',
+        "--custom-dataset-file-type",
         type=str,
         help="file types for custom datasets",
     )
 
     parser.add_argument(
-        '--skip-failed-analyses',
-        action='store_true',
+        "--skip-failed-analyses",
+        action="store_true",
         help="whether to skip failed analyses or report errors.",
     )
     return parser
@@ -362,7 +361,7 @@ def main():
     """The main function to be executed."""
     args = create_parser().parse_args()
 
-    reload_stat: bool = False if args.reload_stat == "0" else True
+    use_cache: bool = args.use_cache
     system_outputs: list[str] = args.system_outputs
 
     reports: list[str] | None = args.reports
@@ -383,7 +382,7 @@ def main():
                     with open(args.system_details) as fin:
                         return json.load(fin)
                 except ValueError as e:
-                    raise ValueError(f'invalid json: {e} for system details')
+                    raise ValueError(f"invalid json: {e} for system details")
 
         output_dir_figures = os.path.join(output_dir, "figures") if output_dir else None
         output_dir_reports = os.path.join(output_dir, "reports") if output_dir else None
@@ -456,15 +455,15 @@ def main():
                 num0 = len(system_datasets[0])
                 num1 = len(system_datasets[1])
                 raise ValueError(
-                    f'Data must be identical for pairwise analysis, but length of '
-                    'files '
-                    f'{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})'
+                    f"Data must be identical for pairwise analysis, but length of "
+                    "files "
+                    f"{system_datasets[0]} ({num0}) != {system_datasets[1]} ({num1})"
                 )
 
         # TODO(gneubig): This gets metadata from the first system and assumes it's the
         #  same for other systems
         target_language = (
-            target_language or system_datasets[0].metadata.target_language or 'en'
+            target_language or system_datasets[0].metadata.target_language or "en"
         )
         source_language = (
             source_language
@@ -479,15 +478,14 @@ def main():
             "split_name": split,
             "source_language": source_language,
             "target_language": target_language,
-            "reload_stat": reload_stat,
             "confidence_alpha": args.confidence_alpha,
             "system_details": system_details,
             "custom_features": system_datasets[0].metadata.custom_features,
             "custom_analyses": system_datasets[0].metadata.custom_analyses,
         }
         if metric_names is not None:
-            if 'metric_configs' in metadata:
-                raise ValueError('Cannot specify both metric names and metric configs')
+            if "metric_configs" in metadata:
+                raise ValueError("Cannot specify both metric names and metric configs")
             metric_configs = {
                 name: get_metric_config_or_eaas(name)(
                     source_language=source_language,
@@ -510,19 +508,20 @@ def main():
                 metadata=metadata_copied,
                 sys_output=system_dataset.samples,
                 skip_failed_analyses=args.skip_failed_analyses,
+                use_cache=use_cache,
             )
             reports.append(report)
 
             # print to the console
-            logger = get_logger('report')
+            logger = get_logger("report")
 
-            logger.info('--- Overall Performance')
+            logger.info("--- Overall Performance")
             for level_name, overall in report.results.overall.items():
                 for metric_name, metric_result in overall.items():
                     value = metric_result.get_value(Score, "score").value
                     logger.info(f"{level_name}\t{metric_name}\t{value}")
-            logger.info('')
-            logger.info('--- Fine-grained Analyses')
+            logger.info("")
+            logger.info("--- Fine-grained Analyses")
             for analysis in report.results.analyses:
                 if analysis is not None:
                     logger.info(analysis.generate_report())
@@ -549,5 +548,5 @@ def main():
                 compare_analysis.print_as_json(file=report_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

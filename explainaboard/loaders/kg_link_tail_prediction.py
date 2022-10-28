@@ -21,7 +21,7 @@ class KgLinkTailPredictionLoader(Loader):
     """Loader for the knowledge graph link prediction task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
 
     NOTE: kg task has a system output format that's different from all the
     other tasks. Samples are stored in a dict instead of a list so we have
@@ -45,11 +45,11 @@ class KgLinkTailPredictionLoader(Loader):
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         """See Loader.default_dataset_file_loaders."""
         file_path = cache_api.cache_online_file(
-            'https://storage.googleapis.com/inspired-public-data/'
-            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
-            'explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json',
+            "https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json",
+            "explainaboard/task_data/kg_link_tail_prediction/entity2wikidata.json",
         )
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             entity_dic = json.load(file)
 
         map_preprocessor = MapPreprocessor(

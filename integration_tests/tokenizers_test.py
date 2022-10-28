@@ -7,8 +7,8 @@ from explainaboard.utils.tokenizer import SacreBleuTokenizer, SingleSpaceTokeniz
 
 class TokenizersTest(unittest.TestCase):
     def test_single_space_tokenizer(self):
-        src = 'this,  is an example '
-        gold_toks = ['this,', '', 'is', 'an', 'example', '']
+        src = "this,  is an example "
+        gold_toks = ["this,", "", "is", "an", "example", ""]
         gold_poss = [0, 6, 7, 10, 13, 21]
         tokenizer = SingleSpaceTokenizer()
         out_tokseq = tokenizer(src)
@@ -19,16 +19,16 @@ class TokenizersTest(unittest.TestCase):
         src = '"this," she   said, is an example.'
         gold_toks = [
             '"',
-            'this',
-            ',',
+            "this",
+            ",",
             '"',
-            'she',
-            'said',
-            ',',
-            'is',
-            'an',
-            'example',
-            '.',
+            "she",
+            "said",
+            ",",
+            "is",
+            "an",
+            "example",
+            ".",
         ]
         gold_poss = [0, 1, 5, 6, 8, 14, 18, 20, 23, 26, 33]
         tokenizer = SacreBleuTokenizer()

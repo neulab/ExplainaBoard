@@ -6,7 +6,6 @@
   "dataset_split": null,
   "source_language": null,
   "target_language": null,
-  "reload_stat": true,
   "is_print_case": true,
   "confidence_alpha": 0.05,
   "system_details": null,

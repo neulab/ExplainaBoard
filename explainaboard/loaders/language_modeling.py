@@ -17,7 +17,7 @@ class LanguageModelingLoader(Loader):
     """Loader for the language modeling task.
 
     usage:
-        please refer to `test_loaders.py`
+        please refer to `loaders_test.py`
     """
 
     @classmethod
@@ -28,7 +28,7 @@ class LanguageModelingLoader(Loader):
     @classmethod
     def default_dataset_file_loaders(cls) -> dict[FileType, FileLoader]:
         """See Loader.default_dataset_file_loaders."""
-        field_name = 'text'
+        field_name = "text"
         return {
             FileType.text: TextFileLoader(field_name, str),
             FileType.json: JSONFileLoader(
@@ -46,7 +46,7 @@ class LanguageModelingLoader(Loader):
     @classmethod
     def default_output_file_loaders(cls) -> dict[FileType, FileLoader]:
         """See Loader.default_output_file_loaders."""
-        field_name = 'log_probs'
+        field_name = "log_probs"
         return {
             FileType.text: TextFileLoader(field_name, str),
             FileType.json: JSONFileLoader(

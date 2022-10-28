@@ -35,12 +35,12 @@ class TextPairClassificationTest(unittest.TestCase):
         self.assertEqual(
             data[1],
             {
-                'text1': 'This church choir sings to the masses as they sing joyous '
-                + 'songs from the book at a church.',
-                'text2': 'The church is filled with song.',
-                'true_label': 'entailment',
-                'id': '1',
-                'predicted_label': 'entailment',
+                "text1": "This church choir sings to the masses as they sing joyous "
+                + "songs from the book at a church.",
+                "text2": "The church is filled with song.",
+                "true_label": "entailment",
+                "id": "1",
+                "predicted_label": "entailment",
             },
         )
 

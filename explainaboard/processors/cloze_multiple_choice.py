@@ -51,14 +51,14 @@ class ClozeMultipleChoiceProcessor(Processor):
             "context_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the length of context",
-                func=lambda info, x, c: count_tokens(info, x['context']),
+                func=lambda info, x, c: count_tokens(info, x["context"]),
             ),
             "relative_blank_position": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the relative position of blank (question mark)"
                 " in the whole context",
                 func=lambda info, x, c: relative_position(
-                    info, x['context'], x['question_mark']
+                    info, x["context"], x["question_mark"]
                 ),
             ),
             "absolute_blank_position": feature.Value(
@@ -66,20 +66,20 @@ class ClozeMultipleChoiceProcessor(Processor):
                 description="the absolute position of blank (question mark)"
                 " in the whole context",
                 func=lambda info, x, c: absolute_position(
-                    info, x['context'], x['question_mark']
+                    info, x["context"], x["question_mark"]
                 ),
             ),
             "answer_length": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the length of answer",
-                func=lambda info, x, c: count_tokens(info, x['answers']['text']),
+                func=lambda info, x, c: count_tokens(info, x["answers"]["text"]),
             ),
             "num_oov": feature.Value(
                 dtype=feature.DataType.FLOAT,
                 description="the number of out-of-vocabulary words",
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_num_oov(
-                    info, x['text'], stat['source_vocab']
+                    info, x["text"], stat["source_vocab"]
                 ),
             ),
             "fre_rank": feature.Value(
@@ -90,14 +90,14 @@ class ClozeMultipleChoiceProcessor(Processor):
                 ),
                 require_training_set=True,
                 func=lambda info, x, c, stat: feat_freq_rank(
-                    info, x['text'], stat['source_vocab_rank']
+                    info, x["text"], stat["source_vocab_rank"]
                 ),
             ),
         }
 
         return [
             AnalysisLevel(
-                name='example',
+                name="example",
                 features=features,
                 metric_configs=self.default_metrics(),
             )
@@ -110,7 +110,7 @@ class ClozeMultipleChoiceProcessor(Processor):
     @classmethod
     def default_metrics(
         cls,
-        level: str = 'example',
+        level: str = "example",
         source_language: str | None = None,
         target_language: str | None = None,
     ) -> dict[str, MetricConfig]:
@@ -136,7 +136,7 @@ class ClozeMultipleChoiceProcessor(Processor):
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
-            samples, lambda x: x['context'], unwrap(sys_info.source_tokenizer)
+            samples, lambda x: x["context"], unwrap(sys_info.source_tokenizer)
         )
 
-        return {'source_vocab': source_vocab, 'source_vocab_rank': source_vocab_rank}
+        return {"source_vocab": source_vocab, "source_vocab_rank": source_vocab_rank}

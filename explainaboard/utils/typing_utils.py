@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Generator, Iterable
 from typing import Any, TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def unwrap(obj: T | None) -> T:
@@ -24,7 +24,7 @@ def unwrap(obj: T | None) -> T:
         ValueError: ``obj`` is None.
     """
     if obj is None:
-        raise ValueError('Attempted to unwrap None.')
+        raise ValueError("Attempted to unwrap None.")
     return obj
 
 
