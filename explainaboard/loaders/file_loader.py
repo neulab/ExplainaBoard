@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 import copy
 import csv
 import dataclasses
@@ -10,18 +10,7 @@ from dataclasses import dataclass, field
 from io import StringIO
 import itertools
 import json
-from typing import (
-    Any,
-    cast,
-    ClassVar,
-    final,
-    Iterable,
-    Optional,
-    Sized,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, cast, ClassVar, final, Optional, Sized, TypeVar, Union
 
 from datalabs import DatasetDict, IterableDatasetDict, load_dataset
 from datalabs.features.features import ClassLabel, Sequence
@@ -33,7 +22,7 @@ from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.load_resources import get_customized_features
 from explainaboard.utils.typing_utils import narrow
 
-DType = Union[Type[int], Type[float], Type[str], Type[dict], Type[list]]
+DType = Union[type[int], type[float], type[str], type[dict], type[list]]
 T = TypeVar("T")
 
 

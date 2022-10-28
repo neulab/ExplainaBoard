@@ -13,6 +13,7 @@ repos:
         additional_dependencies:
           - flake8-absolute-import
           - flake8-black>=0.1.1
+          - flake8-pep585>=0.1.6
         entry: flake8
         files: '\.py$'
       - id: flake8

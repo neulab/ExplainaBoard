@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import itertools
-from typing import cast, Tuple
+from typing import cast
 
 import numpy as np
 
@@ -170,7 +170,7 @@ class APEF1Score(Metric):
 
         for tags, pred_tags in zip(true_data, pred_data):
             gold_spans, pred_spans = cast(
-                Tuple[set, set], gen_argument_pairs(tags, pred_tags)
+                tuple[set, set], gen_argument_pairs(tags, pred_tags)
             )
             stats.append(
                 [len(gold_spans), len(pred_spans), len(gold_spans & pred_spans)]
