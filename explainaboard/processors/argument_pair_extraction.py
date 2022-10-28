@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any, cast, List
+from typing import Any, cast
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
@@ -183,8 +183,8 @@ class ArgumentPairExtractionProcessor(Processor):
             true_spans, pred_spans = self._argument_pair_ops.get_argument_pairs(
                 output["true_tags"], output["pred_tags"], sentences
             )
-            true_spans = cast(List[ArgumentPair], true_spans)
-            pred_spans = cast(List[ArgumentPair], pred_spans)
+            true_spans = cast(list[ArgumentPair], true_spans)
+            pred_spans = cast(list[ArgumentPair], pred_spans)
             # merge the spans together
             merged_spans: dict[tuple[int, int, int, int], ArgumentPair] = {}
             for span in true_spans:
@@ -238,4 +238,4 @@ class ArgumentPairExtractionProcessor(Processor):
             for name, config in analysis_level.metric_configs.items()
         }
 
-        return cast(List[AnalysisCase], cases), metric_stats
+        return cast(list[AnalysisCase], cases), metric_stats

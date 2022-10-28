@@ -5,7 +5,7 @@ from __future__ import annotations
 import abc
 from collections.abc import Iterable
 import copy
-from typing import Any, cast, List
+from typing import Any, cast
 
 from explainaboard.analysis import feature
 from explainaboard.analysis.analyses import (
@@ -294,7 +294,7 @@ class SeqLabProcessor(Processor):
             name: config.to_metric().calc_stats_from_data(true_data, pred_data)
             for name, config in analysis_level.metric_configs.items()
         }
-        return cast(List[AnalysisCase], cases), metric_stats
+        return cast(list[AnalysisCase], cases), metric_stats
 
     def get_econ_efre_dic(
         self, words: list[str], bio_tags: list[str]

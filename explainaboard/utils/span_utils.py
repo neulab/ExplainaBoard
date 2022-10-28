@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import abc
 from dataclasses import dataclass
-from typing import Any, cast, List, Optional
+from typing import Any, cast, Optional
 
 from explainaboard.analysis.feature_funcs import cap_feature
 
@@ -265,8 +265,8 @@ class ArgumentPairOps:
             A list of gold spans and predicted spans.
         """
         gold_spans, pred_spans = gen_argument_pairs(true_tags, pred_tags, sentences)
-        gold_spans_list = cast(List[ArgumentPair], gold_spans)
-        pred_spans_list = cast(List[ArgumentPair], pred_spans)
+        gold_spans_list = cast(list[ArgumentPair], gold_spans)
+        pred_spans_list = cast(list[ArgumentPair], pred_spans)
         return gold_spans_list, pred_spans_list
 
 
