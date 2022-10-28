@@ -6,7 +6,7 @@ Metrics contains exact set match accuracy and execution accuracy.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import cast, Optional
+from typing import cast
 
 import numpy as np
 
@@ -17,10 +17,12 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
-from explainaboard.third_party.text_to_sql_test_suit_eval.evaluation import evaluate
+from explainaboard.third_party.text_to_sql_test_suit_eval.evaluation import (
+    evaluate as sql_evaluate,
+)
 
 
-@dataclass(frozen=True)
+@dataclass
 @common_registry.register("SQLExactSetMatchConfig")
 class SQLExactSetMatchConfig(MetricConfig):
     """Configuration for SQLExactSetMatch.
@@ -48,7 +50,9 @@ class SQLExactSetMatch(Metric):
     """
 
     def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
+        self,
+        true_data: list,
+        pred_data: list,  # , config: Optional[MetricConfig] = None
     ) -> MetricStats:
         """See Metric.calc_stats_from_data.
 
@@ -59,17 +63,17 @@ class SQLExactSetMatch(Metric):
         Returns:
           See Metric.calc_stats_from_data.
         """
-        config = cast(SQLExactSetMatchConfig, config or self.config)
+        config = cast(SQLExactSetMatchConfig, self.config)
         config_dict = {
             "db_dir": config.db_dir,
             "table_path": config.table_path,
             "etype": config.etype,
         }
-        em_list = evaluate(true_data, pred_data, config_dict)
+        em_list = sql_evaluate(true_data, pred_data, config_dict)
         return SimpleMetricStats(np.array(em_list))
 
 
-@dataclass(frozen=True)
+@dataclass
 @common_registry.register("SQLExecutionConfig")
 class SQLExecutionConfig(MetricConfig):
     """Configuration for SQLExecution.
@@ -96,9 +100,7 @@ class SQLExecution(Metric):
     as the groundtruth SQL.
     """
 
-    def calc_stats_from_data(
-        self, true_data: list, pred_data: list, config: Optional[MetricConfig] = None
-    ) -> MetricStats:
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
         """See Metric.calc_stats_from_data.
 
         Args:
@@ -108,11 +110,12 @@ class SQLExecution(Metric):
         Returns:
           See Metric.calc_stats_from_data.
         """
-        config = narrow(SQLExecutionConfig, config or self.config)
+        config = cast(SQLExecutionConfig, self.config)
         config_dict = {
             "db_dir": config.db_dir,
             "table_path": config.table_path,
             "etype": config.etype,
         }
-        ex_list = evaluate(true_data, pred_data, config_dict)
+
+        ex_list = sql_evaluate(true_data, pred_data, config_dict)
         return SimpleMetricStats(np.array(ex_list))

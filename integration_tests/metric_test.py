@@ -152,8 +152,6 @@ class MetricTest(unittest.TestCase):
         )
 
     def test_sql_exactsetmatch(self):
-        # python -m unittest integration_tests.metric_test.
-        # MetricTest.test_sql_exactsetmatch
         metric = explainaboard.metrics.text_to_sql.SQLExactSetMatchConfig(
             db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
             table_path="https://expressai-xlab.s3.amazonaws.com/"
@@ -174,7 +172,6 @@ class MetricTest(unittest.TestCase):
         self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
 
     def test_sql_execution(self):
-        # python -m unittest integration_tests.metric_test.MetricTest.test_sql_execution
         metric = explainaboard.metrics.text_to_sql.SQLExecutionConfig(
             db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
             table_path="https://expressai-xlab.s3.amazonaws.com/"
