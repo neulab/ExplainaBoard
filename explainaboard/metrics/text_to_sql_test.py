@@ -1,4 +1,10 @@
-"""Tests for explainaboard.metrics.text_to_sql"""
+"""Tests for explainaboard.metrics.text_to_sql
+
+We test the two metrics with examples in
+intergration_tests.metric_test.test_sql_exactsetmatch
+and intergration_tests.metric_test.test_sql_execution.
+The test requires network connection.
+"""
 
 from __future__ import annotations
 

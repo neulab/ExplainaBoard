@@ -45,6 +45,7 @@ class SQLExactSetMatchConfig(MetricConfig):
 class SQLExactSetMatch(Metric):
     """Calculate exact set match (Em) accuracy.
 
+    This metric requires network connection.
     The score is 1 iff the prediction SQL equals the ground
     truth on their SQL string match.
     """
@@ -96,6 +97,7 @@ class SQLExecutionConfig(MetricConfig):
 class SQLExecution(Metric):
     """Calculate execution (Ex) accuracy.
 
+    This metric requires network connection.
     The score is 1 iff the prediction SQL generates the same execution results
     as the groundtruth SQL.
     """
