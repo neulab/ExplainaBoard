@@ -18,30 +18,33 @@ with ideas of where to go next*.
 
 <img src="./fig/intro.png" width="300" align="right">
 
-It offers a number of different ways with which you can evaluate and understand your data:
+It offers a number of different ways with which you can evaluate and understand your systems:
 
 1. *Single-system Analysis*: What is a system good or bad at?
 2. *Pairwise Analysis*: Where is one system better (worse) than another?
-3. *Data Bias Analysis*: What are the characteristics of different evaluated datasets?
-4. *Common Errors*: What are common mistakes that top-5 systems made?
-5. *Fine-grained Error Analysis*: where do errors occur?
-6. *System Combination*: Is there potential complementarity between different systems?
+3. *Fine-grained Error Analysis*: On what examples do errors occur?
+4. *Holistic Leaderboards and Benchmarks*: Which systems perform best for a particular task?
 
 ## Using Explainaboard
 
-ExplainaBoard can be used online or offline.
+ExplainaBoard can be used online or offline. For most users, we recommend using the
+online interface, as it is more interactive and easier to get started.
 
 ### Online Usage
 
 Browse the [**web interface**](https://explainaboard.inspiredco.ai), which gives you the
-ability to browse outputs and upload your own system outputs.
+ability to browse outputs and evaluate and analyze your own system outputs.
 
 <a href="https://explainaboard.inspiredco.ai"><img src="./fig/demo-v2.png" width="500" class="center"></a>
 
+If you would like to evaluate and analyze your own systems programmatically, you can
+use the
+<a href="https://github.com/neulab/explainaboard_client">ExplainaBoard client</a>.
+
 ### Offline Usage
 
-First, follow the installation directions below, then take a look at our
-[**CLI examples**](docs/cli_interface.md).
+For power-users who want to use ExplainaBoard offline, first, follow the installation directions
+below, then take a look at our [**CLI examples**](docs/cli_interface.md).
 
 **Install Method 1 - Standard Use:** Simple installation from PyPI (Python 3 only)
 
@@ -97,6 +100,6 @@ other collaborators. If you find it useful in research, you can cite it in paper
 }
 ```
 
-We thanks all authors who share their system outputs with us: Ikuya Yamada, Stefan Schweter,
+We thanks all authors who shared their system outputs with us: Ikuya Yamada, Stefan Schweter,
 Colin Raffel, Yang Liu, Li Dong. We also thank
 Vijay Viswanathan, Yiran Chen, Hiroaki Hayashi for useful discussion and feedback about ExplainaBoard.
