@@ -53,7 +53,7 @@ class SQLExactSetMatch(Metric):
     def calc_stats_from_data(
         self,
         true_data: list,
-        pred_data: list,  # , config: Optional[MetricConfig] = None
+        pred_data: list,
     ) -> MetricStats:
         """See Metric.calc_stats_from_data.
 
