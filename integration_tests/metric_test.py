@@ -153,9 +153,10 @@ class MetricTest(unittest.TestCase):
 
     def test_sql_exactsetmatch(self):
         metric = explainaboard.metrics.text_to_sql.SQLExactSetMatchConfig(
-            db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
-            table_path="https://expressai-xlab.s3.amazonaws.com/"
-            "large_data/table/tables.json",
+            db_dir="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database",
+            table_path="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database/concert_singer/tables.json",
         ).to_metric()
         true = [
             ["select distinct country from singer where age > 20", "concert_singer"],
@@ -172,9 +173,10 @@ class MetricTest(unittest.TestCase):
 
     def test_sql_execution(self):
         metric = explainaboard.metrics.text_to_sql.SQLExecutionConfig(
-            db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
-            table_path="https://expressai-xlab.s3.amazonaws.com/"
-            "large_data/table/tables.json",
+            db_dir="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database",
+            table_path="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database/concert_singer/tables.json",
         ).to_metric()
         true = [
             ["select distinct country from singer where age > 20", "concert_singer"],
