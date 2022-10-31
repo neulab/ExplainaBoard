@@ -156,7 +156,6 @@ class MetricTest(unittest.TestCase):
             db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
             table_path="https://expressai-xlab.s3.amazonaws.com/"
             "large_data/table/tables.json",
-            etype="match",
         ).to_metric()
         true = [
             ["select distinct country from singer where age > 20", "concert_singer"],
@@ -176,7 +175,6 @@ class MetricTest(unittest.TestCase):
             db_dir="https://expressai-xlab.s3.amazonaws.com/large_data/database",
             table_path="https://expressai-xlab.s3.amazonaws.com/"
             "large_data/table/tables.json",
-            etype="exec",
         ).to_metric()
         true = [
             ["select distinct country from singer where age > 20", "concert_singer"],

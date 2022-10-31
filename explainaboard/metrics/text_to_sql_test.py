@@ -20,11 +20,9 @@ from explainaboard.metrics.text_to_sql import (
 
 class SQLExactSetMatchConfigTest(unittest.TestCase):
     def test_to_metric(self) -> None:
-        self.assertIsInstance(
-            SQLExactSetMatchConfig("Accuracy").to_metric(), SQLExactSetMatch
-        )
+        self.assertIsInstance(SQLExactSetMatchConfig().to_metric(), SQLExactSetMatch)
 
 
 class SQLExecutionConfigTest(unittest.TestCase):
     def test_to_metric(self) -> None:
-        self.assertIsInstance(SQLExecutionConfig("Accuracy").to_metric(), SQLExecution)
+        self.assertIsInstance(SQLExecutionConfig().to_metric(), SQLExecution)

@@ -30,12 +30,10 @@ class SQLExactSetMatchConfig(MetricConfig):
     Args:
         db_dir: the path to database folder.
         table_path: the path to table schema file.
-        etype: the evaluation type, "match" or "exec".
     """
 
     db_dir: str = ""
     table_path: str = ""
-    etype: str = "match"
 
     def to_metric(self):
         """See MetricConfig.to_metric."""
@@ -68,7 +66,7 @@ class SQLExactSetMatch(Metric):
         config_dict = {
             "db_dir": config.db_dir,
             "table_path": config.table_path,
-            "etype": config.etype,
+            "etype": "match",
         }
         em_list = sql_evaluate(true_data, pred_data, config_dict)
         return SimpleMetricStats(np.array(em_list))
@@ -87,7 +85,6 @@ class SQLExecutionConfig(MetricConfig):
 
     db_dir: str = ""
     table_path: str = ""
-    etype: str = "exec"
 
     def to_metric(self):
         """See MetricConfig.to_metric."""
@@ -116,7 +113,7 @@ class SQLExecution(Metric):
         config_dict = {
             "db_dir": config.db_dir,
             "table_path": config.table_path,
-            "etype": config.etype,
+            "etype": "exec",
         }
 
         ex_list = sql_evaluate(true_data, pred_data, config_dict)
