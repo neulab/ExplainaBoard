@@ -15,6 +15,7 @@ import explainaboard.metrics.eaas
 import explainaboard.metrics.f1_score
 from explainaboard.metrics.metric import Score
 import explainaboard.metrics.ranking
+import explainaboard.metrics.text_to_sql
 
 
 class MetricTest(unittest.TestCase):
@@ -149,3 +150,43 @@ class MetricTest(unittest.TestCase):
         self.assertAlmostEqual(
             overall["F1"].get_value(Score, "score").value, 0.8235975260931867, 2
         )
+
+    def test_sql_exactsetmatch(self):
+        metric = explainaboard.metrics.text_to_sql.SQLExactSetMatchConfig(
+            db_dir="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database",
+            table_path="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database/concert_singer/tables.json",
+        ).to_metric()
+        true = [
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
+        ]
+        pred = [
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 25", "concert_singer"],
+            ["select distinct country from singer where age = 20", "concert_singer"],
+        ]
+        result = metric.evaluate(true, pred)
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 2.0 / 3.0)
+
+    def test_sql_execution(self):
+        metric = explainaboard.metrics.text_to_sql.SQLExecutionConfig(
+            db_dir="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database",
+            table_path="https://storage.googleapis.com/inspired-public-data/"
+            "explainaboard/task_data/text_to_sql/database/concert_singer/tables.json",
+        ).to_metric()
+        true = [
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 20", "concert_singer"],
+        ]
+        pred = [
+            ["select distinct country from singer where age > 20", "concert_singer"],
+            ["select distinct country from singer where age > 25", "concert_singer"],
+            ["select distinct country from singer where age = 20", "concert_singer"],
+        ]
+        result = metric.evaluate(true, pred)
+        self.assertAlmostEqual(result.get_value(Score, "score").value, 1.0 / 3.0)
