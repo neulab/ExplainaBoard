@@ -32,6 +32,7 @@ class TaskType(str, Enum):
     ranking_with_context = "ranking-with-context"
     argument_pair_identification = "argument-pair-identification"
     meta_evaluation_nlg = "meta-evaluation-nlg"
+    text_to_sql = "text-to-sql"
 
     @staticmethod
     def list() -> list[str]:
