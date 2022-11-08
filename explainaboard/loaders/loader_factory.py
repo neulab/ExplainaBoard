@@ -31,6 +31,7 @@ from explainaboard.loaders.tabular_classification import TabularClassificationLo
 from explainaboard.loaders.tabular_regression import TabularRegressionLoader
 from explainaboard.loaders.text_classification import TextClassificationLoader
 from explainaboard.loaders.text_pair_classification import TextPairClassificationLoader
+from explainaboard.loaders.text_to_sql import TextToSQLLoader
 
 _LOADERS: dict[TaskType, type[Loader]] = {
     TaskType.argument_pair_extraction: ArgumentPairExtractionLoader,
@@ -60,6 +61,7 @@ _LOADERS: dict[TaskType, type[Loader]] = {
     TaskType.meta_evaluation_nlg: MetaEvaluationNLGLoader,
     TaskType.argument_pair_identification: RankingwithContextLoader,
     TaskType.ranking_with_context: RankingwithContextLoader,
+    TaskType.text_to_sql: TextToSQLLoader,
 }
 
 
