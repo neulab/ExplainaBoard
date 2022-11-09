@@ -1,0 +1,17 @@
+[
+    {
+        "db_id": "concert_singer",
+        "query": "select distinct country from singer where age > 20",
+        "question": "Which country has singers who are over 20?"
+    },
+    {
+        "db_id": "concert_singer",
+        "query": "select distinct country from singer where age > 20",
+        "question": "List the countries which have singers who are over 20."
+    },
+    {
+        "db_id": "concert_singer",
+        "query": "select distinct country from singer where age > 20",
+        "question": "What countries have singers who are over 20?"
+    }
+]

@@ -43,6 +43,7 @@ from explainaboard.processors.text_classification import TextClassificationProce
 from explainaboard.processors.text_pair_classification import (
     TextPairClassificationProcessor,
 )
+from explainaboard.processors.text_to_sql import TextToSQLProcessor
 from explainaboard.processors.word_segmentation import CWSProcessor
 
 _TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
@@ -70,6 +71,7 @@ _TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
     TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,
     TaskType.meta_evaluation_nlg: MetaEvaluationNLGProcessor,
     TaskType.argument_pair_identification: ArgumentPairIdentificationProcessor,
+    TaskType.text_to_sql: TextToSQLProcessor,
 }
 
 
