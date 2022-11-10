@@ -90,7 +90,7 @@ class TextToSQLProcessor(Processor):
             ),
         }
 
-    def _get_true_label(self, data_point):
+    def _get_true_label(self, data_point: dict):
         """Override the parent class.
 
         Return a pair of a SQL query and the database it corresponds to.
@@ -98,7 +98,7 @@ class TextToSQLProcessor(Processor):
         """
         return [data_point["true_sql"], data_point["db_id"]]
 
-    def _get_predicted_label(self, data_point):
+    def _get_predicted_label(self, data_point: dict):
         """Override the parent class.
 
         Return a pair of a SQL query and the database it corresponds to.
@@ -109,7 +109,7 @@ class TextToSQLProcessor(Processor):
             data_point["predicted_sql"].split("\t")[1],
         ]
 
-    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
+    def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo) -> Any:
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples, lambda x: x["question"], unwrap(sys_info.source_tokenizer)
         )

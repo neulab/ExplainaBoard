@@ -50,8 +50,8 @@ class TextToSQLTest(unittest.TestCase):
         data = loader.load()
         processor = get_processor_class(TaskType.text_to_sql)()
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
-        self.assertGreater(len(sys_info.results.analyses), 0)
-        self.assertGreater(len(sys_info.results.overall), 0)
+        self.assertEqual(len(sys_info.results.analyses), 2)
+        self.assertEqual(len(sys_info.results.overall), 1)
         self.assertAlmostEqual(
             sys_info.results.overall["example"]["ExactSetMatch"]
             .get_value(Score, "score")
