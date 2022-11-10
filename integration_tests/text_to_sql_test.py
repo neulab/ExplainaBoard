@@ -8,6 +8,7 @@ from integration_tests.utils import test_artifacts_path
 from explainaboard import FileType, get_processor_class, TaskType
 from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.metrics.metric import Score
+from explainaboard.metrics.text_to_sql import SQLExactSetMatchConfig, SQLExecutionConfig
 
 
 class TextToSQLTest(unittest.TestCase):
@@ -23,7 +24,7 @@ class TextToSQLTest(unittest.TestCase):
             output_file_type=FileType.text,
         )
         data = loader.load()
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 4)
         self.assertEqual(
             data[1],
             {
@@ -40,6 +41,20 @@ class TextToSQLTest(unittest.TestCase):
         metadata = {
             "task_name": TaskType.text_to_sql,
             "metric_names": ["ExactSetMatch", "Execution"],
+            "metric_configs": {
+                "ExactSetMatch": SQLExactSetMatchConfig(
+                    db_dir="https://storage.googleapis.com/inspired-public-data/"
+                    "explainaboard/task_data/text_to_sql/database",
+                    table_path="https://storage.googleapis.com/inspired-public-data/"
+                    "explainaboard/task_data/text_to_sql/tables/tables.json",
+                ),
+                "Execution": SQLExecutionConfig(
+                    db_dir="https://storage.googleapis.com/inspired-public-data/"
+                    "explainaboard/task_data/text_to_sql/database",
+                    table_path="https://storage.googleapis.com/inspired-public-data/"
+                    "explainaboard/task_data/text_to_sql/tables/tables.json",
+                ),
+            },
         }
         loader = get_loader_class(TaskType.text_to_sql)(
             self.json_dataset,
@@ -50,17 +65,17 @@ class TextToSQLTest(unittest.TestCase):
         data = loader.load()
         processor = get_processor_class(TaskType.text_to_sql)()
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
-        self.assertEqual(len(sys_info.results.analyses), 2)
+        self.assertEqual(len(sys_info.results.analyses), 12)
         self.assertEqual(len(sys_info.results.overall), 1)
         self.assertAlmostEqual(
             sys_info.results.overall["example"]["ExactSetMatch"]
             .get_value(Score, "score")
             .value,
-            2.0 / 3.0,
+            3.0 / 4.0,
         )
         self.assertAlmostEqual(
             sys_info.results.overall["example"]["Execution"]
             .get_value(Score, "score")
             .value,
-            1.0 / 3.0,
+            2.0 / 4.0,
         )

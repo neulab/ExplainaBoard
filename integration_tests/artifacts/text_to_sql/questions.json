@@ -13,5 +13,10 @@
         "db_id": "concert_singer",
         "query": "select distinct country from singer where age > 20",
         "question": "What countries have singers who are over 20?"
+    },
+    {
+        "db_id": "pets_1",
+        "query": "SELECT max(weight), petType FROM pets GROUP BY petType",
+        "question": "Find the maximum weight for each type of pet. List the maximum weight and pet type."
     }
 ]

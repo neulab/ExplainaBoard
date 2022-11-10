@@ -7,7 +7,7 @@ from typing import Any
 
 from explainaboard import TaskType
 from explainaboard.analysis import feature
-from explainaboard.analysis.analyses import Analysis, AnalysisLevel
+from explainaboard.analysis.analyses import Analysis, AnalysisLevel, BucketAnalysis
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import (
     accumulate_vocab_from_samples,
@@ -23,13 +23,30 @@ from explainaboard.utils.typing_utils import unwrap
 class TextToSQLProcessor(Processor):
     """A processor for the text-to-SQL task."""
 
+    SQL_KEYWORDS = [
+        "select",
+        "join",
+        "where",
+        "group",
+        "sort",
+        "having",
+        "order",
+        "asc",
+        "desc",
+        "limit",
+    ]
+
     @classmethod
     def task_type(cls) -> TaskType:
         """See Processor.task_type."""
         return TaskType.text_to_sql
 
     def default_analysis_levels(self) -> list[AnalysisLevel]:
-        """See Processor.default_analysis_levels."""
+        """See Processor.default_analysis_levels.
+
+        Note: We use SQLite to evaluate SQLs, where SQL keywords and
+         table/column names are case-insensitive.
+        """
         features: dict[str, FeatureType] = {
             "question": feature.Value(
                 dtype=feature.DataType.STRING,
@@ -59,6 +76,15 @@ class TextToSQLProcessor(Processor):
             ),
         }
 
+        # TODO(shuaichen): parse the sql query to make the detection robust
+        for keyword in self.SQL_KEYWORDS:
+            features[f"contains_{keyword}"] = feature.Value(
+                dtype=feature.DataType.STRING,
+                description=f"whether the SQL contains keyword '{keyword}'",
+                func=lambda info, x, c, keyword=keyword: "yes"
+                if f"{keyword}" in x["true_sql"].lower().split()
+                else "no",
+            )
         return [
             AnalysisLevel(
                 name="example",
@@ -69,7 +95,22 @@ class TextToSQLProcessor(Processor):
 
     def default_analyses(self) -> list[Analysis]:
         """See Processor.default_analyses."""
-        return self.continuous_feature_analyses()
+        features = self.default_analysis_levels()[0].features
+        # Create analyses
+        analyses: list[Analysis] = []
+        for keyword in self.SQL_KEYWORDS:
+            analyses.append(
+                BucketAnalysis(
+                    level="example",
+                    description=features[f"contains_{keyword}"].description,
+                    feature=f"contains_{keyword}",
+                    method="discrete",
+                    num_buckets=15,
+                )
+            )
+
+        analyses.extend(self.continuous_feature_analyses())
+        return analyses
 
     @classmethod
     def default_metrics(
