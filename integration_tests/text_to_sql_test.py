@@ -46,13 +46,15 @@ class TextToSQLTest(unittest.TestCase):
                     db_dir="https://storage.googleapis.com/inspired-public-data/"
                     "explainaboard/task_data/text_to_sql/database",
                     table_path="https://storage.googleapis.com/inspired-public-data/"
-                    "explainaboard/task_data/text_to_sql/tables/tables.json",
+                    "explainaboard/task_data/text_to_sql/database/"
+                    "concert_singer/tables.json",
                 ),
                 "Execution": SQLExecutionConfig(
                     db_dir="https://storage.googleapis.com/inspired-public-data/"
                     "explainaboard/task_data/text_to_sql/database",
                     table_path="https://storage.googleapis.com/inspired-public-data/"
-                    "explainaboard/task_data/text_to_sql/tables/tables.json",
+                    "explainaboard/task_data/text_to_sql/database/"
+                    "concert_singer/tables.json",
                 ),
             },
         }
