@@ -46,15 +46,13 @@ class TextToSQLTest(unittest.TestCase):
                     db_dir="https://storage.googleapis.com/inspired-public-data/"
                     "explainaboard/task_data/text_to_sql/database",
                     table_path="https://storage.googleapis.com/inspired-public-data/"
-                    "explainaboard/task_data/text_to_sql/database/"
-                    "concert_singer/tables.json",
+                    "explainaboard/task_data/text_to_sql/tables/tables.json",
                 ),
                 "Execution": SQLExecutionConfig(
                     db_dir="https://storage.googleapis.com/inspired-public-data/"
                     "explainaboard/task_data/text_to_sql/database",
                     table_path="https://storage.googleapis.com/inspired-public-data/"
-                    "explainaboard/task_data/text_to_sql/database/"
-                    "concert_singer/tables.json",
+                    "explainaboard/task_data/text_to_sql/tables/tables.json",
                 ),
             },
         }
@@ -68,6 +66,9 @@ class TextToSQLTest(unittest.TestCase):
         processor = get_processor_class(TaskType.text_to_sql)()
         sys_info = processor.process(metadata, data, skip_failed_analyses=True)
         self.assertEqual(len(sys_info.results.analyses), 12)
+        self.assertEqual(
+            len(sys_info.results.analyses[2].details.bucket_performances), 2
+        )
         self.assertEqual(len(sys_info.results.overall), 1)
         self.assertAlmostEqual(
             sys_info.results.overall["example"]["ExactSetMatch"]
