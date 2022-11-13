@@ -156,7 +156,7 @@ class MetricTest(unittest.TestCase):
             db_dir="https://storage.googleapis.com/inspired-public-data/"
             "explainaboard/task_data/text_to_sql/database",
             table_path="https://storage.googleapis.com/inspired-public-data/"
-            "explainaboard/task_data/text_to_sql/database/concert_singer/tables.json",
+            "explainaboard/task_data/text_to_sql/tables/tables.json",
         ).to_metric()
         true = [
             ["select distinct country from singer where age > 20", "concert_singer"],
@@ -176,7 +176,7 @@ class MetricTest(unittest.TestCase):
             db_dir="https://storage.googleapis.com/inspired-public-data/"
             "explainaboard/task_data/text_to_sql/database",
             table_path="https://storage.googleapis.com/inspired-public-data/"
-            "explainaboard/task_data/text_to_sql/database/concert_singer/tables.json",
+            "explainaboard/task_data/text_to_sql/tables/tables.json",
         ).to_metric()
         true = [
             ["select distinct country from singer where age > 20", "concert_singer"],
