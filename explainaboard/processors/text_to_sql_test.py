@@ -9,6 +9,6 @@ from explainaboard.processors.processor_factory import get_processor_class
 from explainaboard.processors.text_to_sql import TextToSQLProcessor
 
 
-class QAOpenDomainProcessorTest(unittest.TestCase):
+class TextToSQLProcessorTest(unittest.TestCase):
     def test_get_processor_class(self) -> None:
         self.assertIs(get_processor_class(TaskType.text_to_sql), TextToSQLProcessor)
