@@ -5,7 +5,7 @@ repos:
       - id: black
         files: '\.py$'
         exclude: '^explainaboard\/third_party\/.*\.py|_test\.py$'
-  - repo: https://gitlab.com/pycqa/flake8.git
+  - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:
       - id: flake8
