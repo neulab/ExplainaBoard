@@ -45,8 +45,19 @@ where the first column represents source text and the 2nd column denotes gold re
 
 In this task, your system outputs should be as follows:
 
+* (1) `text`: one prediction per line
+
 ```text
 predicted_output_text
+```
+
+* (2) `json` : a list of dictionaries with one key: `hypothesis`
+
+```json
+[
+  {"hypothesis": "这是一部好电影"},
+  ...
+]
 ```
 
 Here is an example system output file for summarization on a subset of the CNN/Daily
