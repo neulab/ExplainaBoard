@@ -36,10 +36,22 @@ A man playing an electric guitar on stage.   A man is performing for cash.  neut
 
 ### Format of `System Output` File
 
-In this task, your system outputs should be one predicted label per line:
+In this task, your system outputs should be:
+
+* (1) `text`: one predicted label per line
 
 ```text
 predicted_label
+```
+
+* (2) `json`: a list of dictionaries with one key: `predicted_label`
+
+```json
+[
+  {"predicted_label": "positive"},
+  {"predicted_label": "negative"}
+  ...
+]
 ```
 
 Let's say we have one system output file from a RoBERTa model.
