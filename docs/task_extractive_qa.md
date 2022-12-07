@@ -30,11 +30,14 @@ In order to perform analysis of your results, they should be in the following
 JSON format:
 
 ```json
-{
-        "predicted_answers": {
-            "text": "Kawann Short"
-        }
+[
+  {
+    "predicted_answers": {
+      "text": "136"
     }
+  },
+  ...
+]
 ```
 
 where
