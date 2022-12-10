@@ -329,8 +329,8 @@ class MetricTest(unittest.TestCase):
         metric = _DummyMetric(_DummyMetricConfig("test"))
         stats = SimpleMetricStats(np.arange(1.0, 31.0))
         ci = unwrap(metric.calc_confidence_interval(stats, 0.05))
-        self.assertAlmostEqual(ci[0], -2.202365416010039)
-        self.assertAlmostEqual(ci[1], 33.20236541601004)
+        self.assertAlmostEqual(ci[0], 12.268005046817326)
+        self.assertAlmostEqual(ci[1], 18.731994953182674)
 
     def test_calc_confidence_interval_tdist_multi_agg(self) -> None:
         metric = _DummyMetric(_DummyMetricConfig("test"))
