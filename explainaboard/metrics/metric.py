@@ -651,14 +651,14 @@ class Metric(metaclass=abc.ABCMeta):
                     f"but the MetricStats has {num_stats} stats."
                 )
             my_mean = np.mean(stats_data)
-            my_std = np.std(stats_data)
-            if my_std == 0.0:
+            my_sem = np.std(stats_data) / np.sqrt(sample_size)
+            if my_sem == 0.0:
                 return (float(my_mean), float(my_mean))
             return stats_t.interval(
                 confidence=1.0 - confidence_alpha,  # See ExplainaBoard/issues/510
                 df=stats_data.shape[-2] - 1,
                 loc=my_mean,
-                scale=my_std,
+                scale=my_sem,
             )
         # Do bootstrapping otherwise
         else:
