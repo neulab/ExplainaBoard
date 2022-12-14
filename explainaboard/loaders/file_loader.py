@@ -135,20 +135,21 @@ class FileLoaderMetadata:
             source_language = target_language = data.get("language")
         custom_features: dict[str, dict[str, FeatureType]] = {}
         custom_analyses: list[Analysis] = []
+        serializer = PrimitiveSerializer()
         if "custom_features" in data:
-            ft_serializer = PrimitiveSerializer()
             custom_features = {
                 k1: {
                     # See https://github.com/python/mypy/issues/4717
-                    k2: narrow(
-                        FeatureType, ft_serializer.deserialize(v2)  # type: ignore
-                    )
+                    k2: narrow(FeatureType, serializer.deserialize(v2))  # type: ignore
                     for k2, v2 in v1.items()
                 }
                 for k1, v1 in data["custom_features"].items()
             }
         if "custom_analyses" in data:
-            custom_analyses = data["custom_analyses"]
+            custom_analyses = [
+                narrow(Analysis, serializer.deserialize(analysis))  # type: ignore
+                for analysis in data["custom_analyses"]
+            ]
         return FileLoaderMetadata(
             system_name=data.get("system_name"),
             dataset_name=data.get("dataset_name"),
@@ -641,14 +642,12 @@ class DatalabFileLoader(FileLoader):
     ) -> FileLoaderReturn:
         """See FileLoader.load_raw."""
         config = narrow(DatalabLoaderOption, data)
-        ft_serializer = PrimitiveSerializer()
+        serializer = PrimitiveSerializer()
 
         # load customized features from global config files
         customized_features_from_config = get_customized_features()
         if config.dataset in customized_features_from_config:
             ds_feats = customized_features_from_config[config.dataset]
-            if config.custom_features is None:
-                config.custom_features = {}
             for level_name, level_feats in ds_feats["custom_features"].items():
                 if level_name != "example":
                     raise NotImplementedError(
@@ -658,12 +657,18 @@ class DatalabFileLoader(FileLoader):
                     )
                 parsed_level_feats = {
                     # See https://github.com/python/mypy/issues/4717
-                    k: narrow(FeatureType, ft_serializer.deserialize(v))  # type: ignore
+                    k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
                     for k, v in level_feats.items()
                 }
                 new_features = config.custom_features.get(level_name, {})
                 new_features.update(parsed_level_feats)
                 config.custom_features[level_name] = new_features
+            config.custom_analyses.extend(
+                [
+                    narrow(Analysis, serializer.deserialize(analysis))  # type: ignore
+                    for analysis in ds_feats["custom_analyses"]
+                ]
+            )
 
         dataset = load_dataset(
             config.dataset, config.subdataset, split=config.split, streaming=False
@@ -686,19 +691,6 @@ class DatalabFileLoader(FileLoader):
             custom_features=config.custom_features,
             custom_analyses=config.custom_analyses,
         )
-        # load customized features from global config files
-        if config.dataset in customized_features_from_config:
-
-            if metadata.custom_features is None:
-                metadata.custom_features = {}
-            metadata.custom_features.update(
-                customized_features_from_config[config.dataset]["custom_features"]
-            )
-            if metadata.custom_analyses is None:
-                metadata.custom_analyses = []
-            metadata.custom_analyses.extend(
-                customized_features_from_config[config.dataset]["custom_analyses"]
-            )
 
         if info.languages is not None:
             metadata.supported_languages = info.languages
