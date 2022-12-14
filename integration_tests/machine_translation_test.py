@@ -107,7 +107,12 @@ class MachineTranslationTest(unittest.TestCase):
         processor = get_processor_class(TaskType.machine_translation)()
 
         sys_info = processor.process(
-            dataclasses.asdict(data.metadata), data.samples, skip_failed_analyses=True
+            {
+                f.name: getattr(data.metadata, f.name)
+                for f in dataclasses.fields(data.metadata)
+            },
+            data.samples,
+            skip_failed_analyses=True,
         )
         analysis_names = [x.name for x in sys_info.results.analyses if x is not None]
         self.assertIn("num_capital_letters", analysis_names)

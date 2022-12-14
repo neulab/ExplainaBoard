@@ -24,7 +24,6 @@ from explainaboard.analysis.result import Result
 from explainaboard.info import OverallStatistics, SysOutputInfo
 from explainaboard.loaders import DatalabLoaderOption, get_loader_class
 from explainaboard.metrics.metric import MetricConfig, MetricResult, MetricStats, Score
-from explainaboard.serialization.serializers import PrimitiveSerializer
 from explainaboard.utils.cache_api import (
     read_statistics_from_cache,
     write_statistics_to_cache,
@@ -243,9 +242,9 @@ class Processor(metaclass=abc.ABCMeta):
     def _customize_analyses(
         self,
         sys_info: SysOutputInfo,
-        custom_features: dict[str, dict[str, dict]],
+        custom_features: dict[str, dict[str, FeatureType]],
         metric_configs: dict[str, dict[str, MetricConfig]],
-        custom_analyses: list[dict],
+        custom_analyses: list[Analysis],
     ) -> tuple[list[AnalysisLevel], list[Analysis]]:
         """Customize analyses for this processor.
 
@@ -277,24 +276,11 @@ class Processor(metaclass=abc.ABCMeta):
 
         level_map = {x.name: x for x in analysis_levels}
 
-        serializer = PrimitiveSerializer()
-
         analyses = self.default_analyses()
-        analyses.extend(
-            [
-                narrow(Analysis, serializer.deserialize(v))  # type: ignore
-                for v in custom_analyses
-            ]
-        )
+        analyses.extend(custom_analyses)
 
         for level_name, feature_content in custom_features.items():
-            additional_features = {
-                k: narrow(FeatureType, serializer.deserialize(v))  # type: ignore
-                if isinstance(v, dict)
-                else v
-                for k, v in feature_content.items()
-            }
-            level_map[level_name].features.update(additional_features)
+            level_map[level_name].features.update(feature_content)
 
         return analysis_levels, analyses
 
@@ -528,8 +514,10 @@ class Processor(metaclass=abc.ABCMeta):
             )
 
         # declare customized features: _features will be updated
-        custom_features: dict = metadata.get("custom_features", {})
-        custom_analyses: list = metadata.get("custom_analyses", [])
+        custom_features: dict[str, dict[str, FeatureType]] = metadata.get(
+            "custom_features", {}
+        )
+        custom_analyses: list[Analysis] = metadata.get("custom_analyses", [])
 
         metric_configs = metadata.get("metric_configs")
         if metric_configs is not None:
