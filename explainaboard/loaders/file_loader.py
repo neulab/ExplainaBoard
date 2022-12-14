@@ -115,6 +115,7 @@ class FileLoaderMetadata:
         self.task_name = other.task_name or self.task_name
         self.supported_tasks = other.supported_tasks or self.supported_tasks
         for level, features in other.custom_features.items():
+            self.custom_features.setdefault(level, {})
             self.custom_features[level].update(features)
         self.custom_analyses.extend(other.custom_analyses)
 
