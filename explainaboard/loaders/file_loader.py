@@ -100,7 +100,9 @@ class FileLoaderMetadata:
     def merge(self, other: FileLoaderMetadata) -> None:
         """Merge the information from the two pieces of metadata.
 
-        In the case that the two conflict, the passed-in metadata get preference.
+        In the case that the two conflict, the passed-in metadata get preference
+        with the exception of `custom_features` and `custom_analyses`. For those
+        two fields, self is updated/extended with the values from other.
         """
         # TODO(gneubig): This should be changed into a for loop
         self.system_name = other.system_name or self.system_name
@@ -112,8 +114,10 @@ class FileLoaderMetadata:
         self.supported_languages = other.supported_languages or self.supported_languages
         self.task_name = other.task_name or self.task_name
         self.supported_tasks = other.supported_tasks or self.supported_tasks
-        self.custom_features = other.custom_features or self.custom_features
-        self.custom_analyses = other.custom_analyses or self.custom_analyses
+        for level, features in other.custom_features.items():
+            self.custom_features.setdefault(level, {})
+            self.custom_features[level].update(features)
+        self.custom_analyses.extend(other.custom_analyses)
 
     @classmethod
     def from_dict(cls, data: dict) -> FileLoaderMetadata:
