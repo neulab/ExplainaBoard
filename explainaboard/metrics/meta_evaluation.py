@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from typing import Any, Optional, Union
 
 import numpy as np
-import math
 from scipy import stats
 
 from explainaboard.metrics.metric import (
@@ -78,8 +78,9 @@ class CorrelationNLG(Metric):
             return SimpleMetricStats(
                 np.array(
                     [
-                        0 if math.isnan(corr_func(true, pred)[0]) else
-                        corr_func(true, pred)[0]
+                        0
+                        if math.isnan(corr_func(true, pred)[0])
+                        else corr_func(true, pred)[0]
                         for true, pred in zip(true_data, pred_data)
                     ]
                 )
