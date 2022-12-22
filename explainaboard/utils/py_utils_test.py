@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import unittest
 import math
+import unittest
+
 from explainaboard.utils.py_utils import replace_nan
 
 
