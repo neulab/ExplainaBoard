@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import math
 from typing import Any, Optional, Union
 
 import numpy as np
@@ -122,14 +121,14 @@ class CorrelationNLG(Metric):
         config = narrow(CorrelationNLGConfig, self.config)
         corr_func = config.get_correlation_func(config.correlation_type)
         if config.group_by == "dataset":
-            val = replace_nan(corr_func(single_stat[:, 0], single_stat[0:, 1])[0], 0)
+            val = replace_nan(corr_func(single_stat[:, 0], single_stat[0:, 1])[0], 0.0)
         elif config.group_by == "sample":
             val = np.mean(single_stat)
         elif config.group_by == "system":
             n_systems = int(single_stat.shape[-1] / 2)
             true_scores = np.sum(single_stat[:, 0:n_systems], axis=0)
             pred_scores = np.sum(single_stat[:, n_systems:], axis=0)
-            val = replace_nan(corr_func(true_scores, pred_scores)[0], 0)
+            val = replace_nan(corr_func(true_scores, pred_scores)[0], 0.0)
         else:
             raise ValueError(
                 f"group_by with the value {config.group_by} hasn't been supported."
@@ -387,6 +386,5 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
 
         assert len(system_score) == len(manual_score)
 
-        res = stats.pearsonr(system_score, manual_score)[0]
-        val = 0 if math.isnan(res) else res
+        val = replace_nan(stats.pearsonr(system_score, manual_score)[0], 0.0)
         return val
