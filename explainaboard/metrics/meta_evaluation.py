@@ -15,6 +15,7 @@ from explainaboard.metrics.metric import (
     SimpleMetricStats,
 )
 from explainaboard.serialization import common_registry
+from explainaboard.utils.py_utils import replace_nan
 from explainaboard.utils.typing_utils import narrow, unwrap_or
 
 
@@ -77,7 +78,7 @@ class CorrelationNLG(Metric):
             return SimpleMetricStats(
                 np.array(
                     [
-                        corr_func(true, pred)[0]
+                        replace_nan(corr_func(true, pred)[0], 0.0)
                         for true, pred in zip(true_data, pred_data)
                     ]
                 )
@@ -116,18 +117,18 @@ class CorrelationNLG(Metric):
         Returns:
             The aggregated metric value.
         """
-        val = 0
+        val = 0.0
         config = narrow(CorrelationNLGConfig, self.config)
         corr_func = config.get_correlation_func(config.correlation_type)
         if config.group_by == "dataset":
-            val = corr_func(single_stat[:, 0], single_stat[0:, 1])[0]
+            val = replace_nan(corr_func(single_stat[:, 0], single_stat[0:, 1])[0], 0.0)
         elif config.group_by == "sample":
             val = np.mean(single_stat)
         elif config.group_by == "system":
             n_systems = int(single_stat.shape[-1] / 2)
             true_scores = np.sum(single_stat[:, 0:n_systems], axis=0)
             pred_scores = np.sum(single_stat[:, n_systems:], axis=0)
-            val = corr_func(true_scores, pred_scores)[0]
+            val = replace_nan(corr_func(true_scores, pred_scores)[0], 0.0)
         else:
             raise ValueError(
                 f"group_by with the value {config.group_by} hasn't been supported."
@@ -385,6 +386,5 @@ class PearsonCorrelationWMTDA(CorrelationWMTDAMetric):
 
         assert len(system_score) == len(manual_score)
 
-        val = stats.pearsonr(system_score, manual_score)[0]
-
+        val = replace_nan(stats.pearsonr(system_score, manual_score)[0], 0.0)
         return val
