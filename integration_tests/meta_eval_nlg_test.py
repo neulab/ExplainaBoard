@@ -219,6 +219,7 @@ class MetaEvalNLGNewsroomTest(unittest.TestCase):
             .value
         )
         self.assertGreater(len(sys_info.results.analyses), 0)
+        # Replicate the Table 4 result in paper: https://arxiv.org/pdf/2106.11520.pdf
         self.assertAlmostEqual(
             overall_score,
             0.0946,
@@ -248,6 +249,8 @@ class MetaEvalNLGNewsroomTest(unittest.TestCase):
             .value
         )
         self.assertGreater(len(sys_info.results.analyses), 0)
+        # Replicate the Table 4 result in paper:
+        # https://github.com/neulab/BARTScore#reproduce
         self.assertAlmostEqual(
             overall_score,
             0.3157,
