@@ -27,7 +27,6 @@ from explainaboard.processors.kg_link_tail_prediction import (
 from explainaboard.processors.language_modeling import LanguageModelingProcessor
 from explainaboard.processors.machine_translation import MachineTranslationProcessor
 from explainaboard.processors.meta_evaluation_nlg import MetaEvaluationNLGProcessor
-from explainaboard.processors.meta_evaluation_wmt_da import MetaEvaluationWMTDAProcessor
 from explainaboard.processors.named_entity_recognition import NERProcessor
 from explainaboard.processors.processor import Processor
 from explainaboard.processors.qa_extractive import QAExtractiveProcessor
@@ -65,7 +64,6 @@ _TASK_TYPE_TO_PROCESSOR: dict[TaskType, type[Processor]] = {
     TaskType.cloze_mutiple_choice: ClozeMultipleChoiceProcessor,
     TaskType.cloze_generative: ClozeGenerativeProcessor,
     TaskType.grammatical_error_correction: GrammaticalErrorCorrectionProcessor,
-    TaskType.meta_evaluation_wmt_da: MetaEvaluationWMTDAProcessor,
     TaskType.tabular_regression: TabularRegressionProcessor,
     TaskType.tabular_classification: TabularClassificationProcessor,
     TaskType.argument_pair_extraction: ArgumentPairExtractionProcessor,

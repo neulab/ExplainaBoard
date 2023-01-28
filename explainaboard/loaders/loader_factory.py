@@ -20,7 +20,6 @@ from explainaboard.loaders.kg_link_tail_prediction import KgLinkTailPredictionLo
 from explainaboard.loaders.language_modeling import LanguageModelingLoader
 from explainaboard.loaders.loader import Loader
 from explainaboard.loaders.meta_evaluation_nlg import MetaEvaluationNLGLoader
-from explainaboard.loaders.meta_evaluation_wmt_da import MetaEvaluationWMTDALoader
 from explainaboard.loaders.qa_extractive import QAExtractiveLoader
 from explainaboard.loaders.qa_multiple_choice import QAMultipleChoiceLoader
 from explainaboard.loaders.qa_open_domain import QAOpenDomainLoader
@@ -47,7 +46,6 @@ _LOADERS: dict[TaskType, type[Loader]] = {
     TaskType.language_modeling: LanguageModelingLoader,
     TaskType.machine_translation: MachineTranslationLoader,
     TaskType.named_entity_recognition: SeqLabLoader,
-    TaskType.meta_evaluation_wmt_da: MetaEvaluationWMTDALoader,
     TaskType.qa_extractive: QAExtractiveLoader,
     TaskType.qa_multiple_choice: QAMultipleChoiceLoader,
     TaskType.qa_open_domain: QAOpenDomainLoader,
