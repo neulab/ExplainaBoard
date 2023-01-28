@@ -44,7 +44,6 @@ for tasks where the documentation does not yet exist! Please open an issue or fi
 * [Tabular Regression](#tabular-regression)
 * [Argument Pair Extraction](argument-pair-extraction)
 * [Argument Pair Identification](argument-pair-identification)
-* [WMT Metrics Direct Assessment Meta-evaluation](#wmt-metrics-direct-assessment-meta-evaluation)
 
 ## [Text Classification](task_text_classification.md)
 
@@ -398,38 +397,4 @@ The below example loads the meval_summeval dataset from DataLab:
 
 ```shell
 explainaboard --task meta-evaluation-nlg --dataset meval_summeval --sub-dataset coherence --system-outputs ./data/system_outputs/summeval/sumeval_bart.json > report.json
-```
-
-## [WMT Metrics Direct Assessment Meta-evaluation](task_meta_evaluation.md)
-
-Evaluating the reliability of automated metrics for [WMT Metrics shared tasks](https://wmt-metrics-task.github.io/)
- using [direct assessment](https://www.statmt.org/wmt16/slides/wmt16-news-da.pdf) (DA).
-
-### CLI Example
-
-This is an example with a custom dataset.
-
-```shell
-explainaboard \
-    --task meta-evaluation-wmt-da \
-    --custom-dataset-paths ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/data.tsv \
-    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score.txt \
-    --output-file-type text \
-    --output-dir output/cs-en \
-    --source-language en \
-    --target-language en
-```
-
-This is an example with a dataset supported by DataLab, for example
-[wmt20_metrics_with_score](https://github.com/ExpressAI/DataLab/blob/main/datasets/wmt20_metrics_with_score/wmt20_metrics_with_score.py).
-
-```shell
-explainaboard \
-    --task meta-evaluation-wmt-da \
-    --dataset wmt20_metrics_with_score \
-    --sub-dataset cs-en_1.0.3 \
-    --system-outputs ./data/system_outputs/nlg_meta_evaluation/wmt20-DA/cs-en/score_1.0.3.txt \
-    --output-file-type text \
-    --source-language en \
-    --target-language en
 ```
