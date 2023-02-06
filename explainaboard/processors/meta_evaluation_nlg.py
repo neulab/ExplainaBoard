@@ -101,6 +101,12 @@ class MetaEvaluationNLGProcessor(Processor):
             "PearsonSystemLevelCorr": CorrelationNLGConfig(
                 group_by="system", correlation_type="pearsonr"
             ),
+            "PearsonDatasetLevelCorr": CorrelationNLGConfig(
+                group_by="dataset", correlation_type="pearsonr"
+            ),
+            "SpearmanDatasetLevelCorr": CorrelationNLGConfig(
+                group_by="dataset", correlation_type="spearmanr"
+            ),
         }
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
