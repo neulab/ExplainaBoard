@@ -7,7 +7,6 @@ from explainaboard.utils.span_utils import BIOSpanOps
 
 class BIOSpanOpsTest(unittest.TestCase):
     def test_get_spans(self):
-
         tags = ["O", "O", "B-LOC", "I-LOC", "O", "B-LOC"]
         toks = ["I", "love", "New", "York", "and", "Beijing"]
 
@@ -21,7 +20,6 @@ class BIOSpanOpsTest(unittest.TestCase):
         self.assertEqual(span_tag_list, ["LOC", "LOC"])
 
     def test_get_matched_spans(self):
-
         # Span a
         tags = ["O", "O", "B-LOC", "I-LOC", "O", "B-LOC"]
         toks = ["I", "love", "New", "York", "and", "Beijing"]

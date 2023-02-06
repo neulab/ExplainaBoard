@@ -808,7 +808,6 @@ def evaluate(glist, plist, config):
                 )
 
             if etype in ["all", "exec"]:
-
                 # sqlite has error for some illegal sqls. add a trick to avoid it
                 if (
                     "players.player_id = players.player_id" in p_str

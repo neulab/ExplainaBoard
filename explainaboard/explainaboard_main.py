@@ -95,7 +95,6 @@ def analyze_reports(args):
     score_tensor = {}
     for report in reports:
         with open(report) as fin:
-
             report_dict = json.load(fin)
 
             system_name = report_dict["system_name"]
@@ -527,7 +526,6 @@ def main():
                     logger.info(analysis.generate_report())
 
             if output_dir:
-
                 # save report to `output_dir_reports`
                 x_file_name = os.path.basename(system_full_path).split(".")[0]
                 report.write_to_directory(output_dir_reports, f"{x_file_name}.json")

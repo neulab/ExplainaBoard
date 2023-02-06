@@ -94,7 +94,6 @@ class CorrelationNLG(Metric):
                 )
             )
         else:
-
             raise ValueError(
                 f"group_by with the value {config.group_by} hasn't been supported."
             )

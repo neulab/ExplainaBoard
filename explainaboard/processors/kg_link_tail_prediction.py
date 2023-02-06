@@ -173,7 +173,6 @@ class KGLinkTailPredictionProcessor(Processor):
         dict_tail: dict[str, int] = {}
 
         for sample in progress(samples):
-
             tail = sample["true_tail_decipher"]
             dict_tail[tail] = dict_tail.get(tail, 0) + 1
 
@@ -233,7 +232,6 @@ class KGLinkTailPredictionProcessor(Processor):
 
     # --- Feature functions accessible by ExplainaboardBuilder._get_feature_func()
     def _get_entity_type_level(self, existing_features: dict):
-
         # entities not found in `entity_type_level_map` get bucketed to this value.
         # in FB15k, "0" is the same as the most generic entity type, "Thing".
         default_level = "0"

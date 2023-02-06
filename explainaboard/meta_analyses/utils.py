@@ -28,11 +28,9 @@ def report_to_sysout(report: SysOutputInfo) -> list[dict]:
 
         # feature_perfs has `n_buckets` elements, each corresponding to a single bucket
         for bucket in details.bucket_performances:
-
             # loop through and record all the metrics that describe this bucket
             example_features: dict[str, Any] = {}
             for metric_name, metric_result in bucket.results.items():
-
                 example_features["feature_name"] = result.name
                 example_features["bucket_interval"] = bucket.bucket_interval
                 example_features["bucket_name"] = bucket.bucket_name

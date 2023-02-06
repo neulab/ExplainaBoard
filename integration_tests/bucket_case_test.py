@@ -11,7 +11,6 @@ from explainaboard.analysis.case import (
 
 class AnalysisCaseClassTest(unittest.TestCase):
     def test_bucket_class_class(self):
-
         my_bucket_seq = AnalysisCase(sample_id=0, features={})
         # print(asdict(my_bucket_seq))
         # {'sample_id': '0'}

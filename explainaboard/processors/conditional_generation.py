@@ -442,7 +442,6 @@ class ConditionalGenerationProcessor(Processor):
 
     @staticmethod
     def _match_toks(toks: TokenSeq, other_toks: TokenSeq):
-
         # Find tokens in other set
         other_tok_list = defaultdict(list)
         for i, tok in enumerate(other_toks):
