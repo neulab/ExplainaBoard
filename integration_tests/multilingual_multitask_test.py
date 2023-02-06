@@ -68,7 +68,6 @@ class MultilingualMultiTaskTest(unittest.TestCase):
         reports = []
         metadata = {}
         for loader, system_output, task in zip(loaders, system_outputs, tasks):
-
             metadata.update(loader.user_defined_metadata_configs)
 
             report = get_processor_class(task)().process(
@@ -89,7 +88,6 @@ class MultilingualMultiTaskTest(unittest.TestCase):
         score_tensor = {}
         for report in reports:
             with open(report) as fin:
-
                 report_dict = json.load(fin)
 
                 system_name = report_dict["system_name"]

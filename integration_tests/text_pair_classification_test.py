@@ -45,7 +45,6 @@ class TextPairClassificationTest(unittest.TestCase):
         )
 
     def test_snli(self):
-
         metadata = {
             "task_name": TaskType.text_classification.value,
             "metric_names": ["Accuracy"],
@@ -67,7 +66,6 @@ class TextPairClassificationTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_paws_fra(self):
-
         metadata = {
             "task_name": TaskType.text_classification.value,
             "metric_names": ["Accuracy"],

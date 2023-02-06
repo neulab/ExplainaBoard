@@ -63,7 +63,6 @@ class MachineTranslationTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
-
         condgen_processor = get_processor_class(TaskType.conditional_generation)()
         mt_processor = get_processor_class(TaskType.machine_translation)()
 

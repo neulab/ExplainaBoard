@@ -36,7 +36,6 @@ class QATatMetric(Metric):
         """See Metric.calc_stats_from_data."""
         stat_list = []
         for true_answer_info, pred_answer_info in zip(true_data, pred_data):
-
             prediction = pred_answer_info["predicted_answer"]
             prediction = prediction if isinstance(prediction, list) else [prediction]
 

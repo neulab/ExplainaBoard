@@ -12,7 +12,6 @@ from explainaboard.metrics.metric import Score
 
 
 class ArgumentPairExtractionTest(unittest.TestCase):
-
     artifact_path = os.path.join(test_artifacts_path, "argument_pair_extraction")
 
     def test_datalab_loader(self):

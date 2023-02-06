@@ -159,7 +159,6 @@ class RankingMetaAnalysis(MetaAnalysis):
         )
         bucket_names = []
         for bucket_id in range(num_buckets):
-
             buckets_per_model = [
                 model_sysout[bucket_id] for model_sysout in model_sysouts
             ]

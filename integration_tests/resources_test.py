@@ -7,7 +7,6 @@ from explainaboard.utils.load_resources import get_customized_features
 
 class ResourcesTest(unittest.TestCase):
     def test_get_customized_features(self):
-
         self.assertEqual(
             {
                 "custom_features": {

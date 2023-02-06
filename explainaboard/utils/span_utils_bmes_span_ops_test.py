@@ -7,7 +7,6 @@ from explainaboard.utils.span_utils import BMESSpanOps
 
 class BMESSpanOpsTest(unittest.TestCase):
     def test_get_spans(self):
-
         tags = ["S", "B", "E", "B", "E"]
         toks = ["我", "喜", "欢", "纽", "约"]
 
@@ -21,7 +20,6 @@ class BMESSpanOpsTest(unittest.TestCase):
         self.assertEqual(span_tag_list, ["S", "BE", "BE"])
 
     def test_get_matched_spans(self):
-
         # Span a
         tags = ["S", "B", "E", "B", "E"]
         toks = ["我", "喜", "欢", "纽", "约"]

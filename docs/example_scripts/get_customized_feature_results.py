@@ -6,7 +6,6 @@ from explainaboard import get_loader_class, get_processor_class, TaskType
 # This code details (1) how to evaluate your systems using ExplainaBoard
 # programmatically (2)how to get results of your customized features
 def get_customized_results(dataset, customized_features):
-
     customized_features_performance = {}
 
     task = TaskType.kg_link_tail_prediction
@@ -26,7 +25,6 @@ def get_customized_results(dataset, customized_features):
 
     # get overall results of different metrics
     for metric_name, metric_info in sys_info.results.overall.items():  # type: ignore
-
         metric_name = metric_info.metric_name
         value = metric_info.value
         confidence_score_low = metric_info.confidence_score_low
