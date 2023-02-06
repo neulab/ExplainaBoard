@@ -8,7 +8,6 @@ from explainaboard.table_schema import table_schemas
 
 class TableSchemaTest(unittest.TestCase):
     def test_table_schemas(self):
-
         self.assertEqual(len(table_schemas[TaskType.text_classification]), 3)
 
         self.assertEqual(len(table_schemas[TaskType.summarization]), 3)

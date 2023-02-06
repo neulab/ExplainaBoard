@@ -46,7 +46,6 @@ def gen_argument_pairs(
     pred_spans_set = set()
 
     for token_idx, token in enumerate(true_tags):
-
         gold_label = _get_argument_label(token)
         prefix = token.split("-")[0]
 
@@ -89,7 +88,6 @@ def gen_argument_pairs(
                     )
 
     for token_idx, token in enumerate(true_tags):
-
         gold_label = _get_argument_label(token)
         prefix = token.split("-")[0]
         next_label = (

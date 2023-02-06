@@ -9,12 +9,10 @@ from explainaboard.utils.typing_utils import narrow, unwrap
 
 
 class MetaEvalNLGInvalidValueTest(unittest.TestCase):
-
     true_data = [[1, 2, 3, 4, 5], [2, 1, 4, 5, 2], [5, 4, 3, 2, 1]]
     pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
 
     def test_illegal_correlation_type_calc_stats_from_data(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="illegal"
         )
@@ -33,7 +31,6 @@ class MetaEvalNLGInvalidValueTest(unittest.TestCase):
             corr_metric._calc_metric_from_aggregate_single(stats_arr)
 
     def test_illegal_group_type_calc_stats_from_data(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="illegal", correlation_type="spearmanr"
         )
@@ -61,7 +58,6 @@ class MetaEvalNLGTest(unittest.TestCase):
     pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
 
     def test_sample_level_spearmanr(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="spearmanr"
         )
@@ -73,7 +69,6 @@ class MetaEvalNLGTest(unittest.TestCase):
         self.assertAlmostEqual(val, 0.8162952, 3)
 
     def test_sample_level_kendalltau(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="kendalltau"
         )
@@ -84,7 +79,6 @@ class MetaEvalNLGTest(unittest.TestCase):
         self.assertAlmostEqual(val, 0.69046817, 3)
 
     def test_sample_level_pearsonr(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="pearsonr"
         )
@@ -95,7 +89,6 @@ class MetaEvalNLGTest(unittest.TestCase):
         self.assertAlmostEqual(val, 0.820707397, 3)
 
     def test_system_level_spearmanr(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="system", correlation_type="spearmanr"
         )
@@ -106,7 +99,6 @@ class MetaEvalNLGTest(unittest.TestCase):
         self.assertAlmostEqual(val, 0.815789, 3)
 
     def test_system_level_kendalltau(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="system", correlation_type="kendalltau"
         )
@@ -117,7 +109,6 @@ class MetaEvalNLGTest(unittest.TestCase):
         self.assertAlmostEqual(val, 0.66666, 3)
 
     def test_dataset_level_spearmanr(self) -> None:
-
         true_data = [[1], [2], [3], [4], [5]]
         pred_data = [[1], [2], [3], [4], [5]]
 
@@ -132,12 +123,10 @@ class MetaEvalNLGTest(unittest.TestCase):
 
 
 class MetaEvalNLGCITest(unittest.TestCase):
-
     true_data = [[1, 2, 3, 4, 5], [2, 1, 4, 5, 2], [5, 4, 3, 2, 1]]
     pred_data = [[2, 1, 3, 4, 5], [2, 4, 5, 5, 2], [5, 3, 4, 2, 1]]
 
     def test_sample_level_spearmanr_bootstrap(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="sample", correlation_type="spearmanr"
         )
@@ -154,7 +143,6 @@ class MetaEvalNLGCITest(unittest.TestCase):
         self.assertAlmostEqual(ci[1], 0.8999, 2)
 
     def test_system_level_spearmanr_bootstrap(self) -> None:
-
         nlg_corr_config = CorrelationNLGConfig(
             group_by="system", correlation_type="spearmanr"
         )
@@ -171,7 +159,6 @@ class MetaEvalNLGCITest(unittest.TestCase):
         self.assertAlmostEqual(ci[1], 0.9746, 2)
 
     def test_dataset_level_spearmanr_bootstrap(self) -> None:
-
         true_data = [[1], [2], [3], [4], [5]]
         pred_data = [[1], [2], [3], [4], [5]]
 

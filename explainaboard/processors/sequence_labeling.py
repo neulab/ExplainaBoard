@@ -191,7 +191,6 @@ class SeqLabProcessor(Processor):
         return data_point["pred_tags"]
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
-
         tokens_sequences = []
         tags_sequences = []
 

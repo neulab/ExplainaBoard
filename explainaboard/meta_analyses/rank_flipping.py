@@ -138,7 +138,6 @@ class RankFlippingMetaAnalysis(MetaAnalysis):
         """
         paired_score_examples = []
         for m1_bucket, m2_bucket in zip(model1_buckets, model2_buckets):
-
             # bucket info (feature name, bucket interval, bucket name, bucket size)
             # should match exactly
             if m1_bucket["feature_name"] != m2_bucket["feature_name"]:

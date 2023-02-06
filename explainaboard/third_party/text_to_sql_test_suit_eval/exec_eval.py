@@ -229,7 +229,6 @@ def eval_exec_match(
     else:
         preds = [p_str]
     for pred in preds:
-
         pred_passes = 1
         # compare the gold and predicted denotations on each database in the directory
         # wrap with progress bar if required
