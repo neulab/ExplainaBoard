@@ -23,7 +23,8 @@ class RootMeanSquaredErrorConfig(MetricConfig):
     """Configuration for RootMeanSquaredError.
 
     Attributes:
-        negative: If True, the root mean squared error is multiplied by -1.
+        negative: If True, the root mean squared error is multiplied by -1. This makes
+            higher values of the metric correspond to better performance.
     """
 
     negative: bool = False
@@ -64,7 +65,8 @@ class AbsoluteErrorConfig(MetricConfig):
     """Configuration for AbsoluteError.
 
     Attributes:
-        negative: If True, the absolute error is multiplied by -1.
+        negative: If True, the absolute error is multiplied by -1. This makes higher
+            values of the metric correspond to better performance.
     """
 
     negative: bool = False
