@@ -10,6 +10,8 @@ from explainaboard.metrics.continuous import (
     RootMeanSquaredError,
     RootMeanSquaredErrorConfig,
 )
+from explainaboard.metrics.metric import Score
+from explainaboard.utils.typing_utils import narrow
 
 
 class RootMeanSquaredErrorConfigTest(unittest.TestCase):
@@ -19,6 +21,7 @@ class RootMeanSquaredErrorConfigTest(unittest.TestCase):
             {
                 "source_language": None,
                 "target_language": None,
+                "negative": False,
             },
         )
 
@@ -42,6 +45,7 @@ class AbsoluteErrorConfigTest(unittest.TestCase):
             {
                 "source_language": None,
                 "target_language": None,
+                "negative": False,
             },
         )
 
@@ -56,3 +60,14 @@ class AbsoluteErrorConfigTest(unittest.TestCase):
             AbsoluteErrorConfig().to_metric(),
             AbsoluteError,
         )
+
+
+class AbsoluteErrorTest(unittest.TestCase):
+
+    def test_basic_calculation(self) -> None:
+        absolute_error = narrow(AbsoluteError, AbsoluteErrorConfig().to_metric())
+        expected = [1.0, 2.0, 3.0]
+        actual = [1.5, 2.0, 3.7]
+        metric_result = absolute_error.evaluate(expected, actual)
+        value = metric_result.get_value(Score, "score").value
+        self.assertAlmostEqual(value, 0.4)
