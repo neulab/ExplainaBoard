@@ -106,5 +106,25 @@
         "method": "continuous"
       }
     ]
+  },
+  "gmu_anlp": {
+    "custom_features": {
+      "example": {
+        "language": {
+          "cls_name": "Value",
+          "dtype": "string",
+          "description": "language"
+        }
+      }
+    },
+    "custom_analyses": [
+      {
+        "cls_name": "BucketAnalysis",
+        "feature": "language",
+        "level": "example",
+        "num_buckets": 12,
+        "method": "discrete"
+      }
+    ]
   }
 }
