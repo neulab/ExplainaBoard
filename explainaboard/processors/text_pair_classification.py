@@ -157,7 +157,6 @@ class TextPairClassificationProcessor(Processor):
         return {"Accuracy": AccuracyConfig()}
 
     def _statistics_func(self, samples: Iterable[Any], sys_info: SysOutputInfo):
-
         samples_list = list(samples)
         source_vocab, source_vocab_rank = accumulate_vocab_from_samples(
             samples_list,

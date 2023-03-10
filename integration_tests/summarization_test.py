@@ -60,7 +60,6 @@ class SummarizationTest(unittest.TestCase):
         self.assertGreater(len(sys_info.results.overall), 0)
 
     def test_default_features_dont_modify_condgen(self):
-
         condgen_processor = get_processor_class(TaskType.conditional_generation)()
         sum_processor = get_processor_class(TaskType.summarization)()
 
@@ -79,7 +78,6 @@ class SummarizationTest(unittest.TestCase):
     # Commented out following code since it's too slow for unittest
     @unittest.skipUnless("test_sum" in OPTIONAL_TEST_SUITES, reason="time consuming")
     def test_datalab_loader(self):
-
         json_output_customized = cache_api.cache_online_file(
             "https://storage.googleapis.com/inspired-public-data/"
             "explainaboard/task_data/summarization/cnndm-bart-output.txt",

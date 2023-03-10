@@ -1,24 +1,24 @@
-"""Tests for explainaboard.metrics.continuous"""
+"""Tests for explainaboard.metrics.meta_evaluation"""
 
 from __future__ import annotations
 
 import math
 import unittest
 
-from explainaboard.metrics.continuous import (
-    AbsoluteError,
-    AbsoluteErrorConfig,
-    RootMeanSquaredError,
-    RootMeanSquaredErrorConfig,
+from explainaboard.metrics.meta_evaluation import (
+    AbsoluteErrorMetaEval,
+    AbsoluteErrorMetaEvalConfig,
+    RootMeanSquaredErrorMetaEval,
+    RootMeanSquaredErrorMetaEvalConfig,
 )
 from explainaboard.metrics.metric import Score
 from explainaboard.utils.typing_utils import narrow
 
 
-class RootMeanSquaredErrorConfigTest(unittest.TestCase):
+class RootMeanSquaredErrorMetaEvalConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            RootMeanSquaredErrorConfig().serialize(),
+            RootMeanSquaredErrorMetaEvalConfig().serialize(),
             {
                 "source_language": None,
                 "target_language": None,
@@ -28,43 +28,45 @@ class RootMeanSquaredErrorConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            RootMeanSquaredErrorConfig.deserialize({}),
-            RootMeanSquaredErrorConfig(),
+            RootMeanSquaredErrorMetaEvalConfig.deserialize({}),
+            RootMeanSquaredErrorMetaEvalConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            RootMeanSquaredErrorConfig().to_metric(),
-            RootMeanSquaredError,
+            RootMeanSquaredErrorMetaEvalConfig().to_metric(),
+            RootMeanSquaredErrorMetaEval,
         )
 
 
-class RootMeanSquaredErrorTest(unittest.TestCase):
+class RootMeanSquaredErrorMetaEvalTest(unittest.TestCase):
     def test_basic_calculation(self) -> None:
         absolute_error = narrow(
-            RootMeanSquaredError, RootMeanSquaredErrorConfig().to_metric()
+            RootMeanSquaredErrorMetaEval,
+            RootMeanSquaredErrorMetaEvalConfig().to_metric(),
         )
-        expected = [1.0, 3.0]
-        actual = [1.4, 2.8]
+        expected = [[1.0, 3.0, 1.0], [3.0]]
+        actual = [[1.4, 2.8, 1.4], [2.8]]
         metric_result = absolute_error.evaluate(expected, actual)
         value = metric_result.get_value(Score, "score").value
         self.assertAlmostEqual(value, math.sqrt(0.1))
 
     def test_negative(self) -> None:
         absolute_error = narrow(
-            RootMeanSquaredError, RootMeanSquaredErrorConfig(negative=True).to_metric()
+            RootMeanSquaredErrorMetaEval,
+            RootMeanSquaredErrorMetaEvalConfig(negative=True).to_metric(),
         )
-        expected = [1.0, 3.0]
-        actual = [1.4, 2.8]
+        expected = [[1.0], [3.0, 1.0, 3.0]]
+        actual = [[1.4], [2.8, 1.4, 2.8]]
         metric_result = absolute_error.evaluate(expected, actual)
         value = metric_result.get_value(Score, "score").value
         self.assertAlmostEqual(value, -math.sqrt(0.1))
 
 
-class AbsoluteErrorConfigTest(unittest.TestCase):
+class AbsoluteErrorMetaEvalConfigTest(unittest.TestCase):
     def test_serialize(self) -> None:
         self.assertEqual(
-            AbsoluteErrorConfig().serialize(),
+            AbsoluteErrorMetaEvalConfig().serialize(),
             {
                 "source_language": None,
                 "target_language": None,
@@ -74,32 +76,35 @@ class AbsoluteErrorConfigTest(unittest.TestCase):
 
     def test_deserialize(self) -> None:
         self.assertEqual(
-            AbsoluteErrorConfig.deserialize({}),
-            AbsoluteErrorConfig(),
+            AbsoluteErrorMetaEvalConfig.deserialize({}),
+            AbsoluteErrorMetaEvalConfig(),
         )
 
     def test_to_metric(self) -> None:
         self.assertIsInstance(
-            AbsoluteErrorConfig().to_metric(),
-            AbsoluteError,
+            AbsoluteErrorMetaEvalConfig().to_metric(),
+            AbsoluteErrorMetaEval,
         )
 
 
-class AbsoluteErrorTest(unittest.TestCase):
+class AbsoluteErrorMetaEvalTest(unittest.TestCase):
     def test_basic_calculation(self) -> None:
-        absolute_error = narrow(AbsoluteError, AbsoluteErrorConfig().to_metric())
-        expected = [1.0, 2.0, 3.0]
-        actual = [1.5, 2.0, 3.7]
+        absolute_error = narrow(
+            AbsoluteErrorMetaEval, AbsoluteErrorMetaEvalConfig().to_metric()
+        )
+        expected = [[1.0, 2.0], [3.0]]
+        actual = [[1.5, 2.0], [3.7]]
         metric_result = absolute_error.evaluate(expected, actual)
         value = metric_result.get_value(Score, "score").value
         self.assertAlmostEqual(value, 0.4)
 
     def test_negative(self) -> None:
         absolute_error = narrow(
-            AbsoluteError, AbsoluteErrorConfig(negative=True).to_metric()
+            AbsoluteErrorMetaEval,
+            AbsoluteErrorMetaEvalConfig(negative=True).to_metric(),
         )
-        expected = [1.0, 2.0, 3.0]
-        actual = [1.5, 2.0, 3.7]
+        expected = [[1.0], [2.0, 3.0]]
+        actual = [[1.5], [2.0, 3.7]]
         metric_result = absolute_error.evaluate(expected, actual)
         value = metric_result.get_value(Score, "score").value
         self.assertAlmostEqual(value, -0.4)

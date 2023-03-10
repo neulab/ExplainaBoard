@@ -11,7 +11,11 @@ from explainaboard.analysis.analyses import Analysis, AnalysisLevel
 from explainaboard.analysis.feature import FeatureType
 from explainaboard.analysis.feature_funcs import count_tokens
 from explainaboard.info import SysOutputInfo
-from explainaboard.metrics.meta_evaluation import CorrelationNLGConfig
+from explainaboard.metrics.meta_evaluation import (
+    AbsoluteErrorMetaEvalConfig,
+    CorrelationNLGConfig,
+    RootMeanSquaredErrorMetaEvalConfig,
+)
 from explainaboard.metrics.metric import MetricConfig
 from explainaboard.processors.processor import Processor
 from explainaboard.utils.language_utils import (
@@ -100,6 +104,18 @@ class MetaEvaluationNLGProcessor(Processor):
             ),
             "PearsonSystemLevelCorr": CorrelationNLGConfig(
                 group_by="system", correlation_type="pearsonr"
+            ),
+            "PearsonDatasetLevelCorr": CorrelationNLGConfig(
+                group_by="dataset", correlation_type="pearsonr"
+            ),
+            "SpearmanDatasetLevelCorr": CorrelationNLGConfig(
+                group_by="dataset", correlation_type="spearmanr"
+            ),
+            "NegativeAbsoluteError": AbsoluteErrorMetaEvalConfig(
+                negative=True,
+            ),
+            "NegativeRMSE": RootMeanSquaredErrorMetaEvalConfig(
+                negative=True,
             ),
         }
 

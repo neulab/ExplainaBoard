@@ -94,7 +94,6 @@ class CorrelationNLG(Metric):
                 )
             )
         else:
-
             raise ValueError(
                 f"group_by with the value {config.group_by} hasn't been supported."
             )
@@ -147,3 +146,104 @@ class CorrelationNLG(Metric):
                 val = self._calc_metric_from_aggregate_single(single_stat)
                 ret_metric[i] = val
             return ret_metric
+
+
+@dataclass
+@common_registry.register("RootMeanSquaredErrorMetaEvalConfig")
+class RootMeanSquaredErrorMetaEvalConfig(MetricConfig):
+    """Configuration for RootMeanSquaredErrorMetaEval.
+
+    Attributes:
+        negative: If True, the root mean squared error is multiplied by -1. This makes
+            higher values of the metric correspond to better performance.
+    """
+
+    negative: bool = False
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
+        return RootMeanSquaredErrorMetaEval(self)
+
+
+class RootMeanSquaredErrorMetaEval(Metric):
+    """Calculate the root mean squared error of continuous values."""
+
+    def calc_stats_from_data(self, true_data: list, pred_data) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
+        error = np.array(
+            [
+                (sum((x - y) * (x - y) for x, y in zip(xs, ys)), len(xs))
+                for xs, ys in zip(true_data, pred_data)
+            ]
+        )
+        return SimpleMetricStats(error)
+
+    def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
+        return False
+
+    def _calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: MetricConfig | None = None
+    ) -> np.ndarray:
+        """See Metric.calc_metric_from_aggregate."""
+        if agg_stats.shape[-1] != 2:
+            raise ValueError("Invalid shape for aggregate stats {agg_stats.shape}")
+        avg_stats = (
+            agg_stats[:, 0] / agg_stats[:, 1]
+            if agg_stats.ndim == 2
+            else agg_stats[0] / agg_stats[1]
+        )
+        error = np.sqrt(avg_stats)
+        if narrow(RootMeanSquaredErrorMetaEvalConfig, self.config).negative:
+            error = -error
+        return error
+
+
+@dataclass
+@common_registry.register("AbsoluteErrorMetaEvalConfig")
+class AbsoluteErrorMetaEvalConfig(MetricConfig):
+    """Configuration for AbsoluteErrorMetaEval.
+
+    Attributes:
+        negative: If True, the absolute error is multiplied by -1.  This makes
+            higher values of the metric correspond to better performance.
+    """
+
+    negative: bool = False
+
+    def to_metric(self) -> Metric:
+        """See MetricConfig.to_metric."""
+        return AbsoluteErrorMetaEval(self)
+
+
+class AbsoluteErrorMetaEval(Metric):
+    """Calculate the absolute error of continuous values."""
+
+    def calc_stats_from_data(self, true_data: list, pred_data: list) -> MetricStats:
+        """See Metric.calc_stats_from_data."""
+        error = np.array(
+            [
+                (sum(abs(x - y) for x, y in zip(xs, ys)), len(xs))
+                for xs, ys in zip(true_data, pred_data)
+            ]
+        )
+        return SimpleMetricStats(error)
+
+    def is_simple_average(self, stats: MetricStats):
+        """See Metric.is_simple_average."""
+        return False
+
+    def _calc_metric_from_aggregate(
+        self, agg_stats: np.ndarray, config: MetricConfig | None = None
+    ) -> np.ndarray:
+        """See Metric.calc_metric_from_aggregate."""
+        if agg_stats.shape[-1] != 2:
+            raise ValueError("Invalid shape for aggregate stats {agg_stats.shape}")
+        error = (
+            agg_stats[:, 0] / agg_stats[:, 1]
+            if agg_stats.ndim == 2
+            else agg_stats[0] / agg_stats[1]
+        )
+        if narrow(AbsoluteErrorMetaEvalConfig, self.config).negative:
+            error = -error
+        return error
