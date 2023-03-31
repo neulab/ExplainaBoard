@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import os
 import unittest
 
+from integration_tests.utils import test_artifacts_path
 import numpy as np
 
+from explainaboard import FileType, get_processor_class, Source, TaskType
+from explainaboard.loaders.file_loader import DatalabLoaderOption
+from explainaboard.loaders.loader_factory import get_loader_class
 from explainaboard.metrics.meta_evaluation import CorrelationNLG, CorrelationNLGConfig
+from explainaboard.metrics.metric import Score
 from explainaboard.utils.typing_utils import narrow, unwrap
 
 
@@ -176,3 +182,77 @@ class MetaEvalNLGCITest(unittest.TestCase):
         ci = unwrap(corr_metric.calc_confidence_interval(stats, 0.05))
         self.assertAlmostEqual(ci[0], 1, 2)
         self.assertAlmostEqual(ci[1], 1, 2)
+
+
+class MetaEvalNLGNewsroomTest(unittest.TestCase):
+    """
+    Test the NLG metric on newsroom dataset and replicate the reported results from
+    the paper: https://arxiv.org/pdf/2106.11520.pdf
+    """
+
+    artifact_path = os.path.join(test_artifacts_path, "newsroom")
+    predictions_rouge1 = os.path.join(artifact_path, "rouge1_f_predictions.json")
+    predictions_bartscore = os.path.join(
+        artifact_path, "bart_score_cnn_ref_hypo_predictions.json"
+    )
+
+    def test_coherence_rouge1_f(self):
+        loader = get_loader_class(TaskType.meta_evaluation_nlg).from_datalab(
+            dataset=DatalabLoaderOption("meval_newsroom", "coherence"),
+            output_data=self.predictions_rouge1,
+            output_source=Source.local_filesystem,
+            output_file_type=FileType.json,
+        )
+        data = loader.load().samples
+
+        metadata = {
+            "task_name": TaskType.meta_evaluation_nlg.value,
+            "dataset_name": "meval_newsroom",
+            "sub_dataset_name": "coherence",
+            "metric_names": ["SpearmanSampleLevelCorr"],
+        }
+        processor = get_processor_class(TaskType.meta_evaluation_nlg)()
+        sys_info = processor.process(metadata, data)
+        overall_score = (
+            sys_info.results.overall["example"]["SpearmanSampleLevelCorr"]
+            .get_value(Score, "score")
+            .value
+        )
+        self.assertGreater(len(sys_info.results.analyses), 0)
+        # Replicate the Table 4 result in paper: https://arxiv.org/pdf/2106.11520.pdf
+        self.assertAlmostEqual(
+            overall_score,
+            0.0946,
+            places=3,
+        )
+
+    def test_coherence_bartscore(self):
+        loader = get_loader_class(TaskType.meta_evaluation_nlg).from_datalab(
+            dataset=DatalabLoaderOption("meval_newsroom", "coherence"),
+            output_data=self.predictions_bartscore,
+            output_source=Source.local_filesystem,
+            output_file_type=FileType.json,
+        )
+        data = loader.load().samples
+
+        metadata = {
+            "task_name": TaskType.meta_evaluation_nlg.value,
+            "dataset_name": "meval_newsroom",
+            "sub_dataset_name": "coherence",
+            "metric_names": ["SpearmanSampleLevelCorr"],
+        }
+        processor = get_processor_class(TaskType.meta_evaluation_nlg)()
+        sys_info = processor.process(metadata, data)
+        overall_score = (
+            sys_info.results.overall["example"]["SpearmanSampleLevelCorr"]
+            .get_value(Score, "score")
+            .value
+        )
+        self.assertGreater(len(sys_info.results.analyses), 0)
+        # Replicate the Table 4 result in paper:
+        # https://github.com/neulab/BARTScore#reproduce
+        self.assertAlmostEqual(
+            overall_score,
+            0.3157,
+            places=3,
+        )
